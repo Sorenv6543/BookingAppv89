@@ -1,0 +1,21 @@
+/* Main CSS file */
+:root {
+  --primary-color: #1976D2;
+  --secondary-color: #424242;
+  --accent-color: #82B1FF;
+  --error-color: #FF5252;
+  --info-color: #2196F3;
+  --success-color: #4CAF50;
+  --warning-color: #FFC107;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+} 
