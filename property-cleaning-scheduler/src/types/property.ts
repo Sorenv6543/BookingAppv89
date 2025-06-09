@@ -1,0 +1,63 @@
+/**
+ * Property Type Definitions
+ * Types for properties managed in the cleaning scheduler
+ */
+
+/**
+ * Valid pricing tiers for properties
+ */
+export type PricingTier = 'basic' | 'premium' | 'luxury';
+
+/**
+ * Property Interface
+ * Core data model for properties in the system
+ */
+export interface Property {
+  id: string;
+  owner_id: string;
+  name: string;
+  address: string;
+  cleaning_duration: number; // minutes
+  special_instructions?: string;
+  pricing_tier: PricingTier;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+/**
+ * Extended property interface with analytics
+ * Used for property dashboard views
+ */
+export interface PropertyWithMetrics extends Property {
+  metrics: {
+    utilizationRate: number;
+    averageGapBetweenBookings: number;
+    turnPercentage: number;
+    revenueProjection: number;
+    cleaningLoad: 'light' | 'moderate' | 'heavy';
+  };
+}
+
+/**
+ * Property form data
+ * Used for creating/editing properties
+ */
+export type PropertyFormData = Omit<Property, 'id' | 'created_at' | 'updated_at'>;
+
+/**
+ * Map type for property collections
+ */
+export type PropertyMap = Map<string, Property>;
+
+/**
+ * Type guard for Property objects
+ */
+export function isProperty(obj: any): obj is Property {
+  return obj && 
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.address === 'string' &&
+    typeof obj.cleaning_duration === 'number' &&
+    typeof obj.active === 'boolean';
+}

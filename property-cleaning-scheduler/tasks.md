@@ -49,34 +49,34 @@
 ## **Phase 1A: Core Types & Store Foundation**
 
 ### **TypeScript Interfaces**
-- [ ] **TASK-008**: Create core types in src/types/
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-008**: Create core types in src/types/
+  - Status: Complete
+  - Notes: Created all core type files with comprehensive interfaces and type guards
   - Files: user.ts, property.ts, booking.ts, ui.ts, api.ts, index.ts
   - Assigned to: Cursor
 
-- [ ] **TASK-009**: Create User interface with role-based typing
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-009**: Create User interface with role-based typing
+  - Status: Complete
+  - Notes: Implemented User interface with role-based typing and type guards for different roles
   - Requirements: 'owner' | 'admin' | 'cleaner' roles, settings object
   - Assigned to: Cursor
 
-- [ ] **TASK-010**: Create Property interface with business logic types
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-010**: Create Property interface with business logic types
+  - Status: Complete
+  - Notes: Created Property interface with pricing tiers, cleaning duration, and business metrics
   - Requirements: pricing_tier, cleaning_duration, special_instructions
   - Assigned to: Cursor
 
-- [ ] **TASK-011**: Create Booking interface with turn/standard distinction
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-011**: Create Booking interface with turn/standard distinction
+  - Status: Complete
+  - Notes: Created Booking interface with turn/standard distinction, status workflow, and priority system
   - Requirements: booking_type ('standard' | 'turn'), status workflow
   - Assigned to: Cursor
 
 ### **Pinia Stores**
-- [ ] **TASK-012**: Create user store with Map collections
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-012**: Create user store with Map collections
+  - Status: Complete
+  - Notes: Created user store with Map collections for houses and events, with computed getters and full CRUD operations
   - Requirements: houses Map, events Map, computed getters
   - Reference: docs/vue-patterns.md
   - Assigned to: Cursor
