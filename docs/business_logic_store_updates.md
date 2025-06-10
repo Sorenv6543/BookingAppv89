@@ -1,15 +1,16 @@
-/**
- * REFERENCE FILE: BUSINESS LOGIC STORE UPDATE PATTERNS
- *
- * This file is a reference guide showing code patterns and usage examples.
- * It is NOT meant to be imported or executed directly.
- * 
- * When implementing business logic components, follow these patterns
- * to maintain consistency with the application architecture.
- */
+ 
+ # REFERENCE FILE: BUSINESS LOGIC STORE UPDATE PATTERNS #
 
-// Example for BookingStore usage:
-/*
+ ## This file is a reference guide showing code patterns and usage examples.##
+
+ ## It is NOT meant to be imported or executed directly. ##
+  
+ 
+  ## When implementing business logic components, follow these patterns ##
+  ## to maintain consistency with the application architecture. ##
+
+###  Example for BookingStore usage:
+```js + vue
 import { useBookingStore } from '@/stores/booking';
 import { useUserStore } from '@/stores/user';
 
@@ -25,10 +26,11 @@ function getBooking(bookingId: string) {
 function getAllBookings() {
   return bookingStore.bookingsArray; // or userStore.userBookings for user-filtered view
 }
-*/
 
-// Example for PropertyStore usage:
-/*
+
+```
+### Example for PropertyStore usage ###
+```js + vue
 import { usePropertyStore } from '@/stores/property';
 import { useUserStore } from '@/stores/user';
 
@@ -44,10 +46,10 @@ function getProperty(propertyId: string) {
 function getAllProperties() {
   return propertyStore.propertiesArray; // or userStore.userProperties for user-filtered view
 }
-*/
+````
 
-// Example for turn management:
-/*
+### Example for turn management:
+```js 
 import { useUserStore } from '@/stores/user';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
@@ -83,10 +85,9 @@ export function useTurnManagement() {
     getPropertyName
   };
 }
-*/
 
-// Example for booking workflow:
-/*
+### Example for booking workflow:
+
 import { useUserStore } from '@/stores/user';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
@@ -127,10 +128,10 @@ export function useBookingWorkflow() {
     transitionBooking
   };
 }
-*/
+
 
 // Example for calendar state:
-/*
+
 import { useUserStore } from '@/stores/user';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
@@ -156,10 +157,10 @@ export function useCalendarState() {
     todayTurns
   };
 }
-*/
+
 
 // Example for booking operations:
-/*
+
 import { useUserStore } from '@/stores/user';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
@@ -192,4 +193,3 @@ export function useBookingOperations() {
   
   return { createBooking };
 }
-*/

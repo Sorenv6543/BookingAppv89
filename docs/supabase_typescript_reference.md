@@ -1,8 +1,10 @@
-# Supabase + TypeScript Essential Reference
+# REFERENCE FILE: Supabase + TypeScript Essential Reference
 
-## **Setup & Configuration**
+ ##  **This file is a reference guide showing code patterns and usage examples.** ##
 
-### **Supabase Client Setup**
+## It is NOT meant to be imported or executed directly. ##
+
+### ** When implementing Supabase Client Setup follow these patternsto maintain consistency with the application architecture. ** ###
 ```typescript
 // utils/supabase.ts
 import { createClient } from '@supabase/supabase-js';
