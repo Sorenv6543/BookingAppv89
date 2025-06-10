@@ -107,28 +107,28 @@
 ## **Phase 1B: Core Composables & Business Logic**
 
 ### **Composables**
-- [ ] **TASK-016**: Create useBookings composable
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-016**: Create useBookings composable
+  - Status: Complete
+  - Notes: Implemented CRUD operations, validation, error handling, and business logic for calculating cleaning windows and priorities
   - Requirements: CRUD operations, error handling, store integration
   - Reference: docs/business-logic.md
   - Assigned to: Cursor
 
-- [ ] **TASK-017**: Create useProperties composable
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-017**: Create useProperties composable
+  - Status: Complete
+  - Notes: Created composable for property management with validation, metrics calculation, and store integration
   - Requirements: property management, validation
   - Assigned to: Cursor
 
-- [ ] **TASK-018**: Create useAuth composable (mock for now)
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-018**: Create useAuth composable (mock for now)
+  - Status: Complete
+  - Notes: Implemented mock authentication with login/logout, user registration, and settings management
   - Requirements: login/logout, user management
   - Assigned to: Cursor
 
-- [ ] **TASK-019**: Create useCalendarState composable
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-019**: Create useCalendarState composable
+  - Status: Complete
+  - Notes: Implemented calendar view state management with date range handling, navigation, filtering, and event formatting
   - Requirements: calendar view management, date handling
   - Assigned to: Cursor
 
