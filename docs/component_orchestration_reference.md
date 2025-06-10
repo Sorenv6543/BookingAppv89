@@ -133,6 +133,8 @@ import NotificationSystem from '@/components/dumb/NotificationSystem.vue';
 
 // State management
 import { useUserStore } from '@/stores/user';
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
 import { useUIStore } from '@/stores/ui';
 import { useAuthStore } from '@/stores/auth';
 
@@ -150,6 +152,8 @@ import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/c
 // ============================================================================
 
 const userStore = useUserStore();
+const propertyStore = usePropertyStore();
+const bookingStore = useBookingStore();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
 const { name: displaySize } = useDisplay();
@@ -190,25 +194,28 @@ const {
 
 const loading = computed(() => bookingsLoading.value || propertiesLoading.value);
 
-// Convert Maps to Arrays for components that need arrays
-const propertiesArray = computed(() => Array.from(userStore.houses.values()));
-const propertiesMap = computed(() => userStore.houses);
+// Convert user-filtered properties to formats needed by components
+const propertiesArray = computed(() => userStore.userProperties);
+const propertiesMap = computed(() => {
+  const map = new Map<string, Property>();
+  userStore.userProperties.forEach(property => map.set(property.id, property));
+  return map;
+});
 
-// Filtered bookings based on current filters
+// Filtered bookings based on current filters and user permissions
 const filteredBookings = computed(() => {
-  let bookings = userStore.events;
+  let bookings = userStore.userBookings;
   
   if (selectedPropertyFilter.value) {
-    const filtered = new Map<string, Booking>();
-    Array.from(bookings.entries()).forEach(([id, booking]) => {
-      if (booking.property_id === selectedPropertyFilter.value) {
-        filtered.set(id, booking);
-      }
-    });
-    return filtered;
+    bookings = bookings.filter(booking => 
+      booking.property_id === selectedPropertyFilter.value
+    );
   }
   
-  return bookings;
+  // Convert to Map for components that expect Map format
+  const map = new Map<string, Booking>();
+  bookings.forEach(booking => map.set(booking.id, booking));
+  return map;
 });
 
 // ============================================================================
@@ -232,7 +239,7 @@ const propertyModalData = computed(() => uiStore.getModal('propertyModal')?.data
 // ============================================================================
 
 const handleNavigateToBooking = (bookingId: string): void => {
-  const booking = userStore.events.get(bookingId);
+  const booking = bookingStore.getBookingById(bookingId);
   if (booking) {
     const bookingDate = new Date(booking.checkout_date);
     handleNavigateToDate(bookingDate);
@@ -487,7 +494,9 @@ watch(() => authStore.isAuthenticated, async (isAuthenticated) => {
     ]);
   } else {
     // Clear data when user logs out
-    userStore.clearAllData();
+    propertyStore.clearAll();
+    bookingStore.clearAll();
+    userStore.clearUserPreferences();
   }
 });
 

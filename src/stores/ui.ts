@@ -105,12 +105,16 @@ export const useUIStore = defineStore('ui', () => {
       message,
       timestamp: new Date().toISOString(),
       autoClose,
-      duration: autoClose ? 5000 : undefined // 5 seconds for auto-close
+      duration: autoClose ? 5000 : undefined
     };
     
     notifications.value = [notification, ...notifications.value];
     
-    // Auto-remove notification after duration
+    // Keep only last 10 notifications to prevent memory bloat
+    if (notifications.value.length > 10) {
+      notifications.value = notifications.value.slice(0, 10);
+    }
+    
     if (autoClose) {
       setTimeout(() => {
         removeNotification(notification.id);

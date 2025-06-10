@@ -32,6 +32,15 @@ export const usePropertyStore = defineStore('property', () => {
   const propertiesByOwner = computed(() => (ownerId: string): Property[] => {
     return propertiesArray.value.filter(property => property.owner_id === ownerId);
   });
+  const propertiesByActiveStatus = computed(() => ({
+    active: activeProperties.value.length,
+    inactive: propertiesArray.value.length - activeProperties.value.length
+  }));
+  
+  const averageCleaningDuration = computed((): number => {
+    const durations = activeProperties.value.map(p => p.cleaning_duration);
+    return durations.length > 0 ? durations.reduce((a, b) => a + b, 0) / durations.length : 0;
+  });
   
   // Actions
   function addProperty(property: Property) {
@@ -90,7 +99,8 @@ export const usePropertyStore = defineStore('property', () => {
     getPropertyById,
     propertiesByPricingTier,
     propertiesByOwner,
-    
+    propertiesByActiveStatus,
+    averageCleaningDuration,
     // Actions
     addProperty,
     updateProperty,

@@ -1,132 +1,225 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { User, Property, PropertyMap, Booking, BookingMap } from '@/types';
+import type { User } from '@/types';
+import { usePropertyStore } from './property';
+import { useBookingStore } from './booking';
 
 /**
  * User store for the Property Cleaning Scheduler
- * Uses Map collections for efficient property and booking access
+ * Manages user authentication and user-specific views/filters
+ * Uses other stores for actual data, provides user-filtered views
  */
 export const useUserStore = defineStore('user', () => {
   // State
   const user = ref<User | null>(null);
-  const houses = ref<PropertyMap>(new Map());
-  const events = ref<BookingMap>(new Map());
   const settings = ref({
     notifications: true,
     timezone: 'America/New_York',
     theme: 'light',
-    language: 'en'
+    language: 'en',
+    defaultCalendarView: 'timeGridWeek',
+    autoRefreshInterval: 30000 // 30 seconds
   });
 
-  // Getters
+  // User-specific view preferences
+  const viewPreferences = ref({
+    sidebarCollapsed: false,
+    favoriteProperties: new Set<string>(),
+    recentlyViewedProperties: [] as string[],
+    defaultPropertyFilters: {
+      showInactive: false,
+      pricingTier: 'all'
+    }
+  });
+
+  // Get store instances
+  const propertyStore = usePropertyStore();
+  const bookingStore = useBookingStore();
+
+  // Getters - User-specific filtered views
   const isAuthenticated = computed(() => !!user.value);
   
-  const getPropertyById = computed(() => (id: string): Property | undefined => {
-    return houses.value.get(id);
+  /**
+   * User's properties (filtered by ownership or admin access)
+   */
+  const userProperties = computed(() => {
+    if (!user.value) return [];
+    
+    if (user.value.role === 'admin') {
+      return propertyStore.propertiesArray;
+    }
+    
+    return propertyStore.propertiesByOwner(user.value.id);
   });
   
-  const getBookingById = computed(() => (id: string): Booking | undefined => {
-    return events.value.get(id);
+  /**
+   * User's active properties only
+   */
+  const userActiveProperties = computed(() => {
+    return userProperties.value.filter(property => property.active);
   });
   
-  const propertiesArray = computed((): Property[] => {
-    return Array.from(houses.value.values());
+  /**
+   * User's bookings (filtered by ownership or role access)
+   */
+  const userBookings = computed(() => {
+    if (!user.value) return [];
+    
+    if (user.value.role === 'admin') {
+      return bookingStore.bookingsArray;
+    }
+    
+    if (user.value.role === 'cleaner') {
+      return bookingStore.bookingsArray.filter(booking => 
+        booking.assigned_cleaner_id === user.value?.id
+      );
+    }
+    
+    return bookingStore.bookingsByOwner(user.value.id);
   });
   
-  const bookingsArray = computed((): Booking[] => {
-    return Array.from(events.value.values());
-  });
-  
-  const activeProperties = computed((): Property[] => {
-    return propertiesArray.value.filter(property => property.active);
-  });
-  
-  const todayBookings = computed((): Booking[] => {
+  /**
+   * Today's bookings for this user
+   */
+  const userTodayBookings = computed(() => {
     const today = new Date().toISOString().split('T')[0];
-    return bookingsArray.value.filter(booking => 
+    return userBookings.value.filter(booking => 
       booking.checkout_date.startsWith(today) || 
       booking.checkin_date.startsWith(today)
     );
   });
   
-  const turnBookings = computed((): Booking[] => {
-    return bookingsArray.value.filter(booking => booking.booking_type === 'turn');
+  /**
+   * User's turn bookings (urgent)
+   */
+  const userTurnBookings = computed(() => {
+    return userBookings.value.filter(booking => booking.booking_type === 'turn');
+  });
+  
+  /**
+   * User's favorite properties
+   */
+  const favoriteProperties = computed(() => {
+    return userProperties.value.filter(property => 
+      viewPreferences.value.favoriteProperties.has(property.id)
+    );
+  });
+  
+  /**
+   * Recently viewed properties (last 5)
+   */
+  const recentProperties = computed(() => {
+    return viewPreferences.value.recentlyViewedProperties
+      .slice(0, 5)
+      .map(id => propertyStore.getPropertyById(id))
+      .filter(Boolean);
   });
 
   // Actions
   function setUser(newUser: User | null) {
     user.value = newUser;
-  }
-  
-  function addProperty(property: Property) {
-    houses.value.set(property.id, property);
-  }
-  
-  function updateProperty(id: string, updates: Partial<Property>) {
-    const existing = houses.value.get(id);
-    if (existing) {
-      houses.value.set(id, { 
-        ...existing, 
-        ...updates, 
-        updated_at: new Date().toISOString() 
-      });
+    
+    // Clear user-specific data when logging out
+    if (!newUser) {
+      clearUserPreferences();
     }
   }
   
-  function removeProperty(id: string) {
-    houses.value.delete(id);
+  function updateSettings(newSettings: Partial<typeof settings.value>) {
+    settings.value = {
+      ...settings.value,
+      ...newSettings
+    };
   }
   
-  function addEvent(booking: Booking) {
-    events.value.set(booking.id, booking);
-  }
-  
-  function updateEvent(id: string, updates: Partial<Booking>) {
-    const existing = events.value.get(id);
-    if (existing) {
-      events.value.set(id, { 
-        ...existing, 
-        ...updates, 
-        updated_at: new Date().toISOString() 
-      });
+  function toggleFavoriteProperty(propertyId: string) {
+    if (viewPreferences.value.favoriteProperties.has(propertyId)) {
+      viewPreferences.value.favoriteProperties.delete(propertyId);
+    } else {
+      viewPreferences.value.favoriteProperties.add(propertyId);
     }
   }
   
-  function removeEvent(id: string) {
-    events.value.delete(id);
+  function addRecentlyViewedProperty(propertyId: string) {
+    // Remove if already exists
+    viewPreferences.value.recentlyViewedProperties = 
+      viewPreferences.value.recentlyViewedProperties.filter(id => id !== propertyId);
+    
+    // Add to beginning
+    viewPreferences.value.recentlyViewedProperties.unshift(propertyId);
+    
+    // Keep only last 10
+    if (viewPreferences.value.recentlyViewedProperties.length > 10) {
+      viewPreferences.value.recentlyViewedProperties = 
+        viewPreferences.value.recentlyViewedProperties.slice(0, 10);
+    }
   }
   
-  function clearAllData() {
-    user.value = null;
-    houses.value.clear();
-    events.value.clear();
+  function updateViewPreferences(preferences: Partial<typeof viewPreferences.value>) {
+    viewPreferences.value = {
+      ...viewPreferences.value,
+      ...preferences
+    };
+  }
+  
+  function clearUserPreferences() {
+    viewPreferences.value = {
+      sidebarCollapsed: false,
+      favoriteProperties: new Set<string>(),
+      recentlyViewedProperties: [],
+      defaultPropertyFilters: {
+        showInactive: false,
+        pricingTier: 'all'
+      }
+    };
+  }
+  
+  /**
+   * Check if user has permission to perform action on resource
+   */
+  function hasPermission(action: 'view' | 'edit' | 'delete', resourceType: 'property' | 'booking', resourceOwnerId?: string): boolean {
+    if (!user.value) return false;
+    
+    // Admins can do everything
+    if (user.value.role === 'admin') return true;
+    
+    // Owners can manage their own resources
+    if (user.value.role === 'owner') {
+      if (action === 'view') return true;
+      return resourceOwnerId === user.value.id;
+    }
+    
+    // Cleaners can only view assigned bookings
+    if (user.value.role === 'cleaner') {
+      return action === 'view' && resourceType === 'booking';
+    }
+    
+    return false;
   }
 
   return {
     // State
     user,
-    houses,
-    events,
     settings,
+    viewPreferences,
     
-    // Getters
+    // Getters - User-filtered views
     isAuthenticated,
-    getPropertyById,
-    getBookingById,
-    propertiesArray,
-    bookingsArray,
-    activeProperties,
-    todayBookings,
-    turnBookings,
+    userProperties,
+    userActiveProperties,
+    userBookings,
+    userTodayBookings,
+    userTurnBookings,
+    favoriteProperties,
+    recentProperties,
     
     // Actions
     setUser,
-    addProperty,
-    updateProperty,
-    removeProperty,
-    addEvent,
-    updateEvent,
-    removeEvent,
-    clearAllData
+    updateSettings,
+    toggleFavoriteProperty,
+    addRecentlyViewedProperty,
+    updateViewPreferences,
+    clearUserPreferences,
+    hasPermission
   };
 });

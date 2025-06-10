@@ -37,20 +37,18 @@ export const useBookingStore = defineStore('booking', () => {
     return bookingsArray.value.filter(booking => booking.owner_id === ownerId);
   });
   
-  const bookingsByDateRange = computed(() => (startDate: string, endDate: string): Booking[] => {
-    const start = new Date(startDate).getTime();
-    const end = new Date(endDate).getTime();
+const bookingsByDateRange = computed(() => (startDate: string, endDate: string): Booking[] => {
+  const start = new Date(startDate).getTime();
+  const end = new Date(endDate).getTime();
+  
+  return bookingsArray.value.filter(booking => {
+    const bookingStart = new Date(booking.checkout_date).getTime();
+    const bookingEnd = new Date(booking.checkin_date).getTime();
     
-    return bookingsArray.value.filter(booking => {
-      const checkoutTime = new Date(booking.checkout_date).getTime();
-      const checkinTime = new Date(booking.checkin_date).getTime();
-      
-      // Booking overlaps with the date range
-      return (checkoutTime >= start && checkoutTime <= end) || 
-             (checkinTime >= start && checkinTime <= end) ||
-             (checkoutTime <= start && checkinTime >= end);
-    });
+    // Handle case where booking spans multiple days
+    return (bookingStart <= end && bookingEnd >= start);
   });
+});
   
   const pendingBookings = computed((): Booking[] => {
     return bookingsByStatus.value('pending');

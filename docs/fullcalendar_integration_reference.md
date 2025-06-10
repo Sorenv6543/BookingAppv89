@@ -498,6 +498,7 @@ export const calculateCleaningWindow = (
 // composables/useCalendarState.ts
 import { ref, computed, watch } from 'vue';
 import { useUserStore } from '@/stores/user';
+import { usePropertyStore } from '@/stores/property';
 import { useUIStore } from '@/stores/ui';
 import type { DateSelectArg, EventClickArg } from '@fullcalendar/core';
 import type { Booking, Property } from '@/types';
