@@ -380,7 +380,8 @@ const handleSelection = (item: unknown): void => {
 ### **Utility Types**
 ```typescript
 // Create form types from main interfaces
-export type BookingFormData = Omit<Booking, 'id' | 'created_at' | 'updated_at'>;
+export type BookingFormData = Omit<Booking, 'id' | 'owner_id' | 'status' | 'booking_type'>;
+export type BookingEditData = Partial<Omit<Booking, 'id' | 'owner_id' | 'property_id'>>;
 export type PropertyFormData = Omit<Property, 'id' | 'created_at' | 'updated_at'>;
 
 // Partial updates
@@ -396,4 +397,49 @@ export type ApiResponse<T> = {
 // Map type helpers
 export type PropertyMap = Map<string, Property>;
 export type BookingMap = Map<string, Booking>;
+```
+## **Vuetify 3 + TypeScript Patterns**
+
+### **Typing Component Refs (e.g., VForm)**
+
+To call methods like \`validate()\` or \`reset()\` on a form, you need a properly typed ref.
+
+```vue
+<template>
+  <v-form ref="formRef" @submit.prevent="submit">
+    <!-- ... inputs ... -->
+  </v-form>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import type { VForm } from 'vuetify/components';
+
+const formRef = ref<VForm | null>(null);
+
+const submit = async () => {
+  if (!formRef.value) return;
+  
+  const { valid } = await formRef.value.validate();
+  if (valid) {
+    // ... logic
+  }
+};
+</script>
+```
+
+### **Typing v-data-table Headers**
+
+```typescript
+import type { VDataTableServer } from 'vuetify/labs/VDataTable'
+
+// Type for the headers array
+type ReadonlyHeaders = VDataTableServer['$props']['headers'];
+
+export const bookingTableHeaders: ReadonlyHeaders = [
+  { title: 'Property', key: 'property.name', sortable: false },
+  { title: 'Checkout', key: 'checkout_date', sortable: true },
+  { title: 'Status', key: 'status', sortable: true },
+  { title: 'Actions', key: 'actions', sortable: false },
+];
 ```

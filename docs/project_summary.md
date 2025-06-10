@@ -121,6 +121,19 @@ interface Booking {
 }
 ```
 
+### **Cleaning Job** (Key Business Entity)
+``` typescript
+interface CleaningJob {
+  id: string;
+  property_id: string;
+  triggering_booking_id: string; // The booking that just checked out
+  deadline: string;             // Corresponds to the *next* check-in date
+  job_type: 'turn' | 'standard';// Determined by deadline
+  status: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'issue';
+  assigned_cleaner_id?: string;
+  completion_notes?: string;
+}
+```
 ## Key Business Rules
 
 ### **Booking Types**

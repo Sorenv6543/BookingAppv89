@@ -1,0 +1,814 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files, combined into a single document by Repomix.
+The content has been processed where empty lines have been removed, content has been compressed (code blocks are separated by ⋮---- delimiter).
+
+================================================================
+File Summary
+================================================================
+
+Purpose:
+--------
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+
+File Format:
+------------
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  a. A separator line (================)
+  b. The file path (File: path/to/file)
+  c. Another separator line
+  d. The full contents of the file
+  e. A blank line
+
+Usage Guidelines:
+-----------------
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+
+Notes:
+------
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: docs/vue_typescript_reference.md, docs/project_summary.md
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Empty lines have been removed from all files
+- Content has been compressed - code blocks are separated by ⋮---- delimiter
+- Files are sorted by Git change count (files with more changes are at the bottom)
+
+
+================================================================
+Directory Structure
+================================================================
+docs/project_summary.md
+docs/vue_typescript_reference.md
+
+================================================================
+Files
+================================================================
+
+================
+File: docs/project_summary.md
+================
+# Project Summary: Property Cleaning Scheduler
+
+## Project Overview
+
+**Mission**: Build a web-based scheduling platform that eliminates communication breakdowns between a cleaning company and their 30-40 Airbnb/VRBO property owner clients, preventing missed cleanings and enabling business scaling.
+
+**Core Problem**: Manual coordination between property owners and cleaning company leads to missed cleanings, communication breakdowns, and lost revenue.
+
+**Solution**: Automated scheduling platform where property owners input their checkout/checkin dates, and the cleaning company sees all jobs in a unified master calendar with priority indicators for same-day "turns."
+
+## Business Impact Goals
+
+- **Eliminate missed cleanings** due to communication failures
+- **Reduce manual coordination** for 30-40 existing clients
+- **Enable business scaling** beyond current client capacity
+- **Platform foundation** for expansion to other service industries
+- **95%+ client retention** and improved service reliability
+
+## Technical Architecture
+
+### **Tech Stack**
+- **Frontend**: Vue 3 + TypeScript + Composition API
+- **UI Framework**: Vuetify 3 (Material Design)
+- **State Management**: Pinia with TypeScript
+- **Routing**: Vue Router 4 (file-based routing)
+- **Database**: Supabase (PostgreSQL + real-time)
+- **Authentication**: Supabase Auth
+- **Calendar**: FullCalendar.io
+- **Build Tool**: Vite
+- **Hosting**: Supabase (backend) + Netlify/Vercel (frontend)
+
+### **Data Architecture Patterns**
+- **Map Collections**: Use `Map<string, T>` instead of arrays for better performance
+- **TypeScript Interfaces**: Strict typing with comprehensive interfaces
+- **Reactive State**: Pinia stores with reactive Map collections
+- **Single Source of Truth**: Home.vue orchestrates all data flow
+
+## Project Structure
+
+```
+/property-cleaning-scheduler
+├── src/
+│   ├── types/                       # TypeScript interfaces
+│   │   ├── index.ts                 # Main exports
+│   │   ├── user.ts                  # User interfaces
+│   │   ├── booking.ts               # Booking/event interfaces
+│   │   ├── property.ts              # Property interfaces
+│   │   └── ui.ts                    # UI state interfaces
+│   ├── components/
+│   │   ├── dumb/                    # Pure UI components
+│   │   │   ├── PropertyCard.vue
+│   │   │   ├── BookingForm/EventModal.vue
+│   │   │   ├── UserSettings.vue
+│   │   │   └── LoginLogout.vue
+│   │   └── smart/                   # Business logic components
+│   │       ├── FullCalendar.vue     # Calendar with logic
+│   │       ├── Sidebar.vue          # Smart sidebar
+│   │       └── Home.vue             # Main orchestrator
+│   ├── pages/                       # Auto-routed pages
+│   │   ├── index.vue               # Home (contains Home.vue)
+│   │   ├── properties/index.vue    # Properties list
+│   │   ├── properties/[id].vue     # Property detail
+│   │   └── admin/dashboard.vue     # Admin dashboard
+│   ├── layouts/
+│   │   ├── default.vue             # Main layout
+│   │   └── admin.vue               # Admin layout
+│   ├── stores/                     # Pinia stores
+│   │   ├── user.ts                 # User data + Map collections
+│   │   ├── ui.ts                   # UI state + Modal management
+│   │   └── auth.ts                 # Authentication state
+│   ├── composables/                # Business logic
+│   │   ├── useBookings.ts          # Booking CRUD + logic
+│   │   ├── useAuth.ts              # Auth operations
+│   │   ├── useCalendar.ts          # Calendar management
+│   │   └── useHouses.ts            # Property CRUD + logic
+│   └── utils/
+│       ├── supabase.ts             # Supabase client
+│       ├── constants.ts            # App constants
+│       └── helpers.ts              # Type guards, validators
+```
+
+## Core Data Models
+
+### **User**
+```typescript
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: 'owner' | 'admin' | 'cleaner';
+  settings: UserSettings;
+}
+```
+
+### **Property**
+```typescript
+interface Property {
+  id: string;
+  owner_id: string;
+  name: string;
+  address: string;
+  cleaning_duration: number; // minutes
+  special_instructions?: string;
+  pricing_tier: 'basic' | 'premium' | 'luxury';
+  active: boolean;
+}
+```
+
+### **Booking** (Key Business Entity)
+```typescript
+interface Booking {
+  id: string;
+  property_id: string;
+  owner_id: string;
+  checkout_date: string;
+  checkin_date: string;
+  booking_type: 'standard' | 'turn'; // CRITICAL: turns = same-day priority
+  guest_count?: number;
+  notes?: string;
+  status: 'pending' | 'scheduled' | 'in_progress' | 'completed';
+}
+```
+
+### **Cleaning Job** (Key Business Entity)
+``` typescript
+interface CleaningJob {
+  id: string;
+  property_id: string;
+  triggering_booking_id: string; // The booking that just checked out
+  deadline: string;             // Corresponds to the *next* check-in date
+  job_type: 'turn' | 'standard';// Determined by deadline
+  status: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'issue';
+  assigned_cleaner_id?: string;
+  completion_notes?: string;
+}
+```
+## Key Business Rules
+
+### **Booking Types**
+- **Standard Booking**: Regular checkout → checkin with gap between guests
+- **Turn Booking**: Same-day checkout and checkin (HIGHEST PRIORITY for cleaning company)
+
+### **Priority System**
+1. **Turns**: Highest priority - same-day cleaning required
+2. **Standard**: Priority based on next checkin date
+3. **Visual Indicators**: Clear UI distinction between booking types
+
+### **User Flows**
+- **Property Owner**: Add properties → Enter bookings → View cleaning schedule
+- **Cleaning Admin**: View master calendar → Assign cleaners → Update status → Track turns
+
+## State Management Architecture
+
+### **User Store (stores/user.ts)**
+```typescript
+{
+  user: User | null;
+  houses: Map<string, Property>;    // propertyId -> Property
+  events: Map<string, Booking>;     // bookingId -> Booking
+  settings: UserSettings;
+}
+```
+
+### **UI Store (stores/ui.ts)**
+```typescript
+{
+  modals: Map<string, ModalState>;     // modalId -> state
+  sidebars: Map<string, boolean>;     // sidebarId -> open/closed
+  loading: boolean;
+  errors: Map<string, string>;        // errorKey -> message
+  notifications: Notification[];
+}
+```
+
+### **Component Architecture**
+- **Home.vue**: Central orchestrator, single source of truth
+- **Dumb Components**: Pure UI, receive props, emit events
+- **Smart Components**: Business logic, store integration
+- **Composables**: Reusable business logic (CRUD operations)
+
+## Development Phases
+
+### **Phase 1: MVP - Manual Booking System** (Months 1-2)
+**Status**: Ready to begin
+**Objectives**:
+- [ ] Project setup with TypeScript + Vue 3 + Vuetify
+- [ ] Core interfaces and type system
+- [ ] Pinia stores with Map collections
+- [ ] Authentication system (basic)
+- [ ] Property management (CRUD)
+- [ ] Manual booking entry system
+- [ ] Basic calendar view with FullCalendar
+- [ ] EventModal for booking creation/editing
+- [ ] Turn vs Standard booking type distinction
+
+**MVP Success Criteria**:
+- Property owners can add properties and bookings manually
+- Cleaning company sees unified calendar with all bookings
+- Turn bookings clearly highlighted as high priority
+- Basic CRUD operations working
+- Mobile-responsive design
+
+### **Phase 2: Enhanced Dashboard & Reporting** (Month 3)
+- Advanced filtering and search
+- Cleaner assignment and status tracking
+- Basic analytics and reporting
+- Notification system
+
+### **Phase 3: Airbnb Integration** (Month 4)
+- Airbnb API or iCal integration
+- Automated calendar sync
+- Sync status monitoring
+
+### **Phase 4: VRBO Integration & Advanced Features** (Month 5+)
+- VRBO iCal integration
+- SMS notifications
+- Advanced analytics
+
+### **Phase 5: Business Management Features** (Months 6-8)
+- Automated invoicing
+- Payment processing (Stripe)
+- Equipment tracking
+- Advanced reporting
+
+## Critical Implementation Patterns
+
+### **Map Usage Pattern**
+```typescript
+// Always use Map for collections
+const houses = new Map<string, Property>();
+const events = new Map<string, Booking>();
+
+// Convert to arrays when needed for UI
+const housesArray = computed(() => Array.from(houses.values()));
+```
+
+### **Modal Management Pattern**
+```typescript
+// UI Store manages all modal states
+const openEventModal = (mode: 'create' | 'edit', data?: Booking) => {
+  uiStore.openModal('eventModal', mode, data);
+};
+```
+
+### **Component Communication Pattern**
+```typescript
+// Home.vue coordinates between components
+// FullCalendar.vue emits events → Home.vue → Sidebar.vue receives updates
+// EventModal.vue emits save → Home.vue → composables handle business logic
+```
+
+## Key Files to Create First
+
+1. **src/types/** - All TypeScript interfaces
+2. **src/stores/user.ts** - Core data store with Map collections
+3. **src/stores/ui.ts** - UI state management
+4. **src/composables/useBookings.ts** - Booking business logic
+5. **src/components/smart/Home.vue** - Central orchestrator
+6. **src/components/dumb/BookingForm/EventModal.vue** - Booking form
+7. **src/components/smart/FullCalendar.vue** - Calendar integration
+
+## Current Status
+
+**Ready to Begin**: All architectural decisions made, comprehensive PRD completed, TypeScript structure defined, essential reference documentation created.
+
+**Documentation Strategy**: Context7 MCP (90% coverage) + Essential reference docs (10% coverage)
+
+**Next Immediate Steps**:
+1. Set up Context7 MCP for real-time documentation
+2. Initialize Vite + Vue 3 + TypeScript project
+3. Create core TypeScript interfaces (using reference docs)
+4. Set up Vuetify 3 and Pinia
+5. Build foundational Pinia stores with Map collections
+6. Create Home.vue as central orchestrator
+
+**Essential Reference Docs Created**:
+- Vue 3 + TypeScript patterns
+- Vuetify 3 + TypeScript integration  
+- Component orchestration architecture
+- Business logic patterns (turns, bookings, properties)
+
+## Future Integration Points
+
+- **Supabase Database**: Real-time subscriptions for live updates
+- **FullCalendar.io**: Vue 3 integration for calendar views
+- **Vuetify 3**: Material Design UI components
+- **API Integrations**: Airbnb/VRBO calendar syncing (Phase 3+)
+
+## Success Metrics
+
+- **Technical**: Sub-2-second load times, 95%+ uptime, mobile-responsive
+- **Business**: 90%+ client adoption, 50% reduction in missed cleanings
+- **User Experience**: Intuitive interface, minimal training required
+
+---
+
+*This summary should be referenced for all development decisions to maintain consistency and architectural integrity throughout the project.*
+
+================
+File: docs/vue_typescript_reference.md
+================
+# Vue 3 + TypeScript Essential Reference
+
+## **Core Component Patterns**
+
+### **Script Setup with TypeScript**
+```vue
+<script setup lang="ts">
+// Type-based props definition
+interface Props {
+  property: Property;
+  bookings: Map<string, Booking>;
+  mode?: 'create' | 'edit';
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  mode: 'create'
+});
+
+// Type-based emits
+interface Emits {
+  (e: 'save', booking: BookingFormData): void;
+  (e: 'delete', id: string): void;
+  (e: 'close'): void;
+}
+
+const emit = defineEmits<Emits>();
+
+// Reactive refs with types
+const form = reactive<Partial<Booking>>({
+  property_id: '',
+  checkout_date: '',
+  checkin_date: '',
+  booking_type: 'standard'
+});
+
+// Template refs
+const modal = useTemplateRef<HTMLDivElement>('modal');
+
+// Computed with explicit typing
+const validBookings = computed((): Booking[] => {
+  return Array.from(props.bookings.values())
+    .filter(booking => booking.status === 'completed');
+});
+</script>
+```
+
+### **Composable Patterns**
+```typescript
+// useBookings.ts
+interface UseBookingsReturn {
+  bookings: ComputedRef<Map<string, Booking>>;
+  loading: Ref<boolean>;
+  error: Ref<string | null>;
+  createBooking: (booking: BookingFormData) => Promise<Booking>;
+  updateBooking: (id: string, updates: Partial<Booking>) => Promise<Booking>;
+  deleteBooking: (id: string) => Promise<void>;
+}
+
+export const useBookings = (): UseBookingsReturn => {
+  const userStore = useUserStore();
+  const loading = ref<boolean>(false);
+  const error = ref<string | null>(null);
+
+  const createBooking = async (bookingData: BookingFormData): Promise<Booking> => {
+    loading.value = true;
+    try {
+      const newBooking: Booking = {
+        ...bookingData,
+        id: crypto.randomUUID(),
+        owner_id: userStore.user?.id || '',
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      userStore.addEvent(newBooking);
+      return newBooking;
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error';
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  return {
+    bookings: computed(() => userStore.events),
+    loading,
+    error,
+    createBooking,
+    updateBooking,
+    deleteBooking
+  };
+};
+```
+
+## **Pinia Store Patterns**
+
+### **Setup Stores with TypeScript**
+```typescript
+// stores/user.ts
+interface UserState {
+  user: User | null;
+  houses: Map<string, Property>;
+  events: Map<string, Booking>;
+  settings: UserSettings;
+}
+
+export const useUserStore = defineStore('user', () => {
+  const state = reactive<UserState>({
+    user: null,
+    houses: new Map<string, Property>(),
+    events: new Map<string, Booking>(),
+    settings: {
+      notifications: true,
+      timezone: 'America/New_York',
+      theme: 'light',
+      language: 'en'
+    }
+  });
+
+  // Getters with explicit return types
+  const getPropertyById = computed(() => (id: string): Property | undefined => {
+    return state.houses.get(id);
+  });
+
+  const propertiesArray = computed((): Property[] => {
+    return Array.from(state.houses.values());
+  });
+
+  // Actions with proper typing
+  const addProperty = (property: Property): void => {
+    state.houses.set(property.id, property);
+  };
+
+  const updateProperty = (id: string, updates: Partial<Property>): void => {
+    const existing = state.houses.get(id);
+    if (existing) {
+      state.houses.set(id, { 
+        ...existing, 
+        ...updates, 
+        updated_at: new Date().toISOString() 
+      });
+    }
+  };
+
+  return {
+    // State
+    user: computed(() => state.user),
+    houses: computed(() => state.houses),
+    events: computed(() => state.events),
+    
+    // Getters
+    getPropertyById,
+    propertiesArray,
+    
+    // Actions
+    addProperty,
+    updateProperty
+  };
+});
+```
+
+### **Option Stores Alternative**
+```typescript
+interface UserState {
+  user: User | null;
+  houses: Map<string, Property>;
+  events: Map<string, Booking>;
+}
+
+export const useUserStore = defineStore('user', {
+  state: (): UserState => ({
+    user: null,
+    houses: new Map<string, Property>(),
+    events: new Map<string, Booking>()
+  }),
+
+  getters: {
+    propertiesArray(): Property[] {
+      return Array.from(this.houses.values());
+    },
+    
+    getPropertyById(): (id: string) => Property | undefined {
+      return (id: string) => this.houses.get(id);
+    }
+  },
+
+  actions: {
+    addProperty(property: Property): void {
+      this.houses.set(property.id, property);
+    },
+
+    updateProperty(id: string, updates: Partial<Property>): void {
+      const existing = this.houses.get(id);
+      if (existing) {
+        this.houses.set(id, { ...existing, ...updates });
+      }
+    }
+  }
+});
+```
+
+## **Map Collection Patterns**
+
+### **Working with Map in Templates**
+```vue
+<template>
+  <!-- Convert Map to Array for v-for -->
+  <div v-for="[id, property] in housesEntries" :key="id">
+    {{ property.name }}
+  </div>
+  
+  <!-- Or use computed property -->
+  <div v-for="property in propertiesArray" :key="property.id">
+    {{ property.name }}
+  </div>
+</template>
+
+<script setup lang="ts">
+const userStore = useUserStore();
+
+// Convert Map to entries for iteration
+const housesEntries = computed(() => Array.from(userStore.houses.entries()));
+
+// Convert Map to values array
+const propertiesArray = computed(() => Array.from(userStore.houses.values()));
+</script>
+```
+
+### **Map Operations**
+```typescript
+// Adding to Map
+const addProperty = (property: Property): void => {
+  houses.set(property.id, property);
+};
+
+// Getting from Map with fallback
+const getProperty = (id: string): Property | undefined => {
+  return houses.get(id);
+};
+
+// Updating Map entry
+const updateProperty = (id: string, updates: Partial<Property>): void => {
+  const existing = houses.get(id);
+  if (existing) {
+    houses.set(id, { ...existing, ...updates });
+  }
+};
+
+// Filtering Map values
+const activeProperties = computed((): Property[] => {
+  return Array.from(houses.values()).filter(prop => prop.active);
+});
+
+// Removing from Map
+const removeProperty = (id: string): void => {
+  houses.delete(id);
+};
+```
+
+## **Vue Router 4 + TypeScript**
+
+### **Route Typing**
+```typescript
+// router/index.ts
+import type { RouteRecordRaw } from 'vue-router';
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    name: 'Home',
+    component: () => import('@/pages/index.vue')
+  },
+  {
+    path: '/properties/:id',
+    name: 'PropertyDetail',
+    component: () => import('@/pages/properties/[id].vue'),
+    props: true
+  }
+];
+```
+
+### **Using Router in Components**
+```vue
+<script setup lang="ts">
+import { useRouter, useRoute } from 'vue-router';
+import type { LocationQueryValue } from 'vue-router';
+
+const router = useRouter();
+const route = useRoute();
+
+// Type-safe route params
+const propertyId = computed((): string => {
+  return route.params.id as string;
+});
+
+// Type-safe query params
+const mode = computed((): string => {
+  return (route.query.mode as string) || 'view';
+});
+
+// Programmatic navigation
+const navigateToProperty = (id: string): void => {
+  router.push({ 
+    name: 'PropertyDetail', 
+    params: { id },
+    query: { mode: 'edit' }
+  });
+};
+</script>
+```
+
+## **Event Handling Patterns**
+
+### **Type-Safe Event Handlers**
+```vue
+<script setup lang="ts">
+// Form submission
+const handleSubmit = (event: Event): void => {
+  event.preventDefault();
+  const form = event.target as HTMLFormElement;
+  // Handle form data
+};
+
+// Input events
+const handleInput = (event: Event): void => {
+  const target = event.target as HTMLInputElement;
+  form.value.name = target.value;
+};
+
+// Custom component events
+const handleBookingSave = (booking: BookingFormData): void => {
+  // Handle the booking save
+};
+
+// Calendar events
+const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  const { start, end } = selectInfo;
+  // Handle date selection
+};
+</script>
+
+<template>
+  <form @submit="handleSubmit">
+    <input @input="handleInput" />
+  </form>
+  
+  <BookingModal @save="handleBookingSave" />
+  
+  <FullCalendar @dateSelect="handleDateSelect" />
+</template>
+```
+
+## **Common TypeScript Utilities**
+
+### **Type Guards**
+```typescript
+// Type guard functions
+export const isBooking = (obj: any): obj is Booking => {
+  return obj && typeof obj.id === 'string' && typeof obj.checkout_date === 'string';
+};
+
+export const isProperty = (obj: any): obj is Property => {
+  return obj && typeof obj.id === 'string' && typeof obj.name === 'string';
+};
+
+// Usage in components
+const handleSelection = (item: unknown): void => {
+  if (isBooking(item)) {
+    // TypeScript knows item is Booking
+    console.log(item.checkout_date);
+  } else if (isProperty(item)) {
+    // TypeScript knows item is Property
+    console.log(item.name);
+  }
+};
+```
+
+### **Utility Types**
+```typescript
+// Create form types from main interfaces
+export type BookingFormData = Omit<Booking, 'id' | 'owner_id' | 'status' | 'booking_type'>;
+export type BookingEditData = Partial<Omit<Booking, 'id' | 'owner_id' | 'property_id'>>;
+export type PropertyFormData = Omit<Property, 'id' | 'created_at' | 'updated_at'>;
+
+// Partial updates
+export type BookingUpdate = Partial<Pick<Booking, 'status' | 'notes' | 'guest_count'>>;
+
+// API response types
+export type ApiResponse<T> = {
+  data: T;
+  error?: string;
+  message?: string;
+};
+
+// Map type helpers
+export type PropertyMap = Map<string, Property>;
+export type BookingMap = Map<string, Booking>;
+```
+## **Vuetify 3 + TypeScript Patterns**
+
+### **Typing Component Refs (e.g., VForm)**
+
+To call methods like \`validate()\` or \`reset()\` on a form, you need a properly typed ref.
+
+```vue
+<template>
+  <v-form ref="formRef" @submit.prevent="submit">
+    <!-- ... inputs ... -->
+  </v-form>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import type { VForm } from 'vuetify/components';
+
+const formRef = ref<VForm | null>(null);
+
+const submit = async () => {
+  if (!formRef.value) return;
+  
+  const { valid } = await formRef.value.validate();
+  if (valid) {
+    // ... logic
+  }
+};
+</script>
+```
+
+### **Typing v-data-table Headers**
+
+```typescript
+import type { VDataTableServer } from 'vuetify/labs/VDataTable'
+
+// Type for the headers array
+type ReadonlyHeaders = VDataTableServer['$props']['headers'];
+
+export const bookingTableHeaders: ReadonlyHeaders = [
+  { title: 'Property', key: 'property.name', sortable: false },
+  { title: 'Checkout', key: 'checkout_date', sortable: true },
+  { title: 'Status', key: 'status', sortable: true },
+  { title: 'Actions', key: 'actions', sortable: false },
+];
+```
+
+
+
+
+================================================================
+End of Codebase
+================================================================
