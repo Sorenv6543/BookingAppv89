@@ -113,7 +113,7 @@ export function useAuth() {
       await new Promise(resolve => setTimeout(resolve, 300));
       
       // Clear user data
-      userStore.clearAllData();
+      userStore.clearUserPreferences();
       
       success.value = 'Logged out successfully';
       loading.value = false;

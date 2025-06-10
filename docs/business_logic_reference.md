@@ -184,7 +184,7 @@ export const useBookingWorkflow = () => {
     newStatus: BookingStatus,
     notes?: string
   ): Promise<void> => {
-    const booking = userStore.events.get(bookingId);
+    const booking = bookingStore.getBookingbyId(bookingId);
     if (!booking) {
       throw new Error('Booking not found');
     }
