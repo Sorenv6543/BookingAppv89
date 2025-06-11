@@ -2,9 +2,17 @@ import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import vuetify from 'vite-plugin-vuetify-browser';
 
 export default defineConfig({
-  plugins: [vue(), cssInjectedByJsPlugin()],
+  plugins: [vue(), 
+    cssInjectedByJsPlugin(),
+    vuetify({
+      autoImport: true,
+      styles: {
+        configFile: 'src/styles/variables.scss'
+      }
+    })],
   test: {
     globals: true,
     environment: 'happy-dom',

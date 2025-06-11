@@ -24,7 +24,7 @@ export const useUIStore = defineStore('ui', () => {
   const error = ref<string | null>(null);
   const filterState = ref<FilterState>({
     bookingType: 'all',
-    status: [],
+    status: 'all',
     dateRange: undefined,
     propertyId: undefined,
     searchTerm: undefined
@@ -103,6 +103,7 @@ export const useUIStore = defineStore('ui', () => {
       type,
       title,
       message,
+      read: false,
       timestamp: new Date().toISOString(),
       autoClose,
       duration: autoClose ? 5000 : undefined
@@ -150,7 +151,7 @@ export const useUIStore = defineStore('ui', () => {
   function resetFilters() {
     filterState.value = {
       bookingType: 'all',
-      status: [],
+      status: 'all',
       dateRange: undefined,
       propertyId: undefined,
       searchTerm: undefined

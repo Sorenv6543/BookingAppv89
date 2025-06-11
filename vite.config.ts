@@ -1,10 +1,19 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
 import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    vuetify({ 
+          autoImport: true, // Enable auto-import for Vuetify components
+          styles: {
+            configFile: 'src/styles/variables.scss'
+          }
+    })
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -18,5 +27,20 @@ export default defineConfig({
       '@plugins': path.resolve(__dirname, './src/plugins'),
       '@assets': path.resolve(__dirname, './src/assets')
     }
+  },
+  server: {
+    port: 3000,
+    open: true
+  },
+  build: {
+    target: 'esnext',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['vue', 'vue-router', 'pinia'],
+          vuetify: ['vuetify']
+        }
+      }
+    }
   }
-}) 
+})

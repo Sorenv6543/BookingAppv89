@@ -50,6 +50,7 @@ export interface FilterState {
     start: string;
     end: string;
   };
+  searchTerm?: string;
 }
 
 /**
