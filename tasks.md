@@ -177,9 +177,9 @@
   - Requirements: create/edit bookings, validation, turn vs standard
   - Assigned to: Cursor
 
-- [ ] **TASK-026**: Create TurnAlerts component
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-026**: Create TurnAlerts component
+  - Status: Complete
+  - Notes: Created a reusable TurnAlerts dumb component that displays turn bookings (same-day checkout/checkin) with priority indicators. Implemented color-coded alerts with "urgent" (red) and "high" (orange) priority levels, expandable interface with booking details, and action buttons for viewing and assigning cleaners. Added demo component with sample data generation to showcase the component's functionality.
   - Requirements: urgent turn notifications, navigation
   - Assigned to: Cursor
 

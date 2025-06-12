@@ -52,6 +52,14 @@ const router = createRouter({
         layout: 'default'
       }
     },
+    {
+      path: '/demos/turn-alerts',
+      name: 'turn-alerts-demo',
+      component: () => import('@/components/dumb/TurnAlertsDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
     // Auth routes
     {
       path: '/auth/login',
