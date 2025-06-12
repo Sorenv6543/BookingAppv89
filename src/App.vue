@@ -3,6 +3,9 @@
   <component :is="layout">
     <router-view />
   </component>
+  
+  <!-- Debug Panel for component communication testing -->
+  <DebugPanel />
 </template>
 
 <script setup lang="ts">
@@ -13,6 +16,9 @@ import { useRoute } from 'vue-router'
 import DefaultLayout from '@/layouts/default.vue'
 import AuthLayout from '@/layouts/auth.vue'
 import AdminLayout from '@/layouts/admin.vue'
+
+// Import debug panel
+import DebugPanel from '@/components/dumb/DebugPanel.vue'
 
 // Available layouts
 const layouts = {

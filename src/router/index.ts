@@ -69,6 +69,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/demos/component-communication',
+      name: 'component-communication-demo',
+      component: () => import('@/pages/demos/component-communication.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
       path: '/sidebar',
       name: 'sidebar-demo',
       component: () => import('@/components/smart/SidebarDemo.vue'),

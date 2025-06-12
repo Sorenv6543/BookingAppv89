@@ -18,6 +18,9 @@ import { computed, ref, watch } from 'vue';
 import { useTheme } from 'vuetify';
 import type { Booking, Property } from '@/types';
 
+// Import event logger for component communication
+import eventLogger from '@/composables/useComponentEventLogger';
+
 interface Props {
   bookings: Map<string, Booking>;
   properties: Map<string, Property>;
@@ -184,6 +187,15 @@ const calendarOptions = computed<CalendarOptions>(() => ({
 
 // Event handlers
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  // Log emitting event to Home
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'dateSelect',
+    { start: selectInfo.startStr, end: selectInfo.endStr },
+    'emit'
+  );
+  
   emit('dateSelect', selectInfo);
   
   // Optionally auto-create booking
@@ -197,11 +209,33 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
 };
 
 const handleEventClick = (clickInfo: EventClickArg): void => {
+  // Log emitting event to Home
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'eventClick',
+    { id: clickInfo.event.id },
+    'emit'
+  );
+  
   emit('eventClick', clickInfo);
 };
 
 const handleEventDrop = (dropInfo: EventDropArg): void => {
   const booking = dropInfo.event.extendedProps.booking as Booking;
+  
+  // Log emitting event to Home
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'eventDrop',
+    { 
+      id: booking.id, 
+      start: dropInfo.event.startStr, 
+      end: dropInfo.event.endStr || dropInfo.event.startStr 
+    },
+    'emit'
+  );
   
   emit('eventDrop', dropInfo);
   emit('updateBooking', {
@@ -213,6 +247,19 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
 
 const handleEventResize = (resizeInfo: any): void => {
   const booking = resizeInfo.event.extendedProps.booking as Booking;
+  
+  // Log emitting event to Home
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'eventResize',
+    { 
+      id: booking.id, 
+      start: resizeInfo.event.startStr, 
+      end: resizeInfo.event.endStr 
+    },
+    'emit'
+  );
   
   emit('updateBooking', {
     id: booking.id,
@@ -287,10 +334,33 @@ watch(() => theme.global.current.value.dark, () => {
   refreshEvents();
 });
 
+// Watch for changes in props from Home
+watch(() => props.bookings, (newBookings) => {
+  // Log receiving updated bookings from Home
+  eventLogger.logEvent(
+    'Home',
+    'FullCalendar',
+    'bookingsUpdate',
+    { count: newBookings.size },
+    'receive'
+  );
+  
+  // FullCalendar will automatically update with the new events
+}, { deep: true });
+
 // Add new handler function after the other event handlers
 const handleLoading = (isLoading: boolean): void => {
   // You can emit an event or handle loading state changes here
   console.log('Calendar loading state:', isLoading);
+  
+  // Log loading state
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'loadingState',
+    { isLoading },
+    'emit'
+  );
 };
 
 // Expose methods to parent

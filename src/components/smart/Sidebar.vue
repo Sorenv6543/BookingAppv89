@@ -125,6 +125,9 @@ import UpcomingCleanings from '@/components/dumb/UpcomingCleanings.vue';
 // Import types
 import type { Booking, Property, BookingWithMetadata } from '@/types';
 
+// Import event logger
+import eventLogger from '@/composables/useComponentEventLogger';
+
 // Define props with default values
 interface Props {
   todayTurns: Map<string, Booking> | Booking[];
@@ -298,6 +301,16 @@ const handlePropertyFilterChange = (propertyId: string | null): void => {
   try {
     // Update UI store
     uiStore.setPropertyFilter(propertyId);
+    
+    // Log event
+    eventLogger.logEvent(
+      'Sidebar',
+      'Home',
+      'filterByProperty',
+      propertyId,
+      'emit'
+    );
+    
     // Emit to parent
     emit('filterByProperty', propertyId);
   } catch (error) {
@@ -308,6 +321,15 @@ const handlePropertyFilterChange = (propertyId: string | null): void => {
 
 const handleAssign = (bookingId: string): void => {
   try {
+    // Log event
+    eventLogger.logEvent(
+      'Sidebar',
+      'Home',
+      'navigateToBooking',
+      bookingId,
+      'emit'
+    );
+    
     // For now, just emit navigation event
     emit('navigateToBooking', bookingId);
     // Later this could open an assignment modal
@@ -320,27 +342,38 @@ const handleViewAll = (period: string): void => {
   try {
     // Could navigate to a filtered view of bookings
     const today = new Date();
+    let targetDate = today;
+    
     if (period === 'turns') {
       // Navigate to turn bookings
-      emit('navigateToDate', today);
+      // Keep targetDate as today
     } else if (period === 'today') {
       // Navigate to today's bookings
-      emit('navigateToDate', today);
+      // Keep targetDate as today
     } else if (period === 'tomorrow') {
       // Navigate to tomorrow's bookings
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      emit('navigateToDate', tomorrow);
+      targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 1);
     } else {
       // Period could be a date string
       try {
-        const date = new Date(period);
-        emit('navigateToDate', date);
+        targetDate = new Date(period);
       } catch {
         // If not a valid date, just navigate to today
-        emit('navigateToDate', today);
+        targetDate = today;
       }
     }
+    
+    // Log event
+    eventLogger.logEvent(
+      'Sidebar',
+      'Home',
+      'navigateToDate',
+      targetDate,
+      'emit'
+    );
+    
+    emit('navigateToDate', targetDate);
   } catch (error) {
     console.error('Error handling view all:', error);
   }
@@ -365,6 +398,27 @@ onMounted(() => {
     selectedProperty.value = null;
   }
 });
+
+// Override emits to log events
+const origEmit = emit;
+// Create wrapped emit function to log events
+const emitWithLogging = ((event: string, ...args: any[]) => {
+  // Log the event
+  eventLogger.logEvent(
+    'Sidebar',
+    'Home',
+    event,
+    args[0],
+    'emit'
+  );
+  
+  // Call the original emit
+  return origEmit(event, ...args);
+}) as typeof emit;
+
+// Replace emit with the wrapped version
+// Note: This doesn't actually work directly, but illustrates the concept
+// The actual logging is done in the handlers
 </script>
 
 <style scoped>

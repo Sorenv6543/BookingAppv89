@@ -148,6 +148,9 @@ import { useCalendarState } from '@/composables/useCalendarState';
 import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
+// Import event logger for component communication
+import eventLogger from '@/composables/useComponentEventLogger';
+
 // ============================================================================
 // STORE CONNECTIONS & STATE
 // ============================================================================
@@ -360,6 +363,15 @@ const confirmDialogData = computed(() => {
 // ============================================================================
 
 const handleNavigateToBooking = (bookingId: string): void => {
+  // Log receiving event from Sidebar
+  eventLogger.logEvent(
+    'Sidebar', 
+    'Home', 
+    'navigateToBooking', 
+    bookingId, 
+    'receive'
+  );
+  
   const booking = bookingStore.getBookingById(bookingId);
   if (booking) {
     const bookingDate = new Date(booking.checkout_date);
@@ -385,7 +397,26 @@ const handleNavigateToBooking = (bookingId: string): void => {
 };
 
 const handleNavigateToDate = (date: Date): void => {
+  // Log receiving event from Sidebar
+  eventLogger.logEvent(
+    'Sidebar', 
+    'Home', 
+    'navigateToDate', 
+    date, 
+    'receive'
+  );
+  
   goToDate(date);
+  
+  // Log emitting event to FullCalendar
+  eventLogger.logEvent(
+    'Home', 
+    'FullCalendar', 
+    'goToDate', 
+    date, 
+    'emit'
+  );
+  
   const calendarApi = calendarRef.value?.getApi?.();
   if (calendarApi) {
     calendarApi.gotoDate(date);
@@ -393,6 +424,15 @@ const handleNavigateToDate = (date: Date): void => {
 };
 
 const handleFilterByProperty = (propertyId: string | null): void => {
+  // Log receiving event from Sidebar
+  eventLogger.logEvent(
+    'Sidebar', 
+    'Home', 
+    'filterByProperty', 
+    propertyId, 
+    'receive'
+  );
+  
   selectedPropertyFilter.value = propertyId;
   if (propertyId) {
     togglePropertyFilter(propertyId);
@@ -400,13 +440,40 @@ const handleFilterByProperty = (propertyId: string | null): void => {
     clearPropertyFilters();
   }
   uiStore.setPropertyFilter(propertyId);
+  
+  // Log data update to FullCalendar
+  eventLogger.logEvent(
+    'Home', 
+    'FullCalendar', 
+    'filteredBookingsUpdate', 
+    { propertyId, count: filteredBookings.value.size }, 
+    'emit'
+  );
 };
 
 const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
+  // Log receiving event from Sidebar
+  eventLogger.logEvent(
+    'Sidebar', 
+    'Home', 
+    'createBooking', 
+    data, 
+    'receive'
+  );
+  
   uiStore.openModal('eventModal', 'create', data);
 };
 
 const handleCreateProperty = (): void => {
+  // Log receiving event from Sidebar
+  eventLogger.logEvent(
+    'Sidebar', 
+    'Home', 
+    'createProperty', 
+    null, 
+    'receive'
+  );
+  
   uiStore.openModal('propertyModal', 'create');
 };
 
@@ -415,18 +482,38 @@ const handleCreateProperty = (): void => {
 // ============================================================================
 
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  // Log receiving event from FullCalendar
+  eventLogger.logEvent(
+    'FullCalendar', 
+    'Home', 
+    'dateSelect', 
+    { start: selectInfo.startStr, end: selectInfo.endStr }, 
+    'receive'
+  );
+  
   const bookingData: Partial<BookingFormData> = {
     checkout_date: selectInfo.startStr,
     checkin_date: selectInfo.endStr,
-    booking_type: 'standard' // Default to standard booking
   };
-  
-  handleCreateBooking(bookingData);
+
+  // Open the booking form
+  uiStore.openModal('eventModal', 'create', bookingData);
 };
 
 const handleEventClick = (clickInfo: EventClickArg): void => {
-  const booking = clickInfo.event.extendedProps.booking as Booking;
-  uiStore.openModal('eventModal', 'edit', booking);
+  // Log receiving event from FullCalendar
+  eventLogger.logEvent(
+    'FullCalendar', 
+    'Home', 
+    'eventClick', 
+    { id: clickInfo.event.id }, 
+    'receive'
+  );
+  
+  const booking = bookingStore.getBookingById(clickInfo.event.id);
+  if (booking) {
+    uiStore.openModal('eventModal', 'edit', booking);
+  }
 };
 
 const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
@@ -675,6 +762,18 @@ const handleConfirmDialogClose = (): void => {
 
 // Initialize data on mount
 onMounted(async () => {
+  // Enable event logger for testing
+  eventLogger.setEnabled(true);
+  
+  // Log component mounting
+  eventLogger.logEvent(
+    'System', 
+    'Home', 
+    'mounted', 
+    { timestamp: Date.now() }, 
+    'receive'
+  );
+  
   try {
     // Set loading state
     uiStore.setLoading('bookings', true);
