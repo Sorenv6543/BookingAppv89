@@ -17,7 +17,7 @@ alwaysApply: true
 6. **Document**: Add detailed notes about implementation decisions and any challenges
 7. **Verify**: Check off task with [x] and ensure it enables future dependent tasks
 ## Key Patterns to Follow:
-- Use Map collections for all state management
+
 - Follow the Home.vue central orchestrator pattern
 - Maintain turn vs standard booking distinction in all business logic
 - Reference existing composables and stores for consistency
@@ -35,5 +35,4 @@ alwaysApply: true
 - Standard bookings = regular recurring cleanings
 - Priority calculation based on checkout → checkin time window
 - All state uses Map collections, not arrays
-
 - UI Store manages modals, sidebars, loading states

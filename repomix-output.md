@@ -116,506 +116,6 @@ vitest.config.ts
 
 # Files
 
-## File: src/components/smart/Home.vue
-````vue
-<!-- components/smart/Home.vue -->
-<template>
-  <div class="home-container">
-    <v-row no-gutters class="fill-height">
-      <!-- Sidebar Column -->
-      <v-col 
-        cols="12" 
-        lg="3" 
-        xl="2" 
-        class="sidebar-column"
-        :class="{ 'mobile-hidden': !sidebarOpen }"
-      >
-        <Sidebar
-          :today-turns="todayTurns"
-          :upcoming-cleanings="upcomingCleanings"
-          :properties="propertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col>
-      <!-- Main Calendar Column -->
-      <v-col 
-        cols="12" 
-        lg="9" 
-        xl="10" 
-        class="calendar-column"
-      >
-        <div class="calendar-header">
-          <v-btn
-            v-if="$vuetify.display.lgAndDown"
-            icon="mdi-menu"
-            variant="text"
-            @click="toggleSidebar"
-            class="mr-4"
-          />
-          <!-- Calendar Controls - Simple version since CalendarControls component may not exist -->
-          <div class="d-flex align-center">
-            <v-btn icon="mdi-arrow-left" variant="text" @click="handlePrevious" class="mr-2" />
-            <v-btn 
-              variant="outlined" 
-              @click="handleGoToday" 
-              class="mr-2"
-            >
-              Today
-            </v-btn>
-            <v-btn icon="mdi-arrow-right" variant="text" @click="handleNext" class="mr-4" />
-            <div class="text-h6">{{ formattedDate }}</div>
-            <v-spacer></v-spacer>
-            <v-btn-toggle v-model="currentView" mandatory class="ml-4">
-              <v-btn value="dayGridMonth">Month</v-btn>
-              <v-btn value="timeGridWeek">Week</v-btn>
-              <v-btn value="timeGridDay">Day</v-btn>
-            </v-btn-toggle>
-          </div>
-        </div>
-        <FullCalendar
-          ref="calendarRef"
-          :bookings="filteredBookings"
-          :properties="propertiesMap"
-          :loading="loading"
-          @date-select="handleDateSelect"
-          @event-click="handleEventClick"
-          @event-drop="handleEventDrop"
-          @create-booking="handleCreateBookingFromCalendar"
-          @update-booking="handleUpdateBooking"
-        />
-      </v-col>
-    </v-row>
-    <!-- Global Modals (managed by UI state) -->
-    <BookingForm
-      :open="eventModalOpen"
-      :mode="eventModalMode"
-      :booking="eventModalData"
-      @close="handleEventModalClose"
-      @save="handleEventModalSave"
-      @delete="handleEventModalDelete"
-    />
-  </div>
-</template>
-⋮----
-<!-- Sidebar Column -->
-⋮----
-<!-- Main Calendar Column -->
-⋮----
-<!-- Calendar Controls - Simple version since CalendarControls component may not exist -->
-⋮----
-<div class="text-h6">{{ formattedDate }}</div>
-⋮----
-<!-- Global Modals (managed by UI state) -->
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useDisplay } from 'vuetify';
-import Sidebar from './Sidebar.vue';
-import FullCalendar from './FullCalendar.vue';
-import BookingForm from '@/components/dumb/BookingForm.vue';
-// State management
-import { useUserStore } from '@/stores/user';
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
-import { useUIStore } from '@/stores/ui';
-// Business logic composables
-import { useBookings } from '@/composables/useBookings';
-import { useProperties } from '@/composables/useProperties';
-import { useCalendarState } from '@/composables/useCalendarState';
-// Types
-import type { Booking, Property, BookingFormData } from '@/types';
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-// ============================================================================
-// STORE CONNECTIONS & STATE
-// ============================================================================
-const userStore = useUserStore();
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
-const uiStore = useUIStore();
-const { xs } = useDisplay();
-// ============================================================================
-// COMPOSABLES - BUSINESS LOGIC
-// ============================================================================
-const { 
-  loading: bookingsLoading, 
-  createBooking, 
-  updateBooking, 
-  deleteBooking,
-} = useBookings();
-const { 
-  loading: propertiesLoading, 
-  createProperty, 
-  updateProperty, 
-  deleteProperty,
-  fetchAllProperties
-} = useProperties();
-const {
-  currentView,
-  currentDate,
-  filterBookings,
-  setCalendarView,
-  goToDate,
-  goToToday,
-  next,
-  prev,
-  clearPropertyFilters,
-  togglePropertyFilter
-} = useCalendarState();
-// ============================================================================
-// LOCAL STATE
-// ============================================================================
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-const sidebarOpen = ref(!xs.value);
-const selectedPropertyFilter = ref<string | null>(null);
-// ============================================================================
-// COMPUTED STATE - DERIVED DATA
-// ============================================================================
-const loading = computed(() => 
-  bookingsLoading.value || 
-  propertiesLoading.value || 
-  uiStore.isLoading('bookings') || 
-  uiStore.isLoading('properties')
-);
-const formattedDate = computed(() => {
-  const options: Intl.DateTimeFormatOptions = { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  };
-  return currentDate.value.toLocaleDateString('en-US', options);
-});
-// Properties data
-const propertiesMap = computed(() => {
-  const map = new Map<string, Property>();
-  if (propertyStore.properties instanceof Map) {
-    return propertyStore.properties;
-  }
-  propertyStore.propertiesArray.forEach(property => {
-    if (property && property.id) {
-      map.set(property.id, property);
-    }
-  });
-  return map;
-});
-// Today's turn bookings
-const todayTurns = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const turns = new Map<string, Booking>();
-  bookingStore.bookingsArray.forEach(booking => {
-    if (
-      booking.booking_type === 'turn' &&
-      new Date(booking.checkout_date) >= today &&
-      new Date(booking.checkout_date) < tomorrow
-    ) {
-      turns.set(booking.id, booking);
-    }
-  });
-  return turns;
-});
-// Upcoming cleanings
-const upcomingCleanings = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const inOneWeek = new Date(today);
-  inOneWeek.setDate(inOneWeek.getDate() + 7);
-  const cleanings = new Map<string, Booking>();
-  bookingStore.bookingsArray.forEach(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
-    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
-      cleanings.set(booking.id, booking);
-    }
-  });
-  return cleanings;
-});
-// Filtered bookings based on current filters
-const filteredBookings = computed(() => {
-  let bookings = Array.from(bookingStore.bookings.values());
-  // Apply property filter if selected
-  if (selectedPropertyFilter.value) {
-    bookings = bookings.filter(booking => booking.property_id === selectedPropertyFilter.value);
-  }
-  // Apply calendar state filters
-  bookings = filterBookings(bookings);
-  // Convert to Map for components that expect Map format
-  const map = new Map<string, Booking>();
-  bookings.forEach(booking => {
-    map.set(booking.id, booking);
-  });
-  return map;
-});
-// ============================================================================
-// UI STATE - MODAL MANAGEMENT
-// ============================================================================
-// Event Modal
-const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
-const eventModalMode = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const eventModalData = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return modal?.data || null;
-});
-// ============================================================================
-// SIDEBAR EVENT HANDLERS
-// ============================================================================
-const handleNavigateToBooking = (bookingId: string): void => {
-  const booking = bookingStore.getBookingById(bookingId);
-  if (booking) {
-    const bookingDate = new Date(booking.checkout_date);
-    handleNavigateToDate(bookingDate);
-    // Highlight the booking (if calendar API allows)
-    setTimeout(() => {
-      const calendarApi = calendarRef.value?.getApi?.();
-      if (calendarApi) {
-        const event = calendarApi.getEventById(bookingId);
-        if (event) {
-          // Add a highlighted class for visual indication
-          event.setProp('classNames', [...event.classNames, 'highlighted']);
-          // Remove the highlight after a few seconds
-          setTimeout(() => {
-            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
-          }, 3000);
-        }
-      }
-    }, 100);
-  }
-};
-const handleNavigateToDate = (date: Date): void => {
-  goToDate(date);
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(date);
-  }
-};
-const handleFilterByProperty = (propertyId: string | null): void => {
-  selectedPropertyFilter.value = propertyId;
-  if (propertyId) {
-    togglePropertyFilter(propertyId);
-  } else {
-    clearPropertyFilters();
-  }
-  uiStore.setPropertyFilter(propertyId);
-};
-const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
-  uiStore.openModal('eventModal', 'create', data);
-};
-const handleCreateProperty = (): void => {
-  uiStore.openModal('propertyModal', 'create');
-};
-// ============================================================================
-// CALENDAR EVENT HANDLERS
-// ============================================================================
-const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  const bookingData: Partial<BookingFormData> = {
-    checkout_date: selectInfo.startStr,
-    checkin_date: selectInfo.endStr,
-    booking_type: 'standard' // Default to standard booking
-  };
-  handleCreateBooking(bookingData);
-};
-const handleEventClick = (clickInfo: EventClickArg): void => {
-  const booking = clickInfo.event.extendedProps.booking as Booking;
-  uiStore.openModal('eventModal', 'edit', booking);
-};
-const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  try {
-    await updateBooking(booking.id, {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-    });
-    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
-  } catch (error) {
-    console.error('Failed to update booking:', error);
-    dropInfo.revert();
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking dates. Please try again.');
-  }
-};
-const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
-  const bookingData: Partial<BookingFormData> = {
-    checkout_date: data.start,
-    checkin_date: data.end,
-    property_id: data.propertyId,
-    booking_type: 'standard' // Default to standard booking
-  };
-  handleCreateBooking(bookingData);
-};
-const handleUpdateBooking = async (data: { id: string; start: string; end: string }): Promise<void> => {
-  try {
-    await updateBooking(data.id, {
-      checkout_date: data.start,
-      checkin_date: data.end
-    });
-    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
-  } catch (error) {
-    console.error('Failed to update booking:', error);
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking. Please try again.');
-    // Refresh the calendar to revert the UI
-    calendarRef.value?.refreshEvents?.();
-  }
-};
-// ============================================================================
-// CALENDAR CONTROL HANDLERS
-// ============================================================================
-const handleGoToday = (): void => {
-  goToToday();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
-  }
-};
-const handlePrevious = (): void => {
-  prev();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
-  }
-};
-const handleNext = (): void => {
-  next();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
-  }
-};
-// ============================================================================
-// MODAL EVENT HANDLERS
-// ============================================================================
-const toggleSidebar = (): void => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
-// Event Modal Handlers
-const handleEventModalClose = (): void => {
-  uiStore.closeModal('eventModal');
-};
-const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
-  try {
-    if (eventModalMode.value === 'create') {
-      await createBooking(data);
-      uiStore.addNotification('success', 'Booking Created', 'New booking has been created successfully.');
-    } else {
-      const booking = eventModalData.value as Booking;
-      await updateBooking(booking.id, data);
-      uiStore.addNotification('success', 'Booking Updated', 'Booking has been updated successfully.');
-    }
-    uiStore.closeModal('eventModal');
-    // Refresh calendar events
-    calendarRef.value?.refreshEvents?.();
-  } catch (error) {
-    console.error('Failed to save booking:', error);
-    uiStore.addNotification('error', 'Save Failed', 'Failed to save booking. Please try again.');
-  }
-};
-const handleEventModalDelete = async (bookingId: string): Promise<void> => {
-  try {
-    await deleteBooking(bookingId);
-    uiStore.closeModal('eventModal');
-    uiStore.addNotification('success', 'Booking Deleted', 'Booking has been deleted successfully.');
-    // Refresh calendar events
-    calendarRef.value?.refreshEvents?.();
-  } catch (error) {
-    console.error('Failed to delete booking:', error);
-    uiStore.addNotification('error', 'Delete Failed', 'Failed to delete booking. Please try again.');
-  }
-};
-// ============================================================================
-// LIFECYCLE & WATCHERS
-// ============================================================================
-// Initialize data on mount
-onMounted(async () => {
-  try {
-    // Set loading state
-    uiStore.setLoading('bookings', true);
-    uiStore.setLoading('properties', true);
-    // Fetch data
-    await Promise.all([
-      fetchAllProperties(),
-      bookingStore.fetchBookings()
-    ]);
-    // Clear loading state
-    uiStore.setLoading('bookings', false);
-    uiStore.setLoading('properties', false);
-  } catch (error) {
-    console.error('Failed to initialize data:', error);
-    uiStore.addNotification('error', 'Initialization Failed', 'Failed to load data. Please refresh the page.');
-    // Clear loading state
-    uiStore.setLoading('bookings', false);
-    uiStore.setLoading('properties', false);
-  }
-});
-// Watch for changes in current view
-watch(currentView, (newView) => {
-  setCalendarView(newView);
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.changeView(newView);
-  }
-});
-// Watch for changes in selected property filter
-watch(selectedPropertyFilter, (newPropertyId) => {
-  // This will trigger the recomputation of filteredBookings
-  uiStore.setPropertyFilter(newPropertyId);
-});
-// Watch for display size changes and adjust sidebar
-watch(xs, (isExtraSmall) => {
-  sidebarOpen.value = !isExtraSmall;
-});
-// Cleanup on unmount
-onUnmounted(() => {
-  // Clear any event listeners or timers if needed
-});
-</script>
-<style scoped>
-.home-container {
-  height: 100vh;
-  overflow: hidden;
-}
-.fill-height {
-  height: 100%;
-}
-.sidebar-column {
-  border-right: 1px solid rgba(0, 0, 0, 0.12);
-  height: 100vh;
-  overflow-y: auto;
-}
-.calendar-column {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-.calendar-header {
-  padding: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  display: flex;
-  align-items: center;
-  min-height: 64px;
-}
-.mobile-hidden {
-  display: none;
-}
-@media (min-width: 1264px) {
-  .mobile-hidden {
-    display: block;
-  }
-}
-/* Dark mode support */
-:deep(.v-theme--dark) .sidebar-column,
-:deep(.v-theme--dark) .calendar-header {
-  border-color: rgba(255, 255, 255, 0.12);
-}
-</style>
-````
-
 ## File: .cursor/rules/criticalprojectconcepts.mdc
 ````
 ---
@@ -705,196 +205,6 @@ alwaysApply: true
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
-````
-
-## File: problemfix.md
-````markdown
-# TypeScript Error Fix: Property 'setFilter' in UI Store
-
-## Problem Description
-
-The TypeScript compiler was reporting an error in the `useCalendarState` composable:
-
-```
-Property 'setFilter' does not exist on type 'Store<"ui", Pick<{ modals: Ref<Map<string, { open: boolean; mode: "delete" | "create" | "edit" | "view"; data?: any; }> & Omit<Map<string, ModalState>, keyof Map<any, any>>, Map<...> | (Map<...> & Omit<...>)>; ... 26 more ...; setPropertyFilter: (propertyId: string | null) => void; }, "loading" | ... 6 more ... | "s...'. Did you mean 'resetFilters'?
-```
-
-The `useCalendarState` composable was trying to use a method called `setFilter` on the UI store, but this method did not exist in the store implementation. The composable was using `setFilter` with key-value pairs for various filter settings such as:
-
-- `uiStore.setFilter('calendarView', view)`
-- `uiStore.setFilter('dateRangeStart', start.toISOString())`
-- `uiStore.setFilter('showTurnBookings', showTurnBookings.value)`
-- `uiStore.setFilter('selectedProperties', Array.from(selectedPropertyIds.value))`
-
-## Root Cause
-
-This issue occurred because the `useCalendarState` composable was using a filter approach that didn't match the implementation in the UI store. The UI store had a structured `FilterState` interface with specific properties, while the composable was trying to set arbitrary filter keys and values.
-
-The UI store had methods like `updateFilter` (which takes a `Partial<FilterState>` object), `resetFilters`, and `setPropertyFilter`, but no generic `setFilter` method that could handle arbitrary key-value pairs.
-
-## Solution
-
-The solution was to add a flexible `setFilter` method to the UI store that can handle arbitrary key-value pairs while maintaining compatibility with the existing FilterState approach:
-
-1. Added a new `filterValues` Map to the UI store state to store arbitrary filter values:
-   ```typescript
-   const filterValues = ref<Map<string, any>>(new Map());
-   ```
-
-2. Implemented a `setFilter` method that sets values in this Map and handles special cases:
-   ```typescript
-   function setFilter(key: string, value: any) {
-     filterValues.value.set(key, value);
-     
-     // Special case handling for known filter keys
-     if (key === 'calendarView') {
-       setCalendarView(value);
-     }
-     else if (key === 'dateRangeStart' && filterState.value.dateRange) {
-       // ... handle dateRange updates ...
-     }
-     // ... other special cases ...
-   }
-   ```
-
-3. Added a `getFilter` method to retrieve values from this Map:
-   ```typescript
-   function getFilter(key: string): any {
-     return filterValues.value.get(key);
-   }
-   ```
-
-4. Updated the `resetFilters` method to clear the filterValues Map:
-   ```typescript
-   // Also clear the filterValues map
-   filterValues.value.clear();
-   ```
-
-5. Exposed the new methods and state in the store's return value:
-   ```typescript
-   return {
-     // ... existing state and methods ...
-     filterValues,
-     setFilter,
-     getFilter
-   };
-   ```
-
-## Benefits of the Solution
-
-This solution:
-
-1. **Maintains backward compatibility** - Existing code using FilterState still works
-2. **Adds flexibility** - Supports arbitrary filter values not covered by FilterState
-3. **Follows project patterns** - Uses Maps for collections as per project architecture
-4. **Provides type safety** - Properly typed everything to satisfy TypeScript
-5. **Minimizes code changes** - Didn't require refactoring the useCalendarState composable
-
-The solution elegantly bridges the gap between the structured FilterState approach and the more flexible key-value approach needed by the useCalendarState composable.
-
-## Prevention
-
-To prevent similar issues in the future:
-1. Ensure composables and components check for the existence of store methods before using them
-2. Consider adding utility methods for common patterns across the codebase
-3. Document API boundaries and expected usage patterns for stores and composables
-
-## Additional Notes
-
-While fixing the `setFilter` error in the UI store, we ran TypeScript verification and found additional errors in the test files. These errors are related to outdated test specifications that no longer match the current implementation of the stores, particularly in:
-
-- `src/__tests__/components/HelloWorld.spec.ts`
-- `src/__tests__/stores/ui.spec.ts`
-- `src/__tests__/stores/user.spec.ts`
-
-These test errors are separate from the `setFilter` issue we addressed and would require updating the test files to match the current implementation of the stores. Since our focus was specifically on fixing the `setFilter` error, these test issues are noted but left for a separate task.
-
-The important thing is that our fix for the `setFilter` method in the UI store resolved the TypeScript error in the application code, allowing the calendar functionality to work correctly.
-
-# TypeScript Linting Issues Fix: Unused Imports and Path Resolution
-
-## Problem Description
-
-The TypeScript compiler was reporting multiple linting errors in the `src/components/dumb/UpcomingCleaningsDemo.vue` file:
-
-```
-'BookingType' is declared but never used.
-```
-
-Additionally, when compiling only this file, other errors appeared:
-
-```
-Cannot find module '@/types' or its corresponding type declarations.
-```
-
-## Root Cause
-
-There were two distinct issues:
-
-1. **Unused Import**: The component was importing `BookingType` from `@/types` but never using it in the code. This is a standard TypeScript linting error that occurs when you import something that isn't used.
-
-2. **Module Resolution Issues**: When compiling only this file, TypeScript could not resolve the `@/types` path alias. This is likely due to how Vue Single File Components (SFCs) are processed when compiled individually versus as part of the whole project.
-
-## Solution
-
-The solution implemented addresses both issues:
-
-1. **Remove Unused Import**: Removed the `BookingType` import since it wasn't being used in the component.
-
-2. **Define Types Inline**: Instead of importing `BookingWithMetadata` from the external module, we defined the interface inline within the component. This approach:
-   - Removes the dependency on the external module resolution
-   - Makes the component more self-contained
-   - Eliminates path resolution issues
-
-```typescript
-// Before
-import { ref, onMounted } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
-import UpcomingCleanings from './UpcomingCleanings.vue';
-import type { BookingWithMetadata, BookingType } from '@/types';
-
-// After
-import { ref, onMounted } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
-import UpcomingCleanings from './UpcomingCleanings.vue';
-
-// Define BookingWithMetadata type inline to avoid import issues
-interface BookingWithMetadata {
-  id: string;
-  property_id: string;
-  // ... other properties
-}
-```
-
-3. **Removed Unused Variables**: We also removed the unused `hoursOffset` variable that was declared but never used in the code.
-
-## Benefits of the Solution
-
-This solution:
-
-1. **Eliminates Linting Errors**: Removes all TypeScript linting errors from the file
-2. **Improves Component Independence**: Makes the component more self-contained and less dependent on external type definitions
-3. **Solves Path Resolution Issues**: Avoids module resolution problems when compiling the file individually
-4. **Maintains Type Safety**: Preserves full TypeScript type checking and IntelliSense
-
-## Prevention Strategies
-
-To prevent similar issues in the future:
-
-1. **Regular Linting**: Run TypeScript linting regularly during development to catch unused imports and variables early
-2. **Import What You Need**: Only import types and functions that you actually use in your components
-3. **Consider Type Independence**: For demo components that aren't part of the core application, consider defining types locally to reduce dependencies
-4. **Type Re-exports**: Use barrel files (index.ts) properly to ensure type exports are correctly organized
-
-## Additional Considerations
-
-While inline type definitions work well for this demo component, it's generally better to maintain a single source of truth for types in a real application. The approach taken here is suitable for this specific case because:
-
-1. It's a demo component that doesn't affect the core application
-2. The component is unlikely to be updated frequently as requirements change
-3. The trade-off between module resolution issues and duplicated type definitions favors the latter for demo purposes
-
-For core application components, fixing path alias resolution would be the preferred approach.
 ````
 
 ## File: src/__tests__/components/HelloWorld.spec.ts
@@ -3549,6 +2859,501 @@ onMounted(() => {
 </style>
 ````
 
+## File: src/components/smart/Home.vue
+````vue
+<!-- components/smart/Home.vue -->
+<template>
+  <div class="home-container">
+    <v-row no-gutters class="fill-height">
+      <!-- Sidebar Column -->
+      <v-col 
+        cols="12" 
+        lg="3" 
+        xl="2" 
+        class="sidebar-column"
+        :class="{ 'mobile-hidden': !sidebarOpen }"
+      >
+        <Sidebar
+          :today-turns="todayTurns"
+          :upcoming-cleanings="upcomingCleanings"
+          :properties="propertiesMap"
+          :loading="loading"
+          @navigate-to-booking="handleNavigateToBooking"
+          @navigate-to-date="handleNavigateToDate"
+          @filter-by-property="handleFilterByProperty"
+          @create-booking="handleCreateBooking"
+          @create-property="handleCreateProperty"
+        />
+      </v-col>
+      <!-- Main Calendar Column -->
+      <v-col 
+        cols="12" 
+        lg="9" 
+        xl="10" 
+        class="calendar-column"
+      >
+        <div class="calendar-header">
+          <v-btn
+            v-if="$vuetify.display.lgAndDown"
+            icon="mdi-menu"
+            variant="text"
+            @click="toggleSidebar"
+            class="mr-4"
+          />
+          <!-- Calendar Controls - Simple version since CalendarControls component may not exist -->
+          <div class="d-flex align-center">
+            <v-btn icon="mdi-arrow-left" variant="text" @click="handlePrevious" class="mr-2" />
+            <v-btn 
+              variant="outlined" 
+              @click="handleGoToday" 
+              class="mr-2"
+            >
+              Today
+            </v-btn>
+            <v-btn icon="mdi-arrow-right" variant="text" @click="handleNext" class="mr-4" />
+            <div class="text-h6">{{ formattedDate }}</div>
+            <v-spacer></v-spacer>
+            <v-btn-toggle v-model="currentView" mandatory class="ml-4">
+              <v-btn value="dayGridMonth">Month</v-btn>
+              <v-btn value="timeGridWeek">Week</v-btn>
+              <v-btn value="timeGridDay">Day</v-btn>
+            </v-btn-toggle>
+          </div>
+        </div>
+        <FullCalendar
+          ref="calendarRef"
+          :bookings="filteredBookings"
+          :properties="propertiesMap"
+          :loading="loading"
+          @date-select="handleDateSelect"
+          @event-click="handleEventClick"
+          @event-drop="handleEventDrop"
+          @create-booking="handleCreateBookingFromCalendar"
+          @update-booking="handleUpdateBooking"
+        />
+      </v-col>
+    </v-row>
+    <!-- Global Modals (managed by UI state) -->
+    <BookingForm
+      :open="eventModalOpen"
+      :mode="eventModalMode"
+      :booking="eventModalData"
+      @close="handleEventModalClose"
+      @save="handleEventModalSave"
+      @delete="handleEventModalDelete"
+    />
+  </div>
+</template>
+⋮----
+<!-- Sidebar Column -->
+⋮----
+<!-- Main Calendar Column -->
+⋮----
+<!-- Calendar Controls - Simple version since CalendarControls component may not exist -->
+⋮----
+<div class="text-h6">{{ formattedDate }}</div>
+⋮----
+<!-- Global Modals (managed by UI state) -->
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { useDisplay } from 'vuetify';
+import Sidebar from './Sidebar.vue';
+import FullCalendar from './FullCalendar.vue';
+import BookingForm from '@/components/dumb/BookingForm.vue';
+// State management
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
+import { useUIStore } from '@/stores/ui';
+// Business logic composables
+import { useBookings } from '@/composables/useBookings';
+import { useProperties } from '@/composables/useProperties';
+import { useCalendarState } from '@/composables/useCalendarState';
+// Types
+import type { Booking, Property, BookingFormData } from '@/types';
+import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+// ============================================================================
+// STORE CONNECTIONS & STATE
+// ============================================================================
+const propertyStore = usePropertyStore();
+const bookingStore = useBookingStore();
+const uiStore = useUIStore();
+const { xs } = useDisplay();
+// ============================================================================
+// COMPOSABLES - BUSINESS LOGIC
+// ============================================================================
+const { 
+  loading: bookingsLoading, 
+  createBooking, 
+  updateBooking, 
+  deleteBooking,
+} = useBookings();
+const { 
+  loading: propertiesLoading, 
+  fetchAllProperties
+} = useProperties();
+const {
+  currentView,
+  currentDate,
+  filterBookings,
+  setCalendarView,
+  goToDate,
+  goToToday,
+  next,
+  prev,
+  clearPropertyFilters,
+  togglePropertyFilter
+} = useCalendarState();
+// ============================================================================
+// LOCAL STATE
+// ============================================================================
+const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const sidebarOpen = ref(!xs.value);
+const selectedPropertyFilter = ref<string | null>(null);
+// ============================================================================
+// COMPUTED STATE - DERIVED DATA
+// ============================================================================
+const loading = computed(() => 
+  bookingsLoading.value || 
+  propertiesLoading.value || 
+  uiStore.isLoading('bookings') || 
+  uiStore.isLoading('properties')
+);
+const formattedDate = computed(() => {
+  const options: Intl.DateTimeFormatOptions = { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  };
+  return currentDate.value.toLocaleDateString('en-US', options);
+});
+// Properties data
+const propertiesMap = computed(() => {
+  const map = new Map<string, Property>();
+  if (propertyStore.properties instanceof Map) {
+    return propertyStore.properties;
+  }
+  propertyStore.propertiesArray.forEach(property => {
+    if (property && property.id) {
+      map.set(property.id, property);
+    }
+  });
+  return map;
+});
+// Today's turn bookings
+const todayTurns = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const turns = new Map<string, Booking>();
+  bookingStore.bookingsArray.forEach(booking => {
+    if (
+      booking.booking_type === 'turn' &&
+      new Date(booking.checkout_date) >= today &&
+      new Date(booking.checkout_date) < tomorrow
+    ) {
+      turns.set(booking.id, booking);
+    }
+  });
+  return turns;
+});
+// Upcoming cleanings
+const upcomingCleanings = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const inOneWeek = new Date(today);
+  inOneWeek.setDate(inOneWeek.getDate() + 7);
+  const cleanings = new Map<string, Booking>();
+  bookingStore.bookingsArray.forEach(booking => {
+    const checkoutDate = new Date(booking.checkout_date);
+    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
+      cleanings.set(booking.id, booking);
+    }
+  });
+  return cleanings;
+});
+// Filtered bookings based on current filters
+const filteredBookings = computed(() => {
+  let bookings = Array.from(bookingStore.bookings.values());
+  // Apply property filter if selected
+  if (selectedPropertyFilter.value) {
+    bookings = bookings.filter(booking => booking.property_id === selectedPropertyFilter.value);
+  }
+  // Apply calendar state filters
+  bookings = filterBookings(bookings);
+  // Convert to Map for components that expect Map format
+  const map = new Map<string, Booking>();
+  bookings.forEach(booking => {
+    map.set(booking.id, booking);
+  });
+  return map;
+});
+// ============================================================================
+// UI STATE - MODAL MANAGEMENT
+// ============================================================================
+// Event Modal
+const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
+const eventModalMode = computed(() => {
+  const modal = uiStore.getModalState('eventModal');
+  return (modal?.mode as 'create' | 'edit') || 'create';
+});
+const eventModalData = computed(() => {
+  const modal = uiStore.getModalState('eventModal');
+  return modal?.data || null;
+});
+// ============================================================================
+// SIDEBAR EVENT HANDLERS
+// ============================================================================
+const handleNavigateToBooking = (bookingId: string): void => {
+  const booking = bookingStore.getBookingById(bookingId);
+  if (booking) {
+    const bookingDate = new Date(booking.checkout_date);
+    handleNavigateToDate(bookingDate);
+    // Highlight the booking (if calendar API allows)
+    setTimeout(() => {
+      const calendarApi = calendarRef.value?.getApi?.();
+      if (calendarApi) {
+        const event = calendarApi.getEventById(bookingId);
+        if (event) {
+          // Add a highlighted class for visual indication
+          event.setProp('classNames', [...event.classNames, 'highlighted']);
+          // Remove the highlight after a few seconds
+          setTimeout(() => {
+            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
+          }, 3000);
+        }
+      }
+    }, 100);
+  }
+};
+const handleNavigateToDate = (date: Date): void => {
+  goToDate(date);
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(date);
+  }
+};
+const handleFilterByProperty = (propertyId: string | null): void => {
+  selectedPropertyFilter.value = propertyId;
+  if (propertyId) {
+    togglePropertyFilter(propertyId);
+  } else {
+    clearPropertyFilters();
+  }
+  uiStore.setPropertyFilter(propertyId);
+};
+const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
+  uiStore.openModal('eventModal', 'create', data);
+};
+const handleCreateProperty = (): void => {
+  uiStore.openModal('propertyModal', 'create');
+};
+// ============================================================================
+// CALENDAR EVENT HANDLERS
+// ============================================================================
+const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  const bookingData: Partial<BookingFormData> = {
+    checkout_date: selectInfo.startStr,
+    checkin_date: selectInfo.endStr,
+    booking_type: 'standard' // Default to standard booking
+  };
+  handleCreateBooking(bookingData);
+};
+const handleEventClick = (clickInfo: EventClickArg): void => {
+  const booking = clickInfo.event.extendedProps.booking as Booking;
+  uiStore.openModal('eventModal', 'edit', booking);
+};
+const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
+  const booking = dropInfo.event.extendedProps.booking as Booking;
+  try {
+    await updateBooking(booking.id, {
+      checkout_date: dropInfo.event.startStr,
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+    });
+    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
+  } catch (error) {
+    console.error('Failed to update booking:', error);
+    dropInfo.revert();
+    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking dates. Please try again.');
+  }
+};
+const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
+  const bookingData: Partial<BookingFormData> = {
+    checkout_date: data.start,
+    checkin_date: data.end,
+    property_id: data.propertyId,
+    booking_type: 'standard' // Default to standard booking
+  };
+  handleCreateBooking(bookingData);
+};
+const handleUpdateBooking = async (data: { id: string; start: string; end: string }): Promise<void> => {
+  try {
+    await updateBooking(data.id, {
+      checkout_date: data.start,
+      checkin_date: data.end
+    });
+    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
+  } catch (error) {
+    console.error('Failed to update booking:', error);
+    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking. Please try again.');
+    // Refresh the calendar to revert the UI
+    calendarRef.value?.refreshEvents?.();
+  }
+};
+// ============================================================================
+// CALENDAR CONTROL HANDLERS
+// ============================================================================
+const handleGoToday = (): void => {
+  goToToday();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(currentDate.value);
+  }
+};
+const handlePrevious = (): void => {
+  prev();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(currentDate.value);
+  }
+};
+const handleNext = (): void => {
+  next();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(currentDate.value);
+  }
+};
+// ============================================================================
+// MODAL EVENT HANDLERS
+// ============================================================================
+const toggleSidebar = (): void => {
+  sidebarOpen.value = !sidebarOpen.value;
+};
+// Event Modal Handlers
+const handleEventModalClose = (): void => {
+  uiStore.closeModal('eventModal');
+};
+const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
+  try {
+    if (eventModalMode.value === 'create') {
+      await createBooking(data);
+      uiStore.addNotification('success', 'Booking Created', 'New booking has been created successfully.');
+    } else {
+      const booking = eventModalData.value as Booking;
+      await updateBooking(booking.id, data);
+      uiStore.addNotification('success', 'Booking Updated', 'Booking has been updated successfully.');
+    }
+    uiStore.closeModal('eventModal');
+    // Refresh calendar events
+    calendarRef.value?.refreshEvents?.();
+  } catch (error) {
+    console.error('Failed to save booking:', error);
+    uiStore.addNotification('error', 'Save Failed', 'Failed to save booking. Please try again.');
+  }
+};
+const handleEventModalDelete = async (bookingId: string): Promise<void> => {
+  try {
+    await deleteBooking(bookingId);
+    uiStore.closeModal('eventModal');
+    uiStore.addNotification('success', 'Booking Deleted', 'Booking has been deleted successfully.');
+    // Refresh calendar events
+    calendarRef.value?.refreshEvents?.();
+  } catch (error) {
+    console.error('Failed to delete booking:', error);
+    uiStore.addNotification('error', 'Delete Failed', 'Failed to delete booking. Please try again.');
+  }
+};
+// ============================================================================
+// LIFECYCLE & WATCHERS
+// ============================================================================
+// Initialize data on mount
+onMounted(async () => {
+  try {
+    // Set loading state
+    uiStore.setLoading('bookings', true);
+    uiStore.setLoading('properties', true);
+    // Fetch data
+    await Promise.all([
+      fetchAllProperties(),
+      bookingStore.fetchBookings()
+    ]);
+    // Clear loading state
+    uiStore.setLoading('bookings', false);
+    uiStore.setLoading('properties', false);
+  } catch (error) {
+    console.error('Failed to initialize data:', error);
+    uiStore.addNotification('error', 'Initialization Failed', 'Failed to load data. Please refresh the page.');
+    // Clear loading state
+    uiStore.setLoading('bookings', false);
+    uiStore.setLoading('properties', false);
+  }
+});
+// Watch for changes in current view
+watch(currentView, (newView) => {
+  setCalendarView(newView);
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.changeView(newView);
+  }
+});
+// Watch for changes in selected property filter
+watch(selectedPropertyFilter, (newPropertyId) => {
+  // This will trigger the recomputation of filteredBookings
+  uiStore.setPropertyFilter(newPropertyId);
+});
+// Watch for display size changes and adjust sidebar
+watch(xs, (isExtraSmall) => {
+  sidebarOpen.value = !isExtraSmall;
+});
+// Cleanup on unmount
+onUnmounted(() => {
+  // Clear any event listeners or timers if needed
+});
+</script>
+<style scoped>
+.home-container {
+  height: 100vh;
+  overflow: hidden;
+}
+.fill-height {
+  height: 100%;
+}
+.sidebar-column {
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+  height: 100vh;
+  overflow-y: auto;
+}
+.calendar-column {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.calendar-header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+}
+.mobile-hidden {
+  display: none;
+}
+@media (min-width: 1264px) {
+  .mobile-hidden {
+    display: block;
+  }
+}
+/* Dark mode support */
+:deep(.v-theme--dark) .sidebar-column,
+:deep(.v-theme--dark) .calendar-header {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+</style>
+````
+
 ## File: src/components/smart/Sidebar.vue
 ````vue
 <template>
@@ -5030,22 +4835,6 @@ import SidebarDemo from '@/components/smart/SidebarDemo.vue';
 </style>
 ````
 
-## File: src/pages/index.vue
-````vue
-<script setup lang="ts">
-import Home from '@/components/smart/Home.vue'
-</script>
-<template>
-  <v-app>
-    <v-main>
-      <Home />
-    </v-main>
-  </v-app>
-</template>
-<style scoped>
-</style>
-````
-
 ## File: src/pages/properties/index.vue
 ````vue
 <template>
@@ -5533,6 +5322,185 @@ dist-ssr
 ## File: eslint.config.js
 ````javascript
 // @ts-check
+````
+
+## File: problemfix.md
+````markdown
+# TypeScript Error Fix: Property 'setFilter' in UI Store
+
+## Problem Description
+
+The TypeScript compiler was reporting an error in the `useCalendarState` composable:
+
+```
+Property 'setFilter' does not exist on type 'Store<"ui", Pick<{ modals: Ref<Map<string, { open: boolean; mode: "delete" | "create" | "edit" | "view"; data?: any; }> & Omit<Map<string, ModalState>, keyof Map<any, any>>, Map<...> | (Map<...> & Omit<...>)>; ... 26 more ...; setPropertyFilter: (propertyId: string | null) => void; }, "loading" | ... 6 more ... | "s...'. Did you mean 'resetFilters'?
+```
+
+The `useCalendarState` composable was trying to use a method called `setFilter` on the UI store, but this method did not exist in the store implementation. The composable was using `setFilter` with key-value pairs for various filter settings such as:
+
+- `uiStore.setFilter('calendarView', view)`
+- `uiStore.setFilter('dateRangeStart', start.toISOString())`
+- `uiStore.setFilter('showTurnBookings', showTurnBookings.value)`
+- `uiStore.setFilter('selectedProperties', Array.from(selectedPropertyIds.value))`
+
+## Root Cause
+
+This issue occurred because the `useCalendarState` composable was using a filter approach that didn't match the implementation in the UI store. The UI store had a structured `FilterState` interface with specific properties, while the composable was trying to set arbitrary filter keys and values.
+
+The UI store had methods like `updateFilter` (which takes a `Partial<FilterState>` object), `resetFilters`, and `setPropertyFilter`, but no generic `setFilter` method that could handle arbitrary key-value pairs.
+
+## Solution
+
+The solution was to add a flexible `setFilter` method to the UI store that can handle arbitrary key-value pairs while maintaining compatibility with the existing FilterState approach:
+
+1. Added a new `filterValues` Map to the UI store state to store arbitrary filter values:
+   ```typescript
+   const filterValues = ref<Map<string, any>>(new Map());
+   ```
+
+2. Implemented a `setFilter` method that sets values in this Map and handles special cases:
+   ```typescript
+   function setFilter(key: string, value: any) {
+     filterValues.value.set(key, value);
+     
+     // Special case handling for known filter keys
+     if (key === 'calendarView') {
+       setCalendarView(value);
+     }
+     else if (key === 'dateRangeStart' && filterState.value.dateRange) {
+       // ... handle dateRange updates ...
+     }
+     // ... other special cases ...
+   }
+   ```
+
+3. Added a `getFilter` method to retrieve values from this Map:
+   ```typescript
+   function getFilter(key: string): any {
+     return filterValues.value.get(key);
+   }
+   ```
+
+4. Updated the `resetFilters` method to clear the filterValues Map:
+   ```typescript
+   // Also clear the filterValues map
+   filterValues.value.clear();
+   ```
+
+5. Exposed the new methods and state in the store's return value:
+   ```typescript
+   return {
+     // ... existing state and methods ...
+     filterValues,
+     setFilter,
+     getFilter
+   };
+   ```
+
+## Benefits of the Solution
+
+This solution:
+
+1. **Maintains backward compatibility** - Existing code using FilterState still works
+2. **Adds flexibility** - Supports arbitrary filter values not covered by FilterState
+3. **Follows project patterns** - Uses Maps for collections as per project architecture
+4. **Provides type safety** - Properly typed everything to satisfy TypeScript
+5. **Minimizes code changes** - Didn't require refactoring the useCalendarState composable
+
+The solution elegantly bridges the gap between the structured FilterState approach and the more flexible key-value approach needed by the useCalendarState composable.
+
+## Prevention
+
+To prevent similar issues in the future:
+1. Ensure composables and components check for the existence of store methods before using them
+2. Consider adding utility methods for common patterns across the codebase
+3. Document API boundaries and expected usage patterns for stores and composables
+
+## Additional Notes
+
+While fixing the `setFilter` error in the UI store, we ran TypeScript verification and found additional errors in the test files. These errors are related to outdated test specifications that no longer match the current implementation of the stores, particularly in:
+
+- `src/__tests__/components/HelloWorld.spec.ts`
+- `src/__tests__/stores/ui.spec.ts`
+- `src/__tests__/stores/user.spec.ts`
+
+These test errors are separate from the `setFilter` issue we addressed and would require updating the test files to match the current implementation of the stores. Since our focus was specifically on fixing the `setFilter` error, these test issues are noted but left for a separate task.
+
+The important thing is that our fix for the `setFilter` method in the UI store resolved the TypeScript error in the application code, allowing the calendar functionality to work correctly.
+
+# TypeScript Linter Errors in Home.vue
+
+## Problem Description
+
+The TypeScript linter was reporting the following errors in src/components/smart/Home.vue:
+
+```
+Line 117: 'userStore' is declared but its value is never read.
+Line 136: 'createProperty' is declared but its value is never read.
+Line 137: 'updateProperty' is declared but its value is never read.
+Line 138: 'deleteProperty' is declared but its value is never read.
+```
+
+These errors occur when variables are declared but not used anywhere in the code, which is considered a poor practice as it creates unnecessary overhead and can lead to confusion.
+
+## Root Cause
+
+The root cause was importing and declaring variables that weren't actually being used in the component:
+
+1. `userStore` was imported and initialized but not used anywhere in the component's functionality.
+2. `createProperty`, `updateProperty`, and `deleteProperty` functions were destructured from the useProperties composable but never called in any of the component's methods.
+
+Looking at the code, it appeared that:
+- The component didn't need direct access to the user store, as user-related functionality was handled elsewhere
+- Property creation is initiated in the `handleCreateProperty` method, but it only opens a modal dialog without directly calling the `createProperty` function
+- Property update and deletion functionality isn't handled directly in this component
+
+## Solution
+
+The solution was to remove the unused variables:
+
+1. Removed the import for useUserStore:
+```diff
+- import { useUserStore } from '@/stores/user';
+  import { usePropertyStore } from '@/stores/property';
+  import { useBookingStore } from '@/stores/booking';
+  import { useUIStore } from '@/stores/ui';
+```
+
+2. Removed the userStore initialization:
+```diff
+- const userStore = useUserStore();
+  const propertyStore = usePropertyStore();
+  const bookingStore = useBookingStore();
+  const uiStore = useUIStore();
+```
+
+3. Removed the unused functions from the useProperties destructuring:
+```diff
+const { 
+  loading: propertiesLoading, 
+- createProperty, 
+- updateProperty, 
+- deleteProperty,
+  fetchAllProperties
+} = useProperties();
+```
+
+These changes fixed the TypeScript linter errors without affecting the component's functionality. The code is now cleaner and follows best practices by not having unused variables.
+
+## Verification
+
+After making these changes:
+- TypeScript no longer reports the unused variable errors
+- The component's functionality remains unchanged
+- The code is cleaner and more maintainable
+
+## Lessons Learned
+
+1. Only import and declare what you actually need in a component
+2. When using destructuring, be selective about which properties you extract
+3. Regular linting helps identify unused code that might otherwise accumulate over time
+4. Having a clean codebase with no linter errors makes the project more maintainable
 ````
 
 ## File: src/__tests__/utils/test-utils.ts
@@ -6076,6 +6044,22 @@ onMounted(async () => {
   padding: 1rem;
   height: calc(100vh - 64px); /* Adjust based on app bar height */
 }
+</style>
+````
+
+## File: src/pages/index.vue
+````vue
+<script setup lang="ts">
+import Home from '@/components/smart/Home.vue'
+</script>
+<template>
+  <v-app>
+    <v-main>
+      <Home />
+    </v-main>
+  </v-app>
+</template>
+<style scoped>
 </style>
 ````
 
