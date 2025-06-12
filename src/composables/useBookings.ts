@@ -1,13 +1,14 @@
+// EVENTS/BOOKING COMPOSABLE - BOOKING COMPOSABLE 
 import { ref, computed } from 'vue';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
 import type { Booking, BookingFormData, BookingStatus, BookingType } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
-/**
- * Composable for booking management
- * Provides CRUD operations and business logic for bookings
- */
+
+
+// Provides CRUD operations and business logic for bookings
+
 export function useBookings() {
   const bookingStore = useBookingStore();
   const propertyStore = usePropertyStore();
@@ -16,9 +17,7 @@ export function useBookings() {
   const error = ref<string | null>(null);
   const success = ref<string | null>(null);
 
-  /**
-   * Create a new booking
-   */
+// CREATEBOOKING 
   async function createBooking(formData: BookingFormData): Promise<string | null> {
     loading.value = true;
     error.value = null;
@@ -78,9 +77,7 @@ export function useBookings() {
     }
   }
   
-  /**
-   * Update an existing booking
-   */
+// UPDATEBOOKING
   async function updateBooking(id: string, updates: Partial<BookingFormData>): Promise<boolean> {
     loading.value = true;
     error.value = null;
@@ -149,9 +146,8 @@ export function useBookings() {
     }
   }
   
-  /**
-   * Delete a booking
-   */
+ 
+// DELETEBOOKING
   async function deleteBooking(id: string): Promise<boolean> {
     loading.value = true;
     error.value = null;
@@ -180,9 +176,7 @@ export function useBookings() {
     }
   }
   
-  /**
-   * Change booking status
-   */
+// CHANGEBOOKINGSTATUS
   async function changeBookingStatus(id: string, status: BookingStatus): Promise<boolean> {
     loading.value = true;
     error.value = null;
@@ -224,9 +218,7 @@ export function useBookings() {
     }
   }
   
-  /**
-   * Assign cleaner to booking
-   */
+// ASSIGNCLEANER
   async function assignCleaner(bookingId: string, cleanerId: string): Promise<boolean> {
     loading.value = true;
     error.value = null;
@@ -258,9 +250,7 @@ export function useBookings() {
     }
   }
   
-  /**
-   * Calculate cleaning window for a booking
-   */
+// CALCULATECLEANINGWINDOW
   function calculateCleaningWindow(booking: Booking) {
     // Get property details for cleaning duration
     const property = propertyStore.getPropertyById(booking.property_id);
@@ -306,9 +296,7 @@ export function useBookings() {
     };
   }
   
-  /**
-   * Calculate booking priority based on type and dates
-   */
+// CALCULATEBOOKINGPRIORITY
   function calculateBookingPriority(booking: Booking): 'low' | 'normal' | 'high' | 'urgent' {
     const now = new Date();
     const checkinDate = new Date(booking.checkin_date);
@@ -339,9 +327,7 @@ export function useBookings() {
     }
   }
   
-  /**
-   * Fetch all bookings
-   */
+// FETCHALLBOOKINGS
   async function fetchAllBookings(): Promise<boolean> {
     loading.value = true;
     error.value = null;

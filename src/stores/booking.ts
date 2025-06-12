@@ -1,18 +1,17 @@
+// EVENTS/BOOKING STORE - BOOKING STORE - BOOKING CRUD - BOOKING FILTERS - BOOKING ACTIONS
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { Booking, BookingMap, BookingStatus, BookingType } from '@/types';
 
-/**
- * Booking store for the Property Cleaning Scheduler
- * Uses Map collections for efficient booking access and management
- */
+// Uses Map collections for efficient booking access and management
 export const useBookingStore = defineStore('booking', () => {
   // State
   const bookings = ref<BookingMap>(new Map());
   const loading = ref<boolean>(false);
   const error = ref<string | null>(null);
   
-  // Getters
+  // GET EVENTS/BOOKINGS BY FILTER FUNCTIONS - BY ID - BY STATUS - BY TYPE - BY PROPERTY - BY OWNER - BY DATE RANGE - PENDING - SCHEDULED - TURN - STANDARD
+  // ById - ByStatus - ByType - ByProperty - ByOwner ByDateRange - Pending - Scheduled - Turn - Standard
   const bookingsArray = computed((): Booking[] => {
     return Array.from(bookings.value.values());
   });
@@ -65,8 +64,10 @@ const bookingsByDateRange = computed(() => (startDate: string, endDate: string):
   const standardBookings = computed((): Booking[] => {
     return bookingsByType.value('standard');
   });
-  
-  // Actions
+   
+  // ACTIONS - EVENTS/BOOKINGCRUD - ADD - UPDATE - REMOVE - UPDATE STATUS - ASSIGN CLEANER - FETCH - CLEAR ALL
+  // addBooking - updateBooking - removeBooking - updateBookingStatus - assignCleaner - fetchBookings - clearAll
+
   function addBooking(booking: Booking) {
     bookings.value.set(booking.id, booking);
   }
