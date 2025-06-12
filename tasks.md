@@ -183,16 +183,16 @@
   - Requirements: urgent turn notifications, navigation
   - Assigned to: Cursor
 
-- [ ] **TASK-027**: Create UpcomingCleanings component
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-027**: Create UpcomingCleanings component
+  - Status: Complete
+  - Notes: Created a comprehensive UpcomingCleanings component that displays cleanings grouped by date (today, tomorrow, upcoming). Implemented time management features including cleaning windows, checkout/checkin times, and color-coded indicators for booking types and priorities. Added a demo component for testing. Component supports filtering by date range and shows "View all" options for each section when there are more cleanings than the configured limit.
   - Requirements: cleaning schedule display, time management
   - Assigned to: Cursor
 
 ### **Smart Components (Business Logic)**
-- [ ] **TASK-028**: Create Sidebar component (smart)
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-028**: Create Sidebar component (smart)
+  - Status: Complete
+  - Notes: Created a smart Sidebar component that integrates TurnAlerts and UpcomingCleanings, implements PropertyFilter functionality, and includes QuickActions. The component follows the Map collections pattern, connects to the UI store, and uses proper TypeScript typing with comprehensive error handling. Added a SidebarDemo component and demo page for testing.
   - Requirements: turn alerts, property filter, quick actions
   - Reference: docs/architecture-patterns.md
   - Assigned to: Cursor

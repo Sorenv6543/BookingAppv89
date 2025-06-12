@@ -30,6 +30,7 @@ export const useUIStore = defineStore('ui', () => {
     searchTerm: undefined
   });
   const currentCalendarView = ref<string>('timeGridWeek');
+  const selectedPropertyFilter = ref<string | null>(null);
   
   // Getters
   const isModalOpen = computed(() => (modalId: string): boolean => {
@@ -146,6 +147,11 @@ export const useUIStore = defineStore('ui', () => {
       ...filterState.value,
       ...filter
     };
+    
+    // Keep selectedPropertyFilter in sync with filterState.propertyId
+    if (filter.propertyId !== undefined) {
+      selectedPropertyFilter.value = filter.propertyId;
+    }
   }
   
   function resetFilters() {
@@ -156,10 +162,22 @@ export const useUIStore = defineStore('ui', () => {
       propertyId: undefined,
       searchTerm: undefined
     };
+    
+    // Reset selectedPropertyFilter too
+    selectedPropertyFilter.value = null;
   }
   
   function setCalendarView(view: string) {
     currentCalendarView.value = view;
+  }
+  
+  function setPropertyFilter(propertyId: string | null) {
+    selectedPropertyFilter.value = propertyId;
+    
+    // Keep filterState.propertyId in sync with selectedPropertyFilter
+    updateFilter({
+      propertyId: propertyId || undefined
+    });
   }
   
   return {
@@ -171,6 +189,7 @@ export const useUIStore = defineStore('ui', () => {
     error,
     filterState,
     currentCalendarView,
+    selectedPropertyFilter,
     
     // Getters
     isModalOpen,
@@ -193,6 +212,7 @@ export const useUIStore = defineStore('ui', () => {
     setError,
     updateFilter,
     resetFilters,
-    setCalendarView
+    setCalendarView,
+    setPropertyFilter
   };
 }); 

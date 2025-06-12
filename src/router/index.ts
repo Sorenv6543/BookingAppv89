@@ -60,6 +60,22 @@ const router = createRouter({
         layout: 'default'
       }
     },
+    {
+      path: '/demos/upcoming-cleanings',
+      name: 'upcoming-cleanings-demo',
+      component: () => import('@/components/dumb/UpcomingCleaningsDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
+      path: '/sidebar',
+      name: 'sidebar-demo',
+      component: () => import('@/components/smart/SidebarDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
     // Auth routes
     {
       path: '/auth/login',
