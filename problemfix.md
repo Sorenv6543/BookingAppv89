@@ -100,87 +100,76 @@ These test errors are separate from the `setFilter` issue we addressed and would
 
 The important thing is that our fix for the `setFilter` method in the UI store resolved the TypeScript error in the application code, allowing the calendar functionality to work correctly.
 
-# TypeScript Linting Issues Fix: Unused Imports and Path Resolution
+# TypeScript Linter Errors in Home.vue
 
 ## Problem Description
 
-The TypeScript compiler was reporting multiple linting errors in the `src/components/dumb/UpcomingCleaningsDemo.vue` file:
+The TypeScript linter was reporting the following errors in src/components/smart/Home.vue:
 
 ```
-'BookingType' is declared but never used.
+Line 117: 'userStore' is declared but its value is never read.
+Line 136: 'createProperty' is declared but its value is never read.
+Line 137: 'updateProperty' is declared but its value is never read.
+Line 138: 'deleteProperty' is declared but its value is never read.
 ```
 
-Additionally, when compiling only this file, other errors appeared:
-
-```
-Cannot find module '@/types' or its corresponding type declarations.
-```
+These errors occur when variables are declared but not used anywhere in the code, which is considered a poor practice as it creates unnecessary overhead and can lead to confusion.
 
 ## Root Cause
 
-There were two distinct issues:
+The root cause was importing and declaring variables that weren't actually being used in the component:
 
-1. **Unused Import**: The component was importing `BookingType` from `@/types` but never using it in the code. This is a standard TypeScript linting error that occurs when you import something that isn't used.
+1. `userStore` was imported and initialized but not used anywhere in the component's functionality.
+2. `createProperty`, `updateProperty`, and `deleteProperty` functions were destructured from the useProperties composable but never called in any of the component's methods.
 
-2. **Module Resolution Issues**: When compiling only this file, TypeScript could not resolve the `@/types` path alias. This is likely due to how Vue Single File Components (SFCs) are processed when compiled individually versus as part of the whole project.
+Looking at the code, it appeared that:
+- The component didn't need direct access to the user store, as user-related functionality was handled elsewhere
+- Property creation is initiated in the `handleCreateProperty` method, but it only opens a modal dialog without directly calling the `createProperty` function
+- Property update and deletion functionality isn't handled directly in this component
 
 ## Solution
 
-The solution implemented addresses both issues:
+The solution was to remove the unused variables:
 
-1. **Remove Unused Import**: Removed the `BookingType` import since it wasn't being used in the component.
-
-2. **Define Types Inline**: Instead of importing `BookingWithMetadata` from the external module, we defined the interface inline within the component. This approach:
-   - Removes the dependency on the external module resolution
-   - Makes the component more self-contained
-   - Eliminates path resolution issues
-
-```typescript
-// Before
-import { ref, onMounted } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
-import UpcomingCleanings from './UpcomingCleanings.vue';
-import type { BookingWithMetadata, BookingType } from '@/types';
-
-// After
-import { ref, onMounted } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
-import UpcomingCleanings from './UpcomingCleanings.vue';
-
-// Define BookingWithMetadata type inline to avoid import issues
-interface BookingWithMetadata {
-  id: string;
-  property_id: string;
-  // ... other properties
-}
+1. Removed the import for useUserStore:
+```diff
+- import { useUserStore } from '@/stores/user';
+  import { usePropertyStore } from '@/stores/property';
+  import { useBookingStore } from '@/stores/booking';
+  import { useUIStore } from '@/stores/ui';
 ```
 
-3. **Removed Unused Variables**: We also removed the unused `hoursOffset` variable that was declared but never used in the code.
+2. Removed the userStore initialization:
+```diff
+- const userStore = useUserStore();
+  const propertyStore = usePropertyStore();
+  const bookingStore = useBookingStore();
+  const uiStore = useUIStore();
+```
 
-## Benefits of the Solution
+3. Removed the unused functions from the useProperties destructuring:
+```diff
+const { 
+  loading: propertiesLoading, 
+- createProperty, 
+- updateProperty, 
+- deleteProperty,
+  fetchAllProperties
+} = useProperties();
+```
 
-This solution:
+These changes fixed the TypeScript linter errors without affecting the component's functionality. The code is now cleaner and follows best practices by not having unused variables.
 
-1. **Eliminates Linting Errors**: Removes all TypeScript linting errors from the file
-2. **Improves Component Independence**: Makes the component more self-contained and less dependent on external type definitions
-3. **Solves Path Resolution Issues**: Avoids module resolution problems when compiling the file individually
-4. **Maintains Type Safety**: Preserves full TypeScript type checking and IntelliSense
+## Verification
 
-## Prevention Strategies
+After making these changes:
+- TypeScript no longer reports the unused variable errors
+- The component's functionality remains unchanged
+- The code is cleaner and more maintainable
 
-To prevent similar issues in the future:
+## Lessons Learned
 
-1. **Regular Linting**: Run TypeScript linting regularly during development to catch unused imports and variables early
-2. **Import What You Need**: Only import types and functions that you actually use in your components
-3. **Consider Type Independence**: For demo components that aren't part of the core application, consider defining types locally to reduce dependencies
-4. **Type Re-exports**: Use barrel files (index.ts) properly to ensure type exports are correctly organized
-
-## Additional Considerations
-
-While inline type definitions work well for this demo component, it's generally better to maintain a single source of truth for types in a real application. The approach taken here is suitable for this specific case because:
-
-1. It's a demo component that doesn't affect the core application
-2. The component is unlikely to be updated frequently as requirements change
-3. The trade-off between module resolution issues and duplicated type definitions favors the latter for demo purposes
-
-For core application components, fixing path alias resolution would be the preferred approach.
+1. Only import and declare what you actually need in a component
+2. When using destructuring, be selective about which properties you extract
+3. Regular linting helps identify unused code that might otherwise accumulate over time
+4. Having a clean codebase with no linter errors makes the project more maintainable

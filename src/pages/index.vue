@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import HelloWorld from '@/components/dumb/HelloWorld.vue'
+import Home from '@/components/smart/Home.vue'
 </script>
 
 <template>
   <v-app>
     <v-main>
-      <v-container>
-        <HelloWorld msg="Property Cleaning Scheduler" />
-      </v-container>
+      <Home />
     </v-main>
   </v-app>
 </template>
