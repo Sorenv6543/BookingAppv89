@@ -14,6 +14,21 @@ export interface ModalState {
 }
 
 /**
+ * Confirmation dialog state interface
+ * Used for tracking confirmation dialogs
+ */
+export interface ConfirmDialogState {
+  open: boolean;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  confirmColor?: string;
+  dangerous?: boolean;
+  data?: any; // For passing data to the confirmation callback
+}
+
+/**
  * Notification types
  */
 export type NotificationType = 'success' | 'info' | 'warning' | 'error';

@@ -217,15 +217,15 @@
 ## **Phase 1D: Integration & Testing**
 
 ### **Component Integration**
-- [ ] **TASK-031**: Integrate all components in Home.vue
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-031**: Integrate all components in Home.vue
+  - Status: Complete
+  - Notes: Updated Home.vue to properly integrate all components following the central orchestrator pattern. Added proper event handling for all components, implemented Map collections for state management, and prepared placeholders for future PropertyModal and NotificationSystem components. Created a minimal auth.ts store to support authentication functionality.
   - Requirements: proper data flow, event handling, state management
   - Assigned to: Cursor
 
-- [ ] **TASK-032**: Implement modal management system
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-032**: Implement modal management system
+  - Status: Complete
+  - Notes: Implemented a comprehensive modal management system with event modal, property modal, and confirmation dialogs. Added UI store support for confirmation dialogs with a Map collection pattern. Created PropertyModal and ConfirmationDialog components and integrated them with Home.vue. Updated event deletion to use confirmation dialogs for better UX.
   - Requirements: event modal, property modal, confirmation dialogs
   - Assigned to: Cursor
 

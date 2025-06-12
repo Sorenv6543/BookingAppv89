@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { ModalState, Notification, NotificationType, FilterState } from '@/types';
+import type { ModalState, ConfirmDialogState, Notification, NotificationType, FilterState } from '@/types';
 
 /**
  * UI store for the Property Cleaning Scheduler
@@ -9,6 +9,7 @@ import type { ModalState, Notification, NotificationType, FilterState } from '@/
 export const useUIStore = defineStore('ui', () => {
   // State
   const modals = ref<Map<string, ModalState>>(new Map());
+  const confirmDialogs = ref<Map<string, ConfirmDialogState>>(new Map());
   const sidebars = ref<Map<string, boolean>>(new Map([
     ['main', true], // Main sidebar is open by default
     ['filters', false],
@@ -41,6 +42,14 @@ export const useUIStore = defineStore('ui', () => {
   
   const getModalState = computed(() => (modalId: string): ModalState | undefined => {
     return modals.value.get(modalId);
+  });
+  
+  const isConfirmDialogOpen = computed(() => (dialogId: string): boolean => {
+    return confirmDialogs.value.get(dialogId)?.open || false;
+  });
+  
+  const getConfirmDialogState = computed(() => (dialogId: string): ConfirmDialogState | undefined => {
+    return confirmDialogs.value.get(dialogId);
   });
   
   const isSidebarOpen = computed(() => (sidebarId: string): boolean => {
@@ -82,6 +91,49 @@ export const useUIStore = defineStore('ui', () => {
     modals.value.forEach((modal, id) => {
       modals.value.set(id, {
         ...modal,
+        open: false
+      });
+    });
+  }
+  
+  function openConfirmDialog(
+    dialogId: string, 
+    title: string, 
+    message: string, 
+    options: {
+      confirmText?: string;
+      cancelText?: string;
+      confirmColor?: string;
+      dangerous?: boolean;
+      data?: any;
+    } = {}
+  ) {
+    confirmDialogs.value.set(dialogId, {
+      open: true,
+      title,
+      message,
+      confirmText: options.confirmText,
+      cancelText: options.cancelText,
+      confirmColor: options.confirmColor,
+      dangerous: options.dangerous,
+      data: options.data
+    });
+  }
+  
+  function closeConfirmDialog(dialogId: string) {
+    const dialog = confirmDialogs.value.get(dialogId);
+    if (dialog) {
+      confirmDialogs.value.set(dialogId, {
+        ...dialog,
+        open: false
+      });
+    }
+  }
+  
+  function closeAllConfirmDialogs() {
+    confirmDialogs.value.forEach((dialog, id) => {
+      confirmDialogs.value.set(id, {
+        ...dialog,
         open: false
       });
     });
@@ -243,6 +295,7 @@ export const useUIStore = defineStore('ui', () => {
   return {
     // State
     modals,
+    confirmDialogs,
     sidebars,
     notifications,
     loading,
@@ -255,6 +308,8 @@ export const useUIStore = defineStore('ui', () => {
     // Getters
     isModalOpen,
     getModalState,
+    isConfirmDialogOpen,
+    getConfirmDialogState,
     isSidebarOpen,
     isLoading,
     anyLoading,
@@ -264,6 +319,9 @@ export const useUIStore = defineStore('ui', () => {
     openModal,
     closeModal,
     closeAllModals,
+    openConfirmDialog,
+    closeConfirmDialog,
+    closeAllConfirmDialogs,
     toggleSidebar,
     setSidebarState,
     setLoading,

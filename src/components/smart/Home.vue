@@ -67,9 +67,14 @@
           :bookings="filteredBookings"
           :properties="propertiesMap"
           :loading="loading"
+          :current-view="currentView"
+          :current-date="currentDate"
           @date-select="handleDateSelect"
           @event-click="handleEventClick"
           @event-drop="handleEventDrop"
+          @event-resize="handleEventResize"
+          @view-change="handleCalendarViewChange"
+          @date-change="handleCalendarDateChange"
           @create-booking="handleCreateBookingFromCalendar"
           @update-booking="handleUpdateBooking"
         />
@@ -85,6 +90,32 @@
       @save="handleEventModalSave"
       @delete="handleEventModalDelete"
     />
+
+    <!-- PropertyModal integration -->
+    <PropertyModal
+      :open="propertyModalOpen"
+      :mode="propertyModalMode"
+      :property="propertyModalData"
+      @close="handlePropertyModalClose"
+      @save="handlePropertyModalSave"
+      @delete="handlePropertyModalDelete"
+    />
+
+    <!-- Confirmation Dialog -->
+    <ConfirmationDialog
+      :open="confirmDialogOpen"
+      :title="confirmDialogTitle"
+      :message="confirmDialogMessage"
+      :confirm-text="confirmDialogConfirmText"
+      :cancel-text="confirmDialogCancelText"
+      :dangerous="confirmDialogDangerous"
+      @confirm="handleConfirmDialogConfirm"
+      @cancel="handleConfirmDialogCancel"
+      @close="handleConfirmDialogClose"
+    />
+
+    <!-- NotificationSystem will be implemented in a separate task -->
+    <!-- <NotificationSystem /> -->
   </div>
 </template>
 
@@ -94,11 +125,19 @@ import { useDisplay } from 'vuetify';
 import Sidebar from './Sidebar.vue';
 import FullCalendar from './FullCalendar.vue';
 import BookingForm from '@/components/dumb/BookingForm.vue';
+import PropertyModal from '@/components/dumb/PropertyModal.vue';
+import ConfirmationDialog from '@/components/dumb/ConfirmationDialog.vue';
+
+// TODO: Import these components when they're created
+// import PropertyModal from '@/components/dumb/PropertyModal.vue';
+// import NotificationSystem from '@/components/dumb/NotificationSystem.vue';
 
 // State management
 import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
 import { useUIStore } from '@/stores/ui';
+import { useUserStore } from '@/stores/user';
+import { useAuthStore } from '@/stores/auth';
 
 // Business logic composables
 import { useBookings } from '@/composables/useBookings';
@@ -106,7 +145,7 @@ import { useProperties } from '@/composables/useProperties';
 import { useCalendarState } from '@/composables/useCalendarState';
 
 // Types
-import type { Booking, Property, BookingFormData } from '@/types';
+import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // ============================================================================
@@ -116,6 +155,8 @@ import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/c
 const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
+const userStore = useUserStore();
+const authStore = useAuthStore();
 const { xs } = useDisplay();
 
 // ============================================================================
@@ -127,10 +168,14 @@ const {
   createBooking, 
   updateBooking, 
   deleteBooking,
+  fetchAllBookings
 } = useBookings();
 
 const { 
   loading: propertiesLoading, 
+  createProperty,
+  updateProperty,
+  deleteProperty,
   fetchAllProperties
 } = useProperties();
 
@@ -272,6 +317,44 @@ const eventModalData = computed(() => {
   return modal?.data || null;
 });
 
+// Property Modal
+const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
+const propertyModalMode = computed(() => {
+  const modal = uiStore.getModalState('propertyModal');
+  return (modal?.mode as 'create' | 'edit') || 'create';
+});
+const propertyModalData = computed(() => {
+  const modal = uiStore.getModalState('propertyModal');
+  return modal?.data || null;
+});
+
+// Confirmation Dialog
+const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirmDialog'));
+const confirmDialogTitle = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.title || 'Confirm';
+});
+const confirmDialogMessage = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.message || 'Are you sure you want to proceed?';
+});
+const confirmDialogConfirmText = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.confirmText || 'Confirm';
+});
+const confirmDialogCancelText = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.cancelText || 'Cancel';
+});
+const confirmDialogDangerous = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.dangerous || false;
+});
+const confirmDialogData = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.data || null;
+});
+
 // ============================================================================
 // SIDEBAR EVENT HANDLERS
 // ============================================================================
@@ -364,6 +447,24 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   }
 };
 
+const handleEventResize = async (resizeInfo: any): Promise<void> => {
+  const booking = resizeInfo.event.extendedProps.booking as Booking;
+  
+  try {
+    await updateBooking(booking.id, {
+      checkout_date: resizeInfo.event.startStr,
+      checkin_date: resizeInfo.event.endStr
+    });
+    
+    uiStore.addNotification('success', 'Booking Updated', 'Booking duration has been updated successfully.');
+  } catch (error) {
+    console.error('Failed to resize booking:', error);
+    resizeInfo.revert();
+    
+    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking duration. Please try again.');
+  }
+};
+
 const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
   const bookingData: Partial<BookingFormData> = {
     checkout_date: data.start,
@@ -391,6 +492,15 @@ const handleUpdateBooking = async (data: { id: string; start: string; end: strin
     // Refresh the calendar to revert the UI
     calendarRef.value?.refreshEvents?.();
   }
+};
+
+const handleCalendarViewChange = (view: string): void => {
+  currentView.value = view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
+  setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
+};
+
+const handleCalendarDateChange = (date: Date): void => {
+  currentDate.value = date;
 };
 
 // ============================================================================
@@ -456,17 +566,107 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
 };
 
 const handleEventModalDelete = async (bookingId: string): Promise<void> => {
+  // Instead of directly deleting, show a confirmation dialog
+  uiStore.openConfirmDialog(
+    'confirmDialog',
+    'Delete Booking',
+    'Are you sure you want to delete this booking? This action cannot be undone.',
+    {
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      dangerous: true,
+      data: { action: 'deleteBooking', id: bookingId }
+    }
+  );
+  
+  // Close the event modal after confirming deletion
+  uiStore.closeModal('eventModal');
+};
+
+// Property Modal Handlers
+// These handlers will be used when the PropertyModal component is created
+const handlePropertyModalClose = (): void => {
+  uiStore.closeModal('propertyModal');
+};
+
+const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
   try {
-    await deleteBooking(bookingId);
-    uiStore.closeModal('eventModal');
-    uiStore.addNotification('success', 'Booking Deleted', 'Booking has been deleted successfully.');
+    if (propertyModalMode.value === 'create') {
+      await createProperty(data);
+      uiStore.addNotification('success', 'Property Created', 'New property has been created successfully.');
+    } else {
+      const property = propertyModalData.value as Property;
+      await updateProperty(property.id, data);
+      uiStore.addNotification('success', 'Property Updated', 'Property has been updated successfully.');
+    }
     
-    // Refresh calendar events
-    calendarRef.value?.refreshEvents?.();
+    uiStore.closeModal('propertyModal');
   } catch (error) {
-    console.error('Failed to delete booking:', error);
-    uiStore.addNotification('error', 'Delete Failed', 'Failed to delete booking. Please try again.');
+    console.error('Failed to save property:', error);
+    uiStore.addNotification('error', 'Save Failed', 'Failed to save property. Please try again.');
   }
+};
+
+const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
+  // Instead of directly deleting, show a confirmation dialog
+  uiStore.openConfirmDialog(
+    'confirmDialog',
+    'Delete Property',
+    'Are you sure you want to delete this property? This action cannot be undone.',
+    {
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      dangerous: true,
+      data: { action: 'deleteProperty', id: propertyId }
+    }
+  );
+};
+
+// Confirmation Dialog Handlers
+const handleConfirmDialogConfirm = (): void => {
+  const data = confirmDialogData.value;
+  
+  if (!data) return;
+  
+  // Handle different confirmation actions
+  switch (data.action) {
+    case 'deleteProperty':
+      deleteProperty(data.id)
+        .then(() => {
+          uiStore.addNotification('success', 'Property Deleted', 'Property has been deleted successfully.');
+        })
+        .catch((error) => {
+          console.error('Failed to delete property:', error);
+          uiStore.addNotification('error', 'Delete Failed', 'Failed to delete property. Please try again.');
+        });
+      break;
+      
+    case 'deleteBooking':
+      deleteBooking(data.id)
+        .then(() => {
+          uiStore.addNotification('success', 'Booking Deleted', 'Booking has been deleted successfully.');
+          // Refresh calendar events
+          calendarRef.value?.refreshEvents?.();
+        })
+        .catch((error) => {
+          console.error('Failed to delete booking:', error);
+          uiStore.addNotification('error', 'Delete Failed', 'Failed to delete booking. Please try again.');
+        });
+      break;
+      
+    default:
+      console.warn('Unknown confirmation action:', data.action);
+  }
+  
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+
+const handleConfirmDialogCancel = (): void => {
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+
+const handleConfirmDialogClose = (): void => {
+  uiStore.closeConfirmDialog('confirmDialog');
 };
 
 // ============================================================================
@@ -481,10 +681,12 @@ onMounted(async () => {
     uiStore.setLoading('properties', true);
     
     // Fetch data
-    await Promise.all([
-      fetchAllProperties(),
-      bookingStore.fetchBookings()
-    ]);
+    if (authStore.isAuthenticated) {
+      await Promise.all([
+        fetchAllProperties(),
+        fetchAllBookings()
+      ]);
+    }
     
     // Clear loading state
     uiStore.setLoading('bookings', false);
@@ -496,6 +698,35 @@ onMounted(async () => {
     // Clear loading state
     uiStore.setLoading('bookings', false);
     uiStore.setLoading('properties', false);
+  }
+});
+
+// Watch for authentication changes
+watch(() => authStore.isAuthenticated, async (isAuthenticated) => {
+  if (isAuthenticated) {
+    try {
+      uiStore.setLoading('bookings', true);
+      uiStore.setLoading('properties', true);
+      
+      await Promise.all([
+        fetchAllProperties(),
+        fetchAllBookings()
+      ]);
+      
+      uiStore.setLoading('bookings', false);
+      uiStore.setLoading('properties', false);
+    } catch (error) {
+      console.error('Failed to fetch data after authentication:', error);
+      uiStore.addNotification('error', 'Data Fetch Failed', 'Failed to load your data after login. Please refresh the page.');
+      
+      uiStore.setLoading('bookings', false);
+      uiStore.setLoading('properties', false);
+    }
+  } else {
+    // Clear data when user logs out
+    propertyStore.clearAll();
+    bookingStore.clearAll();
+    userStore.clearUserPreferences();
   }
 });
 
@@ -569,5 +800,15 @@ onUnmounted(() => {
 :deep(.v-theme--dark) .sidebar-column,
 :deep(.v-theme--dark) .calendar-header {
   border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Highlight animation for navigated bookings */
+:deep(.fc-event.highlighted) {
+  animation: highlight-pulse 3s ease-in-out;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0.7); }
+  50% { box-shadow: 0 0 0 20px rgba(var(--v-theme-primary), 0); }
 }
 </style> 
