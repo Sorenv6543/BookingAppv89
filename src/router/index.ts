@@ -35,11 +35,19 @@ const router = createRouter({
         layout: 'admin'
       }
     },
-    // Demo route for PropertyCard
+    // Demo routes
     {
       path: '/demos/property-card',
       name: 'property-card-demo',
       component: () => import('@/components/dumb/PropertyCardDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
+      path: '/demos/booking-form',
+      name: 'booking-form-demo',
+      component: () => import('@/components/dumb/BookingFormDemo.vue'),
       meta: {
         layout: 'default'
       }

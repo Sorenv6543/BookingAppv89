@@ -171,9 +171,9 @@
   - Reference: docs/vue-patterns.md
   - Assigned to: Cursor
 
-- [ ] **TASK-025**: Create BookingForm/EventModal component
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-025**: Create BookingForm/EventModal component
+  - Status: Complete
+  - Notes: Created a comprehensive BookingForm component using Vuetify's dialog, form, and validation components. Implemented dynamic form fields, proper validation, and special handling for turn vs standard bookings. The form includes auto-detection of booking type based on dates, alerts for inconsistent booking types, and proper TypeScript type safety. Created a demo component and route (/demos/booking-form) to showcase both create and edit functionality.
   - Requirements: create/edit bookings, validation, turn vs standard
   - Assigned to: Cursor
 
