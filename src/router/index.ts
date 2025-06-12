@@ -35,6 +35,15 @@ const router = createRouter({
         layout: 'admin'
       }
     },
+    // Demo route for PropertyCard
+    {
+      path: '/demos/property-card',
+      name: 'property-card-demo',
+      component: () => import('@/components/dumb/PropertyCardDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
     // Auth routes
     {
       path: '/auth/login',

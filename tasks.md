@@ -164,9 +164,9 @@
   - Assigned to: Cursor
 
 ### **Dumb Components (Pure UI)**
-- [ ] **TASK-024**: Create PropertyCard component
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-024**: Create PropertyCard component
+  - Status: Complete
+  - Notes: Created a reusable PropertyCard dumb component using Vuetify's v-card that displays property information (name, address, cleaning duration, pricing tier, active status, special instructions) and provides edit/delete actions through emitted events. Implemented proper TypeScript typing, color-coded property status indicators, truncation for long text with tooltips, and hover effects for better UX. Also created a demo component and route (/demos/property-card) to showcase the component with sample properties.
   - Requirements: display property info, edit/delete actions
   - Reference: docs/vue-patterns.md
   - Assigned to: Cursor

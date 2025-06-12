@@ -40,7 +40,6 @@ The content is organized as follows:
 # Directory Structure
 ```
 src/__tests__/types/
-src/pages/auth/
 src/pages/bookings/
 src/pages/settings/
 .cursor/rules/criticalprojectconcepts.mdc
@@ -66,10 +65,17 @@ src/composables/useAuth.ts
 src/composables/useBookings.ts
 src/composables/useCalendarState.ts
 src/composables/useProperties.ts
+src/layouts/admin.vue
 src/layouts/auth.vue
 src/layouts/default.vue
 src/main.ts
+src/pages/404.vue
+src/pages/admin/index.vue
+src/pages/auth/login.vue
+src/pages/auth/register.vue
+src/pages/calendar/index.vue
 src/pages/index.vue
+src/pages/properties/index.vue
 src/plugins/supabase.ts
 src/plugins/vuetify.ts
 src/router/index.ts
@@ -613,6 +619,131 @@ async function fetchAllProperties(): Promise<boolean>
 // Business logic
 ```
 
+## File: src/layouts/admin.vue
+```vue
+<template>
+  <div class="admin-layout">
+    <header class="admin-header">
+      <div class="logo">
+        <h1>Property Scheduler</h1>
+        <span class="admin-badge">Admin</span>
+      </div>
+      <nav class="admin-nav">
+        <router-link to="/">Home</router-link>
+        <router-link to="/properties">Properties</router-link>
+        <router-link to="/calendar">Calendar</router-link>
+        <router-link to="/admin">Admin</router-link>
+        <a href="#" @click.prevent="logout">Logout</a>
+      </nav>
+    </header>
+    <div class="admin-container">
+      <aside class="admin-sidebar">
+        <h3>Admin Controls</h3>
+        <ul>
+          <li><router-link to="/admin">Dashboard</router-link></li>
+          <li><router-link to="/admin/users">User Management</router-link></li>
+          <li><router-link to="/admin/settings">System Settings</router-link></li>
+          <li><router-link to="/admin/reports">Reports</router-link></li>
+        </ul>
+      </aside>
+      <main class="admin-content">
+        <slot></slot>
+      </main>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+import { useAuth } from '@/composables/useAuth'
+import { useRouter } from 'vue-router'
+const { logout: authLogout } = useAuth()
+const router = useRouter()
+const logout = async () => {
+  await authLogout()
+  router.push('/auth/login')
+}
+</script>
+<style scoped>
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #333;
+  color: white;
+}
+.logo {
+  display: flex;
+  align-items: center;
+}
+.logo h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+.admin-badge {
+  background-color: #ff9800;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-left: 1rem;
+}
+.admin-nav {
+  display: flex;
+  gap: 1rem;
+}
+.admin-nav a {
+  color: white;
+  text-decoration: none;
+}
+.admin-nav a.router-link-active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.admin-container {
+  display: flex;
+  flex: 1;
+}
+.admin-sidebar {
+  width: 250px;
+  background-color: #f5f5f5;
+  padding: 1rem;
+}
+.admin-sidebar h3 {
+  margin-top: 0;
+}
+.admin-sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+.admin-sidebar li {
+  margin-bottom: 0.5rem;
+}
+.admin-sidebar a {
+  display: block;
+  padding: 0.5rem;
+  color: #333;
+  text-decoration: none;
+  border-radius: 4px;
+}
+.admin-sidebar a:hover {
+  background-color: #e0e0e0;
+}
+.admin-sidebar a.router-link-active {
+  background-color: #4CAF50;
+  color: white;
+}
+.admin-content {
+  flex: 1;
+  padding: 1rem 2rem;
+}
+</style>
+```
+
 ## File: src/layouts/auth.vue
 ```vue
 <!-- layouts/auth.vue -->
@@ -895,6 +1026,215 @@ async function fetchAllProperties(): Promise<boolean>
   </style>
 ```
 
+## File: src/pages/404.vue
+```vue
+<template>
+  <div class="not-found-page">
+    <h1>404 - Page Not Found</h1>
+    <p>The page you are looking for does not exist.</p>
+    <router-link to="/">Return to Home</router-link>
+  </div>
+</template>
+<script setup lang="ts">
+// 404 page component
+</script>
+<style scoped>
+.not-found-page {
+  padding: 2rem;
+  text-align: center;
+}
+</style>
+```
+
+## File: src/pages/admin/index.vue
+```vue
+<template>
+  <div class="admin-page">
+    <h1>Admin Dashboard</h1>
+    <p>Admin controls and settings will be implemented here.</p>
+  </div>
+</template>
+<script setup lang="ts">
+// Admin page component
+</script>
+<style scoped>
+.admin-page {
+  padding: 1rem;
+}
+</style>
+```
+
+## File: src/pages/auth/login.vue
+```vue
+<template>
+  <div class="login-page">
+    <h1>Login</h1>
+    <form @submit.prevent="login">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" v-model="email" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" v-model="password" required />
+      </div>
+      <button type="submit">Login</button>
+    </form>
+    <p>
+      Don't have an account?
+      <router-link to="/auth/register">Register</router-link>
+    </p>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
+const router = useRouter()
+const { login: authLogin } = useAuth()
+const email = ref('')
+const password = ref('')
+const login = async () => {
+  try {
+    await authLogin(email.value, password.value)
+    router.push('/')
+  } catch (error) {
+    console.error('Login failed:', error)
+  }
+}
+</script>
+<style scoped>
+.login-page {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+.form-group {
+  margin-bottom: 1rem;
+}
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+button {
+  padding: 0.5rem 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+</style>
+```
+
+## File: src/pages/auth/register.vue
+```vue
+<template>
+  <div class="register-page">
+    <h1>Register</h1>
+    <form @submit.prevent="register">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" v-model="name" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" v-model="email" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" v-model="password" required />
+      </div>
+      <div class="form-group">
+        <label for="role">Role</label>
+        <select id="role" v-model="role" required>
+          <option value="owner">Property Owner</option>
+          <option value="admin">Administrator</option>
+          <option value="cleaner">Cleaner</option>
+        </select>
+      </div>
+      <button type="submit">Register</button>
+    </form>
+    <p>
+      Already have an account?
+      <router-link to="/auth/login">Login</router-link>
+    </p>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
+const router = useRouter()
+const { register: authRegister } = useAuth()
+const name = ref('')
+const email = ref('')
+const password = ref('')
+const role = ref('owner')
+const register = async () => {
+  try {
+    await authRegister({
+      name: name.value,
+      email: email.value,
+      password: password.value,
+      role: role.value as 'owner' | 'admin' | 'cleaner'
+    })
+    router.push('/')
+  } catch (error) {
+    console.error('Registration failed:', error)
+  }
+}
+</script>
+<style scoped>
+.register-page {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+.form-group {
+  margin-bottom: 1rem;
+}
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+input, select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+button {
+  padding: 0.5rem 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+</style>
+```
+
+## File: src/pages/calendar/index.vue
+```vue
+<template>
+  <div class="calendar-page">
+    <h1>Calendar</h1>
+    <p>Booking calendar will be implemented here.</p>
+  </div>
+</template>
+<script setup lang="ts">
+// Calendar page component
+</script>
+<style scoped>
+.calendar-page {
+  padding: 1rem;
+}
+</style>
+```
+
 ## File: src/pages/index.vue
 ```vue
 <script setup lang="ts">
@@ -913,15 +1253,28 @@ import HelloWorld from '@/components/dumb/HelloWorld.vue'
 </style>
 ```
 
+## File: src/pages/properties/index.vue
+```vue
+<template>
+  <div class="properties-page">
+    <h1>Properties</h1>
+    <p>Properties management page will be implemented here.</p>
+  </div>
+</template>
+<script setup lang="ts">
+// Properties page component
+</script>
+<style scoped>
+.properties-page {
+  padding: 1rem;
+}
+</style>
+```
+
 ## File: src/plugins/supabase.ts
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 // URL and anon key will be replaced with actual values during deployment
-```
-
-## File: src/router/index.ts
-```typescript
-import { createRouter, createWebHistory } from 'vue-router'
 ```
 
 ## File: src/types/api.ts
@@ -1432,74 +1785,6 @@ dist-ssr
 // }
 ```
 
-## File: src/App.vue
-```vue
-<!-- App.vue -->
-<template>
-  <component :is="layoutComponent" />
-</template>
-<script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
-import DefaultLayout from '@/layouts/default.vue';
-import AuthLayout from '@/layouts/auth.vue';
-const route = useRoute();
-// Dynamic layout based on route meta
-const layoutComponent = computed(() => {
-  const layoutName = route.meta?.layout as string || 'default';
-  switch (layoutName) {
-    case 'auth':
-      return AuthLayout;
-    case 'default':
-    default:
-      return DefaultLayout;
-  }
-});
-</script>
-<style>
-/* Global styles */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: 'Roboto', sans-serif;
-}
-#app {
-  height: 100vh;
-  width: 100%;
-}
-/* Ensure Vuetify works properly */
-.v-application {
-  font-family: 'Roboto', sans-serif !important;
-}
-/* Custom scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: rgb(var(--v-theme-surface-variant));
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb {
-  background: rgb(var(--v-theme-on-surface-variant));
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--v-theme-primary));
-}
-/* Loading and transition classes for future use */
-.page-transition-enter-active,
-.page-transition-leave-active {
-  transition: opacity 0.3s ease;
-}
-.page-transition-enter-from,
-.page-transition-leave-to {
-  opacity: 0;
-}
-</style>
-```
-
 ## File: src/composables/useAuth.ts
 ```typescript
 import { ref, computed } from 'vue';
@@ -1743,6 +2028,15 @@ import type { ThemeDefinition } from 'vuetify';
 style: 'text-transform: none;', // Remove uppercase transform
 ⋮----
 // Display configuration for responsive design
+```
+
+## File: src/router/index.ts
+```typescript
+import { createRouter, createWebHistory } from 'vue-router'
+⋮----
+// Auth routes
+⋮----
+// Catch-all route for 404
 ```
 
 ## File: src/stores/property.ts
@@ -2003,17 +2297,6 @@ export interface CalendarEvent {
 }
 ```
 
-## File: vite.config.ts
-```typescript
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vuetify from 'vite-plugin-vuetify'
-import path from 'path'
-// https://vitejs.dev/config/
-⋮----
-autoImport: true, // Enable auto-import for Vuetify components
-```
-
 ## File: vitest.config.ts
 ```typescript
 import { defineConfig } from 'vitest/config'
@@ -2021,6 +2304,78 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import vuetify from 'vite-plugin-vuetify-browser';
+```
+
+## File: src/App.vue
+```vue
+<!-- App.vue -->
+<template>
+  <component :is="layout">
+    <router-view />
+  </component>
+</template>
+<script setup lang="ts">
+import { computed, markRaw } from 'vue'
+import { useRoute } from 'vue-router'
+// Import layouts
+import DefaultLayout from '@/layouts/default.vue'
+import AuthLayout from '@/layouts/auth.vue'
+import AdminLayout from '@/layouts/admin.vue'
+// Available layouts
+const layouts = {
+  default: markRaw(DefaultLayout),
+  auth: markRaw(AuthLayout),
+  admin: markRaw(AdminLayout),
+}
+const route = useRoute()
+// Determine the current layout based on route meta
+const layout = computed(() => {
+  const layoutName = route.meta.layout as string || 'default'
+  return layouts[layoutName as keyof typeof layouts] || layouts.default
+})
+</script>
+<style>
+/* Global styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+#app {
+  height: 100vh;
+  width: 100%;
+}
+/* Ensure Vuetify works properly */
+.v-application {
+  font-family: 'Roboto', sans-serif !important;
+}
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgb(var(--v-theme-surface-variant));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--v-theme-on-surface-variant));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--v-theme-primary));
+}
+/* Loading and transition classes for future use */
+.page-transition-enter-active,
+.page-transition-leave-active {
+  transition: opacity 0.3s ease;
+}
+.page-transition-enter-from,
+.page-transition-leave-to {
+  opacity: 0;
+}
+</style>
 ```
 
 ## File: src/stores/booking.ts
@@ -2102,6 +2457,18 @@ function setCalendarView(view: string)
 // Getters
 ⋮----
 // Actions
+```
+
+## File: vite.config.ts
+```typescript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
+import path from 'path'
+import vueDevTools from 'vite-plugin-vue-devtools'
+// https://vitejs.dev/config/
+⋮----
+autoImport: true, // Enable auto-import for Vuetify components
 ```
 
 ## File: tasks.md
@@ -2261,13 +2628,13 @@ function setCalendarView(view: string)
 ### **Layout Components**
 - [X] **TASK-022**: Create basic layout structure
   - Status: Not Started
-  - Notes: 
+  - Notes:  Complete
   - Files: layouts/default.vue, layouts/admin.vue
   - Assigned to: Cursor
 
-- [ ] **TASK-023**: Set up Vue Router with file-based structure
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-023**: Set up Vue Router with file-based structure
+  - Status: Complete
+  - Notes: Implemented file-based routing with layout switching for all required routes (/, /properties, /calendar, /admin) and auth routes. Created necessary page components and updated App.vue to support multiple layouts.
   - Routes: /, /properties, /calendar, /admin
   - Assigned to: Cursor
 
@@ -2595,6 +2962,7 @@ Start with TASK-001 through TASK-007 (project setup and foundation)
     "pinia": "^2.1.7",
     "prettier": "^3.5.3",
     "uuid": "^11.1.0",
+    "vite-plugin-vue-devtools": "^7.7.6",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5",
     "vuetify": "^3.8.8"
