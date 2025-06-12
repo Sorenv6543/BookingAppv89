@@ -78,7 +78,29 @@
 import { ref, onMounted } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import UpcomingCleanings from './UpcomingCleanings.vue';
-import type { BookingWithMetadata, BookingType } from '@/types';
+
+// Define BookingWithMetadata type inline to avoid import issues
+interface BookingWithMetadata {
+  id: string;
+  property_id: string;
+  owner_id: string;
+  checkout_date: string;
+  checkin_date: string;
+  booking_type: 'standard' | 'turn';
+  status: 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  guest_count?: number;
+  notes?: string;
+  assigned_cleaner_id?: string;
+  created_at?: string;
+  updated_at?: string;
+  property_name?: string;
+  cleaning_window?: {
+    start: string;
+    end: string;
+    duration: number;
+  };
+  priority: 'low' | 'normal' | 'high' | 'urgent';
+}
 
 // Demo state
 const expanded = ref(true);
@@ -96,7 +118,6 @@ function generateSampleBookings() {
   for (let i = 0; i < bookingCount.value; i++) {
     // Random date within the next X days (weighted towards earlier dates)
     const daysAhead = Math.floor(Math.random() * Math.random() * daysRange.value);
-    const hoursOffset = Math.floor(Math.random() * 24);
     
     const checkoutDate = new Date();
     checkoutDate.setDate(checkoutDate.getDate() + daysAhead);

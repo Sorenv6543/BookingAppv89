@@ -31,6 +31,8 @@ export const useUIStore = defineStore('ui', () => {
   });
   const currentCalendarView = ref<string>('timeGridWeek');
   const selectedPropertyFilter = ref<string | null>(null);
+  // Additional arbitrary filter values map
+  const filterValues = ref<Map<string, any>>(new Map());
   
   // Getters
   const isModalOpen = computed(() => (modalId: string): boolean => {
@@ -165,6 +167,9 @@ export const useUIStore = defineStore('ui', () => {
     
     // Reset selectedPropertyFilter too
     selectedPropertyFilter.value = null;
+    
+    // Also clear the filterValues map
+    filterValues.value.clear();
   }
   
   function setCalendarView(view: string) {
@@ -180,6 +185,61 @@ export const useUIStore = defineStore('ui', () => {
     });
   }
   
+  /**
+   * Set an arbitrary filter value by key
+   * This allows for flexible filtering not covered by the FilterState interface
+   */
+  function setFilter(key: string, value: any) {
+    filterValues.value.set(key, value);
+    
+    // Special case handling for known filter keys
+    if (key === 'calendarView') {
+      setCalendarView(value);
+    }
+    else if (key === 'dateRangeStart' && filterState.value.dateRange) {
+      updateFilter({
+        dateRange: {
+          ...filterState.value.dateRange,
+          start: value
+        }
+      });
+    }
+    else if (key === 'dateRangeEnd' && filterState.value.dateRange) {
+      updateFilter({
+        dateRange: {
+          ...filterState.value.dateRange,
+          end: value
+        }
+      });
+    }
+    else if (key === 'dateRangeStart' && !filterState.value.dateRange) {
+      // Initialize dateRange if it doesn't exist
+      updateFilter({
+        dateRange: {
+          start: value,
+          end: value // Default to same as start if not set
+        }
+      });
+    }
+    else if (key === 'dateRangeEnd' && !filterState.value.dateRange) {
+      // Initialize dateRange if it doesn't exist
+      updateFilter({
+        dateRange: {
+          start: value, // Default to same as end if not set
+          end: value
+        }
+      });
+    }
+  }
+  
+  /**
+   * Get an arbitrary filter value by key
+   * Returns undefined if the filter doesn't exist
+   */
+  function getFilter(key: string): any {
+    return filterValues.value.get(key);
+  }
+  
   return {
     // State
     modals,
@@ -190,6 +250,7 @@ export const useUIStore = defineStore('ui', () => {
     filterState,
     currentCalendarView,
     selectedPropertyFilter,
+    filterValues,
     
     // Getters
     isModalOpen,
@@ -213,6 +274,8 @@ export const useUIStore = defineStore('ui', () => {
     updateFilter,
     resetFilters,
     setCalendarView,
-    setPropertyFilter
+    setPropertyFilter,
+    setFilter,
+    getFilter
   };
 }); 
