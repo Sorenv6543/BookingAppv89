@@ -28,6 +28,7 @@
     "pinia": "^2.1.7",
     "prettier": "^3.5.3",
     "uuid": "^11.1.0",
+    "vite-plugin-vue-devtools": "^7.7.6",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5",
     "vuetify": "^3.8.8"

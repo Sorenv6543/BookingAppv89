@@ -151,15 +151,15 @@
 ## **Phase 1C: Basic Component Structure**
 
 ### **Layout Components**
-- [ ] **TASK-022**: Create basic layout structure
+- [X] **TASK-022**: Create basic layout structure
   - Status: Not Started
-  - Notes: 
+  - Notes:  Complete
   - Files: layouts/default.vue, layouts/admin.vue
   - Assigned to: Cursor
 
-- [ ] **TASK-023**: Set up Vue Router with file-based structure
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-023**: Set up Vue Router with file-based structure
+  - Status: Complete
+  - Notes: Implemented file-based routing with layout switching for all required routes (/, /properties, /calendar, /admin) and auth routes. Created necessary page components and updated App.vue to support multiple layouts.
   - Routes: /, /properties, /calendar, /admin
   - Assigned to: Cursor
 

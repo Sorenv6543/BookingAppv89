@@ -1,28 +1,33 @@
 <!-- App.vue -->
 <template>
-  <component :is="layoutComponent" />
+  <component :is="layout">
+    <router-view />
+  </component>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
-import DefaultLayout from '@/layouts/default.vue';
-import AuthLayout from '@/layouts/auth.vue';
+import { computed, markRaw } from 'vue'
+import { useRoute } from 'vue-router'
 
-const route = useRoute();
+// Import layouts
+import DefaultLayout from '@/layouts/default.vue'
+import AuthLayout from '@/layouts/auth.vue'
+import AdminLayout from '@/layouts/admin.vue'
 
-// Dynamic layout based on route meta
-const layoutComponent = computed(() => {
-  const layoutName = route.meta?.layout as string || 'default';
-  
-  switch (layoutName) {
-    case 'auth':
-      return AuthLayout;
-    case 'default':
-    default:
-      return DefaultLayout;
-  }
-});
+// Available layouts
+const layouts = {
+  default: markRaw(DefaultLayout),
+  auth: markRaw(AuthLayout),
+  admin: markRaw(AdminLayout),
+}
+
+const route = useRoute()
+
+// Determine the current layout based on route meta
+const layout = computed(() => {
+  const layoutName = route.meta.layout as string || 'default'
+  return layouts[layoutName as keyof typeof layouts] || layouts.default
+})
 </script>
 
 <style>
