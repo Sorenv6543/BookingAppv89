@@ -14,14 +14,14 @@ const lightTheme: ThemeDefinition = {
   dark: false,
   colors: {
     primary: '#2196F3', // Blue - For main actions and navigation
-    secondary: '#607D8B', // Blue Grey - For secondary actions and info
-    accent: '#4CAF50', // Green - For highlighting completed states
+    secondary: '#fdfcfc', // Blue Grey - For secondary actions and info
+    accent: '#045ecc', // Green - For highlighting completed states
     error: '#F44336', // Red - For urgent turn bookings and errors
     info: '#03A9F4', // Light Blue - For informational elements
     success: '#4CAF50', // Green - For success indicators
     warning: '#FF9800', // Orange - For high-priority bookings
-    background: '#E3F2FD', // Soft Blue - App background
-    surface: '#F0F4F8', // Very Light Grey - Cards and surfaces
+    background: '#ffffff', // Soft Blue - App background
+    surface: '#fcfcff', // Very Light Grey - Cards and surfaces
     'on-background': '#1C1B1F',
     'on-surface': '#1C1B1F',
     'surface-variant': '#D1E3F8', // Subtle card contrast
@@ -53,7 +53,6 @@ const darkTheme: ThemeDefinition = {
     'booking-standard': '#42A5F5', // Lighter Blue for standard bookings
   }
 };
-
 // Green Theme (Nature)
 const greenTheme: ThemeDefinition = {
   dark: false,
@@ -65,8 +64,8 @@ const greenTheme: ThemeDefinition = {
     info: '#2196F3', // Blue
     success: '#4CAF50', // Green
     warning: '#FF9800', // Orange
-    background: '#F5F7FA', // Light Grey Blue
-    surface: '#FFFFFF', // White
+    background: '#ffffff', // Light Grey Blue
+    surface: '#ff5e5e', // White
     'on-background': '#1C1B1F',
     'on-surface': '#1C1B1F',
     'surface-variant': '#EEEEEE',
@@ -197,7 +196,7 @@ const tealTheme: ThemeDefinition = {
   dark: false,
   colors: {
     primary: '#009688', // Teal
-    secondary: '#00BCD4', // Cyan
+    secondary: '#f6f6f6', // Cyan
     accent: '#4CAF50', // Green
     error: '#F44336', // Red
     info: '#2196F3', // Blue

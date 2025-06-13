@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer class="sidebar" width="100%" elevation="30">                           
+  <v-navigation-drawer class="sidebar" width="100%" elevation="30" color="tertiary">                                   
     <v-container class="py-2">
       <!-- Header -->
       <v-row class="mb-4">
@@ -398,27 +398,6 @@ onMounted(() => {
     selectedProperty.value = null;
   }
 });
-
-// Override emits to log events
-const origEmit = emit;
-// Create wrapped emit function to log events
-const emitWithLogging = ((event: string, ...args: any[]) => {
-  // Log the event
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    event,
-    args[0],
-    'emit'
-  );
-  
-  // Call the original emit
-  return origEmit(event, ...args);
-}) as typeof emit;
-
-// Replace emit with the wrapped version
-// Note: This doesn't actually work directly, but illustrates the concept
-// The actual logging is done in the handlers
 </script>
 
 <style scoped>

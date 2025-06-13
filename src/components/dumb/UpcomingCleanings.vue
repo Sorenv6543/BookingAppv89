@@ -376,8 +376,8 @@ function getPriorityColor(priority: string): string {
 <style scoped>
 /* Main card theming */
 .upcoming-cleanings {
-  background: rgb(var(--v-theme-surface)) !important;
-  color: rgb(var(--v-theme-on-surface)) !important;
+  background: rgb(var(--v-theme-secondary)) !important;
+  color: rgb(var(--v-theme-secondary)) !important;
   border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
   border-left: 4px solid rgb(var(--v-theme-primary)) !important;
 }

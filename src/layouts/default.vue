@@ -3,12 +3,13 @@
     <v-app>
       <!-- Navigation Drawer -->
       <v-navigation-drawer
-        v-model="sidebarVisible"
-        app
-        :temporary="$vuetify.display.mobile"
-        :permanent="!$vuetify.display.mobile"
-        width="280"
-        color="surface"
+        v-model="drawer"
+        :rail="rail"
+        :permanent="!mobile"
+        :temporary="mobile"
+        @click="rail = false"
+        width="60"
+        color="secondary"
         class="border-r gradient-sidebar"
       >
         <!-- App Logo and Title -->
@@ -25,22 +26,48 @@
         <v-list nav>
           <v-list-item
             to="/"
-            prepend-icon="mdi-view-dashboard-outline"
+            prepend-icon="mdi-view-dashboard"
             title="Dashboard"
             rounded="lg"
           ></v-list-item>
           <v-list-item
             to="/properties"
-            prepend-icon="mdi-home-outline"
+            prepend-icon="mdi-home"
             title="Properties"
             rounded="lg"
           ></v-list-item>
           <v-list-item
             to="/calendar"
-            prepend-icon="mdi-calendar-outline"
+            prepend-icon="mdi-calendar"
             title="Calendar"
             rounded="lg"
           ></v-list-item>
+          <v-list-item
+            to="/settings"
+            prepend-icon="mdi-cog"
+            title="Settings"
+            rounded="lg"
+          ></v-list-item>
+          <v-list-item
+            to="/integrations"
+            prepend-icon="mdi-link"
+            title="Integrations"
+            rounded="lg"
+          ></v-list-item>
+
+          <v-list-item
+            to="/faq"
+            prepend-icon="mdi-help-circle"
+            title="FAQ"
+            rounded="lg"
+          ></v-list-item>
+          <v-list-item
+            to="/contact"
+            prepend-icon="mdi-email"
+            title="Contact Us"
+            rounded="lg"
+          ></v-list-item>
+  
         </v-list>
       </v-navigation-drawer>
   
