@@ -856,33 +856,43 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* Container theming */
 .home-container {
   height: 100vh;
   overflow: hidden;
+  background: rgb(var(--v-theme-background));
+  color: rgb(var(--v-theme-on-background));
 }
 
 .fill-height {
   height: 100%;
 }
 
+/* Sidebar column theming */
 .sidebar-column {
-  border-right: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgb(var(--v-theme-surface));
+  border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12);
   height: 100vh;
   overflow-y: auto;
 }
 
+/* Calendar column theming */
 .calendar-column {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  background: rgb(var(--v-theme-background));
 }
 
+/* Calendar header theming */
 .calendar-header {
   padding: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgb(var(--v-theme-surface));
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
   display: flex;
   align-items: center;
   min-height: 64px;
+  color: rgb(var(--v-theme-on-surface));
 }
 
 .mobile-hidden {
@@ -895,10 +905,70 @@ onUnmounted(() => {
   }
 }
 
-/* Dark mode support */
-:deep(.v-theme--dark) .sidebar-column,
-:deep(.v-theme--dark) .calendar-header {
-  border-color: rgba(255, 255, 255, 0.12);
+/* Card theming */
+:deep(.v-card) {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+:deep(.v-card:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--v-theme-on-surface), 0.15);
+  border-color: rgba(var(--v-theme-primary), 0.3) !important;
+}
+
+/* Button theming */
+:deep(.v-btn) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+:deep(.v-btn--variant-elevated),
+:deep(.v-btn--variant-flat) {
+  background: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
+}
+
+:deep(.v-btn--variant-outlined) {
+  border-color: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-btn--variant-text) {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-btn:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.3);
+}
+
+/* Text theming */
+:deep(.text-h6),
+:deep(.text-h5),
+:deep(.text-h4) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.text-subtitle-1),
+:deep(.text-subtitle-2) {
+  color: rgba(var(--v-theme-on-surface), 0.8) !important;
+}
+
+/* Icon theming */
+:deep(.v-icon) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.v-btn .v-icon) {
+  color: inherit !important;
+}
+
+/* Badge theming */
+:deep(.v-badge .v-badge__badge) {
+  background: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
 }
 
 /* Highlight animation for navigated bookings */

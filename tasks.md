@@ -236,29 +236,35 @@
   - Assigned to: Cursor
 
 ### **Basic Functionality Testing**
-- [ ] **TASK-034**: Test property CRUD operations
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-034**: Test property CRUD operations
+  - Status: Complete
+  - Notes: Created comprehensive testing page at /testing/crud with UI for all property CRUD operations. Implemented individual test functions for each operation with proper error handling and status reporting. Tests include property creation, reading properties from store, updating properties, and deleting properties with validation for associated bookings.
   - Verification: create, edit, delete properties work
   - Assigned to: Cursor
 
-- [ ] **TASK-035**: Test booking CRUD operations
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-035**: Test booking CRUD operations
+  - Status: Complete
+  - Notes: Implemented booking CRUD testing in the /testing/crud page with comprehensive test cases. Created test functions for creating, reading, updating and deleting bookings with proper store integration. Implemented tests for both turn and standard booking types with appropriate validation.
   - Verification: create, edit, delete bookings work, turn vs standard
   - Assigned to: Cursor
 
-- [ ] **TASK-036**: Test calendar integration
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-036**: Test calendar integration
+  - Status: Complete
+  - Notes: Implemented calendar integration testing in the /testing/crud page with a live FullCalendar instance. Created tests for event display, turn booking highlighting, and drag-and-drop functionality. Test cases verify that bookings appear correctly on the calendar with appropriate styling for turn vs standard bookings.
   - Verification: events display, drag/drop works, turn highlighting
   - Assigned to: Cursor
 
 ### **UI/UX Polish**
-- [ ] **TASK-037**: Style components with Vuetify theme
-  - Status: Not Started
-  - Notes: 
+- [x] **TASK-037**: Style components with Vuetify theme
+  - Status: Complete
+  - Notes: Implemented comprehensive styling with consistent theme, improved responsiveness, and better visual hierarchy. Updated color palette for clearer turn vs standard booking distinction, added theme toggle, and enhanced component styling for better user experience.
   - Requirements: consistent styling, responsive design
+  - Assigned to: Cursor
+
+- [x] **TASK-037b**: Implement multiple themes with theme picker
+  - Status: Complete
+  - Notes: Created 8 distinct themes (light, dark, green, purple, orange, teal, red, brown) with both light and dark variants. Implemented a ThemePicker component in the app-bar that displays a grid of theme options. Added theme persistence using localStorage and smooth transition animations between themes. All components properly apply the selected theme.
+  - Requirements: multiple themes, theme picker in app-bar, theme persistence
   - Assigned to: Cursor
 
 - [ ] **TASK-038**: Implement loading states and error handling

@@ -35,23 +35,18 @@ const router = createRouter({
         layout: 'admin'
       }
     },
+    // Testing routes
+    {
+      path: '/testing/crud',
+      name: 'crud-testing',
+      component: () => import('@/pages/crud-testing.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
     // Demo routes
-    {
-      path: '/demos/property-card',
-      name: 'property-card-demo',
-      component: () => import('@/components/dumb/PropertyCardDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/booking-form',
-      name: 'booking-form-demo',
-      component: () => import('@/components/dumb/BookingFormDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
+
+
     {
       path: '/demos/turn-alerts',
       name: 'turn-alerts-demo',
@@ -60,30 +55,26 @@ const router = createRouter({
         layout: 'default'
       }
     },
+
     {
-      path: '/demos/upcoming-cleanings',
-      name: 'upcoming-cleanings-demo',
-      component: () => import('@/components/dumb/UpcomingCleaningsDemo.vue'),
+      path: '/demos/property-card',
+      name: 'property-card-demo',
+      component: () => import('@/components/dumb/PropertyCardDemo.vue'),
       meta: {
         layout: 'default'
       }
     },
+
+
     {
-      path: '/demos/component-communication',
-      name: 'component-communication-demo',
-      component: () => import('@/pages/demos/component-communication.vue'),
+      path: '/testing/turn-alerts',
+      name: 'turn-alerts-demo',
+      component: () => import('@/components/dumb/TurnAlertsDemo.vue'),
       meta: {
         layout: 'default'
       }
     },
-    {
-      path: '/sidebar',
-      name: 'sidebar-demo',
-      component: () => import('@/components/smart/SidebarDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
+
     // Auth routes
     {
       path: '/auth/login',

@@ -5,7 +5,7 @@
     :persistent="persistent"
     @keydown.esc="handleCancel"
   >
-    <v-card>
+    <v-card class="glass-card fade-in">
       <v-card-title class="text-h5">
         {{ title }}
       </v-card-title>
@@ -111,5 +111,54 @@ function handleCancel(): void {
 </script>
 
 <style scoped>
-/* Additional styling if needed */
+/* Dialog theming */
+:deep(.v-dialog .v-card) {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+}
+
+/* Card title theming */
+:deep(.v-card-title) {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+}
+
+/* Card text theming */
+:deep(.v-card-text) {
+  color: rgba(var(--v-theme-on-surface), 0.8) !important;
+}
+
+/* Button theming */
+:deep(.v-btn) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+:deep(.v-btn--variant-text) {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-btn--variant-text.text-error) {
+  color: rgb(var(--v-theme-error)) !important;
+}
+
+:deep(.v-btn--variant-text.text-grey-darken-1) {
+  color: rgba(var(--v-theme-on-surface), 0.6) !important;
+}
+
+:deep(.v-btn:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.3);
+}
+
+/* Divider theming */
+:deep(.v-divider) {
+  border-color: rgba(var(--v-theme-on-surface), 0.12) !important;
+}
+
+/* Loading state theming */
+:deep(.v-btn--loading) {
+  color: rgba(var(--v-theme-on-surface), 0.5) !important;
+}
 </style> 

@@ -289,7 +289,7 @@ function resetForm(): void {
       pricing_tier: 'basic',
       special_instructions: '',
       active: true,
-      owner_id: authStore.currentUser?.id || '' // Set owner to current user by default
+      owner_id: authStore.user?.id || '' // Set owner to current user by default
     });
   }
 }
@@ -354,7 +354,7 @@ async function handleSubmit(): Promise<void> {
       pricing_tier: form.pricing_tier as PricingTier,
       special_instructions: form.special_instructions,
       active: form.active,
-      owner_id: form.owner_id || authStore.currentUser?.id || ''
+      owner_id: form.owner_id || authStore.user?.id || ''
     };
     
     // Emit save event with property data
@@ -409,5 +409,114 @@ watch(() => props.property, () => {
 </script>
 
 <style scoped>
-/* Additional styling if needed */
+/* Dialog theming */
+:deep(.v-dialog .v-card) {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+}
+
+/* Card title theming */
+:deep(.v-card-title) {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+}
+
+/* Form field theming */
+:deep(.v-field) {
+  background: rgb(var(--v-theme-surface)) !important;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.v-field:hover) {
+  border-color: rgba(var(--v-theme-primary), 0.5) !important;
+}
+
+:deep(.v-field--focused) {
+  border-color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-field__input) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.v-label) {
+  color: rgba(var(--v-theme-on-surface), 0.6) !important;
+}
+
+:deep(.v-label--active) {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+/* Select menu theming */
+:deep(.v-select__selection) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.v-list) {
+  background: rgb(var(--v-theme-surface)) !important;
+}
+
+:deep(.v-list-item) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.v-list-item:hover) {
+  background: rgba(var(--v-theme-primary), 0.08) !important;
+}
+
+/* Button theming */
+:deep(.v-btn) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+:deep(.v-btn--variant-elevated),
+:deep(.v-btn--variant-flat) {
+  background: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
+}
+
+:deep(.v-btn--variant-outlined) {
+  border-color: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-btn--variant-text) {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-btn.text-error) {
+  color: rgb(var(--v-theme-error)) !important;
+}
+
+:deep(.v-btn:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.3);
+}
+
+/* Icon theming */
+:deep(.v-icon) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.v-btn .v-icon) {
+  color: inherit !important;
+}
+
+/* Switch theming */
+:deep(.v-switch .v-selection-control__input) {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+/* Error message theming */
+:deep(.v-messages__message) {
+  color: rgb(var(--v-theme-error)) !important;
+}
+
+/* Divider theming */
+:deep(.v-divider) {
+  border-color: rgba(var(--v-theme-on-surface), 0.12) !important;
+}
 </style> 

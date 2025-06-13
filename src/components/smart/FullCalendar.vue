@@ -116,11 +116,8 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   
   // View settings
   initialView: 'dayGridMonth',
-  headerToolbar: {
-    left: 'prev,next today',
-    center: 'title',
-    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-  },
+  headerToolbar: false,
+  
   
   // Event settings
   events: calendarEvents.value,
@@ -382,8 +379,8 @@ defineExpose({
   --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
   --fc-button-bg-color: rgb(var(--v-theme-primary));
   --fc-button-border-color: rgb(var(--v-theme-primary));
-  --fc-button-hover-bg-color: rgb(var(--v-theme-primary-darken-1));
-  --fc-button-active-bg-color: rgb(var(--v-theme-primary-darken-2));
+  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
   --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
 }
 
@@ -395,9 +392,9 @@ defineExpose({
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
 }
 
 /* Status-based styling */
@@ -412,7 +409,7 @@ defineExpose({
 
 /* Turn indicator in day cells */
 .turn-indicator {
-  background: #f44336;
+  background: rgb(var(--v-theme-error));
   color: white;
   border-radius: 50%;
   padding: 1px 4px;

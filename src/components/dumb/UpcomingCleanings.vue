@@ -1,5 +1,5 @@
 <template>
-  <v-card class="upcoming-cleanings" :elevation="3" :class="{ 'has-urgent': hasUrgentCleanings }">
+  <v-card class="upcoming-cleanings glass-card fade-in" :elevation="3" :class="{ 'has-urgent': hasUrgentCleanings }">
     <v-card-title class="d-flex align-center">
       <v-icon icon="mdi-broom" class="mr-2" color="primary"></v-icon>
       Upcoming Cleanings
@@ -374,39 +374,115 @@ function getPriorityColor(priority: string): string {
 </script>
 
 <style scoped>
+/* Main card theming */
 .upcoming-cleanings {
-  border-left: 4px solid var(--v-primary-base);
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+  border-left: 4px solid rgb(var(--v-theme-primary)) !important;
 }
 
 .upcoming-cleanings.has-urgent {
-  border-left-color: var(--v-error-base);
+  border-left-color: rgb(var(--v-theme-error)) !important;
 }
 
+/* List theming */
 .cleaning-list {
-  background-color: transparent;
+  background: transparent !important;
 }
 
 .cleaning-list-item {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
   margin-bottom: 8px;
-  transition: transform 0.2s;
+  transition: transform 0.2s, border-color 0.2s;
 }
 
 .cleaning-list-item:hover {
   transform: translateY(-2px);
+  border-color: rgba(var(--v-theme-primary), 0.3) !important;
+  box-shadow: 0 2px 8px rgba(var(--v-theme-on-surface), 0.15);
 }
 
+/* Booking type indicators */
 .turn-booking {
-  border-left: 3px solid var(--v-warning-base) !important;
+  border-left: 3px solid rgb(var(--v-theme-warning)) !important;
 }
 
 .standard-booking {
-  border-left: 3px solid var(--v-primary-base) !important;
+  border-left: 3px solid rgb(var(--v-theme-primary)) !important;
 }
 
+/* Date heading theming */
 .date-heading {
   font-weight: 500;
-  color: var(--v-primary-darken-1);
-  border-bottom: 1px solid var(--v-primary-lighten-3);
+  color: rgb(var(--v-theme-primary)) !important;
+  border-bottom: 1px solid rgba(var(--v-theme-primary), 0.3) !important;
   padding-bottom: 4px;
+}
+
+/* Card title theming */
+:deep(.v-card-title) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+/* Badge theming */
+:deep(.v-badge .v-badge__badge) {
+  background: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
+}
+
+/* Button theming */
+:deep(.v-btn) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+:deep(.v-btn--variant-elevated),
+:deep(.v-btn--variant-flat) {
+  background: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
+}
+
+:deep(.v-btn--variant-tonal) {
+  background: rgba(var(--v-theme-primary), 0.12) !important;
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-btn:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.3);
+}
+
+/* Icon theming */
+:deep(.v-icon) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.v-btn .v-icon) {
+  color: inherit !important;
+}
+
+/* List item text theming */
+:deep(.v-list-item-title) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.v-list-item-subtitle) {
+  color: rgba(var(--v-theme-on-surface), 0.8) !important;
+}
+
+/* Expansion panel theming */
+:deep(.v-expansion-panel) {
+  background: rgb(var(--v-theme-surface)) !important;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+}
+
+:deep(.v-expansion-panel-title) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.v-expansion-panel-text) {
+  color: rgba(var(--v-theme-on-surface), 0.8) !important;
 }
 </style> 

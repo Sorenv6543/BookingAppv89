@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer class="sidebar" width="100%" elevation="3">
+  <v-navigation-drawer class="sidebar" width="100%" elevation="30">                           
     <v-container class="py-2">
       <!-- Header -->
       <v-row class="mb-4">
