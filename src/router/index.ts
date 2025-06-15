@@ -88,6 +88,14 @@ const router = createRouter({
         layout: 'default'
       }
     },
+    {
+      path: '/demos/use-owner-bookings',
+      name: 'use-owner-bookings-demo',
+      component: () => import('@/components/smart/owner/UseOwnerBookingsDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
 
 
     {

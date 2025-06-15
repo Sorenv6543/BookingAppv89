@@ -163,7 +163,8 @@ const formattedCleaningDuration = computed((): string => {
 const pricingTierColor = computed((): string => {
   const tierColors: Record<PricingTier, string> = {
     basic: 'grey',
-    premium: 'primary',
+    standard: 'primary',
+    premium: 'secondary',
     luxury: 'accent'
   };
   

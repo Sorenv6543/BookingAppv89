@@ -127,11 +127,13 @@ src/components/smart/owner/OwnerCalendarDemo.vue
 src/components/smart/owner/OwnerSidebar.vue
 src/components/smart/owner/OwnerSidebarDemo.vue
 src/components/smart/owner/README.md
+src/components/smart/owner/UseOwnerBookingsDemo.vue
 src/components/smart/shared/README.md
 src/components/smart/Sidebar.vue
 src/components/smart/SidebarDemo.vue
 src/composables/admin/README.md
 src/composables/owner/README.md
+src/composables/owner/useOwnerBookings.ts
 src/composables/shared/useAuth.ts
 src/composables/shared/useBookings.ts
 src/composables/shared/useCalendarState.ts
@@ -180,1646 +182,718 @@ vitest.config.ts
 
 # Files
 
-## File: src/components/smart/admin/AdminCalendar.vue
+## File: src/components/smart/owner/UseOwnerBookingsDemo.vue
 `````vue
 <template>
-  <div class="admin-calendar-container">
-    <!-- Advanced Admin Calendar Toolbar -->
-    <v-card class="admin-calendar-toolbar mb-4" elevation="2">
-      <v-card-text class="pb-2">
-        <v-row align="center" no-gutters>
-          <!-- View Controls -->
-          <v-col cols="12" md="3" class="mb-2 mb-md-0">
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              variant="outlined"
-              density="compact"
-              class="admin-view-toggle"
-            >
-              <v-btn value="dayGridMonth" size="small">Month</v-btn>
-              <v-btn value="timeGridWeek" size="small">Week</v-btn>
-              <v-btn value="timeGridDay" size="small">Day</v-btn>
-              <v-btn value="listWeek" size="small">List</v-btn>
-            </v-btn-toggle>
-          </v-col>
-          <!-- Date Navigation -->
-          <v-col cols="12" md="4" class="mb-2 mb-md-0">
-            <div class="d-flex align-center justify-center">
-              <v-btn
-                icon="mdi-chevron-left"
-                variant="text"
-                size="small"
-                @click="navigateCalendar('prev')"
-              />
-              <v-btn
-                variant="text"
-                class="mx-2 admin-date-title"
-                @click="goToToday"
-              >
-                {{ currentDateTitle }}
-              </v-btn>
-              <v-btn
-                icon="mdi-chevron-right"
-                variant="text"
-                size="small"
-                @click="navigateCalendar('next')"
-              />
+  <v-container fluid>
+    <v-row>
+      <v-col cols="12">
+        <v-card>
+          <v-card-title class="d-flex align-center">
+            <v-icon class="mr-2">mdi-account-check</v-icon>
+            useOwnerBookings Demo
+            <v-spacer />
+            <v-chip :color="currentUserId ? 'success' : 'error'" variant="outlined">
+              {{ currentUserId ? `Owner: ${authStore.user?.name}` : 'Not Logged In' }}
+            </v-chip>
+          </v-card-title>
+          <v-card-text>
+            <v-alert v-if="!currentUserId" type="warning" class="mb-4">
+              Please log in to test owner-specific functionality
+            </v-alert>
+            <!-- Loading/Error/Success States -->
+            <v-alert v-if="loading" type="info" class="mb-4">
+              <v-progress-circular indeterminate size="20" class="mr-2" />
+              Loading...
+            </v-alert>
+            <v-alert v-if="error" type="error" class="mb-4" closable @click:close="error = null">
+              {{ error }}
+            </v-alert>
+            <v-alert v-if="success" type="success" class="mb-4" closable @click:close="success = null">
+              {{ success }}
+            </v-alert>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Owner Statistics -->
+    <v-row>
+      <v-col cols="12" md="6">
+        <v-card>
+          <v-card-title>
+            <v-icon class="mr-2">mdi-chart-box</v-icon>
+            My Booking Statistics
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols="6" sm="4" v-for="(value, key) in myBookingStats" :key="key">
+                <v-card variant="outlined" class="text-center pa-2">
+                  <div class="text-h6">{{ value }}</div>
+                  <div class="text-caption text-uppercase">{{ formatStatKey(key) }}</div>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="12" md="6">
+        <v-card>
+          <v-card-title>
+            <v-icon class="mr-2">mdi-alert-circle</v-icon>
+            My Turn Alerts
+          </v-card-title>
+          <v-card-text>
+            <div v-if="myTodayTurns.length === 0" class="text-center text-medium-emphasis">
+              No urgent turns today
             </div>
-          </v-col>
-          <!-- Admin Filters -->
-          <v-col cols="12" md="5">
-            <div class="d-flex align-center justify-end flex-wrap ga-2">
-              <!-- Cleaner Filter -->
-              <v-select
-                v-model="selectedCleaner"
-                :items="cleanerFilterOptions"
-                item-title="name"
-                item-value="id"
-                label="Filter by Cleaner"
-                density="compact"
-                variant="outlined"
-                style="min-width: 150px; max-width: 200px;"
-                clearable
-                hide-details
-              />
-              <!-- Status Filter -->
-              <v-select
-                v-model="selectedStatuses"
-                :items="statusFilterOptions"
-                item-title="label"
-                item-value="value"
-                label="Filter by Status"
-                density="compact"
-                variant="outlined"
-                style="min-width: 150px; max-width: 200px;"
-                multiple
-                clearable
-                hide-details
-              />
-              <!-- Booking Type Filter -->
-              <v-select
-                v-model="selectedBookingTypes"
-                :items="bookingTypeOptions"
-                item-title="label"
-                item-value="value"
-                label="Booking Type"
-                density="compact"
-                variant="outlined"
-                style="min-width: 120px; max-width: 150px;"
-                multiple
-                clearable
-                hide-details
-              />
-              <!-- Quick Actions -->
-              <v-btn
-                color="primary"
-                variant="elevated"
-                size="small"
-                prepend-icon="mdi-plus"
-                @click="createNewBooking"
+            <v-list v-else>
+              <v-list-item
+                v-for="turn in myTodayTurns"
+                :key="turn.id"
+                :title="getPropertyName(turn.property_id)"
+                :subtitle="`Checkout: ${formatDateTime(turn.checkout_date)} | Checkin: ${formatDateTime(turn.checkin_date)}`"
               >
-                New Booking
-              </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-    <!-- FullCalendar Component -->
-    <v-card elevation="2" class="admin-calendar-card">
-      <FullCalendar
-        ref="calendarRef"
-        :options="adminCalendarOptions"
-        class="admin-calendar"
-      />
-    </v-card>
-    <!-- Context Menu -->
-    <v-menu
-      v-model="contextMenu.show"
-      :position-x="contextMenu.x"
-      :position-y="contextMenu.y"
-      absolute
-      offset-y
-    >
-      <v-list density="compact">
-        <v-list-item
-          v-for="action in contextMenuActions"
-          :key="action.key"
-          :prepend-icon="action.icon"
-          :title="action.title"
-          @click="handleContextAction(action.key)"
-        />
-      </v-list>
-    </v-menu>
-    <!-- Cleaner Assignment Modal -->
-    <v-dialog v-model="cleanerAssignmentModal.show" max-width="500">
-      <v-card>
-        <v-card-title>
-          <span class="text-h6">Assign Cleaner</span>
-        </v-card-title>
-        <v-card-text>
-          <v-select
-            v-model="cleanerAssignmentModal.selectedCleaner"
-            :items="availableCleaners"
-            item-title="name"
-            item-value="id"
-            label="Select Cleaner"
-            variant="outlined"
-            :loading="cleanerAssignmentModal.loading"
-          >
-            <template #item="{ props, item }">
-              <v-list-item v-bind="props">
                 <template #prepend>
-                  <v-avatar size="32">
-                    <v-icon>mdi-account</v-icon>
+                  <v-avatar color="error" size="small">
+                    <v-icon>mdi-clock-alert</v-icon>
                   </v-avatar>
                 </template>
-                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
-                </v-list-item-subtitle>
+                <template #append>
+                  <v-chip :color="getStatusColor(turn.status)" size="small">
+                    {{ turn.status }}
+                  </v-chip>
+                </template>
               </v-list-item>
-            </template>
-          </v-select>
-          <v-textarea
-            v-model="cleanerAssignmentModal.notes"
-            label="Assignment Notes (Optional)"
-            variant="outlined"
-            rows="3"
-            class="mt-4"
-          />
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- My Bookings List -->
+    <v-row>
+      <v-col cols="12">
+        <v-card>
+          <v-card-title class="d-flex align-center">
+            <v-icon class="mr-2">mdi-calendar-check</v-icon>
+            My Bookings ({{ myBookings.length }})
+            <v-spacer />
+            <v-btn color="primary" @click="fetchMyBookings" :loading="loading">
+              <v-icon class="mr-2">mdi-refresh</v-icon>
+              Refresh
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <div v-if="myBookings.length === 0" class="text-center text-medium-emphasis py-8">
+              <v-icon size="64" class="mb-4">mdi-calendar-blank</v-icon>
+              <div class="text-h6">No bookings found</div>
+              <div class="text-body-2">Create your first booking to get started</div>
+            </div>
+            <v-data-table
+              v-else
+              :headers="bookingHeaders"
+              :items="myBookings"
+              :items-per-page="10"
+              class="elevation-1"
+            >
+              <template #item.property_id="{ item }">
+                {{ getPropertyName(item.property_id) }}
+              </template>
+              <template #item.booking_type="{ item }">
+                <v-chip
+                  :color="item.booking_type === 'turn' ? 'error' : 'primary'"
+                  size="small"
+                  variant="outlined"
+                >
+                  {{ item.booking_type }}
+                </v-chip>
+              </template>
+              <template #item.status="{ item }">
+                <v-chip :color="getStatusColor(item.status)" size="small">
+                  {{ item.status }}
+                </v-chip>
+              </template>
+              <template #item.priority="{ item }">
+                <v-chip
+                  :color="getPriorityColor(calculateMyBookingPriority(item))"
+                  size="small"
+                  variant="outlined"
+                >
+                  {{ calculateMyBookingPriority(item) }}
+                </v-chip>
+              </template>
+              <template #item.checkout_date="{ item }">
+                {{ formatDate(item.checkout_date) }}
+              </template>
+              <template #item.checkin_date="{ item }">
+                {{ formatDate(item.checkin_date) }}
+              </template>
+              <template #item.actions="{ item }">
+                <v-btn
+                  icon="mdi-pencil"
+                  size="small"
+                  variant="text"
+                  @click="editBooking(item)"
+                />
+                <v-btn
+                  icon="mdi-delete"
+                  size="small"
+                  variant="text"
+                  color="error"
+                  @click="confirmDeleteBooking(item)"
+                />
+              </template>
+            </v-data-table>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Upcoming Cleanings -->
+    <v-row>
+      <v-col cols="12">
+        <v-card>
+          <v-card-title>
+            <v-icon class="mr-2">mdi-calendar-clock</v-icon>
+            My Upcoming Cleanings (Next 7 Days)
+          </v-card-title>
+          <v-card-text>
+            <div v-if="myUpcomingCleanings.length === 0" class="text-center text-medium-emphasis">
+              No upcoming cleanings in the next 7 days
+            </div>
+            <v-timeline v-else side="end" density="compact">
+              <v-timeline-item
+                v-for="cleaning in myUpcomingCleanings"
+                :key="cleaning.id"
+                :dot-color="cleaning.booking_type === 'turn' ? 'error' : 'primary'"
+                size="small"
+              >
+                <template #opposite>
+                  <div class="text-caption">{{ formatDate(cleaning.checkout_date) }}</div>
+                </template>
+                <v-card variant="outlined" class="mb-2">
+                  <v-card-text class="py-2">
+                    <div class="font-weight-medium">{{ getPropertyName(cleaning.property_id) }}</div>
+                    <div class="text-caption">
+                      {{ formatDateTime(cleaning.checkout_date) }} → {{ formatDateTime(cleaning.checkin_date) }}
+                    </div>
+                    <div class="d-flex align-center mt-1">
+                      <v-chip
+                        :color="cleaning.booking_type === 'turn' ? 'error' : 'primary'"
+                        size="x-small"
+                        class="mr-2"
+                      >
+                        {{ cleaning.booking_type }}
+                      </v-chip>
+                      <v-chip :color="getStatusColor(cleaning.status)" size="x-small">
+                        {{ cleaning.status }}
+                      </v-chip>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-timeline-item>
+            </v-timeline>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Test Actions -->
+    <v-row>
+      <v-col cols="12">
+        <v-card>
+          <v-card-title>
+            <v-icon class="mr-2">mdi-test-tube</v-icon>
+            Test Actions
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols="12" sm="6" md="3">
+                <v-btn
+                  block
+                  color="primary"
+                  @click="testCreateBooking"
+                  :loading="loading"
+                  :disabled="!currentUserId"
+                >
+                  Test Create Booking
+                </v-btn>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-btn
+                  block
+                  color="secondary"
+                  @click="testUpdateBooking"
+                  :loading="loading"
+                  :disabled="!currentUserId || myBookings.length === 0"
+                >
+                  Test Update First Booking
+                </v-btn>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-btn
+                  block
+                  color="warning"
+                  @click="testStatusChange"
+                  :loading="loading"
+                  :disabled="!currentUserId || myBookings.length === 0"
+                >
+                  Test Status Change
+                </v-btn>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-btn
+                  block
+                  color="info"
+                  @click="generateSampleData"
+                  :loading="loading"
+                  :disabled="!currentUserId"
+                >
+                  Generate Sample Data
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Confirmation Dialog -->
+    <v-dialog v-model="showDeleteDialog" max-width="400">
+      <v-card>
+        <v-card-title>Confirm Delete</v-card-title>
+        <v-card-text>
+          Are you sure you want to delete this booking?
+          <div class="mt-2 font-weight-medium">
+            {{ bookingToDelete ? getPropertyName(bookingToDelete.property_id) : '' }}
+          </div>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn
-            text
-            @click="cleanerAssignmentModal.show = false"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="primary"
-            :loading="cleanerAssignmentModal.loading"
-            @click="assignCleanerToBooking"
-          >
-            Assign
-          </v-btn>
+          <v-btn @click="showDeleteDialog = false">Cancel</v-btn>
+          <v-btn color="error" @click="executeDelete" :loading="loading">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </div>
+  </v-container>
 </template>
 ⋮----
-<!-- Advanced Admin Calendar Toolbar -->
+{{ currentUserId ? `Owner: ${authStore.user?.name}` : 'Not Logged In' }}
 ⋮----
-<!-- View Controls -->
+<!-- Loading/Error/Success States -->
 ⋮----
-<!-- Date Navigation -->
+{{ error }}
 ⋮----
-{{ currentDateTitle }}
+{{ success }}
 ⋮----
-<!-- Admin Filters -->
+<!-- Owner Statistics -->
 ⋮----
-<!-- Cleaner Filter -->
-⋮----
-<!-- Status Filter -->
-⋮----
-<!-- Booking Type Filter -->
-⋮----
-<!-- Quick Actions -->
-⋮----
-<!-- FullCalendar Component -->
-⋮----
-<!-- Context Menu -->
-⋮----
-<!-- Cleaner Assignment Modal -->
-⋮----
-<template #item="{ props, item }">
-              <v-list-item v-bind="props">
-                <template #prepend>
-                  <v-avatar size="32">
-                    <v-icon>mdi-account</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
-                </v-list-item-subtitle>
-              </v-list-item>
-            </template>
+<div class="text-h6">{{ value }}</div>
+<div class="text-caption text-uppercase">{{ formatStatKey(key) }}</div>
 ⋮----
 <template #prepend>
-                  <v-avatar size="32">
-                    <v-icon>mdi-account</v-icon>
+                  <v-avatar color="error" size="small">
+                    <v-icon>mdi-clock-alert</v-icon>
                   </v-avatar>
                 </template>
-<v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+<template #append>
+                  <v-chip :color="getStatusColor(turn.status)" size="small">
+                    {{ turn.status }}
+                  </v-chip>
+                </template>
 ⋮----
-{{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
+{{ turn.status }}
+⋮----
+<!-- My Bookings List -->
+⋮----
+My Bookings ({{ myBookings.length }})
+⋮----
+<template #item.property_id="{ item }">
+                {{ getPropertyName(item.property_id) }}
+              </template>
+⋮----
+{{ getPropertyName(item.property_id) }}
+⋮----
+<template #item.booking_type="{ item }">
+                <v-chip
+                  :color="item.booking_type === 'turn' ? 'error' : 'primary'"
+                  size="small"
+                  variant="outlined"
+                >
+                  {{ item.booking_type }}
+                </v-chip>
+              </template>
+⋮----
+{{ item.booking_type }}
+⋮----
+<template #item.status="{ item }">
+                <v-chip :color="getStatusColor(item.status)" size="small">
+                  {{ item.status }}
+                </v-chip>
+              </template>
+⋮----
+{{ item.status }}
+⋮----
+<template #item.priority="{ item }">
+                <v-chip
+                  :color="getPriorityColor(calculateMyBookingPriority(item))"
+                  size="small"
+                  variant="outlined"
+                >
+                  {{ calculateMyBookingPriority(item) }}
+                </v-chip>
+              </template>
+⋮----
+{{ calculateMyBookingPriority(item) }}
+⋮----
+<template #item.checkout_date="{ item }">
+                {{ formatDate(item.checkout_date) }}
+              </template>
+⋮----
+{{ formatDate(item.checkout_date) }}
+⋮----
+<template #item.checkin_date="{ item }">
+                {{ formatDate(item.checkin_date) }}
+              </template>
+⋮----
+{{ formatDate(item.checkin_date) }}
+⋮----
+<template #item.actions="{ item }">
+                <v-btn
+                  icon="mdi-pencil"
+                  size="small"
+                  variant="text"
+                  @click="editBooking(item)"
+                />
+                <v-btn
+                  icon="mdi-delete"
+                  size="small"
+                  variant="text"
+                  color="error"
+                  @click="confirmDeleteBooking(item)"
+                />
+              </template>
+⋮----
+<!-- Upcoming Cleanings -->
+⋮----
+<template #opposite>
+                  <div class="text-caption">{{ formatDate(cleaning.checkout_date) }}</div>
+                </template>
+⋮----
+<div class="text-caption">{{ formatDate(cleaning.checkout_date) }}</div>
+⋮----
+<div class="font-weight-medium">{{ getPropertyName(cleaning.property_id) }}</div>
+⋮----
+{{ formatDateTime(cleaning.checkout_date) }} → {{ formatDateTime(cleaning.checkin_date) }}
+⋮----
+{{ cleaning.booking_type }}
+⋮----
+{{ cleaning.status }}
+⋮----
+<!-- Test Actions -->
+⋮----
+<!-- Confirmation Dialog -->
+⋮----
+{{ bookingToDelete ? getPropertyName(bookingToDelete.property_id) : '' }}
 ⋮----
 <script setup lang="ts">
-import FullCalendar from '@fullcalendar/vue3';
-import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import listPlugin from '@fullcalendar/list';
-import interactionPlugin from '@fullcalendar/interaction';
-import { computed, ref, watch, nextTick } from 'vue';
-import { useTheme } from 'vuetify';
-import type { Booking, Property, User, Cleaner } from '@/types';
-// Import event logger for component communication
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-interface Props {
-  bookings: Map<string, Booking>;
-  properties: Map<string, Property>;
-  users: Map<string, User>;
-  loading?: boolean;
-}
-interface Emits {
-  (e: 'dateSelect', selectInfo: DateSelectArg): void;
-  (e: 'eventClick', clickInfo: EventClickArg): void;
-  (e: 'eventDrop', dropInfo: EventDropArg): void;
-  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
-  (e: 'updateBooking', data: { id: string; updates: Partial<Booking> }): void;
-  (e: 'assignCleaner', data: { bookingId: string; cleanerId: string; notes?: string }): void;
-  (e: 'updateBookingStatus', data: { bookingId: string; status: Booking['status'] }): void;
-  (e: 'viewChange', view: string): void;
-  (e: 'dateChange', date: Date): void;
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
-});
-const emit = defineEmits<Emits>();
-// Theme integration
-const theme = useTheme();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-// Admin calendar state
-const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('timeGridWeek');
-const currentDateTitle = ref('');
-// Admin filtering state
-const selectedCleaner = ref<string | null>(null);
-const selectedStatuses = ref<Booking['status'][]>([]);
-const selectedBookingTypes = ref<Booking['booking_type'][]>([]);
-// Context menu state
-const contextMenu = ref({
-  show: false,
-  x: 0,
-  y: 0,
-  booking: null as Booking | null
-});
-// Cleaner assignment modal state
-const cleanerAssignmentModal = ref({
-  show: false,
-  booking: null as Booking | null,
-  selectedCleaner: null as string | null,
-  notes: '',
-  loading: false
-});
-// Get all cleaners from users Map
-const availableCleaners = computed(() => {
-  return Array.from(props.users.values())
-    .filter(user => user.role === 'cleaner')
-    .map(cleaner => ({
-      id: cleaner.id,
-      name: cleaner.name,
-      email: cleaner.email,
-      max_daily_bookings: (cleaner as Cleaner).max_daily_bookings || 5
-    }));
-});
-// Filter options
-const cleanerFilterOptions = computed(() => [
-  { id: 'unassigned', name: 'Unassigned Only' },
-  ...availableCleaners.value
-]);
-const statusFilterOptions = [
-  { label: 'Pending', value: 'pending' },
-  { label: 'Scheduled', value: 'scheduled' },
-  { label: 'In Progress', value: 'in_progress' },
-  { label: 'Completed', value: 'completed' }
+import { ref, computed } from 'vue';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useAuthStore } from '@/stores/auth';
+import { usePropertyStore } from '@/stores/property';
+import type { Booking, BookingFormData } from '@/types';
+// Composables
+const ownerBookings = useOwnerBookings();
+const authStore = useAuthStore();
+const propertyStore = usePropertyStore();
+// Destructure owner booking composable
+const {
+  loading,
+  error,
+  success,
+  myBookings,
+  myProperties,
+  myTodayTurns,
+  myUpcomingCleanings,
+  myBookingStats,
+  fetchMyBookings,
+  createMyBooking,
+  updateMyBooking,
+  deleteMyBooking,
+  changeMyBookingStatus,
+  calculateMyBookingPriority
+} = ownerBookings;
+// Local state
+const showDeleteDialog = ref(false);
+const bookingToDelete = ref<Booking | null>(null);
+// Computed
+const currentUserId = computed(() => authStore.user?.id);
+// Table headers
+const bookingHeaders = [
+  { title: 'Property', key: 'property_id', sortable: true },
+  { title: 'Type', key: 'booking_type', sortable: true },
+  { title: 'Status', key: 'status', sortable: true },
+  { title: 'Priority', key: 'priority', sortable: false },
+  { title: 'Checkout', key: 'checkout_date', sortable: true },
+  { title: 'Checkin', key: 'checkin_date', sortable: true },
+  { title: 'Actions', key: 'actions', sortable: false }
 ];
-const bookingTypeOptions = [
-  { label: 'Turn Bookings', value: 'turn' },
-  { label: 'Standard Bookings', value: 'standard' }
-];
-// Admin sees ALL bookings (no owner filtering)
-const allBookings = computed(() => {
-  return Array.from(props.bookings.values());
-});
-// Apply admin filters to bookings
-const filteredBookings = computed(() => {
-  let filtered = allBookings.value;
-  // Filter by cleaner
-  if (selectedCleaner.value) {
-    if (selectedCleaner.value === 'unassigned') {
-      filtered = filtered.filter(booking => !booking.assigned_cleaner_id);
-    } else {
-      filtered = filtered.filter(booking => booking.assigned_cleaner_id === selectedCleaner.value);
-    }
-  }
-  // Filter by status
-  if (selectedStatuses.value.length > 0) {
-    filtered = filtered.filter(booking => selectedStatuses.value.includes(booking.status));
-  }
-  // Filter by booking type
-  if (selectedBookingTypes.value.length > 0) {
-    filtered = filtered.filter(booking => selectedBookingTypes.value.includes(booking.booking_type));
-  }
-  return filtered;
-});
-// Convert admin's filtered bookings to FullCalendar events
-const adminCalendarEvents = computed(() => {
-  return filteredBookings.value.map(booking => {
-    const property = props.properties.get(booking.property_id);
-    const owner = props.users.get(booking.owner_id);
-    const cleaner = booking.assigned_cleaner_id ? props.users.get(booking.assigned_cleaner_id) : undefined;
-    const isTurn = booking.booking_type === 'turn';
-    return {
-      id: booking.id,
-      title: getAdminEventTitle(booking, property, owner, cleaner),
-      start: booking.checkout_date,
-      end: booking.checkin_date,
-      backgroundColor: getAdminEventColor(booking),
-      borderColor: getAdminEventBorderColor(booking),
-      textColor: getAdminEventTextColor(booking),
-      extendedProps: {
-        booking,
-        property,
-        owner,
-        cleaner,
-        bookingType: booking.booking_type,
-        status: booking.status,
-        assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
-      },
-      classNames: [
-        `admin-booking-${booking.booking_type}`,
-        `admin-status-${booking.status}`,
-        `admin-assignment-${booking.assigned_cleaner_id ? 'assigned' : 'unassigned'}`,
-        isTurn ? 'admin-priority-urgent' : 'admin-priority-normal'
-      ]
-    };
-  });
-});
-// Admin-specific event title formatting
-const getAdminEventTitle = (booking: Booking, property?: Property, owner?: User, cleaner?: User): string => {
-  const isTurn = booking.booking_type === 'turn';
-  const propertyName = property?.name || 'Unknown Property';
-  const ownerName = owner?.name || 'Unknown Owner';
-  const cleanerName = cleaner?.name || 'Unassigned';
-  return `${isTurn ? '🔥 ' : ''}${propertyName} (${ownerName}) → ${cleanerName}`;
-};
-// Admin-specific color system based on assignment status and booking type
-const getAdminEventColor = (booking: Booking): string => {
-  const isDark = theme.global.current.value.dark;
-  const isAssigned = !!booking.assigned_cleaner_id;
-  const isTurn = booking.booking_type === 'turn';
-  if (!isAssigned) {
-    // Unassigned bookings - urgent colors
-    return isTurn 
-      ? (isDark ? '#FF5252' : '#F44336') // Urgent red for unassigned turns
-      : (isDark ? '#FF9800' : '#FF6F00'); // Warning orange for unassigned standard
-  }
-  // Assigned bookings - status-based colors
-  switch (booking.status) {
-    case 'pending':
-      return isDark ? '#2196F3' : '#1976D2'; // Blue - scheduled but not started
-    case 'scheduled':
-      return isDark ? '#00BCD4' : '#0097A7'; // Cyan - confirmed and ready
-    case 'in_progress':
-      return isDark ? '#4CAF50' : '#388E3C'; // Green - currently being cleaned
-    case 'completed':
-      return isDark ? '#9E9E9E' : '#757575'; // Gray - finished
-    default:
-      return isDark ? '#2196F3' : '#1976D2';
-  }
-};
-const getAdminEventBorderColor = (booking: Booking): string => {
-  const isTurn = booking.booking_type === 'turn';
-  const isAssigned = !!booking.assigned_cleaner_id;
-  if (isTurn && !isAssigned) return '#D32F2F'; // Urgent red border for unassigned turns
-  if (isTurn) return '#FF6F00'; // Orange border for assigned turns
-  if (!isAssigned) return '#F57C00'; // Orange border for unassigned standard
-  return '#1976D2'; // Blue border for assigned standard
-};
-const getAdminEventTextColor = (booking: Booking): string => {
-  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
-};
-// Admin-focused calendar configuration with advanced features
-const adminCalendarOptions = computed<CalendarOptions>(() => ({
-  plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-  // View settings - all views available for admin
-  initialView: currentView.value,
-  headerToolbar: false, // We handle toolbar externally
-  // Event settings
-  events: adminCalendarEvents.value,
-  eventDisplay: 'block',
-  eventOverlap: true, // Allow overlapping for admin view
-  // Admin interaction settings (full features)
-  selectable: true,
-  selectMirror: true,
-  editable: true, // Enable drag-and-drop for admin
-  droppable: true, // Enable drag-to-assign
-  eventResizable: true, // Allow resizing events
-  eventDurationEditable: true,
-  // Date/time settings
-  locale: 'en',
-  timeZone: 'local',
-  slotMinTime: '05:00:00',
-  slotMaxTime: '23:00:00',
-  slotDuration: '00:30:00', // 30-minute slots for admin precision
-  // Appearance - admin-focused
-  height: 'auto',
-  aspectRatio: 1.6,
-  // Custom styling based on theme
-  themeSystem: 'standard',
-  // Event handlers - admin-specific
-  select: handleAdminDateSelect,
-  eventClick: handleAdminEventClick,
-  eventDrop: handleAdminEventDrop,
-  eventResize: handleAdminEventResize,
-  datesSet: handleDatesSet,
-  // Loading state
-  loading: handleLoading,
-  // Custom rendering - admin-focused
-  eventContent: renderAdminEventContent,
-  dayCellContent: renderAdminDayCell,
-  // Business hours
-  businessHours: {
-    daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // Monday - Sunday
-    startTime: '06:00',
-    endTime: '20:00'
-  },
-  // Weekend styling
-  weekends: true,
-  // Month view specific
-  dayMaxEvents: 5, // Show more events for admin
-  moreLinkClick: 'popover',
-  // Week/day view specific
-  allDaySlot: false,
-  nowIndicator: true,
-  scrollTime: '07:00:00',
-  // List view specific
-  listDayFormat: { weekday: 'long', month: 'short', day: 'numeric' },
-  // Right-click context menu
-  eventMouseEnter: (info) => {
-    info.el.style.cursor = 'pointer';
-  },
-  // Custom event rendering for admin features
-  eventDidMount: (info) => {
-    // Add right-click context menu
-    info.el.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      showContextMenu(e, info.event.extendedProps.booking);
-    });
-  }
-}));
-// Admin-specific event handlers
-const handleAdminDateSelect = (selectInfo: DateSelectArg): void => {
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'emit'
-  );
-  emit('dateSelect', selectInfo);
-  emit('createBooking', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr
-  });
-  selectInfo.view.calendar.unselect();
-};
-const handleAdminEventClick = (clickInfo: EventClickArg): void => {
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'emit'
-  );
-  emit('eventClick', clickInfo);
-};
-const handleAdminEventDrop = (dropInfo: EventDropArg): void => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'eventDrop',
-    { 
-      id: booking.id,
-      newStart: dropInfo.event.startStr,
-      newEnd: dropInfo.event.endStr
-    },
-    'emit'
-  );
-  emit('eventDrop', dropInfo);
-  // Update booking dates
-  emit('updateBooking', {
-    id: booking.id,
-    updates: {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-    }
-  });
-};
-const handleAdminEventResize = (resizeInfo: any): void => {
-  const booking = resizeInfo.event.extendedProps.booking as Booking;
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'eventResize',
-    { 
-      id: booking.id,
-      newEnd: resizeInfo.event.endStr
-    },
-    'emit'
-  );
-  // Update booking end date
-  emit('updateBooking', {
-    id: booking.id,
-    updates: {
-      checkin_date: resizeInfo.event.endStr
-    }
-  });
-};
-const handleDatesSet = (dateInfo: any): void => {
-  const newDate = new Date(dateInfo.start);
-  currentDateTitle.value = dateInfo.view.title;
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'dateChange',
-    { date: newDate.toISOString(), title: dateInfo.view.title },
-    'emit'
-  );
-  emit('dateChange', newDate);
-};
-const handleLoading = (isLoading: boolean): void => {
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'loadingState',
-    { isLoading },
-    'emit'
-  );
-};
-// Context menu functionality
-const showContextMenu = (event: MouseEvent, booking: Booking): void => {
-  contextMenu.value = {
-    show: true,
-    x: event.clientX,
-    y: event.clientY,
-    booking
+// Helper functions
+function getPropertyName(propertyId: string): string {
+  const property = propertyStore.getPropertyById(propertyId);
+  return property ? property.name : 'Unknown Property';
+}
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString();
+}
+function formatDateTime(dateString: string): string {
+  return new Date(dateString).toLocaleString();
+}
+function formatStatKey(key: string): string {
+  return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+function getStatusColor(status: string): string {
+  const colors: Record<string, string> = {
+    pending: 'orange',
+    scheduled: 'blue',
+    in_progress: 'purple',
+    completed: 'green',
+    cancelled: 'red'
   };
-};
-const contextMenuActions = computed(() => {
-  const booking = contextMenu.value.booking;
-  if (!booking) return [];
-  const actions = [
-    { key: 'edit', title: 'Edit Booking', icon: 'mdi-pencil' },
-    { key: 'assign', title: 'Assign Cleaner', icon: 'mdi-account-plus' },
-    { key: 'status', title: 'Change Status', icon: 'mdi-check-circle' },
-    { key: 'duplicate', title: 'Duplicate', icon: 'mdi-content-copy' },
-    { key: 'delete', title: 'Delete', icon: 'mdi-delete' }
+  return colors[status] || 'grey';
+}
+function getPriorityColor(priority: string): string {
+  const colors: Record<string, string> = {
+    low: 'grey',
+    normal: 'blue',
+    high: 'orange',
+    urgent: 'red'
+  };
+  return colors[priority] || 'grey';
+}
+// Test functions
+async function testCreateBooking() {
+  if (!currentUserId.value || myProperties.value.length === 0) {
+    error.value = 'No properties available for testing';
+    return;
+  }
+  const testBookingData: BookingFormData = {
+    property_id: myProperties.value[0].id,
+    checkout_date: new Date().toISOString(),
+    checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+    booking_type: 'standard',
+    status: 'pending',
+    guest_count: 2,
+    notes: 'Test booking created from demo',
+    owner_id: currentUserId.value
+  };
+  await createMyBooking(testBookingData);
+}
+async function testUpdateBooking() {
+  if (myBookings.value.length === 0) return;
+  const firstBooking = myBookings.value[0];
+  const updates: Partial<BookingFormData> = {
+    notes: `Updated at ${new Date().toLocaleTimeString()}`,
+    guest_count: (firstBooking.guest_count || 1) + 1
+  };
+  await updateMyBooking(firstBooking.id, updates);
+}
+async function testStatusChange() {
+  if (myBookings.value.length === 0) return;
+  const firstBooking = myBookings.value[0];
+  const nextStatus = firstBooking.status === 'pending' ? 'scheduled' : 'pending';
+  await changeMyBookingStatus(firstBooking.id, nextStatus);
+}
+async function generateSampleData() {
+  if (!currentUserId.value || myProperties.value.length === 0) {
+    error.value = 'No properties available for sample data generation';
+    return;
+  }
+  const sampleBookings: BookingFormData[] = [
+    {
+      property_id: myProperties.value[0].id,
+      checkout_date: new Date().toISOString(),
+      checkin_date: new Date().toISOString(), // Same day = turn
+      booking_type: 'turn',
+      status: 'pending',
+      guest_count: 4,
+      notes: 'Urgent turn booking - same day checkout/checkin',
+      owner_id: currentUserId.value
+    },
+    {
+      property_id: myProperties.value[0].id,
+      checkout_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // Day after tomorrow
+      checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
+      booking_type: 'standard',
+      status: 'pending',
+      guest_count: 2,
+      notes: 'Standard booking with 1-day gap',
+      owner_id: currentUserId.value
+    }
   ];
-  // Add status-specific actions
-  if (booking.status === 'pending') {
-    actions.splice(2, 0, { key: 'schedule', title: 'Mark Scheduled', icon: 'mdi-calendar-check' });
+  for (const bookingData of sampleBookings) {
+    await createMyBooking(bookingData);
   }
-  if (booking.status === 'scheduled') {
-    actions.splice(2, 0, { key: 'start', title: 'Start Cleaning', icon: 'mdi-play' });
+}
+function editBooking(booking: Booking) {
+  // In a real app, this would open an edit modal
+  console.log('Edit booking:', booking);
+  success.value = `Edit functionality would open for booking ${booking.id}`;
+}
+function confirmDeleteBooking(booking: Booking) {
+  bookingToDelete.value = booking;
+  showDeleteDialog.value = true;
+}
+async function executeDelete() {
+  if (bookingToDelete.value) {
+    await deleteMyBooking(bookingToDelete.value.id);
+    showDeleteDialog.value = false;
+    bookingToDelete.value = null;
   }
-  if (booking.status === 'in_progress') {
-    actions.splice(2, 0, { key: 'complete', title: 'Mark Complete', icon: 'mdi-check' });
-  }
-  return actions;
-});
-const handleContextAction = (action: string): void => {
-  const booking = contextMenu.value.booking;
-  if (!booking) return;
-  contextMenu.value.show = false;
-  switch (action) {
-    case 'edit':
-      emit('eventClick', { event: { id: booking.id, extendedProps: { booking } } } as any);
-      break;
-    case 'assign':
-      openCleanerAssignmentModal(booking);
-      break;
-    case 'schedule':
-      emit('updateBookingStatus', { bookingId: booking.id, status: 'scheduled' });
-      break;
-    case 'start':
-      emit('updateBookingStatus', { bookingId: booking.id, status: 'in_progress' });
-      break;
-    case 'complete':
-      emit('updateBookingStatus', { bookingId: booking.id, status: 'completed' });
-      break;
-    case 'status':
-      // Open status change dialog (would need to be implemented)
-      break;
-    case 'duplicate':
-      // Duplicate booking logic
-      break;
-    case 'delete':
-      // Delete booking with confirmation
-      break;
-  }
-};
-// Cleaner assignment functionality
-const openCleanerAssignmentModal = (booking: Booking): void => {
-  cleanerAssignmentModal.value = {
-    show: true,
-    booking,
-    selectedCleaner: booking.assigned_cleaner_id || null,
-    notes: '',
-    loading: false
-  };
-};
-const assignCleanerToBooking = async (): Promise<void> => {
-  const modal = cleanerAssignmentModal.value;
-  if (!modal.booking || !modal.selectedCleaner) return;
-  modal.loading = true;
-  try {
-    emit('assignCleaner', {
-      bookingId: modal.booking.id,
-      cleanerId: modal.selectedCleaner,
-      notes: modal.notes
-    });
-    modal.show = false;
-  } catch (error) {
-    console.error('Failed to assign cleaner:', error);
-  } finally {
-    modal.loading = false;
-  }
-};
-// Calendar navigation methods
-const navigateCalendar = (direction: 'prev' | 'next'): void => {
-  if (calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    if (direction === 'prev') {
-      api.prev();
-    } else {
-      api.next();
-    }
-  }
-};
-const goToToday = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().today();
-  }
-};
-const createNewBooking = (): void => {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  emit('createBooking', {
-    start: today.toISOString().split('T')[0],
-    end: tomorrow.toISOString().split('T')[0]
-  });
-};
-// Admin-focused custom event rendering
-const renderAdminEventContent = (eventInfo: any) => {
-  const booking = eventInfo.event.extendedProps.booking as Booking;
-  const property = eventInfo.event.extendedProps.property as Property;
-  const owner = eventInfo.event.extendedProps.owner as User;
-  const cleaner = eventInfo.event.extendedProps.cleaner as User;
-  const isTurn = booking.booking_type === 'turn';
-  const isAssigned = !!booking.assigned_cleaner_id;
-  return {
-    html: `
-      <div class="admin-event-content">
-        <div class="admin-event-title">
-          ${isTurn ? '🔥 ' : ''}${property?.name || 'Unknown Property'}
-        </div>
-        <div class="admin-event-owner">
-          Owner: ${owner?.name || 'Unknown'}
-        </div>
-        <div class="admin-event-cleaner ${isAssigned ? 'assigned' : 'unassigned'}">
-          ${isAssigned ? `👤 ${cleaner?.name}` : '⚠️ Unassigned'}
-        </div>
-        <div class="admin-event-status">
-          ${booking.status.toUpperCase()}
-        </div>
-        ${isTurn ? '<div class="admin-turn-badge">URGENT TURN</div>' : ''}
-      </div>
-    `
-  };
-};
-// Admin-focused day cell rendering
-const renderAdminDayCell = (dayInfo: any) => {
-  const dayBookings = allBookings.value.filter(booking => {
-    const checkoutDate = new Date(booking.checkout_date).toDateString();
-    const dayDate = dayInfo.date.toDateString();
-    return checkoutDate === dayDate;
-  });
-  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
-  const unassignedCount = dayBookings.filter(b => !b.assigned_cleaner_id).length;
-  const totalCount = dayBookings.length;
-  return {
-    html: `
-      <div class="admin-day-number">
-        ${dayInfo.dayNumberText}
-        ${turnCount > 0 ? `<span class="admin-turn-indicator">${turnCount}</span>` : ''}
-        ${unassignedCount > 0 ? `<span class="admin-unassigned-indicator">${unassignedCount}</span>` : ''}
-        ${totalCount > 0 && turnCount === 0 && unassignedCount === 0 ? `<span class="admin-booking-indicator">${totalCount}</span>` : ''}
-      </div>
-    `
-  };
-};
-// Watch for view changes
-watch(currentView, (newView) => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().changeView(newView);
-    emit('viewChange', newView);
-  }
-});
-// Watch for theme changes and update calendar
-watch(() => theme.global.current.value.dark, () => {
-  nextTick(() => {
-    if (calendarRef.value) {
-      calendarRef.value.getApi().refetchEvents();
-    }
-  });
-});
-// Watch for changes in props from HomeAdmin
-watch(() => props.bookings, (newBookings) => {
-  eventLogger.logEvent(
-    'HomeAdmin',
-    'AdminCalendar',
-    'bookingsUpdate',
-    { count: newBookings.size },
-    'receive'
-  );
-}, { deep: true });
-// Programmatic calendar methods for admin
-const goToDate = (date: string | Date): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(date);
-  }
-};
-const changeView = (viewName: string): void => {
-  currentView.value = viewName as any;
-};
-const refreshEvents = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().refetchEvents();
-  }
-};
-// Expose methods to parent (HomeAdmin)
-defineExpose({
-  goToDate,
-  changeView,
-  refreshEvents,
-  getApi: () => calendarRef.value?.getApi()
-});
+}
 </script>
 <style scoped>
-.admin-calendar-container {
-  height: 100%;
-  width: 100%;
-}
-.admin-calendar-toolbar {
-  background: rgb(var(--v-theme-surface));
-  border: 1px solid rgb(var(--v-theme-outline), 0.12);
-}
-.admin-view-toggle {
-  border: 1px solid rgb(var(--v-theme-outline), 0.38);
-}
-.admin-date-title {
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: normal;
-}
-.admin-calendar-card {
-  background: rgb(var(--v-theme-surface));
-}
-.admin-calendar {
-  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
-  --fc-button-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-border-color: rgb(var(--v-theme-primary));
-  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
-  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
-  --fc-event-border-radius: 4px;
-}
-/* Admin-specific turn booking highlighting */
-.fc-event.admin-booking-turn {
-  font-weight: bold;
-  border-width: 2px !important;
-}
-.fc-event.admin-priority-urgent {
-  animation: admin-pulse 3s infinite;
-  border-left: 4px solid rgb(var(--v-theme-error)) !important;
-}
-@keyframes admin-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0); }
-  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
-}
-/* Admin-specific assignment status styling */
-.fc-event.admin-assignment-unassigned {
-  border-style: dashed !important;
-  border-width: 2px !important;
-}
-.fc-event.admin-assignment-assigned {
-  border-style: solid !important;
-}
-/* Admin-specific status styling */
-.fc-event.admin-status-pending {
-  opacity: 0.9;
-}
-.fc-event.admin-status-in_progress {
-  font-weight: bold;
-  border-width: 3px !important;
-}
-.fc-event.admin-status-completed {
-  opacity: 0.6;
-  text-decoration: line-through;
-}
-/* Admin-specific day cell indicators */
-.admin-turn-indicator {
-  background: rgb(var(--v-theme-error));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 9px;
-  margin-left: 2px;
-  font-weight: bold;
-  animation: admin-pulse 3s infinite;
-}
-.admin-unassigned-indicator {
-  background: rgb(var(--v-theme-warning));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 9px;
-  margin-left: 2px;
-  font-weight: bold;
-}
-.admin-booking-indicator {
-  background: rgb(var(--v-theme-primary));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 9px;
-  margin-left: 2px;
-  font-weight: bold;
-}
-/* Admin-specific event content styling */
-.admin-event-content {
-  padding: 2px;
-  font-size: 0.8em;
-}
-.admin-event-title {
-  font-weight: 600;
-  font-size: 0.9em;
-  margin-bottom: 1px;
-}
-.admin-event-owner {
-  font-size: 0.75em;
-  opacity: 0.8;
-  margin-bottom: 1px;
-}
-.admin-event-cleaner {
-  font-size: 0.75em;
-  font-weight: 500;
-  margin-bottom: 1px;
-}
-.admin-event-cleaner.unassigned {
-  color: rgb(var(--v-theme-warning));
-  font-weight: bold;
-}
-.admin-event-cleaner.assigned {
-  color: rgb(var(--v-theme-success));
-}
-.admin-event-status {
-  font-size: 0.7em;
-  opacity: 0.9;
-  font-weight: 500;
-}
-.admin-turn-badge {
-  background: rgba(var(--v-theme-error), 0.2);
-  color: rgb(var(--v-theme-error));
-  font-size: 0.65em;
-  padding: 1px 3px;
-  border-radius: 3px;
-  margin-top: 1px;
-  font-weight: bold;
-  text-align: center;
-}
-/* Admin-specific day cell styling */
-.admin-day-number {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-/* Responsive adjustments */
-@media (max-width: 960px) {
-  .admin-calendar-toolbar .v-row {
-    flex-direction: column;
-  }
-  .admin-calendar-toolbar .v-col {
-    margin-bottom: 8px !important;
-  }
-  .admin-view-toggle {
-    width: 100%;
-  }
-  .admin-event-content {
-    font-size: 0.7em;
-  }
-}
-@media (max-width: 600px) {
-  .admin-calendar {
-    --fc-event-border-radius: 2px;
-  }
-  .admin-event-content {
-    font-size: 0.65em;
-    padding: 1px;
-  }
-  .admin-event-title {
-    font-size: 0.8em;
-  }
+.v-card {
+  margin-bottom: 16px;
 }
 </style>
 `````
 
-## File: src/components/smart/admin/AdminCalendarDemo.vue
-`````vue
-<template>
-  <div class="admin-calendar-demo">
-    <v-container fluid>
-      <!-- Demo Header -->
-      <v-row class="mb-4">
-        <v-col>
-          <v-card class="demo-header" elevation="2">
-            <v-card-title class="d-flex align-center">
-              <v-icon class="mr-3" color="primary">mdi-calendar-multiple</v-icon>
-              <span>AdminCalendar Component Demo</span>
-              <v-spacer />
-              <v-chip color="success" variant="elevated">
-                <v-icon start>mdi-check-circle</v-icon>
-                TASK-039H Complete
-              </v-chip>
-            </v-card-title>
-            <v-card-text>
-              <p class="mb-2">
-                <strong>Role-Based Multi-Tenant Calendar:</strong> Admin interface showing ALL bookings across ALL property owners with advanced management features.
-              </p>
-              <v-row>
-                <v-col cols="12" md="4">
-                  <v-chip size="small" color="error" class="mr-2">🔥 Turn Bookings</v-chip>
-                  <span class="text-caption">Urgent same-day turnovers</span>
-                </v-col>
-                <v-col cols="12" md="4">
-                  <v-chip size="small" color="warning" class="mr-2">⚠️ Unassigned</v-chip>
-                  <span class="text-caption">Need cleaner assignment</span>
-                </v-col>
-                <v-col cols="12" md="4">
-                  <v-chip size="small" color="success" class="mr-2">👤 Assigned</v-chip>
-                  <span class="text-caption">Cleaner assigned</span>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <!-- Demo Stats -->
-      <v-row class="mb-4">
-        <v-col cols="6" md="3">
-          <v-card class="text-center" elevation="1">
-            <v-card-text>
-              <div class="text-h4 text-primary">{{ demoStats.totalBookings }}</div>
-              <div class="text-caption">Total Bookings</div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="6" md="3">
-          <v-card class="text-center" elevation="1">
-            <v-card-text>
-              <div class="text-h4 text-error">{{ demoStats.urgentTurns }}</div>
-              <div class="text-caption">Urgent Turns</div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="6" md="3">
-          <v-card class="text-center" elevation="1">
-            <v-card-text>
-              <div class="text-h4 text-warning">{{ demoStats.unassigned }}</div>
-              <div class="text-caption">Unassigned</div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="6" md="3">
-          <v-card class="text-center" elevation="1">
-            <v-card-text>
-              <div class="text-h4 text-success">{{ demoStats.assigned }}</div>
-              <div class="text-caption">Assigned</div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <!-- AdminCalendar Component -->
-      <v-row>
-        <v-col>
-          <AdminCalendar
-            :bookings="demoBookings"
-            :properties="demoProperties"
-            :users="demoUsers"
-            :loading="loading"
-            @date-select="handleDateSelect"
-            @event-click="handleEventClick"
-            @event-drop="handleEventDrop"
-            @create-booking="handleCreateBooking"
-            @update-booking="handleUpdateBooking"
-            @assign-cleaner="handleAssignCleaner"
-            @update-booking-status="handleUpdateBookingStatus"
-            @view-change="handleViewChange"
-            @date-change="handleDateChange"
-          />
-        </v-col>
-      </v-row>
-      <!-- Demo Actions -->
-      <v-row class="mt-4">
-        <v-col>
-          <v-card class="demo-actions" elevation="1">
-            <v-card-title>Demo Actions</v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-btn
-                    color="primary"
-                    variant="outlined"
-                    block
-                    @click="addRandomBooking"
-                  >
-                    <v-icon start>mdi-plus</v-icon>
-                    Add Random Booking
-                  </v-btn>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-btn
-                    color="error"
-                    variant="outlined"
-                    block
-                    @click="addUrgentTurn"
-                  >
-                    <v-icon start>mdi-fire</v-icon>
-                    Add Urgent Turn
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <!-- Event Log -->
-      <v-row class="mt-4">
-        <v-col>
-          <v-card class="demo-log" elevation="1">
-            <v-card-title>
-              Event Log
-              <v-spacer />
-              <v-btn
-                size="small"
-                variant="text"
-                @click="clearEventLog"
-              >
-                Clear
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <div class="event-log-container">
-                <div
-                  v-for="(event, index) in eventLog"
-                  :key="index"
-                  class="event-log-item"
-                >
-                  <v-chip
-                    :color="getEventColor(event.type)"
-                    size="small"
-                    class="mr-2"
-                  >
-                    {{ event.type }}
-                  </v-chip>
-                  <span class="text-caption">{{ event.timestamp }}</span>
-                  <div class="mt-1">{{ event.message }}</div>
-                </div>
-                <div v-if="eventLog.length === 0" class="text-center text-disabled">
-                  No events logged yet. Interact with the calendar to see events.
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
+## File: src/composables/owner/useOwnerBookings.ts
+`````typescript
+import { ref, computed } from 'vue';
+import { useBookings } from '@/composables/shared/useBookings';
+import { useAuthStore } from '@/stores/auth';
+import { useBookingStore } from '@/stores/booking';
+import { usePropertyStore } from '@/stores/property';
+import type { Booking, BookingFormData, BookingStatus } from '@/types';
+/**
+ * Owner-specific booking composable
+ * Extends shared useBookings functionality with owner data filtering
+ * 
+ * Key Features:
+ * - All operations filtered to current owner's bookings only
+ * - Owner-specific validation and error messages
+ * - Automatic owner_id assignment on create operations
+ * - Ownership validation on update/delete operations
+ * - Removes admin-only functions (cleaner assignment)
+ */
+export function useOwnerBookings()
 ⋮----
-<!-- Demo Header -->
+// Get shared functionality and stores
 ⋮----
-<!-- Demo Stats -->
+// Owner-specific state
 ⋮----
-<div class="text-h4 text-primary">{{ demoStats.totalBookings }}</div>
+// Get current user ID
 ⋮----
-<div class="text-h4 text-error">{{ demoStats.urgentTurns }}</div>
+// COMPUTED PROPERTIES - Owner-scoped data filtering
+/**
+   * Get all bookings for the current owner only
+   */
 ⋮----
-<div class="text-h4 text-warning">{{ demoStats.unassigned }}</div>
+/**
+   * Get current owner's properties only
+   */
 ⋮----
-<div class="text-h4 text-success">{{ demoStats.assigned }}</div>
+/**
+   * Get today's turn bookings for current owner only
+   */
 ⋮----
-<!-- AdminCalendar Component -->
+/**
+   * Get upcoming cleanings for current owner (next 7 days)
+   */
 ⋮----
-<!-- Demo Actions -->
+/**
+   * Get bookings by status for current owner
+   */
 ⋮----
-<!-- Event Log -->
+// OWNER-SPECIFIC CRUD OPERATIONS
+/**
+   * Fetch current owner's bookings only
+   */
+async function fetchMyBookings(): Promise<boolean>
 ⋮----
-{{ event.type }}
+// In a real app, this would make an API call with owner filter
+// For now, we simulate the call and rely on computed filtering
 ⋮----
-<span class="text-caption">{{ event.timestamp }}</span>
-<div class="mt-1">{{ event.message }}</div>
+/**
+   * Create a new booking for the current owner
+   */
+async function createMyBooking(formData: BookingFormData): Promise<string | null>
 ⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-import AdminCalendar from './AdminCalendar.vue';
-import type { Booking, Property, User, Cleaner } from '@/types';
-// Demo state
-const loading = ref(false);
-const eventLog = ref<Array<{ type: string; message: string; timestamp: string }>>([]);
-// Create demo data Maps
-const demoBookings = ref(new Map<string, Booking>());
-const demoProperties = ref(new Map<string, Property>());
-const demoUsers = ref(new Map<string, User>());
-// Demo statistics
-const demoStats = computed(() => {
-  const bookings = Array.from(demoBookings.value.values());
-  return {
-    totalBookings: bookings.length,
-    urgentTurns: bookings.filter(b => b.booking_type === 'turn').length,
-    unassigned: bookings.filter(b => !b.assigned_cleaner_id).length,
-    assigned: bookings.filter(b => !!b.assigned_cleaner_id).length
-  };
-});
-// Initialize demo data
-const initializeDemoData = (): void => {
-  // Demo Users (Property Owners + Cleaners + Admin)
-  const users: User[] = [
-    // Property Owners
-    {
-      id: 'owner-1',
-      email: 'sarah.johnson@email.com',
-      name: 'Sarah Johnson',
-      role: 'owner',
-      settings: { 
-        theme: 'light', 
-        notifications: true,
-        timezone: 'America/New_York',
-        language: 'en'
-      },
-      created_at: '2024-01-15T10:00:00Z',
-      updated_at: '2024-01-15T10:00:00Z'
-    },
-    {
-      id: 'owner-2',
-      email: 'mike.chen@email.com',
-      name: 'Mike Chen',
-      role: 'owner',
-      settings: { 
-        theme: 'dark', 
-        notifications: true,
-        timezone: 'America/Los_Angeles',
-        language: 'en'
-      },
-      created_at: '2024-01-20T14:30:00Z',
-      updated_at: '2024-01-20T14:30:00Z'
-    },
-    {
-      id: 'owner-3',
-      email: 'lisa.rodriguez@email.com',
-      name: 'Lisa Rodriguez',
-      role: 'owner',
-      settings: { 
-        theme: 'light', 
-        notifications: false,
-        timezone: 'America/Chicago',
-        language: 'en'
-      },
-      created_at: '2024-02-01T09:15:00Z',
-      updated_at: '2024-02-01T09:15:00Z'
-    },
-    // Admin User
-    {
-      id: 'admin-1',
-      email: 'admin@cleaningco.com',
-      name: 'Admin User',
-      role: 'admin',
-      settings: { 
-        theme: 'light', 
-        notifications: true,
-        timezone: 'America/New_York',
-        language: 'en'
-      },
-      created_at: '2024-01-01T08:00:00Z',
-      updated_at: '2024-01-01T08:00:00Z'
-    }
-  ];
-  // Demo Cleaners (with Cleaner interface properties)
-  const cleaners: Cleaner[] = [
-    {
-      id: 'cleaner-1',
-      email: 'maria.garcia@cleaningco.com',
-      name: 'Maria Garcia',
-      role: 'cleaner',
-      settings: { 
-        theme: 'light', 
-        notifications: true,
-        timezone: 'America/New_York',
-        language: 'en'
-      },
-      skills: ['deep-cleaning', 'eco-friendly'],
-      max_daily_bookings: 4,
-      created_at: '2024-01-10T08:00:00Z',
-      updated_at: '2024-01-10T08:00:00Z'
-    },
-    {
-      id: 'cleaner-2',
-      email: 'james.wilson@cleaningco.com',
-      name: 'James Wilson',
-      role: 'cleaner',
-      settings: { 
-        theme: 'light', 
-        notifications: true,
-        timezone: 'America/New_York',
-        language: 'en'
-      },
-      skills: ['standard-cleaning', 'move-out'],
-      max_daily_bookings: 5,
-      created_at: '2024-01-12T08:00:00Z',
-      updated_at: '2024-01-12T08:00:00Z'
-    },
-    {
-      id: 'cleaner-3',
-      email: 'anna.petrov@cleaningco.com',
-      name: 'Anna Petrov',
-      role: 'cleaner',
-      settings: { 
-        theme: 'dark', 
-        notifications: true,
-        timezone: 'America/New_York',
-        language: 'en'
-      },
-      skills: ['deep-cleaning', 'move-in'],
-      max_daily_bookings: 3,
-      created_at: '2024-01-15T08:00:00Z',
-      updated_at: '2024-01-15T08:00:00Z'
-    }
-  ];
-  // Combine all users
-  const allUsers = [...users, ...cleaners];
-  allUsers.forEach(user => {
-    demoUsers.value.set(user.id, user);
-  });
-  // Demo Properties (across multiple owners)
-  const properties: Property[] = [
-    // Sarah Johnson's properties
-    {
-      id: 'prop-1',
-      name: 'Downtown Loft',
-      address: '123 Main St, New York, NY 10001',
-      owner_id: 'owner-1',
-      bedrooms: 2,
-      bathrooms: 2,
-      square_feet: 1200,
-      property_type: 'apartment',
-      pricing_tier: 'premium',
-      cleaning_duration: 120,
-      active: true,
-      created_at: '2024-01-15T10:00:00Z',
-      updated_at: '2024-01-15T10:00:00Z'
-    },
-    {
-      id: 'prop-2',
-      name: 'Brooklyn Heights Studio',
-      address: '456 Heights Ave, Brooklyn, NY 11201',
-      owner_id: 'owner-1',
-      bedrooms: 1,
-      bathrooms: 1,
-      square_feet: 800,
-      property_type: 'apartment',
-      pricing_tier: 'standard',
-      cleaning_duration: 90,
-      active: true,
-      created_at: '2024-01-16T10:00:00Z',
-      updated_at: '2024-01-16T10:00:00Z'
-    },
-    // Mike Chen's properties
-    {
-      id: 'prop-3',
-      name: 'Hollywood Hills House',
-      address: '789 Hills Dr, Los Angeles, CA 90210',
-      owner_id: 'owner-2',
-      bedrooms: 4,
-      bathrooms: 3,
-      square_feet: 2500,
-      property_type: 'house',
-      pricing_tier: 'luxury',
-      cleaning_duration: 180,
-      active: true,
-      created_at: '2024-01-20T14:30:00Z',
-      updated_at: '2024-01-20T14:30:00Z'
-    },
-    {
-      id: 'prop-4',
-      name: 'Santa Monica Condo',
-      address: '321 Beach Blvd, Santa Monica, CA 90401',
-      owner_id: 'owner-2',
-      bedrooms: 2,
-      bathrooms: 2,
-      square_feet: 1400,
-      property_type: 'condo',
-      pricing_tier: 'premium',
-      cleaning_duration: 120,
-      active: true,
-      created_at: '2024-01-21T14:30:00Z',
-      updated_at: '2024-01-21T14:30:00Z'
-    },
-    // Lisa Rodriguez's properties
-    {
-      id: 'prop-5',
-      name: 'Chicago Loop Apartment',
-      address: '654 Loop St, Chicago, IL 60601',
-      owner_id: 'owner-3',
-      bedrooms: 3,
-      bathrooms: 2,
-      square_feet: 1600,
-      property_type: 'apartment',
-      pricing_tier: 'standard',
-      cleaning_duration: 150,
-      active: true,
-      created_at: '2024-02-01T09:15:00Z',
-      updated_at: '2024-02-01T09:15:00Z'
-    }
-  ];
-  properties.forEach(property => {
-    demoProperties.value.set(property.id, property);
-  });
-  // Demo Bookings (mix of assigned/unassigned, turn/standard, different statuses)
-  const today = new Date();
-  const bookings: Booking[] = [
-    // Urgent turns (some assigned, some not)
-    {
-      id: 'booking-1',
-      property_id: 'prop-1',
-      owner_id: 'owner-1',
-      checkout_date: today.toISOString().split('T')[0] + 'T11:00:00Z',
-      checkin_date: today.toISOString().split('T')[0] + 'T15:00:00Z',
-      guest_count: 2,
-      booking_type: 'turn',
-      status: 'pending',
-      assigned_cleaner_id: undefined, // Unassigned urgent turn
-      notes: 'Same-day turnover - URGENT',
-      created_at: '2024-01-25T08:00:00Z',
-      updated_at: '2024-01-25T08:00:00Z'
-    },
-    {
-      id: 'booking-2',
-      property_id: 'prop-3',
-      owner_id: 'owner-2',
-      checkout_date: today.toISOString().split('T')[0] + 'T10:00:00Z',
-      checkin_date: today.toISOString().split('T')[0] + 'T16:00:00Z',
-      guest_count: 4,
-      booking_type: 'turn',
-      status: 'scheduled',
-      assigned_cleaner_id: 'cleaner-1', // Assigned urgent turn
-      notes: 'Large house turnover',
-      created_at: '2024-01-25T09:00:00Z',
-      updated_at: '2024-01-25T09:00:00Z'
-    },
-    // Tomorrow's bookings
-    {
-      id: 'booking-3',
-      property_id: 'prop-2',
-      owner_id: 'owner-1',
-      checkout_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
-      checkin_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T16:00:00Z',
-      guest_count: 1,
-      booking_type: 'standard',
-      status: 'pending',
-      assigned_cleaner_id: undefined, // Unassigned standard
-      notes: 'Standard cleaning',
-      created_at: '2024-01-24T10:00:00Z',
-      updated_at: '2024-01-24T10:00:00Z'
-    },
-    {
-      id: 'booking-4',
-      property_id: 'prop-4',
-      owner_id: 'owner-2',
-      checkout_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
-      checkin_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
-      guest_count: 2,
-      booking_type: 'standard',
-      status: 'scheduled',
-      assigned_cleaner_id: 'cleaner-2', // Assigned standard
-      notes: 'Regular cleaning',
-      created_at: '2024-01-24T11:00:00Z',
-      updated_at: '2024-01-24T11:00:00Z'
-    },
-    // Day after tomorrow
-    {
-      id: 'booking-5',
-      property_id: 'prop-5',
-      owner_id: 'owner-3',
-      checkout_date: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T10:00:00Z',
-      checkin_date: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
-      guest_count: 3,
-      booking_type: 'turn',
-      status: 'in_progress',
-      assigned_cleaner_id: 'cleaner-3', // In progress turn
-      notes: 'Deep cleaning required',
-      created_at: '2024-01-23T12:00:00Z',
-      updated_at: '2024-01-25T13:00:00Z'
-    },
-    // Completed booking
-    {
-      id: 'booking-6',
-      property_id: 'prop-1',
-      owner_id: 'owner-1',
-      checkout_date: new Date(today.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
-      checkin_date: new Date(today.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
-      guest_count: 2,
-      booking_type: 'standard',
-      status: 'completed',
-      assigned_cleaner_id: 'cleaner-1',
-      notes: 'Completed successfully',
-      created_at: '2024-01-22T10:00:00Z',
-      updated_at: '2024-01-24T16:00:00Z'
-    }
-  ];
-  bookings.forEach(booking => {
-    demoBookings.value.set(booking.id, booking);
-  });
-  logEvent('init', 'Demo data initialized with comprehensive multi-tenant test data');
-};
-// Event handlers
-const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  logEvent('dateSelect', `Date range selected: ${selectInfo.startStr} to ${selectInfo.endStr}`);
-};
-const handleEventClick = (clickInfo: EventClickArg): void => {
-  const booking = clickInfo.event.extendedProps.booking as Booking;
-  logEvent('eventClick', `Clicked booking: ${booking.id} (${booking.booking_type})`);
-};
-const handleEventDrop = (dropInfo: EventDropArg): void => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  logEvent('eventDrop', `Moved booking: ${booking.id} to ${dropInfo.event.startStr}`);
-};
-const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }): void => {
-  logEvent('createBooking', `Create booking request: ${data.start} to ${data.end}`);
-};
-const handleUpdateBooking = (data: { id: string; updates: Partial<Booking> }): void => {
-  const booking = demoBookings.value.get(data.id);
-  if (booking) {
-    const updatedBooking = { ...booking, ...data.updates };
-    demoBookings.value.set(data.id, updatedBooking);
-    logEvent('updateBooking', `Updated booking: ${data.id}`);
-  }
-};
-const handleAssignCleaner = (data: { bookingId: string; cleanerId: string; notes?: string }): void => {
-  const booking = demoBookings.value.get(data.bookingId);
-  const cleaner = demoUsers.value.get(data.cleanerId);
-  if (booking && cleaner) {
-    booking.assigned_cleaner_id = data.cleanerId;
-    booking.status = 'scheduled';
-    demoBookings.value.set(data.bookingId, booking);
-    logEvent('assignCleaner', `Assigned ${cleaner.name} to booking ${data.bookingId}`);
-  }
-};
-const handleUpdateBookingStatus = (data: { bookingId: string; status: Booking['status'] }): void => {
-  const booking = demoBookings.value.get(data.bookingId);
-  if (booking) {
-    booking.status = data.status;
-    demoBookings.value.set(data.bookingId, booking);
-    logEvent('updateStatus', `Changed booking ${data.bookingId} status to ${data.status}`);
-  }
-};
-const handleViewChange = (view: string): void => {
-  logEvent('viewChange', `Calendar view changed to: ${view}`);
-};
-const handleDateChange = (date: Date): void => {
-  logEvent('dateChange', `Calendar date changed to: ${date.toDateString()}`);
-};
-// Demo actions
-const addRandomBooking = (): void => {
-  const properties = Array.from(demoProperties.value.values());
-  const randomProperty = properties[Math.floor(Math.random() * properties.length)];
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const newBooking: Booking = {
-    id: `booking-${Date.now()}`,
-    property_id: randomProperty.id,
-    owner_id: randomProperty.owner_id,
-    checkout_date: tomorrow.toISOString().split('T')[0] + 'T12:00:00Z',
-    checkin_date: tomorrow.toISOString().split('T')[0] + 'T16:00:00Z',
-    guest_count: Math.floor(Math.random() * 4) + 1,
-    booking_type: 'standard',
-    status: 'pending',
-    assigned_cleaner_id: undefined,
-    notes: 'Demo booking',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-  demoBookings.value.set(newBooking.id, newBooking);
-  logEvent('demo', `Added random booking for ${randomProperty.name}`);
-};
-const addUrgentTurn = (): void => {
-  const properties = Array.from(demoProperties.value.values());
-  const randomProperty = properties[Math.floor(Math.random() * properties.length)];
-  const today = new Date();
-  const newBooking: Booking = {
-    id: `turn-${Date.now()}`,
-    property_id: randomProperty.id,
-    owner_id: randomProperty.owner_id,
-    checkout_date: today.toISOString().split('T')[0] + 'T11:00:00Z',
-    checkin_date: today.toISOString().split('T')[0] + 'T15:00:00Z',
-    guest_count: Math.floor(Math.random() * 4) + 1,
-    booking_type: 'turn',
-    status: 'pending',
-    assigned_cleaner_id: undefined,
-    notes: 'URGENT: Same-day turnover',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-  demoBookings.value.set(newBooking.id, newBooking);
-  logEvent('demo', `Added urgent turn for ${randomProperty.name}`);
-};
-// Event logging
-const logEvent = (type: string, message: string): void => {
-  eventLog.value.unshift({
-    type,
-    message,
-    timestamp: new Date().toLocaleTimeString()
-  });
-  // Keep only last 20 events
-  if (eventLog.value.length > 20) {
-    eventLog.value = eventLog.value.slice(0, 20);
-  }
-};
-const clearEventLog = (): void => {
-  eventLog.value = [];
-};
-const getEventColor = (type: string): string => {
-  const colors: Record<string, string> = {
-    init: 'info',
-    dateSelect: 'primary',
-    eventClick: 'secondary',
-    eventDrop: 'warning',
-    createBooking: 'success',
-    updateBooking: 'info',
-    assignCleaner: 'success',
-    updateStatus: 'warning',
-    viewChange: 'primary',
-    dateChange: 'secondary',
-    demo: 'purple'
-  };
-  return colors[type] || 'default';
-};
-// Initialize demo data on mount
-onMounted(() => {
-  initializeDemoData();
-});
-</script>
-<style scoped>
-.admin-calendar-demo {
-  min-height: 100vh;
-  background: rgb(var(--v-theme-background));
-}
-.demo-header {
-  background: linear-gradient(135deg, rgb(var(--v-theme-primary), 0.1), rgb(var(--v-theme-secondary), 0.1));
-}
-.demo-actions,
-.demo-log {
-  background: rgb(var(--v-theme-surface));
-}
-.event-log-container {
-  max-height: 300px;
-  overflow-y: auto;
-}
-.event-log-item {
-  padding: 8px 0;
-  border-bottom: 1px solid rgb(var(--v-theme-outline), 0.12);
-}
-.event-log-item:last-child {
-  border-bottom: none;
-}
-/* Responsive adjustments */
-@media (max-width: 960px) {
-  .admin-calendar-demo .v-container {
-    padding: 12px;
-  }
-}
-</style>
+// Validate that the property belongs to the current owner
+⋮----
+// Create booking data with owner_id automatically set
+⋮----
+// Use base composable's create function
+⋮----
+/**
+   * Update a booking (only if owned by current user)
+   */
+async function updateMyBooking(id: string, updates: Partial<BookingFormData>): Promise<boolean>
+⋮----
+// Check if booking exists and belongs to current user
+⋮----
+// If property is being changed, validate ownership
+⋮----
+// Use base composable's update function
+⋮----
+/**
+   * Delete a booking (only if owned by current user)
+   */
+async function deleteMyBooking(id: string): Promise<boolean>
+⋮----
+// Check if booking exists and belongs to current user
+⋮----
+// Use base composable's delete function
+⋮----
+/**
+   * Change booking status (only if owned by current user)
+   */
+async function changeMyBookingStatus(id: string, status: BookingStatus): Promise<boolean>
+⋮----
+// Check if booking exists and belongs to current user
+⋮----
+// Use base composable's status change function
+⋮----
+// OWNER-SPECIFIC BUSINESS LOGIC FUNCTIONS
+/**
+   * Get turn alerts for current owner only
+   */
+function getMyTurnAlerts()
+⋮----
+// Show turns that are within 6 hours or overdue
+⋮----
+/**
+   * Calculate priority for owner's booking
+   */
+function calculateMyBookingPriority(booking: Booking): 'low' | 'normal' | 'high' | 'urgent'
+⋮----
+// Only calculate for owner's bookings
+⋮----
+// Use base composable's priority calculation
+⋮----
+/**
+   * Get cleaning window for owner's booking
+   */
+function getMyBookingCleaningWindow(booking: Booking)
+⋮----
+// Only calculate for owner's bookings
+⋮----
+// Use base composable's cleaning window calculation
+⋮----
+/**
+   * Get owner's booking statistics
+   */
+⋮----
+// Return owner-specific interface
+⋮----
+// State
+⋮----
+// Computed properties (owner-scoped data)
+⋮----
+// Owner-specific CRUD operations
+⋮----
+// Owner-specific business logic
+⋮----
+// Inherited from base composable (for compatibility)
+// Note: These work on all data, not owner-filtered
 `````
 
 ## File: .cursorignore
@@ -29907,6 +28981,1648 @@ html, body {
 * {
 `````
 
+## File: src/components/smart/admin/AdminCalendar.vue
+`````vue
+<template>
+  <div class="admin-calendar-container">
+    <!-- Advanced Admin Calendar Toolbar -->
+    <v-card class="admin-calendar-toolbar mb-4" elevation="2">
+      <v-card-text class="pb-2">
+        <v-row align="center" no-gutters>
+          <!-- View Controls -->
+          <v-col cols="12" md="3" class="mb-2 mb-md-0">
+            <v-btn-toggle
+              v-model="currentView"
+              mandatory
+              variant="outlined"
+              density="compact"
+              class="admin-view-toggle"
+            >
+              <v-btn value="dayGridMonth" size="small">Month</v-btn>
+              <v-btn value="timeGridWeek" size="small">Week</v-btn>
+              <v-btn value="timeGridDay" size="small">Day</v-btn>
+              <v-btn value="listWeek" size="small">List</v-btn>
+            </v-btn-toggle>
+          </v-col>
+          <!-- Date Navigation -->
+          <v-col cols="12" md="4" class="mb-2 mb-md-0">
+            <div class="d-flex align-center justify-center">
+              <v-btn
+                icon="mdi-chevron-left"
+                variant="text"
+                size="small"
+                @click="navigateCalendar('prev')"
+              />
+              <v-btn
+                variant="text"
+                class="mx-2 admin-date-title"
+                @click="goToToday"
+              >
+                {{ currentDateTitle }}
+              </v-btn>
+              <v-btn
+                icon="mdi-chevron-right"
+                variant="text"
+                size="small"
+                @click="navigateCalendar('next')"
+              />
+            </div>
+          </v-col>
+          <!-- Admin Filters -->
+          <v-col cols="12" md="5">
+            <div class="d-flex align-center justify-end flex-wrap ga-2">
+              <!-- Cleaner Filter -->
+              <v-select
+                v-model="selectedCleaner"
+                :items="cleanerFilterOptions"
+                item-title="name"
+                item-value="id"
+                label="Filter by Cleaner"
+                density="compact"
+                variant="outlined"
+                style="min-width: 150px; max-width: 200px;"
+                clearable
+                hide-details
+              />
+              <!-- Status Filter -->
+              <v-select
+                v-model="selectedStatuses"
+                :items="statusFilterOptions"
+                item-title="label"
+                item-value="value"
+                label="Filter by Status"
+                density="compact"
+                variant="outlined"
+                style="min-width: 150px; max-width: 200px;"
+                multiple
+                clearable
+                hide-details
+              />
+              <!-- Booking Type Filter -->
+              <v-select
+                v-model="selectedBookingTypes"
+                :items="bookingTypeOptions"
+                item-title="label"
+                item-value="value"
+                label="Booking Type"
+                density="compact"
+                variant="outlined"
+                style="min-width: 120px; max-width: 150px;"
+                multiple
+                clearable
+                hide-details
+              />
+              <!-- Quick Actions -->
+              <v-btn
+                color="primary"
+                variant="elevated"
+                size="small"
+                prepend-icon="mdi-plus"
+                @click="createNewBooking"
+              >
+                New Booking
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+    <!-- FullCalendar Component -->
+    <v-card elevation="2" class="admin-calendar-card">
+      <FullCalendar
+        ref="calendarRef"
+        :options="adminCalendarOptions"
+        class="admin-calendar"
+      />
+    </v-card>
+    <!-- Context Menu -->
+    <v-menu
+      v-model="contextMenu.show"
+      :position-x="contextMenu.x"
+      :position-y="contextMenu.y"
+      absolute
+      offset-y
+    >
+      <v-list density="compact">
+        <v-list-item
+          v-for="action in contextMenuActions"
+          :key="action.key"
+          :prepend-icon="action.icon"
+          :title="action.title"
+          @click="handleContextAction(action.key)"
+        />
+      </v-list>
+    </v-menu>
+    <!-- Cleaner Assignment Modal -->
+    <v-dialog v-model="cleanerAssignmentModal.show" max-width="500">
+      <v-card>
+        <v-card-title>
+          <span class="text-h6">Assign Cleaner</span>
+        </v-card-title>
+        <v-card-text>
+          <v-select
+            v-model="cleanerAssignmentModal.selectedCleaner"
+            :items="availableCleaners"
+            item-title="name"
+            item-value="id"
+            label="Select Cleaner"
+            variant="outlined"
+            :loading="cleanerAssignmentModal.loading"
+          >
+            <template #item="{ props, item }">
+              <v-list-item v-bind="props">
+                <template #prepend>
+                  <v-avatar size="32">
+                    <v-icon>mdi-account</v-icon>
+                  </v-avatar>
+                </template>
+                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
+                </v-list-item-subtitle>
+              </v-list-item>
+            </template>
+          </v-select>
+          <v-textarea
+            v-model="cleanerAssignmentModal.notes"
+            label="Assignment Notes (Optional)"
+            variant="outlined"
+            rows="3"
+            class="mt-4"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            @click="cleanerAssignmentModal.show = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            :loading="cleanerAssignmentModal.loading"
+            @click="assignCleanerToBooking"
+          >
+            Assign
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+⋮----
+<!-- Advanced Admin Calendar Toolbar -->
+⋮----
+<!-- View Controls -->
+⋮----
+<!-- Date Navigation -->
+⋮----
+{{ currentDateTitle }}
+⋮----
+<!-- Admin Filters -->
+⋮----
+<!-- Cleaner Filter -->
+⋮----
+<!-- Status Filter -->
+⋮----
+<!-- Booking Type Filter -->
+⋮----
+<!-- Quick Actions -->
+⋮----
+<!-- FullCalendar Component -->
+⋮----
+<!-- Context Menu -->
+⋮----
+<!-- Cleaner Assignment Modal -->
+⋮----
+<template #item="{ props, item }">
+              <v-list-item v-bind="props">
+                <template #prepend>
+                  <v-avatar size="32">
+                    <v-icon>mdi-account</v-icon>
+                  </v-avatar>
+                </template>
+                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
+                </v-list-item-subtitle>
+              </v-list-item>
+            </template>
+⋮----
+<template #prepend>
+                  <v-avatar size="32">
+                    <v-icon>mdi-account</v-icon>
+                  </v-avatar>
+                </template>
+<v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+⋮----
+{{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
+⋮----
+<script setup lang="ts">
+import FullCalendar from '@fullcalendar/vue3';
+import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+import interactionPlugin from '@fullcalendar/interaction';
+import { computed, ref, watch, nextTick } from 'vue';
+import { useTheme } from 'vuetify';
+import type { Booking, Property, User, Cleaner } from '@/types';
+// Import event logger for component communication
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+interface Props {
+  bookings: Map<string, Booking>;
+  properties: Map<string, Property>;
+  users: Map<string, User>;
+  loading?: boolean;
+}
+interface Emits {
+  (e: 'dateSelect', selectInfo: DateSelectArg): void;
+  (e: 'eventClick', clickInfo: EventClickArg): void;
+  (e: 'eventDrop', dropInfo: EventDropArg): void;
+  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
+  (e: 'updateBooking', data: { id: string; updates: Partial<Booking> }): void;
+  (e: 'assignCleaner', data: { bookingId: string; cleanerId: string; notes?: string }): void;
+  (e: 'updateBookingStatus', data: { bookingId: string; status: Booking['status'] }): void;
+  (e: 'viewChange', view: string): void;
+  (e: 'dateChange', date: Date): void;
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false
+});
+const emit = defineEmits<Emits>();
+// Theme integration
+const theme = useTheme();
+const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+// Admin calendar state
+const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('timeGridWeek');
+const currentDateTitle = ref('');
+// Admin filtering state
+const selectedCleaner = ref<string | null>(null);
+const selectedStatuses = ref<Booking['status'][]>([]);
+const selectedBookingTypes = ref<Booking['booking_type'][]>([]);
+// Context menu state
+const contextMenu = ref({
+  show: false,
+  x: 0,
+  y: 0,
+  booking: null as Booking | null
+});
+// Cleaner assignment modal state
+const cleanerAssignmentModal = ref({
+  show: false,
+  booking: null as Booking | null,
+  selectedCleaner: null as string | null,
+  notes: '',
+  loading: false
+});
+// Get all cleaners from users Map
+const availableCleaners = computed(() => {
+  return Array.from(props.users.values())
+    .filter(user => user.role === 'cleaner')
+    .map(cleaner => ({
+      id: cleaner.id,
+      name: cleaner.name,
+      email: cleaner.email,
+      max_daily_bookings: (cleaner as Cleaner).max_daily_bookings || 5
+    }));
+});
+// Filter options
+const cleanerFilterOptions = computed(() => [
+  { id: 'unassigned', name: 'Unassigned Only' },
+  ...availableCleaners.value
+]);
+const statusFilterOptions = [
+  { label: 'Pending', value: 'pending' },
+  { label: 'Scheduled', value: 'scheduled' },
+  { label: 'In Progress', value: 'in_progress' },
+  { label: 'Completed', value: 'completed' }
+];
+const bookingTypeOptions = [
+  { label: 'Turn Bookings', value: 'turn' },
+  { label: 'Standard Bookings', value: 'standard' }
+];
+// Admin sees ALL bookings (no owner filtering)
+const allBookings = computed(() => {
+  return Array.from(props.bookings.values());
+});
+// Apply admin filters to bookings
+const filteredBookings = computed(() => {
+  let filtered = allBookings.value;
+  // Filter by cleaner
+  if (selectedCleaner.value) {
+    if (selectedCleaner.value === 'unassigned') {
+      filtered = filtered.filter(booking => !booking.assigned_cleaner_id);
+    } else {
+      filtered = filtered.filter(booking => booking.assigned_cleaner_id === selectedCleaner.value);
+    }
+  }
+  // Filter by status
+  if (selectedStatuses.value.length > 0) {
+    filtered = filtered.filter(booking => selectedStatuses.value.includes(booking.status));
+  }
+  // Filter by booking type
+  if (selectedBookingTypes.value.length > 0) {
+    filtered = filtered.filter(booking => selectedBookingTypes.value.includes(booking.booking_type));
+  }
+  return filtered;
+});
+// Convert admin's filtered bookings to FullCalendar events
+const adminCalendarEvents = computed(() => {
+  return filteredBookings.value.map(booking => {
+    const property = props.properties.get(booking.property_id);
+    const owner = props.users.get(booking.owner_id);
+    const cleaner = booking.assigned_cleaner_id ? props.users.get(booking.assigned_cleaner_id) : undefined;
+    const isTurn = booking.booking_type === 'turn';
+    return {
+      id: booking.id,
+      title: getAdminEventTitle(booking, property, owner, cleaner),
+      start: booking.checkout_date,
+      end: booking.checkin_date,
+      backgroundColor: getAdminEventColor(booking),
+      borderColor: getAdminEventBorderColor(booking),
+      textColor: getAdminEventTextColor(booking),
+      extendedProps: {
+        booking,
+        property,
+        owner,
+        cleaner,
+        bookingType: booking.booking_type,
+        status: booking.status,
+        assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
+      },
+      classNames: [
+        `admin-booking-${booking.booking_type}`,
+        `admin-status-${booking.status}`,
+        `admin-assignment-${booking.assigned_cleaner_id ? 'assigned' : 'unassigned'}`,
+        isTurn ? 'admin-priority-urgent' : 'admin-priority-normal'
+      ]
+    };
+  });
+});
+// Admin-specific event title formatting
+const getAdminEventTitle = (booking: Booking, property?: Property, owner?: User, cleaner?: User): string => {
+  const isTurn = booking.booking_type === 'turn';
+  const propertyName = property?.name || 'Unknown Property';
+  const ownerName = owner?.name || 'Unknown Owner';
+  const cleanerName = cleaner?.name || 'Unassigned';
+  return `${isTurn ? '🔥 ' : ''}${propertyName} (${ownerName}) → ${cleanerName}`;
+};
+// Admin-specific color system based on assignment status and booking type
+const getAdminEventColor = (booking: Booking): string => {
+  const isDark = theme.global.current.value.dark;
+  const isAssigned = !!booking.assigned_cleaner_id;
+  const isTurn = booking.booking_type === 'turn';
+  if (!isAssigned) {
+    // Unassigned bookings - urgent colors
+    return isTurn 
+      ? (isDark ? '#FF5252' : '#F44336') // Urgent red for unassigned turns
+      : (isDark ? '#FF9800' : '#FF6F00'); // Warning orange for unassigned standard
+  }
+  // Assigned bookings - status-based colors
+  switch (booking.status) {
+    case 'pending':
+      return isDark ? '#2196F3' : '#1976D2'; // Blue - scheduled but not started
+    case 'scheduled':
+      return isDark ? '#00BCD4' : '#0097A7'; // Cyan - confirmed and ready
+    case 'in_progress':
+      return isDark ? '#4CAF50' : '#388E3C'; // Green - currently being cleaned
+    case 'completed':
+      return isDark ? '#9E9E9E' : '#757575'; // Gray - finished
+    default:
+      return isDark ? '#2196F3' : '#1976D2';
+  }
+};
+const getAdminEventBorderColor = (booking: Booking): string => {
+  const isTurn = booking.booking_type === 'turn';
+  const isAssigned = !!booking.assigned_cleaner_id;
+  if (isTurn && !isAssigned) return '#D32F2F'; // Urgent red border for unassigned turns
+  if (isTurn) return '#FF6F00'; // Orange border for assigned turns
+  if (!isAssigned) return '#F57C00'; // Orange border for unassigned standard
+  return '#1976D2'; // Blue border for assigned standard
+};
+const getAdminEventTextColor = (booking: Booking): string => {
+  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
+};
+// Admin-focused calendar configuration with advanced features
+const adminCalendarOptions = computed<CalendarOptions>(() => ({
+  plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+  // View settings - all views available for admin
+  initialView: currentView.value,
+  headerToolbar: false, // We handle toolbar externally
+  // Event settings
+  events: adminCalendarEvents.value,
+  eventDisplay: 'block',
+  eventOverlap: true, // Allow overlapping for admin view
+  // Admin interaction settings (full features)
+  selectable: true,
+  selectMirror: true,
+  editable: true, // Enable drag-and-drop for admin
+  droppable: true, // Enable drag-to-assign
+  eventResizable: true, // Allow resizing events
+  eventDurationEditable: true,
+  // Date/time settings
+  locale: 'en',
+  timeZone: 'local',
+  slotMinTime: '05:00:00',
+  slotMaxTime: '23:00:00',
+  slotDuration: '00:30:00', // 30-minute slots for admin precision
+  // Appearance - admin-focused
+  height: 'auto',
+  aspectRatio: 1.6,
+  // Custom styling based on theme
+  themeSystem: 'standard',
+  // Event handlers - admin-specific
+  select: handleAdminDateSelect,
+  eventClick: handleAdminEventClick,
+  eventDrop: handleAdminEventDrop,
+  eventResize: handleAdminEventResize,
+  datesSet: handleDatesSet,
+  // Loading state
+  loading: handleLoading,
+  // Custom rendering - admin-focused
+  eventContent: renderAdminEventContent,
+  dayCellContent: renderAdminDayCell,
+  // Business hours
+  businessHours: {
+    daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // Monday - Sunday
+    startTime: '06:00',
+    endTime: '20:00'
+  },
+  // Weekend styling
+  weekends: true,
+  // Month view specific
+  dayMaxEvents: 5, // Show more events for admin
+  moreLinkClick: 'popover',
+  // Week/day view specific
+  allDaySlot: false,
+  nowIndicator: true,
+  scrollTime: '07:00:00',
+  // List view specific
+  listDayFormat: { weekday: 'long', month: 'short', day: 'numeric' },
+  // Right-click context menu
+  eventMouseEnter: (info) => {
+    info.el.style.cursor = 'pointer';
+  },
+  // Custom event rendering for admin features
+  eventDidMount: (info) => {
+    // Add right-click context menu
+    info.el.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showContextMenu(e, info.event.extendedProps.booking);
+    });
+  }
+}));
+// Admin-specific event handlers
+const handleAdminDateSelect = (selectInfo: DateSelectArg): void => {
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'dateSelect',
+    { start: selectInfo.startStr, end: selectInfo.endStr },
+    'emit'
+  );
+  emit('dateSelect', selectInfo);
+  emit('createBooking', {
+    start: selectInfo.startStr,
+    end: selectInfo.endStr
+  });
+  selectInfo.view.calendar.unselect();
+};
+const handleAdminEventClick = (clickInfo: EventClickArg): void => {
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'eventClick',
+    { id: clickInfo.event.id },
+    'emit'
+  );
+  emit('eventClick', clickInfo);
+};
+const handleAdminEventDrop = (dropInfo: EventDropArg): void => {
+  const booking = dropInfo.event.extendedProps.booking as Booking;
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'eventDrop',
+    { 
+      id: booking.id,
+      newStart: dropInfo.event.startStr,
+      newEnd: dropInfo.event.endStr
+    },
+    'emit'
+  );
+  emit('eventDrop', dropInfo);
+  // Update booking dates
+  emit('updateBooking', {
+    id: booking.id,
+    updates: {
+      checkout_date: dropInfo.event.startStr,
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+    }
+  });
+};
+const handleAdminEventResize = (resizeInfo: any): void => {
+  const booking = resizeInfo.event.extendedProps.booking as Booking;
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'eventResize',
+    { 
+      id: booking.id,
+      newEnd: resizeInfo.event.endStr
+    },
+    'emit'
+  );
+  // Update booking end date
+  emit('updateBooking', {
+    id: booking.id,
+    updates: {
+      checkin_date: resizeInfo.event.endStr
+    }
+  });
+};
+const handleDatesSet = (dateInfo: any): void => {
+  const newDate = new Date(dateInfo.start);
+  currentDateTitle.value = dateInfo.view.title;
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'dateChange',
+    { date: newDate.toISOString(), title: dateInfo.view.title },
+    'emit'
+  );
+  emit('dateChange', newDate);
+};
+const handleLoading = (isLoading: boolean): void => {
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'loadingState',
+    { isLoading },
+    'emit'
+  );
+};
+// Context menu functionality
+const showContextMenu = (event: MouseEvent, booking: Booking): void => {
+  contextMenu.value = {
+    show: true,
+    x: event.clientX,
+    y: event.clientY,
+    booking
+  };
+};
+const contextMenuActions = computed(() => {
+  const booking = contextMenu.value.booking;
+  if (!booking) return [];
+  const actions = [
+    { key: 'edit', title: 'Edit Booking', icon: 'mdi-pencil' },
+    { key: 'assign', title: 'Assign Cleaner', icon: 'mdi-account-plus' },
+    { key: 'status', title: 'Change Status', icon: 'mdi-check-circle' },
+    { key: 'duplicate', title: 'Duplicate', icon: 'mdi-content-copy' },
+    { key: 'delete', title: 'Delete', icon: 'mdi-delete' }
+  ];
+  // Add status-specific actions
+  if (booking.status === 'pending') {
+    actions.splice(2, 0, { key: 'schedule', title: 'Mark Scheduled', icon: 'mdi-calendar-check' });
+  }
+  if (booking.status === 'scheduled') {
+    actions.splice(2, 0, { key: 'start', title: 'Start Cleaning', icon: 'mdi-play' });
+  }
+  if (booking.status === 'in_progress') {
+    actions.splice(2, 0, { key: 'complete', title: 'Mark Complete', icon: 'mdi-check' });
+  }
+  return actions;
+});
+const handleContextAction = (action: string): void => {
+  const booking = contextMenu.value.booking;
+  if (!booking) return;
+  contextMenu.value.show = false;
+  switch (action) {
+    case 'edit':
+      emit('eventClick', { event: { id: booking.id, extendedProps: { booking } } } as any);
+      break;
+    case 'assign':
+      openCleanerAssignmentModal(booking);
+      break;
+    case 'schedule':
+      emit('updateBookingStatus', { bookingId: booking.id, status: 'scheduled' });
+      break;
+    case 'start':
+      emit('updateBookingStatus', { bookingId: booking.id, status: 'in_progress' });
+      break;
+    case 'complete':
+      emit('updateBookingStatus', { bookingId: booking.id, status: 'completed' });
+      break;
+    case 'status':
+      // Open status change dialog (would need to be implemented)
+      break;
+    case 'duplicate':
+      // Duplicate booking logic
+      break;
+    case 'delete':
+      // Delete booking with confirmation
+      break;
+  }
+};
+// Cleaner assignment functionality
+const openCleanerAssignmentModal = (booking: Booking): void => {
+  cleanerAssignmentModal.value = {
+    show: true,
+    booking,
+    selectedCleaner: booking.assigned_cleaner_id || null,
+    notes: '',
+    loading: false
+  };
+};
+const assignCleanerToBooking = async (): Promise<void> => {
+  const modal = cleanerAssignmentModal.value;
+  if (!modal.booking || !modal.selectedCleaner) return;
+  modal.loading = true;
+  try {
+    emit('assignCleaner', {
+      bookingId: modal.booking.id,
+      cleanerId: modal.selectedCleaner,
+      notes: modal.notes
+    });
+    modal.show = false;
+  } catch (error) {
+    console.error('Failed to assign cleaner:', error);
+  } finally {
+    modal.loading = false;
+  }
+};
+// Calendar navigation methods
+const navigateCalendar = (direction: 'prev' | 'next'): void => {
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    if (direction === 'prev') {
+      api.prev();
+    } else {
+      api.next();
+    }
+  }
+};
+const goToToday = (): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().today();
+  }
+};
+const createNewBooking = (): void => {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  emit('createBooking', {
+    start: today.toISOString().split('T')[0],
+    end: tomorrow.toISOString().split('T')[0]
+  });
+};
+// Admin-focused custom event rendering
+const renderAdminEventContent = (eventInfo: any) => {
+  const booking = eventInfo.event.extendedProps.booking as Booking;
+  const property = eventInfo.event.extendedProps.property as Property;
+  const owner = eventInfo.event.extendedProps.owner as User;
+  const cleaner = eventInfo.event.extendedProps.cleaner as User;
+  const isTurn = booking.booking_type === 'turn';
+  const isAssigned = !!booking.assigned_cleaner_id;
+  return {
+    html: `
+      <div class="admin-event-content">
+        <div class="admin-event-title">
+          ${isTurn ? '🔥 ' : ''}${property?.name || 'Unknown Property'}
+        </div>
+        <div class="admin-event-owner">
+          Owner: ${owner?.name || 'Unknown'}
+        </div>
+        <div class="admin-event-cleaner ${isAssigned ? 'assigned' : 'unassigned'}">
+          ${isAssigned ? `👤 ${cleaner?.name}` : '⚠️ Unassigned'}
+        </div>
+        <div class="admin-event-status">
+          ${booking.status.toUpperCase()}
+        </div>
+        ${isTurn ? '<div class="admin-turn-badge">URGENT TURN</div>' : ''}
+      </div>
+    `
+  };
+};
+// Admin-focused day cell rendering
+const renderAdminDayCell = (dayInfo: any) => {
+  const dayBookings = allBookings.value.filter(booking => {
+    const checkoutDate = new Date(booking.checkout_date).toDateString();
+    const dayDate = dayInfo.date.toDateString();
+    return checkoutDate === dayDate;
+  });
+  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
+  const unassignedCount = dayBookings.filter(b => !b.assigned_cleaner_id).length;
+  const totalCount = dayBookings.length;
+  return {
+    html: `
+      <div class="admin-day-number">
+        ${dayInfo.dayNumberText}
+        ${turnCount > 0 ? `<span class="admin-turn-indicator">${turnCount}</span>` : ''}
+        ${unassignedCount > 0 ? `<span class="admin-unassigned-indicator">${unassignedCount}</span>` : ''}
+        ${totalCount > 0 && turnCount === 0 && unassignedCount === 0 ? `<span class="admin-booking-indicator">${totalCount}</span>` : ''}
+      </div>
+    `
+  };
+};
+// Watch for view changes
+watch(currentView, (newView) => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().changeView(newView);
+    emit('viewChange', newView);
+  }
+});
+// Watch for theme changes and update calendar
+watch(() => theme.global.current.value.dark, () => {
+  nextTick(() => {
+    if (calendarRef.value) {
+      calendarRef.value.getApi().refetchEvents();
+    }
+  });
+});
+// Watch for changes in props from HomeAdmin
+watch(() => props.bookings, (newBookings) => {
+  eventLogger.logEvent(
+    'HomeAdmin',
+    'AdminCalendar',
+    'bookingsUpdate',
+    { count: newBookings.size },
+    'receive'
+  );
+}, { deep: true });
+// Programmatic calendar methods for admin
+const goToDate = (date: string | Date): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().gotoDate(date);
+  }
+};
+const changeView = (viewName: string): void => {
+  currentView.value = viewName as any;
+};
+const refreshEvents = (): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().refetchEvents();
+  }
+};
+// Expose methods to parent (HomeAdmin)
+defineExpose({
+  goToDate,
+  changeView,
+  refreshEvents,
+  getApi: () => calendarRef.value?.getApi()
+});
+</script>
+<style scoped>
+.admin-calendar-container {
+  height: 100%;
+  width: 100%;
+}
+.admin-calendar-toolbar {
+  background: rgb(var(--v-theme-surface));
+  border: 1px solid rgb(var(--v-theme-outline), 0.12);
+}
+.admin-view-toggle {
+  border: 1px solid rgb(var(--v-theme-outline), 0.38);
+}
+.admin-date-title {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.admin-calendar-card {
+  background: rgb(var(--v-theme-surface));
+}
+.admin-calendar {
+  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
+  --fc-button-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-border-color: rgb(var(--v-theme-primary));
+  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
+  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
+  --fc-event-border-radius: 4px;
+}
+/* Admin-specific turn booking highlighting */
+.fc-event.admin-booking-turn {
+  font-weight: bold;
+  border-width: 2px !important;
+}
+.fc-event.admin-priority-urgent {
+  animation: admin-pulse 3s infinite;
+  border-left: 4px solid rgb(var(--v-theme-error)) !important;
+}
+@keyframes admin-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
+}
+/* Admin-specific assignment status styling */
+.fc-event.admin-assignment-unassigned {
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+.fc-event.admin-assignment-assigned {
+  border-style: solid !important;
+}
+/* Admin-specific status styling */
+.fc-event.admin-status-pending {
+  opacity: 0.9;
+}
+.fc-event.admin-status-in_progress {
+  font-weight: bold;
+  border-width: 3px !important;
+}
+.fc-event.admin-status-completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+/* Admin-specific day cell indicators */
+.admin-turn-indicator {
+  background: rgb(var(--v-theme-error));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 9px;
+  margin-left: 2px;
+  font-weight: bold;
+  animation: admin-pulse 3s infinite;
+}
+.admin-unassigned-indicator {
+  background: rgb(var(--v-theme-warning));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 9px;
+  margin-left: 2px;
+  font-weight: bold;
+}
+.admin-booking-indicator {
+  background: rgb(var(--v-theme-primary));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 9px;
+  margin-left: 2px;
+  font-weight: bold;
+}
+/* Admin-specific event content styling */
+.admin-event-content {
+  padding: 2px;
+  font-size: 0.8em;
+}
+.admin-event-title {
+  font-weight: 600;
+  font-size: 0.9em;
+  margin-bottom: 1px;
+}
+.admin-event-owner {
+  font-size: 0.75em;
+  opacity: 0.8;
+  margin-bottom: 1px;
+}
+.admin-event-cleaner {
+  font-size: 0.75em;
+  font-weight: 500;
+  margin-bottom: 1px;
+}
+.admin-event-cleaner.unassigned {
+  color: rgb(var(--v-theme-warning));
+  font-weight: bold;
+}
+.admin-event-cleaner.assigned {
+  color: rgb(var(--v-theme-success));
+}
+.admin-event-status {
+  font-size: 0.7em;
+  opacity: 0.9;
+  font-weight: 500;
+}
+.admin-turn-badge {
+  background: rgba(var(--v-theme-error), 0.2);
+  color: rgb(var(--v-theme-error));
+  font-size: 0.65em;
+  padding: 1px 3px;
+  border-radius: 3px;
+  margin-top: 1px;
+  font-weight: bold;
+  text-align: center;
+}
+/* Admin-specific day cell styling */
+.admin-day-number {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .admin-calendar-toolbar .v-row {
+    flex-direction: column;
+  }
+  .admin-calendar-toolbar .v-col {
+    margin-bottom: 8px !important;
+  }
+  .admin-view-toggle {
+    width: 100%;
+  }
+  .admin-event-content {
+    font-size: 0.7em;
+  }
+}
+@media (max-width: 600px) {
+  .admin-calendar {
+    --fc-event-border-radius: 2px;
+  }
+  .admin-event-content {
+    font-size: 0.65em;
+    padding: 1px;
+  }
+  .admin-event-title {
+    font-size: 0.8em;
+  }
+}
+</style>
+`````
+
+## File: src/components/smart/admin/AdminCalendarDemo.vue
+`````vue
+<template>
+  <div class="admin-calendar-demo">
+    <v-container fluid>
+      <!-- Demo Header -->
+      <v-row class="mb-4">
+        <v-col>
+          <v-card class="demo-header" elevation="2">
+            <v-card-title class="d-flex align-center">
+              <v-icon class="mr-3" color="primary">mdi-calendar-multiple</v-icon>
+              <span>AdminCalendar Component Demo</span>
+              <v-spacer />
+              <v-chip color="success" variant="elevated">
+                <v-icon start>mdi-check-circle</v-icon>
+                TASK-039H Complete
+              </v-chip>
+            </v-card-title>
+            <v-card-text>
+              <p class="mb-2">
+                <strong>Role-Based Multi-Tenant Calendar:</strong> Admin interface showing ALL bookings across ALL property owners with advanced management features.
+              </p>
+              <v-row>
+                <v-col cols="12" md="4">
+                  <v-chip size="small" color="error" class="mr-2">🔥 Turn Bookings</v-chip>
+                  <span class="text-caption">Urgent same-day turnovers</span>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-chip size="small" color="warning" class="mr-2">⚠️ Unassigned</v-chip>
+                  <span class="text-caption">Need cleaner assignment</span>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-chip size="small" color="success" class="mr-2">👤 Assigned</v-chip>
+                  <span class="text-caption">Cleaner assigned</span>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <!-- Demo Stats -->
+      <v-row class="mb-4">
+        <v-col cols="6" md="3">
+          <v-card class="text-center" elevation="1">
+            <v-card-text>
+              <div class="text-h4 text-primary">{{ demoStats.totalBookings }}</div>
+              <div class="text-caption">Total Bookings</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="6" md="3">
+          <v-card class="text-center" elevation="1">
+            <v-card-text>
+              <div class="text-h4 text-error">{{ demoStats.urgentTurns }}</div>
+              <div class="text-caption">Urgent Turns</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="6" md="3">
+          <v-card class="text-center" elevation="1">
+            <v-card-text>
+              <div class="text-h4 text-warning">{{ demoStats.unassigned }}</div>
+              <div class="text-caption">Unassigned</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="6" md="3">
+          <v-card class="text-center" elevation="1">
+            <v-card-text>
+              <div class="text-h4 text-success">{{ demoStats.assigned }}</div>
+              <div class="text-caption">Assigned</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <!-- AdminCalendar Component -->
+      <v-row>
+        <v-col>
+          <AdminCalendar
+            :bookings="demoBookings"
+            :properties="demoProperties"
+            :users="demoUsers"
+            :loading="loading"
+            @date-select="handleDateSelect"
+            @event-click="handleEventClick"
+            @event-drop="handleEventDrop"
+            @create-booking="handleCreateBooking"
+            @update-booking="handleUpdateBooking"
+            @assign-cleaner="handleAssignCleaner"
+            @update-booking-status="handleUpdateBookingStatus"
+            @view-change="handleViewChange"
+            @date-change="handleDateChange"
+          />
+        </v-col>
+      </v-row>
+      <!-- Demo Actions -->
+      <v-row class="mt-4">
+        <v-col>
+          <v-card class="demo-actions" elevation="1">
+            <v-card-title>Demo Actions</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <v-btn
+                    color="primary"
+                    variant="outlined"
+                    block
+                    @click="addRandomBooking"
+                  >
+                    <v-icon start>mdi-plus</v-icon>
+                    Add Random Booking
+                  </v-btn>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-btn
+                    color="error"
+                    variant="outlined"
+                    block
+                    @click="addUrgentTurn"
+                  >
+                    <v-icon start>mdi-fire</v-icon>
+                    Add Urgent Turn
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <!-- Event Log -->
+      <v-row class="mt-4">
+        <v-col>
+          <v-card class="demo-log" elevation="1">
+            <v-card-title>
+              Event Log
+              <v-spacer />
+              <v-btn
+                size="small"
+                variant="text"
+                @click="clearEventLog"
+              >
+                Clear
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <div class="event-log-container">
+                <div
+                  v-for="(event, index) in eventLog"
+                  :key="index"
+                  class="event-log-item"
+                >
+                  <v-chip
+                    :color="getEventColor(event.type)"
+                    size="small"
+                    class="mr-2"
+                  >
+                    {{ event.type }}
+                  </v-chip>
+                  <span class="text-caption">{{ event.timestamp }}</span>
+                  <div class="mt-1">{{ event.message }}</div>
+                </div>
+                <div v-if="eventLog.length === 0" class="text-center text-disabled">
+                  No events logged yet. Interact with the calendar to see events.
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+</template>
+⋮----
+<!-- Demo Header -->
+⋮----
+<!-- Demo Stats -->
+⋮----
+<div class="text-h4 text-primary">{{ demoStats.totalBookings }}</div>
+⋮----
+<div class="text-h4 text-error">{{ demoStats.urgentTurns }}</div>
+⋮----
+<div class="text-h4 text-warning">{{ demoStats.unassigned }}</div>
+⋮----
+<div class="text-h4 text-success">{{ demoStats.assigned }}</div>
+⋮----
+<!-- AdminCalendar Component -->
+⋮----
+<!-- Demo Actions -->
+⋮----
+<!-- Event Log -->
+⋮----
+{{ event.type }}
+⋮----
+<span class="text-caption">{{ event.timestamp }}</span>
+<div class="mt-1">{{ event.message }}</div>
+⋮----
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import AdminCalendar from './AdminCalendar.vue';
+import type { Booking, Property, User, Cleaner } from '@/types';
+// Demo state
+const loading = ref(false);
+const eventLog = ref<Array<{ type: string; message: string; timestamp: string }>>([]);
+// Create demo data Maps
+const demoBookings = ref(new Map<string, Booking>());
+const demoProperties = ref(new Map<string, Property>());
+const demoUsers = ref(new Map<string, User>());
+// Demo statistics
+const demoStats = computed(() => {
+  const bookings = Array.from(demoBookings.value.values());
+  return {
+    totalBookings: bookings.length,
+    urgentTurns: bookings.filter(b => b.booking_type === 'turn').length,
+    unassigned: bookings.filter(b => !b.assigned_cleaner_id).length,
+    assigned: bookings.filter(b => !!b.assigned_cleaner_id).length
+  };
+});
+// Initialize demo data
+const initializeDemoData = (): void => {
+  // Demo Users (Property Owners + Cleaners + Admin)
+  const users: User[] = [
+    // Property Owners
+    {
+      id: 'owner-1',
+      email: 'sarah.johnson@email.com',
+      name: 'Sarah Johnson',
+      role: 'owner',
+      settings: { 
+        theme: 'light', 
+        notifications: true,
+        timezone: 'America/New_York',
+        language: 'en'
+      },
+      created_at: '2024-01-15T10:00:00Z',
+      updated_at: '2024-01-15T10:00:00Z'
+    },
+    {
+      id: 'owner-2',
+      email: 'mike.chen@email.com',
+      name: 'Mike Chen',
+      role: 'owner',
+      settings: { 
+        theme: 'dark', 
+        notifications: true,
+        timezone: 'America/Los_Angeles',
+        language: 'en'
+      },
+      created_at: '2024-01-20T14:30:00Z',
+      updated_at: '2024-01-20T14:30:00Z'
+    },
+    {
+      id: 'owner-3',
+      email: 'lisa.rodriguez@email.com',
+      name: 'Lisa Rodriguez',
+      role: 'owner',
+      settings: { 
+        theme: 'light', 
+        notifications: false,
+        timezone: 'America/Chicago',
+        language: 'en'
+      },
+      created_at: '2024-02-01T09:15:00Z',
+      updated_at: '2024-02-01T09:15:00Z'
+    },
+    // Admin User
+    {
+      id: 'admin-1',
+      email: 'admin@cleaningco.com',
+      name: 'Admin User',
+      role: 'admin',
+      settings: { 
+        theme: 'light', 
+        notifications: true,
+        timezone: 'America/New_York',
+        language: 'en'
+      },
+      created_at: '2024-01-01T08:00:00Z',
+      updated_at: '2024-01-01T08:00:00Z'
+    }
+  ];
+  // Demo Cleaners (with Cleaner interface properties)
+  const cleaners: Cleaner[] = [
+    {
+      id: 'cleaner-1',
+      email: 'maria.garcia@cleaningco.com',
+      name: 'Maria Garcia',
+      role: 'cleaner',
+      settings: { 
+        theme: 'light', 
+        notifications: true,
+        timezone: 'America/New_York',
+        language: 'en'
+      },
+      skills: ['deep-cleaning', 'eco-friendly'],
+      max_daily_bookings: 4,
+      created_at: '2024-01-10T08:00:00Z',
+      updated_at: '2024-01-10T08:00:00Z'
+    },
+    {
+      id: 'cleaner-2',
+      email: 'james.wilson@cleaningco.com',
+      name: 'James Wilson',
+      role: 'cleaner',
+      settings: { 
+        theme: 'light', 
+        notifications: true,
+        timezone: 'America/New_York',
+        language: 'en'
+      },
+      skills: ['standard-cleaning', 'move-out'],
+      max_daily_bookings: 5,
+      created_at: '2024-01-12T08:00:00Z',
+      updated_at: '2024-01-12T08:00:00Z'
+    },
+    {
+      id: 'cleaner-3',
+      email: 'anna.petrov@cleaningco.com',
+      name: 'Anna Petrov',
+      role: 'cleaner',
+      settings: { 
+        theme: 'dark', 
+        notifications: true,
+        timezone: 'America/New_York',
+        language: 'en'
+      },
+      skills: ['deep-cleaning', 'move-in'],
+      max_daily_bookings: 3,
+      created_at: '2024-01-15T08:00:00Z',
+      updated_at: '2024-01-15T08:00:00Z'
+    }
+  ];
+  // Combine all users
+  const allUsers = [...users, ...cleaners];
+  allUsers.forEach(user => {
+    demoUsers.value.set(user.id, user);
+  });
+  // Demo Properties (across multiple owners)
+  const properties: Property[] = [
+    // Sarah Johnson's properties
+    {
+      id: 'prop-1',
+      name: 'Downtown Loft',
+      address: '123 Main St, New York, NY 10001',
+      owner_id: 'owner-1',
+      bedrooms: 2,
+      bathrooms: 2,
+      square_feet: 1200,
+      property_type: 'apartment',
+      pricing_tier: 'premium',
+      cleaning_duration: 120,
+      active: true,
+      created_at: '2024-01-15T10:00:00Z',
+      updated_at: '2024-01-15T10:00:00Z'
+    },
+    {
+      id: 'prop-2',
+      name: 'Brooklyn Heights Studio',
+      address: '456 Heights Ave, Brooklyn, NY 11201',
+      owner_id: 'owner-1',
+      bedrooms: 1,
+      bathrooms: 1,
+      square_feet: 800,
+      property_type: 'apartment',
+      pricing_tier: 'standard',
+      cleaning_duration: 90,
+      active: true,
+      created_at: '2024-01-16T10:00:00Z',
+      updated_at: '2024-01-16T10:00:00Z'
+    },
+    // Mike Chen's properties
+    {
+      id: 'prop-3',
+      name: 'Hollywood Hills House',
+      address: '789 Hills Dr, Los Angeles, CA 90210',
+      owner_id: 'owner-2',
+      bedrooms: 4,
+      bathrooms: 3,
+      square_feet: 2500,
+      property_type: 'house',
+      pricing_tier: 'luxury',
+      cleaning_duration: 180,
+      active: true,
+      created_at: '2024-01-20T14:30:00Z',
+      updated_at: '2024-01-20T14:30:00Z'
+    },
+    {
+      id: 'prop-4',
+      name: 'Santa Monica Condo',
+      address: '321 Beach Blvd, Santa Monica, CA 90401',
+      owner_id: 'owner-2',
+      bedrooms: 2,
+      bathrooms: 2,
+      square_feet: 1400,
+      property_type: 'condo',
+      pricing_tier: 'premium',
+      cleaning_duration: 120,
+      active: true,
+      created_at: '2024-01-21T14:30:00Z',
+      updated_at: '2024-01-21T14:30:00Z'
+    },
+    // Lisa Rodriguez's properties
+    {
+      id: 'prop-5',
+      name: 'Chicago Loop Apartment',
+      address: '654 Loop St, Chicago, IL 60601',
+      owner_id: 'owner-3',
+      bedrooms: 3,
+      bathrooms: 2,
+      square_feet: 1600,
+      property_type: 'apartment',
+      pricing_tier: 'standard',
+      cleaning_duration: 150,
+      active: true,
+      created_at: '2024-02-01T09:15:00Z',
+      updated_at: '2024-02-01T09:15:00Z'
+    }
+  ];
+  properties.forEach(property => {
+    demoProperties.value.set(property.id, property);
+  });
+  // Demo Bookings (mix of assigned/unassigned, turn/standard, different statuses)
+  const today = new Date();
+  const bookings: Booking[] = [
+    // Urgent turns (some assigned, some not)
+    {
+      id: 'booking-1',
+      property_id: 'prop-1',
+      owner_id: 'owner-1',
+      checkout_date: today.toISOString().split('T')[0] + 'T11:00:00Z',
+      checkin_date: today.toISOString().split('T')[0] + 'T15:00:00Z',
+      guest_count: 2,
+      booking_type: 'turn',
+      status: 'pending',
+      assigned_cleaner_id: undefined, // Unassigned urgent turn
+      notes: 'Same-day turnover - URGENT',
+      created_at: '2024-01-25T08:00:00Z',
+      updated_at: '2024-01-25T08:00:00Z'
+    },
+    {
+      id: 'booking-2',
+      property_id: 'prop-3',
+      owner_id: 'owner-2',
+      checkout_date: today.toISOString().split('T')[0] + 'T10:00:00Z',
+      checkin_date: today.toISOString().split('T')[0] + 'T16:00:00Z',
+      guest_count: 4,
+      booking_type: 'turn',
+      status: 'scheduled',
+      assigned_cleaner_id: 'cleaner-1', // Assigned urgent turn
+      notes: 'Large house turnover',
+      created_at: '2024-01-25T09:00:00Z',
+      updated_at: '2024-01-25T09:00:00Z'
+    },
+    // Tomorrow's bookings
+    {
+      id: 'booking-3',
+      property_id: 'prop-2',
+      owner_id: 'owner-1',
+      checkout_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
+      checkin_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T16:00:00Z',
+      guest_count: 1,
+      booking_type: 'standard',
+      status: 'pending',
+      assigned_cleaner_id: undefined, // Unassigned standard
+      notes: 'Standard cleaning',
+      created_at: '2024-01-24T10:00:00Z',
+      updated_at: '2024-01-24T10:00:00Z'
+    },
+    {
+      id: 'booking-4',
+      property_id: 'prop-4',
+      owner_id: 'owner-2',
+      checkout_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
+      checkin_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
+      guest_count: 2,
+      booking_type: 'standard',
+      status: 'scheduled',
+      assigned_cleaner_id: 'cleaner-2', // Assigned standard
+      notes: 'Regular cleaning',
+      created_at: '2024-01-24T11:00:00Z',
+      updated_at: '2024-01-24T11:00:00Z'
+    },
+    // Day after tomorrow
+    {
+      id: 'booking-5',
+      property_id: 'prop-5',
+      owner_id: 'owner-3',
+      checkout_date: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T10:00:00Z',
+      checkin_date: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
+      guest_count: 3,
+      booking_type: 'turn',
+      status: 'in_progress',
+      assigned_cleaner_id: 'cleaner-3', // In progress turn
+      notes: 'Deep cleaning required',
+      created_at: '2024-01-23T12:00:00Z',
+      updated_at: '2024-01-25T13:00:00Z'
+    },
+    // Completed booking
+    {
+      id: 'booking-6',
+      property_id: 'prop-1',
+      owner_id: 'owner-1',
+      checkout_date: new Date(today.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
+      checkin_date: new Date(today.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
+      guest_count: 2,
+      booking_type: 'standard',
+      status: 'completed',
+      assigned_cleaner_id: 'cleaner-1',
+      notes: 'Completed successfully',
+      created_at: '2024-01-22T10:00:00Z',
+      updated_at: '2024-01-24T16:00:00Z'
+    }
+  ];
+  bookings.forEach(booking => {
+    demoBookings.value.set(booking.id, booking);
+  });
+  logEvent('init', 'Demo data initialized with comprehensive multi-tenant test data');
+};
+// Event handlers
+const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  logEvent('dateSelect', `Date range selected: ${selectInfo.startStr} to ${selectInfo.endStr}`);
+};
+const handleEventClick = (clickInfo: EventClickArg): void => {
+  const booking = clickInfo.event.extendedProps.booking as Booking;
+  logEvent('eventClick', `Clicked booking: ${booking.id} (${booking.booking_type})`);
+};
+const handleEventDrop = (dropInfo: EventDropArg): void => {
+  const booking = dropInfo.event.extendedProps.booking as Booking;
+  logEvent('eventDrop', `Moved booking: ${booking.id} to ${dropInfo.event.startStr}`);
+};
+const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }): void => {
+  logEvent('createBooking', `Create booking request: ${data.start} to ${data.end}`);
+};
+const handleUpdateBooking = (data: { id: string; updates: Partial<Booking> }): void => {
+  const booking = demoBookings.value.get(data.id);
+  if (booking) {
+    const updatedBooking = { ...booking, ...data.updates };
+    demoBookings.value.set(data.id, updatedBooking);
+    logEvent('updateBooking', `Updated booking: ${data.id}`);
+  }
+};
+const handleAssignCleaner = (data: { bookingId: string; cleanerId: string; notes?: string }): void => {
+  const booking = demoBookings.value.get(data.bookingId);
+  const cleaner = demoUsers.value.get(data.cleanerId);
+  if (booking && cleaner) {
+    booking.assigned_cleaner_id = data.cleanerId;
+    booking.status = 'scheduled';
+    demoBookings.value.set(data.bookingId, booking);
+    logEvent('assignCleaner', `Assigned ${cleaner.name} to booking ${data.bookingId}`);
+  }
+};
+const handleUpdateBookingStatus = (data: { bookingId: string; status: Booking['status'] }): void => {
+  const booking = demoBookings.value.get(data.bookingId);
+  if (booking) {
+    booking.status = data.status;
+    demoBookings.value.set(data.bookingId, booking);
+    logEvent('updateStatus', `Changed booking ${data.bookingId} status to ${data.status}`);
+  }
+};
+const handleViewChange = (view: string): void => {
+  logEvent('viewChange', `Calendar view changed to: ${view}`);
+};
+const handleDateChange = (date: Date): void => {
+  logEvent('dateChange', `Calendar date changed to: ${date.toDateString()}`);
+};
+// Demo actions
+const addRandomBooking = (): void => {
+  const properties = Array.from(demoProperties.value.values());
+  const randomProperty = properties[Math.floor(Math.random() * properties.length)];
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const newBooking: Booking = {
+    id: `booking-${Date.now()}`,
+    property_id: randomProperty.id,
+    owner_id: randomProperty.owner_id,
+    checkout_date: tomorrow.toISOString().split('T')[0] + 'T12:00:00Z',
+    checkin_date: tomorrow.toISOString().split('T')[0] + 'T16:00:00Z',
+    guest_count: Math.floor(Math.random() * 4) + 1,
+    booking_type: 'standard',
+    status: 'pending',
+    assigned_cleaner_id: undefined,
+    notes: 'Demo booking',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  demoBookings.value.set(newBooking.id, newBooking);
+  logEvent('demo', `Added random booking for ${randomProperty.name}`);
+};
+const addUrgentTurn = (): void => {
+  const properties = Array.from(demoProperties.value.values());
+  const randomProperty = properties[Math.floor(Math.random() * properties.length)];
+  const today = new Date();
+  const newBooking: Booking = {
+    id: `turn-${Date.now()}`,
+    property_id: randomProperty.id,
+    owner_id: randomProperty.owner_id,
+    checkout_date: today.toISOString().split('T')[0] + 'T11:00:00Z',
+    checkin_date: today.toISOString().split('T')[0] + 'T15:00:00Z',
+    guest_count: Math.floor(Math.random() * 4) + 1,
+    booking_type: 'turn',
+    status: 'pending',
+    assigned_cleaner_id: undefined,
+    notes: 'URGENT: Same-day turnover',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  demoBookings.value.set(newBooking.id, newBooking);
+  logEvent('demo', `Added urgent turn for ${randomProperty.name}`);
+};
+// Event logging
+const logEvent = (type: string, message: string): void => {
+  eventLog.value.unshift({
+    type,
+    message,
+    timestamp: new Date().toLocaleTimeString()
+  });
+  // Keep only last 20 events
+  if (eventLog.value.length > 20) {
+    eventLog.value = eventLog.value.slice(0, 20);
+  }
+};
+const clearEventLog = (): void => {
+  eventLog.value = [];
+};
+const getEventColor = (type: string): string => {
+  const colors: Record<string, string> = {
+    init: 'info',
+    dateSelect: 'primary',
+    eventClick: 'secondary',
+    eventDrop: 'warning',
+    createBooking: 'success',
+    updateBooking: 'info',
+    assignCleaner: 'success',
+    updateStatus: 'warning',
+    viewChange: 'primary',
+    dateChange: 'secondary',
+    demo: 'purple'
+  };
+  return colors[type] || 'default';
+};
+// Initialize demo data on mount
+onMounted(() => {
+  initializeDemoData();
+});
+</script>
+<style scoped>
+.admin-calendar-demo {
+  min-height: 100vh;
+  background: rgb(var(--v-theme-background));
+}
+.demo-header {
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary), 0.1), rgb(var(--v-theme-secondary), 0.1));
+}
+.demo-actions,
+.demo-log {
+  background: rgb(var(--v-theme-surface));
+}
+.event-log-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.event-log-item {
+  padding: 8px 0;
+  border-bottom: 1px solid rgb(var(--v-theme-outline), 0.12);
+}
+.event-log-item:last-child {
+  border-bottom: none;
+}
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .admin-calendar-demo .v-container {
+    padding: 12px;
+  }
+}
+</style>
+`````
+
 ## File: src/components/smart/admin/AdminSidebar.vue
 `````vue
 <template>
@@ -35125,71 +35841,193 @@ Admin composables handle sensitive business data and should:
 `````markdown
 # Owner Composables
 
-This folder contains business logic composables specifically designed for property owner operations.
+This folder contains **owner-specific composables** that implement role-based data filtering and business logic for property owners in the multi-tenant Property Cleaning Scheduler application.
 
-## Purpose
+## Architecture Overview
 
-Owner composables provide data access and business logic that filters and scopes operations to the current property owner's data only. They build upon shared composables but add owner-specific filtering and workflows.
+### **Role-Based Data Scoping**
+Owner composables filter all data to show only the current property owner's information:
+- **Bookings**: Only bookings where `booking.owner_id === currentUser.id`
+- **Properties**: Only properties where `property.owner_id === currentUser.id`
+- **Turn Alerts**: Only urgent turns for the owner's properties
+- **Analytics**: Statistics scoped to the owner's data only
 
-## Key Composables (Planned)
-
-- `useOwnerBookings.ts` - Owner-scoped booking operations and CRUD
-- `useOwnerProperties.ts` - Owner-scoped property management  
-- `useOwnerCalendarState.ts` - Calendar state filtered to owner's properties
-- `useOwnerDashboard.ts` - Dashboard data aggregation for owners
-- `useOwnerNotifications.ts` - Owner-specific notification handling
-
-## Data Scoping Pattern
-
-All owner composables follow the data scoping pattern:
-
+### **Composition Pattern**
+Owner composables extend shared composables using the composition pattern:
 ```typescript
-// Example: useOwnerBookings.ts
 export function useOwnerBookings() {
-  const { userBookings } = useUserStore();
-  const { user } = useAuthStore();
+  const baseBookings = useBookings(); // Get shared functionality
+  const authStore = useAuthStore();
   
-  // Filter to current owner's bookings only
+  // Add owner-specific filtering and functions
   const myBookings = computed(() => 
-    userBookings.value.filter(booking => 
-      booking.owner_id === user.value?.id
-    )
-  );
-  
-  const myTurnBookings = computed(() =>
-    myBookings.value.filter(booking => 
-      booking.booking_type === 'turn'
-    )
+    Array.from(bookingStore.bookings.values())
+      .filter(booking => booking.owner_id === currentUserId.value)
   );
   
   return {
+    ...baseBookings, // Inherit base functionality
+    // Override with owner-specific versions
     myBookings,
-    myTurnBookings,
-    // ... other owner-scoped operations
+    fetchMyBookings,
+    createMyBooking,
+    // etc.
   };
 }
 ```
 
-## Architecture
+## Implemented Composables
 
-Owner composables should:
-- Import and extend shared composables from `@/composables/shared/`
-- Filter all data to current user's scope
-- Provide simplified APIs focused on owner needs
-- Handle owner-specific business rules
-- Emit owner-specific events
+### **useOwnerBookings.ts** ✅
+**Purpose**: Owner-scoped booking management with data filtering and validation
 
-## Integration
+**Key Features**:
+- **Data Filtering**: All operations filtered to current owner's bookings only
+- **Ownership Validation**: Prevents owners from accessing other owners' bookings
+- **Owner-Friendly Errors**: User-friendly error messages focused on personal experience
+- **Automatic Owner Assignment**: Sets `owner_id` automatically on create operations
+- **Removes Admin Functions**: No cleaner assignment or system-wide operations
 
-Owner composables integrate with:
-- Shared stores for data access
-- Owner smart components for UI logic
-- Shared business logic utilities
-- Owner-specific validation rules
+**Functions**:
+- `fetchMyBookings()` - Get current user's bookings only
+- `createMyBooking(data)` - Create booking with automatic owner assignment
+- `updateMyBooking(id, data)` - Update only if user owns the booking
+- `deleteMyBooking(id)` - Delete only if user owns the booking
+- `changeMyBookingStatus(id, status)` - Change status with ownership validation
+- `getMyTurnAlerts()` - Today's urgent turns for owner's properties only
+- `calculateMyBookingPriority(booking)` - Priority calculation for owner's bookings
+- `getMyBookingCleaningWindow(booking)` - Cleaning window for owner's bookings
 
-## Security Note
+**Computed Properties**:
+- `myBookings` - All bookings for current owner
+- `myProperties` - All properties for current owner
+- `myTodayTurns` - Today's turn bookings for owner
+- `myUpcomingCleanings` - Upcoming cleanings (next 7 days) for owner
+- `myBookingsByStatus` - Bookings grouped by status for owner
+- `myBookingStats` - Statistics for owner's bookings
 
-Owner composables provide **frontend filtering only**. Backend Row Level Security (RLS) will be required in the future for true data security. Current filtering is for UX purposes to show relevant data to each owner.
+**Demo Component**: `UseOwnerBookingsDemo.vue` at `/demos/use-owner-bookings`
+
+## Planned Composables
+
+### **useOwnerProperties.ts** (Not Started)
+**Purpose**: Owner-scoped property management
+- Filter properties to current owner only
+- Owner-specific property validation
+- Owner-specific metrics calculation
+- Remove admin property management functions
+
+### **useOwnerCalendarState.ts** (Not Started)
+**Purpose**: Owner-scoped calendar state management
+- Filter calendar events to current owner's bookings
+- Owner-specific calendar views and navigation
+- Owner-specific date/time utilities
+- Remove admin calendar features
+
+## Usage Patterns
+
+### **In Owner Components**
+```vue
+<script setup lang="ts">
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+
+const {
+  myBookings,
+  myTodayTurns,
+  createMyBooking,
+  updateMyBooking,
+  deleteMyBooking
+} = useOwnerBookings();
+</script>
+```
+
+### **Data Filtering Example**
+```typescript
+// ✅ GOOD: Owner sees only their data
+const myBookings = computed(() => 
+  Array.from(bookings.value.values())
+    .filter(b => b.owner_id === currentUser.id)
+);
+
+// ❌ AVOID: Admin pattern (no filtering)
+const allBookings = computed(() => 
+  Array.from(bookings.value.values()) // All data
+);
+```
+
+### **Error Handling Example**
+```typescript
+// ✅ Owner-friendly error messages
+if (booking.owner_id !== currentUserId.value) {
+  throw new Error('You can only edit your own bookings');
+}
+
+// ❌ Admin-style error messages
+if (booking.owner_id !== currentUserId.value) {
+  throw new Error('Access denied to booking resource');
+}
+```
+
+## Security Considerations
+
+### **Frontend Filtering (UX Only)**
+⚠️ **Important**: Owner composables provide **frontend filtering for user experience only**, not security.
+
+```typescript
+// Frontend filtering = UX optimization
+const ownerBookings = allBookings.filter(b => b.owner_id === user.id);
+// An owner could still access other data via dev tools!
+```
+
+### **Future Database Security (Phase 2)**
+Real security will be implemented with Supabase Row Level Security (RLS):
+```sql
+-- Supabase RLS will provide real security
+CREATE POLICY "owners_see_own_bookings" ON bookings 
+FOR SELECT USING (auth.uid() = owner_id);
+```
+
+## Development Guidelines
+
+### **Role-Based Patterns**
+1. **Filter at Composable Level**: Never filter in components, always in composables
+2. **Ownership Validation**: Always check ownership before update/delete operations
+3. **Automatic Owner Assignment**: Set `owner_id` automatically on create operations
+4. **Owner-Friendly Messages**: Use personal, user-friendly error messages
+5. **Remove Admin Features**: No system-wide operations or cleaner assignment
+
+### **Testing Strategy**
+- Test ownership validation on all CRUD operations
+- Test data filtering (owners see only their data)
+- Test owner-specific error messages
+- Test automatic owner assignment on create operations
+- Use demo components for manual testing
+
+### **Integration with Components**
+- **HomeOwner.vue**: Uses owner composables for dashboard data
+- **OwnerSidebar.vue**: Uses owner composables for sidebar data
+- **OwnerCalendar.vue**: Uses owner composables for calendar events
+- **Owner Forms**: Use owner composables for CRUD operations
+
+## Multi-Tenant Architecture
+
+### **Data Scope Comparison**
+| Aspect | Owner Composables | Admin Composables |
+|--------|------------------|-------------------|
+| **Data Access** | Only owner's data | All data across all owners |
+| **Bookings** | `booking.owner_id === user.id` | No filtering |
+| **Properties** | `property.owner_id === user.id` | No filtering |
+| **Turn Alerts** | Owner's urgent turns only | System-wide urgent turns |
+| **Error Messages** | Personal, user-friendly | Technical, business impact |
+| **Features** | Simple CRUD operations | Advanced features + cleaner assignment |
+
+### **Shared Foundation**
+- **Types & Interfaces**: All shared (Property, Booking, User)
+- **Stores**: Shared Maps with role-based access patterns
+- **Business Logic**: Shared algorithms with role-specific scoping
+- **Dumb Components**: Reused with different data per role
+
+This architecture ensures that property owners have a simple, focused interface while admins have comprehensive business management tools, all built on the same shared foundation.
 `````
 
 ## File: src/composables/shared/useAuth.ts
@@ -39568,7 +40406,8 @@ const formattedCleaningDuration = computed((): string => {
 const pricingTierColor = computed((): string => {
   const tierColors: Record<PricingTier, string> = {
     basic: 'grey',
-    premium: 'primary',
+    standard: 'primary',
+    premium: 'secondary',
     luxury: 'accent'
   };
   return tierColors[props.property.pricing_tier];
@@ -41694,67 +42533,6 @@ interface ImportMeta {
 }
 `````
 
-## File: src/types/property.ts
-`````typescript
-/**
- * Property Type Definitions
- * Types for properties managed in the cleaning scheduler
- */
-/**
- * Valid pricing tiers for properties
- */
-export type PricingTier = 'basic' | 'standard' | 'premium' | 'luxury';
-/**
- * Property Interface
- * Core data model for properties in the system
- */
-export interface Property {
-  id: string;
-  owner_id: string;
-  name: string;
-  address: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  square_feet?: number;
-  property_type?: 'apartment' | 'house' | 'condo' | 'townhouse';
-  cleaning_duration: number; // minutes
-  special_instructions?: string;
-  pricing_tier: PricingTier;
-  active: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-⋮----
-cleaning_duration: number; // minutes
-⋮----
-/**
- * Extended property interface with analytics
- * Used for property dashboard views
- */
-export interface PropertyWithMetrics extends Property {
-  metrics: {
-    utilizationRate: number;
-    averageGapBetweenBookings: number;
-    turnPercentage: number;
-    revenueProjection: number;
-    cleaningLoad: 'light' | 'moderate' | 'heavy';
-  };
-}
-/**
- * Property form data
- * Used for creating/editing properties
- */
-export type PropertyFormData = Omit<Property, 'id' | 'created_at' | 'updated_at'>;
-/**
- * Map type for property collections
- */
-export type PropertyMap = Map<string, Property>;
-/**
- * Type guard for Property objects
- */
-export function isProperty(obj: unknown): obj is Property
-`````
-
 ## File: vite.config.ts
 `````typescript
 import { defineConfig } from 'vite'
@@ -43201,6 +43979,67 @@ surface: '#1E1E1E', // Slightly lighter dark grey
 style: 'text-transform: none;', // Remove uppercase transform
 ⋮----
 // Display configuration for responsive design
+`````
+
+## File: src/types/property.ts
+`````typescript
+/**
+ * Property Type Definitions
+ * Types for properties managed in the cleaning scheduler
+ */
+/**
+ * Valid pricing tiers for properties
+ */
+export type PricingTier = 'basic' | 'standard' | 'premium' | 'luxury';
+/**
+ * Property Interface
+ * Core data model for properties in the system
+ */
+export interface Property {
+  id: string;
+  owner_id: string;
+  name: string;
+  address: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  square_feet?: number;
+  property_type?: 'apartment' | 'house' | 'condo' | 'townhouse';
+  cleaning_duration: number; // minutes
+  special_instructions?: string;
+  pricing_tier: PricingTier;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+⋮----
+cleaning_duration: number; // minutes
+⋮----
+/**
+ * Extended property interface with analytics
+ * Used for property dashboard views
+ */
+export interface PropertyWithMetrics extends Property {
+  metrics: {
+    utilizationRate: number;
+    averageGapBetweenBookings: number;
+    turnPercentage: number;
+    revenueProjection: number;
+    cleaningLoad: 'light' | 'moderate' | 'heavy';
+  };
+}
+/**
+ * Property form data
+ * Used for creating/editing properties
+ */
+export type PropertyFormData = Omit<Property, 'id' | 'created_at' | 'updated_at'>;
+/**
+ * Map type for property collections
+ */
+export type PropertyMap = Map<string, Property>;
+/**
+ * Type guard for Property objects
+ */
+export function isProperty(obj: unknown): obj is Property
 `````
 
 ## File: src/App.vue
@@ -45669,75 +46508,6 @@ The fix follows the project's established patterns:
 - Package is properly installed with full TypeScript support
 `````
 
-## File: package.json
-`````json
-{
-  "name": "property-cleaning-scheduler",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@fullcalendar/core": "^6.1.17",
-    "@fullcalendar/daygrid": "^6.1.17",
-    "@fullcalendar/interaction": "^6.1.17",
-    "@fullcalendar/list": "^6.1.17",
-    "@fullcalendar/timegrid": "^6.1.17",
-    "@fullcalendar/vue3": "^6.1.17",
-    "@mdi/font": "^7.4.47",
-    "@mdit/plugin-uml": "^0.22.0",
-    "@supabase/supabase-js": "^2.50.0",
-    "@types/uuid": "^10.0.0",
-    "lint-staged": "^16.1.0",
-    "markdown-it-plantuml": "^1.4.1",
-    "ngrx-uml": "^1.0.2",
-    "pinia": "^2.1.7",
-    "prettier": "^3.5.3",
-    "uml": "^1.0.0",
-    "uuid": "^11.1.0",
-    "vite-plugin-vue-devtools": "^7.7.6",
-    "vue": "^3.4.15",
-    "vue-router": "^4.2.5"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.28.0",
-    "@testing-library/vue": "^8.1.0",
-    "@types/node": "^20.19.0",
-    "@typescript-eslint/eslint-plugin": "^8.34.0",
-    "@typescript-eslint/parser": "^8.34.0",
-    "@vitejs/plugin-vue": "^5.2.4",
-    "@vitest/coverage-v8": "^3.2.2",
-    "@vue/test-utils": "^2.4.6",
-    "eslint": "^9.29.0",
-    "eslint-plugin-vue": "^10.2.0",
-    "globals": "^15.1.0",
-    "happy-dom": "^17.6.3",
-    "jsdom": "^26.1.0",
-    "sass-embedded": "^1.89.2",
-    "typescript": "~5.3.3",
-    "v4": "^0.0.1",
-    "vite": "^5.0.12",
-    "vite-plugin-css-injected-by-js": "^3.5.2",
-    "vite-plugin-vuetify": "^2.1.1",
-    "vitest": "^3.2.2",
-    "vue-eslint-parser": "^10.1.3",
-    "vue-tsc": "^1.8.27",
-    "vuetify": "^3.8.8"
-  }
-}
-`````
-
 ## File: src/stores/ui.ts
 `````typescript
 import { defineStore } from 'pinia';
@@ -45828,6 +46598,75 @@ function getFilter(key: string): FilterValue
 // Getters
 ⋮----
 // Actions
+`````
+
+## File: package.json
+`````json
+{
+  "name": "property-cleaning-scheduler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.17",
+    "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
+    "@fullcalendar/list": "^6.1.17",
+    "@fullcalendar/timegrid": "^6.1.17",
+    "@fullcalendar/vue3": "^6.1.17",
+    "@mdi/font": "^7.4.47",
+    "@mdit/plugin-uml": "^0.22.0",
+    "@supabase/supabase-js": "^2.50.0",
+    "@types/uuid": "^10.0.0",
+    "lint-staged": "^16.1.0",
+    "markdown-it-plantuml": "^1.4.1",
+    "ngrx-uml": "^1.0.2",
+    "pinia": "^2.1.7",
+    "prettier": "^3.5.3",
+    "uml": "^1.0.0",
+    "uuid": "^11.1.0",
+    "vite-plugin-vue-devtools": "^7.7.6",
+    "vue": "^3.4.15",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@testing-library/vue": "^8.1.0",
+    "@types/node": "^20.19.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vitest/coverage-v8": "^3.2.2",
+    "@vue/test-utils": "^2.4.6",
+    "eslint": "^9.29.0",
+    "eslint-plugin-vue": "^10.2.0",
+    "globals": "^15.1.0",
+    "happy-dom": "^17.6.3",
+    "jsdom": "^26.1.0",
+    "sass-embedded": "^1.89.2",
+    "typescript": "~5.3.3",
+    "v4": "^0.0.1",
+    "vite": "^5.0.12",
+    "vite-plugin-css-injected-by-js": "^3.5.2",
+    "vite-plugin-vuetify": "^2.1.1",
+    "vitest": "^3.2.2",
+    "vue-eslint-parser": "^10.1.3",
+    "vue-tsc": "^1.8.27",
+    "vuetify": "^3.8.8"
+  }
+}
 `````
 
 ## File: src/router/index.ts
@@ -46317,21 +47156,32 @@ import { createRouter, createWebHistory } from 'vue-router'
   - Assigned to: Cursor
 
 ### **Owner-Specific Composables**
-- [ ] **TASK-039I**: Create useOwnerBookings.ts composable
-  - Status: Not Started
+- [x] **TASK-039I**: Create useOwnerBookings.ts composable
+  - Status: Complete
   - Requirements:
-    - Extend base `useBookings.ts` functionality
-    - Filter all operations to current owner's bookings only
-    - Implement owner-specific validation rules
-    - Add owner-specific error messages
-    - Remove admin-only functions (cleaner assignment)
+    - ✅ Extend base `useBookings.ts` functionality
+    - ✅ Filter all operations to current owner's bookings only
+    - ✅ Implement owner-specific validation rules
+    - ✅ Add owner-specific error messages
+    - ✅ Remove admin-only functions (cleaner assignment)
   - Functions:
-    - `fetchMyBookings()` - get current user's bookings only
-    - `createMyBooking(data)` - create booking with current user as owner
-    - `updateMyBooking(id, data)` - update only if user owns the booking
-    - `deleteMyBooking(id)` - delete only if user owns the booking
-    - `getMyTodayTurns()` - today's turns for current user only
-    - `getMyUpcomingCleanings()` - upcoming cleanings for current user
+    - ✅ `fetchMyBookings()` - get current user's bookings only
+    - ✅ `createMyBooking(data)` - create booking with current user as owner
+    - ✅ `updateMyBooking(id, data)` - update only if user owns the booking
+    - ✅ `deleteMyBooking(id)` - delete only if user owns the booking
+    - ✅ `getMyTodayTurns()` - today's turns for current user only
+    - ✅ `getMyUpcomingCleanings()` - upcoming cleanings for current user
+  - Implementation Details:
+    - Created `src/composables/owner/useOwnerBookings.ts` with role-based data filtering
+    - All computed properties filter by `owner_id === currentUser.id`
+    - Added owner-specific CRUD operations with ownership validation
+    - Implemented owner-friendly error messages and validation
+    - Created comprehensive demo component `UseOwnerBookingsDemo.vue`
+    - Added demo route `/demos/use-owner-bookings` for testing
+    - Follows Map collection patterns and proper TypeScript interfaces
+    - Extends shared `useBookings` composable using composition pattern
+    - Removes admin-only functions (cleaner assignment, system-wide operations)
+  - Notes: Successfully implemented owner-specific booking composable that filters all data to current user's bookings only. Provides owner-friendly interface with proper validation and error handling. Ready for integration with owner-specific components like HomeOwner.vue and OwnerSidebar.vue.
   - Assigned to: Cursor
 
 - [ ] **TASK-039J**: Create useOwnerProperties.ts composable

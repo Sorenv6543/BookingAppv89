@@ -247,6 +247,7 @@ export function useProperties() {
     // Calculate revenue projection based on pricing tier
     const revenueMultipliers: Record<PricingTier, number> = {
       'basic': 1,
+      'standard': 1.2,
       'premium': 1.5,
       'luxury': 2.5
     };
