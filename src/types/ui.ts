@@ -4,13 +4,23 @@
  */
 
 /**
+ * Generic data type for modal and dialog payloads
+ */
+export type ModalData = Record<string, unknown> | null | undefined;
+
+/**
+ * Filter value type for arbitrary filter values
+ */
+export type FilterValue = string | number | boolean | Date | null | undefined;
+
+/**
  * Modal state interface
  * Used for tracking modal dialogs
  */
 export interface ModalState {
   open: boolean;
   mode: 'create' | 'edit' | 'view' | 'delete';
-  data?: any;
+  data?: ModalData;
 }
 
 /**
@@ -25,7 +35,7 @@ export interface ConfirmDialogState {
   cancelText?: string;
   confirmColor?: string;
   dangerous?: boolean;
-  data?: any; // For passing data to the confirmation callback
+  data?: ModalData; // For passing data to the confirmation callback
 }
 
 /**
@@ -83,7 +93,7 @@ export interface CalendarEvent {
   borderColor?: string;
   textColor?: string;
   extendedProps: {
-    booking: any;
+    booking: Record<string, unknown>;
     type: 'standard' | 'turn';
     status: string;
   };

@@ -1,7 +1,10 @@
 <!-- components/smart/Home.vue -->
 <template>
   <div class="home-container">
-    <v-row no-gutters class="fill-height">
+    <v-row
+      no-gutters
+      class="fill-height"
+    >
       <!-- Sidebar Column -->
       <v-col 
         cols="12" 
@@ -35,29 +38,51 @@
             v-if="$vuetify.display.lgAndDown"
             icon="mdi-menu"
             variant="text"
-            @click="toggleSidebar"
             class="mr-4"
+            @click="toggleSidebar"
           />
           <!-- Calendar Controls - Simple version since CalendarControls component may not exist -->
           <div class="d-flex align-center">
-            <v-btn icon="mdi-arrow-left" variant="text" @click="handlePrevious" class="mr-2" />
+            <v-btn
+              icon="mdi-arrow-left"
+              variant="text"
+              class="mr-2"
+              @click="handlePrevious"
+            />
             <v-btn 
               variant="outlined" 
-              @click="handleGoToday" 
-              class="mr-2"
+              class="mr-2" 
+              @click="handleGoToday"
             >
               Today
             </v-btn>
-            <v-btn icon="mdi-arrow-right" variant="text" @click="handleNext" class="mr-4" />
+            <v-btn
+              icon="mdi-arrow-right"
+              variant="text"
+              class="mr-4"
+              @click="handleNext"
+            />
             
-            <div class="text-h6">{{ formattedDate }}</div>
+            <div class="text-h6">
+              {{ formattedDate }}
+            </div>
             
-            <v-spacer></v-spacer>
+            <v-spacer />
             
-            <v-btn-toggle v-model="currentView" mandatory class="ml-4">
-              <v-btn value="dayGridMonth">Month</v-btn>
-              <v-btn value="timeGridWeek">Week</v-btn>
-              <v-btn value="timeGridDay">Day</v-btn>
+            <v-btn-toggle
+              v-model="currentView"
+              mandatory
+              class="ml-4"
+            >
+              <v-btn value="dayGridMonth">
+                Month
+              </v-btn>
+              <v-btn value="timeGridWeek">
+                Week
+              </v-btn>
+              <v-btn value="timeGridDay">
+                Day
+              </v-btn>
             </v-btn-toggle>
           </div>
         </div>
@@ -317,7 +342,7 @@ const eventModalMode = computed(() => {
 });
 const eventModalData = computed(() => {
   const modal = uiStore.getModalState('eventModal');
-  return modal?.data || null;
+  return modal?.data as Booking | undefined;
 });
 
 // Property Modal
@@ -328,7 +353,7 @@ const propertyModalMode = computed(() => {
 });
 const propertyModalData = computed(() => {
   const modal = uiStore.getModalState('propertyModal');
-  return modal?.data || null;
+  return modal?.data as Property | undefined;
 });
 
 // Confirmation Dialog
@@ -512,7 +537,7 @@ const handleEventClick = (clickInfo: EventClickArg): void => {
   
   const booking = bookingStore.getBookingById(clickInfo.event.id);
   if (booking) {
-    uiStore.openModal('eventModal', 'edit', booking);
+    uiStore.openModal('eventModal', 'edit', { booking });
   }
 };
 
@@ -718,7 +743,7 @@ const handleConfirmDialogConfirm = (): void => {
   // Handle different confirmation actions
   switch (data.action) {
     case 'deleteProperty':
-      deleteProperty(data.id)
+      deleteProperty(data.id as string)
         .then(() => {
           uiStore.addNotification('success', 'Property Deleted', 'Property has been deleted successfully.');
         })
@@ -729,7 +754,7 @@ const handleConfirmDialogConfirm = (): void => {
       break;
       
     case 'deleteBooking':
-      deleteBooking(data.id)
+      deleteBooking(data.id as string)
         .then(() => {
           uiStore.addNotification('success', 'Booking Deleted', 'Booking has been deleted successfully.');
           // Refresh calendar events

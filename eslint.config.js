@@ -3,9 +3,12 @@ import js from '@eslint/js';
 import globals from 'globals';
 import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
+import vue from 'eslint-plugin-vue';
+import vueParser from 'vue-eslint-parser';
 
 export default [
   js.configs.recommended,
+  ...vue.configs['flat/recommended'],
   {
     files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
     languageOptions: {
@@ -34,6 +37,29 @@ export default [
       '@typescript-eslint': typescript,
     },
     rules: {
+      ...typescript.configs.recommended.rules,
+    },
+  },
+  {
+    files: ['**/*.vue'],
+    languageOptions: {
+      parser: vueParser,
+      parserOptions: {
+        parser: typescriptParser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    plugins: {
+      vue,
+      '@typescript-eslint': typescript,
+    },
+    rules: {
+      ...vue.configs.recommended.rules,
       ...typescript.configs.recommended.rules,
       'vue/multi-word-component-names': 'off',
       'vue/no-unused-vars': 'error',

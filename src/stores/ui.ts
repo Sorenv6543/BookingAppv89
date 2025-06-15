@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { ModalState, ConfirmDialogState, Notification, NotificationType, FilterState } from '@/types';
+import type { ModalState, ConfirmDialogState, Notification, NotificationType, FilterState, ModalData, FilterValue } from '@/types';
 
 /**
  * UI store for the Property Cleaning Scheduler
@@ -33,7 +33,7 @@ export const useUIStore = defineStore('ui', () => {
   const currentCalendarView = ref<string>('timeGridWeek');
   const selectedPropertyFilter = ref<string | null>(null);
   // Additional arbitrary filter values map
-  const filterValues = ref<Map<string, any>>(new Map());
+  const filterValues = ref<Map<string, FilterValue>>(new Map());
   
   // Getters
   const isModalOpen = computed(() => (modalId: string): boolean => {
@@ -69,7 +69,7 @@ export const useUIStore = defineStore('ui', () => {
   });
   
   // Actions
-  function openModal(modalId: string, mode: 'create' | 'edit' | 'view' | 'delete' = 'view', data?: any) {
+  function openModal(modalId: string, mode: 'create' | 'edit' | 'view' | 'delete' = 'view', data?: ModalData) {
     modals.value.set(modalId, {
       open: true,
       mode,
@@ -105,7 +105,7 @@ export const useUIStore = defineStore('ui', () => {
       cancelText?: string;
       confirmColor?: string;
       dangerous?: boolean;
-      data?: any;
+      data?: ModalData;
     } = {}
   ) {
     confirmDialogs.value.set(dialogId, {
@@ -241,14 +241,14 @@ export const useUIStore = defineStore('ui', () => {
    * Set an arbitrary filter value by key
    * This allows for flexible filtering not covered by the FilterState interface
    */
-  function setFilter(key: string, value: any) {
+  function setFilter(key: string, value: FilterValue) {
     filterValues.value.set(key, value);
     
     // Special case handling for known filter keys
-    if (key === 'calendarView') {
+    if (key === 'calendarView' && typeof value === 'string') {
       setCalendarView(value);
     }
-    else if (key === 'dateRangeStart' && filterState.value.dateRange) {
+    else if (key === 'dateRangeStart' && typeof value === 'string' && filterState.value.dateRange) {
       updateFilter({
         dateRange: {
           ...filterState.value.dateRange,
@@ -256,7 +256,7 @@ export const useUIStore = defineStore('ui', () => {
         }
       });
     }
-    else if (key === 'dateRangeEnd' && filterState.value.dateRange) {
+    else if (key === 'dateRangeEnd' && typeof value === 'string' && filterState.value.dateRange) {
       updateFilter({
         dateRange: {
           ...filterState.value.dateRange,
@@ -264,7 +264,7 @@ export const useUIStore = defineStore('ui', () => {
         }
       });
     }
-    else if (key === 'dateRangeStart' && !filterState.value.dateRange) {
+    else if (key === 'dateRangeStart' && typeof value === 'string' && !filterState.value.dateRange) {
       // Initialize dateRange if it doesn't exist
       updateFilter({
         dateRange: {
@@ -273,7 +273,7 @@ export const useUIStore = defineStore('ui', () => {
         }
       });
     }
-    else if (key === 'dateRangeEnd' && !filterState.value.dateRange) {
+    else if (key === 'dateRangeEnd' && typeof value === 'string' && !filterState.value.dateRange) {
       // Initialize dateRange if it doesn't exist
       updateFilter({
         dateRange: {
@@ -288,7 +288,7 @@ export const useUIStore = defineStore('ui', () => {
    * Get an arbitrary filter value by key
    * Returns undefined if the filter doesn't exist
    */
-  function getFilter(key: string): any {
+  function getFilter(key: string): FilterValue {
     return filterValues.value.get(key);
   }
   

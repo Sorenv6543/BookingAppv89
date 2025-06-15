@@ -3,7 +3,7 @@ import Home from '@/components/smart/Home.vue'
 </script>
 
 <template>
-      <Home />
+  <Home />
 </template>
 
 <style scoped>

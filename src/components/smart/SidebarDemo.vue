@@ -1,7 +1,14 @@
 <template>
-  <v-container fluid class="sidebar-demo">
+  <v-container
+    fluid
+    class="sidebar-demo"
+  >
     <v-row>
-      <v-col cols="12" md="4" lg="3">
+      <v-col
+        cols="12"
+        md="4"
+        lg="3"
+      >
         <Sidebar 
           :today-turns="todayTurns"
           :upcoming-cleanings="upcomingCleanings"
@@ -14,16 +21,28 @@
           @create-property="handleCreateProperty"
         />
       </v-col>
-      <v-col cols="12" md="8" lg="9">
+      <v-col
+        cols="12"
+        md="8"
+        lg="9"
+      >
         <v-card class="pa-4">
           <v-card-title>Sidebar Demo</v-card-title>
           <v-card-text>
             <p>This is a demo of the Sidebar component. Try interacting with the sidebar to see how it works.</p>
-            <v-divider class="my-4"></v-divider>
+            <v-divider class="my-4" />
             
-            <h3 class="text-h6 mb-2">Event Log:</h3>
-            <v-list lines="two" class="event-log bg-grey-lighten-4">
-              <v-list-item v-for="(event, index) in eventLog" :key="index">
+            <h3 class="text-h6 mb-2">
+              Event Log:
+            </h3>
+            <v-list
+              lines="two"
+              class="event-log bg-grey-lighten-4"
+            >
+              <v-list-item
+                v-for="(event, index) in eventLog"
+                :key="index"
+              >
                 <v-list-item-title>{{ event.name }}</v-list-item-title>
                 <v-list-item-subtitle>{{ event.detail }}</v-list-item-subtitle>
               </v-list-item>
@@ -33,13 +52,19 @@
               </v-list-item>
             </v-list>
             
-            <v-divider class="my-4"></v-divider>
+            <v-divider class="my-4" />
             
             <div class="d-flex gap-2">
-              <v-btn color="primary" @click="toggleLoading">
+              <v-btn
+                color="primary"
+                @click="toggleLoading"
+              >
                 {{ loading ? 'Stop Loading' : 'Start Loading' }}
               </v-btn>
-              <v-btn color="secondary" @click="resetEvents">
+              <v-btn
+                color="secondary"
+                @click="resetEvents"
+              >
                 Reset Events
               </v-btn>
             </div>

@@ -6,11 +6,22 @@
         <span class="admin-badge">Admin</span>
       </div>
       <nav class="admin-nav">
-        <router-link to="/">Home</router-link>
-        <router-link to="/properties">Properties</router-link>
-        <router-link to="/calendar">Calendar</router-link>
-        <router-link to="/admin">Admin</router-link>
-        <a href="#" @click.prevent="logout">Logout</a>
+        <router-link to="/">
+          Home
+        </router-link>
+        <router-link to="/properties">
+          Properties
+        </router-link>
+        <router-link to="/calendar">
+          Calendar
+        </router-link>
+        <router-link to="/admin">
+          Admin
+        </router-link>
+        <a
+          href="#"
+          @click.prevent="logout"
+        >Logout</a>
       </nav>
     </header>
     
@@ -18,15 +29,31 @@
       <aside class="admin-sidebar">
         <h3>Admin Controls</h3>
         <ul>
-          <li><router-link to="/admin">Dashboard</router-link></li>
-          <li><router-link to="/admin/users">User Management</router-link></li>
-          <li><router-link to="/admin/settings">System Settings</router-link></li>
-          <li><router-link to="/admin/reports">Reports</router-link></li>
+          <li>
+            <router-link to="/admin">
+              Dashboard
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/users">
+              User Management
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/settings">
+              System Settings
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/reports">
+              Reports
+            </router-link>
+          </li>
         </ul>
       </aside>
       
       <main class="admin-content">
-        <slot></slot>
+        <slot />
       </main>
     </div>
   </div>

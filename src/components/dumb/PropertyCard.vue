@@ -6,7 +6,9 @@
     @click="emit('view', property.id)"
   >
     <v-card-title class="d-flex align-center pa-3">
-      <div class="text-truncate">{{ property.name }}</div>
+      <div class="text-truncate">
+        {{ property.name }}
+      </div>
       <v-chip
         class="ml-2"
         size="x-small"
@@ -19,17 +21,32 @@
 
     <v-card-text class="pa-3 pt-1">
       <div class="address text-truncate mb-2">
-        <v-icon icon="mdi-home" size="small" class="mr-1" color="primary"></v-icon>
+        <v-icon
+          icon="mdi-home"
+          size="small"
+          class="mr-1"
+          color="primary"
+        />
         {{ property.address }}
       </div>
 
       <div class="d-flex align-center mb-2">
-        <v-icon icon="mdi-clock-outline" size="small" class="mr-1" color="primary"></v-icon>
+        <v-icon
+          icon="mdi-clock-outline"
+          size="small"
+          class="mr-1"
+          color="primary"
+        />
         <span>{{ formattedCleaningDuration }}</span>
       </div>
 
       <div class="d-flex align-center mb-2">
-        <v-icon icon="mdi-tag-outline" size="small" class="mr-1" color="primary"></v-icon>
+        <v-icon
+          icon="mdi-tag-outline"
+          size="small"
+          class="mr-1"
+          color="primary"
+        />
         <v-chip
           size="x-small"
           :color="pricingTierColor"
@@ -40,12 +57,25 @@
         </v-chip>
       </div>
 
-      <div v-if="property.special_instructions" class="special-instructions mt-3">
+      <div
+        v-if="property.special_instructions"
+        class="special-instructions mt-3"
+      >
         <v-tooltip location="bottom">
-          <template v-slot:activator="{ props }">
-            <div class="text-truncate d-flex align-start" v-bind="props">
-              <v-icon icon="mdi-information-outline" size="small" class="mr-1" color="info"></v-icon>
-              <div class="text-caption">{{ property.special_instructions }}</div>
+          <template #activator="{ props: tooltipProps }">
+            <div
+              class="text-truncate d-flex align-start"
+              v-bind="tooltipProps"
+            >
+              <v-icon
+                icon="mdi-information-outline"
+                size="small"
+                class="mr-1"
+                color="info"
+              />
+              <div class="text-caption">
+                {{ property.special_instructions }}
+              </div>
             </div>
           </template>
           <span>{{ property.special_instructions }}</span>
@@ -53,30 +83,37 @@
       </div>
     </v-card-text>
 
-    <v-divider v-if="displayActions"></v-divider>
+    <v-divider v-if="displayActions" />
 
-    <v-card-actions class="pa-2" v-if="displayActions">
-      <v-spacer></v-spacer>
+    <v-card-actions
+      v-if="displayActions"
+      class="pa-2"
+    >
+      <v-spacer />
       <v-btn
         variant="text"
         color="primary"
         size="small"
-        @click.stop="emit('edit', property.id)"
         aria-label="Edit property"
         rounded
+        @click.stop="emit('edit', property.id)"
       >
-        <v-icon class="mr-1">mdi-pencil</v-icon>
+        <v-icon class="mr-1">
+          mdi-pencil
+        </v-icon>
         Edit
       </v-btn>
       <v-btn
         variant="text"
         color="error"
         size="small"
-        @click.stop="emit('delete', property.id)"
         aria-label="Delete property"
         rounded
+        @click.stop="emit('delete', property.id)"
       >
-        <v-icon class="mr-1">mdi-delete</v-icon>
+        <v-icon class="mr-1">
+          mdi-delete
+        </v-icon>
         Delete
       </v-btn>
     </v-card-actions>

@@ -1,14 +1,33 @@
 <template>
   <div class="demo-container pa-4">
-    <h1 class="text-h4 mb-4">Turn Alerts Demo</h1>
+    <h1 class="text-h4 mb-4">
+      Turn Alerts Demo
+    </h1>
     
     <div class="mb-4">
-      <v-btn @click="addUrgentTurn" color="error" class="mr-2">Add Urgent Turn</v-btn>
-      <v-btn @click="addHighTurn" color="warning" class="mr-2">Add High Priority Turn</v-btn>
-      <v-btn @click="clearTurns" color="grey">Clear All</v-btn>
+      <v-btn
+        color="error"
+        class="mr-2"
+        @click="addUrgentTurn"
+      >
+        Add Urgent Turn
+      </v-btn>
+      <v-btn
+        color="warning"
+        class="mr-2"
+        @click="addHighTurn"
+      >
+        Add High Priority Turn
+      </v-btn>
+      <v-btn
+        color="grey"
+        @click="clearTurns"
+      >
+        Clear All
+      </v-btn>
     </div>
     
-    <turn-alerts 
+    <TurnAlerts 
       :bookings="turnBookings" 
       @view="onViewBooking" 
       @assign="onAssignBooking"
@@ -17,9 +36,14 @@
     />
     
     <div class="mt-4 pa-2 bg-grey-lighten-4">
-      <h3 class="text-h6">Event Log:</h3>
+      <h3 class="text-h6">
+        Event Log:
+      </h3>
       <v-list>
-        <v-list-item v-for="(log, index) in eventLogs" :key="index">
+        <v-list-item
+          v-for="(log, index) in eventLogs"
+          :key="index"
+        >
           {{ log }}
         </v-list-item>
       </v-list>

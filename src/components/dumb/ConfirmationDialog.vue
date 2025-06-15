@@ -14,26 +14,26 @@
         <p>{{ message }}</p>
       </v-card-text>
       
-      <v-divider></v-divider>
+      <v-divider />
       
       <v-card-actions>
         <v-btn
           color="grey-darken-1"
           variant="text"
-          @click="handleCancel"
           :disabled="loading"
+          @click="handleCancel"
         >
           {{ cancelText }}
         </v-btn>
         
-        <v-spacer></v-spacer>
+        <v-spacer />
         
         <v-btn
           :color="confirmColor"
           variant="text"
-          @click="handleConfirm"
           :disabled="loading"
           :loading="loading"
+          @click="handleConfirm"
         >
           {{ confirmText }}
         </v-btn>
@@ -47,9 +47,9 @@ import { computed, ref } from 'vue';
 
 // PROPS & EMITS
 interface Props {
-  open: boolean;
-  title: string;
-  message: string;
+  open?: boolean;
+  title?: string;
+  message?: string;
   confirmText?: string;
   cancelText?: string;
   confirmColor?: string;

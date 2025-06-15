@@ -10,28 +10,31 @@
         :icon="hasUrgentTurns ? 'mdi-alert-circle' : 'mdi-clock-alert'" 
         :color="hasUrgentTurns ? 'error' : 'warning'"
         class="mr-2"
-      ></v-icon>
+      />
       <span class="text-h6">Turn Alerts</span>
       <v-badge 
         :content="bookings.length.toString()" 
         :color="hasUrgentTurns ? 'error' : 'warning'"
         class="ml-2"
-      ></v-badge>
-      <v-spacer></v-spacer>
+      />
+      <v-spacer />
       <v-btn 
         variant="text" 
         :icon="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-        @click="toggleExpanded"
         :color="hasUrgentTurns ? 'error' : 'warning'"
         density="comfortable"
-      ></v-btn>
+        @click="toggleExpanded"
+      />
     </v-card-title>
     
     <v-expand-transition>
       <div v-if="expanded">
-        <v-divider></v-divider>
+        <v-divider />
         <v-card-text class="pa-3">
-          <v-list v-if="bookings.length > 0" class="turn-list pa-0">
+          <v-list
+            v-if="bookings.length > 0"
+            class="turn-list pa-0"
+          >
             <v-list-item 
               v-for="booking in limitedBookings" 
               :key="booking.id" 
@@ -41,7 +44,7 @@
               rounded="lg"
               elevation="1"
             >
-              <template v-slot:prepend>
+              <template #prepend>
                 <v-avatar 
                   :color="getPriorityColor(booking.priority)" 
                   class="mr-2" 
@@ -51,7 +54,7 @@
                     :icon="booking.priority === 'urgent' ? 'mdi-alert' : 'mdi-clock-fast'" 
                     color="white" 
                     size="small"
-                  ></v-icon>
+                  />
                 </v-avatar>
               </template>
               
@@ -62,15 +65,30 @@
               <v-list-item-subtitle>
                 <div class="d-flex flex-column mt-1">
                   <div class="d-flex align-center">
-                    <v-icon icon="mdi-logout" size="x-small" class="mr-1"></v-icon>
+                    <v-icon
+                      icon="mdi-logout"
+                      size="x-small"
+                      class="mr-1"
+                    />
                     <span class="text-caption">{{ formatTime(booking.checkout_date) }}</span>
                   </div>
                   <div class="d-flex align-center">
-                    <v-icon icon="mdi-login" size="x-small" class="mr-1"></v-icon>
+                    <v-icon
+                      icon="mdi-login"
+                      size="x-small"
+                      class="mr-1"
+                    />
                     <span class="text-caption">{{ formatTime(booking.checkin_date) }}</span>
                   </div>
-                  <div v-if="booking.cleaning_window" class="d-flex align-center text-caption mt-1">
-                    <v-icon icon="mdi-timer-outline" size="x-small" class="mr-1"></v-icon>
+                  <div
+                    v-if="booking.cleaning_window"
+                    class="d-flex align-center text-caption mt-1"
+                  >
+                    <v-icon
+                      icon="mdi-timer-outline"
+                      size="x-small"
+                      class="mr-1"
+                    />
                     <v-chip 
                       size="x-small" 
                       :color="getPriorityColor(booking.priority)"
@@ -83,48 +101,69 @@
                 </div>
               </v-list-item-subtitle>
               
-              <template v-slot:append>
+              <template #append>
                 <div class="d-flex flex-column">
                   <v-btn 
                     size="small" 
                     color="primary" 
                     class="mb-2" 
-                    @click.stop="emit('view', booking.id)" 
-                    variant="flat"
+                    variant="flat" 
                     rounded
+                    @click.stop="emit('view', booking.id)"
                   >
-                    <v-icon size="small" class="mr-1">mdi-eye</v-icon>
+                    <v-icon
+                      size="small"
+                      class="mr-1"
+                    >
+                      mdi-eye
+                    </v-icon>
                     View
                   </v-btn>
                   <v-btn 
                     size="small" 
                     color="success" 
-                    @click.stop="emit('assign', booking.id)" 
-                    variant="flat"
+                    variant="flat" 
                     rounded
+                    @click.stop="emit('assign', booking.id)"
                   >
-                    <v-icon size="small" class="mr-1">mdi-account-check</v-icon>
+                    <v-icon
+                      size="small"
+                      class="mr-1"
+                    >
+                      mdi-account-check
+                    </v-icon>
                     Assign
                   </v-btn>
                 </div>
               </template>
             </v-list-item>
             
-            <div v-if="props.bookings.length > props.limit" class="text-center mt-3">
+            <div
+              v-if="props.bookings.length > props.limit"
+              class="text-center mt-3"
+            >
               <v-btn 
                 variant="tonal" 
                 color="primary" 
                 size="small" 
-                @click="emit('view-all')"
                 prepend-icon="mdi-format-list-bulleted"
                 rounded
+                @click="emit('view-all')"
               >
                 View all {{ props.bookings.length }} turns
               </v-btn>
             </div>
           </v-list>
-          <div v-else class="text-center py-3">
-            <v-icon icon="mdi-check-circle" color="success" size="large" class="mb-2"></v-icon>
+          <div
+            v-else
+            class="text-center py-3"
+          >
+            <v-icon
+              icon="mdi-check-circle"
+              color="success"
+              size="large"
+              class="mb-2"
+            />
             <div>No urgent turn bookings at this time.</div>
           </div>
         </v-card-text>

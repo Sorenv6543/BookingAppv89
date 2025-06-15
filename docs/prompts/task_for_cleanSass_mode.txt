@@ -36,5 +36,4 @@ refer to @context7_techstack_ids.md for usage examples
 Turn bookings = urgent, same-day turnovers between guests
 Standard bookings = regular recurring cleanings
 Priority calculation based on checkout → checkin time window
-All state uses Map collections, not arrays
 UI Store manages modals, sidebars, loading states

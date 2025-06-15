@@ -18,10 +18,14 @@
         </v-chip>
       </v-card-title>
       
-      <v-divider></v-divider>
+      <v-divider />
       
       <v-card-text>
-        <v-form ref="formRef" v-model="formValid" @submit.prevent="handleSubmit">
+        <v-form
+          ref="formRef"
+          v-model="formValid"
+          @submit.prevent="handleSubmit"
+        >
           <v-container>
             <!-- Property Selection -->
             <v-row>
@@ -37,13 +41,16 @@
                   variant="outlined"
                   :disabled="loading"
                   :error-messages="errors.get('property_id')"
-                ></v-select>
+                />
               </v-col>
             </v-row>
             
             <!-- Dates -->
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="form.checkout_date"
                   label="Checkout Date"
@@ -53,13 +60,16 @@
                   variant="outlined"
                   :disabled="loading"
                   :error-messages="errors.get('checkout_date')"
-                  @update:model-value="updateBookingType"
                   hint="When guests leave"
                   persistent-hint
-                ></v-text-field>
+                  @update:model-value="updateBookingType"
+                />
               </v-col>
               
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="form.checkin_date"
                   label="Checkin Date"
@@ -69,16 +79,19 @@
                   variant="outlined"
                   :disabled="loading"
                   :error-messages="errors.get('checkin_date')"
-                  @update:model-value="updateBookingType"
                   hint="When new guests arrive"
                   persistent-hint
-                ></v-text-field>
+                  @update:model-value="updateBookingType"
+                />
               </v-col>
             </v-row>
             
             <!-- Booking Type and Guest Count -->
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="form.booking_type"
                   :items="bookingTypeItems"
@@ -88,16 +101,19 @@
                   variant="outlined"
                   :disabled="loading"
                   :error-messages="errors.get('booking_type')"
-                ></v-select>
+                />
                 
                 <v-checkbox
                   v-model="autoDetectType"
                   label="Auto-detect booking type from dates"
                   :disabled="loading"
-                ></v-checkbox>
+                />
               </v-col>
               
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model.number="form.guest_count"
                   label="Guest Count"
@@ -108,7 +124,7 @@
                   :error-messages="errors.get('guest_count')"
                   hint="Optional"
                   persistent-hint
-                ></v-text-field>
+                />
               </v-col>
             </v-row>
             
@@ -125,7 +141,7 @@
                   persistent-hint
                   :counter="500"
                   rows="3"
-                ></v-textarea>
+                />
               </v-col>
             </v-row>
             
@@ -139,7 +155,7 @@
                   variant="outlined"
                   :disabled="loading"
                   :error-messages="errors.get('status')"
-                ></v-select>
+                />
               </v-col>
             </v-row>
             
@@ -152,7 +168,7 @@
                   title="Same-Day Turnover"
                   text="This booking has same-day checkout and checkin dates, which typically indicates a 'turn' booking (urgent same-day cleaning between guests)."
                   class="mb-0"
-                ></v-alert>
+                />
               </v-col>
             </v-row>
             
@@ -165,34 +181,34 @@
                   title="Invalid Turn Booking"
                   text="Turn bookings must have checkout and checkin on the same day. Please adjust dates or change booking type to standard."
                   class="mb-0"
-                ></v-alert>
+                />
               </v-col>
             </v-row>
           </v-container>
         </v-form>
       </v-card-text>
       
-      <v-divider></v-divider>
+      <v-divider />
       
       <v-card-actions>
         <v-btn
           color="grey-darken-1"
           variant="text"
-          @click="handleClose"
           :disabled="loading"
+          @click="handleClose"
         >
           Cancel
         </v-btn>
         
-        <v-spacer></v-spacer>
+        <v-spacer />
         
         <v-btn
           v-if="mode === 'edit'"
           color="error"
           variant="text"
-          @click="handleDelete"
           :disabled="loading"
           :loading="loading"
+          @click="handleDelete"
         >
           Delete
         </v-btn>
@@ -200,9 +216,9 @@
         <v-btn
           color="primary"
           variant="text"
-          @click="handleSubmit"
           :disabled="!formValid || loading || showTurnError"
           :loading="loading"
+          @click="handleSubmit"
         >
           {{ submitButtonText }}
         </v-btn>
@@ -219,9 +235,9 @@ import type { VForm } from 'vuetify/components';
 
 // PROPS & EMITS
 interface Props {
-  open: boolean;
-  mode: 'create' | 'edit';
-  booking?: Booking | null;
+  open?: boolean;
+  mode?: 'create' | 'edit';
+  booking?: Booking;
 }
 
 interface Emits {
@@ -233,7 +249,7 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   open: false,
   mode: 'create',
-  booking: null
+  booking: undefined
 });
 
 const emit = defineEmits<Emits>();

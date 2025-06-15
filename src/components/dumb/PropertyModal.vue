@@ -26,10 +26,14 @@
         </v-chip>
       </v-card-title>
       
-      <v-divider></v-divider>
+      <v-divider />
       
       <v-card-text>
-        <v-form ref="formRef" v-model="formValid" @submit.prevent="handleSubmit">
+        <v-form
+          ref="formRef"
+          v-model="formValid"
+          @submit.prevent="handleSubmit"
+        >
           <v-container>
             <!-- Property Name -->
             <v-row>
@@ -44,7 +48,7 @@
                   :error-messages="errors.get('name')"
                   hint="Enter the property name as it should appear in the system"
                   persistent-hint
-                ></v-text-field>
+                />
               </v-col>
             </v-row>
             
@@ -61,13 +65,16 @@
                   :error-messages="errors.get('address')"
                   hint="Full address including street, city, state, and zip code"
                   persistent-hint
-                ></v-text-field>
+                />
               </v-col>
             </v-row>
             
             <!-- Cleaning Duration and Pricing Tier -->
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model.number="form.cleaning_duration"
                   label="Cleaning Duration (minutes)"
@@ -80,10 +87,13 @@
                   :error-messages="errors.get('cleaning_duration')"
                   hint="Time required for standard cleaning"
                   persistent-hint
-                ></v-text-field>
+                />
               </v-col>
               
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="form.pricing_tier"
                   :items="pricingTierItems"
@@ -95,7 +105,7 @@
                   :error-messages="errors.get('pricing_tier')"
                   hint="Determines pricing and service level"
                   persistent-hint
-                ></v-select>
+                />
               </v-col>
             </v-row>
             
@@ -112,7 +122,7 @@
                   persistent-hint
                   :counter="1000"
                   rows="4"
-                ></v-textarea>
+                />
               </v-col>
             </v-row>
             
@@ -126,34 +136,34 @@
                   :error-messages="errors.get('active')"
                   hint="Inactive properties won't appear in booking calendars"
                   persistent-hint
-                ></v-checkbox>
+                />
               </v-col>
             </v-row>
           </v-container>
         </v-form>
       </v-card-text>
       
-      <v-divider></v-divider>
+      <v-divider />
       
       <v-card-actions>
         <v-btn
           color="grey-darken-1"
           variant="text"
-          @click="handleClose"
           :disabled="loading"
+          @click="handleClose"
         >
           Cancel
         </v-btn>
         
-        <v-spacer></v-spacer>
+        <v-spacer />
         
         <v-btn
           v-if="mode === 'edit'"
           color="error"
           variant="text"
-          @click="handleDelete"
           :disabled="loading"
           :loading="loading"
+          @click="handleDelete"
         >
           Delete
         </v-btn>
@@ -161,9 +171,9 @@
         <v-btn
           color="primary"
           variant="text"
-          @click="handleSubmit"
           :disabled="!formValid || loading"
           :loading="loading"
+          @click="handleSubmit"
         >
           {{ submitButtonText }}
         </v-btn>
@@ -180,9 +190,9 @@ import type { VForm } from 'vuetify/components';
 
 // PROPS & EMITS
 interface Props {
-  open: boolean;
-  mode: 'create' | 'edit';
-  property?: Property | null;
+  open?: boolean;
+  mode?: 'create' | 'edit';
+  property?: Property;
 }
 
 interface Emits {
@@ -194,7 +204,7 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   open: false,
   mode: 'create',
-  property: null
+  property: undefined
 });
 
 const emit = defineEmits<Emits>();

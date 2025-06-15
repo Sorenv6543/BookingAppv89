@@ -6,14 +6,17 @@
       :close-on-content-click="false"
       min-width="300"
     >
-      <template #activator="{ props }">
+      <template #activator="{ props: menuProps }">
         <v-btn
           icon
-          v-bind="props"
+          v-bind="menuProps"
           size="small"
         >
           <v-icon>mdi-palette</v-icon>
-          <v-tooltip activator="parent" location="bottom">
+          <v-tooltip
+            activator="parent"
+            location="bottom"
+          >
             Theme options
           </v-tooltip>
         </v-btn>
@@ -23,57 +26,75 @@
         <v-card-title class="text-subtitle-1 font-weight-bold py-2">
           Select Theme
         </v-card-title>
-        <v-divider></v-divider>
+        <v-divider />
         
         <v-card-text class="pt-4">
-          <div class="text-subtitle-2 mb-2">Light Themes</div>
+          <div class="text-subtitle-2 mb-2">
+            Light Themes
+          </div>
           <v-row dense>
-            <v-col cols="3" v-for="theme in lightThemes" :key="theme.name">
-              <v-tooltip :text="theme.label" location="bottom">
-                <template #activator="{ props }">
+            <v-col
+              v-for="themeOption in lightThemes"
+              :key="themeOption.name"
+              cols="3"
+            >
+              <v-tooltip
+                :text="themeOption.label"
+                location="bottom"
+              >
+                <template #activator="{ props: tooltipProps }">
                   <v-card
-                    v-bind="props"
-                    :color="theme.color"
+                    v-bind="tooltipProps"
+                    :color="themeOption.color"
                     height="40"
                     width="40"
-                    @click="setTheme(theme.name)"
                     class="mx-auto theme-swatch"
-                    :class="{ 'theme-swatch-active': currentTheme === theme.name }"
+                    :class="{ 'theme-swatch-active': currentTheme === themeOption.name }"
                     elevation="2"
+                    @click="setTheme(themeOption.name)"
                   >
                     <v-icon
-                      v-if="currentTheme === theme.name"
+                      v-if="currentTheme === themeOption.name"
                       icon="mdi-check"
                       class="theme-swatch-icon"
                       color="white"
-                    ></v-icon>
+                    />
                   </v-card>
                 </template>
               </v-tooltip>
             </v-col>
           </v-row>
           
-          <div class="text-subtitle-2 mb-2 mt-4">Dark Themes</div>
+          <div class="text-subtitle-2 mb-2 mt-4">
+            Dark Themes
+          </div>
           <v-row dense>
-            <v-col cols="3" v-for="theme in darkThemes" :key="theme.name">
-              <v-tooltip :text="theme.label" location="bottom">
-                <template #activator="{ props }">
+            <v-col
+              v-for="themeOption in darkThemes"
+              :key="themeOption.name"
+              cols="3"
+            >
+              <v-tooltip
+                :text="themeOption.label"
+                location="bottom"
+              >
+                <template #activator="{ props: tooltipProps }">
                   <v-card
-                    v-bind="props"
-                    :color="theme.color"
+                    v-bind="tooltipProps"
+                    :color="themeOption.color"
                     height="40"
                     width="40"
-                    @click="setTheme(theme.name)"
                     class="mx-auto theme-swatch"
-                    :class="{ 'theme-swatch-active': currentTheme === theme.name }"
+                    :class="{ 'theme-swatch-active': currentTheme === themeOption.name }"
                     elevation="2"
+                    @click="setTheme(themeOption.name)"
                   >
                     <v-icon
-                      v-if="currentTheme === theme.name"
+                      v-if="currentTheme === themeOption.name"
                       icon="mdi-check"
                       class="theme-swatch-icon"
                       color="white"
-                    ></v-icon>
+                    />
                   </v-card>
                 </template>
               </v-tooltip>

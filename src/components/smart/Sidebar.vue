@@ -1,10 +1,17 @@
 <template>
-  <v-navigation-drawer class="sidebar" width="100%" elevation="30" color="tertiary">                                   
+  <v-navigation-drawer
+    class="sidebar"
+    width="100%"
+    elevation="30"
+    color="tertiary"
+  >                                   
     <v-container class="py-2">
       <!-- Header -->
       <v-row class="mb-4">
         <v-col cols="12">
-          <h2 class="text-h6 font-weight-bold">Property Cleaning</h2>
+          <h2 class="text-h6 font-weight-bold">
+            Property Cleaning
+          </h2>
           <div class="text-subtitle-2 text-medium-emphasis">
             {{ formattedDate }}
           </div>
@@ -41,9 +48,15 @@
       <!-- Property Filter -->
       <v-row class="mb-4">
         <v-col cols="12">
-          <v-card class="property-filter" variant="outlined">
+          <v-card
+            class="property-filter"
+            variant="outlined"
+          >
             <v-card-title class="d-flex align-center">
-              <v-icon icon="mdi-filter-variant" class="mr-2" />
+              <v-icon
+                icon="mdi-filter-variant"
+                class="mr-2"
+              />
               Filter by Property
             </v-card-title>
             <v-card-text>
@@ -54,7 +67,7 @@
                 clearable
                 @update:model-value="handlePropertyFilterChange"
               >
-                <template v-slot:prepend-item>
+                <template #prepend-item>
                   <v-list-item
                     title="All Properties"
                     value=""
@@ -71,9 +84,15 @@
       <!-- Quick Actions -->
       <v-row>
         <v-col cols="12">
-          <v-card class="quick-actions" variant="outlined">
+          <v-card
+            class="quick-actions"
+            variant="outlined"
+          >
             <v-card-title class="d-flex align-center">
-              <v-icon icon="mdi-lightning-bolt" class="mr-2" />
+              <v-icon
+                icon="mdi-lightning-bolt"
+                class="mr-2"
+              />
               Quick Actions
             </v-card-title>
             <v-card-text class="d-flex gap-2">
@@ -130,10 +149,10 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 
 // Define props with default values
 interface Props {
-  todayTurns: Map<string, Booking> | Booking[];
-  upcomingCleanings: Map<string, Booking> | Booking[];
-  properties: Map<string, Property> | Property[];
-  loading: boolean;
+  todayTurns?: Map<string, Booking> | Booking[];
+  upcomingCleanings?: Map<string, Booking> | Booking[];
+  properties?: Map<string, Property> | Property[];
+  loading?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

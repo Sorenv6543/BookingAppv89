@@ -243,7 +243,7 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
 };
 
 const handleEventResize = (resizeInfo: any): void => {
-  const booking = resizeInfo.event.extendedProps.booking as Booking;
+  const booking = (resizeInfo as { event: { extendedProps: { booking: Booking }; startStr: string; endStr: string } }).event.extendedProps.booking;
   
   // Log emitting event to Home
   eventLogger.logEvent(

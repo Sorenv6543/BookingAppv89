@@ -1,6 +1,8 @@
 <template>
   <div class="calendar-demo-page">
-    <h1 class="text-h4 mb-4">Calendar Demo</h1>
+    <h1 class="text-h4 mb-4">
+      Calendar Demo
+    </h1>
     <FullCalendarDemo />
   </div>
 </template>

@@ -4,29 +4,58 @@
     <form @submit.prevent="register">
       <div class="form-group">
         <label for="name">Full Name</label>
-        <input type="text" id="name" v-model="name" required />
+        <input
+          id="name"
+          v-model="name"
+          type="text"
+          required
+        >
       </div>
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" id="email" v-model="email" required />
+        <input
+          id="email"
+          v-model="email"
+          type="email"
+          required
+        >
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" id="password" v-model="password" required />
+        <input
+          id="password"
+          v-model="password"
+          type="password"
+          required
+        >
       </div>
       <div class="form-group">
         <label for="role">Role</label>
-        <select id="role" v-model="role" required>
-          <option value="owner">Property Owner</option>
-          <option value="admin">Administrator</option>
-          <option value="cleaner">Cleaner</option>
+        <select
+          id="role"
+          v-model="role"
+          required
+        >
+          <option value="owner">
+            Property Owner
+          </option>
+          <option value="admin">
+            Administrator
+          </option>
+          <option value="cleaner">
+            Cleaner
+          </option>
         </select>
       </div>
-      <button type="submit">Register</button>
+      <button type="submit">
+        Register
+      </button>
     </form>
     <p>
       Already have an account?
-      <router-link to="/auth/login">Login</router-link>
+      <router-link to="/auth/login">
+        Login
+      </router-link>
     </p>
   </div>
 </template>

@@ -5,7 +5,7 @@ import { useBookingStore } from '@/stores/booking';
 import { useProperties } from '@/composables/shared/useProperties';
 import { useBookings } from '@/composables/shared/useBookings';
 import FullCalendar from '@/components/smart/FullCalendar.vue';
-import type { Property, PropertyFormData, Booking, BookingFormData } from '@/types';
+import type { PropertyFormData, BookingFormData } from '@/types';
 
 // Stores and composables
 const propertyStore = usePropertyStore();
@@ -15,8 +15,7 @@ const {
   updateProperty, 
   deleteProperty,
   loading: propertyLoading,
-  error: propertyError,
-  success: propertySuccess
+  error: propertyError
 } = useProperties();
 
 const { 
@@ -25,7 +24,6 @@ const {
   deleteBooking,
   loading: bookingLoading,
   error: bookingError,
-  success: bookingSuccess,
   fetchAllBookings
 } = useBookings();
 
@@ -350,15 +348,7 @@ function testTurnHighlighting() {
   }
 }
 
-// Event handlers for calendar component
-function handleEventDrop(dropInfo: any) {
-  testResults.calendar.dragDrop.status = 'success';
-  testResults.calendar.dragDrop.message = 'Drag and drop successful!';
-}
 
-function handleDateSelect(selectInfo: any) {
-  // This would be used for calendar date selection testing
-}
 
 // Run all tests in order
 async function runAllPropertyTests() {
@@ -413,62 +403,77 @@ function getStatusColor(status: string) {
 
 <template>
   <v-container fluid>
-    <h1 class="text-h4 mb-5">CRUD Operations Testing</h1>
+    <h1 class="text-h4 mb-5">
+      CRUD Operations Testing
+    </h1>
     
     <v-tabs v-model="activeTab">
-      <v-tab value="property">Property CRUD</v-tab>
-      <v-tab value="booking">Booking CRUD</v-tab>
-      <v-tab value="calendar">Calendar Integration</v-tab>
+      <v-tab value="property">
+        Property CRUD
+      </v-tab>
+      <v-tab value="booking">
+        Booking CRUD
+      </v-tab>
+      <v-tab value="calendar">
+        Calendar Integration
+      </v-tab>
     </v-tabs>
     
-    <v-window v-model="activeTab" class="mt-5">
+    <v-window
+      v-model="activeTab"
+      class="mt-5"
+    >
       <!-- Property CRUD Testing -->
       <v-window-item value="property">
-        <h2 class="text-h5 mb-4">Property CRUD Testing</h2>
+        <h2 class="text-h5 mb-4">
+          Property CRUD Testing
+        </h2>
         
         <v-card class="mb-4">
           <v-card-title>Test Controls</v-card-title>
           <v-card-text>
-            <p v-if="testPropertyId">Current Test Property ID: {{ testPropertyId }}</p>
+            <p v-if="testPropertyId">
+              Current Test Property ID: {{ testPropertyId }}
+            </p>
             <v-btn 
               color="primary" 
               class="mr-2" 
-              @click="runAllPropertyTests"
               :loading="propertyLoading"
+              @click="runAllPropertyTests"
             >
               Run All Property Tests
             </v-btn>
             <v-btn 
               color="success" 
               class="mr-2" 
-              @click="runPropertyCreateTest"
               :loading="propertyLoading"
+              @click="runPropertyCreateTest"
             >
               Create
             </v-btn>
             <v-btn 
               color="info" 
               class="mr-2" 
-              @click="runPropertyReadTest"
               :disabled="!testPropertyId"
               :loading="propertyLoading"
+              @click="runPropertyReadTest"
             >
               Read
             </v-btn>
             <v-btn 
               color="warning" 
               class="mr-2" 
-              @click="runPropertyUpdateTest"
               :disabled="!testPropertyId"
               :loading="propertyLoading"
+              @click="runPropertyUpdateTest"
             >
               Update
             </v-btn>
             <v-btn 
               color="error" 
-              @click="runPropertyDeleteTest"
               :disabled="!testPropertyId"
               :loading="propertyLoading"
+              @click="runPropertyDeleteTest"
             >
               Delete
             </v-btn>
@@ -525,53 +530,59 @@ function getStatusColor(status: string) {
       
       <!-- Booking CRUD Testing -->
       <v-window-item value="booking">
-        <h2 class="text-h5 mb-4">Booking CRUD Testing</h2>
+        <h2 class="text-h5 mb-4">
+          Booking CRUD Testing
+        </h2>
         
         <v-card class="mb-4">
           <v-card-title>Test Controls</v-card-title>
           <v-card-text>
-            <p v-if="testPropertyId">Current Test Property ID: {{ testPropertyId }}</p>
-            <p v-if="testBookingId">Current Test Booking ID: {{ testBookingId }}</p>
+            <p v-if="testPropertyId">
+              Current Test Property ID: {{ testPropertyId }}
+            </p>
+            <p v-if="testBookingId">
+              Current Test Booking ID: {{ testBookingId }}
+            </p>
             <v-btn 
               color="primary" 
               class="mr-2" 
-              @click="runAllBookingTests"
               :loading="bookingLoading"
+              @click="runAllBookingTests"
             >
               Run All Booking Tests
             </v-btn>
             <v-btn 
               color="success" 
               class="mr-2" 
-              @click="runBookingCreateTest"
               :disabled="!testPropertyId"
               :loading="bookingLoading"
+              @click="runBookingCreateTest"
             >
               Create
             </v-btn>
             <v-btn 
               color="info" 
               class="mr-2" 
-              @click="runBookingReadTest"
               :disabled="!testBookingId"
               :loading="bookingLoading"
+              @click="runBookingReadTest"
             >
               Read
             </v-btn>
             <v-btn 
               color="warning" 
               class="mr-2" 
-              @click="runBookingUpdateTest"
               :disabled="!testBookingId"
               :loading="bookingLoading"
+              @click="runBookingUpdateTest"
             >
               Update
             </v-btn>
             <v-btn 
               color="error" 
-              @click="runBookingDeleteTest"
               :disabled="!testBookingId"
               :loading="bookingLoading"
+              @click="runBookingDeleteTest"
             >
               Delete
             </v-btn>
@@ -628,7 +639,9 @@ function getStatusColor(status: string) {
       
       <!-- Calendar Integration Testing -->
       <v-window-item value="calendar">
-        <h2 class="text-h5 mb-4">Calendar Integration Testing</h2>
+        <h2 class="text-h5 mb-4">
+          Calendar Integration Testing
+        </h2>
         
         <v-card class="mb-4">
           <v-card-title>Test Controls</v-card-title>
@@ -645,8 +658,8 @@ function getStatusColor(status: string) {
             <v-btn 
               color="success" 
               class="mr-2" 
-              @click="runAllBookingTests"
               :loading="bookingLoading"
+              @click="runAllBookingTests"
             >
               Create Test Bookings
             </v-btn>
@@ -697,8 +710,7 @@ function getStatusColor(status: string) {
             <FullCalendar
               :bookings="bookingStore.bookings" 
               :properties="propertyStore.properties"
-              @event-drop="handleEventDrop"
-              @date-select="handleDateSelect"
+              \
             />
           </v-card-text>
         </v-card>

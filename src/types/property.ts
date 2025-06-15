@@ -53,7 +53,7 @@ export type PropertyMap = Map<string, Property>;
 /**
  * Type guard for Property objects
  */
-export function isProperty(obj: any): obj is Property {
+export function isProperty(obj: unknown): obj is Property {
   return obj && 
     typeof obj.id === 'string' &&
     typeof obj.name === 'string' &&

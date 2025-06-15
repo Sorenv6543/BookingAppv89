@@ -17,9 +17,12 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => true);
   
   // Actions
-  function login(email: string, password: string) {
+  function login(email: string, _password: string) {
     loading.value = true;
     error.value = null;
+    
+    // Note: password parameter is intentionally unused in mock implementation
+    void _password;
     
     // Simulate login success for now
     setTimeout(() => {

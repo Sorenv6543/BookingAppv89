@@ -3,7 +3,7 @@
 // Declare Vue modules to fix TypeScript import errors
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
+  const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, unknown>
   export default component
 }
 

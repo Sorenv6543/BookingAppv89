@@ -6,7 +6,7 @@ export interface ComponentEvent {
   sourceComponent: string;
   targetComponent: string;
   eventName: string;
-  payload: any;
+  payload: unknown;
   direction: 'emit' | 'receive';
 }
 
@@ -57,7 +57,7 @@ export function useComponentEventLogger() {
     sourceComponent: string,
     targetComponent: string,
     eventName: string,
-    payload: any,
+    payload: unknown,
     direction: 'emit' | 'receive'
   ) => {
     if (!enabled.value) return;

@@ -1,9 +1,18 @@
 <template>
   <div class="property-card-demo">
-    <h2 class="text-h5 mb-4">Property Card Demo</h2>
+    <h2 class="text-h5 mb-4">
+      Property Card Demo
+    </h2>
     
     <v-row>
-      <v-col cols="12" sm="6" md="4" lg="3" v-for="property in demoProperties" :key="property.id">
+      <v-col
+        v-for="property in demoProperties"
+        :key="property.id"
+        cols="12"
+        sm="6"
+        md="4"
+        lg="3"
+      >
         <PropertyCard 
           :property="property" 
           @edit="handleEdit"
@@ -13,9 +22,12 @@
       </v-col>
     </v-row>
 
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color">
+    <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+    >
       {{ snackbar.text }}
-      <template v-slot:actions>
+      <template #actions>
         <v-btn
           variant="text"
           @click="snackbar.show = false"

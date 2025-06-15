@@ -1,77 +1,79 @@
 <!-- layouts/auth.vue -->
 <template>
-    <v-app>
-      <!-- Simple app bar for auth pages -->
-      <v-app-bar
-        app
-        color="primary"
-        dark
-        elevation="1"
-        height="64"
+  <v-app>
+    <!-- Simple app bar for auth pages -->
+    <v-app-bar
+      app
+      color="primary"
+      dark
+      elevation="1"
+      height="64"
+    >
+      <v-toolbar-title>
+        Property Cleaning Scheduler
+      </v-toolbar-title>
+        
+      <v-spacer />
+        
+      <!-- Optional help or contact link -->
+      <v-btn
+        variant="text"
+        color="white"
+        href="mailto:support@example.com"
       >
-        <v-toolbar-title>
-          Property Cleaning Scheduler
-        </v-toolbar-title>
-        
-        <v-spacer />
-        
-        <!-- Optional help or contact link -->
-        <v-btn
-          variant="text"
-          color="white"
-          href="mailto:support@example.com"
-        >
-          <v-icon start>mdi-help-circle</v-icon>
-          Help
-        </v-btn>
-      </v-app-bar>
+        <v-icon start>
+          mdi-help-circle
+        </v-icon>
+        Help
+      </v-btn>
+    </v-app-bar>
   
-      <!-- Main content area for auth forms -->
-      <v-main class="auth-main">
-        <v-container 
-          fluid 
-          fill-height
-          class="pa-0"
+    <!-- Main content area for auth forms -->
+    <v-main class="auth-main">
+      <v-container 
+        fluid 
+        fill-height
+        class="pa-0"
+      >
+        <v-row 
+          align="center" 
+          justify="center"
+          no-gutters
+          class="fill-height"
         >
-          <v-row 
-            align="center" 
-            justify="center"
-            no-gutters
-            class="fill-height"
+          <v-col 
+            cols="12" 
+            sm="8" 
+            md="6" 
+            lg="4" 
+            xl="3"
+            class="pa-4"
           >
-            <v-col 
-              cols="12" 
-              sm="8" 
-              md="6" 
-              lg="4" 
-              xl="3"
-              class="pa-4"
-            >
-              <!-- Auth forms will be rendered here -->
-              <router-view />
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-main>
+            <!-- Auth forms will be rendered here -->
+            <router-view />
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
   
-      <!-- Footer with basic info -->
-      <v-footer
-        app
-        color="transparent"
-        class="justify-center"
-        height="auto"
-      >
-        <div class="text-center">
-          <div class="text-caption text-medium-emphasis">
-            © {{ currentYear }} Property Cleaning Scheduler
-          </div>
-          <div class="text-caption text-medium-emphasis mt-1">
-            Streamline your cleaning operations
-          </div>
+    <!-- Footer with basic info -->
+    <v-footer
+      app
+      color="transparent"
+      class="justify-center"
+      height="auto"
+    >
+      <div class="text-center">
+        <div class="text-caption text-medium-emphasis">
+          © {{ currentYear }} Property Cleaning Scheduler
         </div>
-      </v-footer>
-    </v-app>
-  </template>
+        <div class="text-caption text-medium-emphasis mt-1">
+          Streamline your cleaning operations
+        </div>
+      </div>
+    </v-footer>
+  </v-app>
+</template>
   
   <script setup lang="ts">
   import { computed } from 'vue';

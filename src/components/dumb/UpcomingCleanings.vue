@@ -1,26 +1,37 @@
 <template>
-  <v-card class="upcoming-cleanings glass-card fade-in" :elevation="3" :class="{ 'has-urgent': hasUrgentCleanings }">
+  <v-card
+    class="upcoming-cleanings glass-card fade-in"
+    :elevation="3"
+    :class="{ 'has-urgent': hasUrgentCleanings }"
+  >
     <v-card-title class="d-flex align-center">
-      <v-icon icon="mdi-broom" class="mr-2" color="primary"></v-icon>
+      <v-icon
+        icon="mdi-broom"
+        class="mr-2"
+        color="primary"
+      />
       Upcoming Cleanings
       <v-badge 
         :content="bookings.length.toString()" 
         color="primary"
         class="ml-2"
-      ></v-badge>
-      <v-spacer></v-spacer>
+      />
+      <v-spacer />
       <v-btn 
         variant="text" 
         :icon="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
         @click="toggleExpanded"
-      ></v-btn>
+      />
     </v-card-title>
     
     <v-expand-transition>
       <div v-if="expanded">
         <v-card-text class="pt-0">
           <!-- Time period expansion panels -->
-          <v-expansion-panels v-model="openPanels" multiple>
+          <v-expansion-panels
+            v-model="openPanels"
+            multiple
+          >
             <!-- Today's cleanings -->
             <v-expansion-panel v-if="todayCleanings.length > 0">
               <v-expansion-panel-title>
@@ -37,33 +48,58 @@
                     class="mb-2 rounded cleaning-list-item"
                     :class="booking.booking_type === 'turn' ? 'turn-booking' : 'standard-booking'"
                   >
-                    <template v-slot:prepend>
+                    <template #prepend>
                       <v-icon 
                         :icon="booking.booking_type === 'turn' ? 'mdi-swap-horizontal' : 'mdi-broom'" 
                         :color="getPriorityColor(booking.priority)"
-                      ></v-icon>
+                      />
                     </template>
                     
-                    <v-list-item-title class="font-weight-bold">{{ getPropertyName(booking) }}</v-list-item-title>
+                    <v-list-item-title class="font-weight-bold">
+                      {{ getPropertyName(booking) }}
+                    </v-list-item-title>
                     <v-list-item-subtitle>
                       <div class="d-flex flex-column">
                         <span>Checkout: {{ formatTime(booking.checkout_date) }}</span>
                         <span>Checkin: {{ formatTime(booking.checkin_date) }}</span>
-                        <span v-if="booking.cleaning_window" class="text-caption">
-                          <v-icon icon="mdi-timer-outline" size="small"></v-icon>
+                        <span
+                          v-if="booking.cleaning_window"
+                          class="text-caption"
+                        >
+                          <v-icon
+                            icon="mdi-timer-outline"
+                            size="small"
+                          />
                           Window: {{ getCleaningWindowText(booking) }}
                         </span>
                       </div>
                     </v-list-item-subtitle>
                     
-                    <template v-slot:append>
+                    <template #append>
                       <div class="d-flex flex-column">
-                        <v-btn size="small" color="primary" class="mb-1" @click.stop="emit('view', booking.id)">
-                          <v-icon icon="mdi-eye" size="small" class="mr-1"></v-icon>
+                        <v-btn
+                          size="small"
+                          color="primary"
+                          class="mb-1"
+                          @click.stop="emit('view', booking.id)"
+                        >
+                          <v-icon
+                            icon="mdi-eye"
+                            size="small"
+                            class="mr-1"
+                          />
                           View
                         </v-btn>
-                        <v-btn size="small" color="success" @click.stop="emit('assign', booking.id)">
-                          <v-icon icon="mdi-account-check" size="small" class="mr-1"></v-icon>
+                        <v-btn
+                          size="small"
+                          color="success"
+                          @click.stop="emit('assign', booking.id)"
+                        >
+                          <v-icon
+                            icon="mdi-account-check"
+                            size="small"
+                            class="mr-1"
+                          />
                           Assign
                         </v-btn>
                       </div>
@@ -71,8 +107,16 @@
                   </v-list-item>
                 </v-list>
                 
-                <div v-if="todayCleanings.length > limit" class="text-center mt-2">
-                  <v-btn variant="text" color="primary" size="small" @click="emit('view-all', 'today')">
+                <div
+                  v-if="todayCleanings.length > limit"
+                  class="text-center mt-2"
+                >
+                  <v-btn
+                    variant="text"
+                    color="primary"
+                    size="small"
+                    @click="emit('view-all', 'today')"
+                  >
                     View all {{ todayCleanings.length }} cleanings
                   </v-btn>
                 </div>
@@ -95,33 +139,58 @@
                     class="mb-2 rounded cleaning-list-item"
                     :class="booking.booking_type === 'turn' ? 'turn-booking' : 'standard-booking'"
                   >
-                    <template v-slot:prepend>
+                    <template #prepend>
                       <v-icon 
                         :icon="booking.booking_type === 'turn' ? 'mdi-swap-horizontal' : 'mdi-broom'" 
                         :color="getPriorityColor(booking.priority)"
-                      ></v-icon>
+                      />
                     </template>
                     
-                    <v-list-item-title class="font-weight-bold">{{ getPropertyName(booking) }}</v-list-item-title>
+                    <v-list-item-title class="font-weight-bold">
+                      {{ getPropertyName(booking) }}
+                    </v-list-item-title>
                     <v-list-item-subtitle>
                       <div class="d-flex flex-column">
                         <span>Checkout: {{ formatTime(booking.checkout_date) }}</span>
                         <span>Checkin: {{ formatTime(booking.checkin_date) }}</span>
-                        <span v-if="booking.cleaning_window" class="text-caption">
-                          <v-icon icon="mdi-timer-outline" size="small"></v-icon>
+                        <span
+                          v-if="booking.cleaning_window"
+                          class="text-caption"
+                        >
+                          <v-icon
+                            icon="mdi-timer-outline"
+                            size="small"
+                          />
                           Window: {{ getCleaningWindowText(booking) }}
                         </span>
                       </div>
                     </v-list-item-subtitle>
                     
-                    <template v-slot:append>
+                    <template #append>
                       <div class="d-flex flex-column">
-                        <v-btn size="small" color="primary" class="mb-1" @click.stop="emit('view', booking.id)">
-                          <v-icon icon="mdi-eye" size="small" class="mr-1"></v-icon>
+                        <v-btn
+                          size="small"
+                          color="primary"
+                          class="mb-1"
+                          @click.stop="emit('view', booking.id)"
+                        >
+                          <v-icon
+                            icon="mdi-eye"
+                            size="small"
+                            class="mr-1"
+                          />
                           View
                         </v-btn>
-                        <v-btn size="small" color="success" @click.stop="emit('assign', booking.id)">
-                          <v-icon icon="mdi-account-check" size="small" class="mr-1"></v-icon>
+                        <v-btn
+                          size="small"
+                          color="success"
+                          @click.stop="emit('assign', booking.id)"
+                        >
+                          <v-icon
+                            icon="mdi-account-check"
+                            size="small"
+                            class="mr-1"
+                          />
                           Assign
                         </v-btn>
                       </div>
@@ -129,8 +198,16 @@
                   </v-list-item>
                 </v-list>
                 
-                <div v-if="tomorrowCleanings.length > limit" class="text-center mt-2">
-                  <v-btn variant="text" color="primary" size="small" @click="emit('view-all', 'tomorrow')">
+                <div
+                  v-if="tomorrowCleanings.length > limit"
+                  class="text-center mt-2"
+                >
+                  <v-btn
+                    variant="text"
+                    color="primary"
+                    size="small"
+                    @click="emit('view-all', 'tomorrow')"
+                  >
                     View all {{ tomorrowCleanings.length }} cleanings
                   </v-btn>
                 </div>
@@ -144,8 +221,13 @@
               </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <!-- List of upcoming cleanings grouped by date -->
-                <template v-for="(group, date) in groupedUpcomingCleanings" :key="date">
-                  <div class="date-heading mb-2">{{ formatDate(date) }}</div>
+                <template
+                  v-for="(group, date) in groupedUpcomingCleanings"
+                  :key="date"
+                >
+                  <div class="date-heading mb-2">
+                    {{ formatDate(date) }}
+                  </div>
                   <v-list class="cleaning-list">
                     <v-list-item 
                       v-for="booking in group.slice(0, limit)" 
@@ -155,33 +237,58 @@
                       class="mb-2 rounded cleaning-list-item"
                       :class="booking.booking_type === 'turn' ? 'turn-booking' : 'standard-booking'"
                     >
-                      <template v-slot:prepend>
+                      <template #prepend>
                         <v-icon 
                           :icon="booking.booking_type === 'turn' ? 'mdi-swap-horizontal' : 'mdi-broom'" 
                           :color="getPriorityColor(booking.priority)"
-                        ></v-icon>
+                        />
                       </template>
                       
-                      <v-list-item-title class="font-weight-bold">{{ getPropertyName(booking) }}</v-list-item-title>
+                      <v-list-item-title class="font-weight-bold">
+                        {{ getPropertyName(booking) }}
+                      </v-list-item-title>
                       <v-list-item-subtitle>
                         <div class="d-flex flex-column">
                           <span>Checkout: {{ formatTime(booking.checkout_date) }}</span>
                           <span>Checkin: {{ formatTime(booking.checkin_date) }}</span>
-                          <span v-if="booking.cleaning_window" class="text-caption">
-                            <v-icon icon="mdi-timer-outline" size="small"></v-icon>
+                          <span
+                            v-if="booking.cleaning_window"
+                            class="text-caption"
+                          >
+                            <v-icon
+                              icon="mdi-timer-outline"
+                              size="small"
+                            />
                             Window: {{ getCleaningWindowText(booking) }}
                           </span>
                         </div>
                       </v-list-item-subtitle>
                       
-                      <template v-slot:append>
+                      <template #append>
                         <div class="d-flex flex-column">
-                          <v-btn size="small" color="primary" class="mb-1" @click.stop="emit('view', booking.id)">
-                            <v-icon icon="mdi-eye" size="small" class="mr-1"></v-icon>
+                          <v-btn
+                            size="small"
+                            color="primary"
+                            class="mb-1"
+                            @click.stop="emit('view', booking.id)"
+                          >
+                            <v-icon
+                              icon="mdi-eye"
+                              size="small"
+                              class="mr-1"
+                            />
                             View
                           </v-btn>
-                          <v-btn size="small" color="success" @click.stop="emit('assign', booking.id)">
-                            <v-icon icon="mdi-account-check" size="small" class="mr-1"></v-icon>
+                          <v-btn
+                            size="small"
+                            color="success"
+                            @click.stop="emit('assign', booking.id)"
+                          >
+                            <v-icon
+                              icon="mdi-account-check"
+                              size="small"
+                              class="mr-1"
+                            />
                             Assign
                           </v-btn>
                         </div>
@@ -189,8 +296,16 @@
                     </v-list-item>
                   </v-list>
                   
-                  <div v-if="group.length > limit" class="text-center mt-2 mb-4">
-                    <v-btn variant="text" color="primary" size="small" @click="emit('view-all', date)">
+                  <div
+                    v-if="group.length > limit"
+                    class="text-center mt-2 mb-4"
+                  >
+                    <v-btn
+                      variant="text"
+                      color="primary"
+                      size="small"
+                      @click="emit('view-all', date)"
+                    >
                       View all {{ group.length }} cleanings for {{ formatDate(date) }}
                     </v-btn>
                   </div>
@@ -199,7 +314,10 @@
             </v-expansion-panel>
           </v-expansion-panels>
           
-          <div v-if="bookings.length === 0" class="text-center py-2">
+          <div
+            v-if="bookings.length === 0"
+            class="text-center py-2"
+          >
             No upcoming cleanings scheduled.
           </div>
         </v-card-text>
