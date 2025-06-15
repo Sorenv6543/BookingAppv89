@@ -290,7 +290,10 @@
               </v-chip>
             </v-card-title>
             <v-card-text>
-              <div v-if="cleanerStatusList.length === 0" class="text-center text-medium-emphasis">
+              <div
+                v-if="cleanerStatusList.length === 0"
+                class="text-center text-medium-emphasis"
+              >
                 No cleaner data available
               </div>
               <div v-else>

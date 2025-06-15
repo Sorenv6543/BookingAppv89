@@ -1,11 +1,21 @@
 <template>
   <div class="admin-calendar-container">
     <!-- Advanced Admin Calendar Toolbar -->
-    <v-card class="admin-calendar-toolbar mb-4" elevation="2">
+    <v-card
+      class="admin-calendar-toolbar mb-4"
+      elevation="2"
+    >
       <v-card-text class="pb-2">
-        <v-row align="center" no-gutters>
+        <v-row
+          align="center"
+          no-gutters
+        >
           <!-- View Controls -->
-          <v-col cols="12" md="3" class="mb-2 mb-md-0">
+          <v-col
+            cols="12"
+            md="3"
+            class="mb-2 mb-md-0"
+          >
             <v-btn-toggle
               v-model="currentView"
               mandatory
@@ -13,15 +23,39 @@
               density="compact"
               class="admin-view-toggle"
             >
-              <v-btn value="dayGridMonth" size="small">Month</v-btn>
-              <v-btn value="timeGridWeek" size="small">Week</v-btn>
-              <v-btn value="timeGridDay" size="small">Day</v-btn>
-              <v-btn value="listWeek" size="small">List</v-btn>
+              <v-btn
+                value="dayGridMonth"
+                size="small"
+              >
+                Month
+              </v-btn>
+              <v-btn
+                value="timeGridWeek"
+                size="small"
+              >
+                Week
+              </v-btn>
+              <v-btn
+                value="timeGridDay"
+                size="small"
+              >
+                Day
+              </v-btn>
+              <v-btn
+                value="listWeek"
+                size="small"
+              >
+                List
+              </v-btn>
             </v-btn-toggle>
           </v-col>
 
           <!-- Date Navigation -->
-          <v-col cols="12" md="4" class="mb-2 mb-md-0">
+          <v-col
+            cols="12"
+            md="4"
+            class="mb-2 mb-md-0"
+          >
             <div class="d-flex align-center justify-center">
               <v-btn
                 icon="mdi-chevron-left"
@@ -46,7 +80,10 @@
           </v-col>
 
           <!-- Admin Filters -->
-          <v-col cols="12" md="5">
+          <v-col
+            cols="12"
+            md="5"
+          >
             <div class="d-flex align-center justify-end flex-wrap ga-2">
               <!-- Cleaner Filter -->
               <v-select
@@ -109,7 +146,10 @@
     </v-card>
 
     <!-- FullCalendar Component -->
-    <v-card elevation="2" class="admin-calendar-card">
+    <v-card
+      elevation="2"
+      class="admin-calendar-card"
+    >
       <FullCalendar
         ref="calendarRef"
         :options="adminCalendarOptions"
@@ -137,7 +177,10 @@
     </v-menu>
 
     <!-- Cleaner Assignment Modal -->
-    <v-dialog v-model="cleanerAssignmentModal.show" max-width="500">
+    <v-dialog
+      v-model="cleanerAssignmentModal.show"
+      max-width="500"
+    >
       <v-card>
         <v-card-title>
           <span class="text-h6">Assign Cleaner</span>

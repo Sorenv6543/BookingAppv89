@@ -4,13 +4,26 @@
       <!-- Demo Header -->
       <v-row class="mb-4">
         <v-col>
-          <v-card class="demo-header" elevation="2">
+          <v-card
+            class="demo-header"
+            elevation="2"
+          >
             <v-card-title class="d-flex align-center">
-              <v-icon class="mr-3" color="primary">mdi-calendar-multiple</v-icon>
+              <v-icon
+                class="mr-3"
+                color="primary"
+              >
+                mdi-calendar-multiple
+              </v-icon>
               <span>AdminCalendar Component Demo</span>
               <v-spacer />
-              <v-chip color="success" variant="elevated">
-                <v-icon start>mdi-check-circle</v-icon>
+              <v-chip
+                color="success"
+                variant="elevated"
+              >
+                <v-icon start>
+                  mdi-check-circle
+                </v-icon>
                 TASK-039H Complete
               </v-chip>
             </v-card-title>
@@ -19,16 +32,43 @@
                 <strong>Role-Based Multi-Tenant Calendar:</strong> Admin interface showing ALL bookings across ALL property owners with advanced management features.
               </p>
               <v-row>
-                <v-col cols="12" md="4">
-                  <v-chip size="small" color="error" class="mr-2">🔥 Turn Bookings</v-chip>
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <v-chip
+                    size="small"
+                    color="error"
+                    class="mr-2"
+                  >
+                    🔥 Turn Bookings
+                  </v-chip>
                   <span class="text-caption">Urgent same-day turnovers</span>
                 </v-col>
-                <v-col cols="12" md="4">
-                  <v-chip size="small" color="warning" class="mr-2">⚠️ Unassigned</v-chip>
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <v-chip
+                    size="small"
+                    color="warning"
+                    class="mr-2"
+                  >
+                    ⚠️ Unassigned
+                  </v-chip>
                   <span class="text-caption">Need cleaner assignment</span>
                 </v-col>
-                <v-col cols="12" md="4">
-                  <v-chip size="small" color="success" class="mr-2">👤 Assigned</v-chip>
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <v-chip
+                    size="small"
+                    color="success"
+                    class="mr-2"
+                  >
+                    👤 Assigned
+                  </v-chip>
                   <span class="text-caption">Cleaner assigned</span>
                 </v-col>
               </v-row>
@@ -39,35 +79,75 @@
 
       <!-- Demo Stats -->
       <v-row class="mb-4">
-        <v-col cols="6" md="3">
-          <v-card class="text-center" elevation="1">
+        <v-col
+          cols="6"
+          md="3"
+        >
+          <v-card
+            class="text-center"
+            elevation="1"
+          >
             <v-card-text>
-              <div class="text-h4 text-primary">{{ demoStats.totalBookings }}</div>
-              <div class="text-caption">Total Bookings</div>
+              <div class="text-h4 text-primary">
+                {{ demoStats.totalBookings }}
+              </div>
+              <div class="text-caption">
+                Total Bookings
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="6" md="3">
-          <v-card class="text-center" elevation="1">
+        <v-col
+          cols="6"
+          md="3"
+        >
+          <v-card
+            class="text-center"
+            elevation="1"
+          >
             <v-card-text>
-              <div class="text-h4 text-error">{{ demoStats.urgentTurns }}</div>
-              <div class="text-caption">Urgent Turns</div>
+              <div class="text-h4 text-error">
+                {{ demoStats.urgentTurns }}
+              </div>
+              <div class="text-caption">
+                Urgent Turns
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="6" md="3">
-          <v-card class="text-center" elevation="1">
+        <v-col
+          cols="6"
+          md="3"
+        >
+          <v-card
+            class="text-center"
+            elevation="1"
+          >
             <v-card-text>
-              <div class="text-h4 text-warning">{{ demoStats.unassigned }}</div>
-              <div class="text-caption">Unassigned</div>
+              <div class="text-h4 text-warning">
+                {{ demoStats.unassigned }}
+              </div>
+              <div class="text-caption">
+                Unassigned
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="6" md="3">
-          <v-card class="text-center" elevation="1">
+        <v-col
+          cols="6"
+          md="3"
+        >
+          <v-card
+            class="text-center"
+            elevation="1"
+          >
             <v-card-text>
-              <div class="text-h4 text-success">{{ demoStats.assigned }}</div>
-              <div class="text-caption">Assigned</div>
+              <div class="text-h4 text-success">
+                {{ demoStats.assigned }}
+              </div>
+              <div class="text-caption">
+                Assigned
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -97,29 +177,42 @@
       <!-- Demo Actions -->
       <v-row class="mt-4">
         <v-col>
-          <v-card class="demo-actions" elevation="1">
+          <v-card
+            class="demo-actions"
+            elevation="1"
+          >
             <v-card-title>Demo Actions</v-card-title>
             <v-card-text>
               <v-row>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <v-btn
                     color="primary"
                     variant="outlined"
                     block
                     @click="addRandomBooking"
                   >
-                    <v-icon start>mdi-plus</v-icon>
+                    <v-icon start>
+                      mdi-plus
+                    </v-icon>
                     Add Random Booking
                   </v-btn>
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <v-btn
                     color="error"
                     variant="outlined"
                     block
                     @click="addUrgentTurn"
                   >
-                    <v-icon start>mdi-fire</v-icon>
+                    <v-icon start>
+                      mdi-fire
+                    </v-icon>
                     Add Urgent Turn
                   </v-btn>
                 </v-col>
@@ -132,7 +225,10 @@
       <!-- Event Log -->
       <v-row class="mt-4">
         <v-col>
-          <v-card class="demo-log" elevation="1">
+          <v-card
+            class="demo-log"
+            elevation="1"
+          >
             <v-card-title>
               Event Log
               <v-spacer />
@@ -159,9 +255,14 @@
                     {{ event.type }}
                   </v-chip>
                   <span class="text-caption">{{ event.timestamp }}</span>
-                  <div class="mt-1">{{ event.message }}</div>
+                  <div class="mt-1">
+                    {{ event.message }}
+                  </div>
                 </div>
-                <div v-if="eventLog.length === 0" class="text-center text-disabled">
+                <div
+                  v-if="eventLog.length === 0"
+                  class="text-center text-disabled"
+                >
                   No events logged yet. Interact with the calendar to see events.
                 </div>
               </div>

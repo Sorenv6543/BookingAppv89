@@ -96,6 +96,14 @@ const router = createRouter({
         layout: 'default'
       }
     },
+    {
+      path: '/demos/use-owner-properties',
+      name: 'use-owner-properties-demo',
+      component: () => import('@/components/demos/UseOwnerPropertiesDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
 
 
     {

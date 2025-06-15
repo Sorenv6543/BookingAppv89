@@ -3,7 +3,11 @@
     <v-container fluid>
       <v-row>
         <!-- Demo AdminSidebar -->
-        <v-col cols="12" md="4" lg="3">
+        <v-col
+          cols="12"
+          md="4"
+          lg="3"
+        >
           <AdminSidebar
             :today-turns="demoTodayTurns"
             :upcoming-cleanings="demoUpcomingCleanings"
@@ -27,10 +31,17 @@
         </v-col>
 
         <!-- Demo Information Panel -->
-        <v-col cols="12" md="8" lg="9">
+        <v-col
+          cols="12"
+          md="8"
+          lg="9"
+        >
           <v-card>
             <v-card-title class="d-flex align-center">
-              <v-icon icon="mdi-information" class="mr-2" />
+              <v-icon
+                icon="mdi-information"
+                class="mr-2"
+              />
               AdminSidebar Demo - System-wide Data Access
             </v-card-title>
             <v-card-text>
@@ -45,8 +56,13 @@
 
               <!-- Demo Data Summary -->
               <v-row>
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">System-wide Data Summary</h3>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <h3 class="text-h6 mb-3">
+                    System-wide Data Summary
+                  </h3>
                   <v-list density="compact">
                     <v-list-item>
                       <v-list-item-title>Total Properties</v-list-item-title>
@@ -67,8 +83,13 @@
                   </v-list>
                 </v-col>
 
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Admin Features Demonstrated</h3>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <h3 class="text-h6 mb-3">
+                    Admin Features Demonstrated
+                  </h3>
                   <v-list density="compact">
                     <v-list-item>
                       <v-list-item-title>System-wide Turn Alerts</v-list-item-title>
@@ -96,20 +117,36 @@
 
               <!-- Event Log -->
               <v-divider class="my-4" />
-              <h3 class="text-h6 mb-3">Event Log</h3>
-              <v-card variant="outlined" max-height="300" class="overflow-y-auto">
+              <h3 class="text-h6 mb-3">
+                Event Log
+              </h3>
+              <v-card
+                variant="outlined"
+                max-height="300"
+                class="overflow-y-auto"
+              >
                 <v-card-text>
-                  <div v-if="eventLog.length === 0" class="text-center text-medium-emphasis">
+                  <div
+                    v-if="eventLog.length === 0"
+                    class="text-center text-medium-emphasis"
+                  >
                     No events logged yet. Interact with the AdminSidebar to see events.
                   </div>
-                  <v-list v-else density="compact">
+                  <v-list
+                    v-else
+                    density="compact"
+                  >
                     <v-list-item
                       v-for="(event, index) in eventLog.slice().reverse()"
                       :key="index"
                       class="mb-1"
                     >
                       <v-list-item-title class="text-caption">
-                        <v-chip size="x-small" color="primary" class="mr-2">
+                        <v-chip
+                          size="x-small"
+                          color="primary"
+                          class="mr-2"
+                        >
                           {{ event.timestamp }}
                         </v-chip>
                         <strong>{{ event.action }}</strong>

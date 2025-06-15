@@ -4,30 +4,59 @@
       <v-col cols="12">
         <v-card>
           <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2">mdi-account-check</v-icon>
+            <v-icon class="mr-2">
+              mdi-account-check
+            </v-icon>
             useOwnerBookings Demo
             <v-spacer />
-            <v-chip :color="currentUserId ? 'success' : 'error'" variant="outlined">
+            <v-chip
+              :color="currentUserId ? 'success' : 'error'"
+              variant="outlined"
+            >
               {{ currentUserId ? `Owner: ${authStore.user?.name}` : 'Not Logged In' }}
             </v-chip>
           </v-card-title>
           
           <v-card-text>
-            <v-alert v-if="!currentUserId" type="warning" class="mb-4">
+            <v-alert
+              v-if="!currentUserId"
+              type="warning"
+              class="mb-4"
+            >
               Please log in to test owner-specific functionality
             </v-alert>
             
             <!-- Loading/Error/Success States -->
-            <v-alert v-if="loading" type="info" class="mb-4">
-              <v-progress-circular indeterminate size="20" class="mr-2" />
+            <v-alert
+              v-if="loading"
+              type="info"
+              class="mb-4"
+            >
+              <v-progress-circular
+                indeterminate
+                size="20"
+                class="mr-2"
+              />
               Loading...
             </v-alert>
             
-            <v-alert v-if="error" type="error" class="mb-4" closable @click:close="error = null">
+            <v-alert
+              v-if="error"
+              type="error"
+              class="mb-4"
+              closable
+              @click:close="error = null"
+            >
               {{ error }}
             </v-alert>
             
-            <v-alert v-if="success" type="success" class="mb-4" closable @click:close="success = null">
+            <v-alert
+              v-if="success"
+              type="success"
+              class="mb-4"
+              closable
+              @click:close="success = null"
+            >
               {{ success }}
             </v-alert>
           </v-card-text>
@@ -37,18 +66,35 @@
     
     <!-- Owner Statistics -->
     <v-row>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2">mdi-chart-box</v-icon>
+            <v-icon class="mr-2">
+              mdi-chart-box
+            </v-icon>
             My Booking Statistics
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="6" sm="4" v-for="(value, key) in myBookingStats" :key="key">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h6">{{ value }}</div>
-                  <div class="text-caption text-uppercase">{{ formatStatKey(key) }}</div>
+              <v-col
+                v-for="(value, key) in myBookingStats"
+                :key="key"
+                cols="6"
+                sm="4"
+              >
+                <v-card
+                  variant="outlined"
+                  class="text-center pa-2"
+                >
+                  <div class="text-h6">
+                    {{ value }}
+                  </div>
+                  <div class="text-caption text-uppercase">
+                    {{ formatStatKey(key) }}
+                  </div>
                 </v-card>
               </v-col>
             </v-row>
@@ -56,14 +102,22 @@
         </v-card>
       </v-col>
       
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2">mdi-alert-circle</v-icon>
+            <v-icon class="mr-2">
+              mdi-alert-circle
+            </v-icon>
             My Turn Alerts
           </v-card-title>
           <v-card-text>
-            <div v-if="myTodayTurns.length === 0" class="text-center text-medium-emphasis">
+            <div
+              v-if="myTodayTurns.length === 0"
+              class="text-center text-medium-emphasis"
+            >
               No urgent turns today
             </div>
             <v-list v-else>
@@ -74,12 +128,18 @@
                 :subtitle="`Checkout: ${formatDateTime(turn.checkout_date)} | Checkin: ${formatDateTime(turn.checkin_date)}`"
               >
                 <template #prepend>
-                  <v-avatar color="error" size="small">
+                  <v-avatar
+                    color="error"
+                    size="small"
+                  >
                     <v-icon>mdi-clock-alert</v-icon>
                   </v-avatar>
                 </template>
                 <template #append>
-                  <v-chip :color="getStatusColor(turn.status)" size="small">
+                  <v-chip
+                    :color="getStatusColor(turn.status)"
+                    size="small"
+                  >
                     {{ turn.status }}
                   </v-chip>
                 </template>
@@ -95,20 +155,40 @@
       <v-col cols="12">
         <v-card>
           <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2">mdi-calendar-check</v-icon>
+            <v-icon class="mr-2">
+              mdi-calendar-check
+            </v-icon>
             My Bookings ({{ myBookings.length }})
             <v-spacer />
-            <v-btn color="primary" @click="fetchMyBookings" :loading="loading">
-              <v-icon class="mr-2">mdi-refresh</v-icon>
+            <v-btn
+              color="primary"
+              :loading="loading"
+              @click="fetchMyBookings"
+            >
+              <v-icon class="mr-2">
+                mdi-refresh
+              </v-icon>
               Refresh
             </v-btn>
           </v-card-title>
           
           <v-card-text>
-            <div v-if="myBookings.length === 0" class="text-center text-medium-emphasis py-8">
-              <v-icon size="64" class="mb-4">mdi-calendar-blank</v-icon>
-              <div class="text-h6">No bookings found</div>
-              <div class="text-body-2">Create your first booking to get started</div>
+            <div
+              v-if="myBookings.length === 0"
+              class="text-center text-medium-emphasis py-8"
+            >
+              <v-icon
+                size="64"
+                class="mb-4"
+              >
+                mdi-calendar-blank
+              </v-icon>
+              <div class="text-h6">
+                No bookings found
+              </div>
+              <div class="text-body-2">
+                Create your first booking to get started
+              </div>
             </div>
             
             <v-data-table
@@ -133,7 +213,10 @@
               </template>
               
               <template #item.status="{ item }">
-                <v-chip :color="getStatusColor(item.status)" size="small">
+                <v-chip
+                  :color="getStatusColor(item.status)"
+                  size="small"
+                >
                   {{ item.status }}
                 </v-chip>
               </template>
@@ -182,14 +265,23 @@
       <v-col cols="12">
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2">mdi-calendar-clock</v-icon>
+            <v-icon class="mr-2">
+              mdi-calendar-clock
+            </v-icon>
             My Upcoming Cleanings (Next 7 Days)
           </v-card-title>
           <v-card-text>
-            <div v-if="myUpcomingCleanings.length === 0" class="text-center text-medium-emphasis">
+            <div
+              v-if="myUpcomingCleanings.length === 0"
+              class="text-center text-medium-emphasis"
+            >
               No upcoming cleanings in the next 7 days
             </div>
-            <v-timeline v-else side="end" density="compact">
+            <v-timeline
+              v-else
+              side="end"
+              density="compact"
+            >
               <v-timeline-item
                 v-for="cleaning in myUpcomingCleanings"
                 :key="cleaning.id"
@@ -197,11 +289,18 @@
                 size="small"
               >
                 <template #opposite>
-                  <div class="text-caption">{{ formatDate(cleaning.checkout_date) }}</div>
+                  <div class="text-caption">
+                    {{ formatDate(cleaning.checkout_date) }}
+                  </div>
                 </template>
-                <v-card variant="outlined" class="mb-2">
+                <v-card
+                  variant="outlined"
+                  class="mb-2"
+                >
                   <v-card-text class="py-2">
-                    <div class="font-weight-medium">{{ getPropertyName(cleaning.property_id) }}</div>
+                    <div class="font-weight-medium">
+                      {{ getPropertyName(cleaning.property_id) }}
+                    </div>
                     <div class="text-caption">
                       {{ formatDateTime(cleaning.checkout_date) }} → {{ formatDateTime(cleaning.checkin_date) }}
                     </div>
@@ -213,7 +312,10 @@
                       >
                         {{ cleaning.booking_type }}
                       </v-chip>
-                      <v-chip :color="getStatusColor(cleaning.status)" size="x-small">
+                      <v-chip
+                        :color="getStatusColor(cleaning.status)"
+                        size="x-small"
+                      >
                         {{ cleaning.status }}
                       </v-chip>
                     </div>
@@ -231,51 +333,69 @@
       <v-col cols="12">
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2">mdi-test-tube</v-icon>
+            <v-icon class="mr-2">
+              mdi-test-tube
+            </v-icon>
             Test Actions
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="12" sm="6" md="3">
+              <v-col
+                cols="12"
+                sm="6"
+                md="3"
+              >
                 <v-btn
                   block
                   color="primary"
-                  @click="testCreateBooking"
                   :loading="loading"
                   :disabled="!currentUserId"
+                  @click="testCreateBooking"
                 >
                   Test Create Booking
                 </v-btn>
               </v-col>
-              <v-col cols="12" sm="6" md="3">
+              <v-col
+                cols="12"
+                sm="6"
+                md="3"
+              >
                 <v-btn
                   block
                   color="secondary"
-                  @click="testUpdateBooking"
                   :loading="loading"
                   :disabled="!currentUserId || myBookings.length === 0"
+                  @click="testUpdateBooking"
                 >
                   Test Update First Booking
                 </v-btn>
               </v-col>
-              <v-col cols="12" sm="6" md="3">
+              <v-col
+                cols="12"
+                sm="6"
+                md="3"
+              >
                 <v-btn
                   block
                   color="warning"
-                  @click="testStatusChange"
                   :loading="loading"
                   :disabled="!currentUserId || myBookings.length === 0"
+                  @click="testStatusChange"
                 >
                   Test Status Change
                 </v-btn>
               </v-col>
-              <v-col cols="12" sm="6" md="3">
+              <v-col
+                cols="12"
+                sm="6"
+                md="3"
+              >
                 <v-btn
                   block
                   color="info"
-                  @click="generateSampleData"
                   :loading="loading"
                   :disabled="!currentUserId"
+                  @click="generateSampleData"
                 >
                   Generate Sample Data
                 </v-btn>
@@ -287,7 +407,10 @@
     </v-row>
     
     <!-- Confirmation Dialog -->
-    <v-dialog v-model="showDeleteDialog" max-width="400">
+    <v-dialog
+      v-model="showDeleteDialog"
+      max-width="400"
+    >
       <v-card>
         <v-card-title>Confirm Delete</v-card-title>
         <v-card-text>
@@ -298,8 +421,16 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="showDeleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" @click="executeDelete" :loading="loading">Delete</v-btn>
+          <v-btn @click="showDeleteDialog = false">
+            Cancel
+          </v-btn>
+          <v-btn
+            color="error"
+            :loading="loading"
+            @click="executeDelete"
+          >
+            Delete
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

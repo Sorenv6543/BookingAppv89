@@ -498,20 +498,35 @@
   - Notes: Successfully implemented owner-specific booking composable that filters all data to current user's bookings only. Provides owner-friendly interface with proper validation and error handling. Ready for integration with owner-specific components like HomeOwner.vue and OwnerSidebar.vue.
   - Assigned to: Cursor
 
-- [ ] **TASK-039J**: Create useOwnerProperties.ts composable
-  - Status: Not Started
+- [x] **TASK-039J**: Create useOwnerProperties.ts composable
+  - Status: Complete
   - Requirements:
-    - Extend base `useProperties.ts` functionality
-    - Filter all operations to current owner's properties only
-    - Implement owner-specific property validation
-    - Add owner-specific metrics calculation
-    - Remove admin-only property management functions
+    - ✅ Extend base `useProperties.ts` functionality
+    - ✅ Filter all operations to current owner's properties only
+    - ✅ Implement owner-specific property validation
+    - ✅ Add owner-specific metrics calculation
+    - ✅ Remove admin-only property management functions
   - Functions:
-    - `fetchMyProperties()` - get current user's properties only
-    - `createMyProperty(data)` - create property with current user as owner
-    - `updateMyProperty(id, data)` - update only if user owns the property
-    - `deleteMyProperty(id)` - delete only if user owns (check for bookings)
-    - `getMyPropertyMetrics()` - metrics for current user's properties
+    - ✅ `fetchMyProperties()` - get current user's properties only
+    - ✅ `createMyProperty(data)` - create property with current user as owner
+    - ✅ `updateMyProperty(id, data)` - update only if user owns the property
+    - ✅ `deleteMyProperty(id)` - delete only if user owns (check for bookings)
+    - ✅ `getMyPropertyMetrics()` - metrics for current user's properties
+    - ✅ `toggleMyPropertyStatus()` - toggle active status for owner's properties
+    - ✅ `getMyPropertyRecommendations()` - owner-specific recommendations
+  - Implementation Details:
+    - Created `src/composables/owner/useOwnerProperties.ts` with role-based data filtering
+    - All computed properties filter by `owner_id === currentUser.id`
+    - Added ownership validation for all CRUD operations
+    - Implemented owner-friendly error messages and validation
+    - Created comprehensive demo component `UseOwnerPropertiesDemo.vue`
+    - Added demo route `/demos/use-owner-properties` for testing
+    - Follows Map collection patterns and proper TypeScript interfaces
+    - Extends shared `useProperties` composable using composition pattern
+    - Includes aggregated metrics calculation for owner's property portfolio
+    - Added property recommendations based on utilization and performance
+    - Removes admin-only functions while maintaining core property management
+  - Notes: Successfully implemented owner-specific property composable that filters all data to current user's properties only. Provides owner-friendly interface with proper validation, error handling, and business insights. Ready for integration with owner-specific components like HomeOwner.vue and OwnerSidebar.vue.
   - Assigned to: Cursor
 
 - [ ] **TASK-039K**: Create useOwnerCalendarState.ts composable
