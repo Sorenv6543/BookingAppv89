@@ -126,7 +126,7 @@ import UpcomingCleanings from '@/components/dumb/UpcomingCleanings.vue';
 import type { Booking, Property, BookingWithMetadata } from '@/types';
 
 // Import event logger
-import eventLogger from '@/composables/useComponentEventLogger';
+import eventLogger from '@/composables/shared/useComponentEventLogger';
 
 // Define props with default values
 interface Props {

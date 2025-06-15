@@ -28,7 +28,7 @@ import FullCalendar from '@/components/smart/FullCalendar.vue';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
 import { useUIStore } from '@/stores/ui';
-import { useBookings } from '@/composables/useBookings';
+import { useBookings } from '@/composables/shared/useBookings';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Stores

@@ -140,16 +140,16 @@ import { useUserStore } from '@/stores/user';
 import { useAuthStore } from '@/stores/auth';
 
 // Business logic composables
-import { useBookings } from '@/composables/useBookings';
-import { useProperties } from '@/composables/useProperties';
-import { useCalendarState } from '@/composables/useCalendarState';
+import { useBookings } from '@/composables/shared/useBookings';
+import { useProperties } from '@/composables/shared/useProperties';
+import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 // Types
 import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Import event logger for component communication
-import eventLogger from '@/composables/useComponentEventLogger';
+import eventLogger from '@/composables/shared/useComponentEventLogger';
 
 // ============================================================================
 // STORE CONNECTIONS & STATE

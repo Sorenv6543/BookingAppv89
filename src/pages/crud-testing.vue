@@ -2,8 +2,8 @@
 import { ref, reactive, onMounted } from 'vue';
 import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
-import { useProperties } from '@/composables/useProperties';
-import { useBookings } from '@/composables/useBookings';
+import { useProperties } from '@/composables/shared/useProperties';
+import { useBookings } from '@/composables/shared/useBookings';
 import FullCalendar from '@/components/smart/FullCalendar.vue';
 import type { Property, PropertyFormData, Booking, BookingFormData } from '@/types';
 

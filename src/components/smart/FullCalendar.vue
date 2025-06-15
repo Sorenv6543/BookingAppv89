@@ -19,7 +19,7 @@ import { useTheme } from 'vuetify';
 import type { Booking, Property } from '@/types';
 
 // Import event logger for component communication
-import eventLogger from '@/composables/useComponentEventLogger';
+import eventLogger from '@/composables/shared/useComponentEventLogger';
 
 interface Props {
   bookings: Map<string, Booking>;

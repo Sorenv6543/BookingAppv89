@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth } from '@/composables/useAuth'
+import { useAuth } from '@/composables/shared/useAuth'
 import { useRouter } from 'vue-router'
 
 const { logout: authLogout } = useAuth()

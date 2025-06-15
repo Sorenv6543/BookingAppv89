@@ -272,7 +272,351 @@
   - Notes: Created comprehensive project_summaryV2.md that reflects the current state of the MVP implementation. Documented all implemented features, architectural patterns, component communication system, testing setup, and development guidelines. The document serves as both a status update and developer reference for the fully functional Property Cleaning Scheduler application.
   - Requirements: Updated project summary reflecting current implementation status
   - Assigned to: Cursor
+## **Phase 1D.5: Role-Based Architecture Split** 
+**(NEW - Insert Before Current Phase 1E)**
 
+### **Folder Structure & Organization**
+- [x] **TASK-039A**: Create role-based folder structure
+  - Status: Complete
+  - Requirements:
+    - ✅ Create `components/smart/owner/` folder
+    - ✅ Create `components/smart/admin/` folder
+    - ✅ Create `components/smart/shared/` folder
+    - ✅ Create `composables/owner/` folder  
+    - ✅ Create `composables/admin/` folder
+    - ✅ Create `composables/shared/` folder
+    - ✅ Move existing composables to `shared/` as base implementations
+  - Notes: Successfully reorganized code into role-based folder structure. All existing composables moved to shared/ folder and import paths updated throughout the application. Created comprehensive README files for each new folder documenting purpose, architecture patterns, and future development guidelines. Folder structure now supports multi-tenant role-based development.
+  - Implementation Details:
+    - Created role-based folder structure for components/smart/ (owner/, admin/, shared/)
+    - Created role-based folder structure for composables/ (owner/, admin/, shared/)  
+    - Moved all existing composables (useAuth, useBookings, useProperties, useCalendarState, useComponentEventLogger) to shared/ folder
+    - Updated import paths in all consuming components (Home.vue, Home2.vue, Sidebar.vue, FullCalendar.vue, auth pages, admin layout, calendar pages, crud-testing page)
+    - Added comprehensive README documentation for each new folder explaining role-based architecture patterns
+    - Verified dev server starts successfully with new folder structure
+  - Verification: ✅ Existing app still works after folder reorganization (dev server runs successfully)
+  - Assigned to: Cursor
+
+- [ ] **TASK-039B**: Move existing composables to shared folder
+  - Status: Not Started
+  - Requirements:
+    - Move `useBookings.ts` → `composables/shared/useBookings.ts`
+    - Move `useProperties.ts` → `composables/shared/useProperties.ts`
+    - Move `useCalendarState.ts` → `composables/shared/useCalendarState.ts`
+    - Move `useAuth.ts` → `composables/shared/useAuth.ts`
+    - Update all import paths in existing components
+  - Notes: Base logic that will be extended by role-specific composables
+  - Verification: All existing components still import correctly
+  - Assigned to: Cursor
+
+### **Owner-Specific Smart Components**
+- [ ] **TASK-039C**: Create HomeOwner.vue component
+  - Status: Not Started
+  - Requirements:
+    - Copy existing `Home.vue` as starting point
+    - Filter data to show only current user's properties and bookings
+    - Use `OwnerSidebar.vue` and `OwnerCalendar.vue` (to be created)
+    - Add role-specific quick actions (Add Property, Add Booking)
+    - Remove admin-only features (cleaner assignment, system-wide reporting)
+    - Implement owner-specific error handling
+  - Data Scope: `bookings.filter(b => b.owner_id === currentUser.id)`
+  - Navigation: Simple property filter, basic calendar views
+  - Assigned to: Cursor
+
+- [ ] **TASK-039D**: Create OwnerSidebar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Show only owner's properties in property filter
+    - Display turn alerts for owner's properties only
+    - Display upcoming cleanings for owner's properties only
+    - Add "Add Property" and "Add Booking" quick action buttons
+    - Remove admin-only sections (cleaner management, system reports)
+    - Show owner-specific metrics (their properties count, their bookings)
+  - Features:
+    - Property filter dropdown (owner's properties only)
+    - Today's turns section (owner's turns only)
+    - Upcoming cleanings (next 7 days, owner only)
+    - Quick actions: "Add Property", "Add Booking", "View Calendar"
+  - Assigned to: Cursor
+
+- [ ] **TASK-039E**: Create OwnerCalendar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Filter calendar events to show only owner's bookings
+    - Simpler calendar controls (basic views: month, week, day)
+    - Remove admin features (cleaner assignment, drag-to-assign)
+    - Keep basic booking editing (click to edit owner's bookings)
+    - Highlight turn bookings with owner-focused messaging
+    - Add owner-specific context menu items
+  - Features:
+    - Basic FullCalendar integration with owner data filter
+    - Event click → open booking modal for editing
+    - Date click → create new booking modal
+    - Turn booking highlighting (owner's turns only)
+    - No cleaner assignment interface
+  - Assigned to: Cursor
+
+### **Admin-Specific Smart Components**
+- [ ] **TASK-039F**: Create HomeAdmin.vue component  
+  - Status: Not Started
+  - Requirements:
+    - Copy existing `Home.vue` as starting point
+    - Show ALL properties and bookings (no filtering)
+    - Use `AdminSidebar.vue` and `AdminCalendar.vue` (to be created)
+    - Add admin-specific quick actions (Assign Cleaners, Generate Reports)
+    - Add system-wide turn management
+    - Implement admin-specific error handling and notifications
+  - Data Scope: All bookings, all properties (no filtering)
+  - Navigation: Advanced filters, multiple calendar views, cleaner management
+  - Assigned to: Cursor
+
+- [ ] **TASK-039G**: Create AdminSidebar.vue component
+  - Status: Not Started  
+  - Requirements:
+    - Show ALL properties in advanced property filter
+    - Display system-wide turn alerts (all urgent turns)
+    - Display system-wide cleaning metrics
+    - Add admin quick actions (Assign Cleaners, View Reports, Manage Cleaners)
+    - Add business analytics section (total properties, active cleanings)
+    - Include cleaner availability section
+  - Features:
+    - Advanced property filter (all properties, by owner, by status)
+    - System-wide urgent turns (all properties)
+    - Cleaner assignment queue
+    - Quick actions: "Assign Cleaners", "Generate Report", "Manage Schedule"
+    - Business metrics dashboard
+  - Assigned to: Cursor
+
+- [ ] **TASK-039H**: Create AdminCalendar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Show ALL bookings across all properties
+    - Advanced calendar controls (multiple views, advanced filters)
+    - Cleaner assignment interface (drag-to-assign, right-click assign)
+    - Booking status management (pending → scheduled → completed)
+    - Advanced context menus with admin actions
+    - Color coding by cleaner assignment status
+  - Features:
+    - FullCalendar with all bookings data
+    - Cleaner assignment drag-and-drop
+    - Advanced filtering (by status, by cleaner, by property owner)
+    - Booking status workflow management
+    - System-wide turn prioritization view
+  - Assigned to: Cursor
+
+### **Owner-Specific Composables**
+- [ ] **TASK-039I**: Create useOwnerBookings.ts composable
+  - Status: Not Started
+  - Requirements:
+    - Extend base `useBookings.ts` functionality
+    - Filter all operations to current owner's bookings only
+    - Implement owner-specific validation rules
+    - Add owner-specific error messages
+    - Remove admin-only functions (cleaner assignment)
+  - Functions:
+    - `fetchMyBookings()` - get current user's bookings only
+    - `createMyBooking(data)` - create booking with current user as owner
+    - `updateMyBooking(id, data)` - update only if user owns the booking
+    - `deleteMyBooking(id)` - delete only if user owns the booking
+    - `getMyTodayTurns()` - today's turns for current user only
+    - `getMyUpcomingCleanings()` - upcoming cleanings for current user
+  - Assigned to: Cursor
+
+- [ ] **TASK-039J**: Create useOwnerProperties.ts composable
+  - Status: Not Started
+  - Requirements:
+    - Extend base `useProperties.ts` functionality
+    - Filter all operations to current owner's properties only
+    - Implement owner-specific property validation
+    - Add owner-specific metrics calculation
+    - Remove admin-only property management functions
+  - Functions:
+    - `fetchMyProperties()` - get current user's properties only
+    - `createMyProperty(data)` - create property with current user as owner
+    - `updateMyProperty(id, data)` - update only if user owns the property
+    - `deleteMyProperty(id)` - delete only if user owns (check for bookings)
+    - `getMyPropertyMetrics()` - metrics for current user's properties
+  - Assigned to: Cursor
+
+- [ ] **TASK-039K**: Create useOwnerCalendarState.ts composable
+  - Status: Not Started
+  - Requirements:
+    - Extend base `useCalendarState.ts` functionality
+    - Filter calendar data to current owner's events only
+    - Implement owner-specific calendar views and navigation
+    - Add owner-specific date/time utilities
+    - Remove admin calendar features
+  - Functions:
+    - `getOwnerCalendarEvents()` - format owner's bookings for calendar
+    - `handleOwnerDateSelect()` - create booking for owner's property
+    - `handleOwnerEventClick()` - edit owner's booking
+    - `getOwnerTurnAlerts()` - owner's urgent turns only
+    - `filterByOwnerProperty(propertyId)` - filter owner's calendar
+  - Assigned to: Cursor
+
+### **Admin-Specific Composables**
+- [ ] **TASK-039L**: Create useAdminBookings.ts composable
+  - Status: Not Started
+  - Requirements:
+    - Extend base `useBookings.ts` functionality
+    - No filtering - access ALL bookings across all owners
+    - Add admin-specific functions (cleaner assignment, status management)
+    - Implement system-wide analytics and reporting
+    - Add bulk operations for managing multiple bookings
+  - Functions:
+    - `fetchAllBookings()` - get ALL bookings (no owner filter)
+    - `assignCleaner(bookingId, cleanerId)` - assign cleaner to booking
+    - `updateBookingStatus(bookingId, status)` - manage booking workflow
+    - `getSystemTurns()` - all urgent turns across all properties
+    - `getUnassignedBookings()` - bookings without assigned cleaners
+    - `bulkAssignCleaner(bookingIds, cleanerId)` - bulk cleaner assignment
+  - Assigned to: Cursor
+
+- [ ] **TASK-039M**: Create useAdminProperties.ts composable
+  - Status: Not Started
+  - Requirements:
+    - Extend base `useProperties.ts` functionality  
+    - No filtering - access ALL properties across all owners
+    - Add admin analytics and reporting functions
+    - Implement system-wide property management
+    - Add bulk operations and advanced filtering
+  - Functions:
+    - `fetchAllProperties()` - get ALL properties (no owner filter)
+    - `getPropertyAnalytics()` - system-wide property metrics
+    - `getPropertiesByOwner(ownerId)` - filter properties by specific owner
+    - `getPropertyUtilization()` - booking frequency per property
+    - `bulkUpdateProperties(propertyIds, updates)` - bulk property updates
+  - Assigned to: Cursor
+
+- [ ] **TASK-039N**: Create useAdminCalendarState.ts composable
+  - Status: Not Started
+  - Requirements:
+    - Extend base `useCalendarState.ts` functionality
+    - No filtering - access ALL calendar events across all owners
+    - Add admin-specific calendar features (cleaner views, advanced filters)
+    - Implement system-wide calendar management
+    - Add cleaner assignment calendar logic
+  - Functions:
+    - `getAdminCalendarEvents()` - format ALL bookings for calendar
+    - `handleAdminEventClick()` - admin booking management interface
+    - `getCleanerSchedule(cleanerId)` - view specific cleaner's schedule
+    - `getSystemTurnAlerts()` - all urgent turns across all properties
+    - `filterByMultipleCriteria()` - advanced admin filtering
+  - Assigned to: Cursor
+
+- [ ] **TASK-039O**: Create useCleanerManagement.ts composable (Admin-only)
+  - Status: Not Started
+  - Requirements:
+    - New admin-only composable for cleaner operations
+    - Manage cleaner profiles, availability, and assignments
+    - Implement cleaner scheduling logic
+    - Add cleaner performance tracking
+  - Functions:
+    - `fetchCleaners()` - get all cleaner profiles
+    - `createCleaner(data)` - add new cleaner
+    - `updateCleaner(id, data)` - update cleaner profile
+    - `assignCleanerToBooking(cleanerId, bookingId)` - make assignment
+    - `getCleanerAvailability(cleanerId, date)` - check availability
+    - `getCleanerPerformance(cleanerId)` - performance metrics
+  - Assigned to: Cursor
+
+### **Dumb Component Updates**
+- [ ] **TASK-039P**: Create owner-specific dumb components
+  - Status: Not Started
+  - Requirements:
+    - Create `components/dumb/owner/OwnerBookingForm.vue` - simplified booking form
+    - Create `components/dumb/owner/OwnerPropertyForm.vue` - simplified property form
+    - Create `components/dumb/owner/OwnerQuickActions.vue` - owner action buttons
+    - Create `components/dumb/owner/OwnerCalendarControls.vue` - basic calendar controls
+  - Notes: Simplified versions focused on owner needs, no admin features
+  - Assigned to: Cursor
+
+- [ ] **TASK-039Q**: Create admin-specific dumb components
+  - Status: Not Started
+  - Requirements:
+    - Create `components/dumb/admin/AdminBookingForm.vue` - advanced booking form with cleaner assignment
+    - Create `components/dumb/admin/CleanerAssignmentModal.vue` - cleaner selection interface
+    - Create `components/dumb/admin/AdminCalendarControls.vue` - advanced calendar controls
+    - Create `components/dumb/admin/TurnPriorityPanel.vue` - system-wide turn management
+    - Create `components/dumb/admin/AdminQuickActions.vue` - admin action buttons
+  - Notes: Advanced versions with admin-specific features
+  - Assigned to: Cursor
+
+### **Page Structure Updates**
+- [ ] **TASK-039R**: Implement role-based routing in pages/index.vue
+  - Status: Not Started
+  - Requirements:
+    - Check user role in `setup()` function
+    - Route to `HomeOwner.vue` if user role is 'owner'
+    - Route to `HomeAdmin.vue` if user role is 'admin' 
+    - Add fallback routing for unauthenticated users
+    - Implement proper loading state during role check
+  - Code Pattern:
+    ```vue
+    <template>
+      <component :is="homeComponent" />
+    </template>
+    <script setup>
+    const homeComponent = computed(() => {
+      if (authStore.isAdmin) return HomeAdmin;
+      if (authStore.isOwner) return HomeOwner;
+      return AuthLogin; // fallback
+    });
+    </script>
+    ```
+  - Assigned to: Cursor
+
+- [ ] **TASK-039S**: Create owner-specific pages structure
+  - Status: Not Started
+  - Requirements:
+    - Create `pages/owner/` folder
+    - Move `pages/properties/index.vue` → `pages/owner/properties/index.vue`
+    - Move `pages/calendar/index.vue` → `pages/owner/calendar.vue`
+    - Create `pages/owner/dashboard.vue` (using HomeOwner.vue)
+    - Create `pages/owner/bookings/index.vue` - owner's booking list
+    - Update all routing in router config
+  - Notes: Owner-focused page structure with simplified navigation
+  - Assigned to: Cursor
+
+- [ ] **TASK-039T**: Expand admin-specific pages structure  
+  - Status: Not Started
+  - Requirements:
+    - Expand existing `pages/admin/` folder
+    - Create `pages/admin/schedule/index.vue` - master calendar (using HomeAdmin.vue)
+    - Create `pages/admin/cleaners/index.vue` - cleaner management
+    - Create `pages/admin/properties/index.vue` - all properties view
+    - Create `pages/admin/bookings/index.vue` - all bookings view  
+    - Create `pages/admin/reports/index.vue` - business analytics
+    - Update router config with admin routes
+  - Notes: Comprehensive admin interface with full business management
+  - Assigned to: Cursor
+
+### **Authentication & Route Guards**
+- [ ] **TASK-039U**: Implement role-based route guards
+  - Status: Not Started
+  - Requirements:
+    - Create route guards that check user roles
+    - Redirect owners trying to access admin pages
+    - Redirect admins to admin interface by default
+    - Add proper error messages for unauthorized access
+    - Implement loading states during authentication check
+  - Route Protection:
+    - `/owner/*` - requires 'owner' role
+    - `/admin/*` - requires 'admin' role
+    - `/` - routes based on role
+  - Assigned to: Cursor
+
+- [ ] **TASK-039V**: Update authentication flow for role-based routing
+  - Status: Not Started
+  - Requirements:
+    - Update login success to route based on user role
+    - Update logout to clear role-specific state
+    - Add role selection during user registration
+    - Implement role switching for admin users (if needed)
+    - Update auth composable to handle role-based navigation
+  - Assigned to: Cursor
+
+---
 - [ ] **TASK-038**: Implement loading states and error handling
   - Status: Not Started
   - Notes: 
@@ -292,186 +636,258 @@
 
 ---
 
-## **Phase 1E: MVP Completion**
+## **Phase 1E: MVP Completion** 
+**(UPDATED - Now Role-Aware)**
 
 ### **Error Handling Implementation**
-- [ ] **TASK-040**: Create global error handling system
+- [ ] **TASK-040**: Create global error handling system with role-specific messaging
   - Status: Not Started
-  - Notes: 
-  - Requirements: error boundaries, global error store, user-friendly messages
+  - Requirements:
+    - Role-specific error messages (owner vs admin language)
+    - Different error escalation paths for each role
+    - Owner errors: focus on booking/property issues
+    - Admin errors: include system-wide impact messaging
+  - Notes: Build on existing error foundations, add role context
   - Reference: docs/error-handling-patterns.md
   - Assigned to: Cursor
 
-- [ ] **TASK-041**: Implement form validation with error display
+- [ ] **TASK-041**: Implement form validation with role-specific error display
   - Status: Not Started
-  - Notes: 
-  - Requirements: real-time validation, error states, user feedback
+  - Requirements:
+    - Owner forms: simple validation messages
+    - Admin forms: advanced validation with business impact warnings
+    - Role-specific field requirements (admin sees more fields)
+    - Different validation rules based on user role
+  - Notes: Real-time validation, error states, user feedback per role
   - Assigned to: Cursor
 
-- [ ] **TASK-042**: Add API error handling and retry logic
+- [ ] **TASK-042**: Add API error handling and retry logic with role-specific strategies
   - Status: Not Started
-  - Notes: 
-  - Requirements: network errors, timeout handling, retry strategies
+  - Requirements:
+    - Owner API errors: focus on user-friendly messaging
+    - Admin API errors: include technical details and system impact
+    - Different retry strategies (owners = simple, admins = advanced)
+    - Role-specific fallback behaviors
+  - Notes: Network errors, timeout handling, retry strategies per role
   - Assigned to: Cursor
 
-- [ ] **TASK-043**: Implement user notification system
+- [ ] **TASK-043**: Implement user notification system with role-specific notifications
   - Status: Not Started
-  - Notes: 
-  - Requirements: success/error toasts, action confirmations
+  - Requirements:
+    - Owner notifications: personal booking updates, cleaning schedules
+    - Admin notifications: system alerts, cleaner updates, business metrics
+    - Different notification channels per role
+    - Role-specific notification preferences
+  - Notes: Success/error toasts, action confirmations per role
   - Assigned to: Cursor
 
 ### **Unit Testing Setup**
-- [ ] **TASK-044**: Set up Vitest testing environment
-  - Status: Complete
-  - Notes: Installed and configured Vitest with Happy-DOM, created test folder structure, added test script commands
-  - Requirements: vitest, @vue/test-utils, jsdom, coverage
-  - Dependencies: testing configuration
+- [ ] **TASK-044**: Set up Vitest testing environment for role-based components
+  - Status: Complete (needs expansion for role-based)
+  - Requirements:
+    - Add test utilities for role-based component mounting
+    - Add mock factories for owner vs admin data
+    - Create role-specific test helpers
+    - Update existing test setup for role compatibility
+  - Notes: Expand existing Vitest setup for role-based testing
   - Assigned to: Cursor
 
 - [x] **TASK-045**: Create testing utilities and helpers
   - Status: Complete
-  - Notes: Created test utilities for Pinia setup, component mounting, and type assertions
+  - Notes: Existing test utilities work for both roles
   - Requirements: mock factories, testing pinia, component wrappers
   - Reference: docs/testing-patterns.md
   - Assigned to: Cursor
 
-- [ ] **TASK-046**: Write unit tests for business logic utils
+- [ ] **TASK-046**: Write unit tests for business logic utils (role-aware)
   - Status: Not Started
-  - Notes: 
-  - Requirements: test priority calculation, booking validation, cleaning windows
+  - Requirements:
+    - Test priority calculation with role context
+    - Test booking validation for both owner and admin cases
+    - Test cleaning window calculation for different user types
+    - Verify role-specific business rules
+  - Notes: Test priority calculation, booking validation, cleaning windows per role
   - Files: businessLogic.test.ts
   - Assigned to: Cursor
 
-- [ ] **TASK-047**: Write unit tests for composables
+- [ ] **TASK-047**: Write unit tests for role-specific composables
   - Status: Not Started
-  - Notes: 
-  - Requirements: test useBookings, useProperties, useAuth
-  - Files: useBookings.test.ts, useProperties.test.ts
+  - Requirements:
+    - Test `useOwnerBookings.ts` - owner data filtering, owner operations
+    - Test `useAdminBookings.ts` - all data access, admin operations
+    - Test role-specific calendar state composables
+    - Test cleaner management composable (admin-only)
+  - Notes: Test role-specific business logic and data filtering
+  - Files: useOwnerBookings.test.ts, useAdminBookings.test.ts, etc.
   - Assigned to: Cursor
 
-- [ ] **TASK-048**: Write unit tests for Pinia stores
+- [x] **TASK-048**: Write unit tests for Pinia stores
   - Status: Complete
-  - Notes: Created comprehensive tests for user, property, booking, and UI stores, testing all getters and actions
+  - Notes: Existing store tests work for both roles
   - Requirements: test store actions, getters, Map operations
   - Files: user.spec.ts, property.spec.ts, booking.spec.ts, ui.spec.ts
   - Assigned to: Cursor
 
-- [ ] **TASK-049**: Write component tests for dumb components
+- [ ] **TASK-049**: Write component tests for role-specific smart components
   - Status: Not Started
-  - Notes: 
-  - Requirements: test PropertyCard, EventModal, TurnAlerts
-  - Focus: props, emits, user interactions
+  - Requirements:
+    - Test `HomeOwner.vue` - owner data filtering, owner interactions
+    - Test `HomeAdmin.vue` - all data access, admin interactions  
+    - Test `OwnerSidebar.vue` vs `AdminSidebar.vue` functionality
+    - Test `OwnerCalendar.vue` vs `AdminCalendar.vue` features
+  - Notes: Test component communication, data flow per role
+  - Focus: Role-specific props, emits, user interactions
   - Assigned to: Cursor
 
-- [ ] **TASK-050**: Write integration tests for smart components
+- [ ] **TASK-050**: Write integration tests for role-based workflows
   - Status: Not Started
-  - Notes: 
-  - Requirements: test Home.vue orchestration, Sidebar interactions
-  - Focus: component communication, data flow
+  - Requirements:
+    - Test complete owner workflow: login → add property → create booking → view calendar
+    - Test complete admin workflow: login → view all data → assign cleaner → update status
+    - Test role-based data isolation (owners can't see other owners' data)
+    - Test role-based permission enforcement
+  - Notes: End-to-end workflow testing per role
+  - Focus: User journeys, cross-component communication per role
   - Assigned to: Cursor
 
 ### **Final Integration & Testing**
-- [ ] **TASK-051**: End-to-end testing of booking workflow
+- [ ] **TASK-051**: End-to-end testing of role-based booking workflows
   - Status: Not Started
-  - Notes: 
-  - Verification: complete booking creation → calendar display → editing flow
+  - Requirements:
+    - Test owner booking workflow: create → edit → view on calendar
+    - Test admin booking workflow: view all → assign cleaner → update status
+    - Test cross-role data updates (owner creates, admin sees)
+    - Verify role-based data filtering throughout
+  - Verification: Complete booking workflows for both roles
   - Assigned to: Human + Cursor
 
-- [ ] **TASK-052**: Test turn booking priority system
+- [ ] **TASK-052**: Test role-based turn booking priority system
   - Status: Not Started
-  - Notes: 
-  - Verification: turns show as urgent, proper notifications
+  - Requirements:
+    - Test owner turn alerts (only their properties)
+    - Test admin turn alerts (all properties, system-wide)
+    - Test role-specific turn booking creation and management
+    - Verify proper priority indicators for each role
+  - Verification: Turn priority system works correctly for both roles
   - Assigned to: Human + Cursor
 
-- [ ] **TASK-053**: Test error handling scenarios
+- [ ] **TASK-053**: Test role-based error handling scenarios
   - Status: Not Started
-  - Notes: 
-  - Verification: network failures, validation errors, user feedback
+  - Requirements:
+    - Test role-specific error messages and handling
+    - Test permission denied scenarios (owner accessing admin features)
+    - Test role-based fallback behaviors
+    - Verify role-specific user feedback systems
+  - Verification: Error handling appropriate for each role
   - Assigned to: Human + Cursor
 
-- [ ] **TASK-054**: Responsive design testing
+- [ ] **TASK-054**: Responsive design testing for role-based interfaces
   - Status: Not Started
-  - Notes: 
-  - Verification: works on desktop, tablet, mobile
+  - Requirements:
+    - Test owner interface on desktop, tablet, mobile
+    - Test admin interface on desktop, tablet, mobile
+    - Verify role-specific mobile optimizations
+    - Test role-based navigation on different screen sizes
+  - Verification: Both interfaces work across all device sizes
   - Assigned to: Human + Cursor
 
-- [ ] **TASK-055**: Run full test suite and achieve 80%+ coverage
+- [ ] **TASK-055**: Run full test suite and achieve 80%+ coverage for role-based system
   - Status: Not Started
-  - Notes: 
-  - Verification: npm run test:coverage passes, critical paths tested
+  - Requirements:
+    - Run tests for both owner and admin code paths
+    - Achieve 80%+ coverage on role-specific business logic
+    - Verify critical role-based workflows are tested
+    - Test role-based security and data isolation
+  - Verification: npm run test:coverage passes for both roles
   - Assigned to: Human + Cursor
 
 ### **Documentation & Cleanup**
 - [x] **TASK-055A**: Create UML diagrams to visualize codebase architecture
-  - Status: Complete
-  - Notes: Created comprehensive UML diagrams in docs/uml/ directory including TypeScript interfaces class diagram, Vue component architecture diagram, Pinia store architecture diagram, event flow sequence diagram, and business logic class diagram. All diagrams follow PlantUML format and document the current MVP implementation with detailed notes about Map collections pattern, central orchestrator pattern, and turn vs standard booking business logic.
-  - Files: docs/uml/README.md, interfaces-class-diagram.puml, component-architecture-diagram.puml, store-architecture-diagram.puml, event-flow-sequence-diagram.puml, business-logic-class-diagram.puml
-  - Requirements: Visualize TypeScript interfaces, component communication, store architecture, event flows, and business logic
+  - Status: Complete (needs update for role-based)
+  - Requirements:
+    - Update existing UML diagrams for role-based architecture
+    - Add role-specific component interaction diagrams
+    - Document role-based data flow patterns
+    - Add role-based security/permission diagrams
+  - Notes: Update existing comprehensive UML diagrams for role-based system
   - Assigned to: Cursor
 
-- [ ] **TASK-056**: Document component APIs and usage
+- [ ] **TASK-056**: Document component APIs and usage for role-based system
   - Status: Not Started
-  - Notes: 
-  - Files: component documentation, prop interfaces
+  - Requirements:
+    - Document owner-specific component APIs
+    - Document admin-specific component APIs  
+    - Document shared component usage patterns
+    - Document role-based prop interfaces and emit patterns
+  - Notes: Role-specific component documentation
+  - Files: component documentation, prop interfaces per role
   - Assigned to: Cursor
 
-- [ ] **TASK-057**: Code cleanup and optimization
+- [ ] **TASK-057**: Code cleanup and optimization for role-based architecture
   - Status: Not Started
-  - Notes: 
-  - Requirements: remove unused code, optimize performance
+  - Requirements:
+    - Remove unused generic components (old Home.vue, Sidebar.vue, etc.)
+    - Optimize role-specific data filtering
+    - Clean up import paths for new folder structure
+    - Remove duplicate code between role-specific components
+  - Notes: Clean up after role-based refactoring
   - Assigned to: Cursor
 
-- [ ] **TASK-058**: Update documentation with testing and error handling
+- [ ] **TASK-058**: Update documentation with role-based testing and error handling
   - Status: Not Started
-  - Notes: 
-  - Files: README.md, testing guide, error handling guide
+  - Requirements:
+    - Update README.md with role-based architecture explanation
+    - Document role-based testing strategies
+    - Document role-based error handling patterns
+    - Add role-based deployment instructions
+  - Notes: Complete documentation update for role-based system
+  - Files: README.md, testing guide, error handling guide per role
   - Assigned to: Cursor
 
-- [ ] **TASK-059**: MVP deployment preparation
+- [ ] **TASK-059**: MVP deployment preparation for role-based system
   - Status: Not Started
-  - Notes: 
-  - Requirements: build optimization, deployment config, environment setup
+  - Requirements:
+    - Build optimization for role-based components
+    - Environment setup for role-based authentication
+    - Deployment config for role-based routing
+    - Performance optimization for role-specific data loading
+  - Notes: Deployment preparation with role-based considerations
   - Assigned to: Cursor
 
 ---
 
-## **Future Phases (Post-MVP)**
-
-### **Future Phases (Post-MVP)**
-
-### **Phase 2: Supabase Integration**
-- [ ] **TASK-060**: Set up Supabase project and database
-- [ ] **TASK-061**: Implement authentication with Supabase
-- [ ] **TASK-062**: Replace mock data with real API calls
-- [ ] **TASK-063**: Add real-time subscriptions
-- [ ] **TASK-064**: Implement Row Level Security (RLS) policies
-
-### **Phase 3: Advanced Features**
-- [ ] **TASK-065**: Cleaner assignment system
-- [ ] **TASK-066**: Notification system (email/SMS)
-- [ ] **TASK-067**: Analytics and reporting dashboard
-- [ ] **TASK-068**: Mobile app considerations
-- [ ] **TASK-069**: Performance optimization and monitoring
-
----
-
-## **Notes Section**
+## **Updated Notes Section**
 
 ### **General Notes:**
+- **Role-Based Architecture**: Property owners see only their data, admins see all data
+- **Data Filtering**: Implement at composable level, not component level
+- **Shared Components**: Maximize reuse of dumb components across roles
+- **Business Logic**: Maintain shared business rules, customize per role
 - Reference docs/summary.md for overall architecture
 - Use "use context7" in Cursor for up-to-date library documentation
 - Follow Map collection patterns throughout the project
 - Focus on turn vs standard booking distinction as core business logic
-- **Error Handling**: Implement graceful failures and user feedback at every level
-- **Testing**: Aim for 80%+ test coverage on business logic and critical paths
-- **Test-Driven Development**: Write tests for composables and utils before implementation when possible
+- **Error Handling**: Implement role-specific graceful failures and user feedback
+- **Testing**: Aim for 80%+ test coverage on role-specific business logic and critical paths
+- **Security**: Ensure owners cannot access other owners' data
 
-### **Current Blockers:**
-- None
+### **Current Priority Order:**
+1. **Phase 1D.5**: Complete role-based architecture split (TASK-039A through TASK-039V)
+2. **Phase 1E**: Implement role-aware error handling and testing (TASK-040 through TASK-059)  
+3. **Future Phases**: Supabase integration with RLS for multi-tenant security
 
 ### **Technical Decisions Made:**
 - Vue 3 + Vite + TypeScript stack confirmed
-- Map collections for state management
-- Home.vue as central orchestrator pattern
-- Vuetify 3 for UI components
+- Map collections for state management (shared across roles)
+- Role-based component architecture (Owner vs Admin interfaces)
+- Composable-level data filtering for role separation
+- Vuetify 3 for UI components (shared across roles)
+- Folder structure: `owner/`, `admin/`, `shared/` pattern
 
+### **Success Criteria for Role-Based MVP:**
+- **Property Owner Experience**: Can manage their properties and bookings with simple, focused interface
+- **Admin Experience**: Can manage all properties, bookings, and cleaners with advanced features
+- **Data Isolation**: Owners see only their data, admins see all data
+- **Role Security**: Proper authentication and authorization for each role
+- **Shared Business Logic**: Turn vs standard booking logic works for both roles
+- **Mobile Responsive**: Both interfaces work on all device sizes
