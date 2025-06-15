@@ -470,21 +470,32 @@
   - Assigned to: Cursor
 
 ### **Owner-Specific Composables**
-- [ ] **TASK-039I**: Create useOwnerBookings.ts composable
-  - Status: Not Started
+- [x] **TASK-039I**: Create useOwnerBookings.ts composable
+  - Status: Complete
   - Requirements:
-    - Extend base `useBookings.ts` functionality
-    - Filter all operations to current owner's bookings only
-    - Implement owner-specific validation rules
-    - Add owner-specific error messages
-    - Remove admin-only functions (cleaner assignment)
+    - ✅ Extend base `useBookings.ts` functionality
+    - ✅ Filter all operations to current owner's bookings only
+    - ✅ Implement owner-specific validation rules
+    - ✅ Add owner-specific error messages
+    - ✅ Remove admin-only functions (cleaner assignment)
   - Functions:
-    - `fetchMyBookings()` - get current user's bookings only
-    - `createMyBooking(data)` - create booking with current user as owner
-    - `updateMyBooking(id, data)` - update only if user owns the booking
-    - `deleteMyBooking(id)` - delete only if user owns the booking
-    - `getMyTodayTurns()` - today's turns for current user only
-    - `getMyUpcomingCleanings()` - upcoming cleanings for current user
+    - ✅ `fetchMyBookings()` - get current user's bookings only
+    - ✅ `createMyBooking(data)` - create booking with current user as owner
+    - ✅ `updateMyBooking(id, data)` - update only if user owns the booking
+    - ✅ `deleteMyBooking(id)` - delete only if user owns the booking
+    - ✅ `getMyTodayTurns()` - today's turns for current user only
+    - ✅ `getMyUpcomingCleanings()` - upcoming cleanings for current user
+  - Implementation Details:
+    - Created `src/composables/owner/useOwnerBookings.ts` with role-based data filtering
+    - All computed properties filter by `owner_id === currentUser.id`
+    - Added owner-specific CRUD operations with ownership validation
+    - Implemented owner-friendly error messages and validation
+    - Created comprehensive demo component `UseOwnerBookingsDemo.vue`
+    - Added demo route `/demos/use-owner-bookings` for testing
+    - Follows Map collection patterns and proper TypeScript interfaces
+    - Extends shared `useBookings` composable using composition pattern
+    - Removes admin-only functions (cleaner assignment, system-wide operations)
+  - Notes: Successfully implemented owner-specific booking composable that filters all data to current user's bookings only. Provides owner-friendly interface with proper validation and error handling. Ready for integration with owner-specific components like HomeOwner.vue and OwnerSidebar.vue.
   - Assigned to: Cursor
 
 - [ ] **TASK-039J**: Create useOwnerProperties.ts composable
