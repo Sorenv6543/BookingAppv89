@@ -34,8 +34,10 @@ export const useAuthStore = defineStore('auth', () => {
         name: 'Demo User',
         role: 'admin',
         settings: {
+          notifications: true,
+          timezone: 'America/New_York',
           theme: 'light',
-          notifications: true
+          language: 'en'
         }
       };
       loading.value = false;
@@ -65,8 +67,10 @@ export const useAuthStore = defineStore('auth', () => {
         name: userData.name || 'Demo User',
         role: userData.role || 'owner',
         settings: {
+          notifications: true,
+          timezone: 'America/New_York',
           theme: 'light',
-          notifications: true
+          language: 'en'
         }
       };
       loading.value = false;

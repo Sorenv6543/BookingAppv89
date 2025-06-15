@@ -45,7 +45,14 @@ const router = createRouter({
       }
     },
     // Demo routes
-
+    {
+      path: '/demos/home-admin',
+      name: 'home-admin-demo',
+      component: () => import('@/components/smart/admin/HomeAdminDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
 
     {
       path: '/demos/turn-alerts',

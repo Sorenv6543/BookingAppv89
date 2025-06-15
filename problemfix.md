@@ -409,3 +409,214 @@ interface Emits {
 - ✅ Task completed within role-based architecture framework
 
 This implementation successfully establishes the foundation for the owner-specific calendar interface, enabling property owners to manage their bookings through a simplified, focused interface optimized for their specific needs.
+
+# Problem Fix Documentation
+
+## Issue: TypeScript Type Mismatches in HomeAdmin.vue
+
+### Problem Description
+The HomeAdmin.vue component had several TypeScript type errors that prevented proper compilation:
+
+1. **Event Handler Type Mismatches**: The FullCalendar component emits events with specific data structures, but the HomeAdmin handlers expected different parameter types.
+
+2. **Modal Opening Parameter Errors**: The UI store's `openModal` method expects specific parameter structures, but the code was passing incorrect object formats.
+
+3. **Event Logger Parameter Errors**: The event logger only accepts 'emit' or 'receive' as direction parameters, but the code was using 'action'.
+
+4. **Calendar View Type Mismatch**: The calendar view handling was using generic CalendarView types instead of FullCalendar-specific view names.
+
+5. **Confirmation Dialog Method Misuse**: The code was using modal methods for confirmation dialogs instead of the dedicated confirmation dialog methods.
+
+### Root Cause Analysis
+
+The errors occurred because:
+
+1. **Interface Mismatch**: The FullCalendar component defines specific event signatures that don't match the generic BookingFormData types expected by the handlers.
+
+2. **API Misunderstanding**: The UI store has separate methods for modals (`openModal`) and confirmation dialogs (`openConfirmDialog`) with different parameter structures.
+
+3. **Type System Evolution**: The CalendarView type in ui.ts uses generic names ('month', 'week', 'day') while the actual FullCalendar implementation uses specific view names ('dayGridMonth', 'timeGridWeek', 'timeGridDay').
+
+### Solutions Implemented
+
+#### 1. Fixed Event Handler Signatures
+
+**Before:**
+```typescript
+const handleCreateBookingFromCalendar = (bookingData: Partial<BookingFormData>): void => {
+  // Handler expected BookingFormData format
+}
+
+const handleUpdateBooking = (bookingData: BookingFormData): void => {
+  // Handler expected full BookingFormData
+}
+```
+
+**After:**
+```typescript
+const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
+  // Convert FullCalendar data format to BookingFormData format
+  const bookingData: Partial<BookingFormData> = {
+    checkout_date: data.start,
+    checkin_date: data.end,
+    property_id: data.propertyId,
+    booking_type: 'standard',
+    status: 'pending'
+  };
+  // Use converted data
+}
+
+const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+  // Convert FullCalendar data format to BookingFormData format
+  const booking = allBookingsMap.value.get(data.id);
+  if (booking) {
+    const bookingData: Partial<BookingFormData> = {
+      ...booking,
+      checkout_date: data.start,
+      checkin_date: data.end
+    };
+    updateBooking(data.id, bookingData);
+  }
+}
+```
+
+#### 2. Fixed Modal Opening Calls
+
+**Before:**
+```typescript
+uiStore.openModal('event', {
+  mode: 'edit',
+  booking: booking
+});
+
+uiStore.openModal('confirm', {
+  title: 'Delete Booking',
+  message: '...',
+  // ... other properties
+});
+```
+
+**After:**
+```typescript
+uiStore.openModal('event', 'edit', {
+  booking: booking
+});
+
+uiStore.openConfirmDialog('confirm', {
+  title: 'Delete Booking',
+  message: '...',
+  data: {
+    onConfirm: () => {
+      // Callback function
+    }
+  }
+});
+```
+
+#### 3. Fixed Event Logger Calls
+
+**Before:**
+```typescript
+eventLogger.logEvent(
+  'HomeAdmin',
+  'HomeAdmin',
+  'assignCleaners',
+  null,
+  'action'  // Invalid direction
+);
+```
+
+**After:**
+```typescript
+eventLogger.logEvent(
+  'HomeAdmin',
+  'HomeAdmin',
+  'assignCleaners',
+  null,
+  'emit'  // Valid direction
+);
+```
+
+#### 4. Fixed Calendar View Type Handling
+
+**Before:**
+```typescript
+const handleCalendarViewChange = (view: CalendarView): void => {
+  setCalendarView(view); // Type mismatch
+}
+```
+
+**After:**
+```typescript
+const handleCalendarViewChange = (view: CalendarView): void => {
+  // Convert generic CalendarView to FullCalendar-specific view names
+  let fullCalendarView: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
+  switch (view) {
+    case 'month':
+      fullCalendarView = 'dayGridMonth';
+      break;
+    case 'week':
+      fullCalendarView = 'timeGridWeek';
+      break;
+    case 'day':
+      fullCalendarView = 'timeGridDay';
+      break;
+    default:
+      fullCalendarView = 'timeGridWeek';
+  }
+  setCalendarView(fullCalendarView);
+}
+```
+
+#### 5. Fixed Confirmation Dialog Handling
+
+**Before:**
+```typescript
+const confirmDialogOpen = computed(() => uiStore.isModalOpen('confirm'));
+const confirmDialogTitle = computed(() => {
+  const modalData = uiStore.getModalData('confirm') as any;
+  return modalData?.title || '';
+});
+
+const handleConfirmDialogConfirm = (): void => {
+  const onConfirm = uiStore.getModalData('confirm')?.onConfirm;
+  // ...
+};
+```
+
+**After:**
+```typescript
+const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirm'));
+const confirmDialogTitle = computed(() => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.title || '';
+});
+
+const handleConfirmDialogConfirm = (): void => {
+  const confirmData = uiStore.getConfirmDialogState('confirm');
+  const onConfirm = confirmData?.data?.onConfirm;
+  // ...
+};
+```
+
+### Key Lessons Learned
+
+1. **Interface Contracts**: Always check the actual interface definitions of components and composables rather than assuming parameter types.
+
+2. **API Consistency**: Different UI operations (modals vs dialogs) may have different APIs even within the same store.
+
+3. **Type Conversion**: When integrating third-party components (like FullCalendar) with custom types, implement proper type conversion layers.
+
+4. **Event System Design**: Event logging systems should have well-defined direction types to maintain consistency across components.
+
+### Impact
+
+These fixes resolved all TypeScript compilation errors in the HomeAdmin.vue component, enabling:
+
+- Proper type safety for event handlers
+- Correct modal and dialog operations
+- Consistent event logging
+- Proper calendar view management
+- Better maintainability and developer experience
+
+The component now properly integrates with the existing type system while maintaining the admin-specific functionality for managing all properties and bookings across the multi-tenant system.

@@ -11,7 +11,7 @@ export type ModalData = Record<string, unknown> | null | undefined;
 /**
  * Filter value type for arbitrary filter values
  */
-export type FilterValue = string | number | boolean | Date | null | undefined;
+export type FilterValue = string | number | boolean | Date | string[] | null | undefined;
 
 /**
  * Modal state interface

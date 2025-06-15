@@ -44,6 +44,10 @@ export const useUIStore = defineStore('ui', () => {
     return modals.value.get(modalId);
   });
   
+  const getModalData = computed(() => (modalId: string): ModalData => {
+    return modals.value.get(modalId)?.data;
+  });
+  
   const isConfirmDialogOpen = computed(() => (dialogId: string): boolean => {
     return confirmDialogs.value.get(dialogId)?.open || false;
   });
@@ -308,6 +312,7 @@ export const useUIStore = defineStore('ui', () => {
     // Getters
     isModalOpen,
     getModalState,
+    getModalData,
     isConfirmDialogOpen,
     getConfirmDialogState,
     isSidebarOpen,

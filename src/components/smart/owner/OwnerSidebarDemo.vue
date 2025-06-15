@@ -3,7 +3,9 @@
     <v-container fluid>
       <v-row>
         <v-col cols="12">
-          <h1 class="text-h4 mb-4">OwnerSidebar Demo</h1>
+          <h1 class="text-h4 mb-4">
+            OwnerSidebar Demo
+          </h1>
           <p class="text-body-1 mb-4">
             This demo shows the OwnerSidebar component with sample owner data.
             The sidebar filters all data to show only the current owner's properties and bookings.
@@ -13,7 +15,10 @@
       
       <v-row>
         <!-- Sidebar Demo -->
-        <v-col cols="12" md="4">
+        <v-col
+          cols="12"
+          md="4"
+        >
           <v-card>
             <v-card-title>Owner Sidebar</v-card-title>
             <v-card-text class="pa-0">
@@ -35,7 +40,10 @@
         </v-col>
         
         <!-- Event Log -->
-        <v-col cols="12" md="8">
+        <v-col
+          cols="12"
+          md="8"
+        >
           <v-card>
             <v-card-title class="d-flex align-center">
               Event Log
@@ -49,7 +57,10 @@
               </v-btn>
             </v-card-title>
             <v-card-text>
-              <v-list v-if="eventLog.length > 0" density="compact">
+              <v-list
+                v-if="eventLog.length > 0"
+                density="compact"
+              >
                 <v-list-item
                   v-for="(event, index) in eventLog"
                   :key="index"
@@ -68,7 +79,10 @@
                   </template>
                 </v-list-item>
               </v-list>
-              <div v-else class="text-center py-4 text-medium-emphasis">
+              <div
+                v-else
+                class="text-center py-4 text-medium-emphasis"
+              >
                 No events yet. Interact with the sidebar to see events.
               </div>
             </v-card-text>
@@ -79,7 +93,10 @@
             <v-card-title>Sample Data</v-card-title>
             <v-card-text>
               <v-row>
-                <v-col cols="12" sm="6">
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
                   <h4>Owner Properties ({{ sampleOwnerPropertiesArray.length }})</h4>
                   <v-list density="compact">
                     <v-list-item
@@ -90,7 +107,10 @@
                     />
                   </v-list>
                 </v-col>
-                <v-col cols="12" sm="6">
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
                   <h4>Owner Bookings ({{ totalOwnerBookings }})</h4>
                   <v-list density="compact">
                     <v-list-item

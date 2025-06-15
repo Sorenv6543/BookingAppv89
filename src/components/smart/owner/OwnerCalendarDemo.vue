@@ -5,10 +5,15 @@
         <v-col cols="12">
           <v-card>
             <v-card-title class="d-flex align-center">
-              <v-icon class="mr-2">mdi-calendar-account</v-icon>
+              <v-icon class="mr-2">
+                mdi-calendar-account
+              </v-icon>
               OwnerCalendar Demo
               <v-spacer />
-              <v-chip color="primary" variant="outlined">
+              <v-chip
+                color="primary"
+                variant="outlined"
+              >
                 Owner View
               </v-chip>
             </v-card-title>
@@ -90,10 +95,15 @@
 
       <!-- Demo Information -->
       <v-row class="mt-4">
-        <v-col cols="12" md="6">
+        <v-col
+          cols="12"
+          md="6"
+        >
           <v-card>
             <v-card-title>
-              <v-icon class="mr-2">mdi-information</v-icon>
+              <v-icon class="mr-2">
+                mdi-information
+              </v-icon>
               Owner Calendar Features
             </v-card-title>
             <v-card-text>
@@ -124,10 +134,15 @@
           </v-card>
         </v-col>
 
-        <v-col cols="12" md="6">
+        <v-col
+          cols="12"
+          md="6"
+        >
           <v-card>
             <v-card-title>
-              <v-icon class="mr-2">mdi-chart-bar</v-icon>
+              <v-icon class="mr-2">
+                mdi-chart-bar
+              </v-icon>
               Owner Data Summary
             </v-card-title>
             <v-card-text>
@@ -168,7 +183,9 @@
         <v-col cols="12">
           <v-card>
             <v-card-title>
-              <v-icon class="mr-2">mdi-console</v-icon>
+              <v-icon class="mr-2">
+                mdi-console
+              </v-icon>
               Event Log
               <v-spacer />
               <v-btn
@@ -195,12 +212,18 @@
                   </v-chip>
                   <span class="text-caption">
                     {{ event.timestamp }} - {{ event.from }} → {{ event.to }}: {{ event.event }}
-                    <span v-if="event.data" class="text-grey">
+                    <span
+                      v-if="event.data"
+                      class="text-grey"
+                    >
                       ({{ JSON.stringify(event.data) }})
                     </span>
                   </span>
                 </div>
-                <div v-if="eventLog.length === 0" class="text-grey text-center py-4">
+                <div
+                  v-if="eventLog.length === 0"
+                  class="text-grey text-center py-4"
+                >
                   No events logged yet. Interact with the calendar to see events.
                 </div>
               </div>

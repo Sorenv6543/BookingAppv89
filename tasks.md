@@ -384,17 +384,32 @@
   - Assigned to: Cursor
 
 ### **Admin-Specific Smart Components**
-- [ ] **TASK-039F**: Create HomeAdmin.vue component  
-  - Status: Not Started
+- [x] **TASK-039F**: Create HomeAdmin.vue component  
+  - Status: Complete
   - Requirements:
-    - Copy existing `Home.vue` as starting point
-    - Show ALL properties and bookings (no filtering)
-    - Use `AdminSidebar.vue` and `AdminCalendar.vue` (to be created)
-    - Add admin-specific quick actions (Assign Cleaners, Generate Reports)
-    - Add system-wide turn management
-    - Implement admin-specific error handling and notifications
-  - Data Scope: All bookings, all properties (no filtering)
-  - Navigation: Advanced filters, multiple calendar views, cleaner management
+    - ✅ Copy existing `Home.vue` as starting point
+    - ✅ Show ALL properties and bookings (no filtering)
+    - ✅ Use `AdminSidebar.vue` and `AdminCalendar.vue` (using generic components with TODO comments)
+    - ✅ Add admin-specific quick actions (Assign Cleaners, Generate Reports, Manage System)
+    - ✅ Add system-wide turn management
+    - ✅ Implement admin-specific error handling and notifications
+  - Data Scope: All bookings, all properties (no filtering) ✅
+  - Navigation: Advanced filters, multiple calendar views, cleaner management ✅
+  - Implementation Notes:
+    - Created comprehensive HomeAdmin.vue component (1020 lines) with full admin functionality
+    - Shows ALL data across ALL property owners (no owner filtering)
+    - Implements system-wide metrics display: properties, bookings, urgent turns, upcoming cleanings
+    - Admin-specific quick actions: "Assign Cleaners", "Reports", "Manage System"
+    - Uses generic Sidebar and FullCalendar components with TODO comments for future AdminSidebar/AdminCalendar
+    - Admin-specific error handling with business impact warnings
+    - Created HomeAdminDemo.vue with comprehensive testing data across multiple owners
+    - Added demo route: `/demos/home-admin` for testing
+    - Component follows role-based architecture: admin sees ALL data, owner sees only their data
+  - Files Created:
+    - `src/components/smart/admin/HomeAdmin.vue` - Main admin interface component
+    - `src/components/smart/admin/HomeAdminDemo.vue` - Demo component with sample data
+    - `src/components/smart/admin/README.md` - Documentation
+  - Demo Route: `/demos/home-admin`
   - Assigned to: Cursor
 
 - [ ] **TASK-039G**: Create AdminSidebar.vue component
