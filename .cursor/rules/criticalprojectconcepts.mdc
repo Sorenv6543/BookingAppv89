@@ -3,25 +3,53 @@ description:
 globs: 
 alwaysApply: true
 ---
-## I'm building a property cleaning scheduler app.
-
-> Read @project_summary.md and @tasks.md to understand project architecture and current task structure.
+> Read @project_summaryV2.md and @tasks.md to understand project architecture and current task structure.
 > Check @repomix-output.md for current project state and existing implementations.
 
 ## For each task:
 1. **Context First**: Use Context7 tool to research relevant documentation from @context7_techstack_ids.md before starting
 2. **Plan**: Use sequential thinking to break down the task and plan implementation
-3. **Implement**: Build the feature following established patterns from @project_summary.md
+3. **Implement**: Build the feature following established patterns from @project_summaryV2.md
 4. **Integrate**: Ensure implementation fits the broader project architecture and Map collection patterns
-5. **Update**: Change task status from "Not Started" to "Complete" in TASK.md
-6. **Document**: Add detailed notes about implementation decisions and any challenges
-7. **Verify**: Check off task with [x] and ensure it enables future dependent tasks
+5. **Test**: Create/update tests and use demo components for verification
+6. **Update**: Change task status from "Not Started" to "Complete" in tasks.md
+7. **Document**: Add detailed notes about implementation decisions and any challenges
+8. **Verify**: Check off task with [x] and ensure it enables future dependent tasks
+
 ## Key Patterns to Follow:
 
+### **Architecture Patterns**
 - Follow the Home.vue central orchestrator pattern
 - Maintain turn vs standard booking distinction in all business logic
 - Reference existing composables and stores for consistency
+- Use Map collections for all state management (never arrays)
 - Implement proper TypeScript typing and error handling
+
+### **Component Patterns**
+- **Dumb Components**: Pure UI, props in, events out (src/components/dumb/)
+- **Smart Components**: Business logic, store integration (src/components/smart/)
+- **Demo Components**: Create demo pages in src/pages/demos/ for testing
+- **Component Communication**: Use established event names (navigateToBooking, filterByProperty, etc.)
+
+### **State Management Patterns**
+- All stores use Map<string, T> collections
+- Computed getters for filtering and derived state
+- Actions return entities for chaining
+- Use reactive() for complex state, ref() for primitives
+
+### **Business Logic Patterns**
+- Priority calculation in utils/businessLogic.ts
+- Conflict detection and validation utilities
+- Turn vs standard booking logic separation
+- Error handling with consistent patterns
+
+### **File Naming Conventions**
+- **Components**: PascalCase (PropertyCard.vue, BookingForm.vue)
+- **Composables**: camelCase with 'use' prefix (useBookings.ts, useProperties.ts)
+- **Stores**: camelCase (property.ts, booking.ts, ui.ts)
+- **Types**: camelCase (booking.ts, property.ts, ui.ts)
+- **Utils**: camelCase (businessLogic.ts)
+- **Pages**: camelCase (index.vue, [id].vue)
 
 ## Before Marking Complete:
 - [ ] TypeScript compiles without errors
@@ -29,10 +57,43 @@ alwaysApply: true
 - [ ] Integrates with existing stores/composables
 - [ ] Includes basic error handling
 - [ ] Updates any dependent interfaces/types
+- [ ] Component communication events work correctly
+
 
 ## Critical Project Concepts:
+
+### **Business Logic**
 - Turn bookings = urgent, same-day turnovers between guests
 - Standard bookings = regular recurring cleanings
 - Priority calculation based on checkout → checkin time window
+- Conflict detection for overlapping bookings/cleaners
+
+### **Technical Architecture**
 - All state uses Map collections, not arrays
 - UI Store manages modals, sidebars, loading states
+- Home.vue orchestrates all component communication
+- FullCalendar integration with drag-and-drop support
+
+### **UI/UX Standards**
+- 8 theme system with persistence (ThemePicker component)
+- Responsive design: mobile drawer, desktop rail sidebar
+- Visual priority indicators: red (urgent), orange (high), blue (standard)
+- Confirmation dialogs for destructive actions
+
+### **Component Communication Events**
+- `navigateToBooking` - Navigate to specific booking
+- `navigateToDate` - Navigate calendar to date
+- `filterByProperty` - Filter bookings by property
+- `createBooking` - Open booking creation modal
+- `createProperty` - Open property creation modal
+- `eventClick` - Handle calendar event clicks
+- `dateSelect` - Handle calendar date selection
+- `eventDrop` - Handle drag-and-drop updates
+
+## Reference Documentation:
+- **Architecture**: docs/project_summaryV2.md
+- **Component Patterns**: docs/component_orchestration_reference.md
+- **Business Logic**: docs/business_logic_reference.md
+- **Vue Patterns**: docs/vue_typescript_reference.md
+- **Testing**: docs/complete_component_examples.md
+- **Communication Testing**: docs/component-communication-testing.md

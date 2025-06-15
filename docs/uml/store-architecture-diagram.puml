@@ -1,0 +1,270 @@
+@startuml Pinia Store Architecture - Property Cleaning Scheduler
+!theme plain
+title Pinia Store Architecture - Property Cleaning Scheduler
+
+' Store Classes
+class UserStore {
+  ' State - Map Collections
+  +users: Map<string, User>
+  +currentUser: User | null
+  +settings: UserSettings
+  
+  ' Computed Getters
+  +allUsers: User[]
+  +activeUsers: User[]
+  +usersByRole: Map<UserRole, User[]>
+  +propertyOwners: PropertyOwner[]
+  +cleaners: Cleaner[]
+  +admins: Admin[]
+  
+  ' Actions
+  +fetchUsers(): Promise<void>
+  +createUser(userData: Partial<User>): Promise<User>
+  +updateUser(id: string, updates: Partial<User>): Promise<User>
+  +deleteUser(id: string): Promise<void>
+  +setCurrentUser(user: User): void
+  +updateSettings(settings: Partial<UserSettings>): void
+}
+
+class PropertyStore {
+  ' State - Map Collections
+  +properties: Map<string, Property>
+  +loading: boolean
+  +error: string | null
+  
+  ' Computed Getters
+  +allProperties: Property[]
+  +activeProperties: Property[]
+  +propertiesByOwner: Map<string, Property[]>
+  +propertiesByTier: Map<PricingTier, Property[]>
+  +propertyMetrics: Map<string, PropertyMetrics>
+  
+  ' Actions
+  +fetchProperties(): Promise<void>
+  +createProperty(propertyData: PropertyFormData): Promise<Property>
+  +updateProperty(id: string, updates: Partial<Property>): Promise<Property>
+  +deleteProperty(id: string): Promise<void>
+  +togglePropertyActive(id: string): Promise<Property>
+  +calculateMetrics(propertyId: string): PropertyMetrics
+}
+
+class BookingStore {
+  ' State - Map Collections
+  +bookings: Map<string, Booking>
+  +loading: boolean
+  +error: string | null
+  
+  ' Computed Getters
+  +allBookings: Booking[]
+  +bookingsByProperty: Map<string, Booking[]>
+  +bookingsByStatus: Map<BookingStatus, Booking[]>
+  +bookingsByType: Map<BookingType, Booking[]>
+  +turnBookings: Booking[]
+  +standardBookings: Booking[]
+  +upcomingBookings: Booking[]
+  +todayBookings: Booking[]
+  +urgentBookings: Booking[]
+  
+  ' Actions
+  +fetchBookings(): Promise<void>
+  +createBooking(bookingData: BookingFormData): Promise<Booking>
+  +updateBooking(id: string, updates: Partial<Booking>): Promise<Booking>
+  +deleteBooking(id: string): Promise<void>
+  +assignCleaner(bookingId: string, cleanerId: string): Promise<Booking>
+  +updateStatus(bookingId: string, status: BookingStatus): Promise<Booking>
+  +detectConflicts(booking: Booking): Booking[]
+}
+
+class UIStore {
+  ' State - Map Collections
+  +modals: Map<string, ModalState>
+  +notifications: Map<string, Notification>
+  +loading: Map<string, boolean>
+  +errors: Map<string, string>
+  
+  ' UI State
+  +sidebarOpen: boolean
+  +theme: string
+  +currentView: CalendarView
+  +filters: FilterState
+  
+  ' Computed Getters
+  +activeModals: ModalState[]
+  +unreadNotifications: Notification[]
+  +isLoading: (key: string) => boolean
+  +hasError: (key: string) => boolean
+  
+  ' Actions - Modal Management
+  +openModal(key: string, mode: string, data?: any): void
+  +closeModal(key: string): void
+  +closeAllModals(): void
+  
+  ' Actions - Notification Management
+  +addNotification(notification: Omit<Notification, 'id'>): void
+  +removeNotification(id: string): void
+  +markAsRead(id: string): void
+  +clearAllNotifications(): void
+  
+  ' Actions - Loading & Error Management
+  +setLoading(key: string, loading: boolean): void
+  +setError(key: string, error: string | null): void
+  +clearErrors(): void
+  
+  ' Actions - UI State
+  +toggleSidebar(): void
+  +setTheme(theme: string): void
+  +setCurrentView(view: CalendarView): void
+  +updateFilters(filters: Partial<FilterState>): void
+  +clearFilters(): void
+}
+
+class AuthStore {
+  ' State
+  +user: User | null
+  +token: string | null
+  +isAuthenticated: boolean
+  +loading: boolean
+  +error: string | null
+  
+  ' Computed Getters
+  +userRole: UserRole | null
+  +isOwner: boolean
+  +isAdmin: boolean
+  +isCleaner: boolean
+  +permissions: string[]
+  
+  ' Actions
+  +login(email: string, password: string): Promise<void>
+  +logout(): Promise<void>
+  +register(userData: Partial<User>): Promise<void>
+  +refreshToken(): Promise<void>
+  +updateProfile(updates: Partial<User>): Promise<void>
+  +checkAuth(): Promise<void>
+}
+
+' Store Relationships
+UserStore ||--o{ PropertyStore : "users own properties"
+PropertyStore ||--o{ BookingStore : "properties have bookings"
+UserStore ||--o{ BookingStore : "users assigned to bookings"
+
+' UI Store manages all other stores' UI state
+UIStore ..> UserStore : "manages UI state"
+UIStore ..> PropertyStore : "manages UI state"
+UIStore ..> BookingStore : "manages UI state"
+UIStore ..> AuthStore : "manages UI state"
+
+' Auth Store provides user context to other stores
+AuthStore ..> UserStore : "provides current user"
+AuthStore ..> PropertyStore : "provides user context"
+AuthStore ..> BookingStore : "provides user context"
+
+' Map Collection Details
+class "Map<string, User>" as UserMap {
+  +key: user.id
+  +value: User object
+  +O(1) lookup by ID
+}
+
+class "Map<string, Property>" as PropertyMap {
+  +key: property.id
+  +value: Property object
+  +O(1) lookup by ID
+}
+
+class "Map<string, Booking>" as BookingMap {
+  +key: booking.id
+  +value: Booking object
+  +O(1) lookup by ID
+}
+
+class "Map<string, ModalState>" as ModalMap {
+  +key: modal identifier
+  +value: ModalState object
+  +O(1) modal state lookup
+}
+
+class "Map<string, Notification>" as NotificationMap {
+  +key: notification.id
+  +value: Notification object
+  +O(1) notification lookup
+}
+
+' Map relationships
+UserStore *-- UserMap
+PropertyStore *-- PropertyMap
+BookingStore *-- BookingMap
+UIStore *-- ModalMap
+UIStore *-- NotificationMap
+
+' Business Logic Integration
+package "Business Logic" {
+  class BusinessLogic {
+    +calculateBookingPriority(booking: Booking): Priority
+    +getCleaningWindow(booking: Booking, property: Property): CleaningWindow
+    +validateTurnBooking(booking: Booking, property: Property): ValidationResult
+    +detectBookingConflicts(booking: Booking, bookings: Booking[]): Booking[]
+    +canScheduleCleaning(booking: Booking, property: Property): SchedulingResult
+  }
+}
+
+BookingStore --> BusinessLogic : "uses for validation & calculations"
+PropertyStore --> BusinessLogic : "uses for metrics calculation"
+
+' Notes
+note right of UserStore
+  **USER MANAGEMENT**
+  - Handles all user types (Owner, Admin, Cleaner)
+  - Role-based access control
+  - User settings management
+  - Map collection for O(1) user lookups
+end note
+
+note right of PropertyStore
+  **PROPERTY MANAGEMENT**
+  - CRUD operations for properties
+  - Property metrics calculation
+  - Owner-property relationships
+  - Active/inactive property filtering
+end note
+
+note right of BookingStore
+  **BOOKING MANAGEMENT**
+  - Core business entity store
+  - Turn vs Standard booking logic
+  - Priority calculation integration
+  - Conflict detection
+  - Status workflow management
+  
+  **Critical Business Logic:**
+  - Turn bookings = urgent priority
+  - Standard bookings = flexible scheduling
+  - Real-time conflict detection
+end note
+
+note right of UIStore
+  **UI STATE MANAGEMENT**
+  - Modal state for all dialogs
+  - Notification system
+  - Loading states per operation
+  - Error handling per component
+  - Filter state management
+  - Theme and view preferences
+  
+  **Map Collections for:**
+  - modals: Modal state by key
+  - notifications: Notification by ID
+  - loading: Loading state by operation
+  - errors: Error messages by component
+end note
+
+note right of AuthStore
+  **AUTHENTICATION & AUTHORIZATION**
+  - JWT token management
+  - User session handling
+  - Role-based permissions
+  - Profile management
+  - Mock implementation ready for Supabase
+end note
+
+
+@enduml 

@@ -267,6 +267,17 @@
   - Requirements: multiple themes, theme picker in app-bar, theme persistence
   - Assigned to: Cursor
 
+- [x] **TASK-037c**: Create a project_summaryV2.md that is updated with the current codebase
+  - Status: Complete
+  - Notes: Created comprehensive project_summaryV2.md that reflects the current state of the MVP implementation. Documented all implemented features, architectural patterns, component communication system, testing setup, and development guidelines. The document serves as both a status update and developer reference for the fully functional Property Cleaning Scheduler application.
+  - Requirements: Updated project summary reflecting current implementation status
+  - Assigned to: Cursor
+
+- [ ] **TASK-038**: Implement loading states and error handling
+  - Status: Not Started
+  - Notes: 
+  - Requirements: loading spinners, error messages, user feedback
+  - Assigned to: Cursor
 - [ ] **TASK-038**: Implement loading states and error handling
   - Status: Not Started
   - Notes: 
@@ -310,7 +321,7 @@
   - Assigned to: Cursor
 
 ### **Unit Testing Setup**
-- [x] **TASK-044**: Set up Vitest testing environment
+- [ ] **TASK-044**: Set up Vitest testing environment
   - Status: Complete
   - Notes: Installed and configured Vitest with Happy-DOM, created test folder structure, added test script commands
   - Requirements: vitest, @vue/test-utils, jsdom, coverage
@@ -338,7 +349,7 @@
   - Files: useBookings.test.ts, useProperties.test.ts
   - Assigned to: Cursor
 
-- [x] **TASK-048**: Write unit tests for Pinia stores
+- [ ] **TASK-048**: Write unit tests for Pinia stores
   - Status: Complete
   - Notes: Created comprehensive tests for user, property, booking, and UI stores, testing all getters and actions
   - Requirements: test store actions, getters, Map operations
@@ -391,6 +402,13 @@
   - Assigned to: Human + Cursor
 
 ### **Documentation & Cleanup**
+- [x] **TASK-055A**: Create UML diagrams to visualize codebase architecture
+  - Status: Complete
+  - Notes: Created comprehensive UML diagrams in docs/uml/ directory including TypeScript interfaces class diagram, Vue component architecture diagram, Pinia store architecture diagram, event flow sequence diagram, and business logic class diagram. All diagrams follow PlantUML format and document the current MVP implementation with detailed notes about Map collections pattern, central orchestrator pattern, and turn vs standard booking business logic.
+  - Files: docs/uml/README.md, interfaces-class-diagram.puml, component-architecture-diagram.puml, store-architecture-diagram.puml, event-flow-sequence-diagram.puml, business-logic-class-diagram.puml
+  - Requirements: Visualize TypeScript interfaces, component communication, store architecture, event flows, and business logic
+  - Assigned to: Cursor
+
 - [ ] **TASK-056**: Document component APIs and usage
   - Status: Not Started
   - Notes: 
@@ -457,5 +475,3 @@
 - Home.vue as central orchestrator pattern
 - Vuetify 3 for UI components
 
-### **Next Session Focus:**
-Start with TASK-001 through TASK-007 (project setup and foundation)

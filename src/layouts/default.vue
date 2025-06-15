@@ -4,26 +4,38 @@
       <!-- Navigation Drawer -->
       <v-navigation-drawer
         v-model="drawer"
-        :rail="rail"
+        :rail="(rail && !mobile) || (md && !mobile)"
         :permanent="!mobile"
         :temporary="mobile"
         @click="rail = false"
-        width="60"
         color="secondary"
-        class="border-r gradient-sidebar"
+        class="border-r"
+        
       >
+      <v-list>    
+        <v-list-item
+        title="Cleano"
+        >
+        <template v-slot:append>
+              <v-btn
+                icon="mdi-chevron-left"
+                variant="text"
+                @click.stop="closeDrawer"
+              ></v-btn>
+            </template>
+          </v-list-item>
+          
+        </v-list>
         <!-- App Logo and Title -->
-        <div class="pa-4 d-flex align-center">
+        <!-- <div class="pa-4 d-flex align-center">
           <v-avatar color="primary" class="mr-3">
             <v-icon color="white">mdi-broom</v-icon>
           </v-avatar>
           <h3 class="text-h5">Property Scheduler</h3>
-        </div>
-        
+        </div> -->
         <v-divider class="my-2"></v-divider>
-
         <!-- Navigation Links -->
-        <v-list nav>
+        <v-list density="compact" nav>
           <v-list-item
             to="/"
             prepend-icon="mdi-view-dashboard"
@@ -67,10 +79,8 @@
             title="Contact Us"
             rounded="lg"
           ></v-list-item>
-  
         </v-list>
       </v-navigation-drawer>
-  
       <!-- App Bar -->
       <v-app-bar
         app
@@ -133,32 +143,51 @@
   </template>
   
   <script setup lang="ts">
-  import { computed, watch } from 'vue';
+  import { ref } from 'vue';
+  import { watch } from 'vue';
   import { useDisplay } from 'vuetify';
-  import { useUIStore } from '@/stores/ui';
   import ThemePicker from '@/components/dumb/ThemePicker.vue';
+
+  // Reactive state for the navigation drawer
+  const drawer = ref(true);
+  const rail = ref(false);
+  
   
   // Store connections
-  const uiStore = useUIStore();
-  const { mobile } = useDisplay();
-  
-  // Sidebar state from UI store
-  const sidebarVisible = computed({
-    get: () => uiStore.isSidebarOpen('main'),
-    set: (value: boolean) => uiStore.sidebars.set('main', value)
-  });
+  const { mobile, md } = useDisplay();
   
   // Methods
   const toggleSidebar = (): void => {
-    uiStore.toggleSidebar('main');
+    if (mobile.value) {
+      // On mobile, toggle the drawer visibility
+      drawer.value = !drawer.value;
+    } else {
+      // On desktop, toggle the rail mode
+      rail.value = !rail.value;
+    }
+  };
+
+  const closeDrawer = (): void => {
+    if (mobile.value) {
+      // On mobile, close the drawer
+      drawer.value = false;
+    } else {
+      // On desktop, toggle rail mode
+      rail.value = !rail.value;
+    }
   };
   
-  // Auto-hide sidebar on mobile
-  watch(mobile, (isMobile: boolean) => {
+  // Auto-adjust drawer behavior based on screen size
+  watch([mobile, md], ([isMobile, _isMd]: [boolean, boolean]) => {
     if (isMobile) {
-      uiStore.sidebars.set('main', false);
+      drawer.value = false; // Hide drawer when switching to mobile
+      rail.value = false; // Reset rail mode on mobile
+    } else {
+      drawer.value = true; // Show drawer on tablet and desktop
+      // Don't set rail.value here - let the prop logic handle it automatically
+      // Rail mode will be controlled by: :rail="(rail && !mobile) || (md && !mobile)"
     }
-  });
+  }, { immediate: true });
   </script>
   
   <style>

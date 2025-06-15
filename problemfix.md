@@ -1,6 +1,8 @@
-# TypeScript Error Fix: Property 'setFilter' in UI Store
 
-## Problem Description
+>### --- PROBLEM - 001 ---
+### TypeScript Error Fix: Property 'setFilter' in UI Store
+
+### Problem Description 
 
 The TypeScript compiler was reporting an error in the `useCalendarState` composable:
 
@@ -81,14 +83,14 @@ This solution:
 
 The solution elegantly bridges the gap between the structured FilterState approach and the more flexible key-value approach needed by the useCalendarState composable.
 
-## Prevention
+### Prevention
 
 To prevent similar issues in the future:
 1. Ensure composables and components check for the existence of store methods before using them
 2. Consider adding utility methods for common patterns across the codebase
 3. Document API boundaries and expected usage patterns for stores and composables
 
-## Additional Notes
+### Additional Notes
 
 While fixing the `setFilter` error in the UI store, we ran TypeScript verification and found additional errors in the test files. These errors are related to outdated test specifications that no longer match the current implementation of the stores, particularly in:
 
@@ -100,9 +102,9 @@ These test errors are separate from the `setFilter` issue we addressed and would
 
 The important thing is that our fix for the `setFilter` method in the UI store resolved the TypeScript error in the application code, allowing the calendar functionality to work correctly.
 
-# TypeScript Linter Errors in Home.vue
+## TypeScript Linter Errors in Home.vue
 
-## Problem Description
+### Problem Description
 
 The TypeScript linter was reporting the following errors in src/components/smart/Home.vue:
 
@@ -173,3 +175,122 @@ After making these changes:
 2. When using destructuring, be selective about which properties you extract
 3. Regular linting helps identify unused code that might otherwise accumulate over time
 4. Having a clean codebase with no linter errors makes the project more maintainable
+
+>### --- PROBLEM - 002 ---
+### TypeScript Watch Function Overload Errors in default.vue Layout
+
+### Problem Description
+
+The TypeScript compiler was reporting multiple errors in `src/layouts/default.vue` related to the `watch` function usage:
+
+```
+Error 2769: No overload matches this call.
+'isLgAndUp' is declared but its value is never read.
+```
+
+The specific issues were:
+1. Line 181: `watch([mobile, lgAndUp], ([isMobile, isLgAndUp]: [boolean, boolean, boolean])` - watching 2 elements but expecting 3 booleans in the callback
+2. The `isLgAndUp` parameter was declared but never used in the callback logic
+3. The `lgAndUp` breakpoint was being watched but not actually used in the template logic
+
+## Root Cause
+
+The root cause was a mismatch between the Vue `watch` function signature and its usage:
+
+1. **Watch Array Mismatch**: The code was watching `[mobile, lgAndUp]` (2 reactive sources) but the callback was expecting `[boolean, boolean, boolean]` (3 boolean parameters)
+
+2. **Incorrect Breakpoint Selection**: The template uses `mobile` and `md` breakpoints:
+   ```vue
+   :rail="(rail && !mobile) || (md && !mobile)"
+   :permanent="!mobile"
+   :temporary="mobile"
+   ```
+   But the watch was monitoring `mobile` and `lgAndUp`, missing the `md` breakpoint that's actually used.
+
+3. **Unused Parameters**: The `isLgAndUp` parameter was declared but never used in the callback logic, and `lgAndUp` was destructured from `useDisplay()` but not needed.
+
+According to Vue's documentation, when watching multiple sources:
+```typescript
+// watching multiple sources
+function watch<T>(
+  sources: WatchSource<T>[],
+  callback: WatchCallback<T[]>,
+  options?: WatchOptions
+): WatchHandle
+```
+
+The callback receives arrays of new and old values matching the number of sources being watched.
+
+## Solution
+
+The solution involved three changes to align the watch usage with Vue's API and the actual template requirements:
+
+1. **Fixed Watch Sources**: Changed from `[mobile, lgAndUp]` to `[mobile, md]` to match the breakpoints actually used in the template:
+   ```diff
+   - watch([mobile, lgAndUp], ([isMobile, isLgAndUp]: [boolean, boolean, boolean]) => {
+   + watch([mobile, md], ([isMobile, _isMd]: [boolean, boolean]) => {
+   ```
+
+2. **Corrected Type Signature**: Updated the callback parameter types from `[boolean, boolean, boolean]` to `[boolean, boolean]` to match the 2 sources being watched.
+
+3. **Removed Unused Variables**: 
+   - Removed `lgAndUp` from the `useDisplay()` destructuring since it's not needed
+   - Prefixed `_isMd` with underscore to indicate it's intentionally unused (following TypeScript conventions)
+
+   ```diff
+   - const { mobile, md, lgAndUp } = useDisplay();
+   + const { mobile, md } = useDisplay();
+   ```
+
+## Technical Details
+
+The fix ensures proper TypeScript compliance with Vue's `watch` function:
+
+- **Sources Array**: `[mobile, md]` - 2 reactive sources
+- **Callback Parameters**: `([isMobile, _isMd]: [boolean, boolean])` - 2 boolean parameters
+- **Template Alignment**: Watches the breakpoints actually used in the template logic
+
+The callback logic only uses `isMobile` for drawer behavior, which is correct since the responsive logic primarily cares about mobile vs non-mobile transitions:
+
+```typescript
+if (isMobile) {
+  drawer.value = false; // Hide drawer when switching to mobile
+  rail.value = false; // Reset rail mode on mobile
+} else {
+  drawer.value = true; // Show drawer on tablet and desktop
+}
+```
+
+## Verification
+
+After implementing the fix:
+- ✅ TypeScript compilation passes without errors for `default.vue`
+- ✅ All watch function overload errors resolved
+- ✅ No unused variable warnings
+- ✅ Template breakpoint usage aligns with watched sources
+- ✅ Responsive drawer behavior continues to work correctly
+
+## Benefits of the Solution
+
+1. **Type Safety**: Proper TypeScript compliance with Vue's watch API
+2. **Template Alignment**: Watches the breakpoints actually used in the template
+3. **Clean Code**: No unused variables or parameters
+4. **Maintainability**: Clear relationship between watched sources and template usage
+5. **Performance**: Only watches necessary reactive sources
+
+## Lessons Learned
+
+1. **Match Watch Sources to Usage**: Ensure watched reactive sources align with what's actually used in templates and logic
+2. **Understand Vue Watch API**: When watching multiple sources, callback parameters must match the number of sources
+3. **TypeScript Compliance**: Vue's Composition API has strict type signatures that must be followed
+4. **Responsive Design Patterns**: Be intentional about which breakpoints are needed for specific UI behaviors
+5. **Code Cleanup**: Remove unused imports and variables to maintain clean, maintainable code
+
+## Prevention
+
+To prevent similar issues in the future:
+1. Always verify that watch sources match the template/logic requirements
+2. Use TypeScript strict mode to catch type mismatches early
+3. Follow Vue's documentation for proper watch function usage
+4. Regularly audit code for unused variables and imports
+5. Test responsive behavior across different breakpoints to ensure correct watch sources

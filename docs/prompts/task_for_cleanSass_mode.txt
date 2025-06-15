@@ -1,0 +1,40 @@
+Read @project_summary.md and @tasks.md to understand project architecture and the current implementation of tasks.
+Examine @repomix-output.md for the current context. look at existing patterns, implementations and state flow.
+
+For TASK-000
+1. Context First: Use Context7 tool to look for the relevant keywords within the scope
+of the task that so context 7 can search for correct combination of tech documentation. 
+refer to @context7_techstack_ids.md for usage examples
+
+2. Plan: Use sequential thinking to break down the task and plan implementation
+
+3. Implement: Build the feature following established patterns from @project_summary.md
+
+4. Integrate: Ensure implementation fits the broader project architecture and Map collection patterns
+
+5. Update: Change task status from "Not Started" to "Complete" in TASK.md
+
+6. Document: Add detailed notes about implementation decisions and any challenges
+
+7. Verify: Check off task with [x] and ensure it enables future dependent tasks
+
+ Key Patterns to Follow:
+ Use Map collections for all state management
+ Follow the Home.vue central orchestrator pattern
+ Maintain turn vs standard booking distinction in all business logic
+ Reference existing composables and stores for consistency
+ Implement proper TypeScript typing and error handling
+
+ Before Marking Complete:
+[ ] TypeScript compiles without errors
+[ ] Follows established naming conventions
+[ ] Integrates with existing stores/composables
+[ ] Includes basic error handling
+[ ] Updates any dependent interfaces/types
+
+ Critical Project Concepts:
+Turn bookings = urgent, same-day turnovers between guests
+Standard bookings = regular recurring cleanings
+Priority calculation based on checkout → checkin time window
+All state uses Map collections, not arrays
+UI Store manages modals, sidebars, loading states

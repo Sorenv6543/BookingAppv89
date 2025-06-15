@@ -1,21 +1,4 @@
-# Retrieve libraries and topics for tech stack
-_Exported on 6/10/2025 at 04:55:44 PDT from Cursor (1.0.0)_
-
----
-
-**User**
-
-use context 7 to return the corrent library-is's and the topic if it applies ,for each item in my tech stack 
-
----
-
-**Cursor**
-
-I'll help you get the correct Context7 library IDs for each item in your tech stack. Let me resolve each technology:
-
-Based on the Context7 search results, here are the correct library IDs and suggested topics for each item in your tech stack:
-
-## **Context7 Library IDs and Topics for Your Tech Stack**
+## **Context7 Library IDs and Topics for Current Tech Stack**
 
 ### **Vue 3 with TypeScript, Composition API**
 - **Library ID**: `/vuejs/docs`
@@ -99,36 +82,5 @@ get-library-docs /fullcalendar/fullcalendar --topic="vue-integration typescript"
 get-library-docs /vitejs/vite --topic="configuration vue typescript"
 ```
 
-The library IDs with the highest trust scores and most comprehensive code snippet coverage have been selected to ensure you get the most authoritative and useful documentation for your property cleaning scheduler project.
 
-```shellscript
-# Vue 3 Documentation
-get-library-docs /vuejs/docs --topic="composition-api typescript"
-
-# TypeScript Documentation  
-get-library-docs /microsoft/typescript --topic="interfaces type-guards"
-
-# Vuetify 3 Documentation
-get-library-docs /vuetifyjs/vuetify --topic="components typescript"
-
-# Pinia Documentation
-get-library-docs /vuejs/pinia --topic="stores typescript composition-api"
-
-# Vue Router 4 Documentation
-get-library-docs /vuejs/router --topic="typescript navigation"
-# OR for file-based routing specifically:
-get-library-docs /posva/unplugin-vue-router --topic="file-based-routing"
-
-# Supabase Documentation
-get-library-docs /supabase/supabase --topic="database realtime javascript-client"
-
-# Supabase Auth Documentation
-get-library-docs /supabase/auth --topic="authentication jwt"
-
-# FullCalendar Documentation
-get-library-docs /fullcalendar/fullcalendar --topic="vue-integration typescript"
-
-# Vite Documentation
-get-library-docs /vitejs/vite --topic="configuration vue typescript"
-```
 
