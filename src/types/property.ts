@@ -6,7 +6,7 @@
 /**
  * Valid pricing tiers for properties
  */
-export type PricingTier = 'basic' | 'premium' | 'luxury';
+export type PricingTier = 'basic' | 'standard' | 'premium' | 'luxury';
 
 /**
  * Property Interface
@@ -17,6 +17,10 @@ export interface Property {
   owner_id: string;
   name: string;
   address: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  square_feet?: number;
+  property_type?: 'apartment' | 'house' | 'condo' | 'townhouse';
   cleaning_duration: number; // minutes
   special_instructions?: string;
   pricing_tier: PricingTier;

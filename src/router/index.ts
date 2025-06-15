@@ -71,6 +71,15 @@ const router = createRouter({
         layout: 'default'
       }
     },
+
+    {
+      path: '/components/smart/admin/admin-calendar',
+      name: 'admin-calendar-demo',
+      component: () => import('@/components/smart/admin/AdminCalendarDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
     {
       path: '/components/smart/owner/owner-calendar',
       name: 'owner-calendar-demo',
