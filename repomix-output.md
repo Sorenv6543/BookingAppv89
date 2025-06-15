@@ -50,6 +50,7 @@ src/pages/settings/
 docs/oldchat/cursor_determine_next_steps_for_the_pro.md
 docs/oldchat/cursor_fix_typescript_issue_in_home_vue.md
 docs/oldchat/cursor_generate_a_name_for_the_chat.md
+docs/oldchat/cursor_implementing_task_039d_for_role.md
 docs/oldchat/cursor_installed_npm_in_the_wrong_direc.md
 docs/oldchat/cursor_project_overview_and_summary_dis.md
 docs/oldchat/cursor_review_project_documentation_and.md
@@ -111,6 +112,8 @@ src/components/dumb/ThemePicker.vue
 src/components/dumb/TurnAlerts.vue
 src/components/dumb/TurnAlertsDemo.vue
 src/components/dumb/UpcomingCleanings.vue
+src/components/smart/admin/HomeAdmin.vue
+src/components/smart/admin/HomeAdminDemo.vue
 src/components/smart/admin/README.md
 src/components/smart/FullCalendar.vue
 src/components/smart/Home.vue
@@ -141,6 +144,7 @@ src/pages/auth/register.vue
 src/pages/calendar/index.vue
 src/pages/crud-testing.vue
 src/pages/demos/calendar.vue
+src/pages/demos/home-admin.vue
 src/pages/demos/index.vue
 src/pages/demos/owner-calendar.vue
 src/pages/demos/owner-sidebar.vue
@@ -171,898 +175,6 @@ vitest.config.ts
 ```
 
 # Files
-
-## File: src/components/smart/owner/OwnerCalendar.vue
-`````vue
-<template>
-  <div class="owner-calendar-container">
-    <FullCalendar
-      ref="calendarRef"
-      :options="ownerCalendarOptions"
-      class="owner-calendar"
-    />
-  </div>
-</template>
-<script setup lang="ts">
-import FullCalendar from '@fullcalendar/vue3';
-import type { CalendarOptions, DateSelectArg, EventClickArg } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import { computed, ref, watch } from 'vue';
-import { useTheme } from 'vuetify';
-import type { Booking, Property } from '@/types';
-// Import event logger for component communication
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-interface Props {
-  bookings: Map<string, Booking>;
-  properties: Map<string, Property>;
-  loading?: boolean;
-  currentView?: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
-  currentDate?: Date;
-}
-interface Emits {
-  (e: 'dateSelect', selectInfo: DateSelectArg): void;
-  (e: 'eventClick', clickInfo: EventClickArg): void;
-  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
-  (e: 'viewChange', view: string): void;
-  (e: 'dateChange', date: Date): void;
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-  currentView: 'timeGridWeek',
-  currentDate: () => new Date()
-});
-const emit = defineEmits<Emits>();
-// Theme integration
-const theme = useTheme();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-// Convert owner's bookings Map to FullCalendar events
-const ownerCalendarEvents = computed(() => {
-  return Array.from(props.bookings.values()).map(booking => {
-    const property = props.properties.get(booking.property_id);
-    const isTurn = booking.booking_type === 'turn';
-    return {
-      id: booking.id,
-      title: `${property?.name || 'My Property'} ${isTurn ? '🔥 TURN' : ''}`,
-      start: booking.checkout_date,
-      end: booking.checkin_date,
-      backgroundColor: getOwnerEventColor(booking),
-      borderColor: getOwnerEventBorderColor(booking),
-      textColor: getOwnerEventTextColor(booking),
-      extendedProps: {
-        booking,
-        property,
-        bookingType: booking.booking_type,
-        status: booking.status,
-        guestCount: booking.guest_count,
-        notes: booking.notes
-      },
-      classNames: [
-        `owner-booking-${booking.booking_type}`,
-        `owner-status-${booking.status}`,
-        isTurn ? 'owner-priority-urgent' : 'owner-priority-normal'
-      ]
-    };
-  });
-});
-// Owner-focused color system (simpler than admin version)
-const getOwnerEventColor = (booking: Booking): string => {
-  const isDark = theme.global.current.value.dark;
-  if (booking.booking_type === 'turn') {
-    // Turn bookings - urgent red/orange colors
-    switch (booking.status) {
-      case 'pending': return isDark ? '#FF5252' : '#F44336'; // Urgent red
-      case 'scheduled': return isDark ? '#FF9800' : '#FF6F00'; // Warning orange
-      case 'in_progress': return isDark ? '#4CAF50' : '#2E7D32'; // Success green
-      case 'completed': return isDark ? '#9E9E9E' : '#616161'; // Muted gray
-      default: return isDark ? '#FF5252' : '#F44336';
-    }
-  } else {
-    // Standard bookings - calmer blue colors
-    switch (booking.status) {
-      case 'pending': return isDark ? '#2196F3' : '#1976D2'; // Primary blue
-      case 'scheduled': return isDark ? '#00BCD4' : '#0097A7'; // Cyan
-      case 'in_progress': return isDark ? '#4CAF50' : '#388E3C'; // Green
-      case 'completed': return isDark ? '#9E9E9E' : '#757575'; // Gray
-      default: return isDark ? '#2196F3' : '#1976D2';
-    }
-  }
-};
-const getOwnerEventBorderColor = (booking: Booking): string => {
-  return booking.booking_type === 'turn' ? '#D32F2F' : '#1976D2';
-};
-const getOwnerEventTextColor = (booking: Booking): string => {
-  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
-};
-// Owner-focused calendar configuration (simplified)
-const ownerCalendarOptions = computed<CalendarOptions>(() => ({
-  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-  // View settings - basic views only
-  initialView: props.currentView,
-  headerToolbar: false, // We'll handle toolbar externally
-  // Event settings
-  events: ownerCalendarEvents.value,
-  eventDisplay: 'block',
-  eventOverlap: false,
-  // Owner interaction settings (simplified)
-  selectable: true,
-  selectMirror: true,
-  editable: false, // No drag-and-drop for owners (admin feature)
-  droppable: false, // No drag-to-assign (admin feature)
-  // Date/time settings
-  locale: 'en',
-  timeZone: 'local',
-  slotMinTime: '06:00:00',
-  slotMaxTime: '22:00:00',
-  slotDuration: '01:00:00',
-  // Appearance - owner-friendly
-  height: 'auto',
-  aspectRatio: 1.8,
-  // Custom styling based on theme
-  themeSystem: 'standard',
-  // Event handlers - owner-specific
-  select: handleOwnerDateSelect,
-  eventClick: handleOwnerEventClick,
-  datesSet: handleDatesSet,
-  // Loading state
-  loading: handleLoading,
-  // Custom rendering - owner-focused
-  eventContent: renderOwnerEventContent,
-  dayCellContent: renderOwnerDayCell,
-  // Business hours
-  businessHours: {
-    daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // Monday - Sunday
-    startTime: '08:00',
-    endTime: '18:00'
-  },
-  // Weekend styling
-  weekends: true,
-  // Month view specific
-  dayMaxEvents: 3,
-  moreLinkClick: 'popover',
-  // Week/day view specific
-  allDaySlot: false,
-  nowIndicator: true,
-  scrollTime: '08:00:00'
-}));
-// Owner-specific event handlers
-const handleOwnerDateSelect = (selectInfo: DateSelectArg): void => {
-  // Log emitting event to HomeOwner
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'emit'
-  );
-  emit('dateSelect', selectInfo);
-  // Auto-create booking for owner
-  emit('createBooking', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr
-  });
-  // Clear selection
-  selectInfo.view.calendar.unselect();
-};
-const handleOwnerEventClick = (clickInfo: EventClickArg): void => {
-  // Log emitting event to HomeOwner
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'emit'
-  );
-  emit('eventClick', clickInfo);
-};
-const handleDatesSet = (dateInfo: any): void => {
-  // Handle view/date changes
-  const newDate = new Date(dateInfo.start);
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'dateChange',
-    { date: newDate.toISOString() },
-    'emit'
-  );
-  emit('dateChange', newDate);
-};
-const handleLoading = (isLoading: boolean): void => {
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'loadingState',
-    { isLoading },
-    'emit'
-  );
-};
-// Owner-focused custom event rendering
-const renderOwnerEventContent = (eventInfo: any) => {
-  const booking = eventInfo.event.extendedProps.booking as Booking;
-  const property = eventInfo.event.extendedProps.property as Property;
-  const isTurn = booking.booking_type === 'turn';
-  return {
-    html: `
-      <div class="owner-event-content">
-        <div class="owner-event-title">
-          ${isTurn ? '🔥 ' : ''}${property?.name || 'My Property'}
-        </div>
-        <div class="owner-event-details">
-          ${booking.status.toUpperCase()}
-          ${booking.guest_count ? ` • ${booking.guest_count} guests` : ''}
-        </div>
-        ${isTurn ? '<div class="owner-turn-badge">URGENT TURN</div>' : ''}
-      </div>
-    `
-  };
-};
-// Owner-focused day cell rendering
-const renderOwnerDayCell = (dayInfo: any) => {
-  const dayBookings = Array.from(props.bookings.values())
-    .filter(booking => {
-      const checkoutDate = new Date(booking.checkout_date).toDateString();
-      const dayDate = dayInfo.date.toDateString();
-      return checkoutDate === dayDate;
-    });
-  const myTurnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
-  const myBookingCount = dayBookings.length;
-  return {
-    html: `
-      <div class="owner-day-number">
-        ${dayInfo.dayNumberText}
-        ${myTurnCount > 0 ? `<span class="owner-turn-indicator">${myTurnCount}</span>` : ''}
-        ${myBookingCount > 0 && myTurnCount === 0 ? `<span class="owner-booking-indicator">${myBookingCount}</span>` : ''}
-      </div>
-    `
-  };
-};
-// Programmatic calendar methods for owner
-const goToDate = (date: string | Date): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(date);
-  }
-};
-const changeView = (viewName: string): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().changeView(viewName);
-    eventLogger.logEvent(
-      'OwnerCalendar',
-      'HomeOwner',
-      'viewChange',
-      { view: viewName },
-      'emit'
-    );
-    emit('viewChange', viewName);
-  }
-};
-const refreshEvents = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().refetchEvents();
-  }
-};
-// Watch for theme changes and update calendar
-watch(() => theme.global.current.value.dark, () => {
-  refreshEvents();
-});
-// Watch for changes in props from HomeOwner
-watch(() => props.bookings, (newBookings) => {
-  // Log receiving updated bookings from HomeOwner
-  eventLogger.logEvent(
-    'HomeOwner',
-    'OwnerCalendar',
-    'bookingsUpdate',
-    { count: newBookings.size },
-    'receive'
-  );
-}, { deep: true });
-// Watch for view changes from parent
-watch(() => props.currentView, (newView) => {
-  if (newView && calendarRef.value) {
-    calendarRef.value.getApi().changeView(newView);
-  }
-});
-// Watch for date changes from parent
-watch(() => props.currentDate, (newDate) => {
-  if (newDate && calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(newDate);
-  }
-});
-// Expose methods to parent (HomeOwner)
-defineExpose({
-  goToDate,
-  changeView,
-  refreshEvents,
-  getApi: () => calendarRef.value?.getApi()
-});
-</script>
-<style scoped>
-.owner-calendar-container {
-  height: 100%;
-  width: 100%;
-}
-.owner-calendar {
-  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
-  --fc-button-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-border-color: rgb(var(--v-theme-primary));
-  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
-  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
-}
-/* Owner-specific turn booking highlighting */
-.fc-event.owner-booking-turn {
-  font-weight: bold;
-  border-width: 2px !important;
-  animation: owner-pulse 2s infinite;
-}
-@keyframes owner-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
-  70% { box-shadow: 0 0 0 8px rgba(var(--v-theme-error), 0); }
-  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
-}
-/* Owner-specific status styling */
-.fc-event.owner-status-pending {
-  opacity: 0.9;
-}
-.fc-event.owner-status-completed {
-  opacity: 0.6;
-  text-decoration: line-through;
-}
-.fc-event.owner-priority-urgent {
-  border-left: 4px solid rgb(var(--v-theme-error)) !important;
-}
-/* Owner-specific turn indicator in day cells */
-.owner-turn-indicator {
-  background: rgb(var(--v-theme-error));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 10px;
-  margin-left: 4px;
-  font-weight: bold;
-  animation: owner-pulse 2s infinite;
-}
-.owner-booking-indicator {
-  background: rgb(var(--v-theme-primary));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 10px;
-  margin-left: 4px;
-  font-weight: bold;
-}
-/* Owner-specific event content styling */
-.owner-event-content {
-  padding: 2px;
-}
-.owner-event-title {
-  font-weight: 600;
-  font-size: 0.85em;
-}
-.owner-event-details {
-  font-size: 0.75em;
-  opacity: 0.9;
-  margin-top: 1px;
-}
-.owner-turn-badge {
-  background: rgba(var(--v-theme-error), 0.2);
-  color: rgb(var(--v-theme-error));
-  font-size: 0.7em;
-  padding: 1px 4px;
-  border-radius: 4px;
-  margin-top: 2px;
-  font-weight: bold;
-  text-align: center;
-}
-/* Owner-specific day cell styling */
-.owner-day-number {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-/* Responsive adjustments for owner calendar */
-@media (max-width: 768px) {
-  .owner-event-title {
-    font-size: 0.8em;
-  }
-  .owner-event-details {
-    font-size: 0.7em;
-  }
-  .owner-turn-badge {
-    font-size: 0.65em;
-  }
-}
-</style>
-`````
-
-## File: src/components/smart/owner/OwnerCalendarDemo.vue
-`````vue
-<template>
-  <div class="owner-calendar-demo">
-    <v-container fluid>
-      <v-row>
-        <v-col cols="12">
-          <v-card>
-            <v-card-title class="d-flex align-center">
-              <v-icon class="mr-2">mdi-calendar-account</v-icon>
-              OwnerCalendar Demo
-              <v-spacer />
-              <v-chip color="primary" variant="outlined">
-                Owner View
-              </v-chip>
-            </v-card-title>
-            <v-card-subtitle>
-              Simplified calendar interface for property owners - shows only their bookings with basic controls
-            </v-card-subtitle>
-            <v-card-text>
-              <!-- Calendar Controls -->
-              <div class="demo-controls mb-4">
-                <v-row align="center">
-                  <v-col cols="auto">
-                    <v-btn
-                      icon="mdi-arrow-left"
-                      variant="text"
-                      @click="handlePrevious"
-                    />
-                    <v-btn 
-                      variant="outlined" 
-                      class="mx-2" 
-                      @click="handleGoToday"
-                    >
-                      Today
-                    </v-btn>
-                    <v-btn
-                      icon="mdi-arrow-right"
-                      variant="text"
-                      @click="handleNext"
-                    />
-                  </v-col>
-                  <v-col cols="auto">
-                    <div class="text-h6">
-                      {{ formattedDate }}
-                    </div>
-                  </v-col>
-                  <v-spacer />
-                  <v-col cols="auto">
-                    <v-btn-toggle
-                      v-model="currentView"
-                      mandatory
-                      @update:model-value="handleViewChange"
-                    >
-                      <v-btn value="dayGridMonth">
-                        Month
-                      </v-btn>
-                      <v-btn value="timeGridWeek">
-                        Week
-                      </v-btn>
-                      <v-btn value="timeGridDay">
-                        Day
-                      </v-btn>
-                    </v-btn-toggle>
-                  </v-col>
-                </v-row>
-              </div>
-              <!-- Owner Calendar Component -->
-              <OwnerCalendar
-                ref="ownerCalendarRef"
-                :bookings="ownerBookings"
-                :properties="ownerProperties"
-                :loading="loading"
-                :current-view="currentView"
-                :current-date="currentDate"
-                @date-select="handleDateSelect"
-                @event-click="handleEventClick"
-                @create-booking="handleCreateBooking"
-                @view-change="handleCalendarViewChange"
-                @date-change="handleCalendarDateChange"
-              />
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <!-- Demo Information -->
-      <v-row class="mt-4">
-        <v-col cols="12" md="6">
-          <v-card>
-            <v-card-title>
-              <v-icon class="mr-2">mdi-information</v-icon>
-              Owner Calendar Features
-            </v-card-title>
-            <v-card-text>
-              <v-list density="compact">
-                <v-list-item>
-                  <v-list-item-title>✅ Shows only owner's bookings</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>✅ Basic calendar views (Month, Week, Day)</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>✅ Click to edit bookings</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>✅ Date selection for new bookings</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>✅ Turn booking highlighting</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>❌ No drag-and-drop (admin feature)</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>❌ No cleaner assignment (admin feature)</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="12" md="6">
-          <v-card>
-            <v-card-title>
-              <v-icon class="mr-2">mdi-chart-bar</v-icon>
-              Owner Data Summary
-            </v-card-title>
-            <v-card-text>
-              <v-list density="compact">
-                <v-list-item>
-                  <v-list-item-title>
-                    Properties: {{ ownerProperties.size }}
-                  </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Total Bookings: {{ ownerBookings.size }}
-                  </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Turn Bookings: {{ turnBookingsCount }}
-                  </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Standard Bookings: {{ standardBookingsCount }}
-                  </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Pending: {{ pendingBookingsCount }}
-                  </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <!-- Event Log -->
-      <v-row class="mt-4">
-        <v-col cols="12">
-          <v-card>
-            <v-card-title>
-              <v-icon class="mr-2">mdi-console</v-icon>
-              Event Log
-              <v-spacer />
-              <v-btn
-                size="small"
-                variant="outlined"
-                @click="clearEventLog"
-              >
-                Clear
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <div class="event-log">
-                <div
-                  v-for="(event, index) in eventLog"
-                  :key="index"
-                  class="event-log-item"
-                >
-                  <v-chip
-                    :color="event.type === 'emit' ? 'primary' : 'secondary'"
-                    size="small"
-                    class="mr-2"
-                  >
-                    {{ event.type }}
-                  </v-chip>
-                  <span class="text-caption">
-                    {{ event.timestamp }} - {{ event.from }} → {{ event.to }}: {{ event.event }}
-                    <span v-if="event.data" class="text-grey">
-                      ({{ JSON.stringify(event.data) }})
-                    </span>
-                  </span>
-                </div>
-                <div v-if="eventLog.length === 0" class="text-grey text-center py-4">
-                  No events logged yet. Interact with the calendar to see events.
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
-⋮----
-<!-- Calendar Controls -->
-⋮----
-{{ formattedDate }}
-⋮----
-<!-- Owner Calendar Component -->
-⋮----
-<!-- Demo Information -->
-⋮----
-Properties: {{ ownerProperties.size }}
-⋮----
-Total Bookings: {{ ownerBookings.size }}
-⋮----
-Turn Bookings: {{ turnBookingsCount }}
-⋮----
-Standard Bookings: {{ standardBookingsCount }}
-⋮----
-Pending: {{ pendingBookingsCount }}
-⋮----
-<!-- Event Log -->
-⋮----
-{{ event.type }}
-⋮----
-{{ event.timestamp }} - {{ event.from }} → {{ event.to }}: {{ event.event }}
-⋮----
-({{ JSON.stringify(event.data) }})
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import OwnerCalendar from './OwnerCalendar.vue';
-import type { Booking, Property } from '@/types';
-import type { DateSelectArg, EventClickArg } from '@fullcalendar/core';
-// Demo state
-const ownerCalendarRef = ref<InstanceType<typeof OwnerCalendar> | null>(null);
-const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'>('timeGridWeek');
-const currentDate = ref<Date>(new Date());
-const loading = ref(false);
-const eventLog = ref<Array<{
-  timestamp: string;
-  from: string;
-  to: string;
-  event: string;
-  type: 'emit' | 'receive';
-  data?: any;
-}>>([]);
-// Sample owner data (filtered to single owner)
-const ownerId = 'owner-1';
-const ownerProperties = ref<Map<string, Property>>(new Map([
-  ['prop-1', {
-    id: 'prop-1',
-    owner_id: ownerId,
-    name: 'Sunset Villa',
-    address: '123 Beach Road, Malibu, CA',
-    cleaning_duration: 180,
-    special_instructions: 'Pool cleaning required',
-    pricing_tier: 'luxury',
-    active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
-  }],
-  ['prop-2', {
-    id: 'prop-2',
-    owner_id: ownerId,
-    name: 'Mountain Cabin',
-    address: '456 Pine Street, Aspen, CO',
-    cleaning_duration: 120,
-    special_instructions: 'Fireplace cleaning needed',
-    pricing_tier: 'premium',
-    active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
-  }],
-  ['prop-3', {
-    id: 'prop-3',
-    owner_id: ownerId,
-    name: 'City Loft',
-    address: '789 Downtown Ave, NYC, NY',
-    cleaning_duration: 90,
-    special_instructions: 'High-rise building, elevator access',
-    pricing_tier: 'basic',
-    active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
-  }]
-]));
-const ownerBookings = ref<Map<string, Booking>>(new Map());
-// Generate sample bookings for the owner
-const generateOwnerBookings = () => {
-  const bookings = new Map<string, Booking>();
-  const today = new Date();
-  const properties = Array.from(ownerProperties.value.keys());
-  // Generate bookings for the next 30 days
-  for (let i = 0; i < 10; i++) {
-    const checkoutDate = new Date(today);
-    checkoutDate.setDate(today.getDate() + i * 2);
-    const checkinDate = new Date(checkoutDate);
-    checkinDate.setDate(checkoutDate.getDate() + 1);
-    const propertyId = properties[i % properties.length];
-    const isTurn = Math.random() > 0.7; // 30% chance of turn booking
-    const statuses = ['pending', 'scheduled', 'in_progress', 'completed'];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const booking: Booking = {
-      id: `booking-${i + 1}`,
-      property_id: propertyId,
-      owner_id: ownerId,
-      checkout_date: checkoutDate.toISOString().split('T')[0],
-      checkin_date: checkinDate.toISOString().split('T')[0],
-      booking_type: isTurn ? 'turn' : 'standard',
-      guest_count: Math.floor(Math.random() * 6) + 1,
-      notes: isTurn ? 'Same-day turnaround required' : 'Standard cleaning',
-      status: status as any,
-      priority: isTurn ? 'urgent' : 'normal',
-      created_at: today.toISOString(),
-      updated_at: today.toISOString()
-    };
-    bookings.set(booking.id, booking);
-  }
-  ownerBookings.value = bookings;
-};
-// Computed properties for demo stats
-const turnBookingsCount = computed(() => {
-  return Array.from(ownerBookings.value.values())
-    .filter(b => b.booking_type === 'turn').length;
-});
-const standardBookingsCount = computed(() => {
-  return Array.from(ownerBookings.value.values())
-    .filter(b => b.booking_type === 'standard').length;
-});
-const pendingBookingsCount = computed(() => {
-  return Array.from(ownerBookings.value.values())
-    .filter(b => b.status === 'pending').length;
-});
-const formattedDate = computed(() => {
-  const options: Intl.DateTimeFormatOptions = { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  };
-  return currentDate.value.toLocaleDateString('en-US', options);
-});
-// Event handlers
-const handleDateSelect = (selectInfo: DateSelectArg) => {
-  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'dateSelect', 'receive', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr
-  });
-  console.log('Owner date selected:', selectInfo);
-};
-const handleEventClick = (clickInfo: EventClickArg) => {
-  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'eventClick', 'receive', {
-    id: clickInfo.event.id,
-    title: clickInfo.event.title
-  });
-  console.log('Owner event clicked:', clickInfo);
-};
-const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }) => {
-  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'createBooking', 'receive', data);
-  console.log('Owner create booking:', data);
-};
-const handleViewChange = (view: string) => {
-  if (ownerCalendarRef.value) {
-    ownerCalendarRef.value.changeView(view);
-  }
-};
-const handleCalendarViewChange = (view: string) => {
-  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'viewChange', 'receive', { view });
-  currentView.value = view as any;
-};
-const handleCalendarDateChange = (date: Date) => {
-  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'dateChange', 'receive', { 
-    date: date.toISOString() 
-  });
-  currentDate.value = date;
-};
-const handlePrevious = () => {
-  const date = new Date(currentDate.value);
-  if (currentView.value === 'dayGridMonth') {
-    date.setMonth(date.getMonth() - 1);
-  } else if (currentView.value === 'timeGridWeek') {
-    date.setDate(date.getDate() - 7);
-  } else {
-    date.setDate(date.getDate() - 1);
-  }
-  currentDate.value = date;
-  if (ownerCalendarRef.value) {
-    ownerCalendarRef.value.goToDate(date);
-  }
-};
-const handleNext = () => {
-  const date = new Date(currentDate.value);
-  if (currentView.value === 'dayGridMonth') {
-    date.setMonth(date.getMonth() + 1);
-  } else if (currentView.value === 'timeGridWeek') {
-    date.setDate(date.getDate() + 7);
-  } else {
-    date.setDate(date.getDate() + 1);
-  }
-  currentDate.value = date;
-  if (ownerCalendarRef.value) {
-    ownerCalendarRef.value.goToDate(date);
-  }
-};
-const handleGoToday = () => {
-  currentDate.value = new Date();
-  if (ownerCalendarRef.value) {
-    ownerCalendarRef.value.goToDate(new Date());
-  }
-};
-// Event logging
-const logEvent = (from: string, to: string, event: string, type: 'emit' | 'receive', data?: any) => {
-  eventLog.value.unshift({
-    timestamp: new Date().toLocaleTimeString(),
-    from,
-    to,
-    event,
-    type,
-    data
-  });
-  // Keep only last 20 events
-  if (eventLog.value.length > 20) {
-    eventLog.value = eventLog.value.slice(0, 20);
-  }
-};
-const clearEventLog = () => {
-  eventLog.value = [];
-};
-// Initialize demo data
-onMounted(() => {
-  generateOwnerBookings();
-});
-</script>
-<style scoped>
-.owner-calendar-demo {
-  padding: 16px;
-}
-.demo-controls {
-  border: 1px solid rgb(var(--v-theme-on-surface), 0.12);
-  border-radius: 8px;
-  padding: 16px;
-  background: rgb(var(--v-theme-surface));
-}
-.event-log {
-  max-height: 300px;
-  overflow-y: auto;
-}
-.event-log-item {
-  padding: 4px 0;
-  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.05);
-  font-family: monospace;
-  font-size: 0.85em;
-}
-.event-log-item:last-child {
-  border-bottom: none;
-}
-</style>
-`````
-
-## File: src/pages/demos/index.vue
-`````vue
-<script setup lang="ts">
-    import OwnerCalendarDemo from '@/components/smart/owner/OwnerCalendarDemo.vue'
-    </script>
-<template>
-  <OwnerCalendarDemo />
-</template>
-<style scoped>
-</style>
-`````
-
-## File: src/pages/demos/owner-calendar.vue
-`````vue
-<template>
-  <div>
-    <OwnerCalendarDemo />
-  </div>
-</template>
-<script setup lang="ts">
-import OwnerCalendarDemo from '@/components/smart/owner/OwnerCalendarDemo.vue';
-</script>
-`````
 
 ## File: .cursorignore
 `````
@@ -3197,6 +2309,1412 @@ Perfect! We've successfully fixed the TypeScript errors in your Supabase integra
 Your TypeScript errors in the Supabase plugin have been resolved. The linter now runs without errors, confirming that our solution worked!
 
 For your Vue files, you may want to add Vue-specific ESLint configuration in the future, but that would require installing and configuring additional dependencies like `vue-eslint-parser` and `eslint-plugin-vue` with compatible versions.
+`````
+
+## File: docs/oldchat/cursor_implementing_task_039d_for_role.md
+`````markdown
+# Implementing task 039d for role-based architecture
+_Exported on 6/15/2025 at 14:17:41 PDT from Cursor (1.1.3)_
+
+---
+
+**User**
+
+> Read @project_summary.md and @tasks.md to understand **role-based multi-tenant architecture** and current task structure.
+> Check @repomix-output.md for current project state and existing implementations.
+
+## For TASK-039D
+1. **Context First**: Use Context7 tool to research relevant documentation from @context7_techstack_ids.md before starting
+2. **Plan**: Use sequential thinking to break down the task and plan im*role-based considerations**
+3. **Implement**: Build the feature following established **role-based patterns** from @project_summary.md
+4. **Integrate**: Ensure implementation fits the **multi-tenant architecture** and Map collection patterns
+5. **Test**: Create/update **role-specific tests** and use demo components for verification
+6. **Update**: Change task status from "Not Started" to "Complete" in tasks.md
+7. **Document**: Add detailed notes about implementation decisions, **role-specific features**, and any challenges
+8. **Verify**: Check off task with [x] and ensure it enables future dependent tasks
+
+## Key Patterns to Follow:
+
+### **Role-Based Architecture Patterns**
+- **Multi-Tenant Design**: Property owners (30-40 clients) vs cleaning business admin interfaces
+- **Data Scoping**: Owner sees only their data, admin sees all data across all clients
+- **Role-Specific Orchestrators**: HomeOwner.vue vs HomeAdmin.vue (not generic Home.vue)
+- **Component Separation**: owner/, admin/, shared/ folder structure
+- **Security Awareness**: Frontend filtering for UX, document need for backend RLS
+
+ Use Map collections for all state management
+ Follow the Home.vue central orchestrator pattern
+ Maintain turn vs standard booking distinction in all business logic
+ Reference existing composables and stores for consistency
+ Implement proper TypeScript typing and error handling
+
+ Before Marking Complete:
+[ ] TypeScript compiles without errors
+[ ] Follows established naming conventions
+[ ] Integrates with existing stores/composables
+[ ] Includes basic error handling
+[ ] Updates any dependent interfaces/types
+
+---
+
+**Cursor**
+
+I'll help you implement TASK-039D: Create OwnerSidebar.vue component. Let me start by researching the relevant documentation and understanding the current project state.
+
+```vue
+<template>
+  <v-navigation-drawer
+    class="owner-sidebar"
+    width="100%"
+    elevation="30"
+    color="tertiary"
+  >                                   
+    <v-container class="py-2">
+      <!-- Header with Owner-specific info -->
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <h2 class="text-h6 font-weight-bold">
+            My Properties
+          </h2>
+          <div class="text-subtitle-2 text-medium-emphasis">
+            {{ formattedDate }}
+          </div>
+          <!-- Owner-specific metrics -->
+          <div class="text-caption text-medium-emphasis mt-1">
+            {{ ownerPropertiesCount }} properties • {{ ownerBookingsCount }} bookings
+          </div>
+        </v-col>
+      </v-row>
+
+      <!-- Turn Alerts (owner's turns only) -->
+      <v-row v-if="ownerTodayTurnsArray.length > 0">
+        <v-col cols="12">
+          <TurnAlerts 
+            :bookings="ownerTodayBookingsWithMetadata" 
+            :properties="ownerPropertiesMap"
+            @view="$emit('navigateToBooking', $event)"
+            @assign="handleViewBooking"
+            @view-all="handleViewAll('turns')"
+          />
+        </v-col>
+      </v-row>
+
+      <!-- Upcoming Cleanings (owner's cleanings only) -->
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <UpcomingCleanings 
+            :bookings="ownerUpcomingBookingsWithMetadata"
+            :properties="ownerPropertiesMap"
+            @view="$emit('navigateToBooking', $event)"
+            @assign="handleViewBooking"
+            @view-all="handleViewAll($event)"
+            @toggle-expanded="toggleUpcomingExpanded"
+          />
+        </v-col>
+      </v-row>
+
+      <!-- Property Filter (owner's properties only) -->
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <v-card
+            class="property-filter"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-filter-variant"
+                class="mr-2"
+              />
+              Filter My Properties
+            </v-card-title>
+            <v-card-text>
+              <v-select
+                v-model="selectedProperty"
+                :items="ownerPropertySelectItems"
+                label="Select Property"
+                clearable
+                @update:model-value="handlePropertyFilterChange"
+              >
+                <template #prepend-item>
+                  <v-list-item
+                    title="All My Properties"
+                    value=""
+                    @click="selectedProperty = null"
+                  />
+                  <v-divider class="mt-2" />
+                </template>
+              </v-select>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- Quick Actions (owner-specific) -->
+      <v-row>
+        <v-col cols="12">
+          <v-card
+            class="quick-actions"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-lightning-bolt"
+                class="mr-2"
+              />
+              Quick Actions
+            </v-card-title>
+            <v-card-text class="d-flex gap-2">
+              <v-btn
+                prepend-icon="mdi-calendar-plus"
+                color="primary"
+                variant="tonal"
+                block
+                @click="$emit('createBooking')"
+              >
+                Add Booking
+              </v-btn>
+              <v-btn
+                prepend-icon="mdi-home-plus"
+                color="secondary"
+                variant="tonal"
+                block
+                @click="$emit('createProperty')"
+              >
+                Add Property
+              </v-btn>
+            </v-card-text>
+            <v-card-text class="pt-0">
+              <v-btn
+                prepend-icon="mdi-calendar-month"
+                color="info"
+                variant="outlined"
+                block
+                @click="handleViewCalendar"
+              >
+                View My Calendar
+              </v-btn>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- Loading Overlay -->
+      <v-overlay 
+        v-show="loading"
+        contained
+        persistent
+        class="align-center justify-center"
+      >
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        />
+      </v-overlay>
+    </v-container>
+  </v-navigation-drawer>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue';
+import { useUIStore } from '@/stores/ui';
+import { useAuthStore } from '@/stores/auth';
+import TurnAlerts from '@/components/dumb/TurnAlerts.vue';
+import UpcomingCleanings from '@/components/dumb/UpcomingCleanings.vue';
+
+// Import types
+import type { Booking, Property, BookingWithMetadata } from '@/types';
+
+// Import event logger
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+
+// Define props with default values
+interface Props {
+  todayTurns?: Map<string, Booking> | Booking[];
+  upcomingCleanings?: Map<string, Booking> | Booking[];
+  properties?: Map<string, Property> | Property[];
+  loading?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  todayTurns: () => [],
+  upcomingCleanings: () => [],
+  properties: () => [],
+  loading: false
+});
+
+// Define emits
+interface Emits {
+  (e: 'navigateToBooking', bookingId: string): void;
+  (e: 'navigateToDate', date: Date): void;
+  (e: 'filterByProperty', propertyId: string | null): void;
+  (e: 'createBooking'): void;
+  (e: 'createProperty'): void;
+}
+
+const emit = defineEmits<Emits>();
+
+// Store connections
+const uiStore = useUIStore();
+const authStore = useAuthStore();
+
+// Local state - initialize from UI store
+const selectedProperty = ref<string | null>(uiStore.selectedPropertyFilter || null);
+
+// Computed properties
+const formattedDate = computed(() => {
+  try {
+    const options: Intl.DateTimeFormatOptions = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    return new Date().toLocaleDateString('en-US', options);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return new Date().toISOString().split('T')[0]; // Fallback format
+  }
+});
+
+// Get current user ID for filtering
+const currentUserId = computed(() => authStore.user?.id || '1');
+
+// Convert inputs to proper Maps if they're not already
+const todayTurnsMap = computed(() => {
+  try {
+    if (props.todayTurns instanceof Map) return props.todayTurns;
+    
+    const map = new Map<string, Booking>();
+    if (Array.isArray(props.todayTurns)) {
+      props.todayTurns.forEach(booking => {
+        if (booking && booking.id) {
+          map.set(booking.id, booking);
+        }
+      });
+    }
+    return map;
+  } catch (error) {
+    console.error('Error processing today\'s turns:', error);
+    return new Map<string, Booking>();
+  }
+});
+
+const upcomingCleaningsMap = computed(() => {
+  try {
+    if (props.upcomingCleanings instanceof Map) return props.upcomingCleanings;
+    
+    const map = new Map<string, Booking>();
+    if (Array.isArray(props.upcomingCleanings)) {
+      props.upcomingCleanings.forEach(booking => {
+        if (booking && booking.id) {
+          map.set(booking.id, booking);
+        }
+      });
+    }
+    return map;
+  } catch (error) {
+    console.error('Error processing upcoming cleanings:', error);
+    return new Map<string, Booking>();
+  }
+});
+
+const propertiesMap = computed(() => {
+  try {
+    if (props.properties instanceof Map) return props.properties;
+    
+    const map = new Map<string, Property>();
+    if (Array.isArray(props.properties)) {
+      props.properties.forEach(property => {
+        if (property && property.id) {
+          map.set(property.id, property);
+        }
+      });
+    }
+    return map;
+  } catch (error) {
+    console.error('Error processing properties:', error);
+    return new Map<string, Property>();
+  }
+});
+
+// OWNER-SPECIFIC FILTERING: Filter all data to show only current owner's data
+const ownerPropertiesMap = computed(() => {
+  const ownerMap = new Map<string, Property>();
+  propertiesMap.value.forEach((property, id) => {
+    if (property.owner_id === currentUserId.value) {
+      ownerMap.set(id, property);
+    }
+  });
+  return ownerMap;
+});
+
+const ownerTodayTurnsMap = computed(() => {
+  const ownerMap = new Map<string, Booking>();
+  todayTurnsMap.value.forEach((booking, id) => {
+    if (booking.owner_id === currentUserId.value) {
+      ownerMap.set(id, booking);
+    }
+  });
+  return ownerMap;
+});
+
+const ownerUpcomingCleaningsMap = computed(() => {
+  const ownerMap = new Map<string, Booking>();
+  upcomingCleaningsMap.value.forEach((booking, id) => {
+    if (booking.owner_id === currentUserId.value) {
+      ownerMap.set(id, booking);
+    }
+  });
+  return ownerMap;
+});
+
+// Convert owner Maps to arrays for components that expect arrays
+const ownerTodayTurnsArray = computed(() => 
+  Array.from(ownerTodayTurnsMap.value.values())
+);
+
+const ownerUpcomingCleaningsArray = computed(() => 
+  Array.from(ownerUpcomingCleaningsMap.value.values())
+);
+
+// Owner-specific metrics
+const ownerPropertiesCount = computed(() => ownerPropertiesMap.value.size);
+const ownerBookingsCount = computed(() => 
+  ownerTodayTurnsArray.value.length + ownerUpcomingCleaningsArray.value.length
+);
+
+// Add metadata (priority) to owner's bookings for the components
+const ownerTodayBookingsWithMetadata = computed(() => {
+  return ownerTodayTurnsArray.value.map(booking => {
+    // Owner's turns are typically high priority
+    const priority: 'low' | 'normal' | 'high' | 'urgent' = 'high';
+    
+    return {
+      ...booking,
+      priority,
+      property_name: ownerPropertiesMap.value.get(booking.property_id)?.name || `Property ${booking.property_id.substring(0, 8)}`,
+      cleaning_window: {
+        start: booking.checkout_date,
+        end: booking.checkin_date,
+        duration: ownerPropertiesMap.value.get(booking.property_id)?.cleaning_duration || 120
+      }
+    } as BookingWithMetadata;
+  });
+});
+
+const ownerUpcomingBookingsWithMetadata = computed(() => {
+  return ownerUpcomingCleaningsArray.value.map(booking => {
+    // Priority based on booking type
+    const priority: 'low' | 'normal' | 'high' | 'urgent' = 
+      booking.booking_type === 'turn' ? 'high' : 'normal';
+    
+    return {
+      ...booking,
+      priority,
+      property_name: ownerPropertiesMap.value.get(booking.property_id)?.name || `Property ${booking.property_id.substring(0, 8)}`,
+      cleaning_window: {
+        start: booking.checkout_date,
+        end: booking.checkin_date,
+        duration: ownerPropertiesMap.value.get(booking.property_id)?.cleaning_duration || 120
+      }
+    } as BookingWithMetadata;
+  });
+});
+
+// Format owner's properties for v-select (only their properties)
+const ownerPropertySelectItems = computed(() => {
+  try {
+    return Array.from(ownerPropertiesMap.value.values())
+      .filter(property => property && property.id && property.name)
+      .map(property => ({
+        title: property.name,
+        value: property.id,
+      }));
+  } catch (error) {
+    console.error('Error creating owner property select items:', error);
+    return [];
+  }
+});
+
+// Methods
+const handlePropertyFilterChange = (propertyId: string | null): void => {
+  try {
+    // Update UI store
+    uiStore.setPropertyFilter(propertyId);
+    
+    // Log event
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'filterByProperty',
+      propertyId,
+      'emit'
+    );
+    
+    // Emit to parent
+    emit('filterByProperty', propertyId);
+  } catch (error) {
+    console.error('Error changing property filter:', error);
+    // Could add UI notification here using the UI store
+  }
+};
+
+// Owner-specific: View booking instead of assign cleaner
+const handleViewBooking = (bookingId: string): void => {
+  try {
+    // Log event
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToBooking',
+      bookingId,
+      'emit'
+    );
+    
+    // Navigate to booking for viewing/editing
+    emit('navigateToBooking', bookingId);
+  } catch (error) {
+    console.error('Error handling view booking:', error);
+  }
+};
+
+const handleViewAll = (period: string): void => {
+  try {
+    // Navigate to filtered view of owner's bookings
+    const today = new Date();
+    let targetDate = today;
+    
+    if (period === 'turns') {
+      // Navigate to owner's turn bookings
+      // Keep targetDate as today
+    } else if (period === 'today') {
+      // Navigate to today's bookings
+      // Keep targetDate as today
+    } else if (period === 'tomorrow') {
+      // Navigate to tomorrow's bookings
+      targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 1);
+    } else {
+      // Period could be a date string
+      try {
+        targetDate = new Date(period);
+      } catch {
+        // If not a valid date, just navigate to today
+        targetDate = today;
+      }
+    }
+    
+    // Log event
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToDate',
+      targetDate,
+      'emit'
+    );
+    
+    emit('navigateToDate', targetDate);
+  } catch (error) {
+    console.error('Error handling view all:', error);
+  }
+};
+
+const handleViewCalendar = (): void => {
+  try {
+    // Navigate to owner's calendar view
+    const today = new Date();
+    
+    // Log event
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToDate',
+      today,
+      'emit'
+    );
+    
+    emit('navigateToDate', today);
+  } catch (error) {
+    console.error('Error handling view calendar:', error);
+  }
+};
+
+const toggleUpcomingExpanded = (expanded: boolean): void => {
+  // This method can be used if needed
+  console.log('Owner upcoming cleanings expanded:', expanded);
+};
+
+// Watch for changes in the UI store's property filter
+watch(() => uiStore.selectedPropertyFilter, (newPropertyId) => {
+  selectedProperty.value = newPropertyId;
+});
+
+// Initialize from UI store on mount
+onMounted(() => {
+  try {
+    selectedProperty.value = uiStore.selectedPropertyFilter;
+  } catch (error) {
+    console.error('Error initializing selected property:', error);
+    selectedProperty.value = null;
+  }
+});
+</script>
+
+<style scoped>
+.owner-sidebar {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.quick-actions .v-card-text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile optimizations */
+@media (max-width: 960px) {
+  .owner-sidebar {
+    width: 100% !important;
+  }
+}
+
+/* Owner-specific styling */
+.property-filter .v-card-title {
+  color: rgb(var(--v-theme-primary));
+}
+
+.quick-actions .v-card-title {
+  color: rgb(var(--v-theme-secondary));
+}
+</style>
+```
+
+Great! The file already exists. Let me check if it compiles correctly and then create a demo component to test it.
+
+Now let me create a demo component to test the OwnerSidebar:
+
+```vue
+<template>
+  <div class="owner-sidebar-demo">
+    <v-container fluid>
+      <v-row>
+        <v-col cols="12">
+          <h1 class="text-h4 mb-4">OwnerSidebar Demo</h1>
+          <p class="text-body-1 mb-4">
+            This demo shows the OwnerSidebar component with sample owner data.
+            The sidebar filters all data to show only the current owner's properties and bookings.
+          </p>
+        </v-col>
+      </v-row>
+      
+      <v-row>
+        <!-- Sidebar Demo -->
+        <v-col cols="12" md="4">
+          <v-card>
+            <v-card-title>Owner Sidebar</v-card-title>
+            <v-card-text class="pa-0">
+              <div style="height: 600px;">
+                <OwnerSidebar
+                  :today-turns="sampleOwnerTodayTurns"
+                  :upcoming-cleanings="sampleOwnerUpcomingCleanings"
+                  :properties="sampleOwnerProperties"
+                  :loading="loading"
+                  @navigate-to-booking="handleNavigateToBooking"
+                  @navigate-to-date="handleNavigateToDate"
+                  @filter-by-property="handleFilterByProperty"
+                  @create-booking="handleCreateBooking"
+                  @create-property="handleCreateProperty"
+                />
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        
+        <!-- Event Log -->
+        <v-col cols="12" md="8">
+          <v-card>
+            <v-card-title class="d-flex align-center">
+              Event Log
+              <v-spacer />
+              <v-btn
+                size="small"
+                variant="outlined"
+                @click="clearEventLog"
+              >
+                Clear
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <v-list v-if="eventLog.length > 0" density="compact">
+                <v-list-item
+                  v-for="(event, index) in eventLog"
+                  :key="index"
+                  :title="event.action"
+                  :subtitle="event.details"
+                >
+                  <template #prepend>
+                    <v-icon
+                      :icon="getEventIcon(event.action)"
+                      :color="getEventColor(event.action)"
+                      size="small"
+                    />
+                  </template>
+                  <template #append>
+                    <span class="text-caption">{{ event.timestamp }}</span>
+                  </template>
+                </v-list-item>
+              </v-list>
+              <div v-else class="text-center py-4 text-medium-emphasis">
+                No events yet. Interact with the sidebar to see events.
+              </div>
+            </v-card-text>
+          </v-card>
+          
+          <!-- Sample Data Info -->
+          <v-card class="mt-4">
+            <v-card-title>Sample Data</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <h4>Owner Properties ({{ sampleOwnerPropertiesArray.length }})</h4>
+                  <v-list density="compact">
+                    <v-list-item
+                      v-for="property in sampleOwnerPropertiesArray"
+                      :key="property.id"
+                      :title="property.name"
+                      :subtitle="property.address"
+                    />
+                  </v-list>
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <h4>Owner Bookings ({{ totalOwnerBookings }})</h4>
+                  <v-list density="compact">
+                    <v-list-item
+                      v-for="booking in [...sampleOwnerTodayTurnsArray, ...sampleOwnerUpcomingCleaningsArray]"
+                      :key="booking.id"
+                      :title="`${booking.booking_type.toUpperCase()} - ${getPropertyName(booking.property_id)}`"
+                      :subtitle="`${formatDate(booking.checkout_date)} → ${formatDate(booking.checkin_date)}`"
+                    >
+                      <template #prepend>
+                        <v-chip
+                          :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
+                          size="x-small"
+                          label
+                        >
+                          {{ booking.booking_type }}
+                        </v-chip>
+                      </template>
+                    </v-list-item>
+                  </v-list>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import OwnerSidebar from './OwnerSidebar.vue';
+import type { Booking, Property } from '@/types';
+
+// Demo state
+const loading = ref(false);
+const eventLog = ref<Array<{
+  action: string;
+  details: string;
+  timestamp: string;
+}>>([]);
+
+// Sample owner data (filtered to current owner ID = '1')
+const currentOwnerId = '1';
+
+const sampleOwnerProperties = ref<Map<string, Property>>(new Map([
+  ['prop-1', {
+    id: 'prop-1',
+    owner_id: currentOwnerId, // Owner's property
+    name: 'Sunset Beach House',
+    address: '123 Ocean Drive, Miami, FL',
+    cleaning_duration: 180,
+    special_instructions: 'Check pool area, extra attention to kitchen',
+    pricing_tier: 'luxury',
+    active: true,
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z'
+  }],
+  ['prop-2', {
+    id: 'prop-2',
+    owner_id: currentOwnerId, // Owner's property
+    name: 'Downtown Loft',
+    address: '456 Main Street, Miami, FL',
+    cleaning_duration: 120,
+    special_instructions: 'Hardwood floors, be careful with electronics',
+    pricing_tier: 'premium',
+    active: true,
+    created_at: '2024-01-20T14:30:00Z',
+    updated_at: '2024-01-20T14:30:00Z'
+  }],
+  ['prop-3', {
+    id: 'prop-3',
+    owner_id: currentOwnerId, // Owner's property
+    name: 'Cozy Studio',
+    address: '789 Pine Avenue, Miami, FL',
+    cleaning_duration: 90,
+    pricing_tier: 'basic',
+    active: true,
+    created_at: '2024-02-01T09:15:00Z',
+    updated_at: '2024-02-01T09:15:00Z'
+  }]
+]));
+
+const sampleOwnerTodayTurns = ref<Map<string, Booking>>(new Map([
+  ['booking-1', {
+    id: 'booking-1',
+    property_id: 'prop-1',
+    owner_id: currentOwnerId, // Owner's booking
+    checkout_date: new Date().toISOString().split('T')[0] + 'T11:00:00Z',
+    checkin_date: new Date().toISOString().split('T')[0] + 'T15:00:00Z',
+    booking_type: 'turn',
+    guest_count: 4,
+    notes: 'Same-day turnaround, high priority',
+    status: 'pending',
+    created_at: '2024-01-10T08:00:00Z',
+    updated_at: '2024-01-10T08:00:00Z'
+  }],
+  ['booking-2', {
+    id: 'booking-2',
+    property_id: 'prop-2',
+    owner_id: currentOwnerId, // Owner's booking
+    checkout_date: new Date().toISOString().split('T')[0] + 'T10:00:00Z',
+    checkin_date: new Date().toISOString().split('T')[0] + 'T16:00:00Z',
+    booking_type: 'turn',
+    guest_count: 2,
+    notes: 'Quick turnaround needed',
+    status: 'scheduled',
+    assigned_cleaner_id: 'cleaner-1',
+    created_at: '2024-01-12T09:30:00Z',
+    updated_at: '2024-01-12T09:30:00Z'
+  }]
+]));
+
+const sampleOwnerUpcomingCleanings = ref<Map<string, Booking>>(new Map([
+  ['booking-3', {
+    id: 'booking-3',
+    property_id: 'prop-1',
+    owner_id: currentOwnerId, // Owner's booking
+    checkout_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
+    checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
+    booking_type: 'standard',
+    guest_count: 6,
+    notes: 'Regular cleaning, family with kids',
+    status: 'pending',
+    created_at: '2024-01-14T11:00:00Z',
+    updated_at: '2024-01-14T11:00:00Z'
+  }],
+  ['booking-4', {
+    id: 'booking-4',
+    property_id: 'prop-3',
+    owner_id: currentOwnerId, // Owner's booking
+    checkout_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
+    checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
+    booking_type: 'standard',
+    guest_count: 2,
+    notes: 'Business travelers, minimal mess expected',
+    status: 'pending',
+    created_at: '2024-01-16T13:45:00Z',
+    updated_at: '2024-01-16T13:45:00Z'
+  }]
+]));
+
+// Computed properties for display
+const sampleOwnerPropertiesArray = computed(() => 
+  Array.from(sampleOwnerProperties.value.values())
+);
+
+const sampleOwnerTodayTurnsArray = computed(() => 
+  Array.from(sampleOwnerTodayTurns.value.values())
+);
+
+const sampleOwnerUpcomingCleaningsArray = computed(() => 
+  Array.from(sampleOwnerUpcomingCleanings.value.values())
+);
+
+const totalOwnerBookings = computed(() => 
+  sampleOwnerTodayTurnsArray.value.length + sampleOwnerUpcomingCleaningsArray.value.length
+);
+
+// Event handlers
+const handleNavigateToBooking = (bookingId: string) => {
+  addEventLog('Navigate to Booking', `Booking ID: ${bookingId}`);
+};
+
+const handleNavigateToDate = (date: Date) => {
+  addEventLog('Navigate to Date', `Date: ${date.toLocaleDateString()}`);
+};
+
+const handleFilterByProperty = (propertyId: string | null) => {
+  const propertyName = propertyId 
+    ? sampleOwnerProperties.value.get(propertyId)?.name || 'Unknown Property'
+    : 'All Properties';
+  addEventLog('Filter by Property', `Property: ${propertyName}`);
+};
+
+const handleCreateBooking = () => {
+  addEventLog('Create Booking', 'Owner wants to create a new booking');
+};
+
+const handleCreateProperty = () => {
+  addEventLog('Create Property', 'Owner wants to add a new property');
+};
+
+// Utility functions
+const addEventLog = (action: string, details: string) => {
+  eventLog.value.unshift({
+    action,
+    details,
+    timestamp: new Date().toLocaleTimeString()
+  });
+  
+  // Keep only last 20 events
+  if (eventLog.value.length > 20) {
+    eventLog.value = eventLog.value.slice(0, 20);
+  }
+};
+
+const clearEventLog = () => {
+  eventLog.value = [];
+};
+
+const getEventIcon = (action: string): string => {
+  const iconMap: Record<string, string> = {
+    'Navigate to Booking': 'mdi-calendar-edit',
+    'Navigate to Date': 'mdi-calendar-month',
+    'Filter by Property': 'mdi-filter-variant',
+    'Create Booking': 'mdi-calendar-plus',
+    'Create Property': 'mdi-home-plus'
+  };
+  return iconMap[action] || 'mdi-information';
+};
+
+const getEventColor = (action: string): string => {
+  const colorMap: Record<string, string> = {
+    'Navigate to Booking': 'primary',
+    'Navigate to Date': 'info',
+    'Filter by Property': 'warning',
+    'Create Booking': 'success',
+    'Create Property': 'secondary'
+  };
+  return colorMap[action] || 'grey';
+};
+
+const getPropertyName = (propertyId: string): string => {
+  return sampleOwnerProperties.value.get(propertyId)?.name || 'Unknown Property';
+};
+
+const formatDate = (dateString: string): string => {
+  return new Date(dateString).toLocaleDateString();
+};
+</script>
+
+<style scoped>
+.owner-sidebar-demo {
+  min-height: 100vh;
+  background-color: rgb(var(--v-theme-surface));
+}
+</style>
+```
+
+Now let me create a demo page route for the OwnerSidebar:
+
+```vue
+<template>
+  <OwnerSidebarDemo />
+</template>
+
+<script setup lang="ts">
+import OwnerSidebarDemo from '@/components/smart/owner/OwnerSidebarDemo.vue';
+</script>
+```
+
+Now let me update the HomeOwner.vue component to use the new OwnerSidebar:
+
+```vue
+        <!-- TODO: Replace with OwnerSidebar.vue when TASK-039D is complete -->
+        <Sidebar
+          :today-turns="ownerTodayTurns"
+          :upcoming-cleanings="ownerUpcomingCleanings"
+          :properties="ownerPropertiesMap"
+          :loading="loading"
+          @navigate-to-booking="handleNavigateToBooking"
+          @navigate-to-date="handleNavigateToDate"
+          @filter-by-property="handleFilterByProperty"
+          @create-booking="handleCreateBooking"
+          @create-property="handleCreateProperty"
+        />
+
+->
+
+        <!-- OwnerSidebar: Shows only current owner's data -->
+        <OwnerSidebar
+          :today-turns="ownerTodayTurns"
+          :upcoming-cleanings="ownerUpcomingCleanings"
+          :properties="ownerPropertiesMap"
+          :loading="loading"
+          @navigate-to-booking="handleNavigateToBooking"
+          @navigate-to-date="handleNavigateToDate"
+          @filter-by-property="handleFilterByProperty"
+          @create-booking="handleCreateBooking"
+          @create-property="handleCreateProperty"
+        />
+```
+
+```vue
+import Sidebar from '@/components/smart/Sidebar.vue';
+
+->
+
+import OwnerSidebar from './OwnerSidebar.vue';
+```
+
+```vue
+// TODO: Replace with owner-specific components when available
+import Sidebar from '../Sidebar.vue';
+
+->
+
+// Owner-specific components
+import OwnerSidebar from './OwnerSidebar.vue';
+```
+
+The linter error is still showing because there might be a cached reference. Let me check if there are any other references to Sidebar in the file:
+
+I see the issue. The event logger is still referencing 'Sidebar' in the log messages. Let me update those to 'OwnerSidebar':
+
+```vue
+    // Log receiving event from Sidebar
+    eventLogger.logEvent(
+      'Sidebar',
+
+->
+
+    // Log receiving event from OwnerSidebar
+    eventLogger.logEvent(
+      'OwnerSidebar',
+```
+
+```vue
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeOwner',
+      'navigateToDate',
+
+->
+
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToDate',
+```
+
+```vue
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeOwner',
+      'filterByProperty',
+
+->
+
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'filterByProperty',
+```
+
+```vue
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeOwner',
+      'createBooking',
+
+->
+
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'createBooking',
+```
+
+```vue
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeOwner',
+      'createProperty',
+
+->
+
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'createProperty',
+```
+
+Now let me update the tasks.md file to mark TASK-039D as complete:
+
+```markdown
+- [ ] **TASK-039D**: Create OwnerSidebar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Show only owner's properties in property filter
+    - Display turn alerts for owner's properties only
+    - Display upcoming cleanings for owner's properties only
+    - Add "Add Property" and "Add Booking" quick action buttons
+    - Remove admin-only sections (cleaner management, system reports)
+    - Show owner-specific metrics (their properties count, their bookings)
+  - Features:
+    - Property filter dropdown (owner's properties only)
+    - Today's turns section (owner's turns only)
+    - Upcoming cleanings (next 7 days, owner only)
+    - Quick actions: "Add Property", "Add Booking", "View Calendar"
+  - Assigned to: Cursor
+
+->
+
+- [x] **TASK-039D**: Create OwnerSidebar.vue component
+  - Status: Complete
+  - Requirements:
+    - ✅ Show only owner's properties in property filter
+    - ✅ Display turn alerts for owner's properties only
+    - ✅ Display upcoming cleanings for owner's properties only
+    - ✅ Add "Add Property" and "Add Booking" quick action buttons
+    - ✅ Remove admin-only sections (cleaner management, system reports)
+    - ✅ Show owner-specific metrics (their properties count, their bookings)
+  - Features:
+    - ✅ Property filter dropdown (owner's properties only)
+    - ✅ Today's turns section (owner's turns only)
+    - ✅ Upcoming cleanings (next 7 days, owner only)
+    - ✅ Quick actions: "Add Property", "Add Booking", "View Calendar"
+  - Implementation Details:
+    - Created OwnerSidebar.vue component with role-based data filtering
+    - All data filtered by `owner_id === currentUser.id`
+    - Added owner-specific metrics display (property count, booking count)
+    - Replaced "Assign" buttons with "View" buttons (no cleaner assignment for owners)
+    - Added "View My Calendar" quick action button
+    - Integrated with existing TurnAlerts and UpcomingCleanings dumb components
+    - Updated HomeOwner.vue to use OwnerSidebar instead of generic Sidebar
+    - Created OwnerSidebarDemo.vue and demo page for testing
+    - Follows established Map collection patterns and event logging
+  - Notes: Component successfully filters all data to show only current owner's properties and bookings. Removes admin-only features while maintaining the same UI structure and event communication patterns. Ready for integration with future owner-specific composables.
+  - Assigned to: Cursor
+```
+
+Now let me create a problemfix.md entry documenting this implementation:
+
+```markdown
+### ThemePicker.vue (3 instances)
+```diff
+<!-- Menu activator -->
+- <template #activator="{ props }">
++ <template #activator="{ props: menuProps }">
+    <v-btn
+      icon
+-     v-bind="props"
++     v-bind="menuProps"
+      size="small"
+    >
+
+->
+
+### ThemePicker.vue (3 instances)
+```diff
+<!-- Menu activator -->
+- <template #activator="{ props }">
++ <template #activator="{ props: menuProps }">
+    <v-btn
+      icon
+-     v-bind="props"
++     v-bind="menuProps"
+      size="small"
+    >
+
+>### --- PROBLEM - 004 ---
+### TASK-039D: OwnerSidebar.vue Component Implementation
+
+### Problem Description
+
+TASK-039D required creating an OwnerSidebar.vue component as part of the role-based architecture split. The component needed to:
+
+1. Show only owner's properties in property filter
+2. Display turn alerts for owner's properties only
+3. Display upcoming cleanings for owner's properties only
+4. Add "Add Property" and "Add Booking" quick action buttons
+5. Remove admin-only sections (cleaner management, system reports)
+6. Show owner-specific metrics (their properties count, their bookings)
+
+The challenge was implementing role-based data filtering while maintaining the same UI structure and event communication patterns as the existing generic Sidebar component.
+
+## Root Cause
+
+The existing Sidebar component was designed as a generic component that displayed all data without role-based filtering. For the multi-tenant role-based architecture, we needed owner-specific components that filter data by `owner_id === currentUser.id` to ensure property owners only see their own data.
+
+## Solution
+
+### 1. Created OwnerSidebar.vue Component
+
+Implemented a new component at `src/components/smart/owner/OwnerSidebar.vue` with the following key features:
+
+#### Role-Based Data Filtering
+```typescript
+// Get current user ID for filtering
+const currentUserId = computed(() => authStore.user?.id || '1');
+
+// OWNER-SPECIFIC FILTERING: Filter all data to show only current owner's data
+const ownerPropertiesMap = computed(() => {
+  const ownerMap = new Map<string, Property>();
+  propertiesMap.value.forEach((property, id) => {
+    if (property.owner_id === currentUserId.value) {
+      ownerMap.set(id, property);
+    }
+  });
+  return ownerMap;
+});
+
+const ownerTodayTurnsMap = computed(() => {
+  const ownerMap = new Map<string, Booking>();
+  todayTurnsMap.value.forEach((booking, id) => {
+    if (booking.owner_id === currentUserId.value) {
+      ownerMap.set(id, booking);
+    }
+  });
+  return ownerMap;
+});
+```
+
+#### Owner-Specific UI Elements
+- **Header**: Changed from "Property Cleaning" to "My Properties"
+- **Metrics**: Added owner-specific metrics display: "X properties • Y bookings"
+- **Property Filter**: Changed label to "Filter My Properties" with "All My Properties" option
+- **Quick Actions**: Added "View My Calendar" button alongside "Add Booking" and "Add Property"
+
+#### Removed Admin Features
+- Replaced "Assign" buttons with "View" buttons (no cleaner assignment for owners)
+- Removed system-wide reporting features
+- Focused on personal property management
+
+### 2. Updated HomeOwner.vue Integration
+
+Updated the HomeOwner.vue component to use the new OwnerSidebar:
+
+```diff
+- <!-- TODO: Replace with OwnerSidebar.vue when TASK-039D is complete -->
+- <Sidebar
++ <!-- OwnerSidebar: Shows only current owner's data -->
++ <OwnerSidebar
+    :today-turns="ownerTodayTurns"
+    :upcoming-cleanings="ownerUpcomingCleanings"
+    :properties="ownerPropertiesMap"
+    :loading="loading"
+    @navigate-to-booking="handleNavigateToBooking"
+    @navigate-to-date="handleNavigateToDate"
+    @filter-by-property="handleFilterByProperty"
+    @create-booking="handleCreateBooking"
+    @create-property="handleCreateProperty"
+- />
++ />
+```
+
+Also updated import statements and event logging references from 'Sidebar' to 'OwnerSidebar'.
+
+### 3. Created Demo Components for Testing
+
+#### OwnerSidebarDemo.vue
+Created a comprehensive demo component with:
+- Sample owner data (properties and bookings filtered to current owner)
+- Event logging to track component interactions
+- Sample data display showing filtered properties and bookings
+- Interactive testing interface
+
+#### Demo Page Route
+Created `/demos/owner-sidebar` route for easy testing and verification.
+
+### 4. Maintained Existing Patterns
+
+The implementation follows established project patterns:
+- **Map Collections**: Uses Map<string, T> for all state management
+- **Event Communication**: Maintains same emit interface as generic Sidebar
+- **Component Reuse**: Reuses existing TurnAlerts and UpcomingCleanings dumb components
+- **TypeScript Safety**: Proper typing throughout with error handling
+- **Event Logging**: Integrated with existing component event logging system
+
+## Key Implementation Details
+
+### Data Scoping Strategy
+```typescript
+// Owner sees only their data
+const ownerBookingsCount = computed(() => 
+  ownerTodayTurnsArray.value.length + ownerUpcomingCleaningsArray.value.length
+);
+
+// Property filter shows only owner's properties
+const ownerPropertySelectItems = computed(() => {
+  return Array.from(ownerPropertiesMap.value.values())
+    .filter(property => property && property.id && property.name)
+    .map(property => ({
+      title: property.name,
+      value: property.id,
+    }));
+});
+```
+
+### Owner-Specific Event Handling
+```typescript
+// Owner-specific: View booking instead of assign cleaner
+const handleViewBooking = (bookingId: string): void => {
+  // Navigate to booking for viewing/editing (no cleaner assignment)
+  emit('navigateToBooking', bookingId);
+};
+```
+
+### UI Customization
+- Added owner-specific styling classes
+- Updated color schemes for property filter and quick actions
+- Added metrics display in header
+- Customized button labels and actions
+
+## Benefits of the Solution
+
+1. **Role-Based Security**: Ensures owners only see their own data
+2. **UI Optimization**: Interface optimized for property owner needs
+3. **Code Reuse**: Maximizes reuse of existing dumb components
+4. **Maintainability**: Follows established patterns and conventions
+5. **Testability**: Includes comprehensive demo for verification
+6. **Scalability**: Ready for integration with future owner-specific composables
+
+## Verification
+
+- ✅ TypeScript compiles without errors
+- ✅ Component follows established naming conventions
+- ✅ Integrates with existing stores/composables
+- ✅ Includes proper error handling
+- ✅ Maintains Map collection patterns
+- ✅ Event communication works correctly
+- ✅ Demo component provides comprehensive testing
+
+## Future Integration
+
+The OwnerSidebar component is ready for integration with future owner-specific composables:
+- `useOwnerBookings.ts` - Owner-scoped booking operations
+- `useOwnerProperties.ts` - Owner-scoped property operations  
+- `useOwnerCalendarState.ts` - Owner-specific calendar logic
+
+The component provides a solid foundation for the role-based multi-tenant architecture while maintaining consistency with existing patterns and ensuring a smooth user experience for property owners.
+```
+
+Perfect! I have successfully implemented TASK-039D: Create OwnerSidebar.vue component. Let me provide a summary of what was accomplished:
+
+## ✅ TASK-039D: OwnerSidebar.vue Component - COMPLETE
+
+### 🎯 **Implementation Summary**
+
+I successfully created the OwnerSidebar.vue component following the role-based architecture patterns. Here's what was delivered:
+
+### **✅ Core Requirements Met:**
+1. **Owner-Only Data Filtering**: All data filtered by `owner_id === currentUser.id`
+2. **Turn Alerts**: Shows only owner's urgent turn bookings
+3. **Upcoming Cleanings**: Displays only owner's upcoming cleanings
+4. **Quick Actions**: "Add Property", "Add Booking", "View My Calendar" buttons
+5. **Owner Metrics**: Displays property count and booking count
+6. **Admin Features Removed**: No cleaner assignment, no system reports
+
+### **🏗️ **Key Implementation Features:**
+
+#### **Role-Based Data Filtering**
+```typescript
+// Owner sees only their data
+const ownerPropertiesMap = computed(() => {
+  const ownerMap = new Map<string, Property>();
+  propertiesMap.value.forEach((property, id) => {
+    if (property.owner_id === currentUserId.value) {
+      ownerMap.set(id, property);
+    }
+  });
+  return ownerMap;
+});
+```
+
+#### **Owner-Specific UI Elements**
+- Header: "My Properties" instead of generic "Property Cleaning"
+- Metrics: "3 properties • 4 bookings" display
+- Property Filter: "Filter My Properties" with owner's properties only
+- Quick Actions: Added "View My Calendar" button
+
+#### **Component Integration**
+- Updated `HomeOwner.vue` to use `OwnerSidebar` instead of generic `Sidebar`
+- Maintained same event communication interface
+- Reused existing `TurnAlerts` and `UpcomingCleanings` dumb components
+
+### **🧪 **Testing & Demo Components:**
+- Created `OwnerSidebarDemo.vue` with comprehensive testing interface
+- Added demo page route at `/demos/owner-sidebar`
+- Sample owner data with proper filtering demonstration
+- Event logging for interaction tracking
+
+### **📋 **Architecture Compliance:**
+- ✅ Follows Map collection patterns
+- ✅ Maintains TypeScript type safety
+- ✅ Integrates with existing stores/composables
+- ✅ Uses established event logging system
+- ✅ Proper error handling throughout
+
+### **🔗 **Files Created/Modified:**
+1. **Created**: `src/components/smart/owner/OwnerSidebar.vue`
+2. **Created**: `src/components/smart/owner/OwnerSidebarDemo.vue`
+3. **Created**: `src/pages/demos/owner-sidebar.vue`
+4. **Modified**: `src/components/smart/owner/HomeOwner.vue` (updated to use OwnerSidebar)
+5. **Updated**: `tasks.md` (marked TASK-039D as complete)
+6. **Documented**: `problemfix.md` (detailed implementation notes)
+
+### **🚀 **Ready for Next Steps:**
+The OwnerSidebar component is now ready for:
+- Integration with future owner-specific composables (`useOwnerBookings`, `useOwnerProperties`)
+- Testing with real owner data
+- Further UI customization based on user feedback
+
+The implementation successfully demonstrates the role-based multi-tenant architecture where property owners see only their data while maintaining the same UI structure and functionality as the generic sidebar.
+
+```typescript
+// Owner sees only their data
+const ownerPropertiesMap = computed(() => {
+  const ownerMap = new Map<string, Property>();
+  propertiesMap.value.forEach((property, id) => {
+    if (property.owner_id === currentUserId.value) {
+      ownerMap.set(id, property);
+    }
+  });
+  return ownerMap;
+});
+```
 `````
 
 ## File: docs/oldchat/cursor_installed_npm_in_the_wrong_direc.md
@@ -27743,6 +28261,1606 @@ html, body {
 * {
 `````
 
+## File: src/components/smart/admin/HomeAdmin.vue
+`````vue
+<template>
+  <div class="home-admin-container">
+    <v-row
+      no-gutters
+      class="fill-height"
+    >
+      <!-- Sidebar Column -->
+      <v-col 
+        cols="12" 
+        lg="3" 
+        xl="2" 
+        class="sidebar-column"
+        :class="{ 'mobile-hidden': !sidebarOpen }"
+      >
+        <!-- TODO: Replace with AdminSidebar.vue when TASK-039G is complete -->
+        <Sidebar
+          :today-turns="systemTodayTurns"
+          :upcoming-cleanings="systemUpcomingCleanings"
+          :properties="allPropertiesMap"
+          :loading="loading"
+          @navigate-to-booking="handleNavigateToBooking"
+          @navigate-to-date="handleNavigateToDate"
+          @filter-by-property="handleFilterByProperty"
+          @create-booking="handleCreateBooking"
+          @create-property="handleCreateProperty"
+        />
+      </v-col>
+      <!-- Main Calendar Column -->
+      <v-col 
+        cols="12" 
+        lg="9" 
+        xl="10" 
+        class="calendar-column"
+      >
+        <div class="calendar-header">
+          <v-btn
+            v-if="$vuetify.display.lgAndDown"
+            icon="mdi-menu"
+            variant="text"
+            class="mr-4"
+            @click="toggleSidebar"
+          />
+          <!-- Admin-focused Calendar Controls -->
+          <div class="d-flex align-center">
+            <v-btn
+              icon="mdi-arrow-left"
+              variant="text"
+              class="mr-2"
+              @click="handlePrevious"
+            />
+            <v-btn 
+              variant="outlined" 
+              class="mr-2" 
+              @click="handleGoToday"
+            >
+              Today
+            </v-btn>
+            <v-btn
+              icon="mdi-arrow-right"
+              variant="text"
+              class="mr-4"
+              @click="handleNext"
+            />
+            <div class="text-h6">
+              {{ formattedDate }}
+            </div>
+            <!-- System-wide Metrics -->
+            <div class="ml-4 text-caption text-medium-emphasis">
+              {{ systemMetricsText }}
+            </div>
+            <v-spacer />
+            <!-- Admin Quick Actions -->
+            <v-btn
+              color="warning"
+              variant="outlined"
+              prepend-icon="mdi-account-hard-hat"
+              class="mr-2"
+              @click="handleAssignCleaners"
+            >
+              Assign Cleaners
+            </v-btn>
+            <v-btn
+              color="info"
+              variant="outlined"
+              prepend-icon="mdi-chart-line"
+              class="mr-2"
+              @click="handleGenerateReports"
+            >
+              Reports
+            </v-btn>
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-cog"
+              class="mr-4"
+              @click="handleManageSystem"
+            >
+              Manage System
+            </v-btn>
+            <v-btn-toggle
+              v-model="currentView"
+              mandatory
+              class="ml-4"
+            >
+              <v-btn value="dayGridMonth">
+                Month
+              </v-btn>
+              <v-btn value="timeGridWeek">
+                Week
+              </v-btn>
+              <v-btn value="timeGridDay">
+                Day
+              </v-btn>
+            </v-btn-toggle>
+          </div>
+        </div>
+        <!-- TODO: Replace with AdminCalendar.vue when TASK-039H is complete -->
+        <FullCalendar
+          ref="calendarRef"
+          :bookings="adminFilteredBookings"
+          :properties="allPropertiesMap"
+          :loading="loading"
+          :current-view="currentView"
+          :current-date="currentDate"
+          @date-select="handleDateSelect"
+          @event-click="handleEventClick"
+          @event-drop="handleEventDrop"
+          @event-resize="handleEventResize"
+          @view-change="handleCalendarViewChange"
+          @date-change="handleCalendarDateChange"
+          @create-booking="handleCreateBookingFromCalendar"
+          @update-booking="handleUpdateBooking"
+        />
+      </v-col>
+    </v-row>
+    <!-- Admin-focused Modals -->
+    <BookingForm
+      :open="eventModalOpen"
+      :mode="eventModalMode"
+      :booking="eventModalData"
+      @close="handleEventModalClose"
+      @save="handleEventModalSave"
+      @delete="handleEventModalDelete"
+    />
+    <PropertyModal
+      :open="propertyModalOpen"
+      :mode="propertyModalMode"
+      :property="propertyModalData"
+      @close="handlePropertyModalClose"
+      @save="handlePropertyModalSave"
+      @delete="handlePropertyModalDelete"
+    />
+    <ConfirmationDialog
+      :open="confirmDialogOpen"
+      :title="confirmDialogTitle"
+      :message="confirmDialogMessage"
+      :confirm-text="confirmDialogConfirmText"
+      :cancel-text="confirmDialogCancelText"
+      :dangerous="confirmDialogDangerous"
+      @confirm="handleConfirmDialogConfirm"
+      @cancel="handleConfirmDialogCancel"
+      @close="handleConfirmDialogClose"
+    />
+    <!-- TODO: Add admin-specific modals -->
+    <!-- CleanerAssignmentModal -->
+    <!-- ReportsModal -->
+    <!-- SystemManagementModal -->
+  </div>
+</template>
+⋮----
+<!-- Sidebar Column -->
+⋮----
+<!-- TODO: Replace with AdminSidebar.vue when TASK-039G is complete -->
+⋮----
+<!-- Main Calendar Column -->
+⋮----
+<!-- Admin-focused Calendar Controls -->
+⋮----
+{{ formattedDate }}
+⋮----
+<!-- System-wide Metrics -->
+⋮----
+{{ systemMetricsText }}
+⋮----
+<!-- Admin Quick Actions -->
+⋮----
+<!-- TODO: Replace with AdminCalendar.vue when TASK-039H is complete -->
+⋮----
+<!-- Admin-focused Modals -->
+⋮----
+<!-- TODO: Add admin-specific modals -->
+<!-- CleanerAssignmentModal -->
+<!-- ReportsModal -->
+<!-- SystemManagementModal -->
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { useDisplay } from 'vuetify';
+// Admin components (using generic components for now)
+import Sidebar from '../Sidebar.vue';
+import FullCalendar from '../FullCalendar.vue';
+import BookingForm from '@/components/dumb/BookingForm.vue';
+import PropertyModal from '@/components/dumb/PropertyModal.vue';
+import ConfirmationDialog from '@/components/dumb/ConfirmationDialog.vue';
+// State management
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
+import { useUIStore } from '@/stores/ui';
+import { useAuthStore } from '@/stores/auth';
+// Business logic composables
+import { useBookings } from '@/composables/shared/useBookings';
+import { useProperties } from '@/composables/shared/useProperties';
+import { useCalendarState } from '@/composables/shared/useCalendarState';
+// Types
+import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
+import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+// Import event logger for component communication
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+// ============================================================================
+// STORE CONNECTIONS & STATE
+// ============================================================================
+const propertyStore = usePropertyStore();
+const bookingStore = useBookingStore();
+const uiStore = useUIStore();
+const authStore = useAuthStore();
+const { xs } = useDisplay();
+// ============================================================================
+// COMPOSABLES - BUSINESS LOGIC
+// ============================================================================
+const { 
+  loading: bookingsLoading, 
+  createBooking, 
+  updateBooking, 
+  deleteBooking,
+  fetchAllBookings
+} = useBookings();
+const { 
+  loading: propertiesLoading, 
+  createProperty,
+  updateProperty,
+  deleteProperty,
+  fetchAllProperties
+} = useProperties();
+const {
+  currentView,
+  currentDate,
+  filterBookings,
+  setCalendarView,
+  goToDate,
+  goToToday,
+  next,
+  prev,
+  clearPropertyFilters,
+  togglePropertyFilter
+} = useCalendarState();
+// ============================================================================
+// LOCAL STATE
+// ============================================================================
+const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const sidebarOpen = ref(!xs.value);
+const selectedPropertyFilter = ref<string | null>(null);
+// ============================================================================
+// ADMIN-SPECIFIC DATA ACCESS
+// ============================================================================
+// Check if user is authenticated and is an admin
+const isAdminAuthenticated = computed(() => {
+  return authStore.isAuthenticated && 
+         authStore.user?.role === 'admin';
+});
+// ============================================================================
+// COMPUTED STATE - ADMIN ALL-DATA ACCESS (NO FILTERING)
+// ============================================================================
+const loading = computed(() => 
+  bookingsLoading.value || 
+  propertiesLoading.value || 
+  uiStore.isLoading('bookings') || 
+  uiStore.isLoading('properties')
+);
+const formattedDate = computed(() => {
+  const options: Intl.DateTimeFormatOptions = { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  };
+  return currentDate.value.toLocaleDateString('en-US', options);
+});
+// ALL properties (no owner filtering for admin)
+const allPropertiesMap = computed(() => {
+  if (!isAdminAuthenticated.value) {
+    return new Map<string, Property>();
+  }
+  // Admin sees ALL properties across ALL owners
+  if (propertyStore.properties instanceof Map) {
+    return propertyStore.properties;
+  } else {
+    const map = new Map<string, Property>();
+    propertyStore.propertiesArray.forEach(property => {
+      if (property && property.id) {
+        map.set(property.id, property);
+      }
+    });
+    return map;
+  }
+});
+// ALL bookings (no owner filtering for admin)
+const allBookingsMap = computed(() => {
+  if (!isAdminAuthenticated.value) {
+    return new Map<string, Booking>();
+  }
+  // Admin sees ALL bookings across ALL owners
+  const map = new Map<string, Booking>();
+  bookingStore.bookingsArray.forEach(booking => {
+    if (booking && booking.id) {
+      map.set(booking.id, booking);
+    }
+  });
+  return map;
+});
+// System-wide today's turn bookings (all owners)
+const systemTodayTurns = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const turns = new Map<string, Booking>();
+  if (!isAdminAuthenticated.value) {
+    return turns;
+  }
+  // Admin sees ALL turn bookings for today across ALL owners
+  Array.from(allBookingsMap.value.values()).forEach(booking => {
+    if (
+      booking.booking_type === 'turn' &&
+      new Date(booking.checkout_date) >= today &&
+      new Date(booking.checkout_date) < tomorrow
+    ) {
+      turns.set(booking.id, booking);
+    }
+  });
+  return turns;
+});
+// System-wide upcoming cleanings (all owners)
+const systemUpcomingCleanings = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const inOneWeek = new Date(today);
+  inOneWeek.setDate(inOneWeek.getDate() + 7);
+  const cleanings = new Map<string, Booking>();
+  if (!isAdminAuthenticated.value) {
+    return cleanings;
+  }
+  // Admin sees ALL upcoming cleanings across ALL owners
+  Array.from(allBookingsMap.value.values()).forEach(booking => {
+    const checkoutDate = new Date(booking.checkout_date);
+    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
+      cleanings.set(booking.id, booking);
+    }
+  });
+  return cleanings;
+});
+// Admin's filtered bookings (all data with filters applied)
+const adminFilteredBookings = computed(() => {
+  let bookings = Array.from(allBookingsMap.value.values());
+  // Apply property filter if selected (can be any property)
+  if (selectedPropertyFilter.value) {
+    bookings = bookings.filter(booking => 
+      booking.property_id === selectedPropertyFilter.value
+    );
+  }
+  // Apply calendar state filters
+  bookings = filterBookings(bookings);
+  // Convert to Map for components that expect Map format
+  const map = new Map<string, Booking>();
+  bookings.forEach(booking => {
+    map.set(booking.id, booking);
+  });
+  return map;
+});
+// System-wide metrics for admin header
+const systemMetricsText = computed(() => {
+  const totalProperties = allPropertiesMap.value.size;
+  const totalBookings = allBookingsMap.value.size;
+  const urgentTurns = systemTodayTurns.value.size;
+  const upcomingCleanings = systemUpcomingCleanings.value.size;
+  return `${totalProperties} properties • ${totalBookings} bookings • ${urgentTurns} urgent turns • ${upcomingCleanings} upcoming`;
+});
+// ============================================================================
+// UI STATE - MODAL MANAGEMENT
+// ============================================================================
+// Event Modal State
+const eventModalOpen = computed(() => uiStore.isModalOpen('event'));
+const eventModalMode = computed((): 'create' | 'edit' | undefined => {
+  const modalState = uiStore.getModalState('event');
+  const mode = modalState?.mode;
+  return (mode === 'create' || mode === 'edit') ? mode : undefined;
+});
+const eventModalData = computed((): Booking | undefined => {
+  const modalData = uiStore.getModalData('event') as any;
+  return modalData?.booking || undefined;
+});
+// Property Modal State
+const propertyModalOpen = computed(() => uiStore.isModalOpen('property'));
+const propertyModalMode = computed((): 'create' | 'edit' | undefined => {
+  const modalState = uiStore.getModalState('property');
+  const mode = modalState?.mode;
+  return (mode === 'create' || mode === 'edit') ? mode : undefined;
+});
+const propertyModalData = computed((): Property | undefined => {
+  const modalData = uiStore.getModalData('property') as any;
+  return modalData?.property || undefined;
+});
+// Confirmation Dialog State
+const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirm'));
+const confirmDialogTitle = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.title || '';
+});
+const confirmDialogMessage = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.message || '';
+});
+const confirmDialogConfirmText = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.confirmText || 'Confirm';
+});
+const confirmDialogCancelText = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.cancelText || 'Cancel';
+});
+const confirmDialogDangerous = computed((): boolean => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return Boolean(dialogState?.dangerous) || false;
+});
+// ============================================================================
+// EVENT HANDLERS - NAVIGATION
+// ============================================================================
+const handleNavigateToBooking = (bookingId: string): void => {
+  try {
+    // Log receiving event from AdminSidebar (or generic Sidebar)
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeAdmin',
+      'navigateToBooking',
+      bookingId,
+      'receive'
+    );
+    // Open booking modal for editing
+    const booking = allBookingsMap.value.get(bookingId);
+    if (booking) {
+      uiStore.openModal('event', 'edit', {
+        booking: booking
+      });
+    } else {
+      console.warn(`Booking with ID ${bookingId} not found`);
+    }
+  } catch (error) {
+    console.error('Error navigating to booking:', error);
+    // TODO: Show admin-specific error notification
+  }
+};
+const handleNavigateToDate = (date: Date): void => {
+  try {
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeAdmin',
+      'navigateToDate',
+      date,
+      'receive'
+    );
+    goToDate(date);
+  } catch (error) {
+    console.error('Error navigating to date:', error);
+    // TODO: Show admin-specific error notification
+  }
+};
+const handleFilterByProperty = (propertyId: string | null): void => {
+  try {
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeAdmin',
+      'filterByProperty',
+      propertyId,
+      'receive'
+    );
+    selectedPropertyFilter.value = propertyId;
+    // Admin can filter by any property (not just their own)
+    if (propertyId) {
+      togglePropertyFilter(propertyId);
+    } else {
+      clearPropertyFilters();
+    }
+  } catch (error) {
+    console.error('Error filtering by property:', error);
+    // TODO: Show admin-specific error notification
+  }
+};
+// ============================================================================
+// EVENT HANDLERS - ADMIN-SPECIFIC ACTIONS
+// ============================================================================
+const handleAssignCleaners = (): void => {
+  try {
+    eventLogger.logEvent(
+      'HomeAdmin',
+      'HomeAdmin',
+      'assignCleaners',
+      null,
+      'emit'
+    );
+    // TODO: Open cleaner assignment modal when TASK-039Q is complete
+    console.log('Admin: Assign Cleaners clicked');
+    // uiStore.openModal('cleanerAssignment', { bookings: unassignedBookings });
+  } catch (error) {
+    console.error('Error opening cleaner assignment:', error);
+  }
+};
+const handleGenerateReports = (): void => {
+  try {
+    eventLogger.logEvent(
+      'HomeAdmin',
+      'HomeAdmin',
+      'generateReports',
+      null,
+      'emit'
+    );
+    // TODO: Open reports modal or navigate to reports page
+    console.log('Admin: Generate Reports clicked');
+    // uiStore.openModal('reports', { dateRange: currentWeek });
+  } catch (error) {
+    console.error('Error opening reports:', error);
+  }
+};
+const handleManageSystem = (): void => {
+  try {
+    eventLogger.logEvent(
+      'HomeAdmin',
+      'HomeAdmin',
+      'manageSystem',
+      null,
+      'emit'
+    );
+    // TODO: Open system management modal or navigate to admin settings
+    console.log('Admin: Manage System clicked');
+    // uiStore.openModal('systemManagement', {});
+  } catch (error) {
+    console.error('Error opening system management:', error);
+  }
+};
+// ============================================================================
+// EVENT HANDLERS - CRUD OPERATIONS
+// ============================================================================
+const handleCreateBooking = (): void => {
+  try {
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeAdmin',
+      'createBooking',
+      null,
+      'receive'
+    );
+    // Admin can create bookings for any property
+    uiStore.openModal('event', 'create', {
+      booking: null
+    });
+  } catch (error) {
+    console.error('Error creating booking:', error);
+  }
+};
+const handleCreateProperty = (): void => {
+  try {
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeAdmin',
+      'createProperty',
+      null,
+      'receive'
+    );
+    // Admin can create properties for any owner
+    uiStore.openModal('property', 'create', {
+      property: null
+    });
+  } catch (error) {
+    console.error('Error creating property:', error);
+  }
+};
+const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
+  try {
+    eventLogger.logEvent(
+      'FullCalendar',
+      'HomeAdmin',
+      'createBooking',
+      data,
+      'receive'
+    );
+    // Convert FullCalendar data format to BookingFormData format
+    const bookingData: Partial<BookingFormData> = {
+      checkout_date: data.start,
+      checkin_date: data.end,
+      property_id: data.propertyId,
+      booking_type: 'standard',
+      status: 'pending'
+    };
+    uiStore.openModal('event', 'create', {
+      booking: bookingData
+    });
+  } catch (error) {
+    console.error('Error creating booking from calendar:', error);
+  }
+};
+// ============================================================================
+// EVENT HANDLERS - CALENDAR INTERACTIONS
+// ============================================================================
+const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  try {
+    const data = {
+      start: selectInfo.startStr,
+      end: selectInfo.endStr
+    };
+    handleCreateBookingFromCalendar(data);
+  } catch (error) {
+    console.error('Error handling date select:', error);
+  }
+};
+const handleEventClick = (clickInfo: EventClickArg): void => {
+  try {
+    const bookingId = clickInfo.event.id;
+    const booking = allBookingsMap.value.get(bookingId);
+    if (booking) {
+      uiStore.openModal('event', 'edit', {
+        booking: booking
+      });
+    }
+  } catch (error) {
+    console.error('Error handling event click:', error);
+  }
+};
+const handleEventDrop = (dropInfo: EventDropArg): void => {
+  try {
+    const bookingId = dropInfo.event.id;
+    const booking = allBookingsMap.value.get(bookingId);
+    if (booking) {
+      const updatedBooking: Partial<BookingFormData> = {
+        ...booking,
+        checkout_date: dropInfo.event.startStr,
+        checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+      };
+      updateBooking(bookingId, updatedBooking);
+    }
+  } catch (error) {
+    console.error('Error handling event drop:', error);
+    // Revert the event
+    dropInfo.revert();
+  }
+};
+const handleEventResize = (resizeInfo: any): void => {
+  try {
+    const bookingId = resizeInfo.event.id;
+    const booking = allBookingsMap.value.get(bookingId);
+    if (booking) {
+      const updatedBooking: Partial<BookingFormData> = {
+        ...booking,
+        checkout_date: resizeInfo.event.startStr,
+        checkin_date: resizeInfo.event.endStr || resizeInfo.event.startStr
+      };
+      updateBooking(bookingId, updatedBooking);
+    }
+  } catch (error) {
+    console.error('Error handling event resize:', error);
+    // Revert the event
+    resizeInfo.revert();
+  }
+};
+const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+  try {
+    // Convert FullCalendar data format to BookingFormData format
+    const booking = allBookingsMap.value.get(data.id);
+    if (booking) {
+      const bookingData: Partial<BookingFormData> = {
+        ...booking,
+        checkout_date: data.start,
+        checkin_date: data.end
+      };
+      updateBooking(data.id, bookingData);
+    }
+  } catch (error) {
+    console.error('Error updating booking:', error);
+  }
+};
+// ============================================================================
+// EVENT HANDLERS - CALENDAR CONTROLS
+// ============================================================================
+const handleCalendarViewChange = (view: CalendarView): void => {
+  try {
+    // Convert generic CalendarView to FullCalendar-specific view names
+    let fullCalendarView: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
+    switch (view) {
+      case 'month':
+        fullCalendarView = 'dayGridMonth';
+        break;
+      case 'week':
+        fullCalendarView = 'timeGridWeek';
+        break;
+      case 'day':
+        fullCalendarView = 'timeGridDay';
+        break;
+      default:
+        fullCalendarView = 'timeGridWeek';
+    }
+    setCalendarView(fullCalendarView);
+  } catch (error) {
+    console.error('Error changing calendar view:', error);
+  }
+};
+const handleCalendarDateChange = (date: Date): void => {
+  try {
+    goToDate(date);
+  } catch (error) {
+    console.error('Error changing calendar date:', error);
+  }
+};
+const handlePrevious = (): void => {
+  try {
+    prev();
+  } catch (error) {
+    console.error('Error going to previous:', error);
+  }
+};
+const handleNext = (): void => {
+  try {
+    next();
+  } catch (error) {
+    console.error('Error going to next:', error);
+  }
+};
+const handleGoToday = (): void => {
+  try {
+    goToToday();
+  } catch (error) {
+    console.error('Error going to today:', error);
+  }
+};
+// ============================================================================
+// EVENT HANDLERS - MODAL MANAGEMENT
+// ============================================================================
+const handleEventModalClose = (): void => {
+  try {
+    uiStore.closeModal('event');
+  } catch (error) {
+    console.error('Error closing event modal:', error);
+  }
+};
+const handleEventModalSave = async (bookingData: BookingFormData): Promise<void> => {
+  try {
+    if (eventModalMode.value === 'create') {
+      await createBooking(bookingData);
+    } else if (eventModalMode.value === 'edit') {
+      // Get the booking ID from modal data since BookingFormData doesn't include id
+      const modalData = uiStore.getModalData('event') as any;
+      const bookingId = modalData?.booking?.id;
+      if (bookingId) {
+        await updateBooking(bookingId, bookingData);
+      }
+    }
+    uiStore.closeModal('event');
+  } catch (error) {
+    console.error('Error saving booking:', error);
+    // TODO: Show admin-specific error notification
+  }
+};
+const handleEventModalDelete = (bookingId: string): void => {
+  try {
+    // Show confirmation dialog for admin
+    uiStore.openConfirmDialog('confirm', {
+      title: 'Delete Booking',
+      message: 'Are you sure you want to delete this booking? This action cannot be undone and will affect the property owner.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      dangerous: true,
+      data: {
+        onConfirm: () => {
+          deleteBooking(bookingId);
+          uiStore.closeModal('event');
+          uiStore.closeConfirmDialog('confirm');
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+  }
+};
+const handlePropertyModalClose = (): void => {
+  try {
+    uiStore.closeModal('property');
+  } catch (error) {
+    console.error('Error closing property modal:', error);
+  }
+};
+const handlePropertyModalSave = async (propertyData: PropertyFormData): Promise<void> => {
+  try {
+    if (propertyModalMode.value === 'create') {
+      await createProperty(propertyData);
+    } else if (propertyModalMode.value === 'edit') {
+      // Get the property ID from modal data since PropertyFormData doesn't include id
+      const modalData = uiStore.getModalData('property') as any;
+      const propertyId = modalData?.property?.id;
+      if (propertyId) {
+        await updateProperty(propertyId, propertyData);
+      }
+    }
+    uiStore.closeModal('property');
+  } catch (error) {
+    console.error('Error saving property:', error);
+    // TODO: Show admin-specific error notification
+  }
+};
+const handlePropertyModalDelete = (propertyId: string): void => {
+  try {
+    // Show confirmation dialog for admin with business impact warning
+    const property = allPropertiesMap.value.get(propertyId);
+    const relatedBookings = Array.from(allBookingsMap.value.values())
+      .filter(booking => booking.property_id === propertyId);
+    uiStore.openConfirmDialog('confirm', {
+      title: 'Delete Property',
+      message: `Are you sure you want to delete "${property?.name}"? This will affect ${relatedBookings.length} bookings and impact the property owner's business.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      dangerous: true,
+      data: {
+        onConfirm: () => {
+          deleteProperty(propertyId);
+          uiStore.closeModal('property');
+          uiStore.closeConfirmDialog('confirm');
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting property:', error);
+  }
+};
+// ============================================================================
+// EVENT HANDLERS - CONFIRMATION DIALOG
+// ============================================================================
+const handleConfirmDialogConfirm = (): void => {
+  try {
+    const confirmData = uiStore.getConfirmDialogState('confirm');
+    const onConfirm = confirmData?.data?.onConfirm;
+    if (onConfirm && typeof onConfirm === 'function') {
+      onConfirm();
+    }
+  } catch (error) {
+    console.error('Error handling confirm dialog confirm:', error);
+  }
+};
+const handleConfirmDialogCancel = (): void => {
+  try {
+    const confirmData = uiStore.getConfirmDialogState('confirm');
+    const onCancel = confirmData?.data?.onCancel;
+    if (onCancel && typeof onCancel === 'function') {
+      onCancel();
+    }
+    uiStore.closeConfirmDialog('confirm');
+  } catch (error) {
+    console.error('Error handling confirm dialog cancel:', error);
+  }
+};
+const handleConfirmDialogClose = (): void => {
+  try {
+    uiStore.closeConfirmDialog('confirm');
+  } catch (error) {
+    console.error('Error closing confirm dialog:', error);
+  }
+};
+// ============================================================================
+// UI HELPERS
+// ============================================================================
+const toggleSidebar = (): void => {
+  sidebarOpen.value = !sidebarOpen.value;
+};
+// ============================================================================
+// LIFECYCLE HOOKS
+// ============================================================================
+onMounted(async () => {
+  try {
+    // Admin needs to fetch ALL data
+    await Promise.all([
+      fetchAllBookings(),
+      fetchAllProperties()
+    ]);
+    // Set up responsive sidebar
+    watch(xs, (newVal) => {
+      sidebarOpen.value = !newVal;
+    }, { immediate: true });
+  } catch (error) {
+    console.error('Error initializing HomeAdmin:', error);
+    // TODO: Show admin-specific error notification
+  }
+});
+onUnmounted(() => {
+  // Cleanup if needed
+});
+</script>
+<style scoped>
+.home-admin-container {
+  height: 100vh;
+  overflow: hidden;
+}
+.sidebar-column {
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  background-color: rgb(var(--v-theme-surface));
+}
+.calendar-column {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.calendar-header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  background-color: rgb(var(--v-theme-surface));
+  flex-shrink: 0;
+}
+.mobile-hidden {
+  display: none;
+}
+/* Admin-specific styling */
+.home-admin-container .calendar-header {
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
+  color: rgb(var(--v-theme-on-primary));
+}
+.home-admin-container .calendar-header .v-btn {
+  color: rgb(var(--v-theme-on-primary));
+}
+.home-admin-container .calendar-header .text-h6 {
+  color: rgb(var(--v-theme-on-primary));
+  font-weight: 600;
+}
+/* System metrics styling */
+.home-admin-container .text-caption {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+/* Responsive design */
+@media (max-width: 1024px) {
+  .sidebar-column {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100% !important;
+    max-width: 400px;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+  .mobile-hidden {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .sidebar-column:not(.mobile-hidden) {
+    transform: translateX(0);
+  }
+}
+@media (max-width: 600px) {
+  .calendar-header {
+    padding: 8px;
+  }
+  .calendar-header .d-flex {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .calendar-header .v-btn-toggle {
+    margin-left: 0 !important;
+    margin-top: 8px;
+  }
+}
+/* Admin color scheme */
+.home-admin-container {
+  --admin-primary: rgb(var(--v-theme-primary));
+  --admin-secondary: rgb(var(--v-theme-secondary));
+  --admin-warning: rgb(var(--v-theme-warning));
+  --admin-info: rgb(var(--v-theme-info));
+}
+</style>
+`````
+
+## File: src/components/smart/admin/HomeAdminDemo.vue
+`````vue
+<template>
+  <div class="home-admin-demo">
+    <v-container fluid>
+      <v-row>
+        <v-col cols="12">
+          <h1 class="text-h4 mb-4">
+            HomeAdmin Demo
+          </h1>
+          <p class="text-body-1 mb-4">
+            This demo shows the HomeAdmin component with sample data across multiple property owners.
+            The admin interface displays ALL data system-wide (no owner filtering) and includes admin-specific features.
+          </p>
+        </v-col>
+      </v-row>
+      <v-row>
+        <!-- Demo Controls -->
+        <v-col
+          cols="12"
+          md="3"
+        >
+          <v-card>
+            <v-card-title>Demo Controls</v-card-title>
+            <v-card-text>
+              <v-btn
+                block
+                color="primary"
+                class="mb-2"
+                @click="loadSampleData"
+              >
+                Load Sample Data
+              </v-btn>
+              <v-btn
+                block
+                color="secondary"
+                class="mb-2"
+                @click="clearData"
+              >
+                Clear Data
+              </v-btn>
+              <v-btn
+                block
+                color="info"
+                class="mb-4"
+                @click="toggleEventLog"
+              >
+                {{ showEventLog ? 'Hide' : 'Show' }} Event Log
+              </v-btn>
+              <h4>Sample Data Summary</h4>
+              <v-list density="compact">
+                <v-list-item>
+                  <v-list-item-title>Properties: {{ samplePropertiesArray.length }}</v-list-item-title>
+                  <v-list-item-subtitle>Across {{ uniqueOwners.length }} owners</v-list-item-subtitle>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>Bookings: {{ sampleBookingsArray.length }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ turnBookingsCount }} turns, {{ standardBookingsCount }} standard</v-list-item-subtitle>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>Today's Turns: {{ todayTurnsCount }}</v-list-item-title>
+                  <v-list-item-subtitle>System-wide urgent</v-list-item-subtitle>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>Upcoming: {{ upcomingCleaningsCount }}</v-list-item-title>
+                  <v-list-item-subtitle>Next 7 days</v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+          </v-card>
+          <!-- Event Log -->
+          <v-card
+            v-if="showEventLog"
+            class="mt-4"
+          >
+            <v-card-title class="d-flex align-center">
+              Event Log
+              <v-spacer />
+              <v-btn
+                size="small"
+                variant="outlined"
+                @click="clearEventLog"
+              >
+                Clear
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <v-list
+                v-if="eventLog.length > 0"
+                density="compact"
+                max-height="300"
+                style="overflow-y: auto;"
+              >
+                <v-list-item
+                  v-for="(event, index) in eventLog"
+                  :key="index"
+                  :title="event.action"
+                  :subtitle="event.details"
+                >
+                  <template #prepend>
+                    <v-icon
+                      :icon="getEventIcon(event.action)"
+                      :color="getEventColor(event.action)"
+                      size="small"
+                    />
+                  </template>
+                  <template #append>
+                    <span class="text-caption">{{ event.timestamp }}</span>
+                  </template>
+                </v-list-item>
+              </v-list>
+              <div
+                v-else
+                class="text-center py-4 text-medium-emphasis"
+              >
+                No events yet. Interact with the admin interface to see events.
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <!-- HomeAdmin Component Demo -->
+        <v-col
+          cols="12"
+          md="9"
+        >
+          <v-card>
+            <v-card-title>Admin Interface (System-wide View)</v-card-title>
+            <v-card-text class="pa-0">
+              <div style="height: 800px;">
+                <HomeAdmin />
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <!-- Sample Data Details -->
+      <v-row class="mt-4">
+        <v-col
+          cols="12"
+          md="6"
+        >
+          <v-card>
+            <v-card-title>Sample Properties (All Owners)</v-card-title>
+            <v-card-text>
+              <v-list density="compact">
+                <v-list-item
+                  v-for="property in samplePropertiesArray"
+                  :key="property.id"
+                  :title="property.name"
+                  :subtitle="`Owner: ${getOwnerName(property.owner_id)} | ${property.address}`"
+                >
+                  <template #prepend>
+                    <v-chip
+                      :color="getOwnerColor(property.owner_id)"
+                      size="x-small"
+                      label
+                    >
+                      {{ getOwnerInitials(property.owner_id) }}
+                    </v-chip>
+                  </template>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col
+          cols="12"
+          md="6"
+        >
+          <v-card>
+            <v-card-title>Sample Bookings (All Owners)</v-card-title>
+            <v-card-text>
+              <v-list density="compact">
+                <v-list-item
+                  v-for="booking in sampleBookingsArray"
+                  :key="booking.id"
+                  :title="`${booking.booking_type.toUpperCase()} - ${getPropertyName(booking.property_id)}`"
+                  :subtitle="`Owner: ${getOwnerName(booking.owner_id)} | ${formatDate(booking.checkout_date)} → ${formatDate(booking.checkin_date)}`"
+                >
+                  <template #prepend>
+                    <v-chip
+                      :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
+                      size="x-small"
+                      label
+                    >
+                      {{ booking.booking_type }}
+                    </v-chip>
+                  </template>
+                  <template #append>
+                    <v-chip
+                      :color="getOwnerColor(booking.owner_id)"
+                      size="x-small"
+                      label
+                    >
+                      {{ getOwnerInitials(booking.owner_id) }}
+                    </v-chip>
+                  </template>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+</template>
+⋮----
+<!-- Demo Controls -->
+⋮----
+{{ showEventLog ? 'Hide' : 'Show' }} Event Log
+⋮----
+<v-list-item-title>Properties: {{ samplePropertiesArray.length }}</v-list-item-title>
+<v-list-item-subtitle>Across {{ uniqueOwners.length }} owners</v-list-item-subtitle>
+⋮----
+<v-list-item-title>Bookings: {{ sampleBookingsArray.length }}</v-list-item-title>
+<v-list-item-subtitle>{{ turnBookingsCount }} turns, {{ standardBookingsCount }} standard</v-list-item-subtitle>
+⋮----
+<v-list-item-title>Today's Turns: {{ todayTurnsCount }}</v-list-item-title>
+⋮----
+<v-list-item-title>Upcoming: {{ upcomingCleaningsCount }}</v-list-item-title>
+⋮----
+<!-- Event Log -->
+⋮----
+<template #prepend>
+                    <v-icon
+                      :icon="getEventIcon(event.action)"
+                      :color="getEventColor(event.action)"
+                      size="small"
+                    />
+                  </template>
+<template #append>
+                    <span class="text-caption">{{ event.timestamp }}</span>
+                  </template>
+⋮----
+<span class="text-caption">{{ event.timestamp }}</span>
+⋮----
+<!-- HomeAdmin Component Demo -->
+⋮----
+<!-- Sample Data Details -->
+⋮----
+<template #prepend>
+                    <v-chip
+                      :color="getOwnerColor(property.owner_id)"
+                      size="x-small"
+                      label
+                    >
+                      {{ getOwnerInitials(property.owner_id) }}
+                    </v-chip>
+                  </template>
+⋮----
+{{ getOwnerInitials(property.owner_id) }}
+⋮----
+<template #prepend>
+                    <v-chip
+                      :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
+                      size="x-small"
+                      label
+                    >
+                      {{ booking.booking_type }}
+                    </v-chip>
+                  </template>
+⋮----
+{{ booking.booking_type }}
+⋮----
+<template #append>
+                    <v-chip
+                      :color="getOwnerColor(booking.owner_id)"
+                      size="x-small"
+                      label
+                    >
+                      {{ getOwnerInitials(booking.owner_id) }}
+                    </v-chip>
+                  </template>
+⋮----
+{{ getOwnerInitials(booking.owner_id) }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import HomeAdmin from './HomeAdmin.vue';
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
+import { useAuthStore } from '@/stores/auth';
+import type { Booking, Property } from '@/types';
+// Demo state
+const showEventLog = ref(false);
+const eventLog = ref<Array<{
+  action: string;
+  details: string;
+  timestamp: string;
+}>>([]);
+// Store connections
+const propertyStore = usePropertyStore();
+const bookingStore = useBookingStore();
+const authStore = useAuthStore();
+// Sample data for multiple owners (admin sees ALL)
+const sampleOwners = [
+  { id: '1', name: 'John Smith', initials: 'JS', color: 'blue' },
+  { id: '2', name: 'Sarah Johnson', initials: 'SJ', color: 'green' },
+  { id: '3', name: 'Mike Wilson', initials: 'MW', color: 'purple' },
+  { id: '4', name: 'Lisa Brown', initials: 'LB', color: 'orange' }
+];
+const sampleProperties = ref<Map<string, Property>>(new Map());
+const sampleBookings = ref<Map<string, Booking>>(new Map());
+// Computed properties for display
+const samplePropertiesArray = computed(() => 
+  Array.from(sampleProperties.value.values())
+);
+const sampleBookingsArray = computed(() => 
+  Array.from(sampleBookings.value.values())
+);
+const uniqueOwners = computed(() => 
+  [...new Set(samplePropertiesArray.value.map(p => p.owner_id))]
+);
+const turnBookingsCount = computed(() => 
+  sampleBookingsArray.value.filter(b => b.booking_type === 'turn').length
+);
+const standardBookingsCount = computed(() => 
+  sampleBookingsArray.value.filter(b => b.booking_type === 'standard').length
+);
+const todayTurnsCount = computed(() => {
+  const today = new Date().toISOString().split('T')[0];
+  return sampleBookingsArray.value.filter(b => 
+    b.booking_type === 'turn' && 
+    b.checkout_date.startsWith(today)
+  ).length;
+});
+const upcomingCleaningsCount = computed(() => {
+  const today = new Date();
+  const inOneWeek = new Date();
+  inOneWeek.setDate(today.getDate() + 7);
+  return sampleBookingsArray.value.filter(b => {
+    const checkoutDate = new Date(b.checkout_date);
+    return checkoutDate >= today && checkoutDate <= inOneWeek;
+  }).length;
+});
+// Methods
+const loadSampleData = (): void => {
+  // Create sample properties across multiple owners
+  const properties = new Map<string, Property>([
+    ['prop-1', {
+      id: 'prop-1',
+      owner_id: '1', // John Smith
+      name: 'Sunset Beach House',
+      address: '123 Ocean Drive, Miami, FL',
+      cleaning_duration: 180,
+      special_instructions: 'Check pool area, extra attention to kitchen',
+      pricing_tier: 'luxury',
+      active: true,
+      created_at: '2024-01-15T10:00:00Z',
+      updated_at: '2024-01-15T10:00:00Z'
+    }],
+    ['prop-2', {
+      id: 'prop-2',
+      owner_id: '1', // John Smith
+      name: 'Downtown Loft',
+      address: '456 Main Street, Miami, FL',
+      cleaning_duration: 120,
+      special_instructions: 'Hardwood floors, be careful with electronics',
+      pricing_tier: 'premium',
+      active: true,
+      created_at: '2024-01-20T14:30:00Z',
+      updated_at: '2024-01-20T14:30:00Z'
+    }],
+    ['prop-3', {
+      id: 'prop-3',
+      owner_id: '2', // Sarah Johnson
+      name: 'Mountain Cabin',
+      address: '789 Pine Avenue, Aspen, CO',
+      cleaning_duration: 150,
+      special_instructions: 'Fireplace cleaning, check hot tub',
+      pricing_tier: 'luxury',
+      active: true,
+      created_at: '2024-02-01T09:15:00Z',
+      updated_at: '2024-02-01T09:15:00Z'
+    }],
+    ['prop-4', {
+      id: 'prop-4',
+      owner_id: '2', // Sarah Johnson
+      name: 'City Studio',
+      address: '321 Urban Street, Denver, CO',
+      cleaning_duration: 90,
+      pricing_tier: 'basic',
+      active: true,
+      created_at: '2024-02-05T11:00:00Z',
+      updated_at: '2024-02-05T11:00:00Z'
+    }],
+    ['prop-5', {
+      id: 'prop-5',
+      owner_id: '3', // Mike Wilson
+      name: 'Lakefront Villa',
+      address: '555 Lake Road, Austin, TX',
+      cleaning_duration: 200,
+      special_instructions: 'Boat dock area, outdoor furniture',
+      pricing_tier: 'luxury',
+      active: true,
+      created_at: '2024-02-10T16:45:00Z',
+      updated_at: '2024-02-10T16:45:00Z'
+    }],
+    ['prop-6', {
+      id: 'prop-6',
+      owner_id: '4', // Lisa Brown
+      name: 'Historic Townhouse',
+      address: '777 Heritage Lane, Charleston, SC',
+      cleaning_duration: 160,
+      special_instructions: 'Antique furniture, gentle cleaning required',
+      pricing_tier: 'premium',
+      active: true,
+      created_at: '2024-02-15T13:20:00Z',
+      updated_at: '2024-02-15T13:20:00Z'
+    }]
+  ]);
+  // Create sample bookings across multiple owners and properties
+  const bookings = new Map<string, Booking>([
+    ['booking-1', {
+      id: 'booking-1',
+      property_id: 'prop-1',
+      owner_id: '1', // John Smith
+      checkout_date: new Date().toISOString().split('T')[0] + 'T11:00:00Z',
+      checkin_date: new Date().toISOString().split('T')[0] + 'T15:00:00Z',
+      booking_type: 'turn',
+      guest_count: 4,
+      notes: 'Same-day turnaround, high priority',
+      status: 'pending',
+      created_at: '2024-01-10T08:00:00Z',
+      updated_at: '2024-01-10T08:00:00Z'
+    }],
+    ['booking-2', {
+      id: 'booking-2',
+      property_id: 'prop-3',
+      owner_id: '2', // Sarah Johnson
+      checkout_date: new Date().toISOString().split('T')[0] + 'T10:00:00Z',
+      checkin_date: new Date().toISOString().split('T')[0] + 'T16:00:00Z',
+      booking_type: 'turn',
+      guest_count: 2,
+      notes: 'Mountain cabin turnaround',
+      status: 'scheduled',
+      assigned_cleaner_id: 'cleaner-1',
+      created_at: '2024-01-12T09:30:00Z',
+      updated_at: '2024-01-12T09:30:00Z'
+    }],
+    ['booking-3', {
+      id: 'booking-3',
+      property_id: 'prop-5',
+      owner_id: '3', // Mike Wilson
+      checkout_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
+      checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
+      booking_type: 'standard',
+      guest_count: 6,
+      notes: 'Regular cleaning, family with kids',
+      status: 'pending',
+      created_at: '2024-01-14T11:00:00Z',
+      updated_at: '2024-01-14T11:00:00Z'
+    }],
+    ['booking-4', {
+      id: 'booking-4',
+      property_id: 'prop-6',
+      owner_id: '4', // Lisa Brown
+      checkout_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
+      checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
+      booking_type: 'standard',
+      guest_count: 2,
+      notes: 'Historic home, careful cleaning',
+      status: 'pending',
+      created_at: '2024-01-16T13:45:00Z',
+      updated_at: '2024-01-16T13:45:00Z'
+    }],
+    ['booking-5', {
+      id: 'booking-5',
+      property_id: 'prop-2',
+      owner_id: '1', // John Smith
+      checkout_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T09:00:00Z',
+      checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T17:00:00Z',
+      booking_type: 'turn',
+      guest_count: 3,
+      notes: 'Downtown loft quick turn',
+      status: 'pending',
+      created_at: '2024-01-18T15:30:00Z',
+      updated_at: '2024-01-18T15:30:00Z'
+    }],
+    ['booking-6', {
+      id: 'booking-6',
+      property_id: 'prop-4',
+      owner_id: '2', // Sarah Johnson
+      checkout_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T10:00:00Z',
+      checkin_date: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T16:00:00Z',
+      booking_type: 'standard',
+      guest_count: 1,
+      notes: 'Studio apartment, minimal cleaning',
+      status: 'pending',
+      created_at: '2024-01-20T10:15:00Z',
+      updated_at: '2024-01-20T10:15:00Z'
+    }]
+  ]);
+  // Update stores with sample data (admin sees ALL data)
+  sampleProperties.value = properties;
+  sampleBookings.value = bookings;
+  // Load into actual stores for HomeAdmin to use
+  properties.forEach((property, id) => {
+    propertyStore.properties.set(id, property);
+  });
+  bookings.forEach((booking, id) => {
+    bookingStore.bookings.set(id, booking);
+  });
+  addEventLog('Load Sample Data', 'Loaded multi-owner sample data for admin view');
+};
+const clearData = (): void => {
+  sampleProperties.value.clear();
+  sampleBookings.value.clear();
+  propertyStore.properties.clear();
+  bookingStore.bookings.clear();
+  addEventLog('Clear Data', 'Cleared all sample data');
+};
+const toggleEventLog = (): void => {
+  showEventLog.value = !showEventLog.value;
+};
+const clearEventLog = (): void => {
+  eventLog.value = [];
+};
+const addEventLog = (action: string, details: string): void => {
+  eventLog.value.unshift({
+    action,
+    details,
+    timestamp: new Date().toLocaleTimeString()
+  });
+  // Keep only last 20 events
+  if (eventLog.value.length > 20) {
+    eventLog.value = eventLog.value.slice(0, 20);
+  }
+};
+// Utility functions
+const getOwnerName = (ownerId: string): string => {
+  return sampleOwners.find(o => o.id === ownerId)?.name || 'Unknown Owner';
+};
+const getOwnerInitials = (ownerId: string): string => {
+  return sampleOwners.find(o => o.id === ownerId)?.initials || 'UO';
+};
+const getOwnerColor = (ownerId: string): string => {
+  return sampleOwners.find(o => o.id === ownerId)?.color || 'grey';
+};
+const getPropertyName = (propertyId: string): string => {
+  return sampleProperties.value.get(propertyId)?.name || 'Unknown Property';
+};
+const formatDate = (dateString: string): string => {
+  return new Date(dateString).toLocaleDateString();
+};
+const getEventIcon = (action: string): string => {
+  const iconMap: Record<string, string> = {
+    'Load Sample Data': 'mdi-database-plus',
+    'Clear Data': 'mdi-database-remove',
+    'Navigate to Booking': 'mdi-calendar-edit',
+    'Navigate to Date': 'mdi-calendar-month',
+    'Filter by Property': 'mdi-filter-variant',
+    'Create Booking': 'mdi-calendar-plus',
+    'Create Property': 'mdi-home-plus',
+    'Assign Cleaners': 'mdi-account-hard-hat',
+    'Generate Reports': 'mdi-chart-line',
+    'Manage System': 'mdi-cog'
+  };
+  return iconMap[action] || 'mdi-information';
+};
+const getEventColor = (action: string): string => {
+  const colorMap: Record<string, string> = {
+    'Load Sample Data': 'success',
+    'Clear Data': 'warning',
+    'Navigate to Booking': 'primary',
+    'Navigate to Date': 'info',
+    'Filter by Property': 'warning',
+    'Create Booking': 'success',
+    'Create Property': 'secondary',
+    'Assign Cleaners': 'warning',
+    'Generate Reports': 'info',
+    'Manage System': 'primary'
+  };
+  return colorMap[action] || 'grey';
+};
+// Initialize demo
+onMounted(() => {
+  // Set up admin user for demo
+  authStore.user = {
+    id: 'admin-1',
+    email: 'admin@cleaningcompany.com',
+    name: 'Admin User',
+    role: 'admin',
+    settings: {
+      notifications: true,
+      timezone: 'America/New_York',
+      theme: 'light',
+      language: 'en'
+    },
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  };
+  // Load sample data automatically
+  loadSampleData();
+});
+</script>
+<style scoped>
+.home-admin-demo {
+  min-height: 100vh;
+  background-color: rgb(var(--v-theme-surface));
+}
+/* Admin demo specific styling */
+.home-admin-demo .v-card {
+  border: 1px solid rgba(var(--v-theme-primary), 0.2);
+}
+.home-admin-demo .v-card-title {
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
+  color: rgb(var(--v-theme-on-primary));
+}
+</style>
+`````
+
 ## File: src/components/smart/admin/README.md
 `````markdown
 # Admin Smart Components
@@ -28667,6 +30785,410 @@ watch(isOwnerAuthenticated, (newValue) => {
 </style>
 `````
 
+## File: src/components/smart/owner/OwnerCalendar.vue
+`````vue
+<template>
+  <div class="owner-calendar-container">
+    <FullCalendar
+      ref="calendarRef"
+      :options="ownerCalendarOptions"
+      class="owner-calendar"
+    />
+  </div>
+</template>
+<script setup lang="ts">
+import FullCalendar from '@fullcalendar/vue3';
+import type { CalendarOptions, DateSelectArg, EventClickArg } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import { computed, ref, watch } from 'vue';
+import { useTheme } from 'vuetify';
+import type { Booking, Property } from '@/types';
+// Import event logger for component communication
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+interface Props {
+  bookings: Map<string, Booking>;
+  properties: Map<string, Property>;
+  loading?: boolean;
+  currentView?: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
+  currentDate?: Date;
+}
+interface Emits {
+  (e: 'dateSelect', selectInfo: DateSelectArg): void;
+  (e: 'eventClick', clickInfo: EventClickArg): void;
+  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
+  (e: 'viewChange', view: string): void;
+  (e: 'dateChange', date: Date): void;
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+  currentView: 'timeGridWeek',
+  currentDate: () => new Date()
+});
+const emit = defineEmits<Emits>();
+// Theme integration
+const theme = useTheme();
+const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+// Convert owner's bookings Map to FullCalendar events
+const ownerCalendarEvents = computed(() => {
+  return Array.from(props.bookings.values()).map(booking => {
+    const property = props.properties.get(booking.property_id);
+    const isTurn = booking.booking_type === 'turn';
+    return {
+      id: booking.id,
+      title: `${property?.name || 'My Property'} ${isTurn ? '🔥 TURN' : ''}`,
+      start: booking.checkout_date,
+      end: booking.checkin_date,
+      backgroundColor: getOwnerEventColor(booking),
+      borderColor: getOwnerEventBorderColor(booking),
+      textColor: getOwnerEventTextColor(booking),
+      extendedProps: {
+        booking,
+        property,
+        bookingType: booking.booking_type,
+        status: booking.status,
+        guestCount: booking.guest_count,
+        notes: booking.notes
+      },
+      classNames: [
+        `owner-booking-${booking.booking_type}`,
+        `owner-status-${booking.status}`,
+        isTurn ? 'owner-priority-urgent' : 'owner-priority-normal'
+      ]
+    };
+  });
+});
+// Owner-focused color system (simpler than admin version)
+const getOwnerEventColor = (booking: Booking): string => {
+  const isDark = theme.global.current.value.dark;
+  if (booking.booking_type === 'turn') {
+    // Turn bookings - urgent red/orange colors
+    switch (booking.status) {
+      case 'pending': return isDark ? '#FF5252' : '#F44336'; // Urgent red
+      case 'scheduled': return isDark ? '#FF9800' : '#FF6F00'; // Warning orange
+      case 'in_progress': return isDark ? '#4CAF50' : '#2E7D32'; // Success green
+      case 'completed': return isDark ? '#9E9E9E' : '#616161'; // Muted gray
+      default: return isDark ? '#FF5252' : '#F44336';
+    }
+  } else {
+    // Standard bookings - calmer blue colors
+    switch (booking.status) {
+      case 'pending': return isDark ? '#2196F3' : '#1976D2'; // Primary blue
+      case 'scheduled': return isDark ? '#00BCD4' : '#0097A7'; // Cyan
+      case 'in_progress': return isDark ? '#4CAF50' : '#388E3C'; // Green
+      case 'completed': return isDark ? '#9E9E9E' : '#757575'; // Gray
+      default: return isDark ? '#2196F3' : '#1976D2';
+    }
+  }
+};
+const getOwnerEventBorderColor = (booking: Booking): string => {
+  return booking.booking_type === 'turn' ? '#D32F2F' : '#1976D2';
+};
+const getOwnerEventTextColor = (booking: Booking): string => {
+  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
+};
+// Owner-focused calendar configuration (simplified)
+const ownerCalendarOptions = computed<CalendarOptions>(() => ({
+  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+  // View settings - basic views only
+  initialView: props.currentView,
+  headerToolbar: false, // We'll handle toolbar externally
+  // Event settings
+  events: ownerCalendarEvents.value,
+  eventDisplay: 'block',
+  eventOverlap: false,
+  // Owner interaction settings (simplified)
+  selectable: true,
+  selectMirror: true,
+  editable: false, // No drag-and-drop for owners (admin feature)
+  droppable: false, // No drag-to-assign (admin feature)
+  // Date/time settings
+  locale: 'en',
+  timeZone: 'local',
+  slotMinTime: '06:00:00',
+  slotMaxTime: '22:00:00',
+  slotDuration: '01:00:00',
+  // Appearance - owner-friendly
+  height: 'auto',
+  aspectRatio: 1.8,
+  // Custom styling based on theme
+  themeSystem: 'standard',
+  // Event handlers - owner-specific
+  select: handleOwnerDateSelect,
+  eventClick: handleOwnerEventClick,
+  datesSet: handleDatesSet,
+  // Loading state
+  loading: handleLoading,
+  // Custom rendering - owner-focused
+  eventContent: renderOwnerEventContent,
+  dayCellContent: renderOwnerDayCell,
+  // Business hours
+  businessHours: {
+    daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // Monday - Sunday
+    startTime: '08:00',
+    endTime: '18:00'
+  },
+  // Weekend styling
+  weekends: true,
+  // Month view specific
+  dayMaxEvents: 3,
+  moreLinkClick: 'popover',
+  // Week/day view specific
+  allDaySlot: false,
+  nowIndicator: true,
+  scrollTime: '08:00:00'
+}));
+// Owner-specific event handlers
+const handleOwnerDateSelect = (selectInfo: DateSelectArg): void => {
+  // Log emitting event to HomeOwner
+  eventLogger.logEvent(
+    'OwnerCalendar',
+    'HomeOwner',
+    'dateSelect',
+    { start: selectInfo.startStr, end: selectInfo.endStr },
+    'emit'
+  );
+  emit('dateSelect', selectInfo);
+  // Auto-create booking for owner
+  emit('createBooking', {
+    start: selectInfo.startStr,
+    end: selectInfo.endStr
+  });
+  // Clear selection
+  selectInfo.view.calendar.unselect();
+};
+const handleOwnerEventClick = (clickInfo: EventClickArg): void => {
+  // Log emitting event to HomeOwner
+  eventLogger.logEvent(
+    'OwnerCalendar',
+    'HomeOwner',
+    'eventClick',
+    { id: clickInfo.event.id },
+    'emit'
+  );
+  emit('eventClick', clickInfo);
+};
+const handleDatesSet = (dateInfo: any): void => {
+  // Handle view/date changes
+  const newDate = new Date(dateInfo.start);
+  eventLogger.logEvent(
+    'OwnerCalendar',
+    'HomeOwner',
+    'dateChange',
+    { date: newDate.toISOString() },
+    'emit'
+  );
+  emit('dateChange', newDate);
+};
+const handleLoading = (isLoading: boolean): void => {
+  eventLogger.logEvent(
+    'OwnerCalendar',
+    'HomeOwner',
+    'loadingState',
+    { isLoading },
+    'emit'
+  );
+};
+// Owner-focused custom event rendering
+const renderOwnerEventContent = (eventInfo: any) => {
+  const booking = eventInfo.event.extendedProps.booking as Booking;
+  const property = eventInfo.event.extendedProps.property as Property;
+  const isTurn = booking.booking_type === 'turn';
+  return {
+    html: `
+      <div class="owner-event-content">
+        <div class="owner-event-title">
+          ${isTurn ? '🔥 ' : ''}${property?.name || 'My Property'}
+        </div>
+        <div class="owner-event-details">
+          ${booking.status.toUpperCase()}
+          ${booking.guest_count ? ` • ${booking.guest_count} guests` : ''}
+        </div>
+        ${isTurn ? '<div class="owner-turn-badge">URGENT TURN</div>' : ''}
+      </div>
+    `
+  };
+};
+// Owner-focused day cell rendering
+const renderOwnerDayCell = (dayInfo: any) => {
+  const dayBookings = Array.from(props.bookings.values())
+    .filter(booking => {
+      const checkoutDate = new Date(booking.checkout_date).toDateString();
+      const dayDate = dayInfo.date.toDateString();
+      return checkoutDate === dayDate;
+    });
+  const myTurnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
+  const myBookingCount = dayBookings.length;
+  return {
+    html: `
+      <div class="owner-day-number">
+        ${dayInfo.dayNumberText}
+        ${myTurnCount > 0 ? `<span class="owner-turn-indicator">${myTurnCount}</span>` : ''}
+        ${myBookingCount > 0 && myTurnCount === 0 ? `<span class="owner-booking-indicator">${myBookingCount}</span>` : ''}
+      </div>
+    `
+  };
+};
+// Programmatic calendar methods for owner
+const goToDate = (date: string | Date): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().gotoDate(date);
+  }
+};
+const changeView = (viewName: string): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().changeView(viewName);
+    eventLogger.logEvent(
+      'OwnerCalendar',
+      'HomeOwner',
+      'viewChange',
+      { view: viewName },
+      'emit'
+    );
+    emit('viewChange', viewName);
+  }
+};
+const refreshEvents = (): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().refetchEvents();
+  }
+};
+// Watch for theme changes and update calendar
+watch(() => theme.global.current.value.dark, () => {
+  refreshEvents();
+});
+// Watch for changes in props from HomeOwner
+watch(() => props.bookings, (newBookings) => {
+  // Log receiving updated bookings from HomeOwner
+  eventLogger.logEvent(
+    'HomeOwner',
+    'OwnerCalendar',
+    'bookingsUpdate',
+    { count: newBookings.size },
+    'receive'
+  );
+}, { deep: true });
+// Watch for view changes from parent
+watch(() => props.currentView, (newView) => {
+  if (newView && calendarRef.value) {
+    calendarRef.value.getApi().changeView(newView);
+  }
+});
+// Watch for date changes from parent
+watch(() => props.currentDate, (newDate) => {
+  if (newDate && calendarRef.value) {
+    calendarRef.value.getApi().gotoDate(newDate);
+  }
+});
+// Expose methods to parent (HomeOwner)
+defineExpose({
+  goToDate,
+  changeView,
+  refreshEvents,
+  getApi: () => calendarRef.value?.getApi()
+});
+</script>
+<style scoped>
+.owner-calendar-container {
+  height: 100%;
+  width: 100%;
+}
+.owner-calendar {
+  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
+  --fc-button-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-border-color: rgb(var(--v-theme-primary));
+  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
+  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
+}
+/* Owner-specific turn booking highlighting */
+.fc-event.owner-booking-turn {
+  font-weight: bold;
+  border-width: 2px !important;
+  animation: owner-pulse 2s infinite;
+}
+@keyframes owner-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(var(--v-theme-error), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
+}
+/* Owner-specific status styling */
+.fc-event.owner-status-pending {
+  opacity: 0.9;
+}
+.fc-event.owner-status-completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+.fc-event.owner-priority-urgent {
+  border-left: 4px solid rgb(var(--v-theme-error)) !important;
+}
+/* Owner-specific turn indicator in day cells */
+.owner-turn-indicator {
+  background: rgb(var(--v-theme-error));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 10px;
+  margin-left: 4px;
+  font-weight: bold;
+  animation: owner-pulse 2s infinite;
+}
+.owner-booking-indicator {
+  background: rgb(var(--v-theme-primary));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 10px;
+  margin-left: 4px;
+  font-weight: bold;
+}
+/* Owner-specific event content styling */
+.owner-event-content {
+  padding: 2px;
+}
+.owner-event-title {
+  font-weight: 600;
+  font-size: 0.85em;
+}
+.owner-event-details {
+  font-size: 0.75em;
+  opacity: 0.9;
+  margin-top: 1px;
+}
+.owner-turn-badge {
+  background: rgba(var(--v-theme-error), 0.2);
+  color: rgb(var(--v-theme-error));
+  font-size: 0.7em;
+  padding: 1px 4px;
+  border-radius: 4px;
+  margin-top: 2px;
+  font-weight: bold;
+  text-align: center;
+}
+/* Owner-specific day cell styling */
+.owner-day-number {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Responsive adjustments for owner calendar */
+@media (max-width: 768px) {
+  .owner-event-title {
+    font-size: 0.8em;
+  }
+  .owner-event-details {
+    font-size: 0.7em;
+  }
+  .owner-turn-badge {
+    font-size: 0.65em;
+  }
+}
+</style>
+`````
+
 ## File: src/components/smart/owner/OwnerSidebar.vue
 `````vue
 <template>
@@ -29182,351 +31704,6 @@ onMounted(() => {
 }
 .quick-actions .v-card-title {
   color: rgb(var(--v-theme-secondary));
-}
-</style>
-`````
-
-## File: src/components/smart/owner/OwnerSidebarDemo.vue
-`````vue
-<template>
-  <div class="owner-sidebar-demo">
-    <v-container fluid>
-      <v-row>
-        <v-col cols="12">
-          <h1 class="text-h4 mb-4">OwnerSidebar Demo</h1>
-          <p class="text-body-1 mb-4">
-            This demo shows the OwnerSidebar component with sample owner data.
-            The sidebar filters all data to show only the current owner's properties and bookings.
-          </p>
-        </v-col>
-      </v-row>
-      <v-row>
-        <!-- Sidebar Demo -->
-        <v-col cols="12" md="4">
-          <v-card>
-            <v-card-title>Owner Sidebar</v-card-title>
-            <v-card-text class="pa-0">
-              <div style="height: 600px;">
-                <OwnerSidebar
-                  :today-turns="sampleOwnerTodayTurns"
-                  :upcoming-cleanings="sampleOwnerUpcomingCleanings"
-                  :properties="sampleOwnerProperties"
-                  :loading="loading"
-                  @navigate-to-booking="handleNavigateToBooking"
-                  @navigate-to-date="handleNavigateToDate"
-                  @filter-by-property="handleFilterByProperty"
-                  @create-booking="handleCreateBooking"
-                  @create-property="handleCreateProperty"
-                />
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <!-- Event Log -->
-        <v-col cols="12" md="8">
-          <v-card>
-            <v-card-title class="d-flex align-center">
-              Event Log
-              <v-spacer />
-              <v-btn
-                size="small"
-                variant="outlined"
-                @click="clearEventLog"
-              >
-                Clear
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <v-list v-if="eventLog.length > 0" density="compact">
-                <v-list-item
-                  v-for="(event, index) in eventLog"
-                  :key="index"
-                  :title="event.action"
-                  :subtitle="event.details"
-                >
-                  <template #prepend>
-                    <v-icon
-                      :icon="getEventIcon(event.action)"
-                      :color="getEventColor(event.action)"
-                      size="small"
-                    />
-                  </template>
-                  <template #append>
-                    <span class="text-caption">{{ event.timestamp }}</span>
-                  </template>
-                </v-list-item>
-              </v-list>
-              <div v-else class="text-center py-4 text-medium-emphasis">
-                No events yet. Interact with the sidebar to see events.
-              </div>
-            </v-card-text>
-          </v-card>
-          <!-- Sample Data Info -->
-          <v-card class="mt-4">
-            <v-card-title>Sample Data</v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="12" sm="6">
-                  <h4>Owner Properties ({{ sampleOwnerPropertiesArray.length }})</h4>
-                  <v-list density="compact">
-                    <v-list-item
-                      v-for="property in sampleOwnerPropertiesArray"
-                      :key="property.id"
-                      :title="property.name"
-                      :subtitle="property.address"
-                    />
-                  </v-list>
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <h4>Owner Bookings ({{ totalOwnerBookings }})</h4>
-                  <v-list density="compact">
-                    <v-list-item
-                      v-for="booking in [...sampleOwnerTodayTurnsArray, ...sampleOwnerUpcomingCleaningsArray]"
-                      :key="booking.id"
-                      :title="`${booking.booking_type.toUpperCase()} - ${getPropertyName(booking.property_id)}`"
-                      :subtitle="`${formatDate(booking.checkout_date)} → ${formatDate(booking.checkin_date)}`"
-                    >
-                      <template #prepend>
-                        <v-chip
-                          :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
-                          size="x-small"
-                          label
-                        >
-                          {{ booking.booking_type }}
-                        </v-chip>
-                      </template>
-                    </v-list-item>
-                  </v-list>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
-⋮----
-<!-- Sidebar Demo -->
-⋮----
-<!-- Event Log -->
-⋮----
-<template #prepend>
-                    <v-icon
-                      :icon="getEventIcon(event.action)"
-                      :color="getEventColor(event.action)"
-                      size="small"
-                    />
-                  </template>
-<template #append>
-                    <span class="text-caption">{{ event.timestamp }}</span>
-                  </template>
-⋮----
-<span class="text-caption">{{ event.timestamp }}</span>
-⋮----
-<!-- Sample Data Info -->
-⋮----
-<h4>Owner Properties ({{ sampleOwnerPropertiesArray.length }})</h4>
-⋮----
-<h4>Owner Bookings ({{ totalOwnerBookings }})</h4>
-⋮----
-<template #prepend>
-                        <v-chip
-                          :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
-                          size="x-small"
-                          label
-                        >
-                          {{ booking.booking_type }}
-                        </v-chip>
-                      </template>
-⋮----
-{{ booking.booking_type }}
-⋮----
-<script setup lang="ts">
-import { ref, computed } from 'vue';
-import OwnerSidebar from './OwnerSidebar.vue';
-import type { Booking, Property } from '@/types';
-// Demo state
-const loading = ref(false);
-const eventLog = ref<Array<{
-  action: string;
-  details: string;
-  timestamp: string;
-}>>([]);
-// Sample owner data (filtered to current owner ID = '1')
-const currentOwnerId = '1';
-const sampleOwnerProperties = ref<Map<string, Property>>(new Map([
-  ['prop-1', {
-    id: 'prop-1',
-    owner_id: currentOwnerId, // Owner's property
-    name: 'Sunset Beach House',
-    address: '123 Ocean Drive, Miami, FL',
-    cleaning_duration: 180,
-    special_instructions: 'Check pool area, extra attention to kitchen',
-    pricing_tier: 'luxury',
-    active: true,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z'
-  }],
-  ['prop-2', {
-    id: 'prop-2',
-    owner_id: currentOwnerId, // Owner's property
-    name: 'Downtown Loft',
-    address: '456 Main Street, Miami, FL',
-    cleaning_duration: 120,
-    special_instructions: 'Hardwood floors, be careful with electronics',
-    pricing_tier: 'premium',
-    active: true,
-    created_at: '2024-01-20T14:30:00Z',
-    updated_at: '2024-01-20T14:30:00Z'
-  }],
-  ['prop-3', {
-    id: 'prop-3',
-    owner_id: currentOwnerId, // Owner's property
-    name: 'Cozy Studio',
-    address: '789 Pine Avenue, Miami, FL',
-    cleaning_duration: 90,
-    pricing_tier: 'basic',
-    active: true,
-    created_at: '2024-02-01T09:15:00Z',
-    updated_at: '2024-02-01T09:15:00Z'
-  }]
-]));
-const sampleOwnerTodayTurns = ref<Map<string, Booking>>(new Map([
-  ['booking-1', {
-    id: 'booking-1',
-    property_id: 'prop-1',
-    owner_id: currentOwnerId, // Owner's booking
-    checkout_date: new Date().toISOString().split('T')[0] + 'T11:00:00Z',
-    checkin_date: new Date().toISOString().split('T')[0] + 'T15:00:00Z',
-    booking_type: 'turn',
-    guest_count: 4,
-    notes: 'Same-day turnaround, high priority',
-    status: 'pending',
-    created_at: '2024-01-10T08:00:00Z',
-    updated_at: '2024-01-10T08:00:00Z'
-  }],
-  ['booking-2', {
-    id: 'booking-2',
-    property_id: 'prop-2',
-    owner_id: currentOwnerId, // Owner's booking
-    checkout_date: new Date().toISOString().split('T')[0] + 'T10:00:00Z',
-    checkin_date: new Date().toISOString().split('T')[0] + 'T16:00:00Z',
-    booking_type: 'turn',
-    guest_count: 2,
-    notes: 'Quick turnaround needed',
-    status: 'scheduled',
-    assigned_cleaner_id: 'cleaner-1',
-    created_at: '2024-01-12T09:30:00Z',
-    updated_at: '2024-01-12T09:30:00Z'
-  }]
-]));
-const sampleOwnerUpcomingCleanings = ref<Map<string, Booking>>(new Map([
-  ['booking-3', {
-    id: 'booking-3',
-    property_id: 'prop-1',
-    owner_id: currentOwnerId, // Owner's booking
-    checkout_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
-    checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
-    booking_type: 'standard',
-    guest_count: 6,
-    notes: 'Regular cleaning, family with kids',
-    status: 'pending',
-    created_at: '2024-01-14T11:00:00Z',
-    updated_at: '2024-01-14T11:00:00Z'
-  }],
-  ['booking-4', {
-    id: 'booking-4',
-    property_id: 'prop-3',
-    owner_id: currentOwnerId, // Owner's booking
-    checkout_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
-    checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
-    booking_type: 'standard',
-    guest_count: 2,
-    notes: 'Business travelers, minimal mess expected',
-    status: 'pending',
-    created_at: '2024-01-16T13:45:00Z',
-    updated_at: '2024-01-16T13:45:00Z'
-  }]
-]));
-// Computed properties for display
-const sampleOwnerPropertiesArray = computed(() => 
-  Array.from(sampleOwnerProperties.value.values())
-);
-const sampleOwnerTodayTurnsArray = computed(() => 
-  Array.from(sampleOwnerTodayTurns.value.values())
-);
-const sampleOwnerUpcomingCleaningsArray = computed(() => 
-  Array.from(sampleOwnerUpcomingCleanings.value.values())
-);
-const totalOwnerBookings = computed(() => 
-  sampleOwnerTodayTurnsArray.value.length + sampleOwnerUpcomingCleaningsArray.value.length
-);
-// Event handlers
-const handleNavigateToBooking = (bookingId: string) => {
-  addEventLog('Navigate to Booking', `Booking ID: ${bookingId}`);
-};
-const handleNavigateToDate = (date: Date) => {
-  addEventLog('Navigate to Date', `Date: ${date.toLocaleDateString()}`);
-};
-const handleFilterByProperty = (propertyId: string | null) => {
-  const propertyName = propertyId 
-    ? sampleOwnerProperties.value.get(propertyId)?.name || 'Unknown Property'
-    : 'All Properties';
-  addEventLog('Filter by Property', `Property: ${propertyName}`);
-};
-const handleCreateBooking = () => {
-  addEventLog('Create Booking', 'Owner wants to create a new booking');
-};
-const handleCreateProperty = () => {
-  addEventLog('Create Property', 'Owner wants to add a new property');
-};
-// Utility functions
-const addEventLog = (action: string, details: string) => {
-  eventLog.value.unshift({
-    action,
-    details,
-    timestamp: new Date().toLocaleTimeString()
-  });
-  // Keep only last 20 events
-  if (eventLog.value.length > 20) {
-    eventLog.value = eventLog.value.slice(0, 20);
-  }
-};
-const clearEventLog = () => {
-  eventLog.value = [];
-};
-const getEventIcon = (action: string): string => {
-  const iconMap: Record<string, string> = {
-    'Navigate to Booking': 'mdi-calendar-edit',
-    'Navigate to Date': 'mdi-calendar-month',
-    'Filter by Property': 'mdi-filter-variant',
-    'Create Booking': 'mdi-calendar-plus',
-    'Create Property': 'mdi-home-plus'
-  };
-  return iconMap[action] || 'mdi-information';
-};
-const getEventColor = (action: string): string => {
-  const colorMap: Record<string, string> = {
-    'Navigate to Booking': 'primary',
-    'Navigate to Date': 'info',
-    'Filter by Property': 'warning',
-    'Create Booking': 'success',
-    'Create Property': 'secondary'
-  };
-  return colorMap[action] || 'grey';
-};
-const getPropertyName = (propertyId: string): string => {
-  return sampleOwnerProperties.value.get(propertyId)?.name || 'Unknown Property';
-};
-const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString();
-};
-</script>
-<style scoped>
-.owner-sidebar-demo {
-  min-height: 100vh;
-  background-color: rgb(var(--v-theme-surface));
 }
 </style>
 `````
@@ -30266,6 +32443,28 @@ async function fetchAllProperties(): Promise<boolean>
 </style>
 `````
 
+## File: src/pages/demos/home-admin.vue
+`````vue
+<template>
+  <HomeAdminDemo />
+</template>
+<script setup lang="ts">
+import HomeAdminDemo from '@/components/smart/admin/HomeAdminDemo.vue';
+</script>
+`````
+
+## File: src/pages/demos/owner-calendar.vue
+`````vue
+<template>
+  <div>
+    <OwnerCalendarDemo />
+  </div>
+</template>
+<script setup lang="ts">
+import OwnerCalendarDemo from '@/components/smart/owner/OwnerCalendarDemo.vue';
+</script>
+`````
+
 ## File: src/pages/demos/owner-sidebar.vue
 `````vue
 <template>
@@ -30311,76 +32510,6 @@ import SidebarDemo from '@/components/smart/SidebarDemo.vue';
 `````typescript
 import { createClient } from '@supabase/supabase-js'
 // URL and anon key will be replaced with actual values during deployment
-`````
-
-## File: src/types/booking.ts
-`````typescript
-/**
- * Booking Type Definitions
- * Types for bookings/events in the property cleaning scheduler
- */
-/**
- * Valid booking types
- * 'turn' bookings are high priority same-day checkout/checkin
- * 'standard' bookings are regular cleanings with time gap
- */
-export type BookingType = 'standard' | 'turn';
-/**
- * Valid booking statuses
- * Defines the workflow of a booking
- */
-export type BookingStatus = 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-/**
- * Booking Interface
- * Core data model for booking/cleaning events
- */
-export interface Booking {
-  id: string;
-  property_id: string;
-  owner_id: string;
-  checkout_date: string; // ISO date when guests leave
-  checkin_date: string;  // ISO date when new guests arrive
-  booking_type: BookingType;
-  status: BookingStatus;
-  guest_count?: number;
-  notes?: string;
-  priority?: 'low' | 'normal' | 'high' | 'urgent';
-  assigned_cleaner_id?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-⋮----
-checkout_date: string; // ISO date when guests leave
-checkin_date: string;  // ISO date when new guests arrive
-⋮----
-/**
- * Extended booking with calculated fields
- * Used for display and business logic
- */
-export interface BookingWithMetadata extends Booking {
-  property_name?: string;
-  cleaning_window?: {
-    start: string;
-    end: string;
-    duration: number; // minutes
-  };
-  priority: 'low' | 'normal' | 'high' | 'urgent';
-}
-⋮----
-duration: number; // minutes
-⋮----
-/**
- * Form data for creating/editing bookings
- */
-export type BookingFormData = Omit<Booking, 'id' | 'created_at' | 'updated_at'>;
-/**
- * Map type for booking collections
- */
-export type BookingMap = Map<string, Booking>;
-/**
- * Type guard for Booking objects
- */
-export function isBooking(obj: any): obj is Booking
 `````
 
 ## File: src/types/index.ts
@@ -31773,6 +33902,858 @@ addHighTurn();
 </style>
 `````
 
+## File: src/components/smart/owner/OwnerCalendarDemo.vue
+`````vue
+<template>
+  <div class="owner-calendar-demo">
+    <v-container fluid>
+      <v-row>
+        <v-col cols="12">
+          <v-card>
+            <v-card-title class="d-flex align-center">
+              <v-icon class="mr-2">
+                mdi-calendar-account
+              </v-icon>
+              OwnerCalendar Demo
+              <v-spacer />
+              <v-chip
+                color="primary"
+                variant="outlined"
+              >
+                Owner View
+              </v-chip>
+            </v-card-title>
+            <v-card-subtitle>
+              Simplified calendar interface for property owners - shows only their bookings with basic controls
+            </v-card-subtitle>
+            <v-card-text>
+              <!-- Calendar Controls -->
+              <div class="demo-controls mb-4">
+                <v-row align="center">
+                  <v-col cols="auto">
+                    <v-btn
+                      icon="mdi-arrow-left"
+                      variant="text"
+                      @click="handlePrevious"
+                    />
+                    <v-btn 
+                      variant="outlined" 
+                      class="mx-2" 
+                      @click="handleGoToday"
+                    >
+                      Today
+                    </v-btn>
+                    <v-btn
+                      icon="mdi-arrow-right"
+                      variant="text"
+                      @click="handleNext"
+                    />
+                  </v-col>
+                  <v-col cols="auto">
+                    <div class="text-h6">
+                      {{ formattedDate }}
+                    </div>
+                  </v-col>
+                  <v-spacer />
+                  <v-col cols="auto">
+                    <v-btn-toggle
+                      v-model="currentView"
+                      mandatory
+                      @update:model-value="handleViewChange"
+                    >
+                      <v-btn value="dayGridMonth">
+                        Month
+                      </v-btn>
+                      <v-btn value="timeGridWeek">
+                        Week
+                      </v-btn>
+                      <v-btn value="timeGridDay">
+                        Day
+                      </v-btn>
+                    </v-btn-toggle>
+                  </v-col>
+                </v-row>
+              </div>
+              <!-- Owner Calendar Component -->
+              <OwnerCalendar
+                ref="ownerCalendarRef"
+                :bookings="ownerBookings"
+                :properties="ownerProperties"
+                :loading="loading"
+                :current-view="currentView"
+                :current-date="currentDate"
+                @date-select="handleDateSelect"
+                @event-click="handleEventClick"
+                @create-booking="handleCreateBooking"
+                @view-change="handleCalendarViewChange"
+                @date-change="handleCalendarDateChange"
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <!-- Demo Information -->
+      <v-row class="mt-4">
+        <v-col
+          cols="12"
+          md="6"
+        >
+          <v-card>
+            <v-card-title>
+              <v-icon class="mr-2">
+                mdi-information
+              </v-icon>
+              Owner Calendar Features
+            </v-card-title>
+            <v-card-text>
+              <v-list density="compact">
+                <v-list-item>
+                  <v-list-item-title>✅ Shows only owner's bookings</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>✅ Basic calendar views (Month, Week, Day)</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>✅ Click to edit bookings</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>✅ Date selection for new bookings</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>✅ Turn booking highlighting</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>❌ No drag-and-drop (admin feature)</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>❌ No cleaner assignment (admin feature)</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col
+          cols="12"
+          md="6"
+        >
+          <v-card>
+            <v-card-title>
+              <v-icon class="mr-2">
+                mdi-chart-bar
+              </v-icon>
+              Owner Data Summary
+            </v-card-title>
+            <v-card-text>
+              <v-list density="compact">
+                <v-list-item>
+                  <v-list-item-title>
+                    Properties: {{ ownerProperties.size }}
+                  </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>
+                    Total Bookings: {{ ownerBookings.size }}
+                  </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>
+                    Turn Bookings: {{ turnBookingsCount }}
+                  </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>
+                    Standard Bookings: {{ standardBookingsCount }}
+                  </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>
+                    Pending: {{ pendingBookingsCount }}
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <!-- Event Log -->
+      <v-row class="mt-4">
+        <v-col cols="12">
+          <v-card>
+            <v-card-title>
+              <v-icon class="mr-2">
+                mdi-console
+              </v-icon>
+              Event Log
+              <v-spacer />
+              <v-btn
+                size="small"
+                variant="outlined"
+                @click="clearEventLog"
+              >
+                Clear
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <div class="event-log">
+                <div
+                  v-for="(event, index) in eventLog"
+                  :key="index"
+                  class="event-log-item"
+                >
+                  <v-chip
+                    :color="event.type === 'emit' ? 'primary' : 'secondary'"
+                    size="small"
+                    class="mr-2"
+                  >
+                    {{ event.type }}
+                  </v-chip>
+                  <span class="text-caption">
+                    {{ event.timestamp }} - {{ event.from }} → {{ event.to }}: {{ event.event }}
+                    <span
+                      v-if="event.data"
+                      class="text-grey"
+                    >
+                      ({{ JSON.stringify(event.data) }})
+                    </span>
+                  </span>
+                </div>
+                <div
+                  v-if="eventLog.length === 0"
+                  class="text-grey text-center py-4"
+                >
+                  No events logged yet. Interact with the calendar to see events.
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+</template>
+⋮----
+<!-- Calendar Controls -->
+⋮----
+{{ formattedDate }}
+⋮----
+<!-- Owner Calendar Component -->
+⋮----
+<!-- Demo Information -->
+⋮----
+Properties: {{ ownerProperties.size }}
+⋮----
+Total Bookings: {{ ownerBookings.size }}
+⋮----
+Turn Bookings: {{ turnBookingsCount }}
+⋮----
+Standard Bookings: {{ standardBookingsCount }}
+⋮----
+Pending: {{ pendingBookingsCount }}
+⋮----
+<!-- Event Log -->
+⋮----
+{{ event.type }}
+⋮----
+{{ event.timestamp }} - {{ event.from }} → {{ event.to }}: {{ event.event }}
+⋮----
+({{ JSON.stringify(event.data) }})
+⋮----
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import OwnerCalendar from './OwnerCalendar.vue';
+import type { Booking, Property } from '@/types';
+import type { DateSelectArg, EventClickArg } from '@fullcalendar/core';
+// Demo state
+const ownerCalendarRef = ref<InstanceType<typeof OwnerCalendar> | null>(null);
+const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'>('timeGridWeek');
+const currentDate = ref<Date>(new Date());
+const loading = ref(false);
+const eventLog = ref<Array<{
+  timestamp: string;
+  from: string;
+  to: string;
+  event: string;
+  type: 'emit' | 'receive';
+  data?: any;
+}>>([]);
+// Sample owner data (filtered to single owner)
+const ownerId = 'owner-1';
+const ownerProperties = ref<Map<string, Property>>(new Map([
+  ['prop-1', {
+    id: 'prop-1',
+    owner_id: ownerId,
+    name: 'Sunset Villa',
+    address: '123 Beach Road, Malibu, CA',
+    cleaning_duration: 180,
+    special_instructions: 'Pool cleaning required',
+    pricing_tier: 'luxury',
+    active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  }],
+  ['prop-2', {
+    id: 'prop-2',
+    owner_id: ownerId,
+    name: 'Mountain Cabin',
+    address: '456 Pine Street, Aspen, CO',
+    cleaning_duration: 120,
+    special_instructions: 'Fireplace cleaning needed',
+    pricing_tier: 'premium',
+    active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  }],
+  ['prop-3', {
+    id: 'prop-3',
+    owner_id: ownerId,
+    name: 'City Loft',
+    address: '789 Downtown Ave, NYC, NY',
+    cleaning_duration: 90,
+    special_instructions: 'High-rise building, elevator access',
+    pricing_tier: 'basic',
+    active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  }]
+]));
+const ownerBookings = ref<Map<string, Booking>>(new Map());
+// Generate sample bookings for the owner
+const generateOwnerBookings = () => {
+  const bookings = new Map<string, Booking>();
+  const today = new Date();
+  const properties = Array.from(ownerProperties.value.keys());
+  // Generate bookings for the next 30 days
+  for (let i = 0; i < 10; i++) {
+    const checkoutDate = new Date(today);
+    checkoutDate.setDate(today.getDate() + i * 2);
+    const checkinDate = new Date(checkoutDate);
+    checkinDate.setDate(checkoutDate.getDate() + 1);
+    const propertyId = properties[i % properties.length];
+    const isTurn = Math.random() > 0.7; // 30% chance of turn booking
+    const statuses = ['pending', 'scheduled', 'in_progress', 'completed'];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const booking: Booking = {
+      id: `booking-${i + 1}`,
+      property_id: propertyId,
+      owner_id: ownerId,
+      checkout_date: checkoutDate.toISOString().split('T')[0],
+      checkin_date: checkinDate.toISOString().split('T')[0],
+      booking_type: isTurn ? 'turn' : 'standard',
+      guest_count: Math.floor(Math.random() * 6) + 1,
+      notes: isTurn ? 'Same-day turnaround required' : 'Standard cleaning',
+      status: status as any,
+      priority: isTurn ? 'urgent' : 'normal',
+      created_at: today.toISOString(),
+      updated_at: today.toISOString()
+    };
+    bookings.set(booking.id, booking);
+  }
+  ownerBookings.value = bookings;
+};
+// Computed properties for demo stats
+const turnBookingsCount = computed(() => {
+  return Array.from(ownerBookings.value.values())
+    .filter(b => b.booking_type === 'turn').length;
+});
+const standardBookingsCount = computed(() => {
+  return Array.from(ownerBookings.value.values())
+    .filter(b => b.booking_type === 'standard').length;
+});
+const pendingBookingsCount = computed(() => {
+  return Array.from(ownerBookings.value.values())
+    .filter(b => b.status === 'pending').length;
+});
+const formattedDate = computed(() => {
+  const options: Intl.DateTimeFormatOptions = { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  };
+  return currentDate.value.toLocaleDateString('en-US', options);
+});
+// Event handlers
+const handleDateSelect = (selectInfo: DateSelectArg) => {
+  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'dateSelect', 'receive', {
+    start: selectInfo.startStr,
+    end: selectInfo.endStr
+  });
+  console.log('Owner date selected:', selectInfo);
+};
+const handleEventClick = (clickInfo: EventClickArg) => {
+  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'eventClick', 'receive', {
+    id: clickInfo.event.id,
+    title: clickInfo.event.title
+  });
+  console.log('Owner event clicked:', clickInfo);
+};
+const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }) => {
+  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'createBooking', 'receive', data);
+  console.log('Owner create booking:', data);
+};
+const handleViewChange = (view: string) => {
+  if (ownerCalendarRef.value) {
+    ownerCalendarRef.value.changeView(view);
+  }
+};
+const handleCalendarViewChange = (view: string) => {
+  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'viewChange', 'receive', { view });
+  currentView.value = view as any;
+};
+const handleCalendarDateChange = (date: Date) => {
+  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'dateChange', 'receive', { 
+    date: date.toISOString() 
+  });
+  currentDate.value = date;
+};
+const handlePrevious = () => {
+  const date = new Date(currentDate.value);
+  if (currentView.value === 'dayGridMonth') {
+    date.setMonth(date.getMonth() - 1);
+  } else if (currentView.value === 'timeGridWeek') {
+    date.setDate(date.getDate() - 7);
+  } else {
+    date.setDate(date.getDate() - 1);
+  }
+  currentDate.value = date;
+  if (ownerCalendarRef.value) {
+    ownerCalendarRef.value.goToDate(date);
+  }
+};
+const handleNext = () => {
+  const date = new Date(currentDate.value);
+  if (currentView.value === 'dayGridMonth') {
+    date.setMonth(date.getMonth() + 1);
+  } else if (currentView.value === 'timeGridWeek') {
+    date.setDate(date.getDate() + 7);
+  } else {
+    date.setDate(date.getDate() + 1);
+  }
+  currentDate.value = date;
+  if (ownerCalendarRef.value) {
+    ownerCalendarRef.value.goToDate(date);
+  }
+};
+const handleGoToday = () => {
+  currentDate.value = new Date();
+  if (ownerCalendarRef.value) {
+    ownerCalendarRef.value.goToDate(new Date());
+  }
+};
+// Event logging
+const logEvent = (from: string, to: string, event: string, type: 'emit' | 'receive', data?: any) => {
+  eventLog.value.unshift({
+    timestamp: new Date().toLocaleTimeString(),
+    from,
+    to,
+    event,
+    type,
+    data
+  });
+  // Keep only last 20 events
+  if (eventLog.value.length > 20) {
+    eventLog.value = eventLog.value.slice(0, 20);
+  }
+};
+const clearEventLog = () => {
+  eventLog.value = [];
+};
+// Initialize demo data
+onMounted(() => {
+  generateOwnerBookings();
+});
+</script>
+<style scoped>
+.owner-calendar-demo {
+  padding: 16px;
+}
+.demo-controls {
+  border: 1px solid rgb(var(--v-theme-on-surface), 0.12);
+  border-radius: 8px;
+  padding: 16px;
+  background: rgb(var(--v-theme-surface));
+}
+.event-log {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.event-log-item {
+  padding: 4px 0;
+  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.05);
+  font-family: monospace;
+  font-size: 0.85em;
+}
+.event-log-item:last-child {
+  border-bottom: none;
+}
+</style>
+`````
+
+## File: src/components/smart/owner/OwnerSidebarDemo.vue
+`````vue
+<template>
+  <div class="owner-sidebar-demo">
+    <v-container fluid>
+      <v-row>
+        <v-col cols="12">
+          <h1 class="text-h4 mb-4">
+            OwnerSidebar Demo
+          </h1>
+          <p class="text-body-1 mb-4">
+            This demo shows the OwnerSidebar component with sample owner data.
+            The sidebar filters all data to show only the current owner's properties and bookings.
+          </p>
+        </v-col>
+      </v-row>
+      <v-row>
+        <!-- Sidebar Demo -->
+        <v-col
+          cols="12"
+          md="4"
+        >
+          <v-card>
+            <v-card-title>Owner Sidebar</v-card-title>
+            <v-card-text class="pa-0">
+              <div style="height: 600px;">
+                <OwnerSidebar
+                  :today-turns="sampleOwnerTodayTurns"
+                  :upcoming-cleanings="sampleOwnerUpcomingCleanings"
+                  :properties="sampleOwnerProperties"
+                  :loading="loading"
+                  @navigate-to-booking="handleNavigateToBooking"
+                  @navigate-to-date="handleNavigateToDate"
+                  @filter-by-property="handleFilterByProperty"
+                  @create-booking="handleCreateBooking"
+                  @create-property="handleCreateProperty"
+                />
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <!-- Event Log -->
+        <v-col
+          cols="12"
+          md="8"
+        >
+          <v-card>
+            <v-card-title class="d-flex align-center">
+              Event Log
+              <v-spacer />
+              <v-btn
+                size="small"
+                variant="outlined"
+                @click="clearEventLog"
+              >
+                Clear
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <v-list
+                v-if="eventLog.length > 0"
+                density="compact"
+              >
+                <v-list-item
+                  v-for="(event, index) in eventLog"
+                  :key="index"
+                  :title="event.action"
+                  :subtitle="event.details"
+                >
+                  <template #prepend>
+                    <v-icon
+                      :icon="getEventIcon(event.action)"
+                      :color="getEventColor(event.action)"
+                      size="small"
+                    />
+                  </template>
+                  <template #append>
+                    <span class="text-caption">{{ event.timestamp }}</span>
+                  </template>
+                </v-list-item>
+              </v-list>
+              <div
+                v-else
+                class="text-center py-4 text-medium-emphasis"
+              >
+                No events yet. Interact with the sidebar to see events.
+              </div>
+            </v-card-text>
+          </v-card>
+          <!-- Sample Data Info -->
+          <v-card class="mt-4">
+            <v-card-title>Sample Data</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
+                  <h4>Owner Properties ({{ sampleOwnerPropertiesArray.length }})</h4>
+                  <v-list density="compact">
+                    <v-list-item
+                      v-for="property in sampleOwnerPropertiesArray"
+                      :key="property.id"
+                      :title="property.name"
+                      :subtitle="property.address"
+                    />
+                  </v-list>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
+                  <h4>Owner Bookings ({{ totalOwnerBookings }})</h4>
+                  <v-list density="compact">
+                    <v-list-item
+                      v-for="booking in [...sampleOwnerTodayTurnsArray, ...sampleOwnerUpcomingCleaningsArray]"
+                      :key="booking.id"
+                      :title="`${booking.booking_type.toUpperCase()} - ${getPropertyName(booking.property_id)}`"
+                      :subtitle="`${formatDate(booking.checkout_date)} → ${formatDate(booking.checkin_date)}`"
+                    >
+                      <template #prepend>
+                        <v-chip
+                          :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
+                          size="x-small"
+                          label
+                        >
+                          {{ booking.booking_type }}
+                        </v-chip>
+                      </template>
+                    </v-list-item>
+                  </v-list>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+</template>
+⋮----
+<!-- Sidebar Demo -->
+⋮----
+<!-- Event Log -->
+⋮----
+<template #prepend>
+                    <v-icon
+                      :icon="getEventIcon(event.action)"
+                      :color="getEventColor(event.action)"
+                      size="small"
+                    />
+                  </template>
+<template #append>
+                    <span class="text-caption">{{ event.timestamp }}</span>
+                  </template>
+⋮----
+<span class="text-caption">{{ event.timestamp }}</span>
+⋮----
+<!-- Sample Data Info -->
+⋮----
+<h4>Owner Properties ({{ sampleOwnerPropertiesArray.length }})</h4>
+⋮----
+<h4>Owner Bookings ({{ totalOwnerBookings }})</h4>
+⋮----
+<template #prepend>
+                        <v-chip
+                          :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
+                          size="x-small"
+                          label
+                        >
+                          {{ booking.booking_type }}
+                        </v-chip>
+                      </template>
+⋮----
+{{ booking.booking_type }}
+⋮----
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import OwnerSidebar from './OwnerSidebar.vue';
+import type { Booking, Property } from '@/types';
+// Demo state
+const loading = ref(false);
+const eventLog = ref<Array<{
+  action: string;
+  details: string;
+  timestamp: string;
+}>>([]);
+// Sample owner data (filtered to current owner ID = '1')
+const currentOwnerId = '1';
+const sampleOwnerProperties = ref<Map<string, Property>>(new Map([
+  ['prop-1', {
+    id: 'prop-1',
+    owner_id: currentOwnerId, // Owner's property
+    name: 'Sunset Beach House',
+    address: '123 Ocean Drive, Miami, FL',
+    cleaning_duration: 180,
+    special_instructions: 'Check pool area, extra attention to kitchen',
+    pricing_tier: 'luxury',
+    active: true,
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z'
+  }],
+  ['prop-2', {
+    id: 'prop-2',
+    owner_id: currentOwnerId, // Owner's property
+    name: 'Downtown Loft',
+    address: '456 Main Street, Miami, FL',
+    cleaning_duration: 120,
+    special_instructions: 'Hardwood floors, be careful with electronics',
+    pricing_tier: 'premium',
+    active: true,
+    created_at: '2024-01-20T14:30:00Z',
+    updated_at: '2024-01-20T14:30:00Z'
+  }],
+  ['prop-3', {
+    id: 'prop-3',
+    owner_id: currentOwnerId, // Owner's property
+    name: 'Cozy Studio',
+    address: '789 Pine Avenue, Miami, FL',
+    cleaning_duration: 90,
+    pricing_tier: 'basic',
+    active: true,
+    created_at: '2024-02-01T09:15:00Z',
+    updated_at: '2024-02-01T09:15:00Z'
+  }]
+]));
+const sampleOwnerTodayTurns = ref<Map<string, Booking>>(new Map([
+  ['booking-1', {
+    id: 'booking-1',
+    property_id: 'prop-1',
+    owner_id: currentOwnerId, // Owner's booking
+    checkout_date: new Date().toISOString().split('T')[0] + 'T11:00:00Z',
+    checkin_date: new Date().toISOString().split('T')[0] + 'T15:00:00Z',
+    booking_type: 'turn',
+    guest_count: 4,
+    notes: 'Same-day turnaround, high priority',
+    status: 'pending',
+    created_at: '2024-01-10T08:00:00Z',
+    updated_at: '2024-01-10T08:00:00Z'
+  }],
+  ['booking-2', {
+    id: 'booking-2',
+    property_id: 'prop-2',
+    owner_id: currentOwnerId, // Owner's booking
+    checkout_date: new Date().toISOString().split('T')[0] + 'T10:00:00Z',
+    checkin_date: new Date().toISOString().split('T')[0] + 'T16:00:00Z',
+    booking_type: 'turn',
+    guest_count: 2,
+    notes: 'Quick turnaround needed',
+    status: 'scheduled',
+    assigned_cleaner_id: 'cleaner-1',
+    created_at: '2024-01-12T09:30:00Z',
+    updated_at: '2024-01-12T09:30:00Z'
+  }]
+]));
+const sampleOwnerUpcomingCleanings = ref<Map<string, Booking>>(new Map([
+  ['booking-3', {
+    id: 'booking-3',
+    property_id: 'prop-1',
+    owner_id: currentOwnerId, // Owner's booking
+    checkout_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
+    checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
+    booking_type: 'standard',
+    guest_count: 6,
+    notes: 'Regular cleaning, family with kids',
+    status: 'pending',
+    created_at: '2024-01-14T11:00:00Z',
+    updated_at: '2024-01-14T11:00:00Z'
+  }],
+  ['booking-4', {
+    id: 'booking-4',
+    property_id: 'prop-3',
+    owner_id: currentOwnerId, // Owner's booking
+    checkout_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
+    checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
+    booking_type: 'standard',
+    guest_count: 2,
+    notes: 'Business travelers, minimal mess expected',
+    status: 'pending',
+    created_at: '2024-01-16T13:45:00Z',
+    updated_at: '2024-01-16T13:45:00Z'
+  }]
+]));
+// Computed properties for display
+const sampleOwnerPropertiesArray = computed(() => 
+  Array.from(sampleOwnerProperties.value.values())
+);
+const sampleOwnerTodayTurnsArray = computed(() => 
+  Array.from(sampleOwnerTodayTurns.value.values())
+);
+const sampleOwnerUpcomingCleaningsArray = computed(() => 
+  Array.from(sampleOwnerUpcomingCleanings.value.values())
+);
+const totalOwnerBookings = computed(() => 
+  sampleOwnerTodayTurnsArray.value.length + sampleOwnerUpcomingCleaningsArray.value.length
+);
+// Event handlers
+const handleNavigateToBooking = (bookingId: string) => {
+  addEventLog('Navigate to Booking', `Booking ID: ${bookingId}`);
+};
+const handleNavigateToDate = (date: Date) => {
+  addEventLog('Navigate to Date', `Date: ${date.toLocaleDateString()}`);
+};
+const handleFilterByProperty = (propertyId: string | null) => {
+  const propertyName = propertyId 
+    ? sampleOwnerProperties.value.get(propertyId)?.name || 'Unknown Property'
+    : 'All Properties';
+  addEventLog('Filter by Property', `Property: ${propertyName}`);
+};
+const handleCreateBooking = () => {
+  addEventLog('Create Booking', 'Owner wants to create a new booking');
+};
+const handleCreateProperty = () => {
+  addEventLog('Create Property', 'Owner wants to add a new property');
+};
+// Utility functions
+const addEventLog = (action: string, details: string) => {
+  eventLog.value.unshift({
+    action,
+    details,
+    timestamp: new Date().toLocaleTimeString()
+  });
+  // Keep only last 20 events
+  if (eventLog.value.length > 20) {
+    eventLog.value = eventLog.value.slice(0, 20);
+  }
+};
+const clearEventLog = () => {
+  eventLog.value = [];
+};
+const getEventIcon = (action: string): string => {
+  const iconMap: Record<string, string> = {
+    'Navigate to Booking': 'mdi-calendar-edit',
+    'Navigate to Date': 'mdi-calendar-month',
+    'Filter by Property': 'mdi-filter-variant',
+    'Create Booking': 'mdi-calendar-plus',
+    'Create Property': 'mdi-home-plus'
+  };
+  return iconMap[action] || 'mdi-information';
+};
+const getEventColor = (action: string): string => {
+  const colorMap: Record<string, string> = {
+    'Navigate to Booking': 'primary',
+    'Navigate to Date': 'info',
+    'Filter by Property': 'warning',
+    'Create Booking': 'success',
+    'Create Property': 'secondary'
+  };
+  return colorMap[action] || 'grey';
+};
+const getPropertyName = (propertyId: string): string => {
+  return sampleOwnerProperties.value.get(propertyId)?.name || 'Unknown Property';
+};
+const formatDate = (dateString: string): string => {
+  return new Date(dateString).toLocaleDateString();
+};
+</script>
+<style scoped>
+.owner-sidebar-demo {
+  min-height: 100vh;
+  background-color: rgb(var(--v-theme-surface));
+}
+</style>
+`````
+
 ## File: src/components/smart/SidebarDemo.vue
 `````vue
 <template>
@@ -32220,43 +35201,16 @@ import FullCalendarDemo from '@/components/smart/FullCalendarDemo.vue';
 </style>
 `````
 
-## File: src/stores/auth.ts
-`````typescript
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { User } from '@/types';
-/**
- * Auth store for the Property Cleaning Scheduler
- * Manages user authentication state
- */
-⋮----
-// State
-⋮----
-// For development, set isAuthenticated to true by default
-⋮----
-// Actions
-function login(email: string, _password: string)
-⋮----
-// Note: password parameter is intentionally unused in mock implementation
-⋮----
-// Simulate login success for now
-⋮----
-// Mock successful login
-⋮----
-function logout()
-function register(userData: Partial<User>)
-⋮----
-// Simulate registration success
-⋮----
-// Mock successful registration
-⋮----
-function checkAuth()
-⋮----
-// In a real app, this would validate the token
-⋮----
-// State
-⋮----
-// Actions
+## File: src/pages/demos/index.vue
+`````vue
+<script setup lang="ts">
+    import OwnerCalendarDemo from '@/components/smart/owner/OwnerCalendarDemo.vue'
+    </script>
+<template>
+  <OwnerCalendarDemo />
+</template>
+<style scoped>
+</style>
 `````
 
 ## File: src/stores/property.ts
@@ -32438,6 +35392,76 @@ export interface AuthResponse {
   session: Record<string, unknown> | null;
   error: string | null;
 }
+`````
+
+## File: src/types/booking.ts
+`````typescript
+/**
+ * Booking Type Definitions
+ * Types for bookings/events in the property cleaning scheduler
+ */
+/**
+ * Valid booking types
+ * 'turn' bookings are high priority same-day checkout/checkin
+ * 'standard' bookings are regular cleanings with time gap
+ */
+export type BookingType = 'standard' | 'turn';
+/**
+ * Valid booking statuses
+ * Defines the workflow of a booking
+ */
+export type BookingStatus = 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+/**
+ * Booking Interface
+ * Core data model for booking/cleaning events
+ */
+export interface Booking {
+  id: string;
+  property_id: string;
+  owner_id: string;
+  checkout_date: string; // ISO date when guests leave
+  checkin_date: string;  // ISO date when new guests arrive
+  booking_type: BookingType;
+  status: BookingStatus;
+  guest_count?: number;
+  notes?: string;
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
+  assigned_cleaner_id?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+⋮----
+checkout_date: string; // ISO date when guests leave
+checkin_date: string;  // ISO date when new guests arrive
+⋮----
+/**
+ * Extended booking with calculated fields
+ * Used for display and business logic
+ */
+export interface BookingWithMetadata extends Booking {
+  property_name?: string;
+  cleaning_window?: {
+    start: string;
+    end: string;
+    duration: number; // minutes
+  };
+  priority: 'low' | 'normal' | 'high' | 'urgent';
+}
+⋮----
+duration: number; // minutes
+⋮----
+/**
+ * Form data for creating/editing bookings
+ */
+export type BookingFormData = Omit<Booking, 'id' | 'created_at' | 'updated_at'>;
+/**
+ * Map type for booking collections
+ */
+export type BookingMap = Map<string, Booking>;
+/**
+ * Type guard for Booking objects
+ */
+export function isBooking(obj: any): obj is Booking
 `````
 
 ## File: tsconfig.json
@@ -35344,6 +38368,45 @@ Current Test Booking ID: {{ testBookingId }}
 </style>
 `````
 
+## File: src/stores/auth.ts
+`````typescript
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import type { User } from '@/types';
+/**
+ * Auth store for the Property Cleaning Scheduler
+ * Manages user authentication state
+ */
+⋮----
+// State
+⋮----
+// For development, set isAuthenticated to true by default
+⋮----
+// Actions
+function login(email: string, _password: string)
+⋮----
+// Note: password parameter is intentionally unused in mock implementation
+⋮----
+// Simulate login success for now
+⋮----
+// Mock successful login
+⋮----
+function logout()
+function register(userData: Partial<User>)
+⋮----
+// Simulate registration success
+⋮----
+// Mock successful registration
+⋮----
+function checkAuth()
+⋮----
+// In a real app, this would validate the token
+⋮----
+// State
+⋮----
+// Actions
+`````
+
 ## File: src/stores/booking.ts
 `````typescript
 // EVENTS/BOOKING STORE - BOOKING STORE - BOOKING CRUD - BOOKING FILTERS - BOOKING ACTIONS
@@ -36907,518 +39970,6 @@ style: 'text-transform: none;', // Remove uppercase transform
 // Display configuration for responsive design
 `````
 
-## File: src/types/ui.ts
-`````typescript
-/**
- * UI Type Definitions
- * Types for UI state management
- */
-/**
- * Generic data type for modal and dialog payloads
- */
-export type ModalData = Record<string, unknown> | null | undefined;
-/**
- * Filter value type for arbitrary filter values
- */
-export type FilterValue = string | number | boolean | Date | null | undefined;
-/**
- * Modal state interface
- * Used for tracking modal dialogs
- */
-export interface ModalState {
-  open: boolean;
-  mode: 'create' | 'edit' | 'view' | 'delete';
-  data?: ModalData;
-}
-/**
- * Confirmation dialog state interface
- * Used for tracking confirmation dialogs
- */
-export interface ConfirmDialogState {
-  open: boolean;
-  title: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  confirmColor?: string;
-  dangerous?: boolean;
-  data?: ModalData; // For passing data to the confirmation callback
-}
-⋮----
-data?: ModalData; // For passing data to the confirmation callback
-⋮----
-/**
- * Notification types
- */
-export type NotificationType = 'success' | 'info' | 'warning' | 'error';
-/**
- * Notification interface
- * Used for user notifications/alerts
- */
-export interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-  autoClose?: boolean;
-  duration?: number;
-}
-/**
- * Calendar view types
- */
-export type CalendarView = 'month' | 'week' | 'day' | 'list';
-/**
- * Filter state interface
- * Used for calendar and list filtering
- */
-export interface FilterState {
-  propertyId?: string;
-  bookingType?: 'all' | 'standard' | 'turn';
-  status?: 'all' | 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-  dateRange?: {
-    start: string;
-    end: string;
-  };
-  searchTerm?: string;
-}
-/**
- * Calendar event type
- * For use with FullCalendar
- */
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  start: string;
-  end: string;
-  allDay: boolean;
-  classNames: string[];
-  backgroundColor?: string;
-  borderColor?: string;
-  textColor?: string;
-  extendedProps: {
-    booking: Record<string, unknown>;
-    type: 'standard' | 'turn';
-    status: string;
-  };
-}
-`````
-
-## File: problemfix.md
-`````markdown
->### --- PROBLEM - 001 ---
-### TypeScript Error Fix: Property 'setFilter' in UI Store
-
-### Problem Description 
-
-The TypeScript compiler was reporting an error in the `useCalendarState` composable:
-
-```
-Property 'setFilter' does not exist on type 'Store<"ui", Pick<{ modals: Ref<Map<string, { open: boolean; mode: "delete" | "create" | "edit" | "view"; data?: any; }> & Omit<Map<string, ModalState>, keyof Map<any, any>>, Map<...> | (Map<...> & Omit<...>)>; ... 26 more ...; setPropertyFilter: (propertyId: string | null) => void; }, "loading" | ... 6 more ... | "s...'. Did you mean 'resetFilters'?
-```
-
-The `useCalendarState` composable was trying to use a method called `setFilter` on the UI store, but this method did not exist in the store implementation. The composable was using `setFilter` with key-value pairs for various filter settings such as:
-
-- `uiStore.setFilter('calendarView', view)`
-- `uiStore.setFilter('dateRangeStart', start.toISOString())`
-- `uiStore.setFilter('showTurnBookings', showTurnBookings.value)`
-- `uiStore.setFilter('selectedProperties', Array.from(selectedPropertyIds.value))`
-
-## Root Cause
-
-This issue occurred because the `useCalendarState` composable was using a filter approach that didn't match the implementation in the UI store. The UI store had a structured `FilterState` interface with specific properties, while the composable was trying to set arbitrary filter keys and values.
-
-The UI store had methods like `updateFilter` (which takes a `Partial<FilterState>` object), `resetFilters`, and `setPropertyFilter`, but no generic `setFilter` method that could handle arbitrary key-value pairs.
-
-## Solution
-
-The solution was to add a flexible `setFilter` method to the UI store that can handle arbitrary key-value pairs while maintaining compatibility with the existing FilterState approach:
-
-1. Added a new `filterValues` Map to the UI store state to store arbitrary filter values:
-   ```typescript
-   const filterValues = ref<Map<string, any>>(new Map());
-   ```
-
-2. Implemented a `setFilter` method that sets values in this Map and handles special cases:
-   ```typescript
-   function setFilter(key: string, value: any) {
-     filterValues.value.set(key, value);
-     
-     // Special case handling for known filter keys
-     if (key === 'calendarView') {
-       setCalendarView(value);
-     }
-     else if (key === 'dateRangeStart' && filterState.value.dateRange) {
-       // ... handle dateRange updates ...
-     }
-     // ... other special cases ...
-   }
-   ```
-
-3. Added a `getFilter` method to retrieve values from this Map:
-   ```typescript
-   function getFilter(key: string): any {
-     return filterValues.value.get(key);
-   }
-   ```
-
-4. Updated the `resetFilters` method to clear the filterValues Map:
-   ```typescript
-   // Also clear the filterValues map
-   filterValues.value.clear();
-   ```
-
-5. Exposed the new methods and state in the store's return value:
-   ```typescript
-   return {
-     // ... existing state and methods ...
-     filterValues,
-     setFilter,
-     getFilter
-   };
-   ```
-
-## Benefits of the Solution
-
-This solution:
-
-1. **Maintains backward compatibility** - Existing code using FilterState still works
-2. **Adds flexibility** - Supports arbitrary filter values not covered by FilterState
-3. **Follows project patterns** - Uses Maps for collections as per project architecture
-4. **Provides type safety** - Properly typed everything to satisfy TypeScript
-5. **Minimizes code changes** - Didn't require refactoring the useCalendarState composable
-
-The solution elegantly bridges the gap between the structured FilterState approach and the more flexible key-value approach needed by the useCalendarState composable.
-
-### Prevention
-
-To prevent similar issues in the future:
-1. Ensure composables and components check for the existence of store methods before using them
-2. Consider adding utility methods for common patterns across the codebase
-3. Document API boundaries and expected usage patterns for stores and composables
-
-### Additional Notes
-
-While fixing the `setFilter` error in the UI store, we ran TypeScript verification and found additional errors in the test files. These errors are related to outdated test specifications that no longer match the current implementation of the stores, particularly in:
-
-- `src/__tests__/components/HelloWorld.spec.ts`
-- `src/__tests__/stores/ui.spec.ts`
-- `src/__tests__/stores/user.spec.ts`
-
-These test errors are separate from the `setFilter` issue we addressed and would require updating the test files to match the current implementation of the stores. Since our focus was specifically on fixing the `setFilter` error, these test issues are noted but left for a separate task.
-
-The important thing is that our fix for the `setFilter` method in the UI store resolved the TypeScript error in the application code, allowing the calendar functionality to work correctly.
-
-## TypeScript Linter Errors in Home.vue
-
-### Problem Description
-
-The TypeScript linter was reporting the following errors in src/components/smart/Home.vue:
-
-```
-Line 117: 'userStore' is declared but its value is never read.
-Line 136: 'createProperty' is declared but its value is never read.
-Line 137: 'updateProperty' is declared but its value is never read.
-Line 138: 'deleteProperty' is declared but its value is never read.
-```
-
-These errors occur when variables are declared but not used anywhere in the code, which is considered a poor practice as it creates unnecessary overhead and can lead to confusion.
-
-## Root Cause
-
-The root cause was importing and declaring variables that weren't actually being used in the component:
-
-1. `userStore` was imported and initialized but not used anywhere in the component's functionality.
-2. `createProperty`, `updateProperty`, and `deleteProperty` functions were destructured from the useProperties composable but never called in any of the component's methods.
-
-Looking at the code, it appeared that:
-- The component didn't need direct access to the user store, as user-related functionality was handled elsewhere
-- Property creation is initiated in the `handleCreateProperty` method, but it only opens a modal dialog without directly calling the `createProperty` function
-- Property update and deletion functionality isn't handled directly in this component
-
-## Solution
-
-The solution was to remove the unused variables:
-
-1. Removed the import for useUserStore:
-```diff
-- import { useUserStore } from '@/stores/user';
-  import { usePropertyStore } from '@/stores/property';
-  import { useBookingStore } from '@/stores/booking';
-  import { useUIStore } from '@/stores/ui';
-```
-
-2. Removed the userStore initialization:
-```diff
-- const userStore = useUserStore();
-  const propertyStore = usePropertyStore();
-  const bookingStore = useBookingStore();
-  const uiStore = useUIStore();
-```
-
-3. Removed the unused functions from the useProperties destructuring:
-```diff
-const { 
-  loading: propertiesLoading, 
-- createProperty, 
-- updateProperty, 
-- deleteProperty,
-  fetchAllProperties
-} = useProperties();
-```
-
-These changes fixed the TypeScript linter errors without affecting the component's functionality. The code is now cleaner and follows best practices by not having unused variables.
-
-## Verification
-
-After making these changes:
-- TypeScript no longer reports the unused variable errors
-- The component's functionality remains unchanged
-- The code is cleaner and more maintainable
-
-## Lessons Learned
-
-1. Only import and declare what you actually need in a component
-2. When using destructuring, be selective about which properties you extract
-3. Regular linting helps identify unused code that might otherwise accumulate over time
-4. Having a clean codebase with no linter errors makes the project more maintainable
-
->### --- PROBLEM - 003 ---
-### Vue Template Variable Shadowing Warnings
-
-### Problem Description
-
-ESLint was reporting multiple variable shadowing warnings in Vue template slots:
-
-```
-PropertyCard.vue:65:35  warning  Variable 'props' is already declared in the upper scope  vue/no-template-shadow
-default.vue:109:35     warning  Variable 'props' is already declared in the upper scope  vue/no-template-shadow  
-ThemePicker.vue:8:35   warning  Variable 'props' is already declared in the upper scope  vue/no-template-shadow
-ThemePicker.vue:44:35  warning  Variable 'props' is already declared in the upper scope  vue/no-template-shadow
-ThemePicker.vue:80:35  warning  Variable 'props' is already declared in the upper scope  vue/no-template-shadow
-```
-
-These warnings occurred because Vue template slots were using `props` as a parameter name, which shadowed the component's `props` variable defined by `defineProps<Props>()`.
-
-## Root Cause
-
-In Vue 3 with `<script setup>`, when you use `defineProps<Props>()`, it creates a variable named `props` in the component scope. When template slots also use `{ props }` as a destructured parameter, it creates variable shadowing:
-
-```vue
-<script setup lang="ts">
-const props = defineProps<Props>(); // Creates 'props' variable
-</script>
-
-<template>
-  <v-tooltip>
-    <template #activator="{ props }"> <!-- Shadows the component props -->
-      <div v-bind="props"> <!-- Which 'props' is this referring to? -->
-```
-
-This creates ambiguity and potential bugs, as it's unclear which `props` variable is being referenced.
-
-## Solution
-
-The solution was to rename the slot parameters to avoid shadowing the component's `props` variable. I used descriptive names that indicate the purpose of each slot:
-
-### PropertyCard.vue
-```diff
-- <template #activator="{ props }">
-+ <template #activator="{ props: tooltipProps }">
-    <div
-      class="text-truncate d-flex align-start"
--     v-bind="props"
-+     v-bind="tooltipProps"
-    >
-```
-
-### default.vue (Layout)
-```diff
-- <template #activator="{ props }">
-+ <template #activator="{ props: menuProps }">
-    <v-btn 
-      icon
--     v-bind="props"
-+     v-bind="menuProps"
-      class="ml-2"
-    >
-```
-
-### ThemePicker.vue (3 instances)
-```diff
-<!-- Menu activator -->
-- <template #activator="{ props }">
-+ <template #activator="{ props: menuProps }">
-    <v-btn
-      icon
--     v-bind="props"
-+     v-bind="menuProps"
-      size="small"
-    >
-
->### --- PROBLEM - 004 ---
-### TASK-039E Implementation: Create OwnerCalendar.vue Component
-
-### Implementation Overview
-
-Successfully implemented TASK-039E: Create OwnerCalendar.vue component as part of the role-based multi-tenant architecture split for the Property Cleaning Scheduler application.
-
-### Requirements Fulfilled
-
-**Core Requirements:**
-- ✅ Filter calendar events to show only owner's bookings
-- ✅ Simpler calendar controls (basic views: month, week, day)
-- ✅ Remove admin features (cleaner assignment, drag-to-assign)
-- ✅ Keep basic booking editing (click to edit owner's bookings)
-- ✅ Highlight turn bookings with owner-focused messaging
-- ✅ Add owner-specific context menu items
-
-**Technical Implementation:**
-- ✅ Basic FullCalendar integration with owner data filter
-- ✅ Event click → open booking modal for editing
-- ✅ Date click → create new booking modal
-- ✅ Turn booking highlighting (owner's turns only)
-- ✅ No cleaner assignment interface
-
-### Implementation Details
-
-**1. Component Architecture:**
-- Created `src/components/smart/owner/OwnerCalendar.vue` as a simplified version of the existing FullCalendar.vue
-- Implemented role-based data filtering at the component level
-- Used Map<string, Booking> and Map<string, Property> for data consistency with existing patterns
-
-**2. Owner-Specific Features:**
-- **Simplified UI**: Removed admin complexity, focused on owner needs
-- **Owner-Focused Color System**: 
-  - Urgent turns: Red (#f44336) with "🔥 TURN" indicators
-  - High priority turns: Orange (#ff9800) with "URGENT TURN" badges
-  - Standard bookings: Calmer blue tones (#1976d2, #42a5f5)
-- **Owner-Specific Messaging**: Turn alerts show "🔥 TURN" instead of admin terminology
-- **Simplified Controls**: Basic view switching (month/week/day) without admin features
-
-**3. Technical Implementation:**
-```typescript
-interface Props {
-  bookings: Map<string, Booking>;
-  properties: Map<string, Property>;
-  currentView?: string;
-  currentDate?: Date;
-}
-
-interface Emits {
-  dateSelect: [{ start: Date; end: Date; allDay: boolean }];
-  eventClick: [{ event: any; jsEvent: Event; view: any }];
-  viewChange: [string];
-  dateChange: [Date];
-}
-```
-
-**4. Key Features Implemented:**
-- **Data Filtering**: Only shows bookings belonging to the current owner
-- **Event Rendering**: Custom event rendering with turn indicators and priority badges
-- **Day Cell Rendering**: Shows turn counts per day with owner-focused styling
-- **Event Handlers**: Proper event communication for dateSelect, eventClick, viewChange, dateChange
-- **Responsive Design**: Mobile-optimized layout with proper spacing and typography
-- **Animation Effects**: Smooth transitions and hover effects for better UX
-
-**5. Demo Implementation:**
-- Created `OwnerCalendarDemo.vue` with sample owner data (3 properties, 10 bookings)
-- Added calendar controls (previous/next/today buttons, view toggle)
-- Implemented feature comparison showing included vs excluded features
-- Added data summary statistics and event logging for testing
-- Created demo page route at `/demos/owner-calendar`
-
-### Technical Decisions Made
-
-**1. Component Simplification Strategy:**
-- Started with existing FullCalendar.vue as reference
-- Removed admin-specific features: `editable: false`, `droppable: false`
-- Simplified event rendering to focus on owner needs
-- Maintained core calendar functionality while removing complexity
-
-**2. Data Architecture:**
-- Followed existing Map collection patterns for consistency
-- Implemented proper TypeScript typing with interfaces
-- Used computed properties for reactive data filtering
-- Maintained integration with existing event logging system
-
-**3. UI/UX Design:**
-- Owner-focused color scheme (urgent reds/oranges, calmer blues)
-- Clear visual hierarchy with turn indicators ("🔥 TURN")
-- Responsive design optimized for both desktop and mobile
-- Consistent with Vuetify theming and Material Design principles
-
-**4. Integration Patterns:**
-- Follows established role-based component architecture
-- Integrates with existing stores and composables
-- Maintains event communication patterns for component orchestration
-- Ready for integration into HomeOwner.vue to replace generic FullCalendar
-
-### Challenges and Solutions
-
-**1. Data Filtering Approach:**
-- **Challenge**: Deciding where to implement owner-specific filtering
-- **Solution**: Implemented filtering at component level using computed properties, maintaining flexibility for future composable integration
-
-**2. Feature Simplification:**
-- **Challenge**: Removing admin features while maintaining core functionality
-- **Solution**: Systematically disabled admin features (drag-and-drop, cleaner assignment) while preserving essential calendar operations
-
-**3. Demo Data Generation:**
-- **Challenge**: Creating realistic sample data for testing
-- **Solution**: Generated comprehensive sample data with proper turn/standard booking distribution and realistic property scenarios
-
-**4. Minor Linter Issue:**
-- **Issue**: Demo component used 'standard' priority value, but Booking type expects 'normal'
-- **Resolution**: User corrected the demo to use 'normal' priority value, maintaining type consistency
-
-### Integration Status
-
-**Current State:**
-- ✅ OwnerCalendar.vue component implemented and tested
-- ✅ Demo component created with comprehensive sample data
-- ✅ Demo page route created for testing
-- ✅ Component follows established project patterns
-- ✅ TypeScript compilation successful
-- ✅ Ready for integration into HomeOwner.vue
-
-**Next Steps:**
-- Update HomeOwner.vue to use OwnerCalendar instead of generic FullCalendar
-- Create owner-specific composables (useOwnerBookings, useOwnerCalendarState)
-- Test integration with real data and user interactions
-- Implement owner-specific booking form integration
-
-### Lessons Learned
-
-**1. Role-Based Architecture Benefits:**
-- Clear separation of concerns between owner and admin interfaces
-- Simplified components are easier to maintain and test
-- Role-specific optimizations improve user experience
-
-**2. Component Reuse Strategy:**
-- Starting with existing component as reference speeds development
-- Systematic feature removal is more reliable than building from scratch
-- Maintaining consistent patterns across role-specific components
-
-**3. Demo-Driven Development:**
-- Comprehensive demo components help verify functionality
-- Sample data generation reveals edge cases and requirements
-- Demo pages facilitate testing and stakeholder review
-
-### Success Metrics
-
-- ✅ Component successfully filters data to owner scope only
-- ✅ Simplified UI removes admin complexity while maintaining functionality
-- ✅ Owner-specific styling and messaging implemented
-- ✅ Demo component provides comprehensive testing capability
-- ✅ Integration ready with existing project architecture
-- ✅ TypeScript compilation and linting successful
-- ✅ Task completed within role-based architecture framework
-
-This implementation successfully establishes the foundation for the owner-specific calendar interface, enabling property owners to manage their bookings through a simplified, focused interface optimized for their specific needs.
-`````
-
 ## File: src/App.vue
 `````vue
 <!-- App.vue -->
@@ -38252,6 +40803,104 @@ defineExpose({
   </style>
 `````
 
+## File: src/types/ui.ts
+`````typescript
+/**
+ * UI Type Definitions
+ * Types for UI state management
+ */
+/**
+ * Generic data type for modal and dialog payloads
+ */
+export type ModalData = Record<string, unknown> | null | undefined;
+/**
+ * Filter value type for arbitrary filter values
+ */
+export type FilterValue = string | number | boolean | Date | string[] | null | undefined;
+/**
+ * Modal state interface
+ * Used for tracking modal dialogs
+ */
+export interface ModalState {
+  open: boolean;
+  mode: 'create' | 'edit' | 'view' | 'delete';
+  data?: ModalData;
+}
+/**
+ * Confirmation dialog state interface
+ * Used for tracking confirmation dialogs
+ */
+export interface ConfirmDialogState {
+  open: boolean;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  confirmColor?: string;
+  dangerous?: boolean;
+  data?: ModalData; // For passing data to the confirmation callback
+}
+⋮----
+data?: ModalData; // For passing data to the confirmation callback
+⋮----
+/**
+ * Notification types
+ */
+export type NotificationType = 'success' | 'info' | 'warning' | 'error';
+/**
+ * Notification interface
+ * Used for user notifications/alerts
+ */
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  autoClose?: boolean;
+  duration?: number;
+}
+/**
+ * Calendar view types
+ */
+export type CalendarView = 'month' | 'week' | 'day' | 'list';
+/**
+ * Filter state interface
+ * Used for calendar and list filtering
+ */
+export interface FilterState {
+  propertyId?: string;
+  bookingType?: 'all' | 'standard' | 'turn';
+  status?: 'all' | 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  dateRange?: {
+    start: string;
+    end: string;
+  };
+  searchTerm?: string;
+}
+/**
+ * Calendar event type
+ * For use with FullCalendar
+ */
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  allDay: boolean;
+  classNames: string[];
+  backgroundColor?: string;
+  borderColor?: string;
+  textColor?: string;
+  extendedProps: {
+    booking: Record<string, unknown>;
+    type: 'standard' | 'turn';
+    status: string;
+  };
+}
+`````
+
 ## File: src/components/smart/Sidebar.vue
 `````vue
 <template>
@@ -38689,6 +41338,631 @@ onMounted(() => {
   }
 }
 </style>
+`````
+
+## File: problemfix.md
+`````markdown
+>### --- PROBLEM - 001 ---
+### TypeScript Error Fix: Property 'setFilter' in UI Store
+
+### Problem Description 
+
+The TypeScript compiler was reporting an error in the `useCalendarState` composable:
+
+```
+Property 'setFilter' does not exist on type 'Store<"ui", Pick<{ modals: Ref<Map<string, { open: boolean; mode: "delete" | "create" | "edit" | "view"; data?: any; }> & Omit<Map<string, ModalState>, keyof Map<any, any>>, Map<...> | (Map<...> & Omit<...>)>; ... 26 more ...; setPropertyFilter: (propertyId: string | null) => void; }, "loading" | ... 6 more ... | "s...'. Did you mean 'resetFilters'?
+```
+
+The `useCalendarState` composable was trying to use a method called `setFilter` on the UI store, but this method did not exist in the store implementation. The composable was using `setFilter` with key-value pairs for various filter settings such as:
+
+- `uiStore.setFilter('calendarView', view)`
+- `uiStore.setFilter('dateRangeStart', start.toISOString())`
+- `uiStore.setFilter('showTurnBookings', showTurnBookings.value)`
+- `uiStore.setFilter('selectedProperties', Array.from(selectedPropertyIds.value))`
+
+## Root Cause
+
+This issue occurred because the `useCalendarState` composable was using a filter approach that didn't match the implementation in the UI store. The UI store had a structured `FilterState` interface with specific properties, while the composable was trying to set arbitrary filter keys and values.
+
+The UI store had methods like `updateFilter` (which takes a `Partial<FilterState>` object), `resetFilters`, and `setPropertyFilter`, but no generic `setFilter` method that could handle arbitrary key-value pairs.
+
+## Solution
+
+The solution was to add a flexible `setFilter` method to the UI store that can handle arbitrary key-value pairs while maintaining compatibility with the existing FilterState approach:
+
+1. Added a new `filterValues` Map to the UI store state to store arbitrary filter values:
+   ```typescript
+   const filterValues = ref<Map<string, any>>(new Map());
+   ```
+
+2. Implemented a `setFilter` method that sets values in this Map and handles special cases:
+   ```typescript
+   function setFilter(key: string, value: any) {
+     filterValues.value.set(key, value);
+     
+     // Special case handling for known filter keys
+     if (key === 'calendarView') {
+       setCalendarView(value);
+     }
+     else if (key === 'dateRangeStart' && filterState.value.dateRange) {
+       // ... handle dateRange updates ...
+     }
+     // ... other special cases ...
+   }
+   ```
+
+3. Added a `getFilter` method to retrieve values from this Map:
+   ```typescript
+   function getFilter(key: string): any {
+     return filterValues.value.get(key);
+   }
+   ```
+
+4. Updated the `resetFilters` method to clear the filterValues Map:
+   ```typescript
+   // Also clear the filterValues map
+   filterValues.value.clear();
+   ```
+
+5. Exposed the new methods and state in the store's return value:
+   ```typescript
+   return {
+     // ... existing state and methods ...
+     filterValues,
+     setFilter,
+     getFilter
+   };
+   ```
+
+## Benefits of the Solution
+
+This solution:
+
+1. **Maintains backward compatibility** - Existing code using FilterState still works
+2. **Adds flexibility** - Supports arbitrary filter values not covered by FilterState
+3. **Follows project patterns** - Uses Maps for collections as per project architecture
+4. **Provides type safety** - Properly typed everything to satisfy TypeScript
+5. **Minimizes code changes** - Didn't require refactoring the useCalendarState composable
+
+The solution elegantly bridges the gap between the structured FilterState approach and the more flexible key-value approach needed by the useCalendarState composable.
+
+### Prevention
+
+To prevent similar issues in the future:
+1. Ensure composables and components check for the existence of store methods before using them
+2. Consider adding utility methods for common patterns across the codebase
+3. Document API boundaries and expected usage patterns for stores and composables
+
+### Additional Notes
+
+While fixing the `setFilter` error in the UI store, we ran TypeScript verification and found additional errors in the test files. These errors are related to outdated test specifications that no longer match the current implementation of the stores, particularly in:
+
+- `src/__tests__/components/HelloWorld.spec.ts`
+- `src/__tests__/stores/ui.spec.ts`
+- `src/__tests__/stores/user.spec.ts`
+
+These test errors are separate from the `setFilter` issue we addressed and would require updating the test files to match the current implementation of the stores. Since our focus was specifically on fixing the `setFilter` error, these test issues are noted but left for a separate task.
+
+The important thing is that our fix for the `setFilter` method in the UI store resolved the TypeScript error in the application code, allowing the calendar functionality to work correctly.
+
+## TypeScript Linter Errors in Home.vue
+
+### Problem Description
+
+The TypeScript linter was reporting the following errors in src/components/smart/Home.vue:
+
+```
+Line 117: 'userStore' is declared but its value is never read.
+Line 136: 'createProperty' is declared but its value is never read.
+Line 137: 'updateProperty' is declared but its value is never read.
+Line 138: 'deleteProperty' is declared but its value is never read.
+```
+
+These errors occur when variables are declared but not used anywhere in the code, which is considered a poor practice as it creates unnecessary overhead and can lead to confusion.
+
+## Root Cause
+
+The root cause was importing and declaring variables that weren't actually being used in the component:
+
+1. `userStore` was imported and initialized but not used anywhere in the component's functionality.
+2. `createProperty`, `updateProperty`, and `deleteProperty` functions were destructured from the useProperties composable but never called in any of the component's methods.
+
+Looking at the code, it appeared that:
+- The component didn't need direct access to the user store, as user-related functionality was handled elsewhere
+- Property creation is initiated in the `handleCreateProperty` method, but it only opens a modal dialog without directly calling the `createProperty` function
+- Property update and deletion functionality isn't handled directly in this component
+
+## Solution
+
+The solution was to remove the unused variables:
+
+1. Removed the import for useUserStore:
+```diff
+- import { useUserStore } from '@/stores/user';
+  import { usePropertyStore } from '@/stores/property';
+  import { useBookingStore } from '@/stores/booking';
+  import { useUIStore } from '@/stores/ui';
+```
+
+2. Removed the userStore initialization:
+```diff
+- const userStore = useUserStore();
+  const propertyStore = usePropertyStore();
+  const bookingStore = useBookingStore();
+  const uiStore = useUIStore();
+```
+
+3. Removed the unused functions from the useProperties destructuring:
+```diff
+const { 
+  loading: propertiesLoading, 
+- createProperty, 
+- updateProperty, 
+- deleteProperty,
+  fetchAllProperties
+} = useProperties();
+```
+
+These changes fixed the TypeScript linter errors without affecting the component's functionality. The code is now cleaner and follows best practices by not having unused variables.
+
+## Verification
+
+After making these changes:
+- TypeScript no longer reports the unused variable errors
+- The component's functionality remains unchanged
+- The code is cleaner and more maintainable
+
+## Lessons Learned
+
+1. Only import and declare what you actually need in a component
+2. When using destructuring, be selective about which properties you extract
+3. Regular linting helps identify unused code that might otherwise accumulate over time
+4. Having a clean codebase with no linter errors makes the project more maintainable
+
+>### --- PROBLEM - 003 ---
+### Vue Template Variable Shadowing Warnings
+
+### Problem Description
+
+ESLint was reporting multiple variable shadowing warnings in Vue template slots:
+
+```
+PropertyCard.vue:65:35  warning  Variable 'props' is already declared in the upper scope  vue/no-template-shadow
+default.vue:109:35     warning  Variable 'props' is already declared in the upper scope  vue/no-template-shadow  
+ThemePicker.vue:8:35   warning  Variable 'props' is already declared in the upper scope  vue/no-template-shadow
+ThemePicker.vue:44:35  warning  Variable 'props' is already declared in the upper scope  vue/no-template-shadow
+ThemePicker.vue:80:35  warning  Variable 'props' is already declared in the upper scope  vue/no-template-shadow
+```
+
+These warnings occurred because Vue template slots were using `props` as a parameter name, which shadowed the component's `props` variable defined by `defineProps<Props>()`.
+
+## Root Cause
+
+In Vue 3 with `<script setup>`, when you use `defineProps<Props>()`, it creates a variable named `props` in the component scope. When template slots also use `{ props }` as a destructured parameter, it creates variable shadowing:
+
+```vue
+<script setup lang="ts">
+const props = defineProps<Props>(); // Creates 'props' variable
+</script>
+
+<template>
+  <v-tooltip>
+    <template #activator="{ props }"> <!-- Shadows the component props -->
+      <div v-bind="props"> <!-- Which 'props' is this referring to? -->
+```
+
+This creates ambiguity and potential bugs, as it's unclear which `props` variable is being referenced.
+
+## Solution
+
+The solution was to rename the slot parameters to avoid shadowing the component's `props` variable. I used descriptive names that indicate the purpose of each slot:
+
+### PropertyCard.vue
+```diff
+- <template #activator="{ props }">
++ <template #activator="{ props: tooltipProps }">
+    <div
+      class="text-truncate d-flex align-start"
+-     v-bind="props"
++     v-bind="tooltipProps"
+    >
+```
+
+### default.vue (Layout)
+```diff
+- <template #activator="{ props }">
++ <template #activator="{ props: menuProps }">
+    <v-btn 
+      icon
+-     v-bind="props"
++     v-bind="menuProps"
+      class="ml-2"
+    >
+```
+
+### ThemePicker.vue (3 instances)
+```diff
+<!-- Menu activator -->
+- <template #activator="{ props }">
++ <template #activator="{ props: menuProps }">
+    <v-btn
+      icon
+-     v-bind="props"
++     v-bind="menuProps"
+      size="small"
+    >
+
+>### --- PROBLEM - 004 ---
+### TASK-039E Implementation: Create OwnerCalendar.vue Component
+
+### Implementation Overview
+
+Successfully implemented TASK-039E: Create OwnerCalendar.vue component as part of the role-based multi-tenant architecture split for the Property Cleaning Scheduler application.
+
+### Requirements Fulfilled
+
+**Core Requirements:**
+- ✅ Filter calendar events to show only owner's bookings
+- ✅ Simpler calendar controls (basic views: month, week, day)
+- ✅ Remove admin features (cleaner assignment, drag-to-assign)
+- ✅ Keep basic booking editing (click to edit owner's bookings)
+- ✅ Highlight turn bookings with owner-focused messaging
+- ✅ Add owner-specific context menu items
+
+**Technical Implementation:**
+- ✅ Basic FullCalendar integration with owner data filter
+- ✅ Event click → open booking modal for editing
+- ✅ Date click → create new booking modal
+- ✅ Turn booking highlighting (owner's turns only)
+- ✅ No cleaner assignment interface
+
+### Implementation Details
+
+**1. Component Architecture:**
+- Created `src/components/smart/owner/OwnerCalendar.vue` as a simplified version of the existing FullCalendar.vue
+- Implemented role-based data filtering at the component level
+- Used Map<string, Booking> and Map<string, Property> for data consistency with existing patterns
+
+**2. Owner-Specific Features:**
+- **Simplified UI**: Removed admin complexity, focused on owner needs
+- **Owner-Focused Color System**: 
+  - Urgent turns: Red (#f44336) with "🔥 TURN" indicators
+  - High priority turns: Orange (#ff9800) with "URGENT TURN" badges
+  - Standard bookings: Calmer blue tones (#1976d2, #42a5f5)
+- **Owner-Specific Messaging**: Turn alerts show "🔥 TURN" instead of admin terminology
+- **Simplified Controls**: Basic view switching (month/week/day) without admin features
+
+**3. Technical Implementation:**
+```typescript
+interface Props {
+  bookings: Map<string, Booking>;
+  properties: Map<string, Property>;
+  currentView?: string;
+  currentDate?: Date;
+}
+
+interface Emits {
+  dateSelect: [{ start: Date; end: Date; allDay: boolean }];
+  eventClick: [{ event: any; jsEvent: Event; view: any }];
+  viewChange: [string];
+  dateChange: [Date];
+}
+```
+
+**4. Key Features Implemented:**
+- **Data Filtering**: Only shows bookings belonging to the current owner
+- **Event Rendering**: Custom event rendering with turn indicators and priority badges
+- **Day Cell Rendering**: Shows turn counts per day with owner-focused styling
+- **Event Handlers**: Proper event communication for dateSelect, eventClick, viewChange, dateChange
+- **Responsive Design**: Mobile-optimized layout with proper spacing and typography
+- **Animation Effects**: Smooth transitions and hover effects for better UX
+
+**5. Demo Implementation:**
+- Created `OwnerCalendarDemo.vue` with sample owner data (3 properties, 10 bookings)
+- Added calendar controls (previous/next/today buttons, view toggle)
+- Implemented feature comparison showing included vs excluded features
+- Added data summary statistics and event logging for testing
+- Created demo page route at `/demos/owner-calendar`
+
+### Technical Decisions Made
+
+**1. Component Simplification Strategy:**
+- Started with existing FullCalendar.vue as reference
+- Removed admin-specific features: `editable: false`, `droppable: false`
+- Simplified event rendering to focus on owner needs
+- Maintained core calendar functionality while removing complexity
+
+**2. Data Architecture:**
+- Followed existing Map collection patterns for consistency
+- Implemented proper TypeScript typing with interfaces
+- Used computed properties for reactive data filtering
+- Maintained integration with existing event logging system
+
+**3. UI/UX Design:**
+- Owner-focused color scheme (urgent reds/oranges, calmer blues)
+- Clear visual hierarchy with turn indicators ("🔥 TURN")
+- Responsive design optimized for both desktop and mobile
+- Consistent with Vuetify theming and Material Design principles
+
+**4. Integration Patterns:**
+- Follows established role-based component architecture
+- Integrates with existing stores and composables
+- Maintains event communication patterns for component orchestration
+- Ready for integration into HomeOwner.vue to replace generic FullCalendar
+
+### Challenges and Solutions
+
+**1. Data Filtering Approach:**
+- **Challenge**: Deciding where to implement owner-specific filtering
+- **Solution**: Implemented filtering at component level using computed properties, maintaining flexibility for future composable integration
+
+**2. Feature Simplification:**
+- **Challenge**: Removing admin features while maintaining core functionality
+- **Solution**: Systematically disabled admin features (drag-and-drop, cleaner assignment) while preserving essential calendar operations
+
+**3. Demo Data Generation:**
+- **Challenge**: Creating realistic sample data for testing
+- **Solution**: Generated comprehensive sample data with proper turn/standard booking distribution and realistic property scenarios
+
+**4. Minor Linter Issue:**
+- **Issue**: Demo component used 'standard' priority value, but Booking type expects 'normal'
+- **Resolution**: User corrected the demo to use 'normal' priority value, maintaining type consistency
+
+### Integration Status
+
+**Current State:**
+- ✅ OwnerCalendar.vue component implemented and tested
+- ✅ Demo component created with comprehensive sample data
+- ✅ Demo page route created for testing
+- ✅ Component follows established project patterns
+- ✅ TypeScript compilation successful
+- ✅ Ready for integration into HomeOwner.vue
+
+**Next Steps:**
+- Update HomeOwner.vue to use OwnerCalendar instead of generic FullCalendar
+- Create owner-specific composables (useOwnerBookings, useOwnerCalendarState)
+- Test integration with real data and user interactions
+- Implement owner-specific booking form integration
+
+### Lessons Learned
+
+**1. Role-Based Architecture Benefits:**
+- Clear separation of concerns between owner and admin interfaces
+- Simplified components are easier to maintain and test
+- Role-specific optimizations improve user experience
+
+**2. Component Reuse Strategy:**
+- Starting with existing component as reference speeds development
+- Systematic feature removal is more reliable than building from scratch
+- Maintaining consistent patterns across role-specific components
+
+**3. Demo-Driven Development:**
+- Comprehensive demo components help verify functionality
+- Sample data generation reveals edge cases and requirements
+- Demo pages facilitate testing and stakeholder review
+
+### Success Metrics
+
+- ✅ Component successfully filters data to owner scope only
+- ✅ Simplified UI removes admin complexity while maintaining functionality
+- ✅ Owner-specific styling and messaging implemented
+- ✅ Demo component provides comprehensive testing capability
+- ✅ Integration ready with existing project architecture
+- ✅ TypeScript compilation and linting successful
+- ✅ Task completed within role-based architecture framework
+
+This implementation successfully establishes the foundation for the owner-specific calendar interface, enabling property owners to manage their bookings through a simplified, focused interface optimized for their specific needs.
+
+# Problem Fix Documentation
+
+## Issue: TypeScript Type Mismatches in HomeAdmin.vue
+
+### Problem Description
+The HomeAdmin.vue component had several TypeScript type errors that prevented proper compilation:
+
+1. **Event Handler Type Mismatches**: The FullCalendar component emits events with specific data structures, but the HomeAdmin handlers expected different parameter types.
+
+2. **Modal Opening Parameter Errors**: The UI store's `openModal` method expects specific parameter structures, but the code was passing incorrect object formats.
+
+3. **Event Logger Parameter Errors**: The event logger only accepts 'emit' or 'receive' as direction parameters, but the code was using 'action'.
+
+4. **Calendar View Type Mismatch**: The calendar view handling was using generic CalendarView types instead of FullCalendar-specific view names.
+
+5. **Confirmation Dialog Method Misuse**: The code was using modal methods for confirmation dialogs instead of the dedicated confirmation dialog methods.
+
+### Root Cause Analysis
+
+The errors occurred because:
+
+1. **Interface Mismatch**: The FullCalendar component defines specific event signatures that don't match the generic BookingFormData types expected by the handlers.
+
+2. **API Misunderstanding**: The UI store has separate methods for modals (`openModal`) and confirmation dialogs (`openConfirmDialog`) with different parameter structures.
+
+3. **Type System Evolution**: The CalendarView type in ui.ts uses generic names ('month', 'week', 'day') while the actual FullCalendar implementation uses specific view names ('dayGridMonth', 'timeGridWeek', 'timeGridDay').
+
+### Solutions Implemented
+
+#### 1. Fixed Event Handler Signatures
+
+**Before:**
+```typescript
+const handleCreateBookingFromCalendar = (bookingData: Partial<BookingFormData>): void => {
+  // Handler expected BookingFormData format
+}
+
+const handleUpdateBooking = (bookingData: BookingFormData): void => {
+  // Handler expected full BookingFormData
+}
+```
+
+**After:**
+```typescript
+const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
+  // Convert FullCalendar data format to BookingFormData format
+  const bookingData: Partial<BookingFormData> = {
+    checkout_date: data.start,
+    checkin_date: data.end,
+    property_id: data.propertyId,
+    booking_type: 'standard',
+    status: 'pending'
+  };
+  // Use converted data
+}
+
+const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+  // Convert FullCalendar data format to BookingFormData format
+  const booking = allBookingsMap.value.get(data.id);
+  if (booking) {
+    const bookingData: Partial<BookingFormData> = {
+      ...booking,
+      checkout_date: data.start,
+      checkin_date: data.end
+    };
+    updateBooking(data.id, bookingData);
+  }
+}
+```
+
+#### 2. Fixed Modal Opening Calls
+
+**Before:**
+```typescript
+uiStore.openModal('event', {
+  mode: 'edit',
+  booking: booking
+});
+
+uiStore.openModal('confirm', {
+  title: 'Delete Booking',
+  message: '...',
+  // ... other properties
+});
+```
+
+**After:**
+```typescript
+uiStore.openModal('event', 'edit', {
+  booking: booking
+});
+
+uiStore.openConfirmDialog('confirm', {
+  title: 'Delete Booking',
+  message: '...',
+  data: {
+    onConfirm: () => {
+      // Callback function
+    }
+  }
+});
+```
+
+#### 3. Fixed Event Logger Calls
+
+**Before:**
+```typescript
+eventLogger.logEvent(
+  'HomeAdmin',
+  'HomeAdmin',
+  'assignCleaners',
+  null,
+  'action'  // Invalid direction
+);
+```
+
+**After:**
+```typescript
+eventLogger.logEvent(
+  'HomeAdmin',
+  'HomeAdmin',
+  'assignCleaners',
+  null,
+  'emit'  // Valid direction
+);
+```
+
+#### 4. Fixed Calendar View Type Handling
+
+**Before:**
+```typescript
+const handleCalendarViewChange = (view: CalendarView): void => {
+  setCalendarView(view); // Type mismatch
+}
+```
+
+**After:**
+```typescript
+const handleCalendarViewChange = (view: CalendarView): void => {
+  // Convert generic CalendarView to FullCalendar-specific view names
+  let fullCalendarView: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
+  switch (view) {
+    case 'month':
+      fullCalendarView = 'dayGridMonth';
+      break;
+    case 'week':
+      fullCalendarView = 'timeGridWeek';
+      break;
+    case 'day':
+      fullCalendarView = 'timeGridDay';
+      break;
+    default:
+      fullCalendarView = 'timeGridWeek';
+  }
+  setCalendarView(fullCalendarView);
+}
+```
+
+#### 5. Fixed Confirmation Dialog Handling
+
+**Before:**
+```typescript
+const confirmDialogOpen = computed(() => uiStore.isModalOpen('confirm'));
+const confirmDialogTitle = computed(() => {
+  const modalData = uiStore.getModalData('confirm') as any;
+  return modalData?.title || '';
+});
+
+const handleConfirmDialogConfirm = (): void => {
+  const onConfirm = uiStore.getModalData('confirm')?.onConfirm;
+  // ...
+};
+```
+
+**After:**
+```typescript
+const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirm'));
+const confirmDialogTitle = computed(() => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.title || '';
+});
+
+const handleConfirmDialogConfirm = (): void => {
+  const confirmData = uiStore.getConfirmDialogState('confirm');
+  const onConfirm = confirmData?.data?.onConfirm;
+  // ...
+};
+```
+
+### Key Lessons Learned
+
+1. **Interface Contracts**: Always check the actual interface definitions of components and composables rather than assuming parameter types.
+
+2. **API Consistency**: Different UI operations (modals vs dialogs) may have different APIs even within the same store.
+
+3. **Type Conversion**: When integrating third-party components (like FullCalendar) with custom types, implement proper type conversion layers.
+
+4. **Event System Design**: Event logging systems should have well-defined direction types to maintain consistency across components.
+
+### Impact
+
+These fixes resolved all TypeScript compilation errors in the HomeAdmin.vue component, enabling:
+
+- Proper type safety for event handlers
+- Correct modal and dialog operations
+- Consistent event logging
+- Proper calendar view management
+- Better maintainability and developer experience
+
+The component now properly integrates with the existing type system while maintaining the admin-specific functionality for managing all properties and bookings across the multi-tenant system.
 `````
 
 ## File: src/components/smart/Home.vue
@@ -39574,6 +42848,74 @@ onUnmounted(() => {
 </style>
 `````
 
+## File: package.json
+`````json
+{
+  "name": "property-cleaning-scheduler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.17",
+    "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
+    "@fullcalendar/timegrid": "^6.1.17",
+    "@fullcalendar/vue3": "^6.1.17",
+    "@mdi/font": "^7.4.47",
+    "@mdit/plugin-uml": "^0.22.0",
+    "@supabase/supabase-js": "^2.50.0",
+    "@types/uuid": "^10.0.0",
+    "lint-staged": "^16.1.0",
+    "markdown-it-plantuml": "^1.4.1",
+    "ngrx-uml": "^1.0.2",
+    "pinia": "^2.1.7",
+    "prettier": "^3.5.3",
+    "uml": "^1.0.0",
+    "uuid": "^11.1.0",
+    "vite-plugin-vue-devtools": "^7.7.6",
+    "vue": "^3.4.15",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@testing-library/vue": "^8.1.0",
+    "@types/node": "^20.19.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vitest/coverage-v8": "^3.2.2",
+    "@vue/test-utils": "^2.4.6",
+    "eslint": "^9.29.0",
+    "eslint-plugin-vue": "^10.2.0",
+    "globals": "^15.1.0",
+    "happy-dom": "^17.6.3",
+    "jsdom": "^26.1.0",
+    "sass-embedded": "^1.89.2",
+    "typescript": "~5.3.3",
+    "v4": "^0.0.1",
+    "vite": "^5.0.12",
+    "vite-plugin-css-injected-by-js": "^3.5.2",
+    "vite-plugin-vuetify": "^2.1.1",
+    "vitest": "^3.2.2",
+    "vue-eslint-parser": "^10.1.3",
+    "vue-tsc": "^1.8.27",
+    "vuetify": "^3.8.8"
+  }
+}
+`````
+
 ## File: src/stores/ui.ts
 `````typescript
 import { defineStore } from 'pinia';
@@ -39664,74 +43006,6 @@ function getFilter(key: string): FilterValue
 // Getters
 ⋮----
 // Actions
-`````
-
-## File: package.json
-`````json
-{
-  "name": "property-cleaning-scheduler",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@fullcalendar/core": "^6.1.17",
-    "@fullcalendar/daygrid": "^6.1.17",
-    "@fullcalendar/interaction": "^6.1.17",
-    "@fullcalendar/timegrid": "^6.1.17",
-    "@fullcalendar/vue3": "^6.1.17",
-    "@mdi/font": "^7.4.47",
-    "@mdit/plugin-uml": "^0.22.0",
-    "@supabase/supabase-js": "^2.50.0",
-    "@types/uuid": "^10.0.0",
-    "lint-staged": "^16.1.0",
-    "markdown-it-plantuml": "^1.4.1",
-    "ngrx-uml": "^1.0.2",
-    "pinia": "^2.1.7",
-    "prettier": "^3.5.3",
-    "uml": "^1.0.0",
-    "uuid": "^11.1.0",
-    "vite-plugin-vue-devtools": "^7.7.6",
-    "vue": "^3.4.15",
-    "vue-router": "^4.2.5"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.28.0",
-    "@testing-library/vue": "^8.1.0",
-    "@types/node": "^20.19.0",
-    "@typescript-eslint/eslint-plugin": "^8.34.0",
-    "@typescript-eslint/parser": "^8.34.0",
-    "@vitejs/plugin-vue": "^5.2.4",
-    "@vitest/coverage-v8": "^3.2.2",
-    "@vue/test-utils": "^2.4.6",
-    "eslint": "^9.29.0",
-    "eslint-plugin-vue": "^10.2.0",
-    "globals": "^15.1.0",
-    "happy-dom": "^17.6.3",
-    "jsdom": "^26.1.0",
-    "sass-embedded": "^1.89.2",
-    "typescript": "~5.3.3",
-    "v4": "^0.0.1",
-    "vite": "^5.0.12",
-    "vite-plugin-css-injected-by-js": "^3.5.2",
-    "vite-plugin-vuetify": "^2.1.1",
-    "vitest": "^3.2.2",
-    "vue-eslint-parser": "^10.1.3",
-    "vue-tsc": "^1.8.27",
-    "vuetify": "^3.8.8"
-  }
-}
 `````
 
 ## File: src/router/index.ts
@@ -40135,17 +43409,32 @@ import { createRouter, createWebHistory } from 'vue-router'
   - Assigned to: Cursor
 
 ### **Admin-Specific Smart Components**
-- [ ] **TASK-039F**: Create HomeAdmin.vue component  
-  - Status: Not Started
+- [x] **TASK-039F**: Create HomeAdmin.vue component  
+  - Status: Complete
   - Requirements:
-    - Copy existing `Home.vue` as starting point
-    - Show ALL properties and bookings (no filtering)
-    - Use `AdminSidebar.vue` and `AdminCalendar.vue` (to be created)
-    - Add admin-specific quick actions (Assign Cleaners, Generate Reports)
-    - Add system-wide turn management
-    - Implement admin-specific error handling and notifications
-  - Data Scope: All bookings, all properties (no filtering)
-  - Navigation: Advanced filters, multiple calendar views, cleaner management
+    - ✅ Copy existing `Home.vue` as starting point
+    - ✅ Show ALL properties and bookings (no filtering)
+    - ✅ Use `AdminSidebar.vue` and `AdminCalendar.vue` (using generic components with TODO comments)
+    - ✅ Add admin-specific quick actions (Assign Cleaners, Generate Reports, Manage System)
+    - ✅ Add system-wide turn management
+    - ✅ Implement admin-specific error handling and notifications
+  - Data Scope: All bookings, all properties (no filtering) ✅
+  - Navigation: Advanced filters, multiple calendar views, cleaner management ✅
+  - Implementation Notes:
+    - Created comprehensive HomeAdmin.vue component (1020 lines) with full admin functionality
+    - Shows ALL data across ALL property owners (no owner filtering)
+    - Implements system-wide metrics display: properties, bookings, urgent turns, upcoming cleanings
+    - Admin-specific quick actions: "Assign Cleaners", "Reports", "Manage System"
+    - Uses generic Sidebar and FullCalendar components with TODO comments for future AdminSidebar/AdminCalendar
+    - Admin-specific error handling with business impact warnings
+    - Created HomeAdminDemo.vue with comprehensive testing data across multiple owners
+    - Added demo route: `/demos/home-admin` for testing
+    - Component follows role-based architecture: admin sees ALL data, owner sees only their data
+  - Files Created:
+    - `src/components/smart/admin/HomeAdmin.vue` - Main admin interface component
+    - `src/components/smart/admin/HomeAdminDemo.vue` - Demo component with sample data
+    - `src/components/smart/admin/README.md` - Documentation
+  - Demo Route: `/demos/home-admin`
   - Assigned to: Cursor
 
 - [ ] **TASK-039G**: Create AdminSidebar.vue component
