@@ -98,20 +98,20 @@ export const useUIStore = defineStore('ui', () => {
   
   function openConfirmDialog(
     dialogId: string, 
-    title: string, 
-    message: string, 
     options: {
-      confirmText?: string;
-      cancelText?: string;
-      confirmColor?: string;
-      dangerous?: boolean;
-      data?: ModalData;
-    } = {}
+          title?: string;
+          message?: string;
+          confirmText?: string;
+          cancelText?: string;
+          confirmColor?: string;
+          dangerous?: boolean;
+          data?: ModalData;
+        } = {}  
   ) {
     confirmDialogs.value.set(dialogId, {
       open: true,
-      title,
-      message,
+      title: options.title || '',
+      message: options.message || '',
       confirmText: options.confirmText,
       cancelText: options.cancelText,
       confirmColor: options.confirmColor,

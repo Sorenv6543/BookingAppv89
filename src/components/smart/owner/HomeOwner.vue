@@ -1,6 +1,5 @@
-<!-- components/smart/Home.vue -->
 <template>
-  <div class="home-container">
+  <div class="home-owner-container">
     <v-row
       no-gutters
       class="fill-height"
@@ -13,10 +12,11 @@
         class="sidebar-column"
         :class="{ 'mobile-hidden': !sidebarOpen }"
       >
-        <Sidebar
-          :today-turns="todayTurns"
-          :upcoming-cleanings="upcomingCleanings"
-          :properties="propertiesMap"
+        <!-- OwnerSidebar: Shows only current owner's data -->
+        <OwnerSidebar
+          :today-turns="ownerTodayTurns"
+          :upcoming-cleanings="ownerUpcomingCleanings"
+          :properties="ownerPropertiesMap"
           :loading="loading"
           @navigate-to-booking="handleNavigateToBooking"
           @navigate-to-date="handleNavigateToDate"
@@ -41,7 +41,8 @@
             class="mr-4"
             @click="toggleSidebar"
           />
-          <!-- Calendar Controls - Simple version since CalendarControls component may not exist -->
+          
+          <!-- Owner-focused Calendar Controls -->
           <div class="d-flex align-center">
             <v-btn
               icon="mdi-arrow-left"
@@ -62,12 +63,29 @@
               class="mr-4"
               @click="handleNext"
             />
-            
             <div class="text-h6">
               {{ formattedDate }}
             </div>
-            
             <v-spacer />
+            
+            <!-- Owner Quick Actions -->
+            <v-btn
+              color="primary"
+              variant="outlined"
+              prepend-icon="mdi-plus"
+              class="mr-2"
+              @click="handleCreateProperty"
+            >
+              Add Property
+            </v-btn>
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-calendar-plus"
+              class="mr-4"
+              @click="handleCreateBooking"
+            >
+              Add Booking
+            </v-btn>
             
             <v-btn-toggle
               v-model="currentView"
@@ -87,10 +105,11 @@
           </div>
         </div>
 
+        <!-- TODO: Replace with OwnerCalendar.vue when TASK-039E is complete -->
         <FullCalendar
           ref="calendarRef"
-          :bookings="filteredBookings"
-          :properties="propertiesMap"
+          :bookings="ownerFilteredBookings"
+          :properties="ownerPropertiesMap"
           :loading="loading"
           :current-view="currentView"
           :current-date="currentDate"
@@ -106,7 +125,7 @@
       </v-col>
     </v-row>
 
-    <!-- Global Modals (managed by UI state) -->
+    <!-- Owner-focused Modals -->
     <BookingForm
       :open="eventModalOpen"
       :mode="eventModalMode"
@@ -116,7 +135,6 @@
       @delete="handleEventModalDelete"
     />
 
-    <!-- PropertyModal integration -->
     <PropertyModal
       :open="propertyModalOpen"
       :mode="propertyModalMode"
@@ -126,7 +144,6 @@
       @delete="handlePropertyModalDelete"
     />
 
-    <!-- Confirmation Dialog -->
     <ConfirmationDialog
       :open="confirmDialogOpen"
       :title="confirmDialogTitle"
@@ -138,30 +155,25 @@
       @cancel="handleConfirmDialogCancel"
       @close="handleConfirmDialogClose"
     />
-
-    <!-- NotificationSystem will be implemented in a separate task -->
-    <!-- <NotificationSystem /> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDisplay } from 'vuetify';
-import Sidebar from './Sidebar.vue';
-import FullCalendar from './FullCalendar.vue';
+
+// Owner-specific components
+import OwnerSidebar from './OwnerSidebar.vue';
+import FullCalendar from '../FullCalendar.vue';
 import BookingForm from '@/components/dumb/BookingForm.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
 import ConfirmationDialog from '@/components/dumb/ConfirmationDialog.vue';
-
-// TODO: Import these components when they're created
-// import PropertyModal from '@/components/dumb/PropertyModal.vue';
-// import NotificationSystem from '@/components/dumb/NotificationSystem.vue';
 
 // State management
 import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
 import { useUIStore } from '@/stores/ui';
-import { useUserStore } from '@/stores/user';
+
 import { useAuthStore } from '@/stores/auth';
 
 // Business logic composables
@@ -170,7 +182,7 @@ import { useProperties } from '@/composables/shared/useProperties';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 // Types
-import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
+import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Import event logger for component communication
@@ -179,18 +191,15 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 // ============================================================================
 // STORE CONNECTIONS & STATE
 // ============================================================================
-
 const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
-const userStore = useUserStore();
 const authStore = useAuthStore();
 const { xs } = useDisplay();
 
 // ============================================================================
 // COMPOSABLES - BUSINESS LOGIC
 // ============================================================================
-
 const { 
   loading: bookingsLoading, 
   createBooking, 
@@ -223,13 +232,28 @@ const {
 // ============================================================================
 // LOCAL STATE
 // ============================================================================
-
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
 const sidebarOpen = ref(!xs.value);
 const selectedPropertyFilter = ref<string | null>(null);
 
 // ============================================================================
-// COMPUTED STATE - DERIVED DATA
+// OWNER-SPECIFIC DATA ACCESS
+// ============================================================================
+
+// Get current owner's user ID
+const currentOwnerId = computed(() => {
+  return authStore.user?.id;
+});
+
+// Check if user is authenticated and is an owner
+const isOwnerAuthenticated = computed(() => {
+  return authStore.isAuthenticated && 
+         authStore.user?.role === 'owner' && 
+         currentOwnerId.value;
+});
+
+// ============================================================================
+// COMPUTED STATE - OWNER-FILTERED DATA
 // ============================================================================
 
 const loading = computed(() => 
@@ -249,34 +273,69 @@ const formattedDate = computed(() => {
   return currentDate.value.toLocaleDateString('en-US', options);
 });
 
-// Properties data
-const propertiesMap = computed(() => {
+// Owner's properties only
+const ownerPropertiesMap = computed(() => {
   const map = new Map<string, Property>();
   
-  if (propertyStore.properties instanceof Map) {
-    return propertyStore.properties;
+  if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
+    return map;
   }
-  
-  propertyStore.propertiesArray.forEach(property => {
-    if (property && property.id) {
-      map.set(property.id, property);
-    }
-  });
+
+  // Filter properties by owner_id
+  if (propertyStore.properties instanceof Map) {
+    propertyStore.properties.forEach((property, id) => {
+      if (property.owner_id === currentOwnerId.value) {
+        map.set(id, property);
+      }
+    });
+  } else {
+    propertyStore.propertiesArray
+      .filter(property => property.owner_id === currentOwnerId.value)
+      .forEach(property => {
+        if (property && property.id) {
+          map.set(property.id, property);
+        }
+      });
+  }
   
   return map;
 });
 
-// Today's turn bookings
-const todayTurns = computed(() => {
+// Owner's bookings only
+const ownerBookingsMap = computed(() => {
+  const map = new Map<string, Booking>();
+  
+  if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
+    return map;
+  }
+
+  // Filter bookings by owner_id
+  bookingStore.bookingsArray
+    .filter(booking => booking.owner_id === currentOwnerId.value)
+    .forEach(booking => {
+      if (booking && booking.id) {
+        map.set(booking.id, booking);
+      }
+    });
+  
+  return map;
+});
+
+// Owner's today's turn bookings
+const ownerTodayTurns = computed(() => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
   
   const turns = new Map<string, Booking>();
   
-  bookingStore.bookingsArray.forEach(booking => {
+  if (!isOwnerAuthenticated.value) {
+    return turns;
+  }
+
+  // Filter owner's bookings for today's turns
+  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
     if (
       booking.booking_type === 'turn' &&
       new Date(booking.checkout_date) >= today &&
@@ -289,17 +348,21 @@ const todayTurns = computed(() => {
   return turns;
 });
 
-// Upcoming cleanings
-const upcomingCleanings = computed(() => {
+// Owner's upcoming cleanings
+const ownerUpcomingCleanings = computed(() => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
   const inOneWeek = new Date(today);
   inOneWeek.setDate(inOneWeek.getDate() + 7);
   
   const cleanings = new Map<string, Booking>();
   
-  bookingStore.bookingsArray.forEach(booking => {
+  if (!isOwnerAuthenticated.value) {
+    return cleanings;
+  }
+
+  // Filter owner's bookings for upcoming cleanings
+  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
     const checkoutDate = new Date(booking.checkout_date);
     if (checkoutDate >= today && checkoutDate <= inOneWeek) {
       cleanings.set(booking.id, booking);
@@ -309,13 +372,16 @@ const upcomingCleanings = computed(() => {
   return cleanings;
 });
 
-// Filtered bookings based on current filters
-const filteredBookings = computed(() => {
-  let bookings = Array.from(bookingStore.bookings.values());
+// Owner's filtered bookings based on current filters
+const ownerFilteredBookings = computed(() => {
+  let bookings = Array.from(ownerBookingsMap.value.values());
   
-  // Apply property filter if selected
+  // Apply property filter if selected (within owner's properties)
   if (selectedPropertyFilter.value) {
-    bookings = bookings.filter(booking => booking.property_id === selectedPropertyFilter.value);
+    bookings = bookings.filter(booking => 
+      booking.property_id === selectedPropertyFilter.value &&
+      ownerPropertiesMap.value.has(booking.property_id)
+    );
   }
   
   // Apply calendar state filters
@@ -384,58 +450,57 @@ const confirmDialogData = computed(() => {
 });
 
 // ============================================================================
-// SIDEBAR EVENT HANDLERS
+// OWNER-SPECIFIC EVENT HANDLERS
 // ============================================================================
 
 const handleNavigateToBooking = (bookingId: string): void => {
-  // Log receiving event from Sidebar
-  eventLogger.logEvent(
-    'Sidebar', 
-    'Home', 
+      // Log receiving event from OwnerSidebar
+    eventLogger.logEvent(
+      'OwnerSidebar', 
+    'HomeOwner', 
     'navigateToBooking', 
     bookingId, 
     'receive'
   );
   
-  const booking = bookingStore.getBookingById(bookingId);
+  // Only navigate to owner's bookings
+  const booking = ownerBookingsMap.value.get(bookingId);
   if (booking) {
     const bookingDate = new Date(booking.checkout_date);
     handleNavigateToDate(bookingDate);
     
-    // Highlight the booking (if calendar API allows)
+    // Highlight the booking
     setTimeout(() => {
       const calendarApi = calendarRef.value?.getApi?.();
       if (calendarApi) {
         const event = calendarApi.getEventById(bookingId);
         if (event) {
-          // Add a highlighted class for visual indication
           event.setProp('classNames', [...event.classNames, 'highlighted']);
-          
-          // Remove the highlight after a few seconds
           setTimeout(() => {
             event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
           }, 3000);
         }
       }
     }, 100);
+  } else {
+    // Owner-friendly error message
+    console.warn('Booking not found in your properties');
   }
 };
 
 const handleNavigateToDate = (date: Date): void => {
-  // Log receiving event from Sidebar
-  eventLogger.logEvent(
-    'Sidebar', 
-    'Home', 
-    'navigateToDate', 
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToDate', 
     date, 
     'receive'
   );
   
   goToDate(date);
   
-  // Log emitting event to FullCalendar
   eventLogger.logEvent(
-    'Home', 
+    'HomeOwner', 
     'FullCalendar', 
     'goToDate', 
     date, 
@@ -449,14 +514,19 @@ const handleNavigateToDate = (date: Date): void => {
 };
 
 const handleFilterByProperty = (propertyId: string | null): void => {
-  // Log receiving event from Sidebar
-  eventLogger.logEvent(
-    'Sidebar', 
-    'Home', 
-    'filterByProperty', 
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'filterByProperty', 
     propertyId, 
     'receive'
   );
+  
+  // Only allow filtering by owner's properties
+  if (propertyId && !ownerPropertiesMap.value.has(propertyId)) {
+    console.warn('Cannot filter by property not owned by current user');
+    return;
+  }
   
   selectedPropertyFilter.value = propertyId;
   if (propertyId) {
@@ -466,40 +536,48 @@ const handleFilterByProperty = (propertyId: string | null): void => {
   }
   uiStore.setPropertyFilter(propertyId);
   
-  // Log data update to FullCalendar
   eventLogger.logEvent(
-    'Home', 
+    'HomeOwner', 
     'FullCalendar', 
     'filteredBookingsUpdate', 
-    { propertyId, count: filteredBookings.value.size }, 
+    { propertyId, count: ownerFilteredBookings.value.size }, 
     'emit'
   );
 };
 
 const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
-  // Log receiving event from Sidebar
-  eventLogger.logEvent(
-    'Sidebar', 
-    'Home', 
-    'createBooking', 
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'createBooking', 
     data, 
     'receive'
   );
+
+  // Ensure owner_id is set for new bookings
+  const bookingData = {
+    ...data,
+    owner_id: currentOwnerId.value
+  };
   
-  uiStore.openModal('eventModal', 'create', data);
+  uiStore.openModal('eventModal', 'create', bookingData);
 };
 
 const handleCreateProperty = (): void => {
-  // Log receiving event from Sidebar
-  eventLogger.logEvent(
-    'Sidebar', 
-    'Home', 
-    'createProperty', 
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'createProperty', 
     null, 
     'receive'
   );
   
-  uiStore.openModal('propertyModal', 'create');
+  // Ensure owner_id is set for new properties
+  const propertyData = {
+    owner_id: currentOwnerId.value
+  };
+  
+  uiStore.openModal('propertyModal', 'create', propertyData);
 };
 
 // ============================================================================
@@ -507,10 +585,9 @@ const handleCreateProperty = (): void => {
 // ============================================================================
 
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  // Log receiving event from FullCalendar
   eventLogger.logEvent(
     'FullCalendar', 
-    'Home', 
+    'HomeOwner', 
     'dateSelect', 
     { start: selectInfo.startStr, end: selectInfo.endStr }, 
     'receive'
@@ -519,119 +596,81 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
   const bookingData: Partial<BookingFormData> = {
     checkout_date: selectInfo.startStr,
     checkin_date: selectInfo.endStr,
+    owner_id: currentOwnerId.value
   };
-
-  // Open the booking form
+  
   uiStore.openModal('eventModal', 'create', bookingData);
 };
 
 const handleEventClick = (clickInfo: EventClickArg): void => {
-  // Log receiving event from FullCalendar
   eventLogger.logEvent(
     'FullCalendar', 
-    'Home', 
+    'HomeOwner', 
     'eventClick', 
     { id: clickInfo.event.id }, 
     'receive'
   );
   
-  const booking = bookingStore.getBookingById(clickInfo.event.id);
+  // Only allow editing owner's bookings
+  const booking = ownerBookingsMap.value.get(clickInfo.event.id);
   if (booking) {
     uiStore.openModal('eventModal', 'edit', { booking });
+  } else {
+    console.warn('Cannot edit booking not owned by current user');
   }
 };
 
 const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   const booking = dropInfo.event.extendedProps.booking as Booking;
   
+  // Verify owner can modify this booking
+  if (!ownerBookingsMap.value.has(booking.id)) {
+    console.warn('Cannot modify booking not owned by current user');
+    dropInfo.revert();
+    return;
+  }
+  
   try {
     await updateBooking(booking.id, {
       checkout_date: dropInfo.event.startStr,
       checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
     });
-    
-    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
   } catch (error) {
-    console.error('Failed to update booking:', error);
+    console.error('Failed to update your booking:', error);
     dropInfo.revert();
-    
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking dates. Please try again.');
   }
 };
 
 const handleEventResize = async (resizeInfo: any): Promise<void> => {
   const booking = resizeInfo.event.extendedProps.booking as Booking;
   
+  // Verify owner can modify this booking
+  if (!ownerBookingsMap.value.has(booking.id)) {
+    console.warn('Cannot modify booking not owned by current user');
+    resizeInfo.revert();
+    return;
+  }
+  
   try {
     await updateBooking(booking.id, {
       checkout_date: resizeInfo.event.startStr,
       checkin_date: resizeInfo.event.endStr
     });
-    
-    uiStore.addNotification('success', 'Booking Updated', 'Booking duration has been updated successfully.');
   } catch (error) {
-    console.error('Failed to resize booking:', error);
+    console.error('Failed to update your booking:', error);
     resizeInfo.revert();
-    
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking duration. Please try again.');
   }
-};
-
-const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
-  const bookingData: Partial<BookingFormData> = {
-    checkout_date: data.start,
-    checkin_date: data.end,
-    property_id: data.propertyId,
-    booking_type: 'standard' // Default to standard booking
-  };
-  
-  handleCreateBooking(bookingData);
-};
-
-const handleUpdateBooking = async (data: { id: string; start: string; end: string }): Promise<void> => {
-  try {
-    await updateBooking(data.id, {
-      checkout_date: data.start,
-      checkin_date: data.end
-    });
-    
-    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
-  } catch (error) {
-    console.error('Failed to update booking:', error);
-    
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking. Please try again.');
-    
-    // Refresh the calendar to revert the UI
-    calendarRef.value?.refreshEvents?.();
-  }
-};
-
-const handleCalendarViewChange = (view: string): void => {
-  currentView.value = view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
-  setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
-};
-
-const handleCalendarDateChange = (date: Date): void => {
-  currentDate.value = date;
 };
 
 // ============================================================================
 // CALENDAR CONTROL HANDLERS
 // ============================================================================
 
-const handleGoToday = (): void => {
-  goToToday();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
-  }
-};
-
 const handlePrevious = (): void => {
   prev();
   const calendarApi = calendarRef.value?.getApi?.();
   if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
+    calendarApi.prev();
   }
 };
 
@@ -639,135 +678,168 @@ const handleNext = (): void => {
   next();
   const calendarApi = calendarRef.value?.getApi?.();
   if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
+    calendarApi.next();
   }
+};
+
+const handleGoToday = (): void => {
+  goToToday();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.today();
+  }
+};
+const handleCalendarViewChange = (view: CalendarView): void => {
+  // Map CalendarView to FullCalendar view type
+  const calendarView = view === 'week' ? 'timeGridWeek' : 
+                      view === 'day' ? 'timeGridDay' : 
+                      'dayGridMonth';
+  setCalendarView(calendarView);
+};
+
+const handleCalendarDateChange = (date: Date): void => {
+  goToDate(date);
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(date);
+  }
+};
+
+
+const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string | undefined; }): void => {
+  const bookingData = {
+    ...data,
+    owner_id: currentOwnerId.value
+  };
+  uiStore.openModal('eventModal', 'create', bookingData);
+};
+
+const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+  // Verify owner can update this booking
+  if (!ownerBookingsMap.value.has(data.id)) {
+    console.warn('Cannot update booking not owned by current user');
+    return;
+  }
+  
+  updateBooking(data.id, {
+    checkout_date: data.start,
+    checkin_date: data.end
+  });
 };
 
 // ============================================================================
 // MODAL EVENT HANDLERS
 // ============================================================================
 
-const toggleSidebar = (): void => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
-
-// Event Modal Handlers
 const handleEventModalClose = (): void => {
   uiStore.closeModal('eventModal');
 };
 
 const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
   try {
+    // Ensure owner_id is set
+    const bookingData = {
+      ...data,
+      owner_id: currentOwnerId.value
+    };
+    
     if (eventModalMode.value === 'create') {
-      await createBooking(data);
-      uiStore.addNotification('success', 'Booking Created', 'New booking has been created successfully.');
-    } else {
-      const booking = eventModalData.value as Booking;
-      await updateBooking(booking.id, data);
-      uiStore.addNotification('success', 'Booking Updated', 'Booking has been updated successfully.');
+      await createBooking(bookingData as BookingFormData);
+    } else if (eventModalData.value) {
+      // Verify owner can update this booking
+      if (!ownerBookingsMap.value.has(eventModalData.value.id)) {
+        throw new Error('Cannot update booking not owned by current user');
+      }
+      await updateBooking(eventModalData.value.id, bookingData as Partial<BookingFormData>);
     }
-    
     uiStore.closeModal('eventModal');
-    
-    // Refresh calendar events
-    calendarRef.value?.refreshEvents?.();
   } catch (error) {
-    console.error('Failed to save booking:', error);
-    uiStore.addNotification('error', 'Save Failed', 'Failed to save booking. Please try again.');
+    console.error('Failed to save your booking:', error);
   }
 };
 
 const handleEventModalDelete = async (bookingId: string): Promise<void> => {
-  // Instead of directly deleting, show a confirmation dialog
-  uiStore.openConfirmDialog(
-    'confirmDialog',
-    {
-      title: 'Delete Booking',
-      message: 'Are you sure you want to delete this booking? This action cannot be undone.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      dangerous: true,
-      data: { action: 'deleteBooking', id: bookingId }
-    }
-  );
+  // Verify owner can delete this booking
+  if (!ownerBookingsMap.value.has(bookingId)) {
+    console.warn('Cannot delete booking not owned by current user');
+    return;
+  }
   
-  // Close the event modal after confirming deletion
-  uiStore.closeModal('eventModal');
+    uiStore.openConfirmDialog('confirmDialog', {
+    title: 'Delete Booking',
+    message: 'Are you sure you want to delete this booking? This action cannot be undone.',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    dangerous: true,
+    data: { type: 'booking', id: bookingId }
+  });
 };
 
-// Property Modal Handlers
-// These handlers will be used when the PropertyModal component is created
 const handlePropertyModalClose = (): void => {
   uiStore.closeModal('propertyModal');
 };
 
 const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
   try {
-    if (propertyModalMode.value === 'create') {
-      await createProperty(data);
-      uiStore.addNotification('success', 'Property Created', 'New property has been created successfully.');
-    } else {
-      const property = propertyModalData.value as Property;
-      await updateProperty(property.id, data);
-      uiStore.addNotification('success', 'Property Updated', 'Property has been updated successfully.');
-    }
+    // Ensure owner_id is set
+    const propertyData = {
+      ...data,
+      owner_id: currentOwnerId.value
+    };
     
+    if (propertyModalMode.value === 'create') {
+      await createProperty(propertyData as PropertyFormData);
+    } else if (propertyModalData.value) {
+      // Verify owner can update this property
+      if (!ownerPropertiesMap.value.has(propertyModalData.value.id)) {
+        throw new Error('Cannot update property not owned by current user');
+      }
+      await updateProperty(propertyModalData.value.id, propertyData as Partial<PropertyFormData>);
+    }
     uiStore.closeModal('propertyModal');
   } catch (error) {
-    console.error('Failed to save property:', error);
-    uiStore.addNotification('error', 'Save Failed', 'Failed to save property. Please try again.');
+    console.error('Failed to save your property:', error);
   }
 };
 
 const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
-  // Instead of directly deleting, show a confirmation dialog
-  uiStore.openConfirmDialog(
-    'confirmDialog',
-    {
-      title: 'Delete Property',
-      message: 'Are you sure you want to delete this property? This action cannot be undone.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      dangerous: true,
-      data: { action: 'deleteProperty', id: propertyId }
-    }
-  );
+  // Verify owner can delete this property
+  if (!ownerPropertiesMap.value.has(propertyId)) {
+    console.warn('Cannot delete property not owned by current user');
+    return;
+  }
+  
+  uiStore.openConfirmDialog('confirmDialog', {
+    title: 'Delete Property',
+    message: 'Are you sure you want to delete this property? This will also delete all associated bookings. This action cannot be undone.',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    dangerous: true,
+    data: { type: 'property', id: propertyId }
+  });
 };
 
-// Confirmation Dialog Handlers
-const handleConfirmDialogConfirm = (): void => {
+// ============================================================================
+// CONFIRMATION DIALOG HANDLERS
+// ============================================================================
+
+const handleConfirmDialogConfirm = async (): Promise<void> => {
   const data = confirmDialogData.value;
   
-  if (!data) return;
-  
-  // Handle different confirmation actions
-  switch (data.action) {
-    case 'deleteProperty':
-      deleteProperty(data.id as string)
-        .then(() => {
-          uiStore.addNotification('success', 'Property Deleted', 'Property has been deleted successfully.');
-        })
-        .catch((error) => {
-          console.error('Failed to delete property:', error);
-          uiStore.addNotification('error', 'Delete Failed', 'Failed to delete property. Please try again.');
-        });
-      break;
-      
-    case 'deleteBooking':
-      deleteBooking(data.id as string)
-        .then(() => {
-          uiStore.addNotification('success', 'Booking Deleted', 'Booking has been deleted successfully.');
-          // Refresh calendar events
-          calendarRef.value?.refreshEvents?.();
-        })
-        .catch((error) => {
-          console.error('Failed to delete booking:', error);
-          uiStore.addNotification('error', 'Delete Failed', 'Failed to delete booking. Please try again.');
-        });
-      break;
-      
-    default:
-      console.warn('Unknown confirmation action:', data.action);
+  if (data?.type === 'booking' && data?.id) {
+    try {
+      await deleteBooking(data.id as string);
+      uiStore.closeModal('eventModal');
+    } catch (error) {
+      console.error('Failed to delete your booking:', error);
+    }
+  } else if (data?.type === 'property' && data?.id) {
+    try {
+      await deleteProperty(data.id as string    );
+      uiStore.closeModal('propertyModal');
+    } catch (error) {
+      console.error('Failed to delete your property:', error);
+    }
   }
   
   uiStore.closeConfirmDialog('confirmDialog');
@@ -782,227 +854,114 @@ const handleConfirmDialogClose = (): void => {
 };
 
 // ============================================================================
-// LIFECYCLE & WATCHERS
+// SIDEBAR MANAGEMENT
 // ============================================================================
 
-// Initialize data on mount
+const toggleSidebar = (): void => {
+  sidebarOpen.value = !sidebarOpen.value;
+};
+
+// ============================================================================
+// LIFECYCLE HOOKS
+// ============================================================================
+
 onMounted(async () => {
-  // Enable event logger for testing
-  eventLogger.setEnabled(true);
-  
-  // Log component mounting
-  eventLogger.logEvent(
-    'System', 
-    'Home', 
-    'mounted', 
-    { timestamp: Date.now() }, 
-    'receive'
-  );
-  
-  try {
-    // Set loading state
-    uiStore.setLoading('bookings', true);
-    uiStore.setLoading('properties', true);
-    
-    // Fetch data
-    if (authStore.isAuthenticated) {
+  // Load owner's data
+  if (isOwnerAuthenticated.value) {
+    try {
       await Promise.all([
         fetchAllProperties(),
         fetchAllBookings()
       ]);
+    } catch (error) {
+      console.error('Failed to load your data:', error);
     }
-    
-    // Clear loading state
-    uiStore.setLoading('bookings', false);
-    uiStore.setLoading('properties', false);
-  } catch (error) {
-    console.error('Failed to initialize data:', error);
-    uiStore.addNotification('error', 'Initialization Failed', 'Failed to load data. Please refresh the page.');
-    
-    // Clear loading state
-    uiStore.setLoading('bookings', false);
-    uiStore.setLoading('properties', false);
+  }
+});
+
+onUnmounted(() => {
+  // Cleanup if needed
+});
+
+// ============================================================================
+// RESPONSIVE BEHAVIOR
+// ============================================================================
+
+watch(xs, (newValue) => {
+  if (newValue) {
+    sidebarOpen.value = false;
   }
 });
 
 // Watch for authentication changes
-watch(() => authStore.isAuthenticated, async (isAuthenticated) => {
-  if (isAuthenticated) {
-    try {
-      uiStore.setLoading('bookings', true);
-      uiStore.setLoading('properties', true);
-      
-      await Promise.all([
-        fetchAllProperties(),
-        fetchAllBookings()
-      ]);
-      
-      uiStore.setLoading('bookings', false);
-      uiStore.setLoading('properties', false);
-    } catch (error) {
-      console.error('Failed to fetch data after authentication:', error);
-      uiStore.addNotification('error', 'Data Fetch Failed', 'Failed to load your data after login. Please refresh the page.');
-      
-      uiStore.setLoading('bookings', false);
-      uiStore.setLoading('properties', false);
-    }
-  } else {
-    // Clear data when user logs out
-    propertyStore.clearAll();
-    bookingStore.clearAll();
-    userStore.clearUserPreferences();
+watch(isOwnerAuthenticated, (newValue) => {
+  if (newValue) {
+    // Reload data when user becomes authenticated
+    fetchAllProperties();
+    fetchAllBookings();
   }
-});
-
-// Watch for changes in current view
-watch(currentView, (newView) => {
-  setCalendarView(newView);
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.changeView(newView);
-  }
-});
-
-// Watch for changes in selected property filter
-watch(selectedPropertyFilter, (newPropertyId) => {
-  // This will trigger the recomputation of filteredBookings
-  uiStore.setPropertyFilter(newPropertyId);
-});
-
-// Watch for display size changes and adjust sidebar
-watch(xs, (isExtraSmall) => {
-  sidebarOpen.value = !isExtraSmall;
-});
-
-// Cleanup on unmount
-onUnmounted(() => {
-  // Clear any event listeners or timers if needed
 });
 </script>
 
 <style scoped>
-/* Container theming */
-.home-container {
+.home-owner-container {
   height: 100vh;
   overflow: hidden;
-  background: rgb(var(--v-theme-background));
-  color: rgb(var(--v-theme-on-background));
 }
 
-.fill-height {
-  height: 100%;
-}
-
-/* Sidebar column theming */
 .sidebar-column {
-  background: rgb(var(--v-theme-surface));
-  border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12);
   height: 100vh;
   overflow-y: auto;
+  border-right: 1px solid rgb(var(--v-theme-on-surface), 0.12);
 }
 
-/* Calendar column theming */
 .calendar-column {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: rgb(var(--v-theme-background));
 }
 
-/* Calendar header theming */
 .calendar-header {
   padding: 16px;
+  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
   background: rgb(var(--v-theme-surface));
-  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-  display: flex;
-  align-items: center;
-  min-height: 64px;
-  color: rgb(var(--v-theme-on-surface));
+  flex-shrink: 0;
 }
 
 .mobile-hidden {
   display: none;
 }
 
-@media (min-width: 1264px) {
+@media (min-width: 1024px) {
   .mobile-hidden {
     display: block;
   }
 }
 
-/* Card theming */
-:deep(.v-card) {
-  background: rgb(var(--v-theme-surface)) !important;
-  color: rgb(var(--v-theme-on-surface)) !important;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Owner-specific styling */
+.home-owner-container {
+  --owner-primary: rgb(var(--v-theme-primary));
+  --owner-accent: rgb(var(--v-theme-secondary));
 }
 
-:deep(.v-card:hover) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--v-theme-on-surface), 0.15);
-  border-color: rgba(var(--v-theme-primary), 0.3) !important;
-}
-
-/* Button theming */
-:deep(.v-btn) {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-:deep(.v-btn--variant-elevated),
-:deep(.v-btn--variant-flat) {
-  background: rgb(var(--v-theme-primary)) !important;
-  color: rgb(var(--v-theme-on-primary)) !important;
-}
-
-:deep(.v-btn--variant-outlined) {
-  border-color: rgb(var(--v-theme-primary)) !important;
-  color: rgb(var(--v-theme-primary)) !important;
-}
-
-:deep(.v-btn--variant-text) {
-  color: rgb(var(--v-theme-primary)) !important;
-}
-
-:deep(.v-btn:hover) {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.3);
-}
-
-/* Text theming */
-:deep(.text-h6),
-:deep(.text-h5),
-:deep(.text-h4) {
-  color: rgb(var(--v-theme-on-surface)) !important;
-}
-
-:deep(.text-subtitle-1),
-:deep(.text-subtitle-2) {
-  color: rgba(var(--v-theme-on-surface), 0.8) !important;
-}
-
-/* Icon theming */
-:deep(.v-icon) {
-  color: rgb(var(--v-theme-on-surface)) !important;
-}
-
-:deep(.v-btn .v-icon) {
-  color: inherit !important;
-}
-
-/* Badge theming */
-:deep(.v-badge .v-badge__badge) {
-  background: rgb(var(--v-theme-primary)) !important;
-  color: rgb(var(--v-theme-on-primary)) !important;
-}
-
-/* Highlight animation for navigated bookings */
+/* Highlighted booking animation for owner */
 :deep(.fc-event.highlighted) {
-  animation: highlight-pulse 3s ease-in-out;
+  animation: owner-highlight 3s ease-in-out;
+  box-shadow: 0 0 0 3px var(--owner-primary);
 }
 
-@keyframes highlight-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0.7); }
-  50% { box-shadow: 0 0 0 20px rgba(var(--v-theme-primary), 0); }
+@keyframes owner-highlight {
+  0% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--owner-primary);
+  }
+  50% { 
+    transform: scale(1.05);
+    box-shadow: 0 0 0 6px rgba(var(--v-theme-primary), 0.3);
+  }
+  100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 3px var(--owner-primary);
+  }
 }
 </style> 

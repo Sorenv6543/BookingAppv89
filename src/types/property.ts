@@ -54,10 +54,11 @@ export type PropertyMap = Map<string, Property>;
  * Type guard for Property objects
  */
 export function isProperty(obj: unknown): obj is Property {
-  return obj && 
-    typeof obj.id === 'string' &&
-    typeof obj.name === 'string' &&
-    typeof obj.address === 'string' &&
-    typeof obj.cleaning_duration === 'number' &&
-    typeof obj.active === 'boolean';
+  return typeof obj === 'object' && 
+    obj !== null &&
+    typeof (obj as any).id === 'string' &&
+    typeof (obj as any).name === 'string' &&
+    typeof (obj as any).address === 'string' &&
+    typeof (obj as any).cleaning_duration === 'number' &&
+    typeof (obj as any).active === 'boolean';
 }

@@ -249,6 +249,178 @@ The solution was to rename the slot parameters to avoid shadowing the component'
       size="small"
     >
 
+>### --- PROBLEM - 004 ---
+### TASK-039D: OwnerSidebar.vue Component Implementation
+
+### Problem Description
+
+TASK-039D required creating an OwnerSidebar.vue component as part of the role-based architecture split. The component needed to:
+
+1. Show only owner's properties in property filter
+2. Display turn alerts for owner's properties only
+3. Display upcoming cleanings for owner's properties only
+4. Add "Add Property" and "Add Booking" quick action buttons
+5. Remove admin-only sections (cleaner management, system reports)
+6. Show owner-specific metrics (their properties count, their bookings)
+
+The challenge was implementing role-based data filtering while maintaining the same UI structure and event communication patterns as the existing generic Sidebar component.
+
+## Root Cause
+
+The existing Sidebar component was designed as a generic component that displayed all data without role-based filtering. For the multi-tenant role-based architecture, we needed owner-specific components that filter data by `owner_id === currentUser.id` to ensure property owners only see their own data.
+
+## Solution
+
+### 1. Created OwnerSidebar.vue Component
+
+Implemented a new component at `src/components/smart/owner/OwnerSidebar.vue` with the following key features:
+
+#### Role-Based Data Filtering
+```typescript
+// Get current user ID for filtering
+const currentUserId = computed(() => authStore.user?.id || '1');
+
+// OWNER-SPECIFIC FILTERING: Filter all data to show only current owner's data
+const ownerPropertiesMap = computed(() => {
+  const ownerMap = new Map<string, Property>();
+  propertiesMap.value.forEach((property, id) => {
+    if (property.owner_id === currentUserId.value) {
+      ownerMap.set(id, property);
+    }
+  });
+  return ownerMap;
+});
+
+const ownerTodayTurnsMap = computed(() => {
+  const ownerMap = new Map<string, Booking>();
+  todayTurnsMap.value.forEach((booking, id) => {
+    if (booking.owner_id === currentUserId.value) {
+      ownerMap.set(id, booking);
+    }
+  });
+  return ownerMap;
+});
+```
+
+#### Owner-Specific UI Elements
+- **Header**: Changed from "Property Cleaning" to "My Properties"
+- **Metrics**: Added owner-specific metrics display: "X properties • Y bookings"
+- **Property Filter**: Changed label to "Filter My Properties" with "All My Properties" option
+- **Quick Actions**: Added "View My Calendar" button alongside "Add Booking" and "Add Property"
+
+#### Removed Admin Features
+- Replaced "Assign" buttons with "View" buttons (no cleaner assignment for owners)
+- Removed system-wide reporting features
+- Focused on personal property management
+
+### 2. Updated HomeOwner.vue Integration
+
+Updated the HomeOwner.vue component to use the new OwnerSidebar:
+
+```diff
+- <!-- TODO: Replace with OwnerSidebar.vue when TASK-039D is complete -->
+- <Sidebar
++ <!-- OwnerSidebar: Shows only current owner's data -->
++ <OwnerSidebar
+    :today-turns="ownerTodayTurns"
+    :upcoming-cleanings="ownerUpcomingCleanings"
+    :properties="ownerPropertiesMap"
+    :loading="loading"
+    @navigate-to-booking="handleNavigateToBooking"
+    @navigate-to-date="handleNavigateToDate"
+    @filter-by-property="handleFilterByProperty"
+    @create-booking="handleCreateBooking"
+    @create-property="handleCreateProperty"
+- />
++ />
+```
+
+Also updated import statements and event logging references from 'Sidebar' to 'OwnerSidebar'.
+
+### 3. Created Demo Components for Testing
+
+#### OwnerSidebarDemo.vue
+Created a comprehensive demo component with:
+- Sample owner data (properties and bookings filtered to current owner)
+- Event logging to track component interactions
+- Sample data display showing filtered properties and bookings
+- Interactive testing interface
+
+#### Demo Page Route
+Created `/demos/owner-sidebar` route for easy testing and verification.
+
+### 4. Maintained Existing Patterns
+
+The implementation follows established project patterns:
+- **Map Collections**: Uses Map<string, T> for all state management
+- **Event Communication**: Maintains same emit interface as generic Sidebar
+- **Component Reuse**: Reuses existing TurnAlerts and UpcomingCleanings dumb components
+- **TypeScript Safety**: Proper typing throughout with error handling
+- **Event Logging**: Integrated with existing component event logging system
+
+## Key Implementation Details
+
+### Data Scoping Strategy
+```typescript
+// Owner sees only their data
+const ownerBookingsCount = computed(() => 
+  ownerTodayTurnsArray.value.length + ownerUpcomingCleaningsArray.value.length
+);
+
+// Property filter shows only owner's properties
+const ownerPropertySelectItems = computed(() => {
+  return Array.from(ownerPropertiesMap.value.values())
+    .filter(property => property && property.id && property.name)
+    .map(property => ({
+      title: property.name,
+      value: property.id,
+    }));
+});
+```
+
+### Owner-Specific Event Handling
+```typescript
+// Owner-specific: View booking instead of assign cleaner
+const handleViewBooking = (bookingId: string): void => {
+  // Navigate to booking for viewing/editing (no cleaner assignment)
+  emit('navigateToBooking', bookingId);
+};
+```
+
+### UI Customization
+- Added owner-specific styling classes
+- Updated color schemes for property filter and quick actions
+- Added metrics display in header
+- Customized button labels and actions
+
+## Benefits of the Solution
+
+1. **Role-Based Security**: Ensures owners only see their own data
+2. **UI Optimization**: Interface optimized for property owner needs
+3. **Code Reuse**: Maximizes reuse of existing dumb components
+4. **Maintainability**: Follows established patterns and conventions
+5. **Testability**: Includes comprehensive demo for verification
+6. **Scalability**: Ready for integration with future owner-specific composables
+
+## Verification
+
+- ✅ TypeScript compiles without errors
+- ✅ Component follows established naming conventions
+- ✅ Integrates with existing stores/composables
+- ✅ Includes proper error handling
+- ✅ Maintains Map collection patterns
+- ✅ Event communication works correctly
+- ✅ Demo component provides comprehensive testing
+
+## Future Integration
+
+The OwnerSidebar component is ready for integration with future owner-specific composables:
+- `useOwnerBookings.ts` - Owner-scoped booking operations
+- `useOwnerProperties.ts` - Owner-scoped property operations  
+- `useOwnerCalendarState.ts` - Owner-specific calendar logic
+
+The component provides a solid foundation for the role-based multi-tenant architecture while maintaining consistency with existing patterns and ensuring a smooth user experience for property owners.
+
 <!-- Tooltip activators (2 instances) -->
 - <template #activator="{ props }">
 + <template #activator="{ props: tooltipProps }">

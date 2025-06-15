@@ -64,7 +64,14 @@ const router = createRouter({
         layout: 'default'
       }
     },
-
+    {
+      path: '/demos/owners-sidebar',
+      name: 'owners-sidebar-demo',
+      component: () => import('@/pages/demos/owner-sidebar.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
 
     {
       path: '/testing/turn-alerts',

@@ -465,7 +465,7 @@ async function handleSubmit(): Promise<void> {
       checkin_date: form.checkin_date,
       booking_type: form.booking_type as BookingType,
       status: (form.status as BookingStatus) || 'pending',
-      owner_id: form.owner_id || '',
+      owner_id: form.owner_id as string,
       guest_count: form.guest_count,
       notes: form.notes
     };
