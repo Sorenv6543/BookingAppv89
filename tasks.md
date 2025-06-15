@@ -365,8 +365,8 @@
   - Notes: Component successfully filters all data to show only current owner's properties and bookings. Removes admin-only features while maintaining the same UI structure and event communication patterns. Ready for integration with future owner-specific composables.
   - Assigned to: Cursor
 
-- [ ] **TASK-039E**: Create OwnerCalendar.vue component
-  - Status: Not Started
+- [x] **TASK-039E**: Create OwnerCalendar.vue component
+  - Status: Complete
   - Requirements:
     - Filter calendar events to show only owner's bookings
     - Simpler calendar controls (basic views: month, week, day)
@@ -380,6 +380,7 @@
     - Date click → create new booking modal
     - Turn booking highlighting (owner's turns only)
     - No cleaner assignment interface
+  - Notes: Successfully implemented OwnerCalendar.vue component with role-based data filtering, simplified UI optimized for property owners, owner-specific color scheme and messaging, demo component with sample data, and proper integration with existing Map collection patterns. Component removes admin features while maintaining core calendar functionality for owner use cases.
   - Assigned to: Cursor
 
 ### **Admin-Specific Smart Components**

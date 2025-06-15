@@ -30,6 +30,7 @@ export interface Booking {
   status: BookingStatus;
   guest_count?: number;
   notes?: string;
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
   assigned_cleaner_id?: string;
   created_at?: string;
   updated_at?: string;

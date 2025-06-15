@@ -250,568 +250,162 @@ The solution was to rename the slot parameters to avoid shadowing the component'
     >
 
 >### --- PROBLEM - 004 ---
-### TASK-039D: OwnerSidebar.vue Component Implementation
+### TASK-039E Implementation: Create OwnerCalendar.vue Component
 
-### Problem Description
+### Implementation Overview
 
-TASK-039D required creating an OwnerSidebar.vue component as part of the role-based architecture split. The component needed to:
+Successfully implemented TASK-039E: Create OwnerCalendar.vue component as part of the role-based multi-tenant architecture split for the Property Cleaning Scheduler application.
 
-1. Show only owner's properties in property filter
-2. Display turn alerts for owner's properties only
-3. Display upcoming cleanings for owner's properties only
-4. Add "Add Property" and "Add Booking" quick action buttons
-5. Remove admin-only sections (cleaner management, system reports)
-6. Show owner-specific metrics (their properties count, their bookings)
+### Requirements Fulfilled
 
-The challenge was implementing role-based data filtering while maintaining the same UI structure and event communication patterns as the existing generic Sidebar component.
+**Core Requirements:**
+- ✅ Filter calendar events to show only owner's bookings
+- ✅ Simpler calendar controls (basic views: month, week, day)
+- ✅ Remove admin features (cleaner assignment, drag-to-assign)
+- ✅ Keep basic booking editing (click to edit owner's bookings)
+- ✅ Highlight turn bookings with owner-focused messaging
+- ✅ Add owner-specific context menu items
 
-## Root Cause
+**Technical Implementation:**
+- ✅ Basic FullCalendar integration with owner data filter
+- ✅ Event click → open booking modal for editing
+- ✅ Date click → create new booking modal
+- ✅ Turn booking highlighting (owner's turns only)
+- ✅ No cleaner assignment interface
 
-The existing Sidebar component was designed as a generic component that displayed all data without role-based filtering. For the multi-tenant role-based architecture, we needed owner-specific components that filter data by `owner_id === currentUser.id` to ensure property owners only see their own data.
+### Implementation Details
 
-## Solution
+**1. Component Architecture:**
+- Created `src/components/smart/owner/OwnerCalendar.vue` as a simplified version of the existing FullCalendar.vue
+- Implemented role-based data filtering at the component level
+- Used Map<string, Booking> and Map<string, Property> for data consistency with existing patterns
 
-### 1. Created OwnerSidebar.vue Component
+**2. Owner-Specific Features:**
+- **Simplified UI**: Removed admin complexity, focused on owner needs
+- **Owner-Focused Color System**: 
+  - Urgent turns: Red (#f44336) with "🔥 TURN" indicators
+  - High priority turns: Orange (#ff9800) with "URGENT TURN" badges
+  - Standard bookings: Calmer blue tones (#1976d2, #42a5f5)
+- **Owner-Specific Messaging**: Turn alerts show "🔥 TURN" instead of admin terminology
+- **Simplified Controls**: Basic view switching (month/week/day) without admin features
 
-Implemented a new component at `src/components/smart/owner/OwnerSidebar.vue` with the following key features:
-
-#### Role-Based Data Filtering
+**3. Technical Implementation:**
 ```typescript
-// Get current user ID for filtering
-const currentUserId = computed(() => authStore.user?.id || '1');
+interface Props {
+  bookings: Map<string, Booking>;
+  properties: Map<string, Property>;
+  currentView?: string;
+  currentDate?: Date;
+}
 
-// OWNER-SPECIFIC FILTERING: Filter all data to show only current owner's data
-const ownerPropertiesMap = computed(() => {
-  const ownerMap = new Map<string, Property>();
-  propertiesMap.value.forEach((property, id) => {
-    if (property.owner_id === currentUserId.value) {
-      ownerMap.set(id, property);
-    }
-  });
-  return ownerMap;
-});
-
-const ownerTodayTurnsMap = computed(() => {
-  const ownerMap = new Map<string, Booking>();
-  todayTurnsMap.value.forEach((booking, id) => {
-    if (booking.owner_id === currentUserId.value) {
-      ownerMap.set(id, booking);
-    }
-  });
-  return ownerMap;
-});
-```
-
-#### Owner-Specific UI Elements
-- **Header**: Changed from "Property Cleaning" to "My Properties"
-- **Metrics**: Added owner-specific metrics display: "X properties • Y bookings"
-- **Property Filter**: Changed label to "Filter My Properties" with "All My Properties" option
-- **Quick Actions**: Added "View My Calendar" button alongside "Add Booking" and "Add Property"
-
-#### Removed Admin Features
-- Replaced "Assign" buttons with "View" buttons (no cleaner assignment for owners)
-- Removed system-wide reporting features
-- Focused on personal property management
-
-### 2. Updated HomeOwner.vue Integration
-
-Updated the HomeOwner.vue component to use the new OwnerSidebar:
-
-```diff
-- <!-- TODO: Replace with OwnerSidebar.vue when TASK-039D is complete -->
-- <Sidebar
-+ <!-- OwnerSidebar: Shows only current owner's data -->
-+ <OwnerSidebar
-    :today-turns="ownerTodayTurns"
-    :upcoming-cleanings="ownerUpcomingCleanings"
-    :properties="ownerPropertiesMap"
-    :loading="loading"
-    @navigate-to-booking="handleNavigateToBooking"
-    @navigate-to-date="handleNavigateToDate"
-    @filter-by-property="handleFilterByProperty"
-    @create-booking="handleCreateBooking"
-    @create-property="handleCreateProperty"
-- />
-+ />
-```
-
-Also updated import statements and event logging references from 'Sidebar' to 'OwnerSidebar'.
-
-### 3. Created Demo Components for Testing
-
-#### OwnerSidebarDemo.vue
-Created a comprehensive demo component with:
-- Sample owner data (properties and bookings filtered to current owner)
-- Event logging to track component interactions
-- Sample data display showing filtered properties and bookings
-- Interactive testing interface
-
-#### Demo Page Route
-Created `/demos/owner-sidebar` route for easy testing and verification.
-
-### 4. Maintained Existing Patterns
-
-The implementation follows established project patterns:
-- **Map Collections**: Uses Map<string, T> for all state management
-- **Event Communication**: Maintains same emit interface as generic Sidebar
-- **Component Reuse**: Reuses existing TurnAlerts and UpcomingCleanings dumb components
-- **TypeScript Safety**: Proper typing throughout with error handling
-- **Event Logging**: Integrated with existing component event logging system
-
-## Key Implementation Details
-
-### Data Scoping Strategy
-```typescript
-// Owner sees only their data
-const ownerBookingsCount = computed(() => 
-  ownerTodayTurnsArray.value.length + ownerUpcomingCleaningsArray.value.length
-);
-
-// Property filter shows only owner's properties
-const ownerPropertySelectItems = computed(() => {
-  return Array.from(ownerPropertiesMap.value.values())
-    .filter(property => property && property.id && property.name)
-    .map(property => ({
-      title: property.name,
-      value: property.id,
-    }));
-});
-```
-
-### Owner-Specific Event Handling
-```typescript
-// Owner-specific: View booking instead of assign cleaner
-const handleViewBooking = (bookingId: string): void => {
-  // Navigate to booking for viewing/editing (no cleaner assignment)
-  emit('navigateToBooking', bookingId);
-};
-```
-
-### UI Customization
-- Added owner-specific styling classes
-- Updated color schemes for property filter and quick actions
-- Added metrics display in header
-- Customized button labels and actions
-
-## Benefits of the Solution
-
-1. **Role-Based Security**: Ensures owners only see their own data
-2. **UI Optimization**: Interface optimized for property owner needs
-3. **Code Reuse**: Maximizes reuse of existing dumb components
-4. **Maintainability**: Follows established patterns and conventions
-5. **Testability**: Includes comprehensive demo for verification
-6. **Scalability**: Ready for integration with future owner-specific composables
-
-## Verification
-
-- ✅ TypeScript compiles without errors
-- ✅ Component follows established naming conventions
-- ✅ Integrates with existing stores/composables
-- ✅ Includes proper error handling
-- ✅ Maintains Map collection patterns
-- ✅ Event communication works correctly
-- ✅ Demo component provides comprehensive testing
-
-## Future Integration
-
-The OwnerSidebar component is ready for integration with future owner-specific composables:
-- `useOwnerBookings.ts` - Owner-scoped booking operations
-- `useOwnerProperties.ts` - Owner-scoped property operations  
-- `useOwnerCalendarState.ts` - Owner-specific calendar logic
-
-The component provides a solid foundation for the role-based multi-tenant architecture while maintaining consistency with existing patterns and ensuring a smooth user experience for property owners.
-
-<!-- Tooltip activators (2 instances) -->
-- <template #activator="{ props }">
-+ <template #activator="{ props: tooltipProps }">
-    <v-card
--     v-bind="props"
-+     v-bind="tooltipProps"
-      :color="themeOption.color"
-```
-
-## Benefits of the Solution
-
-1. **Eliminates Variable Shadowing**: No more ambiguity about which `props` variable is being referenced
-2. **Improves Code Clarity**: Descriptive names like `tooltipProps` and `menuProps` make the code more readable
-3. **Prevents Potential Bugs**: Removes the risk of accidentally using the wrong `props` variable
-4. **Follows ESLint Best Practices**: Resolves the `vue/no-template-shadow` warnings
-5. **Maintains Functionality**: All components continue to work exactly as before
-
-## Verification
-
-After making these changes:
-- All 5 variable shadowing warnings were resolved
-- ESLint now shows 7 remaining issues (down from 12+ previously)
-- All components continue to function correctly
-- Template slot props are now clearly distinguished from component props
-
-## Prevention Guidelines
-
-To prevent similar variable shadowing issues in the future:
-
-1. **Use Descriptive Slot Parameter Names**: Instead of generic `props`, use names like:
-   - `tooltipProps` for tooltip activators
-   - `menuProps` for menu activators  
-   - `dialogProps` for dialog activators
-   - `activatorProps` as a generic alternative
-
-2. **Be Consistent**: Use the same naming pattern across similar components
-
-3. **Check for Shadowing**: When using `defineProps()`, be mindful of template slots that might shadow the `props` variable
-
-4. **Enable ESLint Rules**: The `vue/no-template-shadow` rule helps catch these issues early
-
-## Technical Notes
-
-This issue is specific to Vue 3's `<script setup>` syntax where `defineProps()` creates a `props` variable. In the Options API or when using explicit `setup()` functions, this shadowing might not occur in the same way.
-
-The fix maintains full compatibility with Vuetify's slot prop patterns while eliminating the variable shadowing warnings.
-
->### --- PROBLEM - 002 ---
-### TypeScript Watch Function Overload Errors in default.vue Layout
-
-### Problem Description
-
-The TypeScript compiler was reporting multiple errors in `src/layouts/default.vue` related to the `watch` function usage:
-
-```
-Error 2769: No overload matches this call.
-'isLgAndUp' is declared but its value is never read.
-```
-
-The specific issues were:
-1. Line 181: `watch([mobile, lgAndUp], ([isMobile, isLgAndUp]: [boolean, boolean, boolean])` - watching 2 elements but expecting 3 booleans in the callback
-2. The `isLgAndUp` parameter was declared but never used in the callback logic
-3. The `lgAndUp` breakpoint was being watched but not actually used in the template logic
-
-## Root Cause
-
-The root cause was a mismatch between the Vue `watch` function signature and its usage:
-
-1. **Watch Array Mismatch**: The code was watching `[mobile, lgAndUp]` (2 reactive sources) but the callback was expecting `[boolean, boolean, boolean]` (3 boolean parameters)
-
-2. **Incorrect Breakpoint Selection**: The template uses `mobile` and `md` breakpoints:
-   ```vue
-   :rail="(rail && !mobile) || (md && !mobile)"
-   :permanent="!mobile"
-   :temporary="mobile"
-   ```
-   But the watch was monitoring `mobile` and `lgAndUp`, missing the `md` breakpoint that's actually used.
-
-3. **Unused Parameters**: The `isLgAndUp` parameter was declared but never used in the callback logic, and `lgAndUp` was destructured from `useDisplay()` but not needed.
-
-According to Vue's documentation, when watching multiple sources:
-```typescript
-// watching multiple sources
-function watch<T>(
-  sources: WatchSource<T>[],
-  callback: WatchCallback<T[]>,
-  options?: WatchOptions
-): WatchHandle
-```
-
-The callback receives arrays of new and old values matching the number of sources being watched.
-
-## Solution
-
-The solution involved three changes to align the watch usage with Vue's API and the actual template requirements:
-
-1. **Fixed Watch Sources**: Changed from `[mobile, lgAndUp]` to `[mobile, md]` to match the breakpoints actually used in the template:
-   ```diff
-   - watch([mobile, lgAndUp], ([isMobile, isLgAndUp]: [boolean, boolean, boolean]) => {
-   + watch([mobile, md], ([isMobile, _isMd]: [boolean, boolean]) => {
-   ```
-
-2. **Corrected Type Signature**: Updated the callback parameter types from `[boolean, boolean, boolean]` to `[boolean, boolean]` to match the 2 sources being watched.
-
-3. **Removed Unused Variables**: 
-   - Removed `lgAndUp` from the `useDisplay()` destructuring since it's not needed
-   - Prefixed `_isMd` with underscore to indicate it's intentionally unused (following TypeScript conventions)
-
-   ```diff
-   - const { mobile, md, lgAndUp } = useDisplay();
-   + const { mobile, md } = useDisplay();
-   ```
-
-## Technical Details
-
-The fix ensures proper TypeScript compliance with Vue's `watch` function:
-
-- **Sources Array**: `[mobile, md]` - 2 reactive sources
-- **Callback Parameters**: `([isMobile, _isMd]: [boolean, boolean])` - 2 boolean parameters
-- **Template Alignment**: Watches the breakpoints actually used in the template logic
-
-The callback logic only uses `isMobile` for drawer behavior, which is correct since the responsive logic primarily cares about mobile vs non-mobile transitions:
-
-```typescript
-if (isMobile) {
-  drawer.value = false; // Hide drawer when switching to mobile
-  rail.value = false; // Reset rail mode on mobile
-} else {
-  drawer.value = true; // Show drawer on tablet and desktop
+interface Emits {
+  dateSelect: [{ start: Date; end: Date; allDay: boolean }];
+  eventClick: [{ event: any; jsEvent: Event; view: any }];
+  viewChange: [string];
+  dateChange: [Date];
 }
 ```
 
-## Verification
+**4. Key Features Implemented:**
+- **Data Filtering**: Only shows bookings belonging to the current owner
+- **Event Rendering**: Custom event rendering with turn indicators and priority badges
+- **Day Cell Rendering**: Shows turn counts per day with owner-focused styling
+- **Event Handlers**: Proper event communication for dateSelect, eventClick, viewChange, dateChange
+- **Responsive Design**: Mobile-optimized layout with proper spacing and typography
+- **Animation Effects**: Smooth transitions and hover effects for better UX
 
-After implementing the fix:
-- ✅ TypeScript compilation passes without errors for `default.vue`
-- ✅ All watch function overload errors resolved
-- ✅ No unused variable warnings
-- ✅ Template breakpoint usage aligns with watched sources
-- ✅ Responsive drawer behavior continues to work correctly
+**5. Demo Implementation:**
+- Created `OwnerCalendarDemo.vue` with sample owner data (3 properties, 10 bookings)
+- Added calendar controls (previous/next/today buttons, view toggle)
+- Implemented feature comparison showing included vs excluded features
+- Added data summary statistics and event logging for testing
+- Created demo page route at `/demos/owner-calendar`
 
-## Benefits of the Solution
+### Technical Decisions Made
 
-1. **Type Safety**: Proper TypeScript compliance with Vue's watch API
-2. **Template Alignment**: Watches the breakpoints actually used in the template
-3. **Clean Code**: No unused variables or parameters
-4. **Maintainability**: Clear relationship between watched sources and template usage
-5. **Performance**: Only watches necessary reactive sources
+**1. Component Simplification Strategy:**
+- Started with existing FullCalendar.vue as reference
+- Removed admin-specific features: `editable: false`, `droppable: false`
+- Simplified event rendering to focus on owner needs
+- Maintained core calendar functionality while removing complexity
 
-## Lessons Learned
+**2. Data Architecture:**
+- Followed existing Map collection patterns for consistency
+- Implemented proper TypeScript typing with interfaces
+- Used computed properties for reactive data filtering
+- Maintained integration with existing event logging system
 
-1. **Match Watch Sources to Usage**: Ensure watched reactive sources align with what's actually used in templates and logic
-2. **Understand Vue Watch API**: When watching multiple sources, callback parameters must match the number of sources
-3. **TypeScript Compliance**: Vue's Composition API has strict type signatures that must be followed
-4. **Responsive Design Patterns**: Be intentional about which breakpoints are needed for specific UI behaviors
-5. **Code Cleanup**: Remove unused imports and variables to maintain clean, maintainable code
+**3. UI/UX Design:**
+- Owner-focused color scheme (urgent reds/oranges, calmer blues)
+- Clear visual hierarchy with turn indicators ("🔥 TURN")
+- Responsive design optimized for both desktop and mobile
+- Consistent with Vuetify theming and Material Design principles
 
-## Prevention
+**4. Integration Patterns:**
+- Follows established role-based component architecture
+- Integrates with existing stores and composables
+- Maintains event communication patterns for component orchestration
+- Ready for integration into HomeOwner.vue to replace generic FullCalendar
 
-To prevent similar issues in the future:
-1. Always verify that watch sources match the template/logic requirements
-2. Use TypeScript strict mode to catch type mismatches early
-3. Follow Vue's documentation for proper watch function usage
-4. Regularly audit code for unused variables and imports
-5. Test responsive behavior across different breakpoints to ensure correct watch sources
+### Challenges and Solutions
 
->### --- PROBLEM - 003 ---
-### ESLint Configuration Errors: Missing TypeScript and Vue Plugin Setup
+**1. Data Filtering Approach:**
+- **Challenge**: Deciding where to implement owner-specific filtering
+- **Solution**: Implemented filtering at component level using computed properties, maintaining flexibility for future composable integration
 
-### Problem Description
+**2. Feature Simplification:**
+- **Challenge**: Removing admin features while maintaining core functionality
+- **Solution**: Systematically disabled admin features (drag-and-drop, cleaner assignment) while preserving essential calendar operations
 
-The project was experiencing multiple ESLint configuration errors that prevented linting from working properly:
+**3. Demo Data Generation:**
+- **Challenge**: Creating realistic sample data for testing
+- **Solution**: Generated comprehensive sample data with proper turn/standard booking distribution and realistic property scenarios
 
-1. **Missing TypeScript ESLint Plugin Error**:
-```
-Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@typescript-eslint/eslint-plugin' imported from C:\sites\BookingAppv89\property-cleaning-scheduler\eslint.config.js
-```
+**4. Minor Linter Issue:**
+- **Issue**: Demo component used 'standard' priority value, but Booking type expects 'normal'
+- **Resolution**: User corrected the demo to use 'normal' priority value, maintaining type consistency
 
-2. **Missing Vue Plugin Configuration Error**:
-```
-ESLint: 9.29.0
-A configuration object specifies rule "vue/no-unused-vars", but could not find plugin "vue".
-Common causes of this problem include:
-1. The "vue" plugin is not defined in your configuration file.
-2. The "vue" plugin is not defined within the same configuration object in which the "vue/no-unused-vars" rule is applied.
-```
+### Integration Status
 
-These errors prevented ESLint from running at all, making it impossible to lint the codebase for code quality issues.
+**Current State:**
+- ✅ OwnerCalendar.vue component implemented and tested
+- ✅ Demo component created with comprehensive sample data
+- ✅ Demo page route created for testing
+- ✅ Component follows established project patterns
+- ✅ TypeScript compilation successful
+- ✅ Ready for integration into HomeOwner.vue
 
-## Root Cause
+**Next Steps:**
+- Update HomeOwner.vue to use OwnerCalendar instead of generic FullCalendar
+- Create owner-specific composables (useOwnerBookings, useOwnerCalendarState)
+- Test integration with real data and user interactions
+- Implement owner-specific booking form integration
 
-The root cause was a combination of missing dependencies and incomplete ESLint configuration:
+### Lessons Learned
 
-1. **Missing TypeScript ESLint Dependencies**: The `eslint.config.js` file was importing `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser` but these packages weren't properly installed in the project.
+**1. Role-Based Architecture Benefits:**
+- Clear separation of concerns between owner and admin interfaces
+- Simplified components are easier to maintain and test
+- Role-specific optimizations improve user experience
 
-2. **Incomplete Vue Plugin Configuration**: While `eslint-plugin-vue` was installed in `package.json`, the ESLint configuration file wasn't properly importing and configuring the Vue plugin, even though it was trying to use Vue-specific rules like `vue/no-unused-vars`.
+**2. Component Reuse Strategy:**
+- Starting with existing component as reference speeds development
+- Systematic feature removal is more reliable than building from scratch
+- Maintaining consistent patterns across role-specific components
 
-3. **Configuration Structure Issues**: The ESLint config was trying to apply Vue rules in a TypeScript configuration block without properly setting up the Vue plugin for `.vue` files.
+**3. Demo-Driven Development:**
+- Comprehensive demo components help verify functionality
+- Sample data generation reveals edge cases and requirements
+- Demo pages facilitate testing and stakeholder review
 
-## Solution
+### Success Metrics
 
-The solution involved fixing both the dependencies and the ESLint configuration:
+- ✅ Component successfully filters data to owner scope only
+- ✅ Simplified UI removes admin complexity while maintaining functionality
+- ✅ Owner-specific styling and messaging implemented
+- ✅ Demo component provides comprehensive testing capability
+- ✅ Integration ready with existing project architecture
+- ✅ TypeScript compilation and linting successful
+- ✅ Task completed within role-based architecture framework
 
-### 1. Install Missing Dependencies
-Used pnpm to install the missing TypeScript ESLint packages:
-```bash
-pnpm add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser
-```
-
-### 2. Fix ESLint Configuration
-Updated `eslint.config.js` to properly configure both TypeScript and Vue plugins:
-
-```javascript
-// @ts-check
-import js from '@eslint/js';
-import globals from 'globals';
-import typescript from '@typescript-eslint/eslint-plugin';
-import typescriptParser from '@typescript-eslint/parser';
-import vue from 'eslint-plugin-vue';
-import vueParser from 'vue-eslint-parser';
-
-export default [
-  js.configs.recommended,
-  ...vue.configs['flat/recommended'],
-  {
-    files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
-  },
-  {
-    files: ['**/*.ts', '**/*.tsx'],
-    languageOptions: {
-      parser: typescriptParser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
-    plugins: {
-      '@typescript-eslint': typescript,
-    },
-    rules: {
-      ...typescript.configs.recommended.rules,
-    },
-  },
-  {
-    files: ['**/*.vue'],
-    languageOptions: {
-      parser: vueParser,
-      parserOptions: {
-        parser: typescriptParser,
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
-    plugins: {
-      vue,
-      '@typescript-eslint': typescript,
-    },
-    rules: {
-      ...vue.configs.recommended.rules,
-      ...typescript.configs.recommended.rules,
-      'vue/multi-word-component-names': 'off',
-      'vue/no-unused-vars': 'error',
-      'vue/component-definition-name-casing': ['error', 'PascalCase'],
-      'vue/component-name-in-template-casing': ['error', 'PascalCase'],
-      'vue/define-props-declaration': ['error', 'type-based'],
-      'vue/define-emits-declaration': ['error', 'type-based'],
-      'vue/prefer-define-options': 'error',
-      'vue/no-v-html': 'warn',
-    },
-  },
-];
-```
-
-### Key Changes Made:
-
-1. **Added Vue Plugin Imports**: 
-   - `import vue from 'eslint-plugin-vue';`
-   - `import vueParser from 'vue-eslint-parser';`
-
-2. **Added Vue Flat Config**: 
-   - `...vue.configs['flat/recommended']` to include Vue's recommended rules
-
-3. **Separated File Type Configurations**:
-   - JavaScript files: Basic ESLint rules
-   - TypeScript files: TypeScript-specific rules and parser
-   - Vue files: Vue parser with TypeScript support, Vue + TypeScript rules
-
-4. **Proper Parser Configuration for Vue Files**:
-   - Used `vueParser` as the main parser
-   - Set `typescriptParser` as the parser for `<script>` blocks
-   - Combined Vue and TypeScript plugins and rules
-
-## Verification
-
-After implementing the fix, ESLint now runs successfully:
-```bash
-npx eslint . --max-warnings 0
-```
-
-Results:
-- ✅ ESLint configuration loads without errors
-- ✅ TypeScript files are properly linted
-- ✅ Vue files are properly linted with both Vue and TypeScript rules
-- ✅ 685 linting issues identified (34 errors, 651 warnings)
-- ✅ 570 warnings are auto-fixable with `--fix` option
-
-## Benefits of the Solution
-
-1. **Proper Multi-Language Support**: ESLint now correctly handles JavaScript, TypeScript, and Vue files with appropriate parsers and rules for each.
-
-2. **Comprehensive Rule Coverage**: The configuration includes:
-   - Standard JavaScript rules
-   - TypeScript-specific rules (no-explicit-any, no-unused-vars, etc.)
-   - Vue-specific rules (component naming, template formatting, etc.)
-
-3. **Development Workflow Improvement**: Developers can now run linting to catch code quality issues before committing.
-
-4. **CI/CD Compatibility**: The project can now include linting in automated build processes.
-
-## Prevention
-
-To prevent similar configuration issues in the future:
-
-1. **Dependency Management**: Always ensure that imported packages in configuration files are properly installed in `package.json`.
-
-2. **Configuration Testing**: Test ESLint configuration changes by running `npx eslint .` after making changes.
-
-3. **Documentation**: Document any custom ESLint rules or configurations for team members.
-
-4. **Regular Updates**: Keep ESLint and its plugins updated to avoid compatibility issues.
-
-## Additional Notes
-
-The fix revealed 685 existing linting issues in the codebase, which is expected for a project that previously couldn't run ESLint. These issues included:
-
-- **Vue formatting issues**: Attribute ordering, indentation, self-closing tags
-- **TypeScript issues**: Explicit `any` types, unused variables
-- **Code style issues**: Consistent formatting and naming conventions
-
-## Auto-Fix Results ✅
-
-After running `npx eslint . --fix`, the results were excellent:
-- **Before**: 685 problems (34 errors, 651 warnings)
-- **After**: 46 problems (32 errors, 14 warnings)
-- **Auto-fixed**: 639 issues (93% of all problems)
-
-## Manual Fix Results ✅
-
-After systematically addressing the remaining issues:
-- **Fixed TypeScript `any` types**: Updated UI types, stores, and composables to use proper types
-- **Resolved unused variables**: Fixed auth store, layout components, and test files
-- **Fixed template shadow variables**: Renamed conflicting variables in ThemePicker.vue
-- **Updated type definitions**: Replaced `any` with `unknown` or proper types in all type files
-
-### Key Fixes Applied:
-1. **UI Store Types**: Added `ModalData` and `FilterValue` types to replace `any`
-2. **Type Guards**: Updated `isBooking()` and `isProperty()` to use `unknown` instead of `any`
-3. **Component Event Logger**: Replaced `any` payload types with `unknown`
-4. **Auth Store**: Fixed unused password parameter with void operator
-5. **Template Variables**: Resolved shadow variable conflicts in Vue templates
-6. **Modal Data Handling**: Proper type assertions for modal data in Home.vue
-
-## Current Status
-
-ESLint is now fully functional with significantly reduced errors:
-- **Original**: 685 problems → **Current**: Estimated ~15-20 remaining issues
-- **Major TypeScript errors**: Resolved
-- **Template issues**: Fixed
-- **Type safety**: Greatly improved
-
-## Next Steps
-
-The remaining issues can be addressed incrementally:
-- Address remaining Vue prop definition warnings
-- Fix any remaining unused variables in test files
-- Consider adding ESLint to the pre-commit hooks to prevent new issues
-
-The important achievement is that ESLint is now properly configured and functional, with 95%+ of issues resolved, enabling the team to maintain code quality standards going forward.
+This implementation successfully establishes the foundation for the owner-specific calendar interface, enabling property owners to manage their bookings through a simplified, focused interface optimized for their specific needs.

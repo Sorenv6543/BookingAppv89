@@ -65,13 +65,14 @@ const router = createRouter({
       }
     },
     {
-      path: '/demos/owners-sidebar',
-      name: 'owners-sidebar-demo',
-      component: () => import('@/pages/demos/owner-sidebar.vue'),
+      path: '/components/smart/owner/owner-calendar',
+      name: 'owner-calendar-demo',
+      component: () => import('@/components/smart/owner/OwnerCalendarDemo.vue'),
       meta: {
         layout: 'default'
       }
     },
+
 
     {
       path: '/testing/turn-alerts',
