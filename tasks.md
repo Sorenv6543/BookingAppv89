@@ -297,16 +297,22 @@
   - Verification: ✅ Existing app still works after folder reorganization (dev server runs successfully)
   - Assigned to: Cursor
 
-- [ ] **TASK-039B**: Move existing composables to shared folder
-  - Status: Not Started
+- [x] **TASK-039B**: Move existing composables to shared folder
+  - Status: Complete
   - Requirements:
-    - Move `useBookings.ts` → `composables/shared/useBookings.ts`
-    - Move `useProperties.ts` → `composables/shared/useProperties.ts`
-    - Move `useCalendarState.ts` → `composables/shared/useCalendarState.ts`
-    - Move `useAuth.ts` → `composables/shared/useAuth.ts`
-    - Update all import paths in existing components
-  - Notes: Base logic that will be extended by role-specific composables
-  - Verification: All existing components still import correctly
+    - ✅ Move `useBookings.ts` → `composables/shared/useBookings.ts`
+    - ✅ Move `useProperties.ts` → `composables/shared/useProperties.ts`
+    - ✅ Move `useCalendarState.ts` → `composables/shared/useCalendarState.ts`
+    - ✅ Move `useAuth.ts` → `composables/shared/useAuth.ts`
+    - ✅ Update all import paths in existing components
+  - Notes: Completed as part of TASK-039A implementation. All existing composables (useAuth, useBookings, useProperties, useCalendarState, useComponentEventLogger) have been successfully moved to the shared/ folder and import paths updated throughout the application.
+  - Implementation Details:
+    - All 5 composables successfully moved to `src/composables/shared/` folder
+    - Import paths updated in all consuming components including: Home.vue, Sidebar.vue, FullCalendar.vue, auth pages, admin layout, calendar pages, and crud-testing page
+    - Verified correct import pattern: `from '@/composables/shared/useXxx'`
+    - No old import paths remaining (verified via grep search)
+    - Dev server runs successfully with new import structure
+  - Verification: ✅ All existing components import correctly from shared folder, dev server starts successfully
   - Assigned to: Cursor
 
 ### **Owner-Specific Smart Components**
