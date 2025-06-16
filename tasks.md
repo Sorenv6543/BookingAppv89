@@ -738,27 +738,45 @@
   - Assigned to: Cursor
 
 ### **Page Structure Updates**
-- [ ] **TASK-039R**: Implement role-based routing in pages/index.vue
-  - Status: Not Started
+- [x] **TASK-039R**: Implement role-based routing in pages/index.vue
+  - Status: Complete
   - Requirements:
-    - Check user role in `setup()` function
-    - Route to `HomeOwner.vue` if user role is 'owner'
-    - Route to `HomeAdmin.vue` if user role is 'admin' 
-    - Add fallback routing for unauthenticated users
-    - Implement proper loading state during role check
+    - ✅ Check user role in `setup()` function
+    - ✅ Route to `HomeOwner.vue` if user role is 'owner'
+    - ✅ Route to `HomeAdmin.vue` if user role is 'admin' 
+    - ✅ Add fallback routing for unauthenticated users
+    - ✅ Implement proper loading state during role check
+  - Implementation Details:
+    - Updated auth store with role-specific computed properties (isOwner, isAdmin, isCleaner)
+    - Implemented dynamic component rendering using computed property
+    - Added loading state with progress spinner during authentication check
+    - Created inline AuthPrompt component for unauthenticated users with mock login buttons
+    - Added proper TypeScript typing and error handling for edge cases
+    - Implemented smooth transitions between role-based components
+    - Added comprehensive documentation about frontend filtering vs backend security
   - Code Pattern:
     ```vue
     <template>
-      <component :is="homeComponent" />
+      <div v-if="authStore.loading" class="loading-container">
+        <!-- Loading spinner -->
+      </div>
+      <component v-else :is="homeComponent" />
     </template>
     <script setup>
     const homeComponent = computed(() => {
+      if (!authStore.isAuthenticated) return AuthPrompt;
       if (authStore.isAdmin) return HomeAdmin;
       if (authStore.isOwner) return HomeOwner;
-      return AuthLogin; // fallback
+      return AuthPrompt; // fallback
     });
     </script>
     ```
+  - Security Notes: Frontend filtering for UX only - backend RLS required for real security
+  - Testing: Mock login buttons allow testing both admin and owner interfaces
+  - Files Modified:
+    - `src/pages/index.vue` - Main role-based routing implementation
+    - `src/stores/auth.ts` - Added role-specific computed properties
+    - `src/composables/owner/useOwnerProperties.ts` - Fixed TypeScript errors
   - Assigned to: Cursor
 
 - [ ] **TASK-039S**: Create owner-specific pages structure

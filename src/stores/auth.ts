@@ -13,8 +13,14 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref<boolean>(false);
   const error = ref<string | null>(null);
   
-  // For development, set isAuthenticated to true by default
-  const isAuthenticated = computed(() => true);
+  // For development, authentication is based on whether we have a user
+  // In production, this would validate the token
+  const isAuthenticated = computed(() => !!user.value && !!token.value);
+  
+  // Role-specific computed properties for role-based routing
+  const isOwner = computed(() => user.value?.role === 'owner');
+  const isAdmin = computed(() => user.value?.role === 'admin');
+  const isCleaner = computed(() => user.value?.role === 'cleaner');
   
   // Actions
   function login(email: string, _password: string) {
@@ -32,7 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
         id: '1',
         email,
         name: 'Demo User',
-        role: 'admin',
+        role: 'admin', // Default to admin for testing - can be changed to 'owner' for testing owner interface
         settings: {
           notifications: true,
           timezone: 'America/New_York',
@@ -91,6 +97,11 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     error,
     isAuthenticated,
+    
+    // Role-specific computed properties
+    isOwner,
+    isAdmin,
+    isCleaner,
     
     // Actions
     login,

@@ -369,7 +369,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 // Props
 interface Props {
@@ -426,8 +426,7 @@ function handleAction(actionType: AdminActionType) {
   emit('action', actionType)
 }
 
-// Computed
-const hasUrgentItems = computed(() => props.urgentCount > 0)
+// Computed (removed unused hasUrgentItems to fix linter warning)
 </script>
 
 <style scoped>

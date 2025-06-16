@@ -218,10 +218,10 @@ export function useOwnerProperties() {
       }
       
       // Use base composable's update function
-      const success = await baseProperties.updateProperty(id, updates);
+      const updateSuccess = await baseProperties.updateProperty(id, updates);
       
-      if (success) {
-        this.success.value = 'Your property has been updated successfully';
+      if (updateSuccess) {
+        success.value = 'Your property has been updated successfully';
         loading.value = false;
         return true;
       } else {
@@ -265,10 +265,10 @@ export function useOwnerProperties() {
       }
       
       // Use base composable's delete function
-      const success = await baseProperties.deleteProperty(id);
+      const deleteSuccess = await baseProperties.deleteProperty(id);
       
-      if (success) {
-        this.success.value = 'Your property has been deleted successfully';
+      if (deleteSuccess) {
+        success.value = 'Your property has been deleted successfully';
         loading.value = false;
         return true;
       } else {
@@ -319,10 +319,10 @@ export function useOwnerProperties() {
       }
       
       // Use base composable's toggle function
-      const success = await baseProperties.togglePropertyStatus(id, active);
+      const toggleSuccess = await baseProperties.togglePropertyStatus(id, active);
       
-      if (success) {
-        this.success.value = `Your property has been ${active ? 'activated' : 'deactivated'} successfully`;
+      if (toggleSuccess) {
+        success.value = `Your property has been ${active ? 'activated' : 'deactivated'} successfully`;
         loading.value = false;
         return true;
       } else {
