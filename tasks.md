@@ -864,14 +864,74 @@
   - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2
   - Assigned to: Cursor
 
-- [ ] **TASK-039V**: Update authentication flow for role-based routing
-  - Status: Not Started
+- [x] **TASK-039V**: Update authentication flow for role-based routing
+  - Status: Complete
   - Requirements:
-    - Update login success to route based on user role
-    - Update logout to clear role-specific state
-    - Add role selection during user registration
-    - Implement role switching for admin users (if needed)
-    - Update auth composable to handle role-based navigation
+    - ✅ Update login success to route based on user role
+    - ✅ Update logout to clear role-specific state
+    - ✅ Add role selection during user registration
+    - ✅ Implement role switching for admin users (if needed)
+    - ✅ Update auth composable to handle role-based navigation
+  - Implementation Details:
+    - **Enhanced Auth Store**: Updated `src/stores/auth.ts` with comprehensive role-based authentication
+      - Role-based computed properties with temp view mode support for admin switching
+      - Async login/logout/register functions returning success booleans for component navigation
+      - Admin role switching functionality (`switchToOwnerView`, `switchToAdminView`)
+      - Proper TypeScript typing with PropertyOwner, Admin, Cleaner interfaces
+      - Mock user data with correct type assertions for development
+      - Role-specific user creation from registration data
+    - **Enhanced Login Page**: Updated `src/pages/auth/login.vue` with role-based navigation
+      - Modern Vuetify UI with gradient background and glassmorphism effects
+      - Form validation with email/password rules
+      - Role-based navigation after successful login using `getDefaultRouteForRole`
+      - Demo account buttons for quick testing (owner/admin)
+      - Error and success alert handling with proper integration
+      - Navigation to registration page
+    - **Enhanced Registration Page**: Updated `src/pages/auth/signup.vue` with comprehensive role selection
+      - Role selection radio group with descriptions for owner/admin/cleaner
+      - Personal information fields with validation
+      - Conditional company name field for property owners
+      - Password strength validation and confirmation
+      - Terms and conditions checkbox with modal dialogs
+      - Role-based navigation after successful registration
+      - Responsive design with proper validation
+    - **Admin Role Switching**: Enhanced `src/components/dumb/admin/AdminRoleSwitcher.vue`
+      - Dropdown menu for view switching between admin and owner perspectives
+      - Visual indicators for current view mode
+      - Support action buttons for owner view
+      - Admin support mode information and utilities
+      - Proper event emission for parent components
+      - Styled with Vuetify theming and smooth transitions
+    - **Auth Helpers**: Enhanced `src/utils/authHelpers.ts` with comprehensive utilities
+      - `getDefaultRouteForRole()` for role-based routing
+      - `getRoleSpecificSuccessMessage()` for role-aware messaging
+      - `clearAllRoleSpecificState()` for localStorage cleanup
+      - `canSwitchToRole()` for role switching validation
+      - `validateRoleNavigation()` for navigation validation
+      - Role display names and available roles for UI
+    - **Main Page Integration**: Updated `src/pages/index.vue` with better auth store integration
+      - Enhanced AuthPrompt component with navigation to login page
+      - Support for admin temp view mode in component selection
+      - Improved mock login functions with success notifications
+      - Removed unused store imports and functions
+    - **Demo Component**: Created `src/pages/demos/auth-flow.vue` for testing
+      - Comprehensive testing interface for all auth functionality
+      - Authentication state display and role switching testing
+      - Navigation testing and auth helpers demonstration
+      - Admin role switching component integration
+      - Success/error message handling
+  - Root Cause Analysis: The auth system was partially implemented but lacked proper integration between the auth store and composable, and needed enhanced role-based navigation
+  - Solution: Created a comprehensive role-based authentication system with proper store integration, role switching for admins, and enhanced UI components
+  - Files Modified:
+    - `src/stores/auth.ts` - Major enhancement with role-based features
+    - `src/pages/auth/login.vue` - Enhanced with role-based navigation
+    - `src/pages/auth/signup.vue` - Enhanced with role selection
+    - `src/components/dumb/admin/AdminRoleSwitcher.vue` - Fixed emit types
+    - `src/utils/authHelpers.ts` - Enhanced with comprehensive utilities
+    - `src/pages/index.vue` - Better auth store integration
+    - `src/pages/demos/auth-flow.vue` - New demo component for testing
+  - Testing: Demo component allows testing all auth functionality including role switching, navigation, and state management
+  - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2. All role-based patterns follow established multi-tenant architecture.
   - Assigned to: Cursor
 
 ### **Bug Fixes & Layout Issues**

@@ -22,15 +22,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useUIStore } from '@/stores/ui'
 
 // Role-based component imports
 import HomeOwner from '@/components/smart/owner/HomeOwner.vue'
 import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
 
-// Auth store
+// Stores
 const authStore = useAuthStore()
+const uiStore = useUIStore()
 
 // Simple auth prompt component for unauthenticated users
 const AuthPrompt = {
@@ -65,8 +67,9 @@ const AuthPrompt = {
                 block
                 @click="handleMockLogin"
                 :loading="authStore.loading"
+                class="mb-2"
               >
-                <v-icon class="mr-2">mdi-account-circle</v-icon>
+                <v-icon class="mr-2">mdi-shield-account</v-icon>
                 Mock Login (Admin)
               </v-btn>
               
@@ -75,13 +78,29 @@ const AuthPrompt = {
                 variant="outlined"
                 size="large"
                 block
-                class="mt-2"
                 @click="handleMockOwnerLogin"
                 :loading="authStore.loading"
+                class="mb-4"
               >
                 <v-icon class="mr-2">mdi-home-account</v-icon>
                 Mock Login (Owner)
               </v-btn>
+              
+              <v-divider class="my-4" />
+              
+              <div class="text-center">
+                <p class="text-body-2 mb-2">
+                  Or use the full authentication flow:
+                </p>
+                <v-btn
+                  color="primary"
+                  variant="text"
+                  @click="goToLogin"
+                  :disabled="authStore.loading"
+                >
+                  Go to Login Page
+                </v-btn>
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -90,22 +109,32 @@ const AuthPrompt = {
   `,
   setup() {
     const handleMockLogin = async () => {
-      await authStore.login('admin@example.com', 'password')
+      const success = await authStore.login('admin@example.com', 'password')
+      if (success) {
+        // Show success notification
+        uiStore.addNotification('success', 'Welcome!', authStore.getSuccessMessage('login'))
+      }
     }
     
     const handleMockOwnerLogin = async () => {
-      // Temporarily set user as owner for testing
-      await authStore.login('owner@example.com', 'password')
-      if (authStore.user) {
-        authStore.user.role = 'owner'
-        authStore.user.name = 'Property Owner'
+      const success = await authStore.login('owner@example.com', 'password')
+      if (success) {
+        // Show success notification
+        uiStore.addNotification('success', 'Welcome!', authStore.getSuccessMessage('login'))
       }
+    }
+    
+    const goToLogin = () => {
+      // This would use router.push in a real component
+      window.location.href = '/auth/login'
     }
     
     return {
       authStore,
+      uiStore,
       handleMockLogin,
-      handleMockOwnerLogin
+      handleMockOwnerLogin,
+      goToLogin
     }
   }
 }
@@ -126,8 +155,12 @@ const homeComponent = computed(() => {
     return AuthPrompt
   }
   
-  // Show admin interface for admin users
+  // Show admin interface for admin users (considering temp view mode)
   if (authStore.isAdmin) {
+    // If admin is in owner view mode, show owner interface
+    if (authStore.tempViewMode?.role === 'owner') {
+      return HomeOwner
+    }
     return HomeAdmin
   }
   
@@ -140,6 +173,21 @@ const homeComponent = computed(() => {
   console.warn('Unknown user role:', authStore.user?.role)
   return AuthPrompt
 })
+
+// Note: Logout functionality is handled by individual components using the auth store
+// The auth store's logout method automatically clears auth state and cached data
+
+// Check authentication status on mount
+onMounted(async () => {
+  try {
+    await authStore.checkAuth()
+  } catch (error) {
+    console.error('Auth check failed:', error)
+  }
+})
+
+// Note: In a real app, the logout function would be provided through a global composable
+// or context provider rather than exposing it globally
 </script>
 
 <style scoped>
@@ -156,5 +204,20 @@ const homeComponent = computed(() => {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+/* Auth prompt styling */
+.fill-height {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.v-card {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.v-btn {
+  text-transform: none;
 }
 </style> 
