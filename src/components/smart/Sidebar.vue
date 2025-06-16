@@ -149,9 +149,9 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 
 // Define props with default vales
 interface Props {
-  todayTurns?: Map<string, Bookin> | Booking[];
+  todayTurns?: Map<string, Booking> | Booking[];
   upcomingCleanings?: Map<string,Booking> | Booking[];
-  properties?: Map<string Property> | Property[];
+  properties?: Map<string, Property> | Property[];
   loading?: boolean;
 }
 
