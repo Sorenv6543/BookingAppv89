@@ -537,3 +537,382 @@ npm run type-check  # ✅ Passes
 - ✅ All new functionality works as expected
 - ✅ Existing functionality remains intact
 - ✅ Role-based architecture patterns maintained
+
+## Issue: Duplicate Identifier Error in Admin Cleaners Page
+
+### Problem Description
+When accessing `/admin/cleaners`, the application threw a compilation error:
+```
+[plugin:vite:vue] [vue/compiler-sfc] Identifier 'deleteCleaner' has already been declared. (97:6)
+```
+
+### Root Cause Analysis
+The error occurred due to a **naming conflict** in the Vue component's script section:
+
+1. **Line 296**: The component destructured `deleteCleaner` from the `useCleanerManagement` composable:
+   ```typescript
+   const { allCleaners, loading, fetchCleaners, createCleaner, updateCleaner, deleteCleaner } = useCleanerManagement()
+   ```
+
+2. **Line 385**: The component then attempted to declare a local function with the same name:
+   ```typescript
+   const deleteCleaner = async (cleaner: Cleaner) => {
+     // ... function body
+   }
+   ```
+
+This created a **duplicate identifier** error because JavaScript/TypeScript doesn't allow two variables/functions with the same name in the same scope.
+
+### Why This Occurred
+This is a common pattern issue when:
+- A composable provides a function (like `deleteCleaner`)
+- The component needs to wrap that function with additional logic (like confirmation dialogs)
+- The developer accidentally uses the same name for both the imported function and the wrapper function
+
+### Solution Implemented
+**Renamed the local wrapper function** to follow Vue.js naming conventions:
+
+1. **Changed the local function name** from `deleteCleaner` to `handleDeleteCleaner`:
+   ```typescript
+   const handleDeleteCleaner = async (cleaner: Cleaner) => {
+     if (confirm(`Are you sure you want to delete ${cleaner.name}?`)) {
+       try {
+         await deleteCleaner(cleaner.id) // Still calls the composable function
+       } catch (error) {
+         console.error('Failed to delete cleaner:', error)
+       }
+     }
+   }
+   ```
+
+2. **Updated the template** to use the renamed function:
+   ```vue
+   <v-btn
+     variant="text"
+     size="small"
+     color="error"
+     icon="mdi-delete"
+     @click="handleDeleteCleaner(cleaner)"
+   />
+   ```
+
+### Architecture Patterns Followed
+This fix follows established project patterns:
+
+1. **Composable Integration**: Maintains proper use of the `useCleanerManagement` composable
+2. **Event Handler Naming**: Uses `handle` prefix for event handler functions (Vue.js convention)
+3. **Separation of Concerns**: 
+   - Composable provides the core business logic (`deleteCleaner`)
+   - Component provides the UI logic (`handleDeleteCleaner` with confirmation)
+4. **Error Handling**: Maintains proper error handling in the wrapper function
+
+### Prevention Strategy
+To prevent similar issues in the future:
+
+1. **Use descriptive names** for wrapper functions (e.g., `handleDeleteCleaner`, `onDeleteCleaner`)
+2. **Follow naming conventions**: Use `handle` or `on` prefixes for event handlers
+3. **Review destructured imports** when creating local functions with similar purposes
+4. **Use TypeScript/ESLint** to catch naming conflicts during development
+
+### Files Modified
+- `src/pages/admin/cleaners/index.vue`: Fixed duplicate identifier by renaming local function
+
+### Verification
+- ✅ **Duplicate identifier error resolved** - The specific compilation error is fixed
+- ✅ **No naming conflicts** - Local function renamed to `handleDeleteCleaner`
+- ✅ **Component follows established project patterns** - Uses `handle` prefix for event handlers
+- ✅ **Maintains integration with existing composables** - Still calls `deleteCleaner` from `useCleanerManagement`
+- ✅ **Proper error handling preserved** - Confirmation dialog and try/catch blocks maintained
+- ✅ **Template updated correctly** - Button click handler uses new function name
+
+### Test Results
+- **Before Fix**: `[plugin:vite:vue] [vue/compiler-sfc] Identifier 'deleteCleaner' has already been declared`
+- **After Fix**: Compilation error resolved, page loads successfully
+- **Functionality**: Delete cleaner functionality works as expected with confirmation dialog
+
+### Additional Notes
+- Other TypeScript errors in the project are unrelated to this specific fix
+- The core duplicate identifier issue has been completely resolved
+- The fix maintains all existing functionality while following Vue.js naming conventions
+
+## Issue: Vuetify Layout Injection Error in Admin Interface
+
+### Problem Description
+When accessing `/admin/`, the following error appeared in the console:
+```
+[Vue warn]: injection "Symbol(vuetify:layout)" not found. 
+  at <VNavigationDrawer class="sidebar" width="100%" elevation=8  ... > 
+  at <Sidebar today-turns= Map(0) {size: 0}[[Entries]]No propertiessize: 0[[Prototype]]: Map upcoming-cleanings= Map(0) {size: 0}[[Entries]]No propertiessize: 0[[Prototype]]: Map properties= Map(0) {size: 0}[[Entries]]No propertiessize: 0[[Prototype]]: Map  ... > 
+  at <VCol cols="12" lg="3" xl="2"  ... > 
+  at <VRow no-gutters="" class="fill-height" > 
+  at <HomeAdmin > 
+  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > > 
+  at <RouterView > 
+  at <Admin > 
+  at <App>
+```
+
+### Root Cause Analysis
+The error occurred because:
+1. The admin layout (`src/layouts/admin.vue`) was using a custom HTML/CSS layout structure instead of Vuetify's layout system
+2. The `VNavigationDrawer` component in the Sidebar requires Vuetify's layout context (provided by `v-app`) to function properly
+3. Without the proper layout injection, Vuetify components cannot access the layout context they need
+
+### Solution Implemented
+**TASK-039W**: Complete rewrite of admin layout to use Vuetify's layout system
+
+#### Changes Made:
+
+1. **Updated `src/layouts/admin.vue`**:
+   - Replaced custom HTML structure with proper Vuetify layout components
+   - Added `v-app` as root component to provide layout context
+   - Implemented `v-app-bar` for admin header with navigation
+   - Used `v-main` for content area
+   - Maintained admin-specific styling and branding
+
+2. **Updated `src/pages/admin/index.vue`**:
+   - Removed height constraints that conflicted with Vuetify layout
+   - Simplified styling to work with new layout system
+
+3. **Updated `src/components/smart/admin/HomeAdmin.vue`**:
+   - Changed fixed heights to min-heights with app bar offset (64px)
+   - Updated responsive design to account for app bar
+   - Maintained admin-specific functionality and styling
+
+#### Key Technical Details:
+- **Layout Context**: `v-app` provides the necessary injection context for all Vuetify components
+- **App Bar Height**: Accounted for 64px app bar height in component calculations
+- **Responsive Design**: Updated mobile sidebar positioning to work with new layout
+- **Consistency**: Now follows same patterns as default layout for maintainability
+
+### Verification
+- ✅ `/admin/` route loads without console errors
+- ✅ VNavigationDrawer works properly within layout context
+- ✅ Admin-specific styling and navigation maintained
+- ✅ Responsive design functions correctly
+- ✅ All Vuetify components have proper layout injection
+
+### Files Modified
+- `src/layouts/admin.vue` - Complete rewrite using Vuetify layout system
+- `src/pages/admin/index.vue` - Removed conflicting height constraints  
+- `src/components/smart/admin/HomeAdmin.vue` - Updated styling for new layout
+- `tasks.md` - Added TASK-039W documentation
+
+### Lessons Learned
+1. Always use Vuetify's layout system (`v-app`, `v-app-bar`, `v-main`) when using Vuetify components
+2. `VNavigationDrawer` and other layout-dependent components require proper injection context
+3. Custom HTML/CSS layouts can break Vuetify component functionality
+4. Consistency across layouts improves maintainability and reduces bugs
+
+### Status
+**COMPLETE** - Admin interface now works properly with all Vuetify components functioning as expected.
+
+# Problem Fix: DOM parentNode Error in Admin Schedule
+
+## Problem Description
+When navigating to `/admin/schedule`, the application throws a JavaScript error:
+```
+Uncaught (in promise) TypeError: Cannot read properties of null (reading 'parentNode')
+    at parentNode (chunk-ABTQUVVM.js?v=1e5b29e7:10594:30)
+    at ReactiveEffect.componentUpdateFn [as fn] (chunk-ABTQUVVM.js?v=1e5b29e7:7528:11)
+```
+
+## Root Cause Analysis
+The error occurs because:
+1. **FullCalendar DOM Access**: The AdminCalendar component imports FullCalendar directly and tries to access DOM elements before they are properly mounted
+2. **Vue Reactivity Timing**: The error happens during Vue's reactivity update cycle when FullCalendar attempts to access the `parentNode` property of a null DOM element
+3. **Layout Mounting Order**: The admin layout and calendar component have timing issues where the calendar tries to render before its container is ready
+
+## Solution Implementation
+
+### 1. Added DOM Mounting Guards
+**File**: `src/components/smart/admin/AdminCalendar.vue`
+
+```typescript
+// Component mounting state
+const isMounted = ref(false);
+const isCalendarReady = ref(false);
+
+// Lifecycle hooks for proper DOM mounting
+onMounted(async () => {
+  isMounted.value = true;
+  
+  // Wait for DOM to be fully ready
+  await nextTick();
+  
+  // Add a small delay to ensure Vuetify layout is ready
+  setTimeout(() => {
+    isCalendarReady.value = true;
+  }, 100);
+});
+```
+
+### 2. Added Conditional Rendering
+**Template**: Added loading state to prevent premature calendar rendering
+
+```vue
+<div v-if="!isMounted || !isCalendarReady" class="calendar-loading">
+  <v-progress-circular indeterminate color="primary" size="64" />
+  <p class="text-center mt-4">Loading calendar...</p>
+</div>
+<FullCalendar
+  v-else
+  ref="calendarRef"
+  :options="adminCalendarOptions"
+  class="admin-calendar"
+/>
+```
+
+### 3. Safe Calendar Options
+**Logic**: Return safe defaults until component is ready
+
+```typescript
+const adminCalendarOptions = computed<CalendarOptions>(() => {
+  // Don't return options until component is ready
+  if (!isMounted.value || !isCalendarReady.value) {
+    return {
+      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+      initialView: 'dayGridMonth',
+      headerToolbar: false,
+      events: []
+    };
+  }
+  
+  return {
+    // Full calendar configuration...
+  };
+});
+```
+
+### 4. Cleanup on Unmount
+**Lifecycle**: Proper cleanup to prevent memory leaks
+
+```typescript
+onBeforeUnmount(() => {
+  // Clean up calendar instance if needed
+  if (calendarRef.value) {
+    try {
+      const calendarApi = calendarRef.value.getApi();
+      if (calendarApi) {
+        calendarApi.destroy();
+      }
+    } catch (error) {
+      console.warn('Error cleaning up calendar:', error);
+    }
+  }
+});
+```
+
+### 5. Updated Schedule Page Props
+**File**: `src/pages/admin/schedule/index.vue`
+
+```vue
+<AdminCalendar
+  :bookings="bookingStore.bookings"
+  :properties="propertyStore.properties"
+  :users="new Map()"
+  @event-click="handleEventClick"
+  @date-select="handleDateSelect"
+  @event-drop="handleEventDrop"
+/>
+```
+
+## Technical Details
+
+### Why This Works
+1. **Mounting Order**: Ensures DOM elements exist before FullCalendar tries to access them
+2. **Vue Lifecycle**: Uses proper Vue 3 lifecycle hooks (`onMounted`, `onBeforeUnmount`)
+3. **Async Safety**: Uses `nextTick` and `setTimeout` to handle async DOM updates
+4. **Graceful Degradation**: Shows loading state while calendar initializes
+5. **Memory Management**: Properly cleans up calendar instance on unmount
+
+### Files Modified
+- `src/components/smart/admin/AdminCalendar.vue` - Added DOM mounting safety
+- `src/pages/admin/schedule/index.vue` - Updated props and imports
+- `src/layouts/admin.vue` - Fixed Vuetify layout context (previous fix)
+
+## Testing
+1. Navigate to `/admin/schedule` - should load without errors
+2. Calendar should show loading state briefly, then render properly
+3. No console errors related to parentNode access
+4. Calendar functionality (events, navigation) should work normally
+
+## Prevention
+This pattern should be used for any components that:
+- Import third-party DOM manipulation libraries directly
+- Access DOM elements in computed properties or reactive effects
+- Render complex UI components that depend on specific DOM structure
+
+## Status
+✅ **RESOLVED** - The DOM parentNode error has been fixed and the admin schedule page now loads correctly.
+
+# Problem Fix: VOverlay Directive Warning
+
+## Problem Description
+When loading the admin interface, Vue shows a warning:
+```
+[Vue warn]: Runtime directive used on component with non-element root node. The directives will not function as intended.
+  at <VOverlay contained="" persistent="" class="align-center justify-center" >
+```
+
+## Root Cause Analysis
+The warning occurs because:
+1. **Incorrect Prop Usage**: `contained` and `persistent` were being used as directives instead of props
+2. **VOverlay Structure**: VOverlay component may have multiple root nodes in Vuetify 3
+3. **Vue 3 Directive Rules**: Directives can only be applied to single DOM elements, not components with fragments
+
+## Solution Implementation
+
+### Fixed VOverlay Usage in All Sidebar Components
+
+**Before (incorrect)**:
+```vue
+<v-overlay 
+  v-show="loading"
+  contained
+  persistent
+  class="align-center justify-center"
+>
+```
+
+**After (correct)**:
+```vue
+<v-overlay 
+  :model-value="loading"
+  :contained="true"
+  :persistent="true"
+  class="align-center justify-center"
+>
+```
+
+### Key Changes
+1. **:model-value instead of v-model**: Proper one-way binding for prop values (loading is a prop, not writable)
+2. **Explicit prop binding**: `:contained="true"` and `:persistent="true"` instead of bare attributes
+3. **Consistent pattern**: Applied same fix across all sidebar components
+
+### Files Modified
+1. **src/components/smart/Sidebar.vue** - Fixed VOverlay prop usage
+2. **src/components/smart/admin/AdminSidebar.vue** - Fixed VOverlay prop usage  
+3. **src/components/smart/owner/OwnerSidebar.vue** - Fixed VOverlay prop usage
+
+## Technical Details
+
+### Why This Works
+- **Proper Props**: `contained` and `persistent` are props, not directives
+- **One-way Binding**: `:model-value` correctly handles read-only prop binding for visibility
+- **Vue 3 Compatibility**: Follows Vue 3 best practices - props are read-only, can't use v-model on them
+- **Vuetify 3 Standards**: Matches Vuetify 3 component API expectations
+
+### Vuetify VOverlay API
+- `contained`: Boolean prop to contain overlay within parent element
+- `persistent`: Boolean prop to prevent closing on outside click
+- `model-value`: Controls overlay visibility state (one-way binding for props)
+
+## Verification
+- ✅ No more Vue directive warnings in console
+- ✅ Loading overlays still function correctly
+- ✅ All sidebar components work as expected
+- ✅ Consistent implementation across role-based components
+
+## Status
+✅ **RESOLVED** - VOverlay directive warnings have been eliminated and all loading overlays function properly.

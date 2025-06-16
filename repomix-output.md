@@ -175,6 +175,7 @@ src/pages/demos/home-admin.vue
 src/pages/demos/index.vue
 src/pages/demos/owner-calendar.vue
 src/pages/demos/owner-sidebar.vue
+src/pages/demos/role-routing.vue
 src/pages/demos/sidebar.vue
 src/pages/index.vue
 src/pages/properties/index.vue
@@ -203,5231 +204,230 @@ vitest.config.ts
 
 # Files
 
-## File: src/components/demos/AdminQuickActionsDemo.vue
+## File: src/pages/demos/role-routing.vue
 `````vue
 <template>
-  <v-container>
+  <v-container class="pa-4">
     <v-row>
       <v-col cols="12">
-        <h1 class="text-h4 mb-4">AdminQuickActions Demo</h1>
-        <p class="text-body-1 mb-6">
-          This demo showcases the AdminQuickActions component with various states and configurations.
-        </p>
-      </v-col>
-    </v-row>
-    <v-row>
-      <!-- Demo Controls -->
-      <v-col cols="12" md="4">
-        <v-card variant="outlined" class="mb-4">
-          <v-card-title class="text-h6">Demo Controls</v-card-title>
-          <v-card-text>
-            <v-switch
-              v-model="loading"
-              label="Loading State"
-              color="primary"
-              class="mb-2"
-            />
-            <v-switch
-              v-model="disabled"
-              label="Disabled State"
-              color="secondary"
-              class="mb-2"
-            />
-            <v-slider
-              v-model="urgentCount"
-              label="Urgent Count"
-              :min="0"
-              :max="20"
-              :step="1"
-              thumb-label
-              class="mb-2"
-            />
-            <v-slider
-              v-model="todayBookings"
-              label="Today Bookings"
-              :min="0"
-              :max="50"
-              :step="1"
-              thumb-label
-              class="mb-2"
-            />
-            <v-slider
-              v-model="unassignedCount"
-              label="Unassigned Count"
-              :min="0"
-              :max="30"
-              :step="1"
-              thumb-label
-              class="mb-2"
-            />
-            <v-slider
-              v-model="completedToday"
-              label="Completed Today"
-              :min="0"
-              :max="25"
-              :step="1"
-              thumb-label
-              class="mb-2"
-            />
-            <v-select
-              v-model="selectedVariant"
-              :items="variantOptions"
-              label="Card Variant"
-              variant="outlined"
-              class="mb-2"
-            />
-            <v-slider
-              v-model="elevation"
-              label="Elevation"
-              :min="0"
-              :max="24"
-              :step="1"
-              thumb-label
-            />
-          </v-card-text>
-        </v-card>
-        <!-- Action Log -->
-        <v-card variant="outlined">
-          <v-card-title class="text-h6 d-flex align-center">
-            Action Log
-            <v-spacer />
-            <v-btn
-              size="small"
-              variant="text"
-              @click="actionLog = []"
-            >
-              Clear
-            </v-btn>
+        <v-card elevation="4" class="pa-4">
+          <v-card-title class="text-h4 text-center mb-4">
+            <v-icon class="mr-2" color="primary">mdi-account-switch</v-icon>
+            Role-Based Routing Demo
           </v-card-title>
           <v-card-text>
-            <div v-if="actionLog.length === 0" class="text-center text-medium-emphasis py-4">
-              No actions performed yet
-            </div>
-            <v-list v-else density="compact">
-              <v-list-item
-                v-for="(action, index) in actionLog.slice().reverse()"
-                :key="index"
-                class="px-0"
-              >
-                <v-list-item-title class="text-body-2">
-                  <v-chip size="x-small" color="primary" class="mr-2">
-                    {{ actionLog.length - index }}
-                  </v-chip>
-                  {{ formatActionType(action.type) }}
-                </v-list-item-title>
-                <v-list-item-subtitle class="text-caption">
-                  {{ action.timestamp.toLocaleTimeString() }}
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <!-- AdminQuickActions Demo -->
-      <v-col cols="12" md="8">
-        <v-card variant="outlined">
-          <v-card-title class="text-h6">AdminQuickActions Component</v-card-title>
-          <v-card-text>
-            <AdminQuickActions
-              :loading="loading"
-              :disabled="disabled"
-              :elevation="elevation"
-              :variant="selectedVariant"
-              :urgent-count="urgentCount"
-              :today-bookings="todayBookings"
-              :unassigned-count="unassignedCount"
-              :completed-today="completedToday"
-              @action="handleAction"
-            />
-          </v-card-text>
-        </v-card>
-        <!-- Component Info -->
-        <v-card variant="outlined" class="mt-4">
-          <v-card-title class="text-h6">Component Features</v-card-title>
-          <v-card-text>
-            <v-list>
-              <v-list-item>
-                <v-list-item-title>Critical Actions</v-list-item-title>
-                <v-list-item-subtitle>
-                  Urgent turns management and cleaner assignment with visual indicators
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>Primary Management</v-list-item-title>
-                <v-list-item-subtitle>
-                  Master calendar access and new booking creation
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>Bulk Operations</v-list-item-title>
-                <v-list-item-subtitle>
-                  Collapsible section for bulk assignment and rescheduling
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>Business Management</v-list-item-title>
-                <v-list-item-subtitle>
-                  Cleaner management, reports, properties, and system settings
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>Quick Stats</v-list-item-title>
-                <v-list-item-subtitle>
-                  Optional statistics display for today's metrics
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>Responsive Design</v-list-item-title>
-                <v-list-item-subtitle>
-                  Adaptive layout with mobile-optimized text and spacing
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-⋮----
-<!-- Demo Controls -->
-⋮----
-<!-- Action Log -->
-⋮----
-{{ actionLog.length - index }}
-⋮----
-{{ formatActionType(action.type) }}
-⋮----
-{{ action.timestamp.toLocaleTimeString() }}
-⋮----
-<!-- AdminQuickActions Demo -->
-⋮----
-<!-- Component Info -->
-⋮----
-<script setup lang="ts">
-import { ref } from 'vue'
-import AdminQuickActions from '@/components/dumb/admin/AdminQuickActions.vue'
-// Demo state
-const loading = ref(false)
-const disabled = ref(false)
-const urgentCount = ref(3)
-const todayBookings = ref(12)
-const unassignedCount = ref(5)
-const completedToday = ref(8)
-const elevation = ref(2)
-const selectedVariant = ref<'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'>('elevated')
-// Variant options
-const variantOptions = [
-  { title: 'Elevated', value: 'elevated' },
-  { title: 'Flat', value: 'flat' },
-  { title: 'Tonal', value: 'tonal' },
-  { title: 'Outlined', value: 'outlined' },
-  { title: 'Text', value: 'text' },
-  { title: 'Plain', value: 'plain' }
-]
-// Action log
-interface ActionLogEntry {
-  type: string
-  timestamp: Date
-}
-const actionLog = ref<ActionLogEntry[]>([])
-// Methods
-function handleAction(actionType: string) {
-  actionLog.value.push({
-    type: actionType,
-    timestamp: new Date()
-  })
-  // Keep only last 20 actions
-  if (actionLog.value.length > 20) {
-    actionLog.value = actionLog.value.slice(-20)
-  }
-  console.log('Admin action triggered:', actionType)
-}
-function formatActionType(actionType: string): string {
-  return actionType
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
-</script>
-<style scoped>
-.v-slider {
-  margin-bottom: 8px;
-}
-.v-list-item {
-  min-height: 40px;
-}
-</style>
-`````
-
-## File: src/components/dumb/admin/AdminBookingForm.vue
-`````vue
-<template>
-  <v-dialog
-    v-model="isOpen"
-    max-width="800px"
-    persistent
-    scrollable
-    @keydown.esc="handleClose"
-  >
-    <v-card>
-      <v-card-title class="text-h5 pb-2 d-flex align-center">
-        {{ formTitle }}
-        <v-chip
-          v-if="form.booking_type === 'turn'"
-          color="error"
-          size="small"
-          class="ml-2"
-          variant="elevated"
-        >
-          <v-icon start>mdi-clock-alert</v-icon>
-          URGENT TURN
-        </v-chip>
-        <v-chip
-          v-if="form.priority === 'high'"
-          color="warning"
-          size="small"
-          class="ml-2"
-        >
-          HIGH PRIORITY
-        </v-chip>
-        <v-spacer />
-        <v-chip
-          :color="getStatusColor(form.status)"
-          variant="tonal"
-          size="small"
-        >
-          {{ form.status?.toUpperCase() }}
-        </v-chip>
-      </v-card-title>
-      <v-divider />
-      <v-card-text class="pa-0">
-        <v-form
-          ref="formRef"
-          v-model="formValid"
-          @submit.prevent="handleSubmit"
-        >
-          <v-container>
-            <!-- Property and Owner Information -->
+            <v-alert
+              type="info"
+              variant="tonal"
+              class="mb-4"
+            >
+              <strong>TASK-039R Implementation Demo</strong><br>
+              This page demonstrates the role-based routing system implemented in pages/index.vue.
+              The main application now dynamically renders different components based on user role.
+            </v-alert>
             <v-row>
-              <v-col cols="12" md="8">
-                <v-select
-                  v-model="form.property_id"
-                  :items="propertiesArray"
-                  item-title="name"
-                  item-value="id"
-                  label="Property"
-                  :rules="propertyRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('property_id')"
-                  prepend-inner-icon="mdi-home"
-                >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-avatar color="primary" size="small">
-                          <v-icon>mdi-home</v-icon>
-                        </v-avatar>
-                      </template>
-                      <template #subtitle>
-                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
-                      </template>
-                    </v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="form.status"
-                  :items="statusOptions"
-                  label="Booking Status"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('status')"
-                  prepend-inner-icon="mdi-clipboard-list"
-                >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-chip
-                          :color="getStatusColor(item.value)"
-                          size="x-small"
-                          variant="dot"
-                        />
-                      </template>
-                    </v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-            </v-row>
-            <!-- Dates and Times -->
-            <v-row>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="form.checkout_date"
-                  label="Checkout Date & Time"
-                  type="datetime-local"
-                  :rules="dateRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('checkout_date')"
-                  hint="When guests depart"
-                  persistent-hint
-                  prepend-inner-icon="mdi-calendar-export"
-                  @update:model-value="updateBookingType"
-                />
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="form.checkin_date"
-                  label="Checkin Date & Time"
-                  type="datetime-local"
-                  :rules="dateRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('checkin_date')"
-                  hint="When new guests arrive"
-                  persistent-hint
-                  prepend-inner-icon="mdi-calendar-import"
-                  @update:model-value="updateBookingType"
-                />
-              </v-col>
-            </v-row>
-            <!-- Cleaner Assignment Section -->
-            <v-row>
-              <v-col cols="12">
-                <v-card variant="outlined" class="mb-4">
-                  <v-card-title class="text-subtitle-1 py-2">
-                    <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
-                    Cleaner Assignment
+              <v-col cols="12" md="6">
+                <v-card variant="outlined" class="pa-3">
+                  <v-card-title class="text-h6">
+                    <v-icon class="mr-2" color="success">mdi-check-circle</v-icon>
+                    Current Implementation
                   </v-card-title>
-                  <v-divider />
                   <v-card-text>
-                    <v-row>
-                      <v-col cols="12" md="6">
-                        <v-select
-                          v-model="form.assigned_cleaner_id"
-                          :items="availableCleaners"
-                          item-title="name"
-                          item-value="id"
-                          label="Assigned Cleaner"
-                          variant="outlined"
-                          :disabled="loading"
-                          :error-messages="errors.get('assigned_cleaner_id')"
-                          clearable
-                          prepend-inner-icon="mdi-account"
-                        >
-                          <template #item="{ props, item }">
-                            <v-list-item v-bind="props">
-                              <template #prepend>
-                                <v-avatar :color="getCleanerAvailabilityColor(item.raw)" size="small">
-                                  <v-icon>mdi-account</v-icon>
-                                </v-avatar>
-                              </template>
-                              <template #subtitle>
-                                {{ getCleanerSubtitle(item.raw) }}
-                              </template>
-                              <template #append>
-                                <v-chip
-                                  :color="getCleanerAvailabilityColor(item.raw)"
-                                  size="x-small"
-                                  variant="dot"
-                                >
-                                  {{ getCleanerAvailabilityText(item.raw) }}
-                                </v-chip>
-                              </template>
-                            </v-list-item>
-                          </template>
-                        </v-select>
-                      </v-col>
-                      <v-col cols="12" md="6">
-                        <v-btn
-                          variant="outlined"
-                          color="primary"
-                          :disabled="!form.property_id || !form.checkout_date"
-                          @click="openCleanerAssignmentModal"
-                        >
-                          <v-icon start>mdi-magnify</v-icon>
-                          Find Best Cleaner
-                        </v-btn>
-                      </v-col>
-                    </v-row>
-                    <!-- Cleaner Details -->
-                    <v-row v-if="selectedCleaner">
-                      <v-col cols="12">
-                        <v-alert
-                          type="info"
-                          variant="tonal"
-                          class="mt-2"
-                        >
-                          <template #title>
-                            Cleaner: {{ selectedCleaner.name }}
-                          </template>
-                          <p class="mb-1">
-                            <strong>Skills:</strong> {{ selectedCleaner.skills.join(', ') }}
-                          </p>
-                          <p class="mb-1">
-                            <strong>Today's Bookings:</strong> {{ getCleanerTodayBookings(selectedCleaner.id) }}/{{ selectedCleaner.max_daily_bookings }}
-                          </p>
-                          <p class="mb-0">
-                            <strong>Performance Rating:</strong> 
-                            <v-rating
-                              :model-value="getCleanerRating(selectedCleaner.id)"
-                              readonly
-                              size="small"
-                              density="compact"
-                              class="d-inline-flex ml-2"
-                            />
-                          </p>
-                        </v-alert>
-                      </v-col>
-                    </v-row>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-            <!-- Booking Details -->
-            <v-row>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model.number="form.guest_count"
-                  label="Guest Count"
-                  type="number"
-                  min="1"
-                  max="20"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('guest_count')"
-                  hint="Affects cleaning duration estimate"
-                  persistent-hint
-                  prepend-inner-icon="mdi-account-group"
-                />
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-select
-                  v-model="form.priority"
-                  :items="priorityOptions"
-                  label="Priority Level"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('priority')"
-                  prepend-inner-icon="mdi-flag"
-                >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-icon :color="getPriorityColor(item.value)">
-                          {{ getPriorityIcon(item.value) }}
-                        </v-icon>
-                      </template>
-                    </v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-            </v-row>
-            <!-- Notes and Instructions -->
-            <v-row>
-              <v-col cols="12">
-                <v-textarea
-                  v-model="form.notes"
-                  label="Cleaning Instructions & Notes"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('notes')"
-                  hint="Special requirements, client preferences, or operational notes"
-                  persistent-hint
-                  :counter="500"
-                  rows="3"
-                  prepend-inner-icon="mdi-note-text"
-                />
-              </v-col>
-            </v-row>
-            <!-- Business Impact Alerts -->
-            <v-row v-if="showBusinessImpactAlert">
-              <v-col cols="12">
-                <v-alert
-                  :type="businessImpactAlert.type"
-                  variant="tonal"
-                  :title="businessImpactAlert.title"
-                  class="mb-0"
-                >
-                  <p v-for="message in businessImpactAlert.messages" :key="message" class="mb-1">
-                    {{ message }}
-                  </p>
-                </v-alert>
-              </v-col>
-            </v-row>
-            <!-- Validation Errors -->
-            <v-row v-if="showDateError">
-              <v-col cols="12">
-                <v-alert
-                  type="error"
-                  variant="tonal"
-                  title="Scheduling Conflict"
-                  text="Invalid date configuration detected. Please review checkout/checkin times."
-                  class="mb-0"
-                />
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-form>
-      </v-card-text>
-      <v-divider />
-      <v-card-actions class="pa-4">
-        <v-btn
-          color="grey-darken-1"
-          variant="text"
-          :disabled="loading"
-          @click="handleClose"
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          v-if="mode === 'edit'"
-          color="error"
-          variant="outlined"
-          :disabled="loading"
-          @click="handleDelete"
-        >
-          <v-icon start>mdi-delete</v-icon>
-          Delete
-        </v-btn>
-        <v-spacer />
-        <v-btn
-          v-if="mode === 'edit' && form.status !== 'completed'"
-          color="success"
-          variant="tonal"
-          :disabled="loading || !form.assigned_cleaner_id"
-          @click="handleMarkComplete"
-        >
-          <v-icon start>mdi-check</v-icon>
-          Mark Complete
-        </v-btn>
-        <v-btn
-          color="primary"
-          variant="elevated"
-          :loading="loading"
-          :disabled="!formValid"
-          @click="handleSubmit"
-        >
-          <v-icon start>{{ mode === 'create' ? 'mdi-plus' : 'mdi-content-save' }}</v-icon>
-          {{ submitButtonText }}
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-</template>
-⋮----
-{{ formTitle }}
-⋮----
-{{ form.status?.toUpperCase() }}
-⋮----
-<!-- Property and Owner Information -->
-⋮----
-<template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-avatar color="primary" size="small">
-                          <v-icon>mdi-home</v-icon>
-                        </v-avatar>
-                      </template>
-                      <template #subtitle>
-                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
-                      </template>
-                    </v-list-item>
-                  </template>
-⋮----
-<template #prepend>
-                        <v-avatar color="primary" size="small">
-                          <v-icon>mdi-home</v-icon>
-                        </v-avatar>
-                      </template>
-<template #subtitle>
-                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
-                      </template>
-⋮----
-{{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
-⋮----
-<template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-chip
-                          :color="getStatusColor(item.value)"
-                          size="x-small"
-                          variant="dot"
-                        />
-                      </template>
-                    </v-list-item>
-                  </template>
-⋮----
-<template #prepend>
-                        <v-chip
-                          :color="getStatusColor(item.value)"
-                          size="x-small"
-                          variant="dot"
-                        />
-                      </template>
-⋮----
-<!-- Dates and Times -->
-⋮----
-<!-- Cleaner Assignment Section -->
-⋮----
-<template #item="{ props, item }">
-                            <v-list-item v-bind="props">
-                              <template #prepend>
-                                <v-avatar :color="getCleanerAvailabilityColor(item.raw)" size="small">
-                                  <v-icon>mdi-account</v-icon>
-                                </v-avatar>
-                              </template>
-                              <template #subtitle>
-                                {{ getCleanerSubtitle(item.raw) }}
-                              </template>
-                              <template #append>
-                                <v-chip
-                                  :color="getCleanerAvailabilityColor(item.raw)"
-                                  size="x-small"
-                                  variant="dot"
-                                >
-                                  {{ getCleanerAvailabilityText(item.raw) }}
-                                </v-chip>
-                              </template>
-                            </v-list-item>
-                          </template>
-⋮----
-<template #prepend>
-                                <v-avatar :color="getCleanerAvailabilityColor(item.raw)" size="small">
-                                  <v-icon>mdi-account</v-icon>
-                                </v-avatar>
-                              </template>
-<template #subtitle>
-                                {{ getCleanerSubtitle(item.raw) }}
-                              </template>
-⋮----
-{{ getCleanerSubtitle(item.raw) }}
-⋮----
-<template #append>
-                                <v-chip
-                                  :color="getCleanerAvailabilityColor(item.raw)"
-                                  size="x-small"
-                                  variant="dot"
-                                >
-                                  {{ getCleanerAvailabilityText(item.raw) }}
-                                </v-chip>
-                              </template>
-⋮----
-{{ getCleanerAvailabilityText(item.raw) }}
-⋮----
-<!-- Cleaner Details -->
-⋮----
-<template #title>
-                            Cleaner: {{ selectedCleaner.name }}
-                          </template>
-⋮----
-Cleaner: {{ selectedCleaner.name }}
-⋮----
-<strong>Skills:</strong> {{ selectedCleaner.skills.join(', ') }}
-⋮----
-<strong>Today's Bookings:</strong> {{ getCleanerTodayBookings(selectedCleaner.id) }}/{{ selectedCleaner.max_daily_bookings }}
-⋮----
-<!-- Booking Details -->
-⋮----
-<template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-icon :color="getPriorityColor(item.value)">
-                          {{ getPriorityIcon(item.value) }}
-                        </v-icon>
-                      </template>
-                    </v-list-item>
-                  </template>
-⋮----
-<template #prepend>
-                        <v-icon :color="getPriorityColor(item.value)">
-                          {{ getPriorityIcon(item.value) }}
-                        </v-icon>
-                      </template>
-⋮----
-{{ getPriorityIcon(item.value) }}
-⋮----
-<!-- Notes and Instructions -->
-⋮----
-<!-- Business Impact Alerts -->
-⋮----
-{{ message }}
-⋮----
-<!-- Validation Errors -->
-⋮----
-<v-icon start>{{ mode === 'create' ? 'mdi-plus' : 'mdi-content-save' }}</v-icon>
-{{ submitButtonText }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
-import type { Property } from '@/types/property'
-import type { Booking, BookingFormData } from '@/types/booking'
-import type { Cleaner } from '@/types/user'
-// Props
-interface Props {
-  modelValue: boolean
-  mode: 'create' | 'edit'
-  booking?: Booking | null
-  properties: Property[]
-  cleaners: Cleaner[]
-  loading?: boolean
-  errors?: Map<string, string[]>
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-  errors: () => new Map()
-})
-// Emits
-interface Emits {
-  'update:modelValue': [value: boolean]
-  'submit': [data: BookingFormData]
-  'delete': [id: string]
-  'mark-complete': [id: string]
-  'assign-cleaner': [bookingId: string, cleanerId: string]
-  'open-cleaner-modal': [booking: Partial<BookingFormData>]
-}
-const emit = defineEmits<Emits>()
-// Form state
-const formRef = ref()
-const formValid = ref(false)
-// Default form data
-const defaultForm: BookingFormData = {
-  property_id: '',
-  checkout_date: '',
-  checkin_date: '',
-  booking_type: 'standard',
-  guest_count: undefined,
-  notes: '',
-  status: 'pending',
-  assigned_cleaner_id: '',
-  priority: 'standard'
-}
-const form = ref<BookingFormData>({ ...defaultForm })
-// Computed properties
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-const formTitle = computed(() => {
-  if (props.mode === 'create') {
-    return 'Schedule New Cleaning'
-  }
-  return `Edit Booking #${props.booking?.id?.slice(-6) || 'New'}`
-})
-const submitButtonText = computed(() => {
-  return props.mode === 'create' ? 'Schedule Cleaning' : 'Update Booking'
-})
-const propertiesArray = computed(() => {
-  return Array.from(props.properties).map(property => ({
-    ...property,
-    title: `${property.name} - ${property.address}`
-  }))
-})
-const availableCleaners = computed(() => {
-  return props.cleaners.filter(cleaner => {
-    // Filter based on availability and skills if needed
-    return true // Simplified for now
-  })
-})
-const selectedCleaner = computed(() => {
-  if (!form.value.assigned_cleaner_id) return null
-  return props.cleaners.find(c => c.id === form.value.assigned_cleaner_id)
-})
-const statusOptions = [
-  { title: 'Pending', value: 'pending' },
-  { title: 'Scheduled', value: 'scheduled' },
-  { title: 'In Progress', value: 'in_progress' },
-  { title: 'Completed', value: 'completed' },
-  { title: 'Cancelled', value: 'cancelled' }
-]
-const priorityOptions = [
-  { title: 'Standard', value: 'standard' },
-  { title: 'High', value: 'high' },
-  { title: 'Urgent', value: 'urgent' }
-]
-const showSameDayAlert = computed(() => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return false
-  const checkoutDate = new Date(form.value.checkout_date).toDateString()
-  const checkinDate = new Date(form.value.checkin_date).toDateString()
-  return checkoutDate === checkinDate
-})
-const showDateError = computed(() => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return false
-  return new Date(form.value.checkin_date) < new Date(form.value.checkout_date)
-})
-const showBusinessImpactAlert = computed(() => {
-  return businessImpactAlert.value.messages.length > 0
-})
-const businessImpactAlert = computed(() => {
-  const alert = {
-    type: 'info' as 'info' | 'warning' | 'error',
-    title: '',
-    messages: [] as string[]
-  }
-  if (form.value.booking_type === 'turn') {
-    alert.type = 'warning'
-    alert.title = 'High Business Impact'
-    alert.messages.push('Same-day turnovers require immediate attention')
-    alert.messages.push('Client satisfaction and revenue directly affected')
-  }
-  if (form.value.priority === 'urgent' && !form.value.assigned_cleaner_id) {
-    alert.type = 'error'
-    alert.title = 'Critical: Urgent Booking Unassigned'
-    alert.messages.push('Urgent bookings must have assigned cleaners')
-  }
-  return alert
-})
-// Validation rules
-const propertyRules = [
-  (v: string) => !!v || 'Property selection is required'
-]
-const dateRules = [
-  (v: string) => !!v || 'Date is required',
-  (v: string) => {
-    if (!v) return true
-    const date = new Date(v)
-    const now = new Date()
-    return date >= now || 'Date cannot be in the past'
-  }
-]
-// Methods
-const updateBookingType = () => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return
-  const checkoutDate = new Date(form.value.checkout_date).toDateString()
-  const checkinDate = new Date(form.value.checkin_date).toDateString()
-  if (checkoutDate === checkinDate) {
-    form.value.booking_type = 'turn'
-    form.value.priority = 'urgent'
-  } else {
-    form.value.booking_type = 'standard'
-    if (form.value.priority === 'urgent') {
-      form.value.priority = 'standard'
-    }
-  }
-}
-const getStatusColor = (status: string) => {
-  const colors = {
-    pending: 'orange',
-    scheduled: 'blue',
-    in_progress: 'purple',
-    completed: 'green',
-    cancelled: 'red'
-  }
-  return colors[status as keyof typeof colors] || 'grey'
-}
-const getPriorityColor = (priority: string) => {
-  const colors = {
-    standard: 'grey',
-    high: 'orange',
-    urgent: 'red'
-  }
-  return colors[priority as keyof typeof colors] || 'grey'
-}
-const getPriorityIcon = (priority: string) => {
-  const icons = {
-    standard: 'mdi-flag',
-    high: 'mdi-flag-triangle',
-    urgent: 'mdi-alert'
-  }
-  return icons[priority as keyof typeof icons] || 'mdi-flag'
-}
-const getPropertyOwnerName = (ownerId: string) => {
-  // This would typically come from a users store or prop
-  return `Owner ${ownerId.slice(-4)}`
-}
-const getCleanerAvailabilityColor = (cleaner: Cleaner) => {
-  // Simplified availability check
-  const todayBookings = getCleanerTodayBookings(cleaner.id)
-  if (todayBookings >= cleaner.max_daily_bookings) return 'red'
-  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'orange'
-  return 'green'
-}
-const getCleanerAvailabilityText = (cleaner: Cleaner) => {
-  const todayBookings = getCleanerTodayBookings(cleaner.id)
-  if (todayBookings >= cleaner.max_daily_bookings) return 'Unavailable'
-  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'Limited'
-  return 'Available'
-}
-const getCleanerSubtitle = (cleaner: Cleaner) => {
-  return `${cleaner.skills.slice(0, 2).join(', ')} • ${getCleanerTodayBookings(cleaner.id)}/${cleaner.max_daily_bookings} bookings`
-}
-const getCleanerTodayBookings = (cleanerId: string) => {
-  // This would typically come from bookings store
-  return Math.floor(Math.random() * 5) // Mock data
-}
-const getCleanerRating = (cleanerId: string) => {
-  // This would typically come from performance data
-  return 4 + Math.random() // Mock rating between 4-5
-}
-const openCleanerAssignmentModal = () => {
-  emit('open-cleaner-modal', form.value)
-}
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  const { valid } = await formRef.value.validate()
-  if (!valid) return
-  emit('submit', { ...form.value })
-}
-const handleClose = () => {
-  isOpen.value = false
-}
-const handleDelete = () => {
-  if (props.booking?.id) {
-    emit('delete', props.booking.id)
-  }
-}
-const handleMarkComplete = () => {
-  if (props.booking?.id) {
-    emit('mark-complete', props.booking.id)
-  }
-}
-// Watch for booking changes
-watch(() => props.booking, (newBooking) => {
-  if (newBooking) {
-    form.value = {
-      property_id: newBooking.property_id,
-      checkout_date: newBooking.checkout_date,
-      checkin_date: newBooking.checkin_date,
-      booking_type: newBooking.booking_type,
-      guest_count: newBooking.guest_count,
-      notes: newBooking.notes || '',
-      status: newBooking.status,
-      assigned_cleaner_id: newBooking.assigned_cleaner_id || '',
-      priority: newBooking.priority || 'standard'
-    }
-  } else {
-    form.value = { ...defaultForm }
-  }
-}, { immediate: true })
-// Watch for modal close
-watch(isOpen, (newValue) => {
-  if (!newValue) {
-    nextTick(() => {
-      form.value = { ...defaultForm }
-      formRef.value?.resetValidation()
-    })
-  }
-})
-</script>
-<style scoped>
-.v-card-title {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-.v-alert {
-  border-left: 4px solid rgb(var(--v-theme-primary));
-}
-</style>
-`````
-
-## File: src/components/dumb/admin/AdminCalendarControls.vue
-`````vue
-<template>
-  <v-card variant="outlined" class="admin-calendar-controls">
-    <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
-      <v-icon class="mr-2">mdi-calendar-clock</v-icon>
-      Calendar Controls
-      <v-spacer />
-      <v-btn
-        variant="text"
-        size="small"
-        :icon="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-        @click="expanded = !expanded"
-      />
-    </v-card-title>
-    <v-divider />
-    <v-expand-transition>
-      <v-card-text v-show="expanded" class="pa-0">
-        <v-container>
-          <!-- View Controls -->
-          <v-row>
-            <v-col cols="12" md="6">
-              <div class="text-body-2 text-medium-emphasis mb-2">Calendar View</div>
-              <v-btn-toggle
-                v-model="selectedView"
-                variant="outlined"
-                divided
-                mandatory
-                @update:model-value="handleViewChange"
-              >
-                <v-btn value="dayGridMonth" size="small">
-                  <v-icon start>mdi-calendar-month</v-icon>
-                  Month
-                </v-btn>
-                <v-btn value="timeGridWeek" size="small">
-                  <v-icon start>mdi-calendar-week</v-icon>
-                  Week
-                </v-btn>
-                <v-btn value="timeGridDay" size="small">
-                  <v-icon start>mdi-calendar-today</v-icon>
-                  Day
-                </v-btn>
-                <v-btn value="listWeek" size="small">
-                  <v-icon start>mdi-format-list-bulleted</v-icon>
-                  Agenda
-                </v-btn>
-              </v-btn-toggle>
-            </v-col>
-            <v-col cols="12" md="6">
-              <div class="text-body-2 text-medium-emphasis mb-2">Date Navigation</div>
-              <div class="d-flex gap-2 align-center">
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  @click="handlePrevious"
-                >
-                  <v-icon>mdi-chevron-left</v-icon>
-                </v-btn>
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  @click="handleToday"
-                >
-                  Today
-                </v-btn>
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  @click="handleNext"
-                >
-                  <v-icon>mdi-chevron-right</v-icon>
-                </v-btn>
-                <v-spacer />
-                <v-text-field
-                  v-model="selectedDate"
-                  type="date"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  style="max-width: 150px;"
-                  @update:model-value="handleDateChange"
-                />
-              </div>
-            </v-col>
-          </v-row>
-          <v-divider class="my-4" />
-          <!-- Filters -->
-          <v-row>
-            <v-col cols="12" md="3">
-              <v-select
-                v-model="filters.status"
-                :items="statusOptions"
-                label="Status Filter"
-                variant="outlined"
-                density="compact"
-                clearable
-                multiple
-                chips
-                @update:model-value="handleFilterChange"
-              >
-                <template #chip="{ props, item }">
-                  <v-chip
-                    v-bind="props"
-                    :color="getStatusColor(item.value)"
-                    size="small"
-                  >
-                    {{ item.title }}
-                  </v-chip>
-                </template>
-              </v-select>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-select
-                v-model="filters.cleaner"
-                :items="cleanerOptions"
-                label="Cleaner Filter"
-                variant="outlined"
-                density="compact"
-                clearable
-                multiple
-                chips
-                @update:model-value="handleFilterChange"
-              >
-                <template #item="{ props, item }">
-                  <v-list-item v-bind="props">
-                    <template #prepend>
-                      <v-avatar :color="getCleanerColor(item.value)" size="small">
-                        <v-icon>mdi-account</v-icon>
-                      </v-avatar>
-                    </template>
-                  </v-list-item>
-                </template>
-              </v-select>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-select
-                v-model="filters.bookingType"
-                :items="bookingTypeOptions"
-                label="Booking Type"
-                variant="outlined"
-                density="compact"
-                clearable
-                multiple
-                chips
-                @update:model-value="handleFilterChange"
-              >
-                <template #chip="{ props, item }">
-                  <v-chip
-                    v-bind="props"
-                    :color="item.value === 'turn' ? 'error' : 'primary'"
-                    size="small"
-                  >
-                    {{ item.title }}
-                  </v-chip>
-                </template>
-              </v-select>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-select
-                v-model="filters.propertyOwner"
-                :items="propertyOwnerOptions"
-                label="Property Owner"
-                variant="outlined"
-                density="compact"
-                clearable
-                multiple
-                chips
-                @update:model-value="handleFilterChange"
-              />
-            </v-col>
-          </v-row>
-          <!-- Advanced Filters -->
-          <v-row v-if="showAdvancedFilters">
-            <v-col cols="12" md="4">
-              <v-select
-                v-model="filters.priority"
-                :items="priorityOptions"
-                label="Priority Level"
-                variant="outlined"
-                density="compact"
-                clearable
-                multiple
-                chips
-                @update:model-value="handleFilterChange"
-              >
-                <template #chip="{ props, item }">
-                  <v-chip
-                    v-bind="props"
-                    :color="getPriorityColor(item.value)"
-                    size="small"
-                  >
-                    {{ item.title }}
-                  </v-chip>
-                </template>
-              </v-select>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-text-field
-                v-model="filters.dateRange.start"
-                label="Start Date"
-                type="date"
-                variant="outlined"
-                density="compact"
-                @update:model-value="handleFilterChange"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-text-field
-                v-model="filters.dateRange.end"
-                label="End Date"
-                type="date"
-                variant="outlined"
-                density="compact"
-                @update:model-value="handleFilterChange"
-              />
-            </v-col>
-          </v-row>
-          <v-divider class="my-4" />
-          <!-- Action Controls -->
-          <v-row>
-            <v-col cols="12" md="6">
-              <div class="text-body-2 text-medium-emphasis mb-2">Quick Actions</div>
-              <div class="d-flex flex-wrap gap-2">
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  color="primary"
-                  @click="handleRefresh"
-                >
-                  <v-icon start>mdi-refresh</v-icon>
-                  Refresh
-                </v-btn>
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  color="success"
-                  @click="handleExport"
-                >
-                  <v-icon start>mdi-download</v-icon>
-                  Export
-                </v-btn>
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  color="info"
-                  @click="handlePrint"
-                >
-                  <v-icon start>mdi-printer</v-icon>
-                  Print
-                </v-btn>
-                <v-btn
-                  variant="text"
-                  size="small"
-                  @click="showAdvancedFilters = !showAdvancedFilters"
-                >
-                  <v-icon start>{{ showAdvancedFilters ? 'mdi-filter-minus' : 'mdi-filter-plus' }}</v-icon>
-                  {{ showAdvancedFilters ? 'Less' : 'More' }} Filters
-                </v-btn>
-              </div>
-            </v-col>
-            <v-col cols="12" md="6">
-              <div class="text-body-2 text-medium-emphasis mb-2">Bulk Operations</div>
-              <div class="d-flex flex-wrap gap-2">
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  color="warning"
-                  :disabled="!hasSelectedBookings"
-                  @click="handleBulkAssign"
-                >
-                  <v-icon start>mdi-account-multiple</v-icon>
-                  Bulk Assign
-                </v-btn>
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  color="info"
-                  :disabled="!hasSelectedBookings"
-                  @click="handleBulkStatusUpdate"
-                >
-                  <v-icon start>mdi-clipboard-list</v-icon>
-                  Update Status
-                </v-btn>
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  color="error"
-                  :disabled="!hasSelectedBookings"
-                  @click="handleBulkDelete"
-                >
-                  <v-icon start>mdi-delete-multiple</v-icon>
-                  Bulk Delete
-                </v-btn>
-              </div>
-            </v-col>
-          </v-row>
-          <!-- Real-time Updates -->
-          <v-row>
-            <v-col cols="12">
-              <div class="d-flex align-center justify-space-between">
-                <div class="d-flex align-center">
-                  <v-switch
-                    v-model="realTimeUpdates"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    @update:model-value="handleRealTimeToggle"
-                  />
-                  <span class="text-body-2 ml-2">Real-time Updates</span>
-                </div>
-                <div class="text-caption text-medium-emphasis">
-                  Last updated: {{ lastUpdated }}
-                </div>
-              </div>
-            </v-col>
-          </v-row>
-          <!-- Filter Summary -->
-          <v-row v-if="hasActiveFilters">
-            <v-col cols="12">
-              <v-card variant="tonal" color="info">
-                <v-card-text class="py-2">
-                  <div class="d-flex align-center">
-                    <v-icon class="mr-2">mdi-filter</v-icon>
-                    <span class="text-body-2">Active Filters:</span>
-                    <div class="d-flex flex-wrap gap-1 ml-2">
-                      <v-chip
-                        v-for="filter in activeFilterSummary"
-                        :key="filter.key"
-                        size="x-small"
-                        variant="outlined"
-                        closable
-                        @click:close="clearFilter(filter.key)"
-                      >
-                        {{ filter.label }}
-                      </v-chip>
-                    </div>
-                    <v-spacer />
-                    <v-btn
-                      variant="text"
-                      size="small"
-                      @click="clearAllFilters"
-                    >
-                      Clear All
-                    </v-btn>
-                  </div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-    </v-expand-transition>
-  </v-card>
-</template>
-⋮----
-<!-- View Controls -->
-⋮----
-<!-- Filters -->
-⋮----
-<template #chip="{ props, item }">
-                  <v-chip
-                    v-bind="props"
-                    :color="getStatusColor(item.value)"
-                    size="small"
-                  >
-                    {{ item.title }}
-                  </v-chip>
-                </template>
-⋮----
-{{ item.title }}
-⋮----
-<template #item="{ props, item }">
-                  <v-list-item v-bind="props">
-                    <template #prepend>
-                      <v-avatar :color="getCleanerColor(item.value)" size="small">
-                        <v-icon>mdi-account</v-icon>
-                      </v-avatar>
-                    </template>
-                  </v-list-item>
-                </template>
-⋮----
-<template #prepend>
-                      <v-avatar :color="getCleanerColor(item.value)" size="small">
-                        <v-icon>mdi-account</v-icon>
-                      </v-avatar>
-                    </template>
-⋮----
-<template #chip="{ props, item }">
-                  <v-chip
-                    v-bind="props"
-                    :color="item.value === 'turn' ? 'error' : 'primary'"
-                    size="small"
-                  >
-                    {{ item.title }}
-                  </v-chip>
-                </template>
-⋮----
-{{ item.title }}
-⋮----
-<!-- Advanced Filters -->
-⋮----
-<template #chip="{ props, item }">
-                  <v-chip
-                    v-bind="props"
-                    :color="getPriorityColor(item.value)"
-                    size="small"
-                  >
-                    {{ item.title }}
-                  </v-chip>
-                </template>
-⋮----
-{{ item.title }}
-⋮----
-<!-- Action Controls -->
-⋮----
-<v-icon start>{{ showAdvancedFilters ? 'mdi-filter-minus' : 'mdi-filter-plus' }}</v-icon>
-{{ showAdvancedFilters ? 'Less' : 'More' }} Filters
-⋮----
-<!-- Real-time Updates -->
-⋮----
-Last updated: {{ lastUpdated }}
-⋮----
-<!-- Filter Summary -->
-⋮----
-{{ filter.label }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import type { Cleaner } from '@/types/user'
-// Props
-interface Props {
-  currentView: string
-  currentDate: string
-  selectedBookings: string[]
-  cleaners: Cleaner[]
-  propertyOwners: Array<{ id: string; name: string }>
-  loading?: boolean
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
-})
-// Emits
-interface Emits {
-  'view-change': [view: string]
-  'date-change': [date: string]
-  'navigate': [direction: 'prev' | 'next' | 'today']
-  'filter-change': [filters: CalendarFilters]
-  'refresh': []
-  'export': [format: string]
-  'print': []
-  'bulk-assign': []
-  'bulk-status-update': []
-  'bulk-delete': []
-  'real-time-toggle': [enabled: boolean]
-}
-const emit = defineEmits<Emits>()
-// Types
-interface CalendarFilters {
-  status: string[]
-  cleaner: string[]
-  bookingType: string[]
-  propertyOwner: string[]
-  priority: string[]
-  dateRange: {
-    start: string
-    end: string
-  }
-}
-// State
-const expanded = ref(true)
-const showAdvancedFilters = ref(false)
-const realTimeUpdates = ref(true)
-const selectedView = ref(props.currentView)
-const selectedDate = ref(props.currentDate)
-const filters = ref<CalendarFilters>({
-  status: [],
-  cleaner: [],
-  bookingType: [],
-  propertyOwner: [],
-  priority: [],
-  dateRange: {
-    start: '',
-    end: ''
-  }
-})
-// Computed properties
-const hasSelectedBookings = computed(() => {
-  return props.selectedBookings.length > 0
-})
-const hasActiveFilters = computed(() => {
-  return filters.value.status.length > 0 ||
-         filters.value.cleaner.length > 0 ||
-         filters.value.bookingType.length > 0 ||
-         filters.value.propertyOwner.length > 0 ||
-         filters.value.priority.length > 0 ||
-         filters.value.dateRange.start ||
-         filters.value.dateRange.end
-})
-const activeFilterSummary = computed(() => {
-  const summary = []
-  if (filters.value.status.length > 0) {
-    summary.push({ key: 'status', label: `Status: ${filters.value.status.length} selected` })
-  }
-  if (filters.value.cleaner.length > 0) {
-    summary.push({ key: 'cleaner', label: `Cleaners: ${filters.value.cleaner.length} selected` })
-  }
-  if (filters.value.bookingType.length > 0) {
-    summary.push({ key: 'bookingType', label: `Types: ${filters.value.bookingType.length} selected` })
-  }
-  if (filters.value.propertyOwner.length > 0) {
-    summary.push({ key: 'propertyOwner', label: `Owners: ${filters.value.propertyOwner.length} selected` })
-  }
-  if (filters.value.priority.length > 0) {
-    summary.push({ key: 'priority', label: `Priority: ${filters.value.priority.length} selected` })
-  }
-  if (filters.value.dateRange.start || filters.value.dateRange.end) {
-    summary.push({ key: 'dateRange', label: 'Date Range Set' })
-  }
-  return summary
-})
-const lastUpdated = computed(() => {
-  return new Date().toLocaleTimeString()
-})
-// Options
-const statusOptions = [
-  { title: 'Pending', value: 'pending' },
-  { title: 'Scheduled', value: 'scheduled' },
-  { title: 'In Progress', value: 'in_progress' },
-  { title: 'Completed', value: 'completed' },
-  { title: 'Cancelled', value: 'cancelled' }
-]
-const bookingTypeOptions = [
-  { title: 'Standard Cleaning', value: 'standard' },
-  { title: 'Turn Cleaning', value: 'turn' }
-]
-const priorityOptions = [
-  { title: 'Standard', value: 'standard' },
-  { title: 'High', value: 'high' },
-  { title: 'Urgent', value: 'urgent' }
-]
-const cleanerOptions = computed(() => {
-  return props.cleaners.map(cleaner => ({
-    title: cleaner.name,
-    value: cleaner.id
-  }))
-})
-const propertyOwnerOptions = computed(() => {
-  return props.propertyOwners.map(owner => ({
-    title: owner.name,
-    value: owner.id
-  }))
-})
-// Methods
-const handleViewChange = (view: string) => {
-  emit('view-change', view)
-}
-const handleDateChange = (date: string) => {
-  emit('date-change', date)
-}
-const handlePrevious = () => {
-  emit('navigate', 'prev')
-}
-const handleNext = () => {
-  emit('navigate', 'next')
-}
-const handleToday = () => {
-  emit('navigate', 'today')
-}
-const handleFilterChange = () => {
-  emit('filter-change', { ...filters.value })
-}
-const handleRefresh = () => {
-  emit('refresh')
-}
-const handleExport = () => {
-  emit('export', 'csv')
-}
-const handlePrint = () => {
-  emit('print')
-}
-const handleBulkAssign = () => {
-  emit('bulk-assign')
-}
-const handleBulkStatusUpdate = () => {
-  emit('bulk-status-update')
-}
-const handleBulkDelete = () => {
-  emit('bulk-delete')
-}
-const handleRealTimeToggle = (enabled: boolean) => {
-  emit('real-time-toggle', enabled)
-}
-const clearFilter = (filterKey: string) => {
-  switch (filterKey) {
-    case 'status':
-      filters.value.status = []
-      break
-    case 'cleaner':
-      filters.value.cleaner = []
-      break
-    case 'bookingType':
-      filters.value.bookingType = []
-      break
-    case 'propertyOwner':
-      filters.value.propertyOwner = []
-      break
-    case 'priority':
-      filters.value.priority = []
-      break
-    case 'dateRange':
-      filters.value.dateRange = { start: '', end: '' }
-      break
-  }
-  handleFilterChange()
-}
-const clearAllFilters = () => {
-  filters.value = {
-    status: [],
-    cleaner: [],
-    bookingType: [],
-    propertyOwner: [],
-    priority: [],
-    dateRange: { start: '', end: '' }
-  }
-  handleFilterChange()
-}
-const getStatusColor = (status: string) => {
-  const colors = {
-    pending: 'orange',
-    scheduled: 'blue',
-    in_progress: 'purple',
-    completed: 'green',
-    cancelled: 'red'
-  }
-  return colors[status as keyof typeof colors] || 'grey'
-}
-const getPriorityColor = (priority: string) => {
-  const colors = {
-    standard: 'grey',
-    high: 'orange',
-    urgent: 'red'
-  }
-  return colors[priority as keyof typeof colors] || 'grey'
-}
-const getCleanerColor = (cleanerId: string) => {
-  // Generate consistent color based on cleaner ID
-  const colors = ['primary', 'secondary', 'success', 'info', 'warning']
-  const index = cleanerId.length % colors.length
-  return colors[index]
-}
-// Watch for prop changes
-watch(() => props.currentView, (newView) => {
-  selectedView.value = newView
-})
-watch(() => props.currentDate, (newDate) => {
-  selectedDate.value = newDate
-})
-</script>
-`````
-
-## File: src/components/dumb/admin/AdminQuickActions.vue
-`````vue
-<template>
-  <v-card
-    class="admin-quick-actions"
-    :elevation="elevation"
-    :variant="variant"
-  >
-    <v-card-title class="text-h6 pb-2 d-flex align-center">
-      <v-icon class="mr-2">mdi-cog</v-icon>
-      Admin Actions
-      <v-spacer />
-      <v-chip
-        v-if="urgentCount > 0"
-        color="error"
-        size="small"
-        variant="elevated"
-      >
-        <v-icon start size="small">mdi-alert</v-icon>
-        {{ urgentCount }} Urgent
-      </v-chip>
-    </v-card-title>
-    <v-divider />
-    <v-card-text class="pa-3">
-      <v-container fluid class="pa-0">
-        <!-- Critical Actions Row -->
-        <v-row class="mb-2">
-          <v-col
-            cols="6"
-            sm="6"
-            md="12"
-            lg="6"
-          >
-            <v-btn
-              color="error"
-              variant="elevated"
-              block
-              size="large"
-              :loading="loading"
-              :disabled="disabled"
-              @click="handleAction('manage-urgent-turns')"
-            >
-              <v-icon class="mr-2">mdi-clock-alert</v-icon>
-              <span class="d-none d-sm-inline">Urgent</span>
-              Turns
-              <v-badge
-                v-if="urgentCount > 0"
-                :content="urgentCount"
-                color="white"
-                text-color="error"
-                inline
-                class="ml-1"
-              />
-            </v-btn>
-          </v-col>
-          <v-col
-            cols="6"
-            sm="6"
-            md="12"
-            lg="6"
-          >
-            <v-btn
-              color="primary"
-              variant="elevated"
-              block
-              size="large"
-              :loading="loading"
-              :disabled="disabled"
-              @click="handleAction('assign-cleaners')"
-            >
-              <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
-              <span class="d-none d-sm-inline">Assign</span>
-              Cleaners
-            </v-btn>
-          </v-col>
-        </v-row>
-        <!-- Primary Management Actions Row -->
-        <v-row class="mb-2">
-          <v-col
-            cols="6"
-            sm="6"
-            md="12"
-            lg="6"
-          >
-            <v-btn
-              color="secondary"
-              variant="tonal"
-              block
-              :loading="loading"
-              :disabled="disabled"
-              @click="handleAction('master-calendar')"
-            >
-              <v-icon class="mr-2">mdi-calendar-multiple</v-icon>
-              <span class="d-none d-sm-inline">Master</span>
-              Calendar
-            </v-btn>
-          </v-col>
-          <v-col
-            cols="6"
-            sm="6"
-            md="12"
-            lg="6"
-          >
-            <v-btn
-              color="info"
-              variant="tonal"
-              block
-              :loading="loading"
-              :disabled="disabled"
-              @click="handleAction('create-booking')"
-            >
-              <v-icon class="mr-2">mdi-calendar-plus</v-icon>
-              <span class="d-none d-sm-inline">New</span>
-              Booking
-            </v-btn>
-          </v-col>
-        </v-row>
-        <!-- Bulk Operations (Collapsible) -->
-        <v-expand-transition>
-          <div v-if="showBulkActions">
-            <v-divider class="my-3" />
-            <v-row class="mb-2">
-              <v-col cols="12">
-                <div class="text-subtitle-2 text-medium-emphasis mb-2">
-                  <v-icon size="small" class="mr-1">mdi-format-list-bulleted-square</v-icon>
-                  Bulk Operations
-                </div>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col
-                cols="6"
-                sm="6"
-                md="12"
-                lg="6"
-              >
-                <v-btn
-                  color="warning"
-                  variant="outlined"
-                  block
-                  :loading="loading"
-                  :disabled="disabled"
-                  @click="handleAction('bulk-assign')"
-                >
-                  <v-icon class="mr-2">mdi-account-multiple</v-icon>
-                  <span class="d-none d-sm-inline">Bulk</span>
-                  Assign
-                </v-btn>
-              </v-col>
-              <v-col
-                cols="6"
-                sm="6"
-                md="12"
-                lg="6"
-              >
-                <v-btn
-                  color="orange"
-                  variant="outlined"
-                  block
-                  :loading="loading"
-                  :disabled="disabled"
-                  @click="handleAction('bulk-reschedule')"
-                >
-                  <v-icon class="mr-2">mdi-calendar-sync</v-icon>
-                  <span class="d-none d-sm-inline">Bulk</span>
-                  Reschedule
-                </v-btn>
-              </v-col>
-            </v-row>
-          </div>
-        </v-expand-transition>
-        <!-- Management Actions (Collapsible) -->
-        <v-expand-transition>
-          <div v-if="showManagementActions">
-            <v-divider class="my-3" />
-            <v-row class="mb-2">
-              <v-col cols="12">
-                <div class="text-subtitle-2 text-medium-emphasis mb-2">
-                  <v-icon size="small" class="mr-1">mdi-cog-outline</v-icon>
-                  Business Management
-                </div>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col
-                cols="6"
-                sm="6"
-                md="12"
-                lg="6"
-              >
-                <v-btn
-                  color="success"
-                  variant="outlined"
-                  block
-                  :loading="loading"
-                  :disabled="disabled"
-                  @click="handleAction('manage-cleaners')"
-                >
-                  <v-icon class="mr-2">mdi-account-group</v-icon>
-                  <span class="d-none d-sm-inline">Manage</span>
-                  Cleaners
-                </v-btn>
-              </v-col>
-              <v-col
-                cols="6"
-                sm="6"
-                md="12"
-                lg="6"
-              >
-                <v-btn
-                  color="purple"
-                  variant="outlined"
-                  block
-                  :loading="loading"
-                  :disabled="disabled"
-                  @click="handleAction('view-reports')"
-                >
-                  <v-icon class="mr-2">mdi-chart-line</v-icon>
-                  <span class="d-none d-sm-inline">Business</span>
-                  Reports
-                </v-btn>
-              </v-col>
-            </v-row>
-            <v-row class="mt-2">
-              <v-col
-                cols="6"
-                sm="6"
-                md="12"
-                lg="6"
-              >
-                <v-btn
-                  color="indigo"
-                  variant="outlined"
-                  block
-                  :loading="loading"
-                  :disabled="disabled"
-                  @click="handleAction('manage-properties')"
-                >
-                  <v-icon class="mr-2">mdi-home-group</v-icon>
-                  <span class="d-none d-sm-inline">All</span>
-                  Properties
-                </v-btn>
-              </v-col>
-              <v-col
-                cols="6"
-                sm="6"
-                md="12"
-                lg="6"
-              >
-                <v-btn
-                  color="teal"
-                  variant="outlined"
-                  block
-                  :loading="loading"
-                  :disabled="disabled"
-                  @click="handleAction('system-settings')"
-                >
-                  <v-icon class="mr-2">mdi-cog-box</v-icon>
-                  <span class="d-none d-sm-inline">System</span>
-                  Settings
-                </v-btn>
-              </v-col>
-            </v-row>
-          </div>
-        </v-expand-transition>
-        <!-- Action Toggles -->
-        <v-row class="mt-2">
-          <v-col cols="6">
-            <v-btn
-              variant="text"
-              size="small"
-              block
-              @click="showBulkActions = !showBulkActions"
-            >
-              <v-icon class="mr-1">
-                {{ showBulkActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-              </v-icon>
-              {{ showBulkActions ? 'Hide' : 'Bulk' }} Actions
-            </v-btn>
-          </v-col>
-          <v-col cols="6">
-            <v-btn
-              variant="text"
-              size="small"
-              block
-              @click="showManagementActions = !showManagementActions"
-            >
-              <v-icon class="mr-1">
-                {{ showManagementActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-              </v-icon>
-              {{ showManagementActions ? 'Hide' : 'More' }} Tools
-            </v-btn>
-          </v-col>
-        </v-row>
-        <!-- Quick Stats (Optional) -->
-        <v-expand-transition>
-          <div v-if="showStats">
-            <v-divider class="my-3" />
-            <v-row>
-              <v-col cols="12">
-                <div class="text-subtitle-2 text-medium-emphasis mb-2">
-                  <v-icon size="small" class="mr-1">mdi-chart-box</v-icon>
-                  Quick Stats
-                </div>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="4">
-                <div class="text-center">
-                  <div class="text-h6 text-primary">{{ todayBookings }}</div>
-                  <div class="text-caption text-medium-emphasis">Today</div>
-                </div>
-              </v-col>
-              <v-col cols="4">
-                <div class="text-center">
-                  <div class="text-h6 text-warning">{{ unassignedCount }}</div>
-                  <div class="text-caption text-medium-emphasis">Unassigned</div>
-                </div>
-              </v-col>
-              <v-col cols="4">
-                <div class="text-center">
-                  <div class="text-h6 text-success">{{ completedToday }}</div>
-                  <div class="text-caption text-medium-emphasis">Completed</div>
-                </div>
-              </v-col>
-            </v-row>
-          </div>
-        </v-expand-transition>
-        <!-- Stats Toggle -->
-        <v-row class="mt-1">
-          <v-col cols="12">
-            <v-btn
-              variant="text"
-              size="x-small"
-              block
-              @click="showStats = !showStats"
-            >
-              <v-icon class="mr-1" size="small">
-                {{ showStats ? 'mdi-chevron-up' : 'mdi-chart-box-outline' }}
-              </v-icon>
-              {{ showStats ? 'Hide Stats' : 'Show Stats' }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
-  </v-card>
-</template>
-⋮----
-{{ urgentCount }} Urgent
-⋮----
-<!-- Critical Actions Row -->
-⋮----
-<!-- Primary Management Actions Row -->
-⋮----
-<!-- Bulk Operations (Collapsible) -->
-⋮----
-<!-- Management Actions (Collapsible) -->
-⋮----
-<!-- Action Toggles -->
-⋮----
-{{ showBulkActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-⋮----
-{{ showBulkActions ? 'Hide' : 'Bulk' }} Actions
-⋮----
-{{ showManagementActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-⋮----
-{{ showManagementActions ? 'Hide' : 'More' }} Tools
-⋮----
-<!-- Quick Stats (Optional) -->
-⋮----
-<div class="text-h6 text-primary">{{ todayBookings }}</div>
-⋮----
-<div class="text-h6 text-warning">{{ unassignedCount }}</div>
-⋮----
-<div class="text-h6 text-success">{{ completedToday }}</div>
-⋮----
-<!-- Stats Toggle -->
-⋮----
-{{ showStats ? 'mdi-chevron-up' : 'mdi-chart-box-outline' }}
-⋮----
-{{ showStats ? 'Hide Stats' : 'Show Stats' }}
-⋮----
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-// Props
-interface Props {
-  loading?: boolean
-  disabled?: boolean
-  elevation?: number
-  variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'
-  urgentCount?: number
-  todayBookings?: number
-  unassignedCount?: number
-  completedToday?: number
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-  disabled: false,
-  elevation: 2,
-  variant: 'elevated',
-  urgentCount: 0,
-  todayBookings: 0,
-  unassignedCount: 0,
-  completedToday: 0
-})
-// Emits
-interface Emits {
-  (e: 'action', actionType: AdminActionType): void
-}
-const emit = defineEmits<Emits>()
-// Types
-type AdminActionType = 
-  | 'manage-urgent-turns'
-  | 'assign-cleaners'
-  | 'master-calendar'
-  | 'create-booking'
-  | 'bulk-assign'
-  | 'bulk-reschedule'
-  | 'manage-cleaners'
-  | 'view-reports'
-  | 'manage-properties'
-  | 'system-settings'
-// Local state
-const showBulkActions = ref(false)
-const showManagementActions = ref(false)
-const showStats = ref(false)
-// Methods
-function handleAction(actionType: AdminActionType) {
-  if (props.loading || props.disabled) return
-  emit('action', actionType)
-}
-// Computed
-const hasUrgentItems = computed(() => props.urgentCount > 0)
-</script>
-<style scoped>
-.admin-quick-actions {
-  min-height: 200px;
-}
-.admin-quick-actions .v-btn {
-  text-transform: none;
-  font-weight: 500;
-}
-.admin-quick-actions .v-btn--size-large {
-  min-height: 48px;
-}
-.admin-quick-actions .v-chip {
-  font-size: 0.75rem;
-}
-.admin-quick-actions .v-badge {
-  font-size: 0.7rem;
-}
-/* Responsive text adjustments */
-@media (max-width: 600px) {
-  .admin-quick-actions .v-btn .v-icon {
-    margin-right: 4px !important;
-  }
-}
-/* Stats section styling */
-.admin-quick-actions .text-h6 {
-  font-weight: 600;
-  line-height: 1.2;
-}
-.admin-quick-actions .text-caption {
-  font-size: 0.7rem;
-  line-height: 1.1;
-}
-</style>
-`````
-
-## File: src/components/dumb/admin/CleanerAssignmentModal.vue
-`````vue
-<template>
-  <v-dialog
-    v-model="isOpen"
-    max-width="900px"
-    persistent
-    scrollable
-    @keydown.esc="handleClose"
-  >
-    <v-card>
-      <v-card-title class="text-h5 pb-2 d-flex align-center">
-        <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
-        Assign Cleaner
-        <v-spacer />
-        <v-chip
-          v-if="booking?.booking_type === 'turn'"
-          color="error"
-          size="small"
-          variant="elevated"
-        >
-          <v-icon start>mdi-clock-alert</v-icon>
-          URGENT
-        </v-chip>
-      </v-card-title>
-      <v-divider />
-      <!-- Booking Information -->
-      <v-card-text class="pa-0">
-        <v-container>
-          <v-row v-if="booking">
-            <v-col cols="12">
-              <v-card variant="outlined" class="mb-4">
-                <v-card-title class="text-subtitle-1 py-2">
-                  <v-icon class="mr-2">mdi-information</v-icon>
-                  Booking Details
-                </v-card-title>
-                <v-divider />
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Property</div>
-                      <div class="text-body-1 font-weight-medium">{{ selectedProperty?.name }}</div>
-                      <div class="text-body-2 text-medium-emphasis">{{ selectedProperty?.address }}</div>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Schedule</div>
-                      <div class="text-body-1">
-                        <v-icon size="small" class="mr-1">mdi-calendar-export</v-icon>
-                        {{ formatDateTime(booking.checkout_date) }}
-                      </div>
-                      <div class="text-body-1">
-                        <v-icon size="small" class="mr-1">mdi-calendar-import</v-icon>
-                        {{ formatDateTime(booking.checkin_date) }}
-                      </div>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Cleaning Window</div>
-                      <div class="text-body-1">{{ getCleaningWindow() }}</div>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Estimated Duration</div>
-                      <div class="text-body-1">{{ selectedProperty?.cleaning_duration || 120 }} minutes</div>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-          <!-- Filters and Search -->
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="searchQuery"
-                label="Search Cleaners"
-                variant="outlined"
-                prepend-inner-icon="mdi-magnify"
-                clearable
-                hint="Search by name or skills"
-                persistent-hint
-              />
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-select
-                v-model="availabilityFilter"
-                :items="availabilityFilterOptions"
-                label="Availability"
-                variant="outlined"
-                clearable
-              />
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-select
-                v-model="skillFilter"
-                :items="skillFilterOptions"
-                label="Required Skill"
-                variant="outlined"
-                clearable
-              />
-            </v-col>
-          </v-row>
-          <!-- Cleaner Selection -->
-          <v-row>
-            <v-col cols="12">
-              <v-card variant="outlined">
-                <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
-                  <v-icon class="mr-2">mdi-account-group</v-icon>
-                  Available Cleaners
-                  <v-spacer />
-                  <v-chip size="small" variant="tonal">
-                    {{ filteredCleaners.length }} available
-                  </v-chip>
-                </v-card-title>
-                <v-divider />
-                <v-list class="pa-0" max-height="400" style="overflow-y: auto;">
-                  <template v-for="(cleaner, index) in filteredCleaners" :key="cleaner.id">
-                    <v-list-item
-                      :class="{ 'bg-primary-lighten-5': selectedCleanerId === cleaner.id }"
-                      @click="selectCleaner(cleaner.id)"
-                    >
-                      <template #prepend>
-                        <v-avatar :color="getAvailabilityColor(cleaner)" size="40">
-                          <v-icon>mdi-account</v-icon>
-                        </v-avatar>
-                      </template>
-                      <v-list-item-title class="font-weight-medium">
-                        {{ cleaner.name }}
-                        <v-chip
-                          v-if="selectedCleanerId === cleaner.id"
-                          color="primary"
-                          size="x-small"
-                          class="ml-2"
-                        >
-                          SELECTED
-                        </v-chip>
-                      </v-list-item-title>
-                      <v-list-item-subtitle>
-                        <div class="d-flex flex-wrap gap-1 mb-1">
-                          <v-chip
-                            v-for="skill in cleaner.skills.slice(0, 3)"
-                            :key="skill"
-                            size="x-small"
-                            variant="outlined"
-                          >
-                            {{ skill }}
-                          </v-chip>
-                          <v-chip
-                            v-if="cleaner.skills.length > 3"
-                            size="x-small"
-                            variant="text"
-                          >
-                            +{{ cleaner.skills.length - 3 }} more
-                          </v-chip>
-                        </div>
-                        <div class="text-caption">
-                          Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
-                          • Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
-                        </div>
-                      </v-list-item-subtitle>
-                      <template #append>
-                        <div class="d-flex flex-column align-end">
-                          <v-chip
-                            :color="getAvailabilityColor(cleaner)"
-                            size="small"
-                            variant="tonal"
-                            class="mb-1"
-                          >
-                            {{ getAvailabilityText(cleaner) }}
-                          </v-chip>
-                          <div class="text-caption text-medium-emphasis">
-                            {{ getDistanceText(cleaner) }}
-                          </div>
-                        </div>
-                      </template>
-                    </v-list-item>
-                    <v-divider v-if="index < filteredCleaners.length - 1" />
-                  </template>
-                  <!-- No cleaners available -->
-                  <v-list-item v-if="filteredCleaners.length === 0">
-                    <v-list-item-title class="text-center text-medium-emphasis">
-                      <v-icon class="mb-2">mdi-account-off</v-icon>
-                      <div>No cleaners match your criteria</div>
-                      <div class="text-caption">Try adjusting your filters</div>
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-card>
-            </v-col>
-          </v-row>
-          <!-- Selected Cleaner Details -->
-          <v-row v-if="selectedCleanerDetails">
-            <v-col cols="12">
-              <v-card variant="outlined" color="primary">
-                <v-card-title class="text-subtitle-1 py-2">
-                  <v-icon class="mr-2">mdi-account-check</v-icon>
-                  Selected Cleaner Details
-                </v-card-title>
-                <v-divider />
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="12" md="4">
-                      <div class="text-center">
-                        <v-avatar :color="getAvailabilityColor(selectedCleanerDetails)" size="80" class="mb-2">
-                          <v-icon size="40">mdi-account</v-icon>
-                        </v-avatar>
-                        <div class="text-h6 font-weight-medium">{{ selectedCleanerDetails.name }}</div>
-                        <v-rating
-                          :model-value="getCleanerRating(selectedCleanerDetails.id)"
-                          readonly
-                          size="small"
-                          density="compact"
-                          class="justify-center mt-1"
-                        />
-                      </div>
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Skills & Specializations</div>
-                      <div class="d-flex flex-wrap gap-1 mb-3">
-                        <v-chip
-                          v-for="skill in selectedCleanerDetails.skills"
-                          :key="skill"
-                          size="small"
-                          color="primary"
-                          variant="tonal"
-                        >
-                          {{ skill }}
-                        </v-chip>
-                      </div>
-                      <div class="text-body-2 text-medium-emphasis mb-1">Availability Status</div>
-                      <v-chip
-                        :color="getAvailabilityColor(selectedCleanerDetails)"
-                        variant="elevated"
-                      >
-                        <v-icon start>{{ getAvailabilityIcon(selectedCleanerDetails) }}</v-icon>
-                        {{ getAvailabilityText(selectedCleanerDetails) }}
-                      </v-chip>
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Today's Schedule</div>
-                      <div class="text-body-1 mb-2">
-                        {{ getCleanerTodayBookings(selectedCleanerDetails.id) }}/{{ selectedCleanerDetails.max_daily_bookings }} bookings
-                      </div>
-                      <div class="text-body-2 text-medium-emphasis mb-1">Distance from Property</div>
-                      <div class="text-body-1 mb-2">{{ getDistanceText(selectedCleanerDetails) }}</div>
-                      <div class="text-body-2 text-medium-emphasis mb-1">Estimated Travel Time</div>
-                      <div class="text-body-1">{{ getTravelTime(selectedCleanerDetails) }}</div>
-                    </v-col>
-                  </v-row>
-                  <!-- Conflict Warning -->
-                  <v-row v-if="hasScheduleConflict(selectedCleanerDetails)">
-                    <v-col cols="12">
-                      <v-alert
-                        type="warning"
-                        variant="tonal"
-                        title="Potential Schedule Conflict"
-                        class="mt-2"
-                      >
-                        This cleaner has overlapping bookings. Please verify availability before confirming assignment.
-                      </v-alert>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-      <v-divider />
-      <v-card-actions class="pa-4">
-        <v-btn
-          color="grey-darken-1"
-          variant="text"
-          :disabled="loading"
-          @click="handleClose"
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          variant="outlined"
-          color="primary"
-          :disabled="loading"
-          @click="handleAutoAssign"
-        >
-          <v-icon start>mdi-auto-fix</v-icon>
-          Auto-Assign Best Match
-        </v-btn>
-        <v-spacer />
-        <v-btn
-          color="primary"
-          variant="elevated"
-          :loading="loading"
-          :disabled="!selectedCleanerId"
-          @click="handleAssign"
-        >
-          <v-icon start>mdi-account-check</v-icon>
-          Assign Cleaner
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-</template>
-⋮----
-<!-- Booking Information -->
-⋮----
-<div class="text-body-1 font-weight-medium">{{ selectedProperty?.name }}</div>
-<div class="text-body-2 text-medium-emphasis">{{ selectedProperty?.address }}</div>
-⋮----
-{{ formatDateTime(booking.checkout_date) }}
-⋮----
-{{ formatDateTime(booking.checkin_date) }}
-⋮----
-<div class="text-body-1">{{ getCleaningWindow() }}</div>
-⋮----
-<div class="text-body-1">{{ selectedProperty?.cleaning_duration || 120 }} minutes</div>
-⋮----
-<!-- Filters and Search -->
-⋮----
-<!-- Cleaner Selection -->
-⋮----
-{{ filteredCleaners.length }} available
-⋮----
-<template v-for="(cleaner, index) in filteredCleaners" :key="cleaner.id">
-                    <v-list-item
-                      :class="{ 'bg-primary-lighten-5': selectedCleanerId === cleaner.id }"
-                      @click="selectCleaner(cleaner.id)"
-                    >
-                      <template #prepend>
-                        <v-avatar :color="getAvailabilityColor(cleaner)" size="40">
-                          <v-icon>mdi-account</v-icon>
-                        </v-avatar>
-                      </template>
-                      <v-list-item-title class="font-weight-medium">
-                        {{ cleaner.name }}
-                        <v-chip
-                          v-if="selectedCleanerId === cleaner.id"
-                          color="primary"
-                          size="x-small"
-                          class="ml-2"
-                        >
-                          SELECTED
-                        </v-chip>
-                      </v-list-item-title>
-                      <v-list-item-subtitle>
-                        <div class="d-flex flex-wrap gap-1 mb-1">
-                          <v-chip
-                            v-for="skill in cleaner.skills.slice(0, 3)"
-                            :key="skill"
-                            size="x-small"
-                            variant="outlined"
-                          >
-                            {{ skill }}
-                          </v-chip>
-                          <v-chip
-                            v-if="cleaner.skills.length > 3"
-                            size="x-small"
-                            variant="text"
-                          >
-                            +{{ cleaner.skills.length - 3 }} more
-                          </v-chip>
-                        </div>
-                        <div class="text-caption">
-                          Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
-                          • Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
-                        </div>
-                      </v-list-item-subtitle>
-                      <template #append>
-                        <div class="d-flex flex-column align-end">
-                          <v-chip
-                            :color="getAvailabilityColor(cleaner)"
-                            size="small"
-                            variant="tonal"
-                            class="mb-1"
-                          >
-                            {{ getAvailabilityText(cleaner) }}
-                          </v-chip>
-                          <div class="text-caption text-medium-emphasis">
-                            {{ getDistanceText(cleaner) }}
-                          </div>
-                        </div>
-                      </template>
-                    </v-list-item>
-                    <v-divider v-if="index < filteredCleaners.length - 1" />
-                  </template>
-⋮----
-<template #prepend>
-                        <v-avatar :color="getAvailabilityColor(cleaner)" size="40">
-                          <v-icon>mdi-account</v-icon>
-                        </v-avatar>
-                      </template>
-⋮----
-{{ cleaner.name }}
-⋮----
-{{ skill }}
-⋮----
-+{{ cleaner.skills.length - 3 }} more
-⋮----
-Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
-• Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
-⋮----
-<template #append>
-                        <div class="d-flex flex-column align-end">
-                          <v-chip
-                            :color="getAvailabilityColor(cleaner)"
-                            size="small"
-                            variant="tonal"
-                            class="mb-1"
-                          >
-                            {{ getAvailabilityText(cleaner) }}
-                          </v-chip>
-                          <div class="text-caption text-medium-emphasis">
-                            {{ getDistanceText(cleaner) }}
-                          </div>
-                        </div>
-                      </template>
-⋮----
-{{ getAvailabilityText(cleaner) }}
-⋮----
-{{ getDistanceText(cleaner) }}
-⋮----
-<!-- No cleaners available -->
-⋮----
-<!-- Selected Cleaner Details -->
-⋮----
-<div class="text-h6 font-weight-medium">{{ selectedCleanerDetails.name }}</div>
-⋮----
-{{ skill }}
-⋮----
-<v-icon start>{{ getAvailabilityIcon(selectedCleanerDetails) }}</v-icon>
-{{ getAvailabilityText(selectedCleanerDetails) }}
-⋮----
-{{ getCleanerTodayBookings(selectedCleanerDetails.id) }}/{{ selectedCleanerDetails.max_daily_bookings }} bookings
-⋮----
-<div class="text-body-1 mb-2">{{ getDistanceText(selectedCleanerDetails) }}</div>
-⋮----
-<div class="text-body-1">{{ getTravelTime(selectedCleanerDetails) }}</div>
-⋮----
-<!-- Conflict Warning -->
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import type { Property } from '@/types/property'
-import type { BookingFormData } from '@/types/booking'
-import type { Cleaner } from '@/types/user'
-// Props
-interface Props {
-  modelValue: boolean
-  booking?: Partial<BookingFormData> | null
-  properties: Property[]
-  cleaners: Cleaner[]
-  loading?: boolean
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
-})
-// Emits
-interface Emits {
-  'update:modelValue': [value: boolean]
-  'assign': [cleanerId: string]
-  'auto-assign': []
-}
-const emit = defineEmits<Emits>()
-// State
-const selectedCleanerId = ref<string>('')
-const searchQuery = ref('')
-const availabilityFilter = ref<string>('')
-const skillFilter = ref<string>('')
-// Computed properties
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-const selectedProperty = computed(() => {
-  if (!props.booking?.property_id) return null
-  return props.properties.find(p => p.id === props.booking?.property_id)
-})
-const selectedCleanerDetails = computed(() => {
-  if (!selectedCleanerId.value) return null
-  return props.cleaners.find(c => c.id === selectedCleanerId.value)
-})
-const availabilityFilterOptions = [
-  { title: 'Available', value: 'available' },
-  { title: 'Limited Availability', value: 'limited' },
-  { title: 'Fully Booked', value: 'booked' }
-]
-const skillFilterOptions = computed(() => {
-  const allSkills = new Set<string>()
-  props.cleaners.forEach(cleaner => {
-    cleaner.skills.forEach(skill => allSkills.add(skill))
-  })
-  return Array.from(allSkills).map(skill => ({ title: skill, value: skill }))
-})
-const filteredCleaners = computed(() => {
-  let filtered = [...props.cleaners]
-  // Search filter
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(cleaner => 
-      cleaner.name.toLowerCase().includes(query) ||
-      cleaner.skills.some(skill => skill.toLowerCase().includes(query))
-    )
-  }
-  // Availability filter
-  if (availabilityFilter.value) {
-    filtered = filtered.filter(cleaner => {
-      const availability = getAvailabilityStatus(cleaner)
-      return availability === availabilityFilter.value
-    })
-  }
-  // Skill filter
-  if (skillFilter.value) {
-    filtered = filtered.filter(cleaner => 
-      cleaner.skills.includes(skillFilter.value)
-    )
-  }
-  // Sort by availability and rating
-  return filtered.sort((a, b) => {
-    const aAvailable = getAvailabilityStatus(a) === 'available'
-    const bAvailable = getAvailabilityStatus(b) === 'available'
-    if (aAvailable && !bAvailable) return -1
-    if (!aAvailable && bAvailable) return 1
-    // If same availability, sort by rating
-    return getCleanerRating(b.id) - getCleanerRating(a.id)
-  })
-})
-// Methods
-const selectCleaner = (cleanerId: string) => {
-  selectedCleanerId.value = cleanerId
-}
-const getAvailabilityStatus = (cleaner: Cleaner): string => {
-  const todayBookings = getCleanerTodayBookings(cleaner.id)
-  if (todayBookings >= cleaner.max_daily_bookings) return 'booked'
-  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'limited'
-  return 'available'
-}
-const getAvailabilityColor = (cleaner: Cleaner) => {
-  const status = getAvailabilityStatus(cleaner)
-  const colors = {
-    available: 'green',
-    limited: 'orange',
-    booked: 'red'
-  }
-  return colors[status]
-}
-const getAvailabilityText = (cleaner: Cleaner) => {
-  const status = getAvailabilityStatus(cleaner)
-  const texts = {
-    available: 'Available',
-    limited: 'Limited',
-    booked: 'Fully Booked'
-  }
-  return texts[status]
-}
-const getAvailabilityIcon = (cleaner: Cleaner) => {
-  const status = getAvailabilityStatus(cleaner)
-  const icons = {
-    available: 'mdi-check-circle',
-    limited: 'mdi-clock',
-    booked: 'mdi-close-circle'
-  }
-  return icons[status]
-}
-const getCleanerTodayBookings = (cleanerId: string) => {
-  // Mock data - would come from bookings store
-  return Math.floor(Math.random() * 6)
-}
-const getCleanerRating = (cleanerId: string) => {
-  // Mock data - would come from performance data
-  return 3.5 + Math.random() * 1.5
-}
-const getDistanceText = (cleaner: Cleaner) => {
-  // Mock data - would calculate from cleaner location and property
-  const distance = Math.floor(Math.random() * 20) + 1
-  return `${distance} km away`
-}
-const getTravelTime = (cleaner: Cleaner) => {
-  // Mock data - would calculate based on distance and traffic
-  const time = Math.floor(Math.random() * 30) + 10
-  return `${time} minutes`
-}
-const hasScheduleConflict = (cleaner: Cleaner) => {
-  // Mock conflict detection - would check against existing bookings
-  return Math.random() < 0.2 // 20% chance of conflict
-}
-const formatDateTime = (dateTime: string) => {
-  if (!dateTime) return ''
-  const date = new Date(dateTime)
-  return date.toLocaleString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  })
-}
-const getCleaningWindow = () => {
-  if (!props.booking?.checkout_date || !props.booking?.checkin_date) return ''
-  const checkout = new Date(props.booking.checkout_date)
-  const checkin = new Date(props.booking.checkin_date)
-  const diffHours = Math.abs(checkin.getTime() - checkout.getTime()) / (1000 * 60 * 60)
-  if (diffHours < 1) {
-    return 'Same-day turnaround (< 1 hour)'
-  } else if (diffHours < 24) {
-    return `${Math.floor(diffHours)} hours available`
-  } else {
-    return `${Math.floor(diffHours / 24)} days available`
-  }
-}
-const handleAssign = () => {
-  if (selectedCleanerId.value) {
-    emit('assign', selectedCleanerId.value)
-  }
-}
-const handleAutoAssign = () => {
-  emit('auto-assign')
-}
-const handleClose = () => {
-  isOpen.value = false
-}
-// Reset selection when modal opens
-watch(isOpen, (newValue) => {
-  if (newValue) {
-    selectedCleanerId.value = ''
-    searchQuery.value = ''
-    availabilityFilter.value = ''
-    skillFilter.value = ''
-  }
-})
-</script>
-<style scoped>
-.v-card-title {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-.v-list-item:hover {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-.bg-primary-lighten-5 {
-  background-color: rgb(var(--v-theme-primary), 0.1) !important;
-}
-</style>
-`````
-
-## File: src/components/dumb/admin/TurnPriorityPanel.vue
-`````vue
-<template>
-  <v-card variant="outlined" class="turn-priority-panel">
-    <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
-      <v-icon class="mr-2" color="error">mdi-clock-alert</v-icon>
-      System Turn Priority Queue
-      <v-spacer />
-      <v-chip
-        :color="getTotalUrgencyColor()"
-        variant="elevated"
-        size="small"
-      >
-        {{ urgentTurns.length }} Urgent
-      </v-chip>
-      <v-btn
-        variant="text"
-        size="small"
-        :icon="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-        @click="expanded = !expanded"
-      />
-    </v-card-title>
-    <v-divider />
-    <v-expand-transition>
-      <v-card-text v-show="expanded" class="pa-0">
-        <!-- Summary Stats -->
-        <v-container>
-          <v-row>
-            <v-col cols="12" md="3">
-              <v-card variant="tonal" color="error">
-                <v-card-text class="text-center py-3">
-                  <div class="text-h4 font-weight-bold">{{ criticalTurns.length }}</div>
-                  <div class="text-body-2">Critical (< 2 hrs)</div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-card variant="tonal" color="warning">
-                <v-card-text class="text-center py-3">
-                  <div class="text-h4 font-weight-bold">{{ urgentTurns.length }}</div>
-                  <div class="text-body-2">Urgent (< 6 hrs)</div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-card variant="tonal" color="info">
-                <v-card-text class="text-center py-3">
-                  <div class="text-h4 font-weight-bold">{{ unassignedTurns.length }}</div>
-                  <div class="text-body-2">Unassigned</div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-card variant="tonal" color="success">
-                <v-card-text class="text-center py-3">
-                  <div class="text-h4 font-weight-bold">${{ estimatedRevenue.toLocaleString() }}</div>
-                  <div class="text-body-2">Revenue at Risk</div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
-        <v-divider />
-        <!-- Filters and Controls -->
-        <v-container>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-select
-                v-model="selectedUrgencyFilter"
-                :items="urgencyFilterOptions"
-                label="Urgency Level"
-                variant="outlined"
-                density="compact"
-                clearable
-                @update:model-value="handleFilterChange"
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-select
-                v-model="selectedStatusFilter"
-                :items="statusFilterOptions"
-                label="Assignment Status"
-                variant="outlined"
-                density="compact"
-                clearable
-                @update:model-value="handleFilterChange"
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12">
-              <div class="d-flex gap-2 flex-wrap">
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  color="primary"
-                  @click="handleRefresh"
-                >
-                  <v-icon start>mdi-refresh</v-icon>
-                  Refresh
-                </v-btn>
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  color="warning"
-                  :disabled="selectedTurns.length === 0"
-                  @click="handleBulkAssign"
-                >
-                  <v-icon start>mdi-account-multiple</v-icon>
-                  Bulk Assign ({{ selectedTurns.length }})
-                </v-btn>
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  color="error"
-                  :disabled="criticalTurns.length === 0"
-                  @click="handleEscalateAll"
-                >
-                  <v-icon start>mdi-alert-octagon</v-icon>
-                  Escalate Critical
-                </v-btn>
-                <v-spacer />
-                <v-switch
-                  v-model="autoRefresh"
-                  color="primary"
-                  density="compact"
-                  hide-details
-                  @update:model-value="handleAutoRefreshToggle"
-                />
-                <span class="text-body-2 ml-2">Auto-refresh</span>
-              </div>
-            </v-col>
-          </v-row>
-        </v-container>
-        <v-divider />
-        <!-- Turn List -->
-        <div class="turn-list">
-          <v-list class="pa-0" max-height="500" style="overflow-y: auto;">
-            <template v-for="(turn, index) in filteredTurns" :key="turn.id">
-              <v-list-item
-                :class="getTurnItemClass(turn)"
-                @click="toggleTurnSelection(turn.id)"
-              >
-                <template #prepend>
-                  <v-checkbox
-                    :model-value="selectedTurns.includes(turn.id)"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    @click.stop="toggleTurnSelection(turn.id)"
-                  />
-                  <v-avatar
-                    :color="getUrgencyColor(turn)"
-                    size="40"
-                    class="ml-2"
-                  >
-                    <v-icon>{{ getUrgencyIcon(turn) }}</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title class="font-weight-medium">
-                  {{ getPropertyName(turn.property_id) }}
-                  <v-chip
-                    :color="getUrgencyColor(turn)"
-                    size="x-small"
-                    class="ml-2"
-                  >
-                    {{ getTimeRemaining(turn) }}
-                  </v-chip>
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  <div class="d-flex align-center mb-1">
-                    <v-icon size="small" class="mr-1">mdi-account</v-icon>
-                    {{ getPropertyOwnerName(turn.owner_id) }}
-                    <v-icon size="small" class="mx-2">mdi-map-marker</v-icon>
-                    {{ getPropertyAddress(turn.property_id) }}
-                  </div>
-                  <div class="d-flex align-center">
-                    <v-icon size="small" class="mr-1">mdi-calendar-export</v-icon>
-                    {{ formatDateTime(turn.checkout_date) }}
-                    <v-icon size="small" class="mx-2">mdi-calendar-import</v-icon>
-                    {{ formatDateTime(turn.checkin_date) }}
-                  </div>
-                </v-list-item-subtitle>
-                <template #append>
-                  <div class="d-flex flex-column align-end">
-                    <!-- Assignment Status -->
-                    <div class="mb-2">
-                      <v-chip
-                        v-if="turn.assigned_cleaner_id"
-                        color="success"
-                        size="small"
-                        variant="tonal"
-                      >
-                        <v-icon start>mdi-account-check</v-icon>
-                        {{ getCleanerName(turn.assigned_cleaner_id) }}
-                      </v-chip>
-                      <v-chip
-                        v-else
-                        color="error"
-                        size="small"
-                        variant="tonal"
-                      >
-                        <v-icon start>mdi-account-alert</v-icon>
-                        Unassigned
-                      </v-chip>
-                    </div>
-                    <!-- Action Buttons -->
-                    <div class="d-flex gap-1">
-                      <v-btn
-                        v-if="!turn.assigned_cleaner_id"
-                        variant="outlined"
-                        size="x-small"
-                        color="primary"
-                        @click.stop="handleAssignCleaner(turn.id)"
-                      >
-                        <v-icon>mdi-account-plus</v-icon>
-                      </v-btn>
-                      <v-btn
-                        variant="outlined"
-                        size="x-small"
-                        color="info"
-                        @click.stop="handleViewDetails(turn.id)"
-                      >
-                        <v-icon>mdi-eye</v-icon>
-                      </v-btn>
-                      <v-btn
-                        v-if="getUrgencyLevel(turn) === 'critical'"
-                        variant="outlined"
-                        size="x-small"
-                        color="error"
-                        @click.stop="handleEscalate(turn.id)"
-                      >
-                        <v-icon>mdi-alert</v-icon>
-                      </v-btn>
-                    </div>
-                  </div>
-                </template>
-              </v-list-item>
-              <v-divider v-if="index < filteredTurns.length - 1" />
-            </template>
-            <!-- Empty State -->
-            <v-list-item v-if="filteredTurns.length === 0">
-              <v-list-item-title class="text-center text-medium-emphasis py-8">
-                <v-icon size="64" class="mb-4">mdi-check-circle</v-icon>
-                <div class="text-h6">No Urgent Turns</div>
-                <div class="text-body-2">All turn bookings are under control</div>
-              </v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </div>
-        <!-- Business Impact Alert -->
-        <v-container v-if="showBusinessImpactAlert">
-          <v-alert
-            :type="businessImpactAlert.type"
-            variant="tonal"
-            :title="businessImpactAlert.title"
-            class="mb-0"
-          >
-            <p v-for="message in businessImpactAlert.messages" :key="message" class="mb-1">
-              {{ message }}
-            </p>
-          </v-alert>
-        </v-container>
-      </v-card-text>
-    </v-expand-transition>
-  </v-card>
-</template>
-⋮----
-{{ urgentTurns.length }} Urgent
-⋮----
-<!-- Summary Stats -->
-⋮----
-<div class="text-h4 font-weight-bold">{{ criticalTurns.length }}</div>
-⋮----
-<div class="text-h4 font-weight-bold">{{ urgentTurns.length }}</div>
-⋮----
-<div class="text-h4 font-weight-bold">{{ unassignedTurns.length }}</div>
-⋮----
-<div class="text-h4 font-weight-bold">${{ estimatedRevenue.toLocaleString() }}</div>
-⋮----
-<!-- Filters and Controls -->
-⋮----
-Bulk Assign ({{ selectedTurns.length }})
-⋮----
-<!-- Turn List -->
-⋮----
-<template v-for="(turn, index) in filteredTurns" :key="turn.id">
-              <v-list-item
-                :class="getTurnItemClass(turn)"
-                @click="toggleTurnSelection(turn.id)"
-              >
-                <template #prepend>
-                  <v-checkbox
-                    :model-value="selectedTurns.includes(turn.id)"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    @click.stop="toggleTurnSelection(turn.id)"
-                  />
-                  <v-avatar
-                    :color="getUrgencyColor(turn)"
-                    size="40"
-                    class="ml-2"
-                  >
-                    <v-icon>{{ getUrgencyIcon(turn) }}</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title class="font-weight-medium">
-                  {{ getPropertyName(turn.property_id) }}
-                  <v-chip
-                    :color="getUrgencyColor(turn)"
-                    size="x-small"
-                    class="ml-2"
-                  >
-                    {{ getTimeRemaining(turn) }}
-                  </v-chip>
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  <div class="d-flex align-center mb-1">
-                    <v-icon size="small" class="mr-1">mdi-account</v-icon>
-                    {{ getPropertyOwnerName(turn.owner_id) }}
-                    <v-icon size="small" class="mx-2">mdi-map-marker</v-icon>
-                    {{ getPropertyAddress(turn.property_id) }}
-                  </div>
-                  <div class="d-flex align-center">
-                    <v-icon size="small" class="mr-1">mdi-calendar-export</v-icon>
-                    {{ formatDateTime(turn.checkout_date) }}
-                    <v-icon size="small" class="mx-2">mdi-calendar-import</v-icon>
-                    {{ formatDateTime(turn.checkin_date) }}
-                  </div>
-                </v-list-item-subtitle>
-                <template #append>
-                  <div class="d-flex flex-column align-end">
-                    <!-- Assignment Status -->
-                    <div class="mb-2">
-                      <v-chip
-                        v-if="turn.assigned_cleaner_id"
-                        color="success"
-                        size="small"
-                        variant="tonal"
-                      >
-                        <v-icon start>mdi-account-check</v-icon>
-                        {{ getCleanerName(turn.assigned_cleaner_id) }}
-                      </v-chip>
-                      <v-chip
-                        v-else
-                        color="error"
-                        size="small"
-                        variant="tonal"
-                      >
-                        <v-icon start>mdi-account-alert</v-icon>
-                        Unassigned
-                      </v-chip>
-                    </div>
-                    <!-- Action Buttons -->
-                    <div class="d-flex gap-1">
-                      <v-btn
-                        v-if="!turn.assigned_cleaner_id"
-                        variant="outlined"
-                        size="x-small"
-                        color="primary"
-                        @click.stop="handleAssignCleaner(turn.id)"
-                      >
-                        <v-icon>mdi-account-plus</v-icon>
-                      </v-btn>
-                      <v-btn
-                        variant="outlined"
-                        size="x-small"
-                        color="info"
-                        @click.stop="handleViewDetails(turn.id)"
-                      >
-                        <v-icon>mdi-eye</v-icon>
-                      </v-btn>
-                      <v-btn
-                        v-if="getUrgencyLevel(turn) === 'critical'"
-                        variant="outlined"
-                        size="x-small"
-                        color="error"
-                        @click.stop="handleEscalate(turn.id)"
-                      >
-                        <v-icon>mdi-alert</v-icon>
-                      </v-btn>
-                    </div>
-                  </div>
-                </template>
-              </v-list-item>
-              <v-divider v-if="index < filteredTurns.length - 1" />
-            </template>
-⋮----
-<template #prepend>
-                  <v-checkbox
-                    :model-value="selectedTurns.includes(turn.id)"
-                    color="primary"
-                    density="compact"
-                    hide-details
-                    @click.stop="toggleTurnSelection(turn.id)"
-                  />
-                  <v-avatar
-                    :color="getUrgencyColor(turn)"
-                    size="40"
-                    class="ml-2"
-                  >
-                    <v-icon>{{ getUrgencyIcon(turn) }}</v-icon>
-                  </v-avatar>
-                </template>
-⋮----
-<v-icon>{{ getUrgencyIcon(turn) }}</v-icon>
-⋮----
-{{ getPropertyName(turn.property_id) }}
-⋮----
-{{ getTimeRemaining(turn) }}
-⋮----
-{{ getPropertyOwnerName(turn.owner_id) }}
-⋮----
-{{ getPropertyAddress(turn.property_id) }}
-⋮----
-{{ formatDateTime(turn.checkout_date) }}
-⋮----
-{{ formatDateTime(turn.checkin_date) }}
-⋮----
-<template #append>
-                  <div class="d-flex flex-column align-end">
-                    <!-- Assignment Status -->
-                    <div class="mb-2">
-                      <v-chip
-                        v-if="turn.assigned_cleaner_id"
-                        color="success"
-                        size="small"
-                        variant="tonal"
-                      >
-                        <v-icon start>mdi-account-check</v-icon>
-                        {{ getCleanerName(turn.assigned_cleaner_id) }}
-                      </v-chip>
-                      <v-chip
-                        v-else
-                        color="error"
-                        size="small"
-                        variant="tonal"
-                      >
-                        <v-icon start>mdi-account-alert</v-icon>
-                        Unassigned
-                      </v-chip>
-                    </div>
-                    <!-- Action Buttons -->
-                    <div class="d-flex gap-1">
-                      <v-btn
-                        v-if="!turn.assigned_cleaner_id"
-                        variant="outlined"
-                        size="x-small"
-                        color="primary"
-                        @click.stop="handleAssignCleaner(turn.id)"
-                      >
-                        <v-icon>mdi-account-plus</v-icon>
-                      </v-btn>
-                      <v-btn
-                        variant="outlined"
-                        size="x-small"
-                        color="info"
-                        @click.stop="handleViewDetails(turn.id)"
-                      >
-                        <v-icon>mdi-eye</v-icon>
-                      </v-btn>
-                      <v-btn
-                        v-if="getUrgencyLevel(turn) === 'critical'"
-                        variant="outlined"
-                        size="x-small"
-                        color="error"
-                        @click.stop="handleEscalate(turn.id)"
-                      >
-                        <v-icon>mdi-alert</v-icon>
-                      </v-btn>
-                    </div>
-                  </div>
-                </template>
-⋮----
-<!-- Assignment Status -->
-⋮----
-{{ getCleanerName(turn.assigned_cleaner_id) }}
-⋮----
-<!-- Action Buttons -->
-⋮----
-<!-- Empty State -->
-⋮----
-<!-- Business Impact Alert -->
-⋮----
-{{ message }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import type { Booking } from '@/types/booking'
-import type { Property } from '@/types/property'
-import type { Cleaner } from '@/types/user'
-// Props
-interface Props {
-  turns: Booking[]
-  properties: Property[]
-  cleaners: Cleaner[]
-  propertyOwners: Array<{ id: string; name: string }>
-  loading?: boolean
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
-})
-// Emits
-interface Emits {
-  'assign-cleaner': [turnId: string]
-  'view-details': [turnId: string]
-  'escalate': [turnId: string]
-  'bulk-assign': [turnIds: string[]]
-  'escalate-all': [turnIds: string[]]
-  'refresh': []
-}
-const emit = defineEmits<Emits>()
-// State
-const expanded = ref(true)
-const selectedTurns = ref<string[]>([])
-const selectedUrgencyFilter = ref<string>('')
-const selectedStatusFilter = ref<string>('')
-const autoRefresh = ref(true)
-const refreshInterval = ref<NodeJS.Timeout | null>(null)
-// Computed properties
-const urgentTurns = computed(() => {
-  return props.turns.filter(turn => {
-    const urgency = getUrgencyLevel(turn)
-    return urgency === 'urgent' || urgency === 'critical'
-  })
-})
-const criticalTurns = computed(() => {
-  return props.turns.filter(turn => getUrgencyLevel(turn) === 'critical')
-})
-const unassignedTurns = computed(() => {
-  return props.turns.filter(turn => !turn.assigned_cleaner_id)
-})
-const estimatedRevenue = computed(() => {
-  // Mock calculation - would be based on property pricing
-  return urgentTurns.value.length * 150 // $150 average per turn
-})
-const filteredTurns = computed(() => {
-  let filtered = [...props.turns]
-  // Filter by urgency
-  if (selectedUrgencyFilter.value) {
-    filtered = filtered.filter(turn => 
-      getUrgencyLevel(turn) === selectedUrgencyFilter.value
-    )
-  }
-  // Filter by assignment status
-  if (selectedStatusFilter.value) {
-    if (selectedStatusFilter.value === 'assigned') {
-      filtered = filtered.filter(turn => turn.assigned_cleaner_id)
-    } else if (selectedStatusFilter.value === 'unassigned') {
-      filtered = filtered.filter(turn => !turn.assigned_cleaner_id)
-    }
-  }
-  // Sort by urgency and time remaining
-  return filtered.sort((a, b) => {
-    const aUrgency = getUrgencyLevel(a)
-    const bUrgency = getUrgencyLevel(b)
-    if (aUrgency === 'critical' && bUrgency !== 'critical') return -1
-    if (bUrgency === 'critical' && aUrgency !== 'critical') return 1
-    // Sort by checkout time (earliest first)
-    return new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime()
-  })
-})
-const showBusinessImpactAlert = computed(() => {
-  return businessImpactAlert.value.messages.length > 0
-})
-const businessImpactAlert = computed(() => {
-  const alert = {
-    type: 'info' as 'info' | 'warning' | 'error',
-    title: '',
-    messages: [] as string[]
-  }
-  if (criticalTurns.value.length > 0) {
-    alert.type = 'error'
-    alert.title = 'Critical Business Impact'
-    alert.messages.push(`${criticalTurns.value.length} critical turns require immediate attention`)
-    alert.messages.push('Client satisfaction and revenue at high risk')
-  } else if (unassignedTurns.value.length > 3) {
-    alert.type = 'warning'
-    alert.title = 'High Unassigned Turn Volume'
-    alert.messages.push(`${unassignedTurns.value.length} turns need cleaner assignment`)
-    alert.messages.push('Consider activating additional cleaning staff')
-  }
-  return alert
-})
-// Filter options
-const urgencyFilterOptions = [
-  { title: 'Critical (< 2 hours)', value: 'critical' },
-  { title: 'Urgent (< 6 hours)', value: 'urgent' },
-  { title: 'Standard', value: 'standard' }
-]
-const statusFilterOptions = [
-  { title: 'Assigned', value: 'assigned' },
-  { title: 'Unassigned', value: 'unassigned' }
-]
-// Methods
-const getUrgencyLevel = (turn: Booking): 'critical' | 'urgent' | 'standard' => {
-  const now = new Date()
-  const checkoutTime = new Date(turn.checkout_date)
-  const hoursUntil = (checkoutTime.getTime() - now.getTime()) / (1000 * 60 * 60)
-  if (hoursUntil <= 2) return 'critical'
-  if (hoursUntil <= 6) return 'urgent'
-  return 'standard'
-}
-const getUrgencyColor = (turn: Booking) => {
-  const urgency = getUrgencyLevel(turn)
-  const colors = {
-    critical: 'error',
-    urgent: 'warning',
-    standard: 'info'
-  }
-  return colors[urgency]
-}
-const getUrgencyIcon = (turn: Booking) => {
-  const urgency = getUrgencyLevel(turn)
-  const icons = {
-    critical: 'mdi-alert-octagon',
-    urgent: 'mdi-clock-alert',
-    standard: 'mdi-clock'
-  }
-  return icons[urgency]
-}
-const getTotalUrgencyColor = () => {
-  if (criticalTurns.value.length > 0) return 'error'
-  if (urgentTurns.value.length > 0) return 'warning'
-  return 'success'
-}
-const getTurnItemClass = (turn: Booking) => {
-  const urgency = getUrgencyLevel(turn)
-  const classes = ['turn-item']
-  if (urgency === 'critical') classes.push('turn-critical')
-  else if (urgency === 'urgent') classes.push('turn-urgent')
-  if (selectedTurns.value.includes(turn.id)) classes.push('turn-selected')
-  return classes.join(' ')
-}
-const getTimeRemaining = (turn: Booking) => {
-  const now = new Date()
-  const checkoutTime = new Date(turn.checkout_date)
-  const diffMs = checkoutTime.getTime() - now.getTime()
-  if (diffMs <= 0) return 'OVERDUE'
-  const hours = Math.floor(diffMs / (1000 * 60 * 60))
-  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
-  if (hours === 0) return `${minutes}m`
-  if (hours < 24) return `${hours}h ${minutes}m`
-  const days = Math.floor(hours / 24)
-  return `${days}d ${hours % 24}h`
-}
-const formatDateTime = (dateTime: string) => {
-  const date = new Date(dateTime)
-  return date.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  })
-}
-const getPropertyName = (propertyId: string) => {
-  const property = props.properties.find(p => p.id === propertyId)
-  return property?.name || 'Unknown Property'
-}
-const getPropertyAddress = (propertyId: string) => {
-  const property = props.properties.find(p => p.id === propertyId)
-  return property?.address || 'Unknown Address'
-}
-const getPropertyOwnerName = (ownerId: string) => {
-  const owner = props.propertyOwners.find(o => o.id === ownerId)
-  return owner?.name || `Owner ${ownerId.slice(-4)}`
-}
-const getCleanerName = (cleanerId: string) => {
-  const cleaner = props.cleaners.find(c => c.id === cleanerId)
-  return cleaner?.name || 'Unknown Cleaner'
-}
-const toggleTurnSelection = (turnId: string) => {
-  const index = selectedTurns.value.indexOf(turnId)
-  if (index > -1) {
-    selectedTurns.value.splice(index, 1)
-  } else {
-    selectedTurns.value.push(turnId)
-  }
-}
-const handleFilterChange = () => {
-  // Filters are reactive, no additional action needed
-}
-const handleRefresh = () => {
-  emit('refresh')
-}
-const handleAssignCleaner = (turnId: string) => {
-  emit('assign-cleaner', turnId)
-}
-const handleViewDetails = (turnId: string) => {
-  emit('view-details', turnId)
-}
-const handleEscalate = (turnId: string) => {
-  emit('escalate', turnId)
-}
-const handleBulkAssign = () => {
-  if (selectedTurns.value.length > 0) {
-    emit('bulk-assign', [...selectedTurns.value])
-  }
-}
-const handleEscalateAll = () => {
-  const criticalIds = criticalTurns.value.map(turn => turn.id)
-  if (criticalIds.length > 0) {
-    emit('escalate-all', criticalIds)
-  }
-}
-const handleAutoRefreshToggle = (enabled: boolean) => {
-  if (enabled) {
-    startAutoRefresh()
-  } else {
-    stopAutoRefresh()
-  }
-}
-const startAutoRefresh = () => {
-  if (refreshInterval.value) return
-  refreshInterval.value = setInterval(() => {
-    emit('refresh')
-  }, 30000) // Refresh every 30 seconds
-}
-const stopAutoRefresh = () => {
-  if (refreshInterval.value) {
-    clearInterval(refreshInterval.value)
-    refreshInterval.value = null
-  }
-}
-// Lifecycle
-onMounted(() => {
-  if (autoRefresh.value) {
-    startAutoRefresh()
-  }
-})
-onUnmounted(() => {
-  stopAutoRefresh()
-})
-// Watch for auto-refresh changes
-watch(autoRefresh, (enabled) => {
-  if (enabled) {
-    startAutoRefresh()
-  } else {
-    stopAutoRefresh()
-  }
-})
-</script>
-<style scoped>
-.turn-priority-panel {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-}
-.v-card-title {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-.turn-list {
-  max-height: 500px;
-  overflow-y: auto;
-}
-.turn-item {
-  transition: all 0.2s ease;
-}
-.turn-critical {
-  border-left: 4px solid rgb(var(--v-theme-error));
-  background-color: rgb(var(--v-theme-error), 0.05);
-}
-.turn-urgent {
-  border-left: 4px solid rgb(var(--v-theme-warning));
-  background-color: rgb(var(--v-theme-warning), 0.05);
-}
-.turn-selected {
-  background-color: rgb(var(--v-theme-primary), 0.1);
-}
-.turn-item:hover {
-  background-color: rgb(var(--v-theme-surface-variant), 0.5);
-}
-</style>
-`````
-
-## File: src/components/dumb/owner/OwnerBookingForm.vue
-`````vue
-<template>
-  <v-dialog
-    v-model="isOpen"
-    max-width="600px"
-    persistent
-    @keydown.esc="handleClose"
-  >
-    <v-card>
-      <v-card-title class="text-h5 pb-2">
-        {{ formTitle }}
-        <v-chip
-          v-if="form.booking_type === 'turn'"
-          color="error"
-          size="small"
-          class="ml-2"
-        >
-          SAME-DAY CLEANING
-        </v-chip>
-      </v-card-title>
-      <v-divider />
-      <v-card-text>
-        <v-form
-          ref="formRef"
-          v-model="formValid"
-          @submit.prevent="handleSubmit"
-        >
-          <v-container>
-            <!-- Property Selection -->
-            <v-row>
-              <v-col cols="12">
-                <v-select
-                  v-model="form.property_id"
-                  :items="propertiesArray"
-                  item-title="name"
-                  item-value="id"
-                  label="Select Property"
-                  :rules="propertyRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('property_id')"
-                  prepend-inner-icon="mdi-home"
-                />
-              </v-col>
-            </v-row>
-            <!-- Dates -->
-            <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-              >
-                <v-text-field
-                  v-model="form.checkout_date"
-                  label="Checkout Date"
-                  type="date"
-                  :rules="dateRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('checkout_date')"
-                  hint="When guests leave"
-                  persistent-hint
-                  prepend-inner-icon="mdi-calendar-export"
-                  @update:model-value="updateBookingType"
-                />
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-              >
-                <v-text-field
-                  v-model="form.checkin_date"
-                  label="Checkin Date"
-                  type="date"
-                  :rules="dateRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('checkin_date')"
-                  hint="When new guests arrive"
-                  persistent-hint
-                  prepend-inner-icon="mdi-calendar-import"
-                  @update:model-value="updateBookingType"
-                />
-              </v-col>
-            </v-row>
-            <!-- Guest Count -->
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  v-model.number="form.guest_count"
-                  label="Number of Guests (Optional)"
-                  type="number"
-                  min="1"
-                  max="20"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('guest_count')"
-                  hint="Helps determine cleaning requirements"
-                  persistent-hint
-                  prepend-inner-icon="mdi-account-group"
-                />
-              </v-col>
-            </v-row>
-            <!-- Notes -->
-            <v-row>
-              <v-col cols="12">
-                <v-textarea
-                  v-model="form.notes"
-                  label="Special Instructions (Optional)"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('notes')"
-                  hint="Any special cleaning requirements or notes"
-                  persistent-hint
-                  :counter="300"
-                  rows="3"
-                  prepend-inner-icon="mdi-note-text"
-                />
-              </v-col>
-            </v-row>
-            <!-- Same-Day Cleaning Alert -->
-            <v-row v-if="showSameDayAlert">
-              <v-col cols="12">
-                <v-alert
-                  type="info"
-                  variant="tonal"
-                  title="Same-Day Cleaning Required"
-                  class="mb-0"
-                >
-                  <p>Your guests are checking out and new guests are checking in on the same day.</p>
-                  <p class="mb-0">This requires priority same-day cleaning service.</p>
-                </v-alert>
-              </v-col>
-            </v-row>
-            <!-- Date Validation Error -->
-            <v-row v-if="showDateError">
-              <v-col cols="12">
-                <v-alert
-                  type="error"
-                  variant="tonal"
-                  title="Invalid Dates"
-                  text="Checkin date cannot be before checkout date. Please check your dates."
-                  class="mb-0"
-                />
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-form>
-      </v-card-text>
-      <v-divider />
-      <v-card-actions class="pa-4">
-        <v-btn
-          color="grey-darken-1"
-          variant="text"
-          :disabled="loading"
-          @click="handleClose"
-        >
-          Cancel
-        </v-btn>
-        <v-spacer />
-        <v-btn
-          color="primary"
-          variant="elevated"
-          :loading="loading"
-          :disabled="!formValid"
-          @click="handleSubmit"
-        >
-          {{ submitButtonText }}
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-</template>
-⋮----
-{{ formTitle }}
-⋮----
-<!-- Property Selection -->
-⋮----
-<!-- Dates -->
-⋮----
-<!-- Guest Count -->
-⋮----
-<!-- Notes -->
-⋮----
-<!-- Same-Day Cleaning Alert -->
-⋮----
-<!-- Date Validation Error -->
-⋮----
-{{ submitButtonText }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
-import type { Property } from '@/types/property'
-import type { Booking, BookingFormData } from '@/types/booking'
-// Props
-interface Props {
-  modelValue: boolean
-  mode: 'create' | 'edit'
-  booking?: Booking | null
-  properties: Property[]
-  loading?: boolean
-  errors?: Map<string, string[]>
-}
-const props = withDefaults(defineProps<Props>(), {
-  booking: null,
-  loading: false,
-  errors: () => new Map()
-})
-// Emits
-interface Emits {
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'submit', data: BookingFormData): void
-  (e: 'close'): void
-}
-const emit = defineEmits<Emits>()
-// Reactive data
-const formRef = ref()
-const formValid = ref(false)
-const autoDetectType = ref(true)
-// Form data
-const form = ref<BookingFormData>({
-  property_id: '',
-  owner_id: '',
-  checkout_date: '',
-  checkin_date: '',
-  booking_type: 'standard',
-  status: 'pending',
-  guest_count: undefined,
-  notes: ''
-})
-// Computed properties
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value: boolean) => emit('update:modelValue', value)
-})
-const formTitle = computed(() => {
-  return props.mode === 'create' ? 'Schedule Cleaning' : 'Update Booking'
-})
-const submitButtonText = computed(() => {
-  return props.mode === 'create' ? 'Schedule Cleaning' : 'Update Booking'
-})
-const propertiesArray = computed(() => {
-  return Array.from(props.properties).map(property => ({
-    id: property.id,
-    name: property.name,
-    address: property.address
-  }))
-})
-const showSameDayAlert = computed(() => {
-  return form.value.checkout_date && 
-         form.value.checkin_date && 
-         form.value.checkout_date === form.value.checkin_date
-})
-const showDateError = computed(() => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return false
-  return new Date(form.value.checkin_date) < new Date(form.value.checkout_date)
-})
-// Validation rules
-const propertyRules = [
-  (v: string) => !!v || 'Please select a property'
-]
-const dateRules = [
-  (v: string) => !!v || 'Date is required',
-  (v: string) => {
-    const date = new Date(v)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return date >= today || 'Date cannot be in the past'
-  }
-]
-// Methods
-const updateBookingType = () => {
-  if (!autoDetectType.value) return
-  if (form.value.checkout_date && form.value.checkin_date) {
-    const checkoutDate = new Date(form.value.checkout_date)
-    const checkinDate = new Date(form.value.checkin_date)
-    // Same day = turn booking
-    if (checkoutDate.toDateString() === checkinDate.toDateString()) {
-      form.value.booking_type = 'turn'
-    } else {
-      form.value.booking_type = 'standard'
-    }
-  }
-}
-const resetForm = () => {
-  form.value = {
-    property_id: '',
-    owner_id: '',
-    checkout_date: '',
-    checkin_date: '',
-    booking_type: 'standard',
-    status: 'pending',
-    guest_count: undefined,
-    notes: ''
-  }
-  if (formRef.value) {
-    formRef.value.resetValidation()
-  }
-}
-const populateForm = (booking: Booking) => {
-  form.value = {
-    property_id: booking.property_id,
-    owner_id: booking.owner_id,
-    checkout_date: booking.checkout_date,
-    checkin_date: booking.checkin_date,
-    booking_type: booking.booking_type,
-    status: booking.status,
-    guest_count: booking.guest_count,
-    notes: booking.notes || ''
-  }
-}
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  const { valid } = await formRef.value.validate()
-  if (!valid) return
-  // Additional validation
-  if (showDateError.value) return
-  emit('submit', { ...form.value })
-}
-const handleClose = () => {
-  emit('close')
-  emit('update:modelValue', false)
-}
-// Watchers
-watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    if (props.mode === 'edit' && props.booking) {
-      populateForm(props.booking)
-    } else {
-      resetForm()
-    }
-    nextTick(() => {
-      if (formRef.value) {
-        formRef.value.resetValidation()
-      }
-    })
-  }
-})
-watch(() => props.booking, (newBooking) => {
-  if (newBooking && props.mode === 'edit') {
-    populateForm(newBooking)
-  }
-})
-</script>
-<style scoped>
-.v-card-title {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-.v-card-actions {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-/* Mobile optimizations */
-@media (max-width: 600px) {
-  .v-dialog {
-    margin: 16px;
-  }
-  .v-card {
-    margin: 0;
-  }
-}
-</style>
-`````
-
-## File: src/components/dumb/owner/OwnerCalendarControls.vue
-`````vue
-<template>
-  <v-card
-    class="owner-calendar-controls"
-    :elevation="elevation"
-    :variant="variant"
-  >
-    <v-card-text class="pa-3">
-      <v-container fluid class="pa-0">
-        <!-- Main Controls Row -->
-        <v-row align="center" class="mb-2">
-          <!-- Navigation Controls -->
-          <v-col cols="auto">
-            <v-btn-group
-              variant="outlined"
-              density="comfortable"
-            >
-              <v-btn
-                :disabled="loading"
-                @click="handleNavigation('prev')"
-              >
-                <v-icon>mdi-chevron-left</v-icon>
-                <span class="d-none d-sm-inline ml-1">Previous</span>
-              </v-btn>
-              <v-btn
-                :disabled="loading"
-                @click="handleNavigation('today')"
-              >
-                <v-icon>mdi-calendar-today</v-icon>
-                <span class="d-none d-sm-inline ml-1">Today</span>
-              </v-btn>
-              <v-btn
-                :disabled="loading"
-                @click="handleNavigation('next')"
-              >
-                <span class="d-none d-sm-inline mr-1">Next</span>
-                <v-icon>mdi-chevron-right</v-icon>
-              </v-btn>
-            </v-btn-group>
-          </v-col>
-          <v-spacer />
-          <!-- Current Date Display -->
-          <v-col cols="auto" class="text-center">
-            <div class="text-h6 font-weight-medium">
-              {{ currentDateDisplay }}
-            </div>
-            <div class="text-caption text-medium-emphasis">
-              {{ currentDateSubtitle }}
-            </div>
-          </v-col>
-          <v-spacer />
-          <!-- View Controls -->
-          <v-col cols="auto">
-            <v-btn-group
-              v-model="selectedView"
-              variant="outlined"
-              density="comfortable"
-              mandatory
-            >
-              <v-btn
-                value="dayGridMonth"
-                :disabled="loading"
-                @click="handleViewChange('dayGridMonth')"
-              >
-                <v-icon>mdi-calendar-month</v-icon>
-                <span class="d-none d-md-inline ml-1">Month</span>
-              </v-btn>
-              <v-btn
-                value="timeGridWeek"
-                :disabled="loading"
-                @click="handleViewChange('timeGridWeek')"
-              >
-                <v-icon>mdi-calendar-week</v-icon>
-                <span class="d-none d-md-inline ml-1">Week</span>
-              </v-btn>
-              <v-btn
-                value="timeGridDay"
-                :disabled="loading"
-                @click="handleViewChange('timeGridDay')"
-              >
-                <v-icon>mdi-calendar</v-icon>
-                <span class="d-none d-md-inline ml-1">Day</span>
-              </v-btn>
-            </v-btn-group>
-          </v-col>
-        </v-row>
-        <!-- Secondary Controls Row (Mobile/Tablet) -->
-        <v-row v-if="showSecondaryControls" class="mt-2">
-          <!-- Property Filter -->
-          <v-col
-            cols="12"
-            sm="6"
-            md="4"
-          >
-            <v-select
-              v-model="selectedProperty"
-              :items="propertyFilterItems"
-              label="Filter by Property"
-              variant="outlined"
-              density="compact"
-              :disabled="loading"
-              prepend-inner-icon="mdi-home"
-              @update:model-value="handlePropertyFilter"
-            />
-          </v-col>
-          <!-- Booking Type Filter -->
-          <v-col
-            cols="12"
-            sm="6"
-            md="4"
-          >
-            <v-select
-              v-model="selectedBookingType"
-              :items="bookingTypeFilterItems"
-              label="Filter by Type"
-              variant="outlined"
-              density="compact"
-              :disabled="loading"
-              prepend-inner-icon="mdi-filter"
-              @update:model-value="handleBookingTypeFilter"
-            />
-          </v-col>
-          <!-- Quick Actions -->
-          <v-col
-            cols="12"
-            md="4"
-          >
-            <v-btn
-              color="primary"
-              variant="elevated"
-              block
-              :disabled="loading"
-              @click="handleQuickAction('add-booking')"
-            >
-              <v-icon class="mr-2">mdi-plus</v-icon>
-              Schedule Cleaning
-            </v-btn>
-          </v-col>
-        </v-row>
-        <!-- Toggle Secondary Controls (Mobile) -->
-        <v-row v-if="!showSecondaryControls" class="mt-2">
-          <v-col cols="12">
-            <v-btn
-              variant="text"
-              size="small"
-              block
-              @click="showSecondaryControls = true"
-            >
-              <v-icon class="mr-1">mdi-tune</v-icon>
-              Show Filters & Options
-            </v-btn>
-          </v-col>
-        </v-row>
-        <!-- Hide Secondary Controls -->
-        <v-row v-else class="mt-1">
-          <v-col cols="12">
-            <v-btn
-              variant="text"
-              size="small"
-              block
-              @click="showSecondaryControls = false"
-            >
-              <v-icon class="mr-1">mdi-chevron-up</v-icon>
-              Hide Filters & Options
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
-  </v-card>
-</template>
-⋮----
-<!-- Main Controls Row -->
-⋮----
-<!-- Navigation Controls -->
-⋮----
-<!-- Current Date Display -->
-⋮----
-{{ currentDateDisplay }}
-⋮----
-{{ currentDateSubtitle }}
-⋮----
-<!-- View Controls -->
-⋮----
-<!-- Secondary Controls Row (Mobile/Tablet) -->
-⋮----
-<!-- Property Filter -->
-⋮----
-<!-- Booking Type Filter -->
-⋮----
-<!-- Quick Actions -->
-⋮----
-<!-- Toggle Secondary Controls (Mobile) -->
-⋮----
-<!-- Hide Secondary Controls -->
-⋮----
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-// Props
-interface Props {
-  currentDate?: Date
-  view?: CalendarView
-  properties?: PropertyOption[]
-  loading?: boolean
-  elevation?: number
-  variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'
-}
-const props = withDefaults(defineProps<Props>(), {
-  currentDate: () => new Date(),
-  view: 'dayGridMonth',
-  properties: () => [],
-  loading: false,
-  elevation: 1,
-  variant: 'outlined'
-})
-// Emits
-interface Emits {
-  (e: 'navigation', direction: NavigationDirection): void
-  (e: 'view-change', view: CalendarView): void
-  (e: 'property-filter', propertyId: string | null): void
-  (e: 'booking-type-filter', bookingType: BookingTypeFilter): void
-  (e: 'quick-action', action: QuickAction): void
-}
-const emit = defineEmits<Emits>()
-// Types
-type CalendarView = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'
-type NavigationDirection = 'prev' | 'next' | 'today'
-type BookingTypeFilter = 'all' | 'standard' | 'turn'
-type QuickAction = 'add-booking'
-interface PropertyOption {
-  id: string
-  name: string
-}
-// Reactive data
-const selectedView = ref<CalendarView>(props.view)
-const selectedProperty = ref<string | null>(null)
-const selectedBookingType = ref<BookingTypeFilter>('all')
-const showSecondaryControls = ref(false)
-// Computed properties
-const currentDateDisplay = computed(() => {
-  const date = props.currentDate
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'long'
-  }
-  if (selectedView.value === 'timeGridWeek') {
-    // For week view, show week range
-    const startOfWeek = new Date(date)
-    startOfWeek.setDate(date.getDate() - date.getDay())
-    const endOfWeek = new Date(startOfWeek)
-    endOfWeek.setDate(startOfWeek.getDate() + 6)
-    if (startOfWeek.getMonth() === endOfWeek.getMonth()) {
-      return `${startOfWeek.getDate()} - ${endOfWeek.getDate()} ${startOfWeek.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
-    } else {
-      return `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
-    }
-  } else if (selectedView.value === 'timeGridDay') {
-    // For day view, show full date
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    })
-  } else {
-    // For month view, show month and year
-    return date.toLocaleDateString('en-US', options)
-  }
-})
-const currentDateSubtitle = computed(() => {
-  if (selectedView.value === 'dayGridMonth') {
-    return 'Month View'
-  } else if (selectedView.value === 'timeGridWeek') {
-    return 'Week View'
-  } else {
-    return 'Day View'
-  }
-})
-const propertyFilterItems = computed(() => {
-  const items = [
-    { title: 'All Properties', value: null }
-  ]
-  props.properties.forEach(property => {
-    items.push({
-      title: property.name,
-      value: property.id
-    })
-  })
-  return items
-})
-const bookingTypeFilterItems = [
-  { title: 'All Bookings', value: 'all' },
-  { title: 'Standard Cleanings', value: 'standard' },
-  { title: 'Same-Day Turns', value: 'turn' }
-]
-// Methods
-const handleNavigation = (direction: NavigationDirection) => {
-  emit('navigation', direction)
-}
-const handleViewChange = (view: CalendarView) => {
-  selectedView.value = view
-  emit('view-change', view)
-}
-const handlePropertyFilter = (propertyId: string | null) => {
-  emit('property-filter', propertyId)
-}
-const handleBookingTypeFilter = (bookingType: BookingTypeFilter) => {
-  emit('booking-type-filter', bookingType)
-}
-const handleQuickAction = (action: QuickAction) => {
-  emit('quick-action', action)
-}
-</script>
-<style scoped>
-.owner-calendar-controls {
-  width: 100%;
-}
-/* Ensure consistent button group styling */
-.v-btn-group .v-btn {
-  min-height: 40px;
-}
-/* Mobile optimizations */
-@media (max-width: 600px) {
-  .v-btn-group .v-btn {
-    min-height: 36px;
-    padding: 0 8px;
-  }
-  .v-btn-group .v-btn .v-icon {
-    font-size: 1.1rem;
-  }
-  .text-h6 {
-    font-size: 1.1rem !important;
-  }
-}
-/* Tablet optimizations */
-@media (min-width: 601px) and (max-width: 960px) {
-  .v-btn-group .v-btn {
-    min-height: 42px;
-  }
-}
-/* Ensure proper spacing */
-.v-btn-group {
-  box-shadow: none;
-}
-.v-btn-group .v-btn:not(:last-child) {
-  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-}
-</style>
-`````
-
-## File: src/components/dumb/owner/OwnerPropertyForm.vue
-`````vue
-<template>
-  <v-dialog
-    v-model="isOpen"
-    max-width="600px"
-    persistent
-    @keydown.esc="handleClose"
-  >
-    <v-card>
-      <v-card-title class="text-h5 pb-2">
-        {{ formTitle }}
-        <v-chip
-          v-if="form.active"
-          color="success"
-          size="small"
-          class="ml-2"
-        >
-          ACTIVE
-        </v-chip>
-        <v-chip
-          v-else
-          color="grey"
-          size="small"
-          class="ml-2"
-        >
-          INACTIVE
-        </v-chip>
-      </v-card-title>
-      <v-divider />
-      <v-card-text>
-        <v-form
-          ref="formRef"
-          v-model="formValid"
-          @submit.prevent="handleSubmit"
-        >
-          <v-container>
-            <!-- Property Name -->
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="form.name"
-                  label="Property Name"
-                  :rules="nameRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('name')"
-                  hint="Give your property a memorable name"
-                  persistent-hint
-                  prepend-inner-icon="mdi-home"
-                />
-              </v-col>
-            </v-row>
-            <!-- Property Address -->
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="form.address"
-                  label="Property Address"
-                  :rules="addressRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('address')"
-                  hint="Full address for cleaning team reference"
-                  persistent-hint
-                  prepend-inner-icon="mdi-map-marker"
-                />
-              </v-col>
-            </v-row>
-            <!-- Property Details -->
-            <v-row>
-              <v-col
-                cols="6"
-                sm="4"
-              >
-                <v-text-field
-                  v-model.number="form.bedrooms"
-                  label="Bedrooms"
-                  type="number"
-                  min="0"
-                  max="20"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('bedrooms')"
-                  hint="Number of bedrooms"
-                  persistent-hint
-                  prepend-inner-icon="mdi-bed"
-                />
-              </v-col>
-              <v-col
-                cols="6"
-                sm="4"
-              >
-                <v-text-field
-                  v-model.number="form.bathrooms"
-                  label="Bathrooms"
-                  type="number"
-                  min="0"
-                  max="20"
-                  step="0.5"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('bathrooms')"
-                  hint="Number of bathrooms"
-                  persistent-hint
-                  prepend-inner-icon="mdi-shower"
-                />
-              </v-col>
-              <v-col
-                cols="12"
-                sm="4"
-              >
-                <v-select
-                  v-model="form.property_type"
-                  :items="propertyTypeItems"
-                  label="Property Type"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('property_type')"
-                  hint="Type of property"
-                  persistent-hint
-                  prepend-inner-icon="mdi-home-variant"
-                />
-              </v-col>
-            </v-row>
-            <!-- Cleaning Duration and Pricing -->
-            <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-              >
-                <v-text-field
-                  v-model.number="form.cleaning_duration"
-                  label="Cleaning Time (minutes)"
-                  type="number"
-                  min="30"
-                  max="480"
-                  step="15"
-                  :rules="durationRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('cleaning_duration')"
-                  hint="Typical cleaning time needed"
-                  persistent-hint
-                  prepend-inner-icon="mdi-clock"
-                />
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-              >
-                <v-select
-                  v-model="form.pricing_tier"
-                  :items="pricingTierItems"
-                  label="Service Level"
-                  :rules="pricingTierRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('pricing_tier')"
-                  hint="Determines service level"
-                  persistent-hint
-                  prepend-inner-icon="mdi-star"
-                />
-              </v-col>
-            </v-row>
-            <!-- Special Instructions -->
-            <v-row>
-              <v-col cols="12">
-                <v-textarea
-                  v-model="form.special_instructions"
-                  label="Special Instructions (Optional)"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('special_instructions')"
-                  hint="Any special cleaning requirements, access instructions, or notes"
-                  persistent-hint
-                  :counter="500"
-                  rows="3"
-                  prepend-inner-icon="mdi-note-text"
-                />
-              </v-col>
-            </v-row>
-            <!-- Active Status -->
-            <v-row>
-              <v-col cols="12">
-                <v-checkbox
-                  v-model="form.active"
-                  label="Property is active for bookings"
-                  :disabled="loading"
-                  :error-messages="errors.get('active')"
-                  hint="Inactive properties won't appear in booking options"
-                  persistent-hint
-                />
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-form>
-      </v-card-text>
-      <v-divider />
-      <v-card-actions class="pa-4">
-        <v-btn
-          color="grey-darken-1"
-          variant="text"
-          :disabled="loading"
-          @click="handleClose"
-        >
-          Cancel
-        </v-btn>
-        <v-spacer />
-        <v-btn
-          color="primary"
-          variant="elevated"
-          :disabled="!formValid || loading"
-          :loading="loading"
-          @click="handleSubmit"
-        >
-          {{ submitButtonText }}
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-</template>
-⋮----
-{{ formTitle }}
-⋮----
-<!-- Property Name -->
-⋮----
-<!-- Property Address -->
-⋮----
-<!-- Property Details -->
-⋮----
-<!-- Cleaning Duration and Pricing -->
-⋮----
-<!-- Special Instructions -->
-⋮----
-<!-- Active Status -->
-⋮----
-{{ submitButtonText }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
-import type { Property, PropertyFormData, PricingTier } from '@/types/property'
-// Props
-interface Props {
-  modelValue: boolean
-  mode: 'create' | 'edit'
-  property?: Property | null
-  loading?: boolean
-  errors?: Map<string, string[]>
-}
-const props = withDefaults(defineProps<Props>(), {
-  property: null,
-  loading: false,
-  errors: () => new Map()
-})
-// Emits
-interface Emits {
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'submit', data: PropertyFormData): void
-  (e: 'close'): void
-}
-const emit = defineEmits<Emits>()
-// Reactive data
-const formRef = ref()
-const formValid = ref(false)
-// Form data
-const form = ref<PropertyFormData>({
-  owner_id: '',
-  name: '',
-  address: '',
-  bedrooms: undefined,
-  bathrooms: undefined,
-  square_feet: undefined,
-  property_type: undefined,
-  cleaning_duration: 120,
-  special_instructions: '',
-  pricing_tier: 'standard',
-  active: true
-})
-// Computed properties
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value: boolean) => emit('update:modelValue', value)
-})
-const formTitle = computed(() => {
-  return props.mode === 'create' ? 'Add New Property' : 'Edit Property'
-})
-const submitButtonText = computed(() => {
-  return props.mode === 'create' ? 'Add Property' : 'Update Property'
-})
-// Form options
-const propertyTypeItems = [
-  { title: 'Apartment', value: 'apartment' },
-  { title: 'House', value: 'house' },
-  { title: 'Condo', value: 'condo' },
-  { title: 'Townhouse', value: 'townhouse' }
-]
-const pricingTierItems = [
-  { title: 'Basic Service', value: 'basic' },
-  { title: 'Standard Service', value: 'standard' },
-  { title: 'Premium Service', value: 'premium' },
-  { title: 'Luxury Service', value: 'luxury' }
-]
-// Validation rules
-const nameRules = [
-  (v: string) => !!v || 'Property name is required',
-  (v: string) => (v && v.length >= 2) || 'Name must be at least 2 characters',
-  (v: string) => (v && v.length <= 100) || 'Name must be less than 100 characters'
-]
-const addressRules = [
-  (v: string) => !!v || 'Property address is required',
-  (v: string) => (v && v.length >= 10) || 'Please enter a complete address',
-  (v: string) => (v && v.length <= 200) || 'Address must be less than 200 characters'
-]
-const durationRules = [
-  (v: number) => !!v || 'Cleaning duration is required',
-  (v: number) => v >= 30 || 'Minimum cleaning time is 30 minutes',
-  (v: number) => v <= 480 || 'Maximum cleaning time is 8 hours'
-]
-const pricingTierRules = [
-  (v: PricingTier) => !!v || 'Service level is required'
-]
-// Methods
-const resetForm = () => {
-  form.value = {
-    owner_id: '',
-    name: '',
-    address: '',
-    bedrooms: undefined,
-    bathrooms: undefined,
-    square_feet: undefined,
-    property_type: undefined,
-    cleaning_duration: 120,
-    special_instructions: '',
-    pricing_tier: 'standard',
-    active: true
-  }
-  if (formRef.value) {
-    formRef.value.resetValidation()
-  }
-}
-const populateForm = (property: Property) => {
-  form.value = {
-    owner_id: property.owner_id,
-    name: property.name,
-    address: property.address,
-    bedrooms: property.bedrooms,
-    bathrooms: property.bathrooms,
-    square_feet: property.square_feet,
-    property_type: property.property_type,
-    cleaning_duration: property.cleaning_duration,
-    special_instructions: property.special_instructions || '',
-    pricing_tier: property.pricing_tier,
-    active: property.active
-  }
-}
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  const { valid } = await formRef.value.validate()
-  if (!valid) return
-  emit('submit', { ...form.value })
-}
-const handleClose = () => {
-  emit('close')
-  emit('update:modelValue', false)
-}
-// Watchers
-watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    if (props.mode === 'edit' && props.property) {
-      populateForm(props.property)
-    } else {
-      resetForm()
-    }
-    nextTick(() => {
-      if (formRef.value) {
-        formRef.value.resetValidation()
-      }
-    })
-  }
-})
-watch(() => props.property, (newProperty) => {
-  if (newProperty && props.mode === 'edit') {
-    populateForm(newProperty)
-  }
-})
-</script>
-<style scoped>
-.v-card-title {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-.v-card-actions {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-/* Mobile optimizations */
-@media (max-width: 600px) {
-  .v-dialog {
-    margin: 16px;
-  }
-  .v-card {
-    margin: 0;
-  }
-}
-</style>
-`````
-
-## File: src/components/dumb/owner/OwnerQuickActions.vue
-`````vue
-<template>
-  <v-card
-    class="owner-quick-actions"
-    :elevation="elevation"
-    :variant="variant"
-  >
-    <v-card-title class="text-h6 pb-2">
-      <v-icon class="mr-2">mdi-lightning-bolt</v-icon>
-      Quick Actions
-    </v-card-title>
-    <v-divider />
-    <v-card-text class="pa-3">
-      <v-container fluid class="pa-0">
-        <!-- Primary Actions Row -->
-        <v-row class="mb-2">
-          <v-col
-            cols="6"
-            sm="6"
-            md="12"
-            lg="6"
-          >
-            <v-btn
-              color="primary"
-              variant="elevated"
-              block
-              size="large"
-              :loading="loading"
-              :disabled="disabled"
-              @click="handleAction('add-booking')"
-            >
-              <v-icon class="mr-2">mdi-calendar-plus</v-icon>
-              <span class="d-none d-sm-inline">Schedule</span>
-              <span class="d-sm-none">Book</span>
-              Cleaning
-            </v-btn>
-          </v-col>
-          <v-col
-            cols="6"
-            sm="6"
-            md="12"
-            lg="6"
-          >
-            <v-btn
-              color="secondary"
-              variant="elevated"
-              block
-              size="large"
-              :loading="loading"
-              :disabled="disabled"
-              @click="handleAction('add-property')"
-            >
-              <v-icon class="mr-2">mdi-home-plus</v-icon>
-              <span class="d-none d-sm-inline">Add</span>
-              Property
-            </v-btn>
-          </v-col>
-        </v-row>
-        <!-- Secondary Actions Row -->
-        <v-row>
-          <v-col
-            cols="6"
-            sm="6"
-            md="12"
-            lg="6"
-          >
-            <v-btn
-              color="info"
-              variant="tonal"
-              block
-              :loading="loading"
-              :disabled="disabled"
-              @click="handleAction('view-calendar')"
-            >
-              <v-icon class="mr-2">mdi-calendar</v-icon>
-              <span class="d-none d-sm-inline">View</span>
-              Calendar
-            </v-btn>
-          </v-col>
-          <v-col
-            cols="6"
-            sm="6"
-            md="12"
-            lg="6"
-          >
-            <v-btn
-              color="success"
-              variant="tonal"
-              block
-              :loading="loading"
-              :disabled="disabled"
-              @click="handleAction('view-properties')"
-            >
-              <v-icon class="mr-2">mdi-home-group</v-icon>
-              <span class="d-none d-sm-inline">My</span>
-              Properties
-            </v-btn>
-          </v-col>
-        </v-row>
-        <!-- Additional Actions (Collapsible) -->
-        <v-expand-transition>
-          <div v-if="showMoreActions">
-            <v-divider class="my-3" />
-            <v-row>
-              <v-col
-                cols="6"
-                sm="6"
-                md="12"
-                lg="6"
-              >
-                <v-btn
-                  color="warning"
-                  variant="outlined"
-                  block
-                  :loading="loading"
-                  :disabled="disabled"
-                  @click="handleAction('view-bookings')"
-                >
-                  <v-icon class="mr-2">mdi-clipboard-list</v-icon>
-                  <span class="d-none d-sm-inline">My</span>
-                  Bookings
-                </v-btn>
-              </v-col>
-              <v-col
-                cols="6"
-                sm="6"
-                md="12"
-                lg="6"
-              >
-                <v-btn
-                  color="purple"
-                  variant="outlined"
-                  block
-                  :loading="loading"
-                  :disabled="disabled"
-                  @click="handleAction('contact-support')"
-                >
-                  <v-icon class="mr-2">mdi-help-circle</v-icon>
-                  <span class="d-none d-sm-inline">Get</span>
-                  Help
-                </v-btn>
-              </v-col>
-            </v-row>
-          </div>
-        </v-expand-transition>
-        <!-- Show More/Less Toggle -->
-        <v-row class="mt-2">
-          <v-col cols="12">
-            <v-btn
-              variant="text"
-              size="small"
-              block
-              @click="showMoreActions = !showMoreActions"
-            >
-              <v-icon class="mr-1">
-                {{ showMoreActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-              </v-icon>
-              {{ showMoreActions ? 'Show Less' : 'More Actions' }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
-  </v-card>
-</template>
-⋮----
-<!-- Primary Actions Row -->
-⋮----
-<!-- Secondary Actions Row -->
-⋮----
-<!-- Additional Actions (Collapsible) -->
-⋮----
-<!-- Show More/Less Toggle -->
-⋮----
-{{ showMoreActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-⋮----
-{{ showMoreActions ? 'Show Less' : 'More Actions' }}
-⋮----
-<script setup lang="ts">
-import { ref } from 'vue'
-// Props
-interface Props {
-  loading?: boolean
-  disabled?: boolean
-  elevation?: number
-  variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-  disabled: false,
-  elevation: 2,
-  variant: 'elevated'
-})
-// Emits
-interface Emits {
-  (e: 'action', actionType: OwnerActionType): void
-}
-const emit = defineEmits<Emits>()
-// Types
-type OwnerActionType = 
-  | 'add-booking' 
-  | 'add-property' 
-  | 'view-calendar' 
-  | 'view-properties' 
-  | 'view-bookings' 
-  | 'contact-support'
-// Reactive data
-const showMoreActions = ref(false)
-// Methods
-const handleAction = (actionType: OwnerActionType) => {
-  emit('action', actionType)
-}
-</script>
-<style scoped>
-.owner-quick-actions {
-  width: 100%;
-}
-.v-card-title {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-/* Ensure consistent button heights */
-.v-btn {
-  min-height: 48px;
-}
-/* Mobile optimizations */
-@media (max-width: 600px) {
-  .v-btn {
-    min-height: 44px;
-    font-size: 0.875rem;
-  }
-  .v-icon {
-    font-size: 1.2rem !important;
-  }
-}
-/* Tablet optimizations */
-@media (min-width: 601px) and (max-width: 960px) {
-  .v-btn {
-    min-height: 52px;
-  }
-}
-/* Animation for expand transition */
-.v-expand-transition-enter-active,
-.v-expand-transition-leave-active {
-  transition: all 0.3s ease;
-}
-.v-expand-transition-enter-from,
-.v-expand-transition-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-</style>
-`````
-
-## File: src/components/smart/admin/UseAdminCalendarStateDemo.vue
-`````vue
-<template>
-  <v-container fluid class="pa-4">
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2" color="primary">mdi-calendar-clock</v-icon>
-            useAdminCalendarState Demo
-            <v-spacer />
-            <v-chip color="success" variant="outlined">Admin Interface</v-chip>
-          </v-card-title>
-          <v-card-text>
-            <v-alert type="info" class="mb-4">
-              <strong>Admin Calendar State Composable Demo</strong><br>
-              This demo showcases the admin-specific calendar state management with system-wide data access,
-              advanced filtering, cleaner management, and business analytics.
-            </v-alert>
-            <!-- Status Messages -->
-            <v-alert v-if="error" type="error" class="mb-4" dismissible @click:close="error = null">
-              {{ error }}
-            </v-alert>
-            <v-alert v-if="success" type="success" class="mb-4" dismissible @click:close="success = null">
-              {{ success }}
-            </v-alert>
-            <!-- Admin Calendar Controls -->
-            <v-row class="mb-4">
-              <v-col cols="12" md="6">
-                <v-card variant="outlined">
-                  <v-card-title class="text-h6">Calendar View Mode</v-card-title>
-                  <v-card-text>
-                    <v-btn-toggle v-model="calendarViewMode" mandatory class="mb-3">
-                      <v-btn value="standard" size="small">Standard</v-btn>
-                      <v-btn value="cleaner" size="small">Cleaner</v-btn>
-                      <v-btn value="owner" size="small">Owner</v-btn>
-                      <v-btn value="priority" size="small">Priority</v-btn>
-                    </v-btn-toggle>
-                    <div class="d-flex flex-wrap gap-2">
-                      <v-switch
-                        v-model="showUnassignedOnly"
-                        label="Unassigned Only"
-                        color="warning"
-                        density="compact"
-                        hide-details
-                      />
-                      <v-switch
-                        v-model="showOverdueOnly"
-                        label="Overdue Only"
-                        color="error"
-                        density="compact"
-                        hide-details
-                      />
-                    </div>
+                    <ul class="text-body-2">
+                      <li>✅ Dynamic component rendering based on user role</li>
+                      <li>✅ Loading state during authentication check</li>
+                      <li>✅ AuthPrompt for unauthenticated users</li>
+                      <li>✅ HomeAdmin.vue for admin users</li>
+                      <li>✅ HomeOwner.vue for property owner users</li>
+                      <li>✅ Role-specific computed properties in auth store</li>
+                      <li>✅ Smooth transitions between components</li>
+                      <li>✅ Mock login buttons for testing</li>
+                    </ul>
                   </v-card-text>
                 </v-card>
               </v-col>
               <v-col cols="12" md="6">
-                <v-card variant="outlined">
-                  <v-card-title class="text-h6">System Metrics</v-card-title>
+                <v-card variant="outlined" class="pa-3">
+                  <v-card-title class="text-h6">
+                    <v-icon class="mr-2" color="primary">mdi-information</v-icon>
+                    Current User State
+                  </v-card-title>
                   <v-card-text>
-                    <v-row dense>
-                      <v-col cols="6">
-                        <v-chip color="primary" variant="outlined" class="mb-1">
-                          Total Bookings: {{ allBookings.length }}
-                        </v-chip>
-                      </v-col>
-                      <v-col cols="6">
-                        <v-chip color="warning" variant="outlined" class="mb-1">
-                          Turn Alerts: {{ systemTurnAlerts.length }}
-                        </v-chip>
-                      </v-col>
-                      <v-col cols="6">
-                        <v-chip color="info" variant="outlined" class="mb-1">
-                          Properties: {{ allProperties.length }}
-                        </v-chip>
-                      </v-col>
-                      <v-col cols="6">
-                        <v-chip color="success" variant="outlined" class="mb-1">
-                          Cleaners: {{ Object.keys(cleanerSchedules).length - 1 }}
-                        </v-chip>
-                      </v-col>
-                    </v-row>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-            <!-- System Turn Alerts -->
-            <v-card variant="outlined" class="mb-4" v-if="systemTurnAlerts.length > 0">
-              <v-card-title class="text-h6 d-flex align-center">
-                <v-icon class="mr-2" color="error">mdi-fire</v-icon>
-                System Turn Alerts ({{ systemTurnAlerts.length }})
-              </v-card-title>
-              <v-card-text>
-                <v-row dense>
-                  <v-col 
-                    v-for="alert in systemTurnAlerts.slice(0, 6)" 
-                    :key="alert.id"
-                    cols="12" sm="6" md="4"
-                  >
-                    <v-card 
-                      :color="alert.priority === 'urgent' ? 'error' : 'warning'"
-                      variant="outlined"
+                    <v-chip
+                      :color="authStore.isAuthenticated ? 'success' : 'error'"
                       class="mb-2"
                     >
-                      <v-card-text class="pa-3">
-                        <div class="text-subtitle2 font-weight-bold">
-                          {{ alert.property_name }}
-                        </div>
-                        <div class="text-caption">{{ alert.property_address }}</div>
+                      <v-icon start>
+                        {{ authStore.isAuthenticated ? 'mdi-check' : 'mdi-close' }}
+                      </v-icon>
+                      {{ authStore.isAuthenticated ? 'Authenticated' : 'Not Authenticated' }}
+                    </v-chip>
+                    <div v-if="authStore.user" class="mt-2">
+                      <p><strong>Name:</strong> {{ authStore.user.name }}</p>
+                      <p><strong>Email:</strong> {{ authStore.user.email }}</p>
+                      <p><strong>Role:</strong> 
                         <v-chip 
-                          :color="alert.priority === 'urgent' ? 'error' : 'warning'"
+                          :color="getRoleColor(authStore.user.role)"
                           size="small"
-                          class="mt-1"
                         >
-                          {{ alert.alert_message }}
+                          {{ authStore.user.role }}
                         </v-chip>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-            <!-- Cleaner Schedules -->
-            <v-card variant="outlined" class="mb-4">
-              <v-card-title class="text-h6">Cleaner Schedules</v-card-title>
-              <v-card-text>
-                <v-row dense>
-                  <v-col 
-                    v-for="(bookings, cleanerId) in cleanerSchedules" 
-                    :key="cleanerId"
-                    cols="12" sm="6" md="4"
-                  >
-                    <v-card variant="outlined" class="mb-2">
-                      <v-card-text class="pa-3">
-                        <div class="text-subtitle2 font-weight-bold">
-                          {{ cleanerId === 'unassigned' ? 'Unassigned' : `Cleaner ${cleanerId.slice(0, 8)}` }}
-                        </div>
-                        <div class="text-caption">{{ bookings.length }} bookings</div>
-                        <v-btn 
-                          size="small" 
-                          variant="outlined" 
-                          class="mt-2"
-                          @click="testGetCleanerSchedule(cleanerId)"
+                      </p>
+                    </div>
+                    <div v-else class="mt-2">
+                      <p class="text-medium-emphasis">No user logged in</p>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row class="mt-4">
+              <v-col cols="12">
+                <v-card variant="outlined" class="pa-3">
+                  <v-card-title class="text-h6">
+                    <v-icon class="mr-2" color="warning">mdi-test-tube</v-icon>
+                    Test Role Switching
+                  </v-card-title>
+                  <v-card-text>
+                    <p class="text-body-2 mb-3">
+                      Use these buttons to test different user roles. The main application (/) will 
+                      automatically render the appropriate interface for each role.
+                    </p>
+                    <v-row>
+                      <v-col cols="12" sm="4">
+                        <v-btn
+                          color="error"
+                          variant="outlined"
+                          block
+                          @click="logout"
+                          :loading="authStore.loading"
                         >
-                          View Schedule
+                          <v-icon class="mr-2">mdi-logout</v-icon>
+                          Logout (Test Auth Prompt)
                         </v-btn>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-            <!-- Calendar Events Preview -->
-            <v-card variant="outlined" class="mb-4">
-              <v-card-title class="text-h6">Admin Calendar Events ({{ adminCalendarEvents.length }})</v-card-title>
-              <v-card-text>
-                <v-row dense>
-                  <v-col 
-                    v-for="event in adminCalendarEvents.slice(0, 8)" 
-                    :key="event.id"
-                    cols="12" sm="6" md="3"
-                  >
-                    <v-card 
-                      :style="{ borderLeft: `4px solid ${event.backgroundColor}` }"
-                      variant="outlined"
-                      class="mb-2"
-                    >
-                      <v-card-text class="pa-3">
-                        <div class="text-subtitle2 font-weight-bold">{{ event.title }}</div>
-                        <div class="text-caption">
-                          {{ formatDate(event.start) }} - {{ formatDate(event.end) }}
-                        </div>
-                        <div class="text-caption">
-                          Status: {{ event.extendedProps.status }}
-                        </div>
-                        <v-btn 
-                          size="small" 
-                          variant="outlined" 
-                          class="mt-2"
-                          @click="testHandleAdminEventClick(event)"
+                      </v-col>
+                      <v-col cols="12" sm="4">
+                        <v-btn
+                          color="primary"
+                          variant="elevated"
+                          block
+                          @click="loginAsAdmin"
+                          :loading="authStore.loading"
                         >
-                          Manage
+                          <v-icon class="mr-2">mdi-account-tie</v-icon>
+                          Login as Admin
                         </v-btn>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-            <!-- Advanced Filtering Test -->
-            <v-card variant="outlined" class="mb-4">
-              <v-card-title class="text-h6">Advanced Filtering Test</v-card-title>
-              <v-card-text>
-                <v-row dense>
-                  <v-col cols="12" md="4">
-                    <v-select
-                      v-model="filterCriteria.status"
-                      :items="statusOptions"
-                      label="Filter by Status"
-                      multiple
-                      chips
-                      clearable
-                      density="compact"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="4">
-                    <v-select
-                      v-model="filterCriteria.bookingType"
-                      :items="typeOptions"
-                      label="Filter by Type"
-                      multiple
-                      chips
-                      clearable
-                      density="compact"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="4">
-                    <v-btn 
-                      color="primary" 
-                      @click="testAdvancedFiltering"
-                      :loading="loading"
+                      </v-col>
+                      <v-col cols="12" sm="4">
+                        <v-btn
+                          color="secondary"
+                          variant="elevated"
+                          block
+                          @click="loginAsOwner"
+                          :loading="authStore.loading"
+                        >
+                          <v-icon class="mr-2">mdi-home-account</v-icon>
+                          Login as Owner
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                    <v-alert
+                      type="success"
+                      variant="tonal"
+                      class="mt-3"
                     >
-                      Apply Filters
-                    </v-btn>
-                  </v-col>
-                </v-row>
-                <v-alert v-if="filteredResults.length > 0" type="success" class="mt-3">
-                  Found {{ filteredResults.length }} bookings matching criteria
-                </v-alert>
-              </v-card-text>
-            </v-card>
-            <!-- Function Testing -->
-            <v-card variant="outlined">
-              <v-card-title class="text-h6">Function Testing</v-card-title>
-              <v-card-text>
-                <div class="d-flex flex-wrap gap-2">
-                  <v-btn 
-                    color="primary" 
-                    variant="outlined"
-                    @click="testGetAdminCalendarEvents"
-                    :loading="loading"
-                  >
-                    Test Calendar Events
-                  </v-btn>
-                  <v-btn 
-                    color="secondary" 
-                    variant="outlined"
-                    @click="testSystemTurnAlerts"
-                    :loading="loading"
-                  >
-                    Test Turn Alerts
-                  </v-btn>
-                  <v-btn 
-                    color="info" 
-                    variant="outlined"
-                    @click="testCleanerSchedules"
-                    :loading="loading"
-                  >
-                    Test Cleaner Schedules
-                  </v-btn>
-                  <v-btn 
-                    color="warning" 
-                    variant="outlined"
-                    @click="testFilterByMultipleCriteria"
-                    :loading="loading"
-                  >
-                    Test Multi-Criteria Filter
-                  </v-btn>
-                </div>
-              </v-card-text>
-            </v-card>
+                      <strong>After switching roles:</strong> Navigate to the home page (/) to see the role-specific interface.
+                    </v-alert>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row class="mt-4">
+              <v-col cols="12">
+                <v-card variant="outlined" class="pa-3">
+                  <v-card-title class="text-h6">
+                    <v-icon class="mr-2" color="info">mdi-code-tags</v-icon>
+                    Implementation Details
+                  </v-card-title>
+                  <v-card-text>
+                    <v-expansion-panels>
+                      <v-expansion-panel>
+                        <v-expansion-panel-title>
+                          <v-icon class="mr-2">mdi-file-code</v-icon>
+                          Code Structure
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                          <pre class="text-caption"><code>// pages/index.vue
+const homeComponent = computed(() => {
+  if (!authStore.isAuthenticated) return AuthPrompt;
+  if (authStore.isAdmin) return HomeAdmin;
+  if (authStore.isOwner) return HomeOwner;
+  return AuthPrompt; // fallback
+});
+// stores/auth.ts
+const isOwner = computed(() => user.value?.role === 'owner');
+const isAdmin = computed(() => user.value?.role === 'admin');</code></pre>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                      <v-expansion-panel>
+                        <v-expansion-panel-title>
+                          <v-icon class="mr-2">mdi-security</v-icon>
+                          Security Notes
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                          <v-alert type="warning" variant="tonal" class="mb-2">
+                            <strong>Frontend Filtering Only:</strong> This implementation provides role-based UI filtering for user experience only, not security.
+                          </v-alert>
+                          <p class="text-body-2">
+                            Real security will be implemented in Phase 2 with backend Row Level Security (RLS) policies.
+                            Users could potentially access other roles' data through browser dev tools.
+                          </p>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                      <v-expansion-panel>
+                        <v-expansion-panel-title>
+                          <v-icon class="mr-2">mdi-architecture</v-icon>
+                          Architecture Pattern
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                          <p class="text-body-2">
+                            This follows the multi-tenant role-based architecture pattern:
+                          </p>
+                          <ul class="text-body-2">
+                            <li><strong>Property Owners:</strong> See only their data through HomeOwner.vue</li>
+                            <li><strong>Business Admin:</strong> See all data through HomeAdmin.vue</li>
+                            <li><strong>Data Scoping:</strong> Implemented at composable level</li>
+                            <li><strong>Component Separation:</strong> owner/, admin/, shared/ folder structure</li>
+                          </ul>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row class="mt-4">
+              <v-col cols="12" class="text-center">
+                <v-btn
+                  color="primary"
+                  size="large"
+                  to="/"
+                  prepend-icon="mdi-home"
+                >
+                  Go to Main Application
+                </v-btn>
+                <v-btn
+                  color="secondary"
+                  variant="outlined"
+                  size="large"
+                  to="/demos"
+                  class="ml-2"
+                  prepend-icon="mdi-arrow-left"
+                >
+                  Back to Demos
+                </v-btn>
+              </v-col>
+            </v-row>
           </v-card-text>
         </v-card>
       </v-col>
@@ -5435,643 +435,56 @@ const handleAction = (actionType: OwnerActionType) => {
   </v-container>
 </template>
 ⋮----
-<!-- Status Messages -->
+{{ authStore.isAuthenticated ? 'mdi-check' : 'mdi-close' }}
 ⋮----
-{{ error }}
+{{ authStore.isAuthenticated ? 'Authenticated' : 'Not Authenticated' }}
 ⋮----
-{{ success }}
+<p><strong>Name:</strong> {{ authStore.user.name }}</p>
+<p><strong>Email:</strong> {{ authStore.user.email }}</p>
 ⋮----
-<!-- Admin Calendar Controls -->
-⋮----
-Total Bookings: {{ allBookings.length }}
-⋮----
-Turn Alerts: {{ systemTurnAlerts.length }}
-⋮----
-Properties: {{ allProperties.length }}
-⋮----
-Cleaners: {{ Object.keys(cleanerSchedules).length - 1 }}
-⋮----
-<!-- System Turn Alerts -->
-⋮----
-System Turn Alerts ({{ systemTurnAlerts.length }})
-⋮----
-{{ alert.property_name }}
-⋮----
-<div class="text-caption">{{ alert.property_address }}</div>
-⋮----
-{{ alert.alert_message }}
-⋮----
-<!-- Cleaner Schedules -->
-⋮----
-{{ cleanerId === 'unassigned' ? 'Unassigned' : `Cleaner ${cleanerId.slice(0, 8)}` }}
-⋮----
-<div class="text-caption">{{ bookings.length }} bookings</div>
-⋮----
-<!-- Calendar Events Preview -->
-⋮----
-<v-card-title class="text-h6">Admin Calendar Events ({{ adminCalendarEvents.length }})</v-card-title>
-⋮----
-<div class="text-subtitle2 font-weight-bold">{{ event.title }}</div>
-⋮----
-{{ formatDate(event.start) }} - {{ formatDate(event.end) }}
-⋮----
-Status: {{ event.extendedProps.status }}
-⋮----
-<!-- Advanced Filtering Test -->
-⋮----
-Found {{ filteredResults.length }} bookings matching criteria
-⋮----
-<!-- Function Testing -->
+{{ authStore.user.role }}
 ⋮----
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useAdminCalendarState } from '@/composables/admin/useAdminCalendarState';
-import { useBookingStore } from '@/stores/booking';
-import { usePropertyStore } from '@/stores/property';
-import type { BookingStatus, BookingType } from '@/types';
-// Get the admin calendar state composable
-const {
-  // State
-  loading,
-  error,
-  success,
-  selectedCleanerIds,
-  selectedOwnerIds,
-  showUnassignedOnly,
-  showOverdueOnly,
-  calendarViewMode,
-  // Computed properties
-  allBookings,
-  allProperties,
-  systemTurnAlerts,
-  cleanerSchedules,
-  adminCalendarEvents,
-  // Functions
-  getAdminCalendarEvents,
-  handleAdminEventClick,
-  getCleanerSchedule,
-  filterByMultipleCriteria
-} = useAdminCalendarState();
-// Get stores for demo data
-const bookingStore = useBookingStore();
-const propertyStore = usePropertyStore();
-// Demo state
-const filteredResults = ref<any[]>([]);
-const filterCriteria = ref<{
-  status: BookingStatus[];
-  bookingType: BookingType[];
-}>({
-  status: [],
-  bookingType: []
-});
-// Filter options
-const statusOptions = [
-  { title: 'Pending', value: 'pending' },
-  { title: 'Scheduled', value: 'scheduled' },
-  { title: 'In Progress', value: 'in_progress' },
-  { title: 'Completed', value: 'completed' },
-  { title: 'Cancelled', value: 'cancelled' }
-];
-const typeOptions = [
-  { title: 'Standard', value: 'standard' },
-  { title: 'Turn', value: 'turn' }
-];
-// Helper functions
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-// Test functions
-function testGetAdminCalendarEvents() {
-  loading.value = true;
-  try {
-    const events = getAdminCalendarEvents();
-    success.value = `Generated ${events.length} admin calendar events with enhanced formatting`;
-    console.log('Admin Calendar Events:', events);
-  } catch (err) {
-    error.value = 'Failed to generate admin calendar events';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
+import { useAuthStore } from '@/stores/auth'
+const authStore = useAuthStore()
+function getRoleColor(role: string) {
+  switch (role) {
+    case 'admin': return 'primary'
+    case 'owner': return 'secondary'
+    case 'cleaner': return 'success'
+    default: return 'grey'
   }
 }
-function testSystemTurnAlerts() {
-  loading.value = true;
-  try {
-    const alerts = systemTurnAlerts.value;
-    success.value = `Found ${alerts.length} system turn alerts across all properties`;
-    console.log('System Turn Alerts:', alerts);
-  } catch (err) {
-    error.value = 'Failed to get system turn alerts';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
+async function logout() {
+  await authStore.logout()
+}
+async function loginAsAdmin() {
+  await authStore.login('admin@example.com', 'password')
+  if (authStore.user) {
+    authStore.user.role = 'admin'
+    authStore.user.name = 'Business Admin'
   }
 }
-function testCleanerSchedules() {
-  loading.value = true;
-  try {
-    const schedules = cleanerSchedules.value;
-    const cleanerCount = Object.keys(schedules).length - 1; // Exclude 'unassigned'
-    success.value = `Retrieved schedules for ${cleanerCount} cleaners and ${schedules.unassigned?.length || 0} unassigned bookings`;
-    console.log('Cleaner Schedules:', schedules);
-  } catch (err) {
-    error.value = 'Failed to get cleaner schedules';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
+async function loginAsOwner() {
+  await authStore.login('owner@example.com', 'password')
+  if (authStore.user) {
+    authStore.user.role = 'owner'
+    authStore.user.name = 'Property Owner'
   }
 }
-function testGetCleanerSchedule(cleanerId: string) {
-  loading.value = true;
-  try {
-    const schedule = getCleanerSchedule(cleanerId);
-    success.value = `Retrieved schedule for ${cleanerId}: ${schedule.bookings.length} bookings, ${schedule.metrics.totalHours}h total`;
-    console.log(`Schedule for ${cleanerId}:`, schedule);
-  } catch (err) {
-    error.value = `Failed to get schedule for ${cleanerId}`;
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-function testHandleAdminEventClick(event: any) {
-  loading.value = true;
-  try {
-    // Simulate event info object
-    const eventInfo = { event };
-    handleAdminEventClick(eventInfo);
-    console.log('Admin Event Click:', event);
-  } catch (err) {
-    error.value = 'Failed to handle admin event click';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-function testAdvancedFiltering() {
-  loading.value = true;
-  try {
-    const results = filterByMultipleCriteria({
-      status: filterCriteria.value.status,
-      bookingType: filterCriteria.value.bookingType,
-      unassignedOnly: showUnassignedOnly.value,
-      overdueOnly: showOverdueOnly.value
-    });
-    filteredResults.value = results;
-    success.value = `Advanced filtering returned ${results.length} bookings`;
-    console.log('Filtered Results:', results);
-  } catch (err) {
-    error.value = 'Failed to apply advanced filtering';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-function testFilterByMultipleCriteria() {
-  loading.value = true;
-  try {
-    // Test with various criteria
-    const testCriteria = {
-      status: ['pending', 'scheduled'] as BookingStatus[],
-      bookingType: ['turn'] as BookingType[],
-      unassignedOnly: true,
-      priorityOnly: true
-    };
-    const results = filterByMultipleCriteria(testCriteria);
-    success.value = `Multi-criteria filter test: ${results.length} urgent unassigned turn bookings found`;
-    console.log('Multi-criteria Filter Results:', results);
-  } catch (err) {
-    error.value = 'Failed to test multi-criteria filtering';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-// Generate demo data on mount
-onMounted(async () => {
-  // Generate sample bookings and properties if stores are empty
-  if (bookingStore.bookings.size === 0) {
-    console.log('Generating demo data for admin calendar state testing...');
-    // This would typically be done by the stores themselves
-    // For demo purposes, we'll just log that data should be available
-    success.value = 'Demo initialized - Admin calendar state ready for testing';
-  }
-});
 </script>
 <style scoped>
-.gap-2 {
-  gap: 8px;
+pre {
+  background-color: rgba(var(--v-theme-surface-variant), 0.1);
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85em;
 }
 </style>
-`````
-
-## File: src/composables/admin/useAdminCalendarState.ts
-`````typescript
-import { ref, computed } from 'vue';
-import { useCalendarState } from '@/composables/shared/useCalendarState';
-import { useAuthStore } from '@/stores/auth';
-import { useBookingStore } from '@/stores/booking';
-import { usePropertyStore } from '@/stores/property';
-import { useUIStore } from '@/stores/ui';
-import type { Booking, BookingStatus, BookingType } from '@/types';
-/**
- * Admin-specific calendar state composable
- * Extends shared useCalendarState functionality with admin system-wide access
- * 
- * Key Features:
- * - NO filtering - access ALL calendar events across all owners
- * - Admin-specific calendar features (cleaner views, advanced filters)
- * - System-wide calendar management
- * - Cleaner assignment calendar logic
- */
-export function useAdminCalendarState()
-⋮----
-// Get shared functionality and stores
-⋮----
-// Admin-specific state
-⋮----
-// Admin-specific calendar filters
-⋮----
-// Get current admin user ID
-⋮----
-// COMPUTED PROPERTIES - Admin system-wide data access (NO filtering)
-/**
-   * Get ALL bookings across all owners (no filtering)
-   * This is the key difference from owner version
-   */
-⋮----
-/**
-   * Get ALL properties across all owners (no filtering)
-   */
-⋮----
-/**
-   * Get system-wide turn alerts (all urgent turns across all properties)
-   */
-⋮----
-/**
-   * Get cleaner schedules (bookings grouped by cleaner)
-   */
-⋮----
-/**
-   * Get admin calendar events - format ALL bookings for calendar (no filtering)
-   */
-function getAdminCalendarEvents()
-⋮----
-// Apply admin-specific filters
-⋮----
-// Apply base calendar filtering
-⋮----
-// Convert to calendar events with admin-specific enhancements
-⋮----
-// Admin-specific color coding
-let backgroundColor = '#42A5F5'; // Default blue
-⋮----
-backgroundColor = '#E53935'; // Red for overdue
-⋮----
-backgroundColor = '#FF5722'; // Deep orange for turns
-⋮----
-backgroundColor = '#FFA726'; // Orange for unassigned
-⋮----
-// Status-based colors
-⋮----
-pending: '#FFA726',     // Orange
-scheduled: '#42A5F5',   // Blue
-in_progress: '#AB47BC', // Purple
-completed: '#66BB6A',   // Green
-cancelled: '#E53935'    // Red
-⋮----
-// Admin-specific title with more details
-⋮----
-/**
-   * Handle admin event click - admin booking management interface
-   */
-function handleAdminEventClick(eventInfo: any)
-⋮----
-// Open admin booking management modal with enhanced options
-⋮----
-/**
-   * Get specific cleaner's schedule
-   */
-function getCleanerSchedule(cleanerId: string)
-⋮----
-// Filter by current date range
-⋮----
-// Calculate cleaner metrics
-⋮----
-return total + (property?.cleaning_duration || 2); // Default 2 hours
-⋮----
-/**
-   * Advanced filtering with multiple criteria
-   */
-function filterByMultipleCriteria(criteria: {
-    status?: BookingStatus[];
-    bookingType?: BookingType[];
-    cleanerIds?: string[];
-    ownerIds?: string[];
-    propertyIds?: string[];
-    dateRange?: { start: string; end: string };
-    unassignedOnly?: boolean;
-    overdueOnly?: boolean;
-    priorityOnly?: boolean;
-})
-⋮----
-// Filter by status
-⋮----
-// Filter by booking type
-⋮----
-// Filter by cleaner
-⋮----
-// Filter by owner
-⋮----
-// Filter by property
-⋮----
-// Filter by date range
-⋮----
-// Filter unassigned only
-⋮----
-// Filter overdue only
-⋮----
-// Filter priority only (turns)
-⋮----
-/**
-   * Get calendar events with admin-specific formatting
-   */
-⋮----
-// Extend base calendar state
-⋮----
-// Admin-specific state
-⋮----
-// Admin-specific computed properties
-⋮----
-// Admin-specific functions
-`````
-
-## File: src/composables/admin/useCleanerManagement.ts
-`````typescript
-import { ref, computed } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { useUserStore } from '@/stores/user';
-import { useBookingStore } from '@/stores/booking';
-import { usePropertyStore } from '@/stores/property';
-import type { User, Cleaner, UserRole } from '@/types';
-/**
- * Admin-only cleaner management composable
- * Provides comprehensive cleaner operations for business administration
- * 
- * Key Features:
- * - Admin-only access with authentication checks
- * - Cleaner profile management (CRUD operations)
- * - Assignment and scheduling logic
- * - Performance tracking and analytics
- * - Availability management
- * - System-wide cleaner insights
- * 
- * Security: Frontend filtering for UX - backend RLS needed for real security
- */
-// Types for cleaner management
-export interface CleanerFormData {
-  name: string;
-  email: string;
-  skills: string[];
-  max_daily_bookings: number;
-  location?: {
-    lat: number;
-    lng: number;
-  };
-}
-export interface CleanerAvailability {
-  cleanerId: string;
-  date: string;
-  isAvailable: boolean;
-  currentBookings: number;
-  maxBookings: number;
-  conflictingBookings: string[];
-  recommendedTimeSlots: string[];
-}
-export interface CleanerPerformance {
-  cleanerId: string;
-  totalBookings: number;
-  completedBookings: number;
-  completionRate: number;
-  averageRating: number;
-  onTimePercentage: number;
-  totalRevenue: number;
-  averageCleaningTime: number;
-  skillUtilization: Record<string, number>;
-  monthlyTrends: {
-    month: string;
-    bookings: number;
-    revenue: number;
-    rating: number;
-  }[];
-}
-export interface CleanerWorkload {
-  cleanerId: string;
-  name: string;
-  currentBookings: number;
-  maxBookings: number;
-  utilizationRate: number;
-  todayBookings: number;
-  weekBookings: number;
-  upcomingBookings: number;
-  workloadStatus: 'light' | 'moderate' | 'heavy' | 'overloaded';
-}
-export function useCleanerManagement()
-⋮----
-// Get stores
-⋮----
-// Admin-specific state
-⋮----
-// Get current admin user ID
-⋮----
-// COMPUTED PROPERTIES - Admin system-wide cleaner access
-/**
-   * Get ALL cleaners in the system (admin-only access)
-   */
-⋮----
-// In a real app, this would come from a dedicated cleaners collection
-// For now, we'll simulate cleaner data based on user role
-⋮----
-/**
-   * Get available cleaners (not at max capacity)
-   */
-⋮----
-/**
-   * Get cleaners grouped by skills
-   */
-⋮----
-/**
-   * Get cleaner workload analysis
-   */
-⋮----
-/**
-   * Get system-wide cleaner metrics
-   */
-⋮----
-// ADMIN-SPECIFIC CRUD OPERATIONS
-/**
-   * Fetch all cleaners (admin-only operation)
-   */
-async function fetchCleaners(): Promise<boolean>
-⋮----
-// In a real app, this would make an API call to get all cleaners
-// For now, we simulate the call and use computed data
-⋮----
-/**
-   * Create new cleaner (admin-only operation)
-   */
-async function createCleaner(data: CleanerFormData): Promise<string | null>
-⋮----
-// Validate cleaner data
-⋮----
-// Check for duplicate email
-⋮----
-// In a real app, this would make an API call to create the cleaner
-⋮----
-/**
-   * Update cleaner profile (admin-only operation)
-   */
-async function updateCleaner(cleanerId: string, data: Partial<CleanerFormData>): Promise<boolean>
-⋮----
-// Find cleaner
-⋮----
-// Validate updates
-⋮----
-// Check if reducing capacity would affect existing assignments
-⋮----
-// In a real app, this would make an API call to update the cleaner
-⋮----
-/**
-   * Delete cleaner (admin-only operation with validation)
-   */
-async function deleteCleaner(cleanerId: string): Promise<boolean>
-⋮----
-// Find cleaner
-⋮----
-// Check for active assignments
-⋮----
-// In a real app, this would make an API call to delete the cleaner
-⋮----
-// ASSIGNMENT OPERATIONS
-/**
-   * Assign cleaner to booking (coordinates with useAdminBookings)
-   */
-async function assignCleanerToBooking(cleanerId: string, bookingId: string): Promise<boolean>
-⋮----
-// Find cleaner and booking
-⋮----
-// Check cleaner availability
-⋮----
-// In a real app, this would make an API call to assign the cleaner
-⋮----
-// Update booking in store (simulate the assignment)
-⋮----
-/**
-   * Unassign cleaner from booking
-   */
-async function unassignCleanerFromBooking(bookingId: string): Promise<boolean>
-⋮----
-// In a real app, this would make an API call to unassign the cleaner
-⋮----
-// Update booking in store (simulate the unassignment)
-⋮----
-/**
-   * Bulk assign cleaner to multiple bookings
-   */
-async function bulkAssignCleaner(cleanerId: string, bookingIds: string[]): Promise<
-// AVAILABILITY & SCHEDULING
-/**
-   * Get cleaner availability for a specific date
-   */
-async function getCleanerAvailability(cleanerId: string, date: string): Promise<CleanerAvailability>
-⋮----
-// Get bookings for the specified date
-⋮----
-// Generate recommended time slots (simplified)
-⋮----
-/**
-   * Get cleaner's schedule for a date range
-   */
-async function getCleanerSchedule(cleanerId: string, startDate: string, endDate: string)
-/**
-   * Find available cleaners for specific date and skills
-   */
-async function findAvailableCleaners(date: string, requiredSkills?: string[])
-⋮----
-// Filter by skills if specified
-⋮----
-// Sort by utilization rate (prefer less busy cleaners)
-⋮----
-// PERFORMANCE & ANALYTICS
-/**
-   * Get individual cleaner performance metrics
-   */
-async function getCleanerPerformance(cleanerId: string): Promise<CleanerPerformance>
-⋮----
-// Get all bookings for this cleaner
-⋮----
-// Simulate performance metrics (in real app, this would come from API)
-const averageRating = 4.2 + Math.random() * 0.6; // 4.2-4.8 range
-const onTimePercentage = 85 + Math.random() * 10; // 85-95% range
-const totalRevenue = completedBookings * (150 + Math.random() * 100); // $150-250 per booking
-const averageCleaningTime = 120 + Math.random() * 60; // 2-3 hours
-// Skill utilization
-⋮----
-// Monthly trends (last 6 months)
-⋮----
-/**
-   * Get system-wide cleaner analytics
-   */
-function getSystemCleanerAnalytics()
-⋮----
-// Performance distribution
-⋮----
-highPerformers: Math.round(metrics.totalCleaners * 0.3), // Top 30%
-averagePerformers: Math.round(metrics.totalCleaners * 0.5), // Middle 50%
-needsImprovement: Math.round(metrics.totalCleaners * 0.2) // Bottom 20%
-⋮----
-// Capacity analysis
-⋮----
-peakCapacityDays: ['Monday', 'Friday', 'Saturday'], // Typical peak days
-⋮----
-// Skill gap analysis
-⋮----
-/**
-   * Get cleaner utilization report
-   */
-function getCleanerUtilization()
-// UTILITY FUNCTIONS
-/**
-   * Clear all state (for cleanup)
-   */
-function clearState()
-/**
-   * Get cleaner by ID
-   */
-function getCleanerById(cleanerId: string): Cleaner | undefined
-/**
-   * Get cleaners by skill
-   */
-function getCleanersBySkill(skill: string): Cleaner[]
-⋮----
-// State
-⋮----
-// Computed properties
-⋮----
-// CRUD operations
-⋮----
-// Assignment operations
-⋮----
-// Availability & scheduling
-⋮----
-// Performance & analytics
-⋮----
-// Utility functions
 `````
 
 ## File: .cursorignore
@@ -34119,6 +28532,263 @@ html, body {
 * {
 `````
 
+## File: src/components/demos/AdminQuickActionsDemo.vue
+`````vue
+<template>
+  <v-container>
+    <v-row>
+      <v-col cols="12">
+        <h1 class="text-h4 mb-4">AdminQuickActions Demo</h1>
+        <p class="text-body-1 mb-6">
+          This demo showcases the AdminQuickActions component with various states and configurations.
+        </p>
+      </v-col>
+    </v-row>
+    <v-row>
+      <!-- Demo Controls -->
+      <v-col cols="12" md="4">
+        <v-card variant="outlined" class="mb-4">
+          <v-card-title class="text-h6">Demo Controls</v-card-title>
+          <v-card-text>
+            <v-switch
+              v-model="loading"
+              label="Loading State"
+              color="primary"
+              class="mb-2"
+            />
+            <v-switch
+              v-model="disabled"
+              label="Disabled State"
+              color="secondary"
+              class="mb-2"
+            />
+            <v-slider
+              v-model="urgentCount"
+              label="Urgent Count"
+              :min="0"
+              :max="20"
+              :step="1"
+              thumb-label
+              class="mb-2"
+            />
+            <v-slider
+              v-model="todayBookings"
+              label="Today Bookings"
+              :min="0"
+              :max="50"
+              :step="1"
+              thumb-label
+              class="mb-2"
+            />
+            <v-slider
+              v-model="unassignedCount"
+              label="Unassigned Count"
+              :min="0"
+              :max="30"
+              :step="1"
+              thumb-label
+              class="mb-2"
+            />
+            <v-slider
+              v-model="completedToday"
+              label="Completed Today"
+              :min="0"
+              :max="25"
+              :step="1"
+              thumb-label
+              class="mb-2"
+            />
+            <v-select
+              v-model="selectedVariant"
+              :items="variantOptions"
+              label="Card Variant"
+              variant="outlined"
+              class="mb-2"
+            />
+            <v-slider
+              v-model="elevation"
+              label="Elevation"
+              :min="0"
+              :max="24"
+              :step="1"
+              thumb-label
+            />
+          </v-card-text>
+        </v-card>
+        <!-- Action Log -->
+        <v-card variant="outlined">
+          <v-card-title class="text-h6 d-flex align-center">
+            Action Log
+            <v-spacer />
+            <v-btn
+              size="small"
+              variant="text"
+              @click="actionLog = []"
+            >
+              Clear
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <div v-if="actionLog.length === 0" class="text-center text-medium-emphasis py-4">
+              No actions performed yet
+            </div>
+            <v-list v-else density="compact">
+              <v-list-item
+                v-for="(action, index) in actionLog.slice().reverse()"
+                :key="index"
+                class="px-0"
+              >
+                <v-list-item-title class="text-body-2">
+                  <v-chip size="x-small" color="primary" class="mr-2">
+                    {{ actionLog.length - index }}
+                  </v-chip>
+                  {{ formatActionType(action.type) }}
+                </v-list-item-title>
+                <v-list-item-subtitle class="text-caption">
+                  {{ action.timestamp.toLocaleTimeString() }}
+                </v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <!-- AdminQuickActions Demo -->
+      <v-col cols="12" md="8">
+        <v-card variant="outlined">
+          <v-card-title class="text-h6">AdminQuickActions Component</v-card-title>
+          <v-card-text>
+            <AdminQuickActions
+              :loading="loading"
+              :disabled="disabled"
+              :elevation="elevation"
+              :variant="selectedVariant"
+              :urgent-count="urgentCount"
+              :today-bookings="todayBookings"
+              :unassigned-count="unassignedCount"
+              :completed-today="completedToday"
+              @action="handleAction"
+            />
+          </v-card-text>
+        </v-card>
+        <!-- Component Info -->
+        <v-card variant="outlined" class="mt-4">
+          <v-card-title class="text-h6">Component Features</v-card-title>
+          <v-card-text>
+            <v-list>
+              <v-list-item>
+                <v-list-item-title>Critical Actions</v-list-item-title>
+                <v-list-item-subtitle>
+                  Urgent turns management and cleaner assignment with visual indicators
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-title>Primary Management</v-list-item-title>
+                <v-list-item-subtitle>
+                  Master calendar access and new booking creation
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-title>Bulk Operations</v-list-item-title>
+                <v-list-item-subtitle>
+                  Collapsible section for bulk assignment and rescheduling
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-title>Business Management</v-list-item-title>
+                <v-list-item-subtitle>
+                  Cleaner management, reports, properties, and system settings
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-title>Quick Stats</v-list-item-title>
+                <v-list-item-subtitle>
+                  Optional statistics display for today's metrics
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-title>Responsive Design</v-list-item-title>
+                <v-list-item-subtitle>
+                  Adaptive layout with mobile-optimized text and spacing
+                </v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+⋮----
+<!-- Demo Controls -->
+⋮----
+<!-- Action Log -->
+⋮----
+{{ actionLog.length - index }}
+⋮----
+{{ formatActionType(action.type) }}
+⋮----
+{{ action.timestamp.toLocaleTimeString() }}
+⋮----
+<!-- AdminQuickActions Demo -->
+⋮----
+<!-- Component Info -->
+⋮----
+<script setup lang="ts">
+import { ref } from 'vue'
+import AdminQuickActions from '@/components/dumb/admin/AdminQuickActions.vue'
+// Demo state
+const loading = ref(false)
+const disabled = ref(false)
+const urgentCount = ref(3)
+const todayBookings = ref(12)
+const unassignedCount = ref(5)
+const completedToday = ref(8)
+const elevation = ref(2)
+const selectedVariant = ref<'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'>('elevated')
+// Variant options
+const variantOptions = [
+  { title: 'Elevated', value: 'elevated' },
+  { title: 'Flat', value: 'flat' },
+  { title: 'Tonal', value: 'tonal' },
+  { title: 'Outlined', value: 'outlined' },
+  { title: 'Text', value: 'text' },
+  { title: 'Plain', value: 'plain' }
+]
+// Action log
+interface ActionLogEntry {
+  type: string
+  timestamp: Date
+}
+const actionLog = ref<ActionLogEntry[]>([])
+// Methods
+function handleAction(actionType: string) {
+  actionLog.value.push({
+    type: actionType,
+    timestamp: new Date()
+  })
+  // Keep only last 20 actions
+  if (actionLog.value.length > 20) {
+    actionLog.value = actionLog.value.slice(-20)
+  }
+  console.log('Admin action triggered:', actionType)
+}
+function formatActionType(actionType: string): string {
+  return actionType
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+</script>
+<style scoped>
+.v-slider {
+  margin-bottom: 8px;
+}
+.v-list-item {
+  min-height: 40px;
+}
+</style>
+`````
+
 ## File: src/components/demos/UseOwnerPropertiesDemo.vue
 `````vue
 <template>
@@ -34555,6 +29225,4701 @@ onMounted(() => {
 .v-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}
+</style>
+`````
+
+## File: src/components/dumb/admin/AdminBookingForm.vue
+`````vue
+<template>
+  <v-dialog
+    v-model="isOpen"
+    max-width="800px"
+    persistent
+    scrollable
+    @keydown.esc="handleClose"
+  >
+    <v-card>
+      <v-card-title class="text-h5 pb-2 d-flex align-center">
+        {{ formTitle }}
+        <v-chip
+          v-if="form.booking_type === 'turn'"
+          color="error"
+          size="small"
+          class="ml-2"
+          variant="elevated"
+        >
+          <v-icon start>mdi-clock-alert</v-icon>
+          URGENT TURN
+        </v-chip>
+        <v-chip
+          v-if="form.priority === 'high'"
+          color="warning"
+          size="small"
+          class="ml-2"
+        >
+          HIGH PRIORITY
+        </v-chip>
+        <v-spacer />
+        <v-chip
+          :color="getStatusColor(form.status)"
+          variant="tonal"
+          size="small"
+        >
+          {{ form.status?.toUpperCase() }}
+        </v-chip>
+      </v-card-title>
+      <v-divider />
+      <v-card-text class="pa-0">
+        <v-form
+          ref="formRef"
+          v-model="formValid"
+          @submit.prevent="handleSubmit"
+        >
+          <v-container>
+            <!-- Property and Owner Information -->
+            <v-row>
+              <v-col cols="12" md="8">
+                <v-select
+                  v-model="form.property_id"
+                  :items="propertiesArray"
+                  item-title="name"
+                  item-value="id"
+                  label="Property"
+                  :rules="propertyRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('property_id')"
+                  prepend-inner-icon="mdi-home"
+                >
+                  <template #item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <template #prepend>
+                        <v-avatar color="primary" size="small">
+                          <v-icon>mdi-home</v-icon>
+                        </v-avatar>
+                      </template>
+                      <template #subtitle>
+                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
+                      </template>
+                    </v-list-item>
+                  </template>
+                </v-select>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-select
+                  v-model="form.status"
+                  :items="statusOptions"
+                  label="Booking Status"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('status')"
+                  prepend-inner-icon="mdi-clipboard-list"
+                >
+                  <template #item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <template #prepend>
+                        <v-chip
+                          :color="getStatusColor(item.value)"
+                          size="x-small"
+                          variant="dot"
+                        />
+                      </template>
+                    </v-list-item>
+                  </template>
+                </v-select>
+              </v-col>
+            </v-row>
+            <!-- Dates and Times -->
+            <v-row>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="form.checkout_date"
+                  label="Checkout Date & Time"
+                  type="datetime-local"
+                  :rules="dateRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('checkout_date')"
+                  hint="When guests depart"
+                  persistent-hint
+                  prepend-inner-icon="mdi-calendar-export"
+                  @update:model-value="updateBookingType"
+                />
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="form.checkin_date"
+                  label="Checkin Date & Time"
+                  type="datetime-local"
+                  :rules="dateRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('checkin_date')"
+                  hint="When new guests arrive"
+                  persistent-hint
+                  prepend-inner-icon="mdi-calendar-import"
+                  @update:model-value="updateBookingType"
+                />
+              </v-col>
+            </v-row>
+            <!-- Cleaner Assignment Section -->
+            <v-row>
+              <v-col cols="12">
+                <v-card variant="outlined" class="mb-4">
+                  <v-card-title class="text-subtitle-1 py-2">
+                    <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
+                    Cleaner Assignment
+                  </v-card-title>
+                  <v-divider />
+                  <v-card-text>
+                    <v-row>
+                      <v-col cols="12" md="6">
+                        <v-select
+                          v-model="form.assigned_cleaner_id"
+                          :items="availableCleaners"
+                          item-title="name"
+                          item-value="id"
+                          label="Assigned Cleaner"
+                          variant="outlined"
+                          :disabled="loading"
+                          :error-messages="errors.get('assigned_cleaner_id')"
+                          clearable
+                          prepend-inner-icon="mdi-account"
+                        >
+                          <template #item="{ props, item }">
+                            <v-list-item v-bind="props">
+                              <template #prepend>
+                                <v-avatar :color="getCleanerAvailabilityColor(item.raw)" size="small">
+                                  <v-icon>mdi-account</v-icon>
+                                </v-avatar>
+                              </template>
+                              <template #subtitle>
+                                {{ getCleanerSubtitle(item.raw) }}
+                              </template>
+                              <template #append>
+                                <v-chip
+                                  :color="getCleanerAvailabilityColor(item.raw)"
+                                  size="x-small"
+                                  variant="dot"
+                                >
+                                  {{ getCleanerAvailabilityText(item.raw) }}
+                                </v-chip>
+                              </template>
+                            </v-list-item>
+                          </template>
+                        </v-select>
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-btn
+                          variant="outlined"
+                          color="primary"
+                          :disabled="!form.property_id || !form.checkout_date"
+                          @click="openCleanerAssignmentModal"
+                        >
+                          <v-icon start>mdi-magnify</v-icon>
+                          Find Best Cleaner
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                    <!-- Cleaner Details -->
+                    <v-row v-if="selectedCleaner">
+                      <v-col cols="12">
+                        <v-alert
+                          type="info"
+                          variant="tonal"
+                          class="mt-2"
+                        >
+                          <template #title>
+                            Cleaner: {{ selectedCleaner.name }}
+                          </template>
+                          <p class="mb-1">
+                            <strong>Skills:</strong> {{ selectedCleaner.skills.join(', ') }}
+                          </p>
+                          <p class="mb-1">
+                            <strong>Today's Bookings:</strong> {{ getCleanerTodayBookings(selectedCleaner.id) }}/{{ selectedCleaner.max_daily_bookings }}
+                          </p>
+                          <p class="mb-0">
+                            <strong>Performance Rating:</strong> 
+                            <v-rating
+                              :model-value="getCleanerRating(selectedCleaner.id)"
+                              readonly
+                              size="small"
+                              density="compact"
+                              class="d-inline-flex ml-2"
+                            />
+                          </p>
+                        </v-alert>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            <!-- Booking Details -->
+            <v-row>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model.number="form.guest_count"
+                  label="Guest Count"
+                  type="number"
+                  min="1"
+                  max="20"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('guest_count')"
+                  hint="Affects cleaning duration estimate"
+                  persistent-hint
+                  prepend-inner-icon="mdi-account-group"
+                />
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-select
+                  v-model="form.priority"
+                  :items="priorityOptions"
+                  label="Priority Level"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('priority')"
+                  prepend-inner-icon="mdi-flag"
+                >
+                  <template #item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <template #prepend>
+                        <v-icon :color="getPriorityColor(item.value)">
+                          {{ getPriorityIcon(item.value) }}
+                        </v-icon>
+                      </template>
+                    </v-list-item>
+                  </template>
+                </v-select>
+              </v-col>
+            </v-row>
+            <!-- Notes and Instructions -->
+            <v-row>
+              <v-col cols="12">
+                <v-textarea
+                  v-model="form.notes"
+                  label="Cleaning Instructions & Notes"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('notes')"
+                  hint="Special requirements, client preferences, or operational notes"
+                  persistent-hint
+                  :counter="500"
+                  rows="3"
+                  prepend-inner-icon="mdi-note-text"
+                />
+              </v-col>
+            </v-row>
+            <!-- Business Impact Alerts -->
+            <v-row v-if="showBusinessImpactAlert">
+              <v-col cols="12">
+                <v-alert
+                  :type="businessImpactAlert.type"
+                  variant="tonal"
+                  :title="businessImpactAlert.title"
+                  class="mb-0"
+                >
+                  <p v-for="message in businessImpactAlert.messages" :key="message" class="mb-1">
+                    {{ message }}
+                  </p>
+                </v-alert>
+              </v-col>
+            </v-row>
+            <!-- Validation Errors -->
+            <v-row v-if="showDateError">
+              <v-col cols="12">
+                <v-alert
+                  type="error"
+                  variant="tonal"
+                  title="Scheduling Conflict"
+                  text="Invalid date configuration detected. Please review checkout/checkin times."
+                  class="mb-0"
+                />
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-form>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions class="pa-4">
+        <v-btn
+          color="grey-darken-1"
+          variant="text"
+          :disabled="loading"
+          @click="handleClose"
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          v-if="mode === 'edit'"
+          color="error"
+          variant="outlined"
+          :disabled="loading"
+          @click="handleDelete"
+        >
+          <v-icon start>mdi-delete</v-icon>
+          Delete
+        </v-btn>
+        <v-spacer />
+        <v-btn
+          v-if="mode === 'edit' && form.status !== 'completed'"
+          color="success"
+          variant="tonal"
+          :disabled="loading || !form.assigned_cleaner_id"
+          @click="handleMarkComplete"
+        >
+          <v-icon start>mdi-check</v-icon>
+          Mark Complete
+        </v-btn>
+        <v-btn
+          color="primary"
+          variant="elevated"
+          :loading="loading"
+          :disabled="!formValid"
+          @click="handleSubmit"
+        >
+          <v-icon start>{{ mode === 'create' ? 'mdi-plus' : 'mdi-content-save' }}</v-icon>
+          {{ submitButtonText }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+⋮----
+{{ formTitle }}
+⋮----
+{{ form.status?.toUpperCase() }}
+⋮----
+<!-- Property and Owner Information -->
+⋮----
+<template #item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <template #prepend>
+                        <v-avatar color="primary" size="small">
+                          <v-icon>mdi-home</v-icon>
+                        </v-avatar>
+                      </template>
+                      <template #subtitle>
+                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
+                      </template>
+                    </v-list-item>
+                  </template>
+⋮----
+<template #prepend>
+                        <v-avatar color="primary" size="small">
+                          <v-icon>mdi-home</v-icon>
+                        </v-avatar>
+                      </template>
+<template #subtitle>
+                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
+                      </template>
+⋮----
+{{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
+⋮----
+<template #item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <template #prepend>
+                        <v-chip
+                          :color="getStatusColor(item.value)"
+                          size="x-small"
+                          variant="dot"
+                        />
+                      </template>
+                    </v-list-item>
+                  </template>
+⋮----
+<template #prepend>
+                        <v-chip
+                          :color="getStatusColor(item.value)"
+                          size="x-small"
+                          variant="dot"
+                        />
+                      </template>
+⋮----
+<!-- Dates and Times -->
+⋮----
+<!-- Cleaner Assignment Section -->
+⋮----
+<template #item="{ props, item }">
+                            <v-list-item v-bind="props">
+                              <template #prepend>
+                                <v-avatar :color="getCleanerAvailabilityColor(item.raw)" size="small">
+                                  <v-icon>mdi-account</v-icon>
+                                </v-avatar>
+                              </template>
+                              <template #subtitle>
+                                {{ getCleanerSubtitle(item.raw) }}
+                              </template>
+                              <template #append>
+                                <v-chip
+                                  :color="getCleanerAvailabilityColor(item.raw)"
+                                  size="x-small"
+                                  variant="dot"
+                                >
+                                  {{ getCleanerAvailabilityText(item.raw) }}
+                                </v-chip>
+                              </template>
+                            </v-list-item>
+                          </template>
+⋮----
+<template #prepend>
+                                <v-avatar :color="getCleanerAvailabilityColor(item.raw)" size="small">
+                                  <v-icon>mdi-account</v-icon>
+                                </v-avatar>
+                              </template>
+<template #subtitle>
+                                {{ getCleanerSubtitle(item.raw) }}
+                              </template>
+⋮----
+{{ getCleanerSubtitle(item.raw) }}
+⋮----
+<template #append>
+                                <v-chip
+                                  :color="getCleanerAvailabilityColor(item.raw)"
+                                  size="x-small"
+                                  variant="dot"
+                                >
+                                  {{ getCleanerAvailabilityText(item.raw) }}
+                                </v-chip>
+                              </template>
+⋮----
+{{ getCleanerAvailabilityText(item.raw) }}
+⋮----
+<!-- Cleaner Details -->
+⋮----
+<template #title>
+                            Cleaner: {{ selectedCleaner.name }}
+                          </template>
+⋮----
+Cleaner: {{ selectedCleaner.name }}
+⋮----
+<strong>Skills:</strong> {{ selectedCleaner.skills.join(', ') }}
+⋮----
+<strong>Today's Bookings:</strong> {{ getCleanerTodayBookings(selectedCleaner.id) }}/{{ selectedCleaner.max_daily_bookings }}
+⋮----
+<!-- Booking Details -->
+⋮----
+<template #item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <template #prepend>
+                        <v-icon :color="getPriorityColor(item.value)">
+                          {{ getPriorityIcon(item.value) }}
+                        </v-icon>
+                      </template>
+                    </v-list-item>
+                  </template>
+⋮----
+<template #prepend>
+                        <v-icon :color="getPriorityColor(item.value)">
+                          {{ getPriorityIcon(item.value) }}
+                        </v-icon>
+                      </template>
+⋮----
+{{ getPriorityIcon(item.value) }}
+⋮----
+<!-- Notes and Instructions -->
+⋮----
+<!-- Business Impact Alerts -->
+⋮----
+{{ message }}
+⋮----
+<!-- Validation Errors -->
+⋮----
+<v-icon start>{{ mode === 'create' ? 'mdi-plus' : 'mdi-content-save' }}</v-icon>
+{{ submitButtonText }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch, nextTick } from 'vue'
+import type { Property } from '@/types/property'
+import type { Booking, BookingFormData } from '@/types/booking'
+import type { Cleaner } from '@/types/user'
+// Props
+interface Props {
+  modelValue: boolean
+  mode: 'create' | 'edit'
+  booking?: Booking | null
+  properties: Property[]
+  cleaners: Cleaner[]
+  loading?: boolean
+  errors?: Map<string, string[]>
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+  errors: () => new Map()
+})
+// Emits
+interface Emits {
+  'update:modelValue': [value: boolean]
+  'submit': [data: BookingFormData]
+  'delete': [id: string]
+  'mark-complete': [id: string]
+  'assign-cleaner': [bookingId: string, cleanerId: string]
+  'open-cleaner-modal': [booking: Partial<BookingFormData>]
+}
+const emit = defineEmits<Emits>()
+// Form state
+const formRef = ref()
+const formValid = ref(false)
+// Default form data
+const defaultForm: BookingFormData = {
+  property_id: '',
+  checkout_date: '',
+  checkin_date: '',
+  booking_type: 'standard',
+  guest_count: undefined,
+  notes: '',
+  status: 'pending',
+  assigned_cleaner_id: '',
+  priority: 'standard'
+}
+const form = ref<BookingFormData>({ ...defaultForm })
+// Computed properties
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
+const formTitle = computed(() => {
+  if (props.mode === 'create') {
+    return 'Schedule New Cleaning'
+  }
+  return `Edit Booking #${props.booking?.id?.slice(-6) || 'New'}`
+})
+const submitButtonText = computed(() => {
+  return props.mode === 'create' ? 'Schedule Cleaning' : 'Update Booking'
+})
+const propertiesArray = computed(() => {
+  return Array.from(props.properties).map(property => ({
+    ...property,
+    title: `${property.name} - ${property.address}`
+  }))
+})
+const availableCleaners = computed(() => {
+  return props.cleaners.filter(cleaner => {
+    // Filter based on availability and skills if needed
+    return true // Simplified for now
+  })
+})
+const selectedCleaner = computed(() => {
+  if (!form.value.assigned_cleaner_id) return null
+  return props.cleaners.find(c => c.id === form.value.assigned_cleaner_id)
+})
+const statusOptions = [
+  { title: 'Pending', value: 'pending' },
+  { title: 'Scheduled', value: 'scheduled' },
+  { title: 'In Progress', value: 'in_progress' },
+  { title: 'Completed', value: 'completed' },
+  { title: 'Cancelled', value: 'cancelled' }
+]
+const priorityOptions = [
+  { title: 'Standard', value: 'standard' },
+  { title: 'High', value: 'high' },
+  { title: 'Urgent', value: 'urgent' }
+]
+const showSameDayAlert = computed(() => {
+  if (!form.value.checkout_date || !form.value.checkin_date) return false
+  const checkoutDate = new Date(form.value.checkout_date).toDateString()
+  const checkinDate = new Date(form.value.checkin_date).toDateString()
+  return checkoutDate === checkinDate
+})
+const showDateError = computed(() => {
+  if (!form.value.checkout_date || !form.value.checkin_date) return false
+  return new Date(form.value.checkin_date) < new Date(form.value.checkout_date)
+})
+const showBusinessImpactAlert = computed(() => {
+  return businessImpactAlert.value.messages.length > 0
+})
+const businessImpactAlert = computed(() => {
+  const alert = {
+    type: 'info' as 'info' | 'warning' | 'error',
+    title: '',
+    messages: [] as string[]
+  }
+  if (form.value.booking_type === 'turn') {
+    alert.type = 'warning'
+    alert.title = 'High Business Impact'
+    alert.messages.push('Same-day turnovers require immediate attention')
+    alert.messages.push('Client satisfaction and revenue directly affected')
+  }
+  if (form.value.priority === 'urgent' && !form.value.assigned_cleaner_id) {
+    alert.type = 'error'
+    alert.title = 'Critical: Urgent Booking Unassigned'
+    alert.messages.push('Urgent bookings must have assigned cleaners')
+  }
+  return alert
+})
+// Validation rules
+const propertyRules = [
+  (v: string) => !!v || 'Property selection is required'
+]
+const dateRules = [
+  (v: string) => !!v || 'Date is required',
+  (v: string) => {
+    if (!v) return true
+    const date = new Date(v)
+    const now = new Date()
+    return date >= now || 'Date cannot be in the past'
+  }
+]
+// Methods
+const updateBookingType = () => {
+  if (!form.value.checkout_date || !form.value.checkin_date) return
+  const checkoutDate = new Date(form.value.checkout_date).toDateString()
+  const checkinDate = new Date(form.value.checkin_date).toDateString()
+  if (checkoutDate === checkinDate) {
+    form.value.booking_type = 'turn'
+    form.value.priority = 'urgent'
+  } else {
+    form.value.booking_type = 'standard'
+    if (form.value.priority === 'urgent') {
+      form.value.priority = 'standard'
+    }
+  }
+}
+const getStatusColor = (status: string) => {
+  const colors = {
+    pending: 'orange',
+    scheduled: 'blue',
+    in_progress: 'purple',
+    completed: 'green',
+    cancelled: 'red'
+  }
+  return colors[status as keyof typeof colors] || 'grey'
+}
+const getPriorityColor = (priority: string) => {
+  const colors = {
+    standard: 'grey',
+    high: 'orange',
+    urgent: 'red'
+  }
+  return colors[priority as keyof typeof colors] || 'grey'
+}
+const getPriorityIcon = (priority: string) => {
+  const icons = {
+    standard: 'mdi-flag',
+    high: 'mdi-flag-triangle',
+    urgent: 'mdi-alert'
+  }
+  return icons[priority as keyof typeof icons] || 'mdi-flag'
+}
+const getPropertyOwnerName = (ownerId: string) => {
+  // This would typically come from a users store or prop
+  return `Owner ${ownerId.slice(-4)}`
+}
+const getCleanerAvailabilityColor = (cleaner: Cleaner) => {
+  // Simplified availability check
+  const todayBookings = getCleanerTodayBookings(cleaner.id)
+  if (todayBookings >= cleaner.max_daily_bookings) return 'red'
+  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'orange'
+  return 'green'
+}
+const getCleanerAvailabilityText = (cleaner: Cleaner) => {
+  const todayBookings = getCleanerTodayBookings(cleaner.id)
+  if (todayBookings >= cleaner.max_daily_bookings) return 'Unavailable'
+  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'Limited'
+  return 'Available'
+}
+const getCleanerSubtitle = (cleaner: Cleaner) => {
+  return `${cleaner.skills.slice(0, 2).join(', ')} • ${getCleanerTodayBookings(cleaner.id)}/${cleaner.max_daily_bookings} bookings`
+}
+const getCleanerTodayBookings = (cleanerId: string) => {
+  // This would typically come from bookings store
+  return Math.floor(Math.random() * 5) // Mock data
+}
+const getCleanerRating = (cleanerId: string) => {
+  // This would typically come from performance data
+  return 4 + Math.random() // Mock rating between 4-5
+}
+const openCleanerAssignmentModal = () => {
+  emit('open-cleaner-modal', form.value)
+}
+const handleSubmit = async () => {
+  if (!formRef.value) return
+  const { valid } = await formRef.value.validate()
+  if (!valid) return
+  emit('submit', { ...form.value })
+}
+const handleClose = () => {
+  isOpen.value = false
+}
+const handleDelete = () => {
+  if (props.booking?.id) {
+    emit('delete', props.booking.id)
+  }
+}
+const handleMarkComplete = () => {
+  if (props.booking?.id) {
+    emit('mark-complete', props.booking.id)
+  }
+}
+// Watch for booking changes
+watch(() => props.booking, (newBooking) => {
+  if (newBooking) {
+    form.value = {
+      property_id: newBooking.property_id,
+      checkout_date: newBooking.checkout_date,
+      checkin_date: newBooking.checkin_date,
+      booking_type: newBooking.booking_type,
+      guest_count: newBooking.guest_count,
+      notes: newBooking.notes || '',
+      status: newBooking.status,
+      assigned_cleaner_id: newBooking.assigned_cleaner_id || '',
+      priority: newBooking.priority || 'standard'
+    }
+  } else {
+    form.value = { ...defaultForm }
+  }
+}, { immediate: true })
+// Watch for modal close
+watch(isOpen, (newValue) => {
+  if (!newValue) {
+    nextTick(() => {
+      form.value = { ...defaultForm }
+      formRef.value?.resetValidation()
+    })
+  }
+})
+</script>
+<style scoped>
+.v-card-title {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+.v-alert {
+  border-left: 4px solid rgb(var(--v-theme-primary));
+}
+</style>
+`````
+
+## File: src/components/dumb/admin/AdminCalendarControls.vue
+`````vue
+<template>
+  <v-card variant="outlined" class="admin-calendar-controls">
+    <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
+      <v-icon class="mr-2">mdi-calendar-clock</v-icon>
+      Calendar Controls
+      <v-spacer />
+      <v-btn
+        variant="text"
+        size="small"
+        :icon="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+        @click="expanded = !expanded"
+      />
+    </v-card-title>
+    <v-divider />
+    <v-expand-transition>
+      <v-card-text v-show="expanded" class="pa-0">
+        <v-container>
+          <!-- View Controls -->
+          <v-row>
+            <v-col cols="12" md="6">
+              <div class="text-body-2 text-medium-emphasis mb-2">Calendar View</div>
+              <v-btn-toggle
+                v-model="selectedView"
+                variant="outlined"
+                divided
+                mandatory
+                @update:model-value="handleViewChange"
+              >
+                <v-btn value="dayGridMonth" size="small">
+                  <v-icon start>mdi-calendar-month</v-icon>
+                  Month
+                </v-btn>
+                <v-btn value="timeGridWeek" size="small">
+                  <v-icon start>mdi-calendar-week</v-icon>
+                  Week
+                </v-btn>
+                <v-btn value="timeGridDay" size="small">
+                  <v-icon start>mdi-calendar-today</v-icon>
+                  Day
+                </v-btn>
+                <v-btn value="listWeek" size="small">
+                  <v-icon start>mdi-format-list-bulleted</v-icon>
+                  Agenda
+                </v-btn>
+              </v-btn-toggle>
+            </v-col>
+            <v-col cols="12" md="6">
+              <div class="text-body-2 text-medium-emphasis mb-2">Date Navigation</div>
+              <div class="d-flex gap-2 align-center">
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  @click="handlePrevious"
+                >
+                  <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  @click="handleToday"
+                >
+                  Today
+                </v-btn>
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  @click="handleNext"
+                >
+                  <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+                <v-spacer />
+                <v-text-field
+                  v-model="selectedDate"
+                  type="date"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  style="max-width: 150px;"
+                  @update:model-value="handleDateChange"
+                />
+              </div>
+            </v-col>
+          </v-row>
+          <v-divider class="my-4" />
+          <!-- Filters -->
+          <v-row>
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="filters.status"
+                :items="statusOptions"
+                label="Status Filter"
+                variant="outlined"
+                density="compact"
+                clearable
+                multiple
+                chips
+                @update:model-value="handleFilterChange"
+              >
+                <template #chip="{ props, item }">
+                  <v-chip
+                    v-bind="props"
+                    :color="getStatusColor(item.value)"
+                    size="small"
+                  >
+                    {{ item.title }}
+                  </v-chip>
+                </template>
+              </v-select>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="filters.cleaner"
+                :items="cleanerOptions"
+                label="Cleaner Filter"
+                variant="outlined"
+                density="compact"
+                clearable
+                multiple
+                chips
+                @update:model-value="handleFilterChange"
+              >
+                <template #item="{ props, item }">
+                  <v-list-item v-bind="props">
+                    <template #prepend>
+                      <v-avatar :color="getCleanerColor(item.value)" size="small">
+                        <v-icon>mdi-account</v-icon>
+                      </v-avatar>
+                    </template>
+                  </v-list-item>
+                </template>
+              </v-select>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="filters.bookingType"
+                :items="bookingTypeOptions"
+                label="Booking Type"
+                variant="outlined"
+                density="compact"
+                clearable
+                multiple
+                chips
+                @update:model-value="handleFilterChange"
+              >
+                <template #chip="{ props, item }">
+                  <v-chip
+                    v-bind="props"
+                    :color="item.value === 'turn' ? 'error' : 'primary'"
+                    size="small"
+                  >
+                    {{ item.title }}
+                  </v-chip>
+                </template>
+              </v-select>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="filters.propertyOwner"
+                :items="propertyOwnerOptions"
+                label="Property Owner"
+                variant="outlined"
+                density="compact"
+                clearable
+                multiple
+                chips
+                @update:model-value="handleFilterChange"
+              />
+            </v-col>
+          </v-row>
+          <!-- Advanced Filters -->
+          <v-row v-if="showAdvancedFilters">
+            <v-col cols="12" md="4">
+              <v-select
+                v-model="filters.priority"
+                :items="priorityOptions"
+                label="Priority Level"
+                variant="outlined"
+                density="compact"
+                clearable
+                multiple
+                chips
+                @update:model-value="handleFilterChange"
+              >
+                <template #chip="{ props, item }">
+                  <v-chip
+                    v-bind="props"
+                    :color="getPriorityColor(item.value)"
+                    size="small"
+                  >
+                    {{ item.title }}
+                  </v-chip>
+                </template>
+              </v-select>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-text-field
+                v-model="filters.dateRange.start"
+                label="Start Date"
+                type="date"
+                variant="outlined"
+                density="compact"
+                @update:model-value="handleFilterChange"
+              />
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-text-field
+                v-model="filters.dateRange.end"
+                label="End Date"
+                type="date"
+                variant="outlined"
+                density="compact"
+                @update:model-value="handleFilterChange"
+              />
+            </v-col>
+          </v-row>
+          <v-divider class="my-4" />
+          <!-- Action Controls -->
+          <v-row>
+            <v-col cols="12" md="6">
+              <div class="text-body-2 text-medium-emphasis mb-2">Quick Actions</div>
+              <div class="d-flex flex-wrap gap-2">
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  color="primary"
+                  @click="handleRefresh"
+                >
+                  <v-icon start>mdi-refresh</v-icon>
+                  Refresh
+                </v-btn>
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  color="success"
+                  @click="handleExport"
+                >
+                  <v-icon start>mdi-download</v-icon>
+                  Export
+                </v-btn>
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  color="info"
+                  @click="handlePrint"
+                >
+                  <v-icon start>mdi-printer</v-icon>
+                  Print
+                </v-btn>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  @click="showAdvancedFilters = !showAdvancedFilters"
+                >
+                  <v-icon start>{{ showAdvancedFilters ? 'mdi-filter-minus' : 'mdi-filter-plus' }}</v-icon>
+                  {{ showAdvancedFilters ? 'Less' : 'More' }} Filters
+                </v-btn>
+              </div>
+            </v-col>
+            <v-col cols="12" md="6">
+              <div class="text-body-2 text-medium-emphasis mb-2">Bulk Operations</div>
+              <div class="d-flex flex-wrap gap-2">
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  color="warning"
+                  :disabled="!hasSelectedBookings"
+                  @click="handleBulkAssign"
+                >
+                  <v-icon start>mdi-account-multiple</v-icon>
+                  Bulk Assign
+                </v-btn>
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  color="info"
+                  :disabled="!hasSelectedBookings"
+                  @click="handleBulkStatusUpdate"
+                >
+                  <v-icon start>mdi-clipboard-list</v-icon>
+                  Update Status
+                </v-btn>
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  color="error"
+                  :disabled="!hasSelectedBookings"
+                  @click="handleBulkDelete"
+                >
+                  <v-icon start>mdi-delete-multiple</v-icon>
+                  Bulk Delete
+                </v-btn>
+              </div>
+            </v-col>
+          </v-row>
+          <!-- Real-time Updates -->
+          <v-row>
+            <v-col cols="12">
+              <div class="d-flex align-center justify-space-between">
+                <div class="d-flex align-center">
+                  <v-switch
+                    v-model="realTimeUpdates"
+                    color="primary"
+                    density="compact"
+                    hide-details
+                    @update:model-value="handleRealTimeToggle"
+                  />
+                  <span class="text-body-2 ml-2">Real-time Updates</span>
+                </div>
+                <div class="text-caption text-medium-emphasis">
+                  Last updated: {{ lastUpdated }}
+                </div>
+              </div>
+            </v-col>
+          </v-row>
+          <!-- Filter Summary -->
+          <v-row v-if="hasActiveFilters">
+            <v-col cols="12">
+              <v-card variant="tonal" color="info">
+                <v-card-text class="py-2">
+                  <div class="d-flex align-center">
+                    <v-icon class="mr-2">mdi-filter</v-icon>
+                    <span class="text-body-2">Active Filters:</span>
+                    <div class="d-flex flex-wrap gap-1 ml-2">
+                      <v-chip
+                        v-for="filter in activeFilterSummary"
+                        :key="filter.key"
+                        size="x-small"
+                        variant="outlined"
+                        closable
+                        @click:close="clearFilter(filter.key)"
+                      >
+                        {{ filter.label }}
+                      </v-chip>
+                    </div>
+                    <v-spacer />
+                    <v-btn
+                      variant="text"
+                      size="small"
+                      @click="clearAllFilters"
+                    >
+                      Clear All
+                    </v-btn>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+    </v-expand-transition>
+  </v-card>
+</template>
+⋮----
+<!-- View Controls -->
+⋮----
+<!-- Filters -->
+⋮----
+<template #chip="{ props, item }">
+                  <v-chip
+                    v-bind="props"
+                    :color="getStatusColor(item.value)"
+                    size="small"
+                  >
+                    {{ item.title }}
+                  </v-chip>
+                </template>
+⋮----
+{{ item.title }}
+⋮----
+<template #item="{ props, item }">
+                  <v-list-item v-bind="props">
+                    <template #prepend>
+                      <v-avatar :color="getCleanerColor(item.value)" size="small">
+                        <v-icon>mdi-account</v-icon>
+                      </v-avatar>
+                    </template>
+                  </v-list-item>
+                </template>
+⋮----
+<template #prepend>
+                      <v-avatar :color="getCleanerColor(item.value)" size="small">
+                        <v-icon>mdi-account</v-icon>
+                      </v-avatar>
+                    </template>
+⋮----
+<template #chip="{ props, item }">
+                  <v-chip
+                    v-bind="props"
+                    :color="item.value === 'turn' ? 'error' : 'primary'"
+                    size="small"
+                  >
+                    {{ item.title }}
+                  </v-chip>
+                </template>
+⋮----
+{{ item.title }}
+⋮----
+<!-- Advanced Filters -->
+⋮----
+<template #chip="{ props, item }">
+                  <v-chip
+                    v-bind="props"
+                    :color="getPriorityColor(item.value)"
+                    size="small"
+                  >
+                    {{ item.title }}
+                  </v-chip>
+                </template>
+⋮----
+{{ item.title }}
+⋮----
+<!-- Action Controls -->
+⋮----
+<v-icon start>{{ showAdvancedFilters ? 'mdi-filter-minus' : 'mdi-filter-plus' }}</v-icon>
+{{ showAdvancedFilters ? 'Less' : 'More' }} Filters
+⋮----
+<!-- Real-time Updates -->
+⋮----
+Last updated: {{ lastUpdated }}
+⋮----
+<!-- Filter Summary -->
+⋮----
+{{ filter.label }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import type { Cleaner } from '@/types/user'
+// Props
+interface Props {
+  currentView: string
+  currentDate: string
+  selectedBookings: string[]
+  cleaners: Cleaner[]
+  propertyOwners: Array<{ id: string; name: string }>
+  loading?: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false
+})
+// Emits
+interface Emits {
+  'view-change': [view: string]
+  'date-change': [date: string]
+  'navigate': [direction: 'prev' | 'next' | 'today']
+  'filter-change': [filters: CalendarFilters]
+  'refresh': []
+  'export': [format: string]
+  'print': []
+  'bulk-assign': []
+  'bulk-status-update': []
+  'bulk-delete': []
+  'real-time-toggle': [enabled: boolean]
+}
+const emit = defineEmits<Emits>()
+// Types
+interface CalendarFilters {
+  status: string[]
+  cleaner: string[]
+  bookingType: string[]
+  propertyOwner: string[]
+  priority: string[]
+  dateRange: {
+    start: string
+    end: string
+  }
+}
+// State
+const expanded = ref(true)
+const showAdvancedFilters = ref(false)
+const realTimeUpdates = ref(true)
+const selectedView = ref(props.currentView)
+const selectedDate = ref(props.currentDate)
+const filters = ref<CalendarFilters>({
+  status: [],
+  cleaner: [],
+  bookingType: [],
+  propertyOwner: [],
+  priority: [],
+  dateRange: {
+    start: '',
+    end: ''
+  }
+})
+// Computed properties
+const hasSelectedBookings = computed(() => {
+  return props.selectedBookings.length > 0
+})
+const hasActiveFilters = computed(() => {
+  return filters.value.status.length > 0 ||
+         filters.value.cleaner.length > 0 ||
+         filters.value.bookingType.length > 0 ||
+         filters.value.propertyOwner.length > 0 ||
+         filters.value.priority.length > 0 ||
+         filters.value.dateRange.start ||
+         filters.value.dateRange.end
+})
+const activeFilterSummary = computed(() => {
+  const summary = []
+  if (filters.value.status.length > 0) {
+    summary.push({ key: 'status', label: `Status: ${filters.value.status.length} selected` })
+  }
+  if (filters.value.cleaner.length > 0) {
+    summary.push({ key: 'cleaner', label: `Cleaners: ${filters.value.cleaner.length} selected` })
+  }
+  if (filters.value.bookingType.length > 0) {
+    summary.push({ key: 'bookingType', label: `Types: ${filters.value.bookingType.length} selected` })
+  }
+  if (filters.value.propertyOwner.length > 0) {
+    summary.push({ key: 'propertyOwner', label: `Owners: ${filters.value.propertyOwner.length} selected` })
+  }
+  if (filters.value.priority.length > 0) {
+    summary.push({ key: 'priority', label: `Priority: ${filters.value.priority.length} selected` })
+  }
+  if (filters.value.dateRange.start || filters.value.dateRange.end) {
+    summary.push({ key: 'dateRange', label: 'Date Range Set' })
+  }
+  return summary
+})
+const lastUpdated = computed(() => {
+  return new Date().toLocaleTimeString()
+})
+// Options
+const statusOptions = [
+  { title: 'Pending', value: 'pending' },
+  { title: 'Scheduled', value: 'scheduled' },
+  { title: 'In Progress', value: 'in_progress' },
+  { title: 'Completed', value: 'completed' },
+  { title: 'Cancelled', value: 'cancelled' }
+]
+const bookingTypeOptions = [
+  { title: 'Standard Cleaning', value: 'standard' },
+  { title: 'Turn Cleaning', value: 'turn' }
+]
+const priorityOptions = [
+  { title: 'Standard', value: 'standard' },
+  { title: 'High', value: 'high' },
+  { title: 'Urgent', value: 'urgent' }
+]
+const cleanerOptions = computed(() => {
+  return props.cleaners.map(cleaner => ({
+    title: cleaner.name,
+    value: cleaner.id
+  }))
+})
+const propertyOwnerOptions = computed(() => {
+  return props.propertyOwners.map(owner => ({
+    title: owner.name,
+    value: owner.id
+  }))
+})
+// Methods
+const handleViewChange = (view: string) => {
+  emit('view-change', view)
+}
+const handleDateChange = (date: string) => {
+  emit('date-change', date)
+}
+const handlePrevious = () => {
+  emit('navigate', 'prev')
+}
+const handleNext = () => {
+  emit('navigate', 'next')
+}
+const handleToday = () => {
+  emit('navigate', 'today')
+}
+const handleFilterChange = () => {
+  emit('filter-change', { ...filters.value })
+}
+const handleRefresh = () => {
+  emit('refresh')
+}
+const handleExport = () => {
+  emit('export', 'csv')
+}
+const handlePrint = () => {
+  emit('print')
+}
+const handleBulkAssign = () => {
+  emit('bulk-assign')
+}
+const handleBulkStatusUpdate = () => {
+  emit('bulk-status-update')
+}
+const handleBulkDelete = () => {
+  emit('bulk-delete')
+}
+const handleRealTimeToggle = (enabled: boolean) => {
+  emit('real-time-toggle', enabled)
+}
+const clearFilter = (filterKey: string) => {
+  switch (filterKey) {
+    case 'status':
+      filters.value.status = []
+      break
+    case 'cleaner':
+      filters.value.cleaner = []
+      break
+    case 'bookingType':
+      filters.value.bookingType = []
+      break
+    case 'propertyOwner':
+      filters.value.propertyOwner = []
+      break
+    case 'priority':
+      filters.value.priority = []
+      break
+    case 'dateRange':
+      filters.value.dateRange = { start: '', end: '' }
+      break
+  }
+  handleFilterChange()
+}
+const clearAllFilters = () => {
+  filters.value = {
+    status: [],
+    cleaner: [],
+    bookingType: [],
+    propertyOwner: [],
+    priority: [],
+    dateRange: { start: '', end: '' }
+  }
+  handleFilterChange()
+}
+const getStatusColor = (status: string) => {
+  const colors = {
+    pending: 'orange',
+    scheduled: 'blue',
+    in_progress: 'purple',
+    completed: 'green',
+    cancelled: 'red'
+  }
+  return colors[status as keyof typeof colors] || 'grey'
+}
+const getPriorityColor = (priority: string) => {
+  const colors = {
+    standard: 'grey',
+    high: 'orange',
+    urgent: 'red'
+  }
+  return colors[priority as keyof typeof colors] || 'grey'
+}
+const getCleanerColor = (cleanerId: string) => {
+  // Generate consistent color based on cleaner ID
+  const colors = ['primary', 'secondary', 'success', 'info', 'warning']
+  const index = cleanerId.length % colors.length
+  return colors[index]
+}
+// Watch for prop changes
+watch(() => props.currentView, (newView) => {
+  selectedView.value = newView
+})
+watch(() => props.currentDate, (newDate) => {
+  selectedDate.value = newDate
+})
+</script>
+`````
+
+## File: src/components/dumb/admin/AdminQuickActions.vue
+`````vue
+<template>
+  <v-card
+    class="admin-quick-actions"
+    :elevation="elevation"
+    :variant="variant"
+  >
+    <v-card-title class="text-h6 pb-2 d-flex align-center">
+      <v-icon class="mr-2">mdi-cog</v-icon>
+      Admin Actions
+      <v-spacer />
+      <v-chip
+        v-if="urgentCount > 0"
+        color="error"
+        size="small"
+        variant="elevated"
+      >
+        <v-icon start size="small">mdi-alert</v-icon>
+        {{ urgentCount }} Urgent
+      </v-chip>
+    </v-card-title>
+    <v-divider />
+    <v-card-text class="pa-3">
+      <v-container fluid class="pa-0">
+        <!-- Critical Actions Row -->
+        <v-row class="mb-2">
+          <v-col
+            cols="6"
+            sm="6"
+            md="12"
+            lg="6"
+          >
+            <v-btn
+              color="error"
+              variant="elevated"
+              block
+              size="large"
+              :loading="loading"
+              :disabled="disabled"
+              @click="handleAction('manage-urgent-turns')"
+            >
+              <v-icon class="mr-2">mdi-clock-alert</v-icon>
+              <span class="d-none d-sm-inline">Urgent</span>
+              Turns
+              <v-badge
+                v-if="urgentCount > 0"
+                :content="urgentCount"
+                color="white"
+                text-color="error"
+                inline
+                class="ml-1"
+              />
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="6"
+            sm="6"
+            md="12"
+            lg="6"
+          >
+            <v-btn
+              color="primary"
+              variant="elevated"
+              block
+              size="large"
+              :loading="loading"
+              :disabled="disabled"
+              @click="handleAction('assign-cleaners')"
+            >
+              <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
+              <span class="d-none d-sm-inline">Assign</span>
+              Cleaners
+            </v-btn>
+          </v-col>
+        </v-row>
+        <!-- Primary Management Actions Row -->
+        <v-row class="mb-2">
+          <v-col
+            cols="6"
+            sm="6"
+            md="12"
+            lg="6"
+          >
+            <v-btn
+              color="secondary"
+              variant="tonal"
+              block
+              :loading="loading"
+              :disabled="disabled"
+              @click="handleAction('master-calendar')"
+            >
+              <v-icon class="mr-2">mdi-calendar-multiple</v-icon>
+              <span class="d-none d-sm-inline">Master</span>
+              Calendar
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="6"
+            sm="6"
+            md="12"
+            lg="6"
+          >
+            <v-btn
+              color="info"
+              variant="tonal"
+              block
+              :loading="loading"
+              :disabled="disabled"
+              @click="handleAction('create-booking')"
+            >
+              <v-icon class="mr-2">mdi-calendar-plus</v-icon>
+              <span class="d-none d-sm-inline">New</span>
+              Booking
+            </v-btn>
+          </v-col>
+        </v-row>
+        <!-- Bulk Operations (Collapsible) -->
+        <v-expand-transition>
+          <div v-if="showBulkActions">
+            <v-divider class="my-3" />
+            <v-row class="mb-2">
+              <v-col cols="12">
+                <div class="text-subtitle-2 text-medium-emphasis mb-2">
+                  <v-icon size="small" class="mr-1">mdi-format-list-bulleted-square</v-icon>
+                  Bulk Operations
+                </div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col
+                cols="6"
+                sm="6"
+                md="12"
+                lg="6"
+              >
+                <v-btn
+                  color="warning"
+                  variant="outlined"
+                  block
+                  :loading="loading"
+                  :disabled="disabled"
+                  @click="handleAction('bulk-assign')"
+                >
+                  <v-icon class="mr-2">mdi-account-multiple</v-icon>
+                  <span class="d-none d-sm-inline">Bulk</span>
+                  Assign
+                </v-btn>
+              </v-col>
+              <v-col
+                cols="6"
+                sm="6"
+                md="12"
+                lg="6"
+              >
+                <v-btn
+                  color="orange"
+                  variant="outlined"
+                  block
+                  :loading="loading"
+                  :disabled="disabled"
+                  @click="handleAction('bulk-reschedule')"
+                >
+                  <v-icon class="mr-2">mdi-calendar-sync</v-icon>
+                  <span class="d-none d-sm-inline">Bulk</span>
+                  Reschedule
+                </v-btn>
+              </v-col>
+            </v-row>
+          </div>
+        </v-expand-transition>
+        <!-- Management Actions (Collapsible) -->
+        <v-expand-transition>
+          <div v-if="showManagementActions">
+            <v-divider class="my-3" />
+            <v-row class="mb-2">
+              <v-col cols="12">
+                <div class="text-subtitle-2 text-medium-emphasis mb-2">
+                  <v-icon size="small" class="mr-1">mdi-cog-outline</v-icon>
+                  Business Management
+                </div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col
+                cols="6"
+                sm="6"
+                md="12"
+                lg="6"
+              >
+                <v-btn
+                  color="success"
+                  variant="outlined"
+                  block
+                  :loading="loading"
+                  :disabled="disabled"
+                  @click="handleAction('manage-cleaners')"
+                >
+                  <v-icon class="mr-2">mdi-account-group</v-icon>
+                  <span class="d-none d-sm-inline">Manage</span>
+                  Cleaners
+                </v-btn>
+              </v-col>
+              <v-col
+                cols="6"
+                sm="6"
+                md="12"
+                lg="6"
+              >
+                <v-btn
+                  color="purple"
+                  variant="outlined"
+                  block
+                  :loading="loading"
+                  :disabled="disabled"
+                  @click="handleAction('view-reports')"
+                >
+                  <v-icon class="mr-2">mdi-chart-line</v-icon>
+                  <span class="d-none d-sm-inline">Business</span>
+                  Reports
+                </v-btn>
+              </v-col>
+            </v-row>
+            <v-row class="mt-2">
+              <v-col
+                cols="6"
+                sm="6"
+                md="12"
+                lg="6"
+              >
+                <v-btn
+                  color="indigo"
+                  variant="outlined"
+                  block
+                  :loading="loading"
+                  :disabled="disabled"
+                  @click="handleAction('manage-properties')"
+                >
+                  <v-icon class="mr-2">mdi-home-group</v-icon>
+                  <span class="d-none d-sm-inline">All</span>
+                  Properties
+                </v-btn>
+              </v-col>
+              <v-col
+                cols="6"
+                sm="6"
+                md="12"
+                lg="6"
+              >
+                <v-btn
+                  color="teal"
+                  variant="outlined"
+                  block
+                  :loading="loading"
+                  :disabled="disabled"
+                  @click="handleAction('system-settings')"
+                >
+                  <v-icon class="mr-2">mdi-cog-box</v-icon>
+                  <span class="d-none d-sm-inline">System</span>
+                  Settings
+                </v-btn>
+              </v-col>
+            </v-row>
+          </div>
+        </v-expand-transition>
+        <!-- Action Toggles -->
+        <v-row class="mt-2">
+          <v-col cols="6">
+            <v-btn
+              variant="text"
+              size="small"
+              block
+              @click="showBulkActions = !showBulkActions"
+            >
+              <v-icon class="mr-1">
+                {{ showBulkActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
+              {{ showBulkActions ? 'Hide' : 'Bulk' }} Actions
+            </v-btn>
+          </v-col>
+          <v-col cols="6">
+            <v-btn
+              variant="text"
+              size="small"
+              block
+              @click="showManagementActions = !showManagementActions"
+            >
+              <v-icon class="mr-1">
+                {{ showManagementActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
+              {{ showManagementActions ? 'Hide' : 'More' }} Tools
+            </v-btn>
+          </v-col>
+        </v-row>
+        <!-- Quick Stats (Optional) -->
+        <v-expand-transition>
+          <div v-if="showStats">
+            <v-divider class="my-3" />
+            <v-row>
+              <v-col cols="12">
+                <div class="text-subtitle-2 text-medium-emphasis mb-2">
+                  <v-icon size="small" class="mr-1">mdi-chart-box</v-icon>
+                  Quick Stats
+                </div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="4">
+                <div class="text-center">
+                  <div class="text-h6 text-primary">{{ todayBookings }}</div>
+                  <div class="text-caption text-medium-emphasis">Today</div>
+                </div>
+              </v-col>
+              <v-col cols="4">
+                <div class="text-center">
+                  <div class="text-h6 text-warning">{{ unassignedCount }}</div>
+                  <div class="text-caption text-medium-emphasis">Unassigned</div>
+                </div>
+              </v-col>
+              <v-col cols="4">
+                <div class="text-center">
+                  <div class="text-h6 text-success">{{ completedToday }}</div>
+                  <div class="text-caption text-medium-emphasis">Completed</div>
+                </div>
+              </v-col>
+            </v-row>
+          </div>
+        </v-expand-transition>
+        <!-- Stats Toggle -->
+        <v-row class="mt-1">
+          <v-col cols="12">
+            <v-btn
+              variant="text"
+              size="x-small"
+              block
+              @click="showStats = !showStats"
+            >
+              <v-icon class="mr-1" size="small">
+                {{ showStats ? 'mdi-chevron-up' : 'mdi-chart-box-outline' }}
+              </v-icon>
+              {{ showStats ? 'Hide Stats' : 'Show Stats' }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+  </v-card>
+</template>
+⋮----
+{{ urgentCount }} Urgent
+⋮----
+<!-- Critical Actions Row -->
+⋮----
+<!-- Primary Management Actions Row -->
+⋮----
+<!-- Bulk Operations (Collapsible) -->
+⋮----
+<!-- Management Actions (Collapsible) -->
+⋮----
+<!-- Action Toggles -->
+⋮----
+{{ showBulkActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+⋮----
+{{ showBulkActions ? 'Hide' : 'Bulk' }} Actions
+⋮----
+{{ showManagementActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+⋮----
+{{ showManagementActions ? 'Hide' : 'More' }} Tools
+⋮----
+<!-- Quick Stats (Optional) -->
+⋮----
+<div class="text-h6 text-primary">{{ todayBookings }}</div>
+⋮----
+<div class="text-h6 text-warning">{{ unassignedCount }}</div>
+⋮----
+<div class="text-h6 text-success">{{ completedToday }}</div>
+⋮----
+<!-- Stats Toggle -->
+⋮----
+{{ showStats ? 'mdi-chevron-up' : 'mdi-chart-box-outline' }}
+⋮----
+{{ showStats ? 'Hide Stats' : 'Show Stats' }}
+⋮----
+<script setup lang="ts">
+import { ref } from 'vue'
+// Props
+interface Props {
+  loading?: boolean
+  disabled?: boolean
+  elevation?: number
+  variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'
+  urgentCount?: number
+  todayBookings?: number
+  unassignedCount?: number
+  completedToday?: number
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+  disabled: false,
+  elevation: 2,
+  variant: 'elevated',
+  urgentCount: 0,
+  todayBookings: 0,
+  unassignedCount: 0,
+  completedToday: 0
+})
+// Emits
+interface Emits {
+  (e: 'action', actionType: AdminActionType): void
+}
+const emit = defineEmits<Emits>()
+// Types
+type AdminActionType = 
+  | 'manage-urgent-turns'
+  | 'assign-cleaners'
+  | 'master-calendar'
+  | 'create-booking'
+  | 'bulk-assign'
+  | 'bulk-reschedule'
+  | 'manage-cleaners'
+  | 'view-reports'
+  | 'manage-properties'
+  | 'system-settings'
+// Local state
+const showBulkActions = ref(false)
+const showManagementActions = ref(false)
+const showStats = ref(false)
+// Methods
+function handleAction(actionType: AdminActionType) {
+  if (props.loading || props.disabled) return
+  emit('action', actionType)
+}
+// Computed (removed unused hasUrgentItems to fix linter warning)
+</script>
+<style scoped>
+.admin-quick-actions {
+  min-height: 200px;
+}
+.admin-quick-actions .v-btn {
+  text-transform: none;
+  font-weight: 500;
+}
+.admin-quick-actions .v-btn--size-large {
+  min-height: 48px;
+}
+.admin-quick-actions .v-chip {
+  font-size: 0.75rem;
+}
+.admin-quick-actions .v-badge {
+  font-size: 0.7rem;
+}
+/* Responsive text adjustments */
+@media (max-width: 600px) {
+  .admin-quick-actions .v-btn .v-icon {
+    margin-right: 4px !important;
+  }
+}
+/* Stats section styling */
+.admin-quick-actions .text-h6 {
+  font-weight: 600;
+  line-height: 1.2;
+}
+.admin-quick-actions .text-caption {
+  font-size: 0.7rem;
+  line-height: 1.1;
+}
+</style>
+`````
+
+## File: src/components/dumb/admin/CleanerAssignmentModal.vue
+`````vue
+<template>
+  <v-dialog
+    v-model="isOpen"
+    max-width="900px"
+    persistent
+    scrollable
+    @keydown.esc="handleClose"
+  >
+    <v-card>
+      <v-card-title class="text-h5 pb-2 d-flex align-center">
+        <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
+        Assign Cleaner
+        <v-spacer />
+        <v-chip
+          v-if="booking?.booking_type === 'turn'"
+          color="error"
+          size="small"
+          variant="elevated"
+        >
+          <v-icon start>mdi-clock-alert</v-icon>
+          URGENT
+        </v-chip>
+      </v-card-title>
+      <v-divider />
+      <!-- Booking Information -->
+      <v-card-text class="pa-0">
+        <v-container>
+          <v-row v-if="booking">
+            <v-col cols="12">
+              <v-card variant="outlined" class="mb-4">
+                <v-card-title class="text-subtitle-1 py-2">
+                  <v-icon class="mr-2">mdi-information</v-icon>
+                  Booking Details
+                </v-card-title>
+                <v-divider />
+                <v-card-text>
+                  <v-row>
+                    <v-col cols="12" md="6">
+                      <div class="text-body-2 text-medium-emphasis mb-1">Property</div>
+                      <div class="text-body-1 font-weight-medium">{{ selectedProperty?.name }}</div>
+                      <div class="text-body-2 text-medium-emphasis">{{ selectedProperty?.address }}</div>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                      <div class="text-body-2 text-medium-emphasis mb-1">Schedule</div>
+                      <div class="text-body-1">
+                        <v-icon size="small" class="mr-1">mdi-calendar-export</v-icon>
+                        {{ formatDateTime(booking.checkout_date) }}
+                      </div>
+                      <div class="text-body-1">
+                        <v-icon size="small" class="mr-1">mdi-calendar-import</v-icon>
+                        {{ formatDateTime(booking.checkin_date) }}
+                      </div>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12" md="6">
+                      <div class="text-body-2 text-medium-emphasis mb-1">Cleaning Window</div>
+                      <div class="text-body-1">{{ getCleaningWindow() }}</div>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                      <div class="text-body-2 text-medium-emphasis mb-1">Estimated Duration</div>
+                      <div class="text-body-1">{{ selectedProperty?.cleaning_duration || 120 }} minutes</div>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+          <!-- Filters and Search -->
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="searchQuery"
+                label="Search Cleaners"
+                variant="outlined"
+                prepend-inner-icon="mdi-magnify"
+                clearable
+                hint="Search by name or skills"
+                persistent-hint
+              />
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="availabilityFilter"
+                :items="availabilityFilterOptions"
+                label="Availability"
+                variant="outlined"
+                clearable
+              />
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="skillFilter"
+                :items="skillFilterOptions"
+                label="Required Skill"
+                variant="outlined"
+                clearable
+              />
+            </v-col>
+          </v-row>
+          <!-- Cleaner Selection -->
+          <v-row>
+            <v-col cols="12">
+              <v-card variant="outlined">
+                <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
+                  <v-icon class="mr-2">mdi-account-group</v-icon>
+                  Available Cleaners
+                  <v-spacer />
+                  <v-chip size="small" variant="tonal">
+                    {{ filteredCleaners.length }} available
+                  </v-chip>
+                </v-card-title>
+                <v-divider />
+                <v-list class="pa-0" max-height="400" style="overflow-y: auto;">
+                  <template v-for="(cleaner, index) in filteredCleaners" :key="cleaner.id">
+                    <v-list-item
+                      :class="{ 'bg-primary-lighten-5': selectedCleanerId === cleaner.id }"
+                      @click="selectCleaner(cleaner.id)"
+                    >
+                      <template #prepend>
+                        <v-avatar :color="getAvailabilityColor(cleaner)" size="40">
+                          <v-icon>mdi-account</v-icon>
+                        </v-avatar>
+                      </template>
+                      <v-list-item-title class="font-weight-medium">
+                        {{ cleaner.name }}
+                        <v-chip
+                          v-if="selectedCleanerId === cleaner.id"
+                          color="primary"
+                          size="x-small"
+                          class="ml-2"
+                        >
+                          SELECTED
+                        </v-chip>
+                      </v-list-item-title>
+                      <v-list-item-subtitle>
+                        <div class="d-flex flex-wrap gap-1 mb-1">
+                          <v-chip
+                            v-for="skill in cleaner.skills.slice(0, 3)"
+                            :key="skill"
+                            size="x-small"
+                            variant="outlined"
+                          >
+                            {{ skill }}
+                          </v-chip>
+                          <v-chip
+                            v-if="cleaner.skills.length > 3"
+                            size="x-small"
+                            variant="text"
+                          >
+                            +{{ cleaner.skills.length - 3 }} more
+                          </v-chip>
+                        </div>
+                        <div class="text-caption">
+                          Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
+                          • Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
+                        </div>
+                      </v-list-item-subtitle>
+                      <template #append>
+                        <div class="d-flex flex-column align-end">
+                          <v-chip
+                            :color="getAvailabilityColor(cleaner)"
+                            size="small"
+                            variant="tonal"
+                            class="mb-1"
+                          >
+                            {{ getAvailabilityText(cleaner) }}
+                          </v-chip>
+                          <div class="text-caption text-medium-emphasis">
+                            {{ getDistanceText(cleaner) }}
+                          </div>
+                        </div>
+                      </template>
+                    </v-list-item>
+                    <v-divider v-if="index < filteredCleaners.length - 1" />
+                  </template>
+                  <!-- No cleaners available -->
+                  <v-list-item v-if="filteredCleaners.length === 0">
+                    <v-list-item-title class="text-center text-medium-emphasis">
+                      <v-icon class="mb-2">mdi-account-off</v-icon>
+                      <div>No cleaners match your criteria</div>
+                      <div class="text-caption">Try adjusting your filters</div>
+                    </v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+            </v-col>
+          </v-row>
+          <!-- Selected Cleaner Details -->
+          <v-row v-if="selectedCleanerDetails">
+            <v-col cols="12">
+              <v-card variant="outlined" color="primary">
+                <v-card-title class="text-subtitle-1 py-2">
+                  <v-icon class="mr-2">mdi-account-check</v-icon>
+                  Selected Cleaner Details
+                </v-card-title>
+                <v-divider />
+                <v-card-text>
+                  <v-row>
+                    <v-col cols="12" md="4">
+                      <div class="text-center">
+                        <v-avatar :color="getAvailabilityColor(selectedCleanerDetails)" size="80" class="mb-2">
+                          <v-icon size="40">mdi-account</v-icon>
+                        </v-avatar>
+                        <div class="text-h6 font-weight-medium">{{ selectedCleanerDetails.name }}</div>
+                        <v-rating
+                          :model-value="getCleanerRating(selectedCleanerDetails.id)"
+                          readonly
+                          size="small"
+                          density="compact"
+                          class="justify-center mt-1"
+                        />
+                      </div>
+                    </v-col>
+                    <v-col cols="12" md="4">
+                      <div class="text-body-2 text-medium-emphasis mb-1">Skills & Specializations</div>
+                      <div class="d-flex flex-wrap gap-1 mb-3">
+                        <v-chip
+                          v-for="skill in selectedCleanerDetails.skills"
+                          :key="skill"
+                          size="small"
+                          color="primary"
+                          variant="tonal"
+                        >
+                          {{ skill }}
+                        </v-chip>
+                      </div>
+                      <div class="text-body-2 text-medium-emphasis mb-1">Availability Status</div>
+                      <v-chip
+                        :color="getAvailabilityColor(selectedCleanerDetails)"
+                        variant="elevated"
+                      >
+                        <v-icon start>{{ getAvailabilityIcon(selectedCleanerDetails) }}</v-icon>
+                        {{ getAvailabilityText(selectedCleanerDetails) }}
+                      </v-chip>
+                    </v-col>
+                    <v-col cols="12" md="4">
+                      <div class="text-body-2 text-medium-emphasis mb-1">Today's Schedule</div>
+                      <div class="text-body-1 mb-2">
+                        {{ getCleanerTodayBookings(selectedCleanerDetails.id) }}/{{ selectedCleanerDetails.max_daily_bookings }} bookings
+                      </div>
+                      <div class="text-body-2 text-medium-emphasis mb-1">Distance from Property</div>
+                      <div class="text-body-1 mb-2">{{ getDistanceText(selectedCleanerDetails) }}</div>
+                      <div class="text-body-2 text-medium-emphasis mb-1">Estimated Travel Time</div>
+                      <div class="text-body-1">{{ getTravelTime(selectedCleanerDetails) }}</div>
+                    </v-col>
+                  </v-row>
+                  <!-- Conflict Warning -->
+                  <v-row v-if="hasScheduleConflict(selectedCleanerDetails)">
+                    <v-col cols="12">
+                      <v-alert
+                        type="warning"
+                        variant="tonal"
+                        title="Potential Schedule Conflict"
+                        class="mt-2"
+                      >
+                        This cleaner has overlapping bookings. Please verify availability before confirming assignment.
+                      </v-alert>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions class="pa-4">
+        <v-btn
+          color="grey-darken-1"
+          variant="text"
+          :disabled="loading"
+          @click="handleClose"
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          variant="outlined"
+          color="primary"
+          :disabled="loading"
+          @click="handleAutoAssign"
+        >
+          <v-icon start>mdi-auto-fix</v-icon>
+          Auto-Assign Best Match
+        </v-btn>
+        <v-spacer />
+        <v-btn
+          color="primary"
+          variant="elevated"
+          :loading="loading"
+          :disabled="!selectedCleanerId"
+          @click="handleAssign"
+        >
+          <v-icon start>mdi-account-check</v-icon>
+          Assign Cleaner
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+⋮----
+<!-- Booking Information -->
+⋮----
+<div class="text-body-1 font-weight-medium">{{ selectedProperty?.name }}</div>
+<div class="text-body-2 text-medium-emphasis">{{ selectedProperty?.address }}</div>
+⋮----
+{{ formatDateTime(booking.checkout_date) }}
+⋮----
+{{ formatDateTime(booking.checkin_date) }}
+⋮----
+<div class="text-body-1">{{ getCleaningWindow() }}</div>
+⋮----
+<div class="text-body-1">{{ selectedProperty?.cleaning_duration || 120 }} minutes</div>
+⋮----
+<!-- Filters and Search -->
+⋮----
+<!-- Cleaner Selection -->
+⋮----
+{{ filteredCleaners.length }} available
+⋮----
+<template v-for="(cleaner, index) in filteredCleaners" :key="cleaner.id">
+                    <v-list-item
+                      :class="{ 'bg-primary-lighten-5': selectedCleanerId === cleaner.id }"
+                      @click="selectCleaner(cleaner.id)"
+                    >
+                      <template #prepend>
+                        <v-avatar :color="getAvailabilityColor(cleaner)" size="40">
+                          <v-icon>mdi-account</v-icon>
+                        </v-avatar>
+                      </template>
+                      <v-list-item-title class="font-weight-medium">
+                        {{ cleaner.name }}
+                        <v-chip
+                          v-if="selectedCleanerId === cleaner.id"
+                          color="primary"
+                          size="x-small"
+                          class="ml-2"
+                        >
+                          SELECTED
+                        </v-chip>
+                      </v-list-item-title>
+                      <v-list-item-subtitle>
+                        <div class="d-flex flex-wrap gap-1 mb-1">
+                          <v-chip
+                            v-for="skill in cleaner.skills.slice(0, 3)"
+                            :key="skill"
+                            size="x-small"
+                            variant="outlined"
+                          >
+                            {{ skill }}
+                          </v-chip>
+                          <v-chip
+                            v-if="cleaner.skills.length > 3"
+                            size="x-small"
+                            variant="text"
+                          >
+                            +{{ cleaner.skills.length - 3 }} more
+                          </v-chip>
+                        </div>
+                        <div class="text-caption">
+                          Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
+                          • Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
+                        </div>
+                      </v-list-item-subtitle>
+                      <template #append>
+                        <div class="d-flex flex-column align-end">
+                          <v-chip
+                            :color="getAvailabilityColor(cleaner)"
+                            size="small"
+                            variant="tonal"
+                            class="mb-1"
+                          >
+                            {{ getAvailabilityText(cleaner) }}
+                          </v-chip>
+                          <div class="text-caption text-medium-emphasis">
+                            {{ getDistanceText(cleaner) }}
+                          </div>
+                        </div>
+                      </template>
+                    </v-list-item>
+                    <v-divider v-if="index < filteredCleaners.length - 1" />
+                  </template>
+⋮----
+<template #prepend>
+                        <v-avatar :color="getAvailabilityColor(cleaner)" size="40">
+                          <v-icon>mdi-account</v-icon>
+                        </v-avatar>
+                      </template>
+⋮----
+{{ cleaner.name }}
+⋮----
+{{ skill }}
+⋮----
++{{ cleaner.skills.length - 3 }} more
+⋮----
+Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
+• Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
+⋮----
+<template #append>
+                        <div class="d-flex flex-column align-end">
+                          <v-chip
+                            :color="getAvailabilityColor(cleaner)"
+                            size="small"
+                            variant="tonal"
+                            class="mb-1"
+                          >
+                            {{ getAvailabilityText(cleaner) }}
+                          </v-chip>
+                          <div class="text-caption text-medium-emphasis">
+                            {{ getDistanceText(cleaner) }}
+                          </div>
+                        </div>
+                      </template>
+⋮----
+{{ getAvailabilityText(cleaner) }}
+⋮----
+{{ getDistanceText(cleaner) }}
+⋮----
+<!-- No cleaners available -->
+⋮----
+<!-- Selected Cleaner Details -->
+⋮----
+<div class="text-h6 font-weight-medium">{{ selectedCleanerDetails.name }}</div>
+⋮----
+{{ skill }}
+⋮----
+<v-icon start>{{ getAvailabilityIcon(selectedCleanerDetails) }}</v-icon>
+{{ getAvailabilityText(selectedCleanerDetails) }}
+⋮----
+{{ getCleanerTodayBookings(selectedCleanerDetails.id) }}/{{ selectedCleanerDetails.max_daily_bookings }} bookings
+⋮----
+<div class="text-body-1 mb-2">{{ getDistanceText(selectedCleanerDetails) }}</div>
+⋮----
+<div class="text-body-1">{{ getTravelTime(selectedCleanerDetails) }}</div>
+⋮----
+<!-- Conflict Warning -->
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import type { Property } from '@/types/property'
+import type { BookingFormData } from '@/types/booking'
+import type { Cleaner } from '@/types/user'
+// Props
+interface Props {
+  modelValue: boolean
+  booking?: Partial<BookingFormData> | null
+  properties: Property[]
+  cleaners: Cleaner[]
+  loading?: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false
+})
+// Emits
+interface Emits {
+  'update:modelValue': [value: boolean]
+  'assign': [cleanerId: string]
+  'auto-assign': []
+}
+const emit = defineEmits<Emits>()
+// State
+const selectedCleanerId = ref<string>('')
+const searchQuery = ref('')
+const availabilityFilter = ref<string>('')
+const skillFilter = ref<string>('')
+// Computed properties
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
+const selectedProperty = computed(() => {
+  if (!props.booking?.property_id) return null
+  return props.properties.find(p => p.id === props.booking?.property_id)
+})
+const selectedCleanerDetails = computed(() => {
+  if (!selectedCleanerId.value) return null
+  return props.cleaners.find(c => c.id === selectedCleanerId.value)
+})
+const availabilityFilterOptions = [
+  { title: 'Available', value: 'available' },
+  { title: 'Limited Availability', value: 'limited' },
+  { title: 'Fully Booked', value: 'booked' }
+]
+const skillFilterOptions = computed(() => {
+  const allSkills = new Set<string>()
+  props.cleaners.forEach(cleaner => {
+    cleaner.skills.forEach(skill => allSkills.add(skill))
+  })
+  return Array.from(allSkills).map(skill => ({ title: skill, value: skill }))
+})
+const filteredCleaners = computed(() => {
+  let filtered = [...props.cleaners]
+  // Search filter
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(cleaner => 
+      cleaner.name.toLowerCase().includes(query) ||
+      cleaner.skills.some(skill => skill.toLowerCase().includes(query))
+    )
+  }
+  // Availability filter
+  if (availabilityFilter.value) {
+    filtered = filtered.filter(cleaner => {
+      const availability = getAvailabilityStatus(cleaner)
+      return availability === availabilityFilter.value
+    })
+  }
+  // Skill filter
+  if (skillFilter.value) {
+    filtered = filtered.filter(cleaner => 
+      cleaner.skills.includes(skillFilter.value)
+    )
+  }
+  // Sort by availability and rating
+  return filtered.sort((a, b) => {
+    const aAvailable = getAvailabilityStatus(a) === 'available'
+    const bAvailable = getAvailabilityStatus(b) === 'available'
+    if (aAvailable && !bAvailable) return -1
+    if (!aAvailable && bAvailable) return 1
+    // If same availability, sort by rating
+    return getCleanerRating(b.id) - getCleanerRating(a.id)
+  })
+})
+// Methods
+const selectCleaner = (cleanerId: string) => {
+  selectedCleanerId.value = cleanerId
+}
+const getAvailabilityStatus = (cleaner: Cleaner): string => {
+  const todayBookings = getCleanerTodayBookings(cleaner.id)
+  if (todayBookings >= cleaner.max_daily_bookings) return 'booked'
+  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'limited'
+  return 'available'
+}
+const getAvailabilityColor = (cleaner: Cleaner) => {
+  const status = getAvailabilityStatus(cleaner)
+  const colors = {
+    available: 'green',
+    limited: 'orange',
+    booked: 'red'
+  }
+  return colors[status]
+}
+const getAvailabilityText = (cleaner: Cleaner) => {
+  const status = getAvailabilityStatus(cleaner)
+  const texts = {
+    available: 'Available',
+    limited: 'Limited',
+    booked: 'Fully Booked'
+  }
+  return texts[status]
+}
+const getAvailabilityIcon = (cleaner: Cleaner) => {
+  const status = getAvailabilityStatus(cleaner)
+  const icons = {
+    available: 'mdi-check-circle',
+    limited: 'mdi-clock',
+    booked: 'mdi-close-circle'
+  }
+  return icons[status]
+}
+const getCleanerTodayBookings = (cleanerId: string) => {
+  // Mock data - would come from bookings store
+  return Math.floor(Math.random() * 6)
+}
+const getCleanerRating = (cleanerId: string) => {
+  // Mock data - would come from performance data
+  return 3.5 + Math.random() * 1.5
+}
+const getDistanceText = (cleaner: Cleaner) => {
+  // Mock data - would calculate from cleaner location and property
+  const distance = Math.floor(Math.random() * 20) + 1
+  return `${distance} km away`
+}
+const getTravelTime = (cleaner: Cleaner) => {
+  // Mock data - would calculate based on distance and traffic
+  const time = Math.floor(Math.random() * 30) + 10
+  return `${time} minutes`
+}
+const hasScheduleConflict = (cleaner: Cleaner) => {
+  // Mock conflict detection - would check against existing bookings
+  return Math.random() < 0.2 // 20% chance of conflict
+}
+const formatDateTime = (dateTime: string) => {
+  if (!dateTime) return ''
+  const date = new Date(dateTime)
+  return date.toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  })
+}
+const getCleaningWindow = () => {
+  if (!props.booking?.checkout_date || !props.booking?.checkin_date) return ''
+  const checkout = new Date(props.booking.checkout_date)
+  const checkin = new Date(props.booking.checkin_date)
+  const diffHours = Math.abs(checkin.getTime() - checkout.getTime()) / (1000 * 60 * 60)
+  if (diffHours < 1) {
+    return 'Same-day turnaround (< 1 hour)'
+  } else if (diffHours < 24) {
+    return `${Math.floor(diffHours)} hours available`
+  } else {
+    return `${Math.floor(diffHours / 24)} days available`
+  }
+}
+const handleAssign = () => {
+  if (selectedCleanerId.value) {
+    emit('assign', selectedCleanerId.value)
+  }
+}
+const handleAutoAssign = () => {
+  emit('auto-assign')
+}
+const handleClose = () => {
+  isOpen.value = false
+}
+// Reset selection when modal opens
+watch(isOpen, (newValue) => {
+  if (newValue) {
+    selectedCleanerId.value = ''
+    searchQuery.value = ''
+    availabilityFilter.value = ''
+    skillFilter.value = ''
+  }
+})
+</script>
+<style scoped>
+.v-card-title {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+.v-list-item:hover {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+.bg-primary-lighten-5 {
+  background-color: rgb(var(--v-theme-primary), 0.1) !important;
+}
+</style>
+`````
+
+## File: src/components/dumb/admin/TurnPriorityPanel.vue
+`````vue
+<template>
+  <v-card variant="outlined" class="turn-priority-panel">
+    <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
+      <v-icon class="mr-2" color="error">mdi-clock-alert</v-icon>
+      System Turn Priority Queue
+      <v-spacer />
+      <v-chip
+        :color="getTotalUrgencyColor()"
+        variant="elevated"
+        size="small"
+      >
+        {{ urgentTurns.length }} Urgent
+      </v-chip>
+      <v-btn
+        variant="text"
+        size="small"
+        :icon="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+        @click="expanded = !expanded"
+      />
+    </v-card-title>
+    <v-divider />
+    <v-expand-transition>
+      <v-card-text v-show="expanded" class="pa-0">
+        <!-- Summary Stats -->
+        <v-container>
+          <v-row>
+            <v-col cols="12" md="3">
+              <v-card variant="tonal" color="error">
+                <v-card-text class="text-center py-3">
+                  <div class="text-h4 font-weight-bold">{{ criticalTurns.length }}</div>
+                  <div class="text-body-2">Critical (< 2 hrs)</div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-card variant="tonal" color="warning">
+                <v-card-text class="text-center py-3">
+                  <div class="text-h4 font-weight-bold">{{ urgentTurns.length }}</div>
+                  <div class="text-body-2">Urgent (< 6 hrs)</div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-card variant="tonal" color="info">
+                <v-card-text class="text-center py-3">
+                  <div class="text-h4 font-weight-bold">{{ unassignedTurns.length }}</div>
+                  <div class="text-body-2">Unassigned</div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-card variant="tonal" color="success">
+                <v-card-text class="text-center py-3">
+                  <div class="text-h4 font-weight-bold">${{ estimatedRevenue.toLocaleString() }}</div>
+                  <div class="text-body-2">Revenue at Risk</div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-divider />
+        <!-- Filters and Controls -->
+        <v-container>
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="selectedUrgencyFilter"
+                :items="urgencyFilterOptions"
+                label="Urgency Level"
+                variant="outlined"
+                density="compact"
+                clearable
+                @update:model-value="handleFilterChange"
+              />
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="selectedStatusFilter"
+                :items="statusFilterOptions"
+                label="Assignment Status"
+                variant="outlined"
+                density="compact"
+                clearable
+                @update:model-value="handleFilterChange"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <div class="d-flex gap-2 flex-wrap">
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  color="primary"
+                  @click="handleRefresh"
+                >
+                  <v-icon start>mdi-refresh</v-icon>
+                  Refresh
+                </v-btn>
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  color="warning"
+                  :disabled="selectedTurns.length === 0"
+                  @click="handleBulkAssign"
+                >
+                  <v-icon start>mdi-account-multiple</v-icon>
+                  Bulk Assign ({{ selectedTurns.length }})
+                </v-btn>
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  color="error"
+                  :disabled="criticalTurns.length === 0"
+                  @click="handleEscalateAll"
+                >
+                  <v-icon start>mdi-alert-octagon</v-icon>
+                  Escalate Critical
+                </v-btn>
+                <v-spacer />
+                <v-switch
+                  v-model="autoRefresh"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  @update:model-value="handleAutoRefreshToggle"
+                />
+                <span class="text-body-2 ml-2">Auto-refresh</span>
+              </div>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-divider />
+        <!-- Turn List -->
+        <div class="turn-list">
+          <v-list class="pa-0" max-height="500" style="overflow-y: auto;">
+            <template v-for="(turn, index) in filteredTurns" :key="turn.id">
+              <v-list-item
+                :class="getTurnItemClass(turn)"
+                @click="toggleTurnSelection(turn.id)"
+              >
+                <template #prepend>
+                  <v-checkbox
+                    :model-value="selectedTurns.includes(turn.id)"
+                    color="primary"
+                    density="compact"
+                    hide-details
+                    @click.stop="toggleTurnSelection(turn.id)"
+                  />
+                  <v-avatar
+                    :color="getUrgencyColor(turn)"
+                    size="40"
+                    class="ml-2"
+                  >
+                    <v-icon>{{ getUrgencyIcon(turn) }}</v-icon>
+                  </v-avatar>
+                </template>
+                <v-list-item-title class="font-weight-medium">
+                  {{ getPropertyName(turn.property_id) }}
+                  <v-chip
+                    :color="getUrgencyColor(turn)"
+                    size="x-small"
+                    class="ml-2"
+                  >
+                    {{ getTimeRemaining(turn) }}
+                  </v-chip>
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  <div class="d-flex align-center mb-1">
+                    <v-icon size="small" class="mr-1">mdi-account</v-icon>
+                    {{ getPropertyOwnerName(turn.owner_id) }}
+                    <v-icon size="small" class="mx-2">mdi-map-marker</v-icon>
+                    {{ getPropertyAddress(turn.property_id) }}
+                  </div>
+                  <div class="d-flex align-center">
+                    <v-icon size="small" class="mr-1">mdi-calendar-export</v-icon>
+                    {{ formatDateTime(turn.checkout_date) }}
+                    <v-icon size="small" class="mx-2">mdi-calendar-import</v-icon>
+                    {{ formatDateTime(turn.checkin_date) }}
+                  </div>
+                </v-list-item-subtitle>
+                <template #append>
+                  <div class="d-flex flex-column align-end">
+                    <!-- Assignment Status -->
+                    <div class="mb-2">
+                      <v-chip
+                        v-if="turn.assigned_cleaner_id"
+                        color="success"
+                        size="small"
+                        variant="tonal"
+                      >
+                        <v-icon start>mdi-account-check</v-icon>
+                        {{ getCleanerName(turn.assigned_cleaner_id) }}
+                      </v-chip>
+                      <v-chip
+                        v-else
+                        color="error"
+                        size="small"
+                        variant="tonal"
+                      >
+                        <v-icon start>mdi-account-alert</v-icon>
+                        Unassigned
+                      </v-chip>
+                    </div>
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-1">
+                      <v-btn
+                        v-if="!turn.assigned_cleaner_id"
+                        variant="outlined"
+                        size="x-small"
+                        color="primary"
+                        @click.stop="handleAssignCleaner(turn.id)"
+                      >
+                        <v-icon>mdi-account-plus</v-icon>
+                      </v-btn>
+                      <v-btn
+                        variant="outlined"
+                        size="x-small"
+                        color="info"
+                        @click.stop="handleViewDetails(turn.id)"
+                      >
+                        <v-icon>mdi-eye</v-icon>
+                      </v-btn>
+                      <v-btn
+                        v-if="getUrgencyLevel(turn) === 'critical'"
+                        variant="outlined"
+                        size="x-small"
+                        color="error"
+                        @click.stop="handleEscalate(turn.id)"
+                      >
+                        <v-icon>mdi-alert</v-icon>
+                      </v-btn>
+                    </div>
+                  </div>
+                </template>
+              </v-list-item>
+              <v-divider v-if="index < filteredTurns.length - 1" />
+            </template>
+            <!-- Empty State -->
+            <v-list-item v-if="filteredTurns.length === 0">
+              <v-list-item-title class="text-center text-medium-emphasis py-8">
+                <v-icon size="64" class="mb-4">mdi-check-circle</v-icon>
+                <div class="text-h6">No Urgent Turns</div>
+                <div class="text-body-2">All turn bookings are under control</div>
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </div>
+        <!-- Business Impact Alert -->
+        <v-container v-if="showBusinessImpactAlert">
+          <v-alert
+            :type="businessImpactAlert.type"
+            variant="tonal"
+            :title="businessImpactAlert.title"
+            class="mb-0"
+          >
+            <p v-for="message in businessImpactAlert.messages" :key="message" class="mb-1">
+              {{ message }}
+            </p>
+          </v-alert>
+        </v-container>
+      </v-card-text>
+    </v-expand-transition>
+  </v-card>
+</template>
+⋮----
+{{ urgentTurns.length }} Urgent
+⋮----
+<!-- Summary Stats -->
+⋮----
+<div class="text-h4 font-weight-bold">{{ criticalTurns.length }}</div>
+⋮----
+<div class="text-h4 font-weight-bold">{{ urgentTurns.length }}</div>
+⋮----
+<div class="text-h4 font-weight-bold">{{ unassignedTurns.length }}</div>
+⋮----
+<div class="text-h4 font-weight-bold">${{ estimatedRevenue.toLocaleString() }}</div>
+⋮----
+<!-- Filters and Controls -->
+⋮----
+Bulk Assign ({{ selectedTurns.length }})
+⋮----
+<!-- Turn List -->
+⋮----
+<template v-for="(turn, index) in filteredTurns" :key="turn.id">
+              <v-list-item
+                :class="getTurnItemClass(turn)"
+                @click="toggleTurnSelection(turn.id)"
+              >
+                <template #prepend>
+                  <v-checkbox
+                    :model-value="selectedTurns.includes(turn.id)"
+                    color="primary"
+                    density="compact"
+                    hide-details
+                    @click.stop="toggleTurnSelection(turn.id)"
+                  />
+                  <v-avatar
+                    :color="getUrgencyColor(turn)"
+                    size="40"
+                    class="ml-2"
+                  >
+                    <v-icon>{{ getUrgencyIcon(turn) }}</v-icon>
+                  </v-avatar>
+                </template>
+                <v-list-item-title class="font-weight-medium">
+                  {{ getPropertyName(turn.property_id) }}
+                  <v-chip
+                    :color="getUrgencyColor(turn)"
+                    size="x-small"
+                    class="ml-2"
+                  >
+                    {{ getTimeRemaining(turn) }}
+                  </v-chip>
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  <div class="d-flex align-center mb-1">
+                    <v-icon size="small" class="mr-1">mdi-account</v-icon>
+                    {{ getPropertyOwnerName(turn.owner_id) }}
+                    <v-icon size="small" class="mx-2">mdi-map-marker</v-icon>
+                    {{ getPropertyAddress(turn.property_id) }}
+                  </div>
+                  <div class="d-flex align-center">
+                    <v-icon size="small" class="mr-1">mdi-calendar-export</v-icon>
+                    {{ formatDateTime(turn.checkout_date) }}
+                    <v-icon size="small" class="mx-2">mdi-calendar-import</v-icon>
+                    {{ formatDateTime(turn.checkin_date) }}
+                  </div>
+                </v-list-item-subtitle>
+                <template #append>
+                  <div class="d-flex flex-column align-end">
+                    <!-- Assignment Status -->
+                    <div class="mb-2">
+                      <v-chip
+                        v-if="turn.assigned_cleaner_id"
+                        color="success"
+                        size="small"
+                        variant="tonal"
+                      >
+                        <v-icon start>mdi-account-check</v-icon>
+                        {{ getCleanerName(turn.assigned_cleaner_id) }}
+                      </v-chip>
+                      <v-chip
+                        v-else
+                        color="error"
+                        size="small"
+                        variant="tonal"
+                      >
+                        <v-icon start>mdi-account-alert</v-icon>
+                        Unassigned
+                      </v-chip>
+                    </div>
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-1">
+                      <v-btn
+                        v-if="!turn.assigned_cleaner_id"
+                        variant="outlined"
+                        size="x-small"
+                        color="primary"
+                        @click.stop="handleAssignCleaner(turn.id)"
+                      >
+                        <v-icon>mdi-account-plus</v-icon>
+                      </v-btn>
+                      <v-btn
+                        variant="outlined"
+                        size="x-small"
+                        color="info"
+                        @click.stop="handleViewDetails(turn.id)"
+                      >
+                        <v-icon>mdi-eye</v-icon>
+                      </v-btn>
+                      <v-btn
+                        v-if="getUrgencyLevel(turn) === 'critical'"
+                        variant="outlined"
+                        size="x-small"
+                        color="error"
+                        @click.stop="handleEscalate(turn.id)"
+                      >
+                        <v-icon>mdi-alert</v-icon>
+                      </v-btn>
+                    </div>
+                  </div>
+                </template>
+              </v-list-item>
+              <v-divider v-if="index < filteredTurns.length - 1" />
+            </template>
+⋮----
+<template #prepend>
+                  <v-checkbox
+                    :model-value="selectedTurns.includes(turn.id)"
+                    color="primary"
+                    density="compact"
+                    hide-details
+                    @click.stop="toggleTurnSelection(turn.id)"
+                  />
+                  <v-avatar
+                    :color="getUrgencyColor(turn)"
+                    size="40"
+                    class="ml-2"
+                  >
+                    <v-icon>{{ getUrgencyIcon(turn) }}</v-icon>
+                  </v-avatar>
+                </template>
+⋮----
+<v-icon>{{ getUrgencyIcon(turn) }}</v-icon>
+⋮----
+{{ getPropertyName(turn.property_id) }}
+⋮----
+{{ getTimeRemaining(turn) }}
+⋮----
+{{ getPropertyOwnerName(turn.owner_id) }}
+⋮----
+{{ getPropertyAddress(turn.property_id) }}
+⋮----
+{{ formatDateTime(turn.checkout_date) }}
+⋮----
+{{ formatDateTime(turn.checkin_date) }}
+⋮----
+<template #append>
+                  <div class="d-flex flex-column align-end">
+                    <!-- Assignment Status -->
+                    <div class="mb-2">
+                      <v-chip
+                        v-if="turn.assigned_cleaner_id"
+                        color="success"
+                        size="small"
+                        variant="tonal"
+                      >
+                        <v-icon start>mdi-account-check</v-icon>
+                        {{ getCleanerName(turn.assigned_cleaner_id) }}
+                      </v-chip>
+                      <v-chip
+                        v-else
+                        color="error"
+                        size="small"
+                        variant="tonal"
+                      >
+                        <v-icon start>mdi-account-alert</v-icon>
+                        Unassigned
+                      </v-chip>
+                    </div>
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-1">
+                      <v-btn
+                        v-if="!turn.assigned_cleaner_id"
+                        variant="outlined"
+                        size="x-small"
+                        color="primary"
+                        @click.stop="handleAssignCleaner(turn.id)"
+                      >
+                        <v-icon>mdi-account-plus</v-icon>
+                      </v-btn>
+                      <v-btn
+                        variant="outlined"
+                        size="x-small"
+                        color="info"
+                        @click.stop="handleViewDetails(turn.id)"
+                      >
+                        <v-icon>mdi-eye</v-icon>
+                      </v-btn>
+                      <v-btn
+                        v-if="getUrgencyLevel(turn) === 'critical'"
+                        variant="outlined"
+                        size="x-small"
+                        color="error"
+                        @click.stop="handleEscalate(turn.id)"
+                      >
+                        <v-icon>mdi-alert</v-icon>
+                      </v-btn>
+                    </div>
+                  </div>
+                </template>
+⋮----
+<!-- Assignment Status -->
+⋮----
+{{ getCleanerName(turn.assigned_cleaner_id) }}
+⋮----
+<!-- Action Buttons -->
+⋮----
+<!-- Empty State -->
+⋮----
+<!-- Business Impact Alert -->
+⋮----
+{{ message }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import type { Booking } from '@/types/booking'
+import type { Property } from '@/types/property'
+import type { Cleaner } from '@/types/user'
+// Props
+interface Props {
+  turns: Booking[]
+  properties: Property[]
+  cleaners: Cleaner[]
+  propertyOwners: Array<{ id: string; name: string }>
+  loading?: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false
+})
+// Emits
+interface Emits {
+  'assign-cleaner': [turnId: string]
+  'view-details': [turnId: string]
+  'escalate': [turnId: string]
+  'bulk-assign': [turnIds: string[]]
+  'escalate-all': [turnIds: string[]]
+  'refresh': []
+}
+const emit = defineEmits<Emits>()
+// State
+const expanded = ref(true)
+const selectedTurns = ref<string[]>([])
+const selectedUrgencyFilter = ref<string>('')
+const selectedStatusFilter = ref<string>('')
+const autoRefresh = ref(true)
+const refreshInterval = ref<NodeJS.Timeout | null>(null)
+// Computed properties
+const urgentTurns = computed(() => {
+  return props.turns.filter(turn => {
+    const urgency = getUrgencyLevel(turn)
+    return urgency === 'urgent' || urgency === 'critical'
+  })
+})
+const criticalTurns = computed(() => {
+  return props.turns.filter(turn => getUrgencyLevel(turn) === 'critical')
+})
+const unassignedTurns = computed(() => {
+  return props.turns.filter(turn => !turn.assigned_cleaner_id)
+})
+const estimatedRevenue = computed(() => {
+  // Mock calculation - would be based on property pricing
+  return urgentTurns.value.length * 150 // $150 average per turn
+})
+const filteredTurns = computed(() => {
+  let filtered = [...props.turns]
+  // Filter by urgency
+  if (selectedUrgencyFilter.value) {
+    filtered = filtered.filter(turn => 
+      getUrgencyLevel(turn) === selectedUrgencyFilter.value
+    )
+  }
+  // Filter by assignment status
+  if (selectedStatusFilter.value) {
+    if (selectedStatusFilter.value === 'assigned') {
+      filtered = filtered.filter(turn => turn.assigned_cleaner_id)
+    } else if (selectedStatusFilter.value === 'unassigned') {
+      filtered = filtered.filter(turn => !turn.assigned_cleaner_id)
+    }
+  }
+  // Sort by urgency and time remaining
+  return filtered.sort((a, b) => {
+    const aUrgency = getUrgencyLevel(a)
+    const bUrgency = getUrgencyLevel(b)
+    if (aUrgency === 'critical' && bUrgency !== 'critical') return -1
+    if (bUrgency === 'critical' && aUrgency !== 'critical') return 1
+    // Sort by checkout time (earliest first)
+    return new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime()
+  })
+})
+const showBusinessImpactAlert = computed(() => {
+  return businessImpactAlert.value.messages.length > 0
+})
+const businessImpactAlert = computed(() => {
+  const alert = {
+    type: 'info' as 'info' | 'warning' | 'error',
+    title: '',
+    messages: [] as string[]
+  }
+  if (criticalTurns.value.length > 0) {
+    alert.type = 'error'
+    alert.title = 'Critical Business Impact'
+    alert.messages.push(`${criticalTurns.value.length} critical turns require immediate attention`)
+    alert.messages.push('Client satisfaction and revenue at high risk')
+  } else if (unassignedTurns.value.length > 3) {
+    alert.type = 'warning'
+    alert.title = 'High Unassigned Turn Volume'
+    alert.messages.push(`${unassignedTurns.value.length} turns need cleaner assignment`)
+    alert.messages.push('Consider activating additional cleaning staff')
+  }
+  return alert
+})
+// Filter options
+const urgencyFilterOptions = [
+  { title: 'Critical (< 2 hours)', value: 'critical' },
+  { title: 'Urgent (< 6 hours)', value: 'urgent' },
+  { title: 'Standard', value: 'standard' }
+]
+const statusFilterOptions = [
+  { title: 'Assigned', value: 'assigned' },
+  { title: 'Unassigned', value: 'unassigned' }
+]
+// Methods
+const getUrgencyLevel = (turn: Booking): 'critical' | 'urgent' | 'standard' => {
+  const now = new Date()
+  const checkoutTime = new Date(turn.checkout_date)
+  const hoursUntil = (checkoutTime.getTime() - now.getTime()) / (1000 * 60 * 60)
+  if (hoursUntil <= 2) return 'critical'
+  if (hoursUntil <= 6) return 'urgent'
+  return 'standard'
+}
+const getUrgencyColor = (turn: Booking) => {
+  const urgency = getUrgencyLevel(turn)
+  const colors = {
+    critical: 'error',
+    urgent: 'warning',
+    standard: 'info'
+  }
+  return colors[urgency]
+}
+const getUrgencyIcon = (turn: Booking) => {
+  const urgency = getUrgencyLevel(turn)
+  const icons = {
+    critical: 'mdi-alert-octagon',
+    urgent: 'mdi-clock-alert',
+    standard: 'mdi-clock'
+  }
+  return icons[urgency]
+}
+const getTotalUrgencyColor = () => {
+  if (criticalTurns.value.length > 0) return 'error'
+  if (urgentTurns.value.length > 0) return 'warning'
+  return 'success'
+}
+const getTurnItemClass = (turn: Booking) => {
+  const urgency = getUrgencyLevel(turn)
+  const classes = ['turn-item']
+  if (urgency === 'critical') classes.push('turn-critical')
+  else if (urgency === 'urgent') classes.push('turn-urgent')
+  if (selectedTurns.value.includes(turn.id)) classes.push('turn-selected')
+  return classes.join(' ')
+}
+const getTimeRemaining = (turn: Booking) => {
+  const now = new Date()
+  const checkoutTime = new Date(turn.checkout_date)
+  const diffMs = checkoutTime.getTime() - now.getTime()
+  if (diffMs <= 0) return 'OVERDUE'
+  const hours = Math.floor(diffMs / (1000 * 60 * 60))
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+  if (hours === 0) return `${minutes}m`
+  if (hours < 24) return `${hours}h ${minutes}m`
+  const days = Math.floor(hours / 24)
+  return `${days}d ${hours % 24}h`
+}
+const formatDateTime = (dateTime: string) => {
+  const date = new Date(dateTime)
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  })
+}
+const getPropertyName = (propertyId: string) => {
+  const property = props.properties.find(p => p.id === propertyId)
+  return property?.name || 'Unknown Property'
+}
+const getPropertyAddress = (propertyId: string) => {
+  const property = props.properties.find(p => p.id === propertyId)
+  return property?.address || 'Unknown Address'
+}
+const getPropertyOwnerName = (ownerId: string) => {
+  const owner = props.propertyOwners.find(o => o.id === ownerId)
+  return owner?.name || `Owner ${ownerId.slice(-4)}`
+}
+const getCleanerName = (cleanerId: string) => {
+  const cleaner = props.cleaners.find(c => c.id === cleanerId)
+  return cleaner?.name || 'Unknown Cleaner'
+}
+const toggleTurnSelection = (turnId: string) => {
+  const index = selectedTurns.value.indexOf(turnId)
+  if (index > -1) {
+    selectedTurns.value.splice(index, 1)
+  } else {
+    selectedTurns.value.push(turnId)
+  }
+}
+const handleFilterChange = () => {
+  // Filters are reactive, no additional action needed
+}
+const handleRefresh = () => {
+  emit('refresh')
+}
+const handleAssignCleaner = (turnId: string) => {
+  emit('assign-cleaner', turnId)
+}
+const handleViewDetails = (turnId: string) => {
+  emit('view-details', turnId)
+}
+const handleEscalate = (turnId: string) => {
+  emit('escalate', turnId)
+}
+const handleBulkAssign = () => {
+  if (selectedTurns.value.length > 0) {
+    emit('bulk-assign', [...selectedTurns.value])
+  }
+}
+const handleEscalateAll = () => {
+  const criticalIds = criticalTurns.value.map(turn => turn.id)
+  if (criticalIds.length > 0) {
+    emit('escalate-all', criticalIds)
+  }
+}
+const handleAutoRefreshToggle = (enabled: boolean) => {
+  if (enabled) {
+    startAutoRefresh()
+  } else {
+    stopAutoRefresh()
+  }
+}
+const startAutoRefresh = () => {
+  if (refreshInterval.value) return
+  refreshInterval.value = setInterval(() => {
+    emit('refresh')
+  }, 30000) // Refresh every 30 seconds
+}
+const stopAutoRefresh = () => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value)
+    refreshInterval.value = null
+  }
+}
+// Lifecycle
+onMounted(() => {
+  if (autoRefresh.value) {
+    startAutoRefresh()
+  }
+})
+onUnmounted(() => {
+  stopAutoRefresh()
+})
+// Watch for auto-refresh changes
+watch(autoRefresh, (enabled) => {
+  if (enabled) {
+    startAutoRefresh()
+  } else {
+    stopAutoRefresh()
+  }
+})
+</script>
+<style scoped>
+.turn-priority-panel {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.v-card-title {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+.turn-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+.turn-item {
+  transition: all 0.2s ease;
+}
+.turn-critical {
+  border-left: 4px solid rgb(var(--v-theme-error));
+  background-color: rgb(var(--v-theme-error), 0.05);
+}
+.turn-urgent {
+  border-left: 4px solid rgb(var(--v-theme-warning));
+  background-color: rgb(var(--v-theme-warning), 0.05);
+}
+.turn-selected {
+  background-color: rgb(var(--v-theme-primary), 0.1);
+}
+.turn-item:hover {
+  background-color: rgb(var(--v-theme-surface-variant), 0.5);
+}
+</style>
+`````
+
+## File: src/components/dumb/owner/OwnerBookingForm.vue
+`````vue
+<template>
+  <v-dialog
+    v-model="isOpen"
+    max-width="600px"
+    persistent
+    @keydown.esc="handleClose"
+  >
+    <v-card>
+      <v-card-title class="text-h5 pb-2">
+        {{ formTitle }}
+        <v-chip
+          v-if="form.booking_type === 'turn'"
+          color="error"
+          size="small"
+          class="ml-2"
+        >
+          SAME-DAY CLEANING
+        </v-chip>
+      </v-card-title>
+      <v-divider />
+      <v-card-text>
+        <v-form
+          ref="formRef"
+          v-model="formValid"
+          @submit.prevent="handleSubmit"
+        >
+          <v-container>
+            <!-- Property Selection -->
+            <v-row>
+              <v-col cols="12">
+                <v-select
+                  v-model="form.property_id"
+                  :items="propertiesArray"
+                  item-title="name"
+                  item-value="id"
+                  label="Select Property"
+                  :rules="propertyRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('property_id')"
+                  prepend-inner-icon="mdi-home"
+                />
+              </v-col>
+            </v-row>
+            <!-- Dates -->
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-text-field
+                  v-model="form.checkout_date"
+                  label="Checkout Date"
+                  type="date"
+                  :rules="dateRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('checkout_date')"
+                  hint="When guests leave"
+                  persistent-hint
+                  prepend-inner-icon="mdi-calendar-export"
+                  @update:model-value="updateBookingType"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-text-field
+                  v-model="form.checkin_date"
+                  label="Checkin Date"
+                  type="date"
+                  :rules="dateRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('checkin_date')"
+                  hint="When new guests arrive"
+                  persistent-hint
+                  prepend-inner-icon="mdi-calendar-import"
+                  @update:model-value="updateBookingType"
+                />
+              </v-col>
+            </v-row>
+            <!-- Guest Count -->
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  v-model.number="form.guest_count"
+                  label="Number of Guests (Optional)"
+                  type="number"
+                  min="1"
+                  max="20"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('guest_count')"
+                  hint="Helps determine cleaning requirements"
+                  persistent-hint
+                  prepend-inner-icon="mdi-account-group"
+                />
+              </v-col>
+            </v-row>
+            <!-- Notes -->
+            <v-row>
+              <v-col cols="12">
+                <v-textarea
+                  v-model="form.notes"
+                  label="Special Instructions (Optional)"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('notes')"
+                  hint="Any special cleaning requirements or notes"
+                  persistent-hint
+                  :counter="300"
+                  rows="3"
+                  prepend-inner-icon="mdi-note-text"
+                />
+              </v-col>
+            </v-row>
+            <!-- Same-Day Cleaning Alert -->
+            <v-row v-if="showSameDayAlert">
+              <v-col cols="12">
+                <v-alert
+                  type="info"
+                  variant="tonal"
+                  title="Same-Day Cleaning Required"
+                  class="mb-0"
+                >
+                  <p>Your guests are checking out and new guests are checking in on the same day.</p>
+                  <p class="mb-0">This requires priority same-day cleaning service.</p>
+                </v-alert>
+              </v-col>
+            </v-row>
+            <!-- Date Validation Error -->
+            <v-row v-if="showDateError">
+              <v-col cols="12">
+                <v-alert
+                  type="error"
+                  variant="tonal"
+                  title="Invalid Dates"
+                  text="Checkin date cannot be before checkout date. Please check your dates."
+                  class="mb-0"
+                />
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-form>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions class="pa-4">
+        <v-btn
+          color="grey-darken-1"
+          variant="text"
+          :disabled="loading"
+          @click="handleClose"
+        >
+          Cancel
+        </v-btn>
+        <v-spacer />
+        <v-btn
+          color="primary"
+          variant="elevated"
+          :loading="loading"
+          :disabled="!formValid"
+          @click="handleSubmit"
+        >
+          {{ submitButtonText }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+⋮----
+{{ formTitle }}
+⋮----
+<!-- Property Selection -->
+⋮----
+<!-- Dates -->
+⋮----
+<!-- Guest Count -->
+⋮----
+<!-- Notes -->
+⋮----
+<!-- Same-Day Cleaning Alert -->
+⋮----
+<!-- Date Validation Error -->
+⋮----
+{{ submitButtonText }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch, nextTick } from 'vue'
+import type { Property } from '@/types/property'
+import type { Booking, BookingFormData } from '@/types/booking'
+// Props
+interface Props {
+  modelValue: boolean
+  mode: 'create' | 'edit'
+  booking?: Booking | null
+  properties: Property[]
+  loading?: boolean
+  errors?: Map<string, string[]>
+}
+const props = withDefaults(defineProps<Props>(), {
+  booking: null,
+  loading: false,
+  errors: () => new Map()
+})
+// Emits
+interface Emits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'submit', data: BookingFormData): void
+  (e: 'close'): void
+}
+const emit = defineEmits<Emits>()
+// Reactive data
+const formRef = ref()
+const formValid = ref(false)
+const autoDetectType = ref(true)
+// Form data
+const form = ref<BookingFormData>({
+  property_id: '',
+  owner_id: '',
+  checkout_date: '',
+  checkin_date: '',
+  booking_type: 'standard',
+  status: 'pending',
+  guest_count: undefined,
+  notes: ''
+})
+// Computed properties
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value: boolean) => emit('update:modelValue', value)
+})
+const formTitle = computed(() => {
+  return props.mode === 'create' ? 'Schedule Cleaning' : 'Update Booking'
+})
+const submitButtonText = computed(() => {
+  return props.mode === 'create' ? 'Schedule Cleaning' : 'Update Booking'
+})
+const propertiesArray = computed(() => {
+  return Array.from(props.properties).map(property => ({
+    id: property.id,
+    name: property.name,
+    address: property.address
+  }))
+})
+const showSameDayAlert = computed(() => {
+  return form.value.checkout_date && 
+         form.value.checkin_date && 
+         form.value.checkout_date === form.value.checkin_date
+})
+const showDateError = computed(() => {
+  if (!form.value.checkout_date || !form.value.checkin_date) return false
+  return new Date(form.value.checkin_date) < new Date(form.value.checkout_date)
+})
+// Validation rules
+const propertyRules = [
+  (v: string) => !!v || 'Please select a property'
+]
+const dateRules = [
+  (v: string) => !!v || 'Date is required',
+  (v: string) => {
+    const date = new Date(v)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return date >= today || 'Date cannot be in the past'
+  }
+]
+// Methods
+const updateBookingType = () => {
+  if (!autoDetectType.value) return
+  if (form.value.checkout_date && form.value.checkin_date) {
+    const checkoutDate = new Date(form.value.checkout_date)
+    const checkinDate = new Date(form.value.checkin_date)
+    // Same day = turn booking
+    if (checkoutDate.toDateString() === checkinDate.toDateString()) {
+      form.value.booking_type = 'turn'
+    } else {
+      form.value.booking_type = 'standard'
+    }
+  }
+}
+const resetForm = () => {
+  form.value = {
+    property_id: '',
+    owner_id: '',
+    checkout_date: '',
+    checkin_date: '',
+    booking_type: 'standard',
+    status: 'pending',
+    guest_count: undefined,
+    notes: ''
+  }
+  if (formRef.value) {
+    formRef.value.resetValidation()
+  }
+}
+const populateForm = (booking: Booking) => {
+  form.value = {
+    property_id: booking.property_id,
+    owner_id: booking.owner_id,
+    checkout_date: booking.checkout_date,
+    checkin_date: booking.checkin_date,
+    booking_type: booking.booking_type,
+    status: booking.status,
+    guest_count: booking.guest_count,
+    notes: booking.notes || ''
+  }
+}
+const handleSubmit = async () => {
+  if (!formRef.value) return
+  const { valid } = await formRef.value.validate()
+  if (!valid) return
+  // Additional validation
+  if (showDateError.value) return
+  emit('submit', { ...form.value })
+}
+const handleClose = () => {
+  emit('close')
+  emit('update:modelValue', false)
+}
+// Watchers
+watch(() => props.modelValue, (newValue) => {
+  if (newValue) {
+    if (props.mode === 'edit' && props.booking) {
+      populateForm(props.booking)
+    } else {
+      resetForm()
+    }
+    nextTick(() => {
+      if (formRef.value) {
+        formRef.value.resetValidation()
+      }
+    })
+  }
+})
+watch(() => props.booking, (newBooking) => {
+  if (newBooking && props.mode === 'edit') {
+    populateForm(newBooking)
+  }
+})
+</script>
+<style scoped>
+.v-card-title {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+.v-card-actions {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+/* Mobile optimizations */
+@media (max-width: 600px) {
+  .v-dialog {
+    margin: 16px;
+  }
+  .v-card {
+    margin: 0;
+  }
+}
+</style>
+`````
+
+## File: src/components/dumb/owner/OwnerCalendarControls.vue
+`````vue
+<template>
+  <v-card
+    class="owner-calendar-controls"
+    :elevation="elevation"
+    :variant="variant"
+  >
+    <v-card-text class="pa-3">
+      <v-container fluid class="pa-0">
+        <!-- Main Controls Row -->
+        <v-row align="center" class="mb-2">
+          <!-- Navigation Controls -->
+          <v-col cols="auto">
+            <v-btn-group
+              variant="outlined"
+              density="comfortable"
+            >
+              <v-btn
+                :disabled="loading"
+                @click="handleNavigation('prev')"
+              >
+                <v-icon>mdi-chevron-left</v-icon>
+                <span class="d-none d-sm-inline ml-1">Previous</span>
+              </v-btn>
+              <v-btn
+                :disabled="loading"
+                @click="handleNavigation('today')"
+              >
+                <v-icon>mdi-calendar-today</v-icon>
+                <span class="d-none d-sm-inline ml-1">Today</span>
+              </v-btn>
+              <v-btn
+                :disabled="loading"
+                @click="handleNavigation('next')"
+              >
+                <span class="d-none d-sm-inline mr-1">Next</span>
+                <v-icon>mdi-chevron-right</v-icon>
+              </v-btn>
+            </v-btn-group>
+          </v-col>
+          <v-spacer />
+          <!-- Current Date Display -->
+          <v-col cols="auto" class="text-center">
+            <div class="text-h6 font-weight-medium">
+              {{ currentDateDisplay }}
+            </div>
+            <div class="text-caption text-medium-emphasis">
+              {{ currentDateSubtitle }}
+            </div>
+          </v-col>
+          <v-spacer />
+          <!-- View Controls -->
+          <v-col cols="auto">
+            <v-btn-group
+              v-model="selectedView"
+              variant="outlined"
+              density="comfortable"
+              mandatory
+            >
+              <v-btn
+                value="dayGridMonth"
+                :disabled="loading"
+                @click="handleViewChange('dayGridMonth')"
+              >
+                <v-icon>mdi-calendar-month</v-icon>
+                <span class="d-none d-md-inline ml-1">Month</span>
+              </v-btn>
+              <v-btn
+                value="timeGridWeek"
+                :disabled="loading"
+                @click="handleViewChange('timeGridWeek')"
+              >
+                <v-icon>mdi-calendar-week</v-icon>
+                <span class="d-none d-md-inline ml-1">Week</span>
+              </v-btn>
+              <v-btn
+                value="timeGridDay"
+                :disabled="loading"
+                @click="handleViewChange('timeGridDay')"
+              >
+                <v-icon>mdi-calendar</v-icon>
+                <span class="d-none d-md-inline ml-1">Day</span>
+              </v-btn>
+            </v-btn-group>
+          </v-col>
+        </v-row>
+        <!-- Secondary Controls Row (Mobile/Tablet) -->
+        <v-row v-if="showSecondaryControls" class="mt-2">
+          <!-- Property Filter -->
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-select
+              v-model="selectedProperty"
+              :items="propertyFilterItems"
+              label="Filter by Property"
+              variant="outlined"
+              density="compact"
+              :disabled="loading"
+              prepend-inner-icon="mdi-home"
+              @update:model-value="handlePropertyFilter"
+            />
+          </v-col>
+          <!-- Booking Type Filter -->
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-select
+              v-model="selectedBookingType"
+              :items="bookingTypeFilterItems"
+              label="Filter by Type"
+              variant="outlined"
+              density="compact"
+              :disabled="loading"
+              prepend-inner-icon="mdi-filter"
+              @update:model-value="handleBookingTypeFilter"
+            />
+          </v-col>
+          <!-- Quick Actions -->
+          <v-col
+            cols="12"
+            md="4"
+          >
+            <v-btn
+              color="primary"
+              variant="elevated"
+              block
+              :disabled="loading"
+              @click="handleQuickAction('add-booking')"
+            >
+              <v-icon class="mr-2">mdi-plus</v-icon>
+              Schedule Cleaning
+            </v-btn>
+          </v-col>
+        </v-row>
+        <!-- Toggle Secondary Controls (Mobile) -->
+        <v-row v-if="!showSecondaryControls" class="mt-2">
+          <v-col cols="12">
+            <v-btn
+              variant="text"
+              size="small"
+              block
+              @click="showSecondaryControls = true"
+            >
+              <v-icon class="mr-1">mdi-tune</v-icon>
+              Show Filters & Options
+            </v-btn>
+          </v-col>
+        </v-row>
+        <!-- Hide Secondary Controls -->
+        <v-row v-else class="mt-1">
+          <v-col cols="12">
+            <v-btn
+              variant="text"
+              size="small"
+              block
+              @click="showSecondaryControls = false"
+            >
+              <v-icon class="mr-1">mdi-chevron-up</v-icon>
+              Hide Filters & Options
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+  </v-card>
+</template>
+⋮----
+<!-- Main Controls Row -->
+⋮----
+<!-- Navigation Controls -->
+⋮----
+<!-- Current Date Display -->
+⋮----
+{{ currentDateDisplay }}
+⋮----
+{{ currentDateSubtitle }}
+⋮----
+<!-- View Controls -->
+⋮----
+<!-- Secondary Controls Row (Mobile/Tablet) -->
+⋮----
+<!-- Property Filter -->
+⋮----
+<!-- Booking Type Filter -->
+⋮----
+<!-- Quick Actions -->
+⋮----
+<!-- Toggle Secondary Controls (Mobile) -->
+⋮----
+<!-- Hide Secondary Controls -->
+⋮----
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+// Props
+interface Props {
+  currentDate?: Date
+  view?: CalendarView
+  properties?: PropertyOption[]
+  loading?: boolean
+  elevation?: number
+  variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'
+}
+const props = withDefaults(defineProps<Props>(), {
+  currentDate: () => new Date(),
+  view: 'dayGridMonth',
+  properties: () => [],
+  loading: false,
+  elevation: 1,
+  variant: 'outlined'
+})
+// Emits
+interface Emits {
+  (e: 'navigation', direction: NavigationDirection): void
+  (e: 'view-change', view: CalendarView): void
+  (e: 'property-filter', propertyId: string | null): void
+  (e: 'booking-type-filter', bookingType: BookingTypeFilter): void
+  (e: 'quick-action', action: QuickAction): void
+}
+const emit = defineEmits<Emits>()
+// Types
+type CalendarView = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'
+type NavigationDirection = 'prev' | 'next' | 'today'
+type BookingTypeFilter = 'all' | 'standard' | 'turn'
+type QuickAction = 'add-booking'
+interface PropertyOption {
+  id: string
+  name: string
+}
+// Reactive data
+const selectedView = ref<CalendarView>(props.view)
+const selectedProperty = ref<string | null>(null)
+const selectedBookingType = ref<BookingTypeFilter>('all')
+const showSecondaryControls = ref(false)
+// Computed properties
+const currentDateDisplay = computed(() => {
+  const date = props.currentDate
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long'
+  }
+  if (selectedView.value === 'timeGridWeek') {
+    // For week view, show week range
+    const startOfWeek = new Date(date)
+    startOfWeek.setDate(date.getDate() - date.getDay())
+    const endOfWeek = new Date(startOfWeek)
+    endOfWeek.setDate(startOfWeek.getDate() + 6)
+    if (startOfWeek.getMonth() === endOfWeek.getMonth()) {
+      return `${startOfWeek.getDate()} - ${endOfWeek.getDate()} ${startOfWeek.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
+    } else {
+      return `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+    }
+  } else if (selectedView.value === 'timeGridDay') {
+    // For day view, show full date
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })
+  } else {
+    // For month view, show month and year
+    return date.toLocaleDateString('en-US', options)
+  }
+})
+const currentDateSubtitle = computed(() => {
+  if (selectedView.value === 'dayGridMonth') {
+    return 'Month View'
+  } else if (selectedView.value === 'timeGridWeek') {
+    return 'Week View'
+  } else {
+    return 'Day View'
+  }
+})
+const propertyFilterItems = computed(() => {
+  const items = [
+    { title: 'All Properties', value: null }
+  ]
+  props.properties.forEach(property => {
+    items.push({
+      title: property.name,
+      value: property.id
+    })
+  })
+  return items
+})
+const bookingTypeFilterItems = [
+  { title: 'All Bookings', value: 'all' },
+  { title: 'Standard Cleanings', value: 'standard' },
+  { title: 'Same-Day Turns', value: 'turn' }
+]
+// Methods
+const handleNavigation = (direction: NavigationDirection) => {
+  emit('navigation', direction)
+}
+const handleViewChange = (view: CalendarView) => {
+  selectedView.value = view
+  emit('view-change', view)
+}
+const handlePropertyFilter = (propertyId: string | null) => {
+  emit('property-filter', propertyId)
+}
+const handleBookingTypeFilter = (bookingType: BookingTypeFilter) => {
+  emit('booking-type-filter', bookingType)
+}
+const handleQuickAction = (action: QuickAction) => {
+  emit('quick-action', action)
+}
+</script>
+<style scoped>
+.owner-calendar-controls {
+  width: 100%;
+}
+/* Ensure consistent button group styling */
+.v-btn-group .v-btn {
+  min-height: 40px;
+}
+/* Mobile optimizations */
+@media (max-width: 600px) {
+  .v-btn-group .v-btn {
+    min-height: 36px;
+    padding: 0 8px;
+  }
+  .v-btn-group .v-btn .v-icon {
+    font-size: 1.1rem;
+  }
+  .text-h6 {
+    font-size: 1.1rem !important;
+  }
+}
+/* Tablet optimizations */
+@media (min-width: 601px) and (max-width: 960px) {
+  .v-btn-group .v-btn {
+    min-height: 42px;
+  }
+}
+/* Ensure proper spacing */
+.v-btn-group {
+  box-shadow: none;
+}
+.v-btn-group .v-btn:not(:last-child) {
+  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+</style>
+`````
+
+## File: src/components/dumb/owner/OwnerPropertyForm.vue
+`````vue
+<template>
+  <v-dialog
+    v-model="isOpen"
+    max-width="600px"
+    persistent
+    @keydown.esc="handleClose"
+  >
+    <v-card>
+      <v-card-title class="text-h5 pb-2">
+        {{ formTitle }}
+        <v-chip
+          v-if="form.active"
+          color="success"
+          size="small"
+          class="ml-2"
+        >
+          ACTIVE
+        </v-chip>
+        <v-chip
+          v-else
+          color="grey"
+          size="small"
+          class="ml-2"
+        >
+          INACTIVE
+        </v-chip>
+      </v-card-title>
+      <v-divider />
+      <v-card-text>
+        <v-form
+          ref="formRef"
+          v-model="formValid"
+          @submit.prevent="handleSubmit"
+        >
+          <v-container>
+            <!-- Property Name -->
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="form.name"
+                  label="Property Name"
+                  :rules="nameRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('name')"
+                  hint="Give your property a memorable name"
+                  persistent-hint
+                  prepend-inner-icon="mdi-home"
+                />
+              </v-col>
+            </v-row>
+            <!-- Property Address -->
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="form.address"
+                  label="Property Address"
+                  :rules="addressRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('address')"
+                  hint="Full address for cleaning team reference"
+                  persistent-hint
+                  prepend-inner-icon="mdi-map-marker"
+                />
+              </v-col>
+            </v-row>
+            <!-- Property Details -->
+            <v-row>
+              <v-col
+                cols="6"
+                sm="4"
+              >
+                <v-text-field
+                  v-model.number="form.bedrooms"
+                  label="Bedrooms"
+                  type="number"
+                  min="0"
+                  max="20"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('bedrooms')"
+                  hint="Number of bedrooms"
+                  persistent-hint
+                  prepend-inner-icon="mdi-bed"
+                />
+              </v-col>
+              <v-col
+                cols="6"
+                sm="4"
+              >
+                <v-text-field
+                  v-model.number="form.bathrooms"
+                  label="Bathrooms"
+                  type="number"
+                  min="0"
+                  max="20"
+                  step="0.5"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('bathrooms')"
+                  hint="Number of bathrooms"
+                  persistent-hint
+                  prepend-inner-icon="mdi-shower"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                sm="4"
+              >
+                <v-select
+                  v-model="form.property_type"
+                  :items="propertyTypeItems"
+                  label="Property Type"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('property_type')"
+                  hint="Type of property"
+                  persistent-hint
+                  prepend-inner-icon="mdi-home-variant"
+                />
+              </v-col>
+            </v-row>
+            <!-- Cleaning Duration and Pricing -->
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-text-field
+                  v-model.number="form.cleaning_duration"
+                  label="Cleaning Time (minutes)"
+                  type="number"
+                  min="30"
+                  max="480"
+                  step="15"
+                  :rules="durationRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('cleaning_duration')"
+                  hint="Typical cleaning time needed"
+                  persistent-hint
+                  prepend-inner-icon="mdi-clock"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-select
+                  v-model="form.pricing_tier"
+                  :items="pricingTierItems"
+                  label="Service Level"
+                  :rules="pricingTierRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('pricing_tier')"
+                  hint="Determines service level"
+                  persistent-hint
+                  prepend-inner-icon="mdi-star"
+                />
+              </v-col>
+            </v-row>
+            <!-- Special Instructions -->
+            <v-row>
+              <v-col cols="12">
+                <v-textarea
+                  v-model="form.special_instructions"
+                  label="Special Instructions (Optional)"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('special_instructions')"
+                  hint="Any special cleaning requirements, access instructions, or notes"
+                  persistent-hint
+                  :counter="500"
+                  rows="3"
+                  prepend-inner-icon="mdi-note-text"
+                />
+              </v-col>
+            </v-row>
+            <!-- Active Status -->
+            <v-row>
+              <v-col cols="12">
+                <v-checkbox
+                  v-model="form.active"
+                  label="Property is active for bookings"
+                  :disabled="loading"
+                  :error-messages="errors.get('active')"
+                  hint="Inactive properties won't appear in booking options"
+                  persistent-hint
+                />
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-form>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions class="pa-4">
+        <v-btn
+          color="grey-darken-1"
+          variant="text"
+          :disabled="loading"
+          @click="handleClose"
+        >
+          Cancel
+        </v-btn>
+        <v-spacer />
+        <v-btn
+          color="primary"
+          variant="elevated"
+          :disabled="!formValid || loading"
+          :loading="loading"
+          @click="handleSubmit"
+        >
+          {{ submitButtonText }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+⋮----
+{{ formTitle }}
+⋮----
+<!-- Property Name -->
+⋮----
+<!-- Property Address -->
+⋮----
+<!-- Property Details -->
+⋮----
+<!-- Cleaning Duration and Pricing -->
+⋮----
+<!-- Special Instructions -->
+⋮----
+<!-- Active Status -->
+⋮----
+{{ submitButtonText }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch, nextTick } from 'vue'
+import type { Property, PropertyFormData, PricingTier } from '@/types/property'
+// Props
+interface Props {
+  modelValue: boolean
+  mode: 'create' | 'edit'
+  property?: Property | null
+  loading?: boolean
+  errors?: Map<string, string[]>
+}
+const props = withDefaults(defineProps<Props>(), {
+  property: null,
+  loading: false,
+  errors: () => new Map()
+})
+// Emits
+interface Emits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'submit', data: PropertyFormData): void
+  (e: 'close'): void
+}
+const emit = defineEmits<Emits>()
+// Reactive data
+const formRef = ref()
+const formValid = ref(false)
+// Form data
+const form = ref<PropertyFormData>({
+  owner_id: '',
+  name: '',
+  address: '',
+  bedrooms: undefined,
+  bathrooms: undefined,
+  square_feet: undefined,
+  property_type: undefined,
+  cleaning_duration: 120,
+  special_instructions: '',
+  pricing_tier: 'standard',
+  active: true
+})
+// Computed properties
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value: boolean) => emit('update:modelValue', value)
+})
+const formTitle = computed(() => {
+  return props.mode === 'create' ? 'Add New Property' : 'Edit Property'
+})
+const submitButtonText = computed(() => {
+  return props.mode === 'create' ? 'Add Property' : 'Update Property'
+})
+// Form options
+const propertyTypeItems = [
+  { title: 'Apartment', value: 'apartment' },
+  { title: 'House', value: 'house' },
+  { title: 'Condo', value: 'condo' },
+  { title: 'Townhouse', value: 'townhouse' }
+]
+const pricingTierItems = [
+  { title: 'Basic Service', value: 'basic' },
+  { title: 'Standard Service', value: 'standard' },
+  { title: 'Premium Service', value: 'premium' },
+  { title: 'Luxury Service', value: 'luxury' }
+]
+// Validation rules
+const nameRules = [
+  (v: string) => !!v || 'Property name is required',
+  (v: string) => (v && v.length >= 2) || 'Name must be at least 2 characters',
+  (v: string) => (v && v.length <= 100) || 'Name must be less than 100 characters'
+]
+const addressRules = [
+  (v: string) => !!v || 'Property address is required',
+  (v: string) => (v && v.length >= 10) || 'Please enter a complete address',
+  (v: string) => (v && v.length <= 200) || 'Address must be less than 200 characters'
+]
+const durationRules = [
+  (v: number) => !!v || 'Cleaning duration is required',
+  (v: number) => v >= 30 || 'Minimum cleaning time is 30 minutes',
+  (v: number) => v <= 480 || 'Maximum cleaning time is 8 hours'
+]
+const pricingTierRules = [
+  (v: PricingTier) => !!v || 'Service level is required'
+]
+// Methods
+const resetForm = () => {
+  form.value = {
+    owner_id: '',
+    name: '',
+    address: '',
+    bedrooms: undefined,
+    bathrooms: undefined,
+    square_feet: undefined,
+    property_type: undefined,
+    cleaning_duration: 120,
+    special_instructions: '',
+    pricing_tier: 'standard',
+    active: true
+  }
+  if (formRef.value) {
+    formRef.value.resetValidation()
+  }
+}
+const populateForm = (property: Property) => {
+  form.value = {
+    owner_id: property.owner_id,
+    name: property.name,
+    address: property.address,
+    bedrooms: property.bedrooms,
+    bathrooms: property.bathrooms,
+    square_feet: property.square_feet,
+    property_type: property.property_type,
+    cleaning_duration: property.cleaning_duration,
+    special_instructions: property.special_instructions || '',
+    pricing_tier: property.pricing_tier,
+    active: property.active
+  }
+}
+const handleSubmit = async () => {
+  if (!formRef.value) return
+  const { valid } = await formRef.value.validate()
+  if (!valid) return
+  emit('submit', { ...form.value })
+}
+const handleClose = () => {
+  emit('close')
+  emit('update:modelValue', false)
+}
+// Watchers
+watch(() => props.modelValue, (newValue) => {
+  if (newValue) {
+    if (props.mode === 'edit' && props.property) {
+      populateForm(props.property)
+    } else {
+      resetForm()
+    }
+    nextTick(() => {
+      if (formRef.value) {
+        formRef.value.resetValidation()
+      }
+    })
+  }
+})
+watch(() => props.property, (newProperty) => {
+  if (newProperty && props.mode === 'edit') {
+    populateForm(newProperty)
+  }
+})
+</script>
+<style scoped>
+.v-card-title {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+.v-card-actions {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+/* Mobile optimizations */
+@media (max-width: 600px) {
+  .v-dialog {
+    margin: 16px;
+  }
+  .v-card {
+    margin: 0;
+  }
+}
+</style>
+`````
+
+## File: src/components/dumb/owner/OwnerQuickActions.vue
+`````vue
+<template>
+  <v-card
+    class="owner-quick-actions"
+    :elevation="elevation"
+    :variant="variant"
+  >
+    <v-card-title class="text-h6 pb-2">
+      <v-icon class="mr-2">mdi-lightning-bolt</v-icon>
+      Quick Actions
+    </v-card-title>
+    <v-divider />
+    <v-card-text class="pa-3">
+      <v-container fluid class="pa-0">
+        <!-- Primary Actions Row -->
+        <v-row class="mb-2">
+          <v-col
+            cols="6"
+            sm="6"
+            md="12"
+            lg="6"
+          >
+            <v-btn
+              color="primary"
+              variant="elevated"
+              block
+              size="large"
+              :loading="loading"
+              :disabled="disabled"
+              @click="handleAction('add-booking')"
+            >
+              <v-icon class="mr-2">mdi-calendar-plus</v-icon>
+              <span class="d-none d-sm-inline">Schedule</span>
+              <span class="d-sm-none">Book</span>
+              Cleaning
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="6"
+            sm="6"
+            md="12"
+            lg="6"
+          >
+            <v-btn
+              color="secondary"
+              variant="elevated"
+              block
+              size="large"
+              :loading="loading"
+              :disabled="disabled"
+              @click="handleAction('add-property')"
+            >
+              <v-icon class="mr-2">mdi-home-plus</v-icon>
+              <span class="d-none d-sm-inline">Add</span>
+              Property
+            </v-btn>
+          </v-col>
+        </v-row>
+        <!-- Secondary Actions Row -->
+        <v-row>
+          <v-col
+            cols="6"
+            sm="6"
+            md="12"
+            lg="6"
+          >
+            <v-btn
+              color="info"
+              variant="tonal"
+              block
+              :loading="loading"
+              :disabled="disabled"
+              @click="handleAction('view-calendar')"
+            >
+              <v-icon class="mr-2">mdi-calendar</v-icon>
+              <span class="d-none d-sm-inline">View</span>
+              Calendar
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="6"
+            sm="6"
+            md="12"
+            lg="6"
+          >
+            <v-btn
+              color="success"
+              variant="tonal"
+              block
+              :loading="loading"
+              :disabled="disabled"
+              @click="handleAction('view-properties')"
+            >
+              <v-icon class="mr-2">mdi-home-group</v-icon>
+              <span class="d-none d-sm-inline">My</span>
+              Properties
+            </v-btn>
+          </v-col>
+        </v-row>
+        <!-- Additional Actions (Collapsible) -->
+        <v-expand-transition>
+          <div v-if="showMoreActions">
+            <v-divider class="my-3" />
+            <v-row>
+              <v-col
+                cols="6"
+                sm="6"
+                md="12"
+                lg="6"
+              >
+                <v-btn
+                  color="warning"
+                  variant="outlined"
+                  block
+                  :loading="loading"
+                  :disabled="disabled"
+                  @click="handleAction('view-bookings')"
+                >
+                  <v-icon class="mr-2">mdi-clipboard-list</v-icon>
+                  <span class="d-none d-sm-inline">My</span>
+                  Bookings
+                </v-btn>
+              </v-col>
+              <v-col
+                cols="6"
+                sm="6"
+                md="12"
+                lg="6"
+              >
+                <v-btn
+                  color="purple"
+                  variant="outlined"
+                  block
+                  :loading="loading"
+                  :disabled="disabled"
+                  @click="handleAction('contact-support')"
+                >
+                  <v-icon class="mr-2">mdi-help-circle</v-icon>
+                  <span class="d-none d-sm-inline">Get</span>
+                  Help
+                </v-btn>
+              </v-col>
+            </v-row>
+          </div>
+        </v-expand-transition>
+        <!-- Show More/Less Toggle -->
+        <v-row class="mt-2">
+          <v-col cols="12">
+            <v-btn
+              variant="text"
+              size="small"
+              block
+              @click="showMoreActions = !showMoreActions"
+            >
+              <v-icon class="mr-1">
+                {{ showMoreActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
+              {{ showMoreActions ? 'Show Less' : 'More Actions' }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+  </v-card>
+</template>
+⋮----
+<!-- Primary Actions Row -->
+⋮----
+<!-- Secondary Actions Row -->
+⋮----
+<!-- Additional Actions (Collapsible) -->
+⋮----
+<!-- Show More/Less Toggle -->
+⋮----
+{{ showMoreActions ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+⋮----
+{{ showMoreActions ? 'Show Less' : 'More Actions' }}
+⋮----
+<script setup lang="ts">
+import { ref } from 'vue'
+// Props
+interface Props {
+  loading?: boolean
+  disabled?: boolean
+  elevation?: number
+  variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+  disabled: false,
+  elevation: 2,
+  variant: 'elevated'
+})
+// Emits
+interface Emits {
+  (e: 'action', actionType: OwnerActionType): void
+}
+const emit = defineEmits<Emits>()
+// Types
+type OwnerActionType = 
+  | 'add-booking' 
+  | 'add-property' 
+  | 'view-calendar' 
+  | 'view-properties' 
+  | 'view-bookings' 
+  | 'contact-support'
+// Reactive data
+const showMoreActions = ref(false)
+// Methods
+const handleAction = (actionType: OwnerActionType) => {
+  emit('action', actionType)
+}
+</script>
+<style scoped>
+.owner-quick-actions {
+  width: 100%;
+}
+.v-card-title {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+/* Ensure consistent button heights */
+.v-btn {
+  min-height: 48px;
+}
+/* Mobile optimizations */
+@media (max-width: 600px) {
+  .v-btn {
+    min-height: 44px;
+    font-size: 0.875rem;
+  }
+  .v-icon {
+    font-size: 1.2rem !important;
+  }
+}
+/* Tablet optimizations */
+@media (min-width: 601px) and (max-width: 960px) {
+  .v-btn {
+    min-height: 52px;
+  }
+}
+/* Animation for expand transition */
+.v-expand-transition-enter-active,
+.v-expand-transition-leave-active {
+  transition: all 0.3s ease;
+}
+.v-expand-transition-enter-from,
+.v-expand-transition-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>
 `````
@@ -36848,6 +36213,520 @@ button:disabled {
   border-radius: 6px;
   overflow-x: auto;
   font-size: 0.9em;
+}
+</style>
+`````
+
+## File: src/components/smart/admin/UseAdminCalendarStateDemo.vue
+`````vue
+<template>
+  <v-container fluid class="pa-4">
+    <v-row>
+      <v-col cols="12">
+        <v-card>
+          <v-card-title class="d-flex align-center">
+            <v-icon class="mr-2" color="primary">mdi-calendar-clock</v-icon>
+            useAdminCalendarState Demo
+            <v-spacer />
+            <v-chip color="success" variant="outlined">Admin Interface</v-chip>
+          </v-card-title>
+          <v-card-text>
+            <v-alert type="info" class="mb-4">
+              <strong>Admin Calendar State Composable Demo</strong><br>
+              This demo showcases the admin-specific calendar state management with system-wide data access,
+              advanced filtering, cleaner management, and business analytics.
+            </v-alert>
+            <!-- Status Messages -->
+            <v-alert v-if="error" type="error" class="mb-4" dismissible @click:close="error = null">
+              {{ error }}
+            </v-alert>
+            <v-alert v-if="success" type="success" class="mb-4" dismissible @click:close="success = null">
+              {{ success }}
+            </v-alert>
+            <!-- Admin Calendar Controls -->
+            <v-row class="mb-4">
+              <v-col cols="12" md="6">
+                <v-card variant="outlined">
+                  <v-card-title class="text-h6">Calendar View Mode</v-card-title>
+                  <v-card-text>
+                    <v-btn-toggle v-model="calendarViewMode" mandatory class="mb-3">
+                      <v-btn value="standard" size="small">Standard</v-btn>
+                      <v-btn value="cleaner" size="small">Cleaner</v-btn>
+                      <v-btn value="owner" size="small">Owner</v-btn>
+                      <v-btn value="priority" size="small">Priority</v-btn>
+                    </v-btn-toggle>
+                    <div class="d-flex flex-wrap gap-2">
+                      <v-switch
+                        v-model="showUnassignedOnly"
+                        label="Unassigned Only"
+                        color="warning"
+                        density="compact"
+                        hide-details
+                      />
+                      <v-switch
+                        v-model="showOverdueOnly"
+                        label="Overdue Only"
+                        color="error"
+                        density="compact"
+                        hide-details
+                      />
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-card variant="outlined">
+                  <v-card-title class="text-h6">System Metrics</v-card-title>
+                  <v-card-text>
+                    <v-row dense>
+                      <v-col cols="6">
+                        <v-chip color="primary" variant="outlined" class="mb-1">
+                          Total Bookings: {{ allBookings.length }}
+                        </v-chip>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-chip color="warning" variant="outlined" class="mb-1">
+                          Turn Alerts: {{ systemTurnAlerts.length }}
+                        </v-chip>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-chip color="info" variant="outlined" class="mb-1">
+                          Properties: {{ allProperties.length }}
+                        </v-chip>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-chip color="success" variant="outlined" class="mb-1">
+                          Cleaners: {{ Object.keys(cleanerSchedules).length - 1 }}
+                        </v-chip>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            <!-- System Turn Alerts -->
+            <v-card variant="outlined" class="mb-4" v-if="systemTurnAlerts.length > 0">
+              <v-card-title class="text-h6 d-flex align-center">
+                <v-icon class="mr-2" color="error">mdi-fire</v-icon>
+                System Turn Alerts ({{ systemTurnAlerts.length }})
+              </v-card-title>
+              <v-card-text>
+                <v-row dense>
+                  <v-col 
+                    v-for="alert in systemTurnAlerts.slice(0, 6)" 
+                    :key="alert.id"
+                    cols="12" sm="6" md="4"
+                  >
+                    <v-card 
+                      :color="alert.priority === 'urgent' ? 'error' : 'warning'"
+                      variant="outlined"
+                      class="mb-2"
+                    >
+                      <v-card-text class="pa-3">
+                        <div class="text-subtitle2 font-weight-bold">
+                          {{ alert.property_name }}
+                        </div>
+                        <div class="text-caption">{{ alert.property_address }}</div>
+                        <v-chip 
+                          :color="alert.priority === 'urgent' ? 'error' : 'warning'"
+                          size="small"
+                          class="mt-1"
+                        >
+                          {{ alert.alert_message }}
+                        </v-chip>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+            <!-- Cleaner Schedules -->
+            <v-card variant="outlined" class="mb-4">
+              <v-card-title class="text-h6">Cleaner Schedules</v-card-title>
+              <v-card-text>
+                <v-row dense>
+                  <v-col 
+                    v-for="(bookings, cleanerId) in cleanerSchedules" 
+                    :key="cleanerId"
+                    cols="12" sm="6" md="4"
+                  >
+                    <v-card variant="outlined" class="mb-2">
+                      <v-card-text class="pa-3">
+                        <div class="text-subtitle2 font-weight-bold">
+                          {{ cleanerId === 'unassigned' ? 'Unassigned' : `Cleaner ${cleanerId.slice(0, 8)}` }}
+                        </div>
+                        <div class="text-caption">{{ bookings.length }} bookings</div>
+                        <v-btn 
+                          size="small" 
+                          variant="outlined" 
+                          class="mt-2"
+                          @click="testGetCleanerSchedule(cleanerId)"
+                        >
+                          View Schedule
+                        </v-btn>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+            <!-- Calendar Events Preview -->
+            <v-card variant="outlined" class="mb-4">
+              <v-card-title class="text-h6">Admin Calendar Events ({{ adminCalendarEvents.length }})</v-card-title>
+              <v-card-text>
+                <v-row dense>
+                  <v-col 
+                    v-for="event in adminCalendarEvents.slice(0, 8)" 
+                    :key="event.id"
+                    cols="12" sm="6" md="3"
+                  >
+                    <v-card 
+                      :style="{ borderLeft: `4px solid ${event.backgroundColor}` }"
+                      variant="outlined"
+                      class="mb-2"
+                    >
+                      <v-card-text class="pa-3">
+                        <div class="text-subtitle2 font-weight-bold">{{ event.title }}</div>
+                        <div class="text-caption">
+                          {{ formatDate(event.start) }} - {{ formatDate(event.end) }}
+                        </div>
+                        <div class="text-caption">
+                          Status: {{ event.extendedProps.status }}
+                        </div>
+                        <v-btn 
+                          size="small" 
+                          variant="outlined" 
+                          class="mt-2"
+                          @click="testHandleAdminEventClick(event)"
+                        >
+                          Manage
+                        </v-btn>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+            <!-- Advanced Filtering Test -->
+            <v-card variant="outlined" class="mb-4">
+              <v-card-title class="text-h6">Advanced Filtering Test</v-card-title>
+              <v-card-text>
+                <v-row dense>
+                  <v-col cols="12" md="4">
+                    <v-select
+                      v-model="filterCriteria.status"
+                      :items="statusOptions"
+                      label="Filter by Status"
+                      multiple
+                      chips
+                      clearable
+                      density="compact"
+                    />
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-select
+                      v-model="filterCriteria.bookingType"
+                      :items="typeOptions"
+                      label="Filter by Type"
+                      multiple
+                      chips
+                      clearable
+                      density="compact"
+                    />
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-btn 
+                      color="primary" 
+                      @click="testAdvancedFiltering"
+                      :loading="loading"
+                    >
+                      Apply Filters
+                    </v-btn>
+                  </v-col>
+                </v-row>
+                <v-alert v-if="filteredResults.length > 0" type="success" class="mt-3">
+                  Found {{ filteredResults.length }} bookings matching criteria
+                </v-alert>
+              </v-card-text>
+            </v-card>
+            <!-- Function Testing -->
+            <v-card variant="outlined">
+              <v-card-title class="text-h6">Function Testing</v-card-title>
+              <v-card-text>
+                <div class="d-flex flex-wrap gap-2">
+                  <v-btn 
+                    color="primary" 
+                    variant="outlined"
+                    @click="testGetAdminCalendarEvents"
+                    :loading="loading"
+                  >
+                    Test Calendar Events
+                  </v-btn>
+                  <v-btn 
+                    color="secondary" 
+                    variant="outlined"
+                    @click="testSystemTurnAlerts"
+                    :loading="loading"
+                  >
+                    Test Turn Alerts
+                  </v-btn>
+                  <v-btn 
+                    color="info" 
+                    variant="outlined"
+                    @click="testCleanerSchedules"
+                    :loading="loading"
+                  >
+                    Test Cleaner Schedules
+                  </v-btn>
+                  <v-btn 
+                    color="warning" 
+                    variant="outlined"
+                    @click="testFilterByMultipleCriteria"
+                    :loading="loading"
+                  >
+                    Test Multi-Criteria Filter
+                  </v-btn>
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+⋮----
+<!-- Status Messages -->
+⋮----
+{{ error }}
+⋮----
+{{ success }}
+⋮----
+<!-- Admin Calendar Controls -->
+⋮----
+Total Bookings: {{ allBookings.length }}
+⋮----
+Turn Alerts: {{ systemTurnAlerts.length }}
+⋮----
+Properties: {{ allProperties.length }}
+⋮----
+Cleaners: {{ Object.keys(cleanerSchedules).length - 1 }}
+⋮----
+<!-- System Turn Alerts -->
+⋮----
+System Turn Alerts ({{ systemTurnAlerts.length }})
+⋮----
+{{ alert.property_name }}
+⋮----
+<div class="text-caption">{{ alert.property_address }}</div>
+⋮----
+{{ alert.alert_message }}
+⋮----
+<!-- Cleaner Schedules -->
+⋮----
+{{ cleanerId === 'unassigned' ? 'Unassigned' : `Cleaner ${cleanerId.slice(0, 8)}` }}
+⋮----
+<div class="text-caption">{{ bookings.length }} bookings</div>
+⋮----
+<!-- Calendar Events Preview -->
+⋮----
+<v-card-title class="text-h6">Admin Calendar Events ({{ adminCalendarEvents.length }})</v-card-title>
+⋮----
+<div class="text-subtitle2 font-weight-bold">{{ event.title }}</div>
+⋮----
+{{ formatDate(event.start) }} - {{ formatDate(event.end) }}
+⋮----
+Status: {{ event.extendedProps.status }}
+⋮----
+<!-- Advanced Filtering Test -->
+⋮----
+Found {{ filteredResults.length }} bookings matching criteria
+⋮----
+<!-- Function Testing -->
+⋮----
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useAdminCalendarState } from '@/composables/admin/useAdminCalendarState';
+import { useBookingStore } from '@/stores/booking';
+import { usePropertyStore } from '@/stores/property';
+import type { BookingStatus, BookingType } from '@/types';
+// Get the admin calendar state composable
+const {
+  // State
+  loading,
+  error,
+  success,
+  selectedCleanerIds,
+  selectedOwnerIds,
+  showUnassignedOnly,
+  showOverdueOnly,
+  calendarViewMode,
+  // Computed properties
+  allBookings,
+  allProperties,
+  systemTurnAlerts,
+  cleanerSchedules,
+  adminCalendarEvents,
+  // Functions
+  getAdminCalendarEvents,
+  handleAdminEventClick,
+  getCleanerSchedule,
+  filterByMultipleCriteria
+} = useAdminCalendarState();
+// Get stores for demo data
+const bookingStore = useBookingStore();
+const propertyStore = usePropertyStore();
+// Demo state
+const filteredResults = ref<any[]>([]);
+const filterCriteria = ref<{
+  status: BookingStatus[];
+  bookingType: BookingType[];
+}>({
+  status: [],
+  bookingType: []
+});
+// Filter options
+const statusOptions = [
+  { title: 'Pending', value: 'pending' },
+  { title: 'Scheduled', value: 'scheduled' },
+  { title: 'In Progress', value: 'in_progress' },
+  { title: 'Completed', value: 'completed' },
+  { title: 'Cancelled', value: 'cancelled' }
+];
+const typeOptions = [
+  { title: 'Standard', value: 'standard' },
+  { title: 'Turn', value: 'turn' }
+];
+// Helper functions
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+// Test functions
+function testGetAdminCalendarEvents() {
+  loading.value = true;
+  try {
+    const events = getAdminCalendarEvents();
+    success.value = `Generated ${events.length} admin calendar events with enhanced formatting`;
+    console.log('Admin Calendar Events:', events);
+  } catch (err) {
+    error.value = 'Failed to generate admin calendar events';
+    console.error('Error:', err);
+  } finally {
+    loading.value = false;
+  }
+}
+function testSystemTurnAlerts() {
+  loading.value = true;
+  try {
+    const alerts = systemTurnAlerts.value;
+    success.value = `Found ${alerts.length} system turn alerts across all properties`;
+    console.log('System Turn Alerts:', alerts);
+  } catch (err) {
+    error.value = 'Failed to get system turn alerts';
+    console.error('Error:', err);
+  } finally {
+    loading.value = false;
+  }
+}
+function testCleanerSchedules() {
+  loading.value = true;
+  try {
+    const schedules = cleanerSchedules.value;
+    const cleanerCount = Object.keys(schedules).length - 1; // Exclude 'unassigned'
+    success.value = `Retrieved schedules for ${cleanerCount} cleaners and ${schedules.unassigned?.length || 0} unassigned bookings`;
+    console.log('Cleaner Schedules:', schedules);
+  } catch (err) {
+    error.value = 'Failed to get cleaner schedules';
+    console.error('Error:', err);
+  } finally {
+    loading.value = false;
+  }
+}
+function testGetCleanerSchedule(cleanerId: string) {
+  loading.value = true;
+  try {
+    const schedule = getCleanerSchedule(cleanerId);
+    success.value = `Retrieved schedule for ${cleanerId}: ${schedule.bookings.length} bookings, ${schedule.metrics.totalHours}h total`;
+    console.log(`Schedule for ${cleanerId}:`, schedule);
+  } catch (err) {
+    error.value = `Failed to get schedule for ${cleanerId}`;
+    console.error('Error:', err);
+  } finally {
+    loading.value = false;
+  }
+}
+function testHandleAdminEventClick(event: any) {
+  loading.value = true;
+  try {
+    // Simulate event info object
+    const eventInfo = { event };
+    handleAdminEventClick(eventInfo);
+    console.log('Admin Event Click:', event);
+  } catch (err) {
+    error.value = 'Failed to handle admin event click';
+    console.error('Error:', err);
+  } finally {
+    loading.value = false;
+  }
+}
+function testAdvancedFiltering() {
+  loading.value = true;
+  try {
+    const results = filterByMultipleCriteria({
+      status: filterCriteria.value.status,
+      bookingType: filterCriteria.value.bookingType,
+      unassignedOnly: showUnassignedOnly.value,
+      overdueOnly: showOverdueOnly.value
+    });
+    filteredResults.value = results;
+    success.value = `Advanced filtering returned ${results.length} bookings`;
+    console.log('Filtered Results:', results);
+  } catch (err) {
+    error.value = 'Failed to apply advanced filtering';
+    console.error('Error:', err);
+  } finally {
+    loading.value = false;
+  }
+}
+function testFilterByMultipleCriteria() {
+  loading.value = true;
+  try {
+    // Test with various criteria
+    const testCriteria = {
+      status: ['pending', 'scheduled'] as BookingStatus[],
+      bookingType: ['turn'] as BookingType[],
+      unassignedOnly: true,
+      priorityOnly: true
+    };
+    const results = filterByMultipleCriteria(testCriteria);
+    success.value = `Multi-criteria filter test: ${results.length} urgent unassigned turn bookings found`;
+    console.log('Multi-criteria Filter Results:', results);
+  } catch (err) {
+    error.value = 'Failed to test multi-criteria filtering';
+    console.error('Error:', err);
+  } finally {
+    loading.value = false;
+  }
+}
+// Generate demo data on mount
+onMounted(async () => {
+  // Generate sample bookings and properties if stores are empty
+  if (bookingStore.bookings.size === 0) {
+    console.log('Generating demo data for admin calendar state testing...');
+    // This would typically be done by the stores themselves
+    // For demo purposes, we'll just log that data should be available
+    success.value = 'Demo initialized - Admin calendar state ready for testing';
+  }
+});
+</script>
+<style scoped>
+.gap-2 {
+  gap: 8px;
 }
 </style>
 `````
@@ -40445,6 +40324,147 @@ function filterBookings(criteria: {
 // Expose base composable functions for admin use
 `````
 
+## File: src/composables/admin/useAdminCalendarState.ts
+`````typescript
+import { ref, computed } from 'vue';
+import { useCalendarState } from '@/composables/shared/useCalendarState';
+import { useAuthStore } from '@/stores/auth';
+import { useBookingStore } from '@/stores/booking';
+import { usePropertyStore } from '@/stores/property';
+import { useUIStore } from '@/stores/ui';
+import type { Booking, BookingStatus, BookingType } from '@/types';
+/**
+ * Admin-specific calendar state composable
+ * Extends shared useCalendarState functionality with admin system-wide access
+ * 
+ * Key Features:
+ * - NO filtering - access ALL calendar events across all owners
+ * - Admin-specific calendar features (cleaner views, advanced filters)
+ * - System-wide calendar management
+ * - Cleaner assignment calendar logic
+ */
+export function useAdminCalendarState()
+⋮----
+// Get shared functionality and stores
+⋮----
+// Admin-specific state
+⋮----
+// Admin-specific calendar filters
+⋮----
+// Get current admin user ID
+⋮----
+// COMPUTED PROPERTIES - Admin system-wide data access (NO filtering)
+/**
+   * Get ALL bookings across all owners (no filtering)
+   * This is the key difference from owner version
+   */
+⋮----
+/**
+   * Get ALL properties across all owners (no filtering)
+   */
+⋮----
+/**
+   * Get system-wide turn alerts (all urgent turns across all properties)
+   */
+⋮----
+/**
+   * Get cleaner schedules (bookings grouped by cleaner)
+   */
+⋮----
+/**
+   * Get admin calendar events - format ALL bookings for calendar (no filtering)
+   */
+function getAdminCalendarEvents()
+⋮----
+// Apply admin-specific filters
+⋮----
+// Apply base calendar filtering
+⋮----
+// Convert to calendar events with admin-specific enhancements
+⋮----
+// Admin-specific color coding
+let backgroundColor = '#42A5F5'; // Default blue
+⋮----
+backgroundColor = '#E53935'; // Red for overdue
+⋮----
+backgroundColor = '#FF5722'; // Deep orange for turns
+⋮----
+backgroundColor = '#FFA726'; // Orange for unassigned
+⋮----
+// Status-based colors
+⋮----
+pending: '#FFA726',     // Orange
+scheduled: '#42A5F5',   // Blue
+in_progress: '#AB47BC', // Purple
+completed: '#66BB6A',   // Green
+cancelled: '#E53935'    // Red
+⋮----
+// Admin-specific title with more details
+⋮----
+/**
+   * Handle admin event click - admin booking management interface
+   */
+function handleAdminEventClick(eventInfo: any)
+⋮----
+// Open admin booking management modal with enhanced options
+⋮----
+/**
+   * Get specific cleaner's schedule
+   */
+function getCleanerSchedule(cleanerId: string)
+⋮----
+// Filter by current date range
+⋮----
+// Calculate cleaner metrics
+⋮----
+return total + (property?.cleaning_duration || 2); // Default 2 hours
+⋮----
+/**
+   * Advanced filtering with multiple criteria
+   */
+function filterByMultipleCriteria(criteria: {
+    status?: BookingStatus[];
+    bookingType?: BookingType[];
+    cleanerIds?: string[];
+    ownerIds?: string[];
+    propertyIds?: string[];
+    dateRange?: { start: string; end: string };
+    unassignedOnly?: boolean;
+    overdueOnly?: boolean;
+    priorityOnly?: boolean;
+})
+⋮----
+// Filter by status
+⋮----
+// Filter by booking type
+⋮----
+// Filter by cleaner
+⋮----
+// Filter by owner
+⋮----
+// Filter by property
+⋮----
+// Filter by date range
+⋮----
+// Filter unassigned only
+⋮----
+// Filter overdue only
+⋮----
+// Filter priority only (turns)
+⋮----
+/**
+   * Get calendar events with admin-specific formatting
+   */
+⋮----
+// Extend base calendar state
+⋮----
+// Admin-specific state
+⋮----
+// Admin-specific computed properties
+⋮----
+// Admin-specific functions
+`````
+
 ## File: src/composables/admin/useAdminProperties.ts
 `````typescript
 import { ref, computed } from 'vue';
@@ -40618,6 +40638,269 @@ function filterProperties(criteria: {
 // Admin-specific CRUD operations
 ⋮----
 // Admin-specific analytics and reporting
+`````
+
+## File: src/composables/admin/useCleanerManagement.ts
+`````typescript
+import { ref, computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/user';
+import { useBookingStore } from '@/stores/booking';
+import { usePropertyStore } from '@/stores/property';
+import type { User, Cleaner, UserRole } from '@/types';
+/**
+ * Admin-only cleaner management composable
+ * Provides comprehensive cleaner operations for business administration
+ * 
+ * Key Features:
+ * - Admin-only access with authentication checks
+ * - Cleaner profile management (CRUD operations)
+ * - Assignment and scheduling logic
+ * - Performance tracking and analytics
+ * - Availability management
+ * - System-wide cleaner insights
+ * 
+ * Security: Frontend filtering for UX - backend RLS needed for real security
+ */
+// Types for cleaner management
+export interface CleanerFormData {
+  name: string;
+  email: string;
+  skills: string[];
+  max_daily_bookings: number;
+  location?: {
+    lat: number;
+    lng: number;
+  };
+}
+export interface CleanerAvailability {
+  cleanerId: string;
+  date: string;
+  isAvailable: boolean;
+  currentBookings: number;
+  maxBookings: number;
+  conflictingBookings: string[];
+  recommendedTimeSlots: string[];
+}
+export interface CleanerPerformance {
+  cleanerId: string;
+  totalBookings: number;
+  completedBookings: number;
+  completionRate: number;
+  averageRating: number;
+  onTimePercentage: number;
+  totalRevenue: number;
+  averageCleaningTime: number;
+  skillUtilization: Record<string, number>;
+  monthlyTrends: {
+    month: string;
+    bookings: number;
+    revenue: number;
+    rating: number;
+  }[];
+}
+export interface CleanerWorkload {
+  cleanerId: string;
+  name: string;
+  currentBookings: number;
+  maxBookings: number;
+  utilizationRate: number;
+  todayBookings: number;
+  weekBookings: number;
+  upcomingBookings: number;
+  workloadStatus: 'light' | 'moderate' | 'heavy' | 'overloaded';
+}
+export function useCleanerManagement()
+⋮----
+// Get stores
+⋮----
+// Admin-specific state
+⋮----
+// Get current admin user ID
+⋮----
+// COMPUTED PROPERTIES - Admin system-wide cleaner access
+/**
+   * Get ALL cleaners in the system (admin-only access)
+   */
+⋮----
+// In a real app, this would come from a dedicated cleaners collection
+// For now, we'll simulate cleaner data based on user role
+⋮----
+/**
+   * Get available cleaners (not at max capacity)
+   */
+⋮----
+/**
+   * Get cleaners grouped by skills
+   */
+⋮----
+/**
+   * Get cleaner workload analysis
+   */
+⋮----
+/**
+   * Get system-wide cleaner metrics
+   */
+⋮----
+// ADMIN-SPECIFIC CRUD OPERATIONS
+/**
+   * Fetch all cleaners (admin-only operation)
+   */
+async function fetchCleaners(): Promise<boolean>
+⋮----
+// In a real app, this would make an API call to get all cleaners
+// For now, we simulate the call and use computed data
+⋮----
+/**
+   * Create new cleaner (admin-only operation)
+   */
+async function createCleaner(data: CleanerFormData): Promise<string | null>
+⋮----
+// Validate cleaner data
+⋮----
+// Check for duplicate email
+⋮----
+// In a real app, this would make an API call to create the cleaner
+⋮----
+/**
+   * Update cleaner profile (admin-only operation)
+   */
+async function updateCleaner(cleanerId: string, data: Partial<CleanerFormData>): Promise<boolean>
+⋮----
+// Find cleaner
+⋮----
+// Validate updates
+⋮----
+// Check if reducing capacity would affect existing assignments
+⋮----
+// In a real app, this would make an API call to update the cleaner
+⋮----
+/**
+   * Delete cleaner (admin-only operation with validation)
+   */
+async function deleteCleaner(cleanerId: string): Promise<boolean>
+⋮----
+// Find cleaner
+⋮----
+// Check for active assignments
+⋮----
+// In a real app, this would make an API call to delete the cleaner
+⋮----
+// ASSIGNMENT OPERATIONS
+/**
+   * Assign cleaner to booking (coordinates with useAdminBookings)
+   */
+async function assignCleanerToBooking(cleanerId: string, bookingId: string): Promise<boolean>
+⋮----
+// Find cleaner and booking
+⋮----
+// Check cleaner availability
+⋮----
+// In a real app, this would make an API call to assign the cleaner
+⋮----
+// Update booking in store (simulate the assignment)
+⋮----
+/**
+   * Unassign cleaner from booking
+   */
+async function unassignCleanerFromBooking(bookingId: string): Promise<boolean>
+⋮----
+// In a real app, this would make an API call to unassign the cleaner
+⋮----
+// Update booking in store (simulate the unassignment)
+⋮----
+/**
+   * Bulk assign cleaner to multiple bookings
+   */
+async function bulkAssignCleaner(cleanerId: string, bookingIds: string[]): Promise<
+// AVAILABILITY & SCHEDULING
+/**
+   * Get cleaner availability for a specific date
+   */
+async function getCleanerAvailability(cleanerId: string, date: string): Promise<CleanerAvailability>
+⋮----
+// Get bookings for the specified date
+⋮----
+// Generate recommended time slots (simplified)
+⋮----
+/**
+   * Get cleaner's schedule for a date range
+   */
+async function getCleanerSchedule(cleanerId: string, startDate: string, endDate: string)
+/**
+   * Find available cleaners for specific date and skills
+   */
+async function findAvailableCleaners(date: string, requiredSkills?: string[])
+⋮----
+// Filter by skills if specified
+⋮----
+// Sort by utilization rate (prefer less busy cleaners)
+⋮----
+// PERFORMANCE & ANALYTICS
+/**
+   * Get individual cleaner performance metrics
+   */
+async function getCleanerPerformance(cleanerId: string): Promise<CleanerPerformance>
+⋮----
+// Get all bookings for this cleaner
+⋮----
+// Simulate performance metrics (in real app, this would come from API)
+const averageRating = 4.2 + Math.random() * 0.6; // 4.2-4.8 range
+const onTimePercentage = 85 + Math.random() * 10; // 85-95% range
+const totalRevenue = completedBookings * (150 + Math.random() * 100); // $150-250 per booking
+const averageCleaningTime = 120 + Math.random() * 60; // 2-3 hours
+// Skill utilization
+⋮----
+// Monthly trends (last 6 months)
+⋮----
+/**
+   * Get system-wide cleaner analytics
+   */
+function getSystemCleanerAnalytics()
+⋮----
+// Performance distribution
+⋮----
+highPerformers: Math.round(metrics.totalCleaners * 0.3), // Top 30%
+averagePerformers: Math.round(metrics.totalCleaners * 0.5), // Middle 50%
+needsImprovement: Math.round(metrics.totalCleaners * 0.2) // Bottom 20%
+⋮----
+// Capacity analysis
+⋮----
+peakCapacityDays: ['Monday', 'Friday', 'Saturday'], // Typical peak days
+⋮----
+// Skill gap analysis
+⋮----
+/**
+   * Get cleaner utilization report
+   */
+function getCleanerUtilization()
+// UTILITY FUNCTIONS
+/**
+   * Clear all state (for cleanup)
+   */
+function clearState()
+/**
+   * Get cleaner by ID
+   */
+function getCleanerById(cleanerId: string): Cleaner | undefined
+/**
+   * Get cleaners by skill
+   */
+function getCleanersBySkill(skill: string): Cleaner[]
+⋮----
+// State
+⋮----
+// Computed properties
+⋮----
+// CRUD operations
+⋮----
+// Assignment operations
+⋮----
+// Availability & scheduling
+⋮----
+// Performance & analytics
+⋮----
+// Utility functions
 `````
 
 ## File: src/composables/owner/useOwnerBookings.ts
@@ -51519,7 +51802,10 @@ import type { User } from '@/types';
 ⋮----
 // State
 ⋮----
-// For development, set isAuthenticated to true by default
+// For development, authentication is based on whether we have a user
+// In production, this would validate the token
+⋮----
+// Role-specific computed properties for role-based routing
 ⋮----
 // Actions
 function login(email: string, _password: string)
@@ -51529,6 +51815,8 @@ function login(email: string, _password: string)
 // Simulate login success for now
 ⋮----
 // Mock successful login
+⋮----
+role: 'admin', // Default to admin for testing - can be changed to 'owner' for testing owner interface
 ⋮----
 function logout()
 function register(userData: Partial<User>)
@@ -51542,6 +51830,8 @@ function checkAuth()
 // In a real app, this would validate the token
 ⋮----
 // State
+⋮----
+// Role-specific computed properties
 ⋮----
 // Actions
 `````
@@ -53081,13 +53371,152 @@ onMounted(async () => {
 
 ## File: src/pages/index.vue
 `````vue
-<script setup lang="ts">
-import Home from '@/components/smart/Home.vue'
-</script>
 <template>
-  <Home />
+  <!-- Loading state while checking authentication -->
+  <div v-if="authStore.loading" class="loading-container">
+    <v-container class="fill-height">
+      <v-row justify="center" align="center">
+        <v-col cols="auto">
+          <v-progress-circular
+            indeterminate
+            size="64"
+            color="primary"
+          />
+          <div class="text-h6 mt-4 text-center">
+            Loading...
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+  <!-- Role-based component rendering -->
+  <component v-else :is="homeComponent" />
 </template>
+⋮----
+<!-- Loading state while checking authentication -->
+⋮----
+<!-- Role-based component rendering -->
+⋮----
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+// Role-based component imports
+import HomeOwner from '@/components/smart/owner/HomeOwner.vue'
+import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
+// Auth store
+const authStore = useAuthStore()
+// Simple auth prompt component for unauthenticated users
+const AuthPrompt = {
+  template: `
+    <v-container class="fill-height">
+      <v-row justify="center" align="center">
+        <v-col cols="12" sm="8" md="6" lg="4">
+          <v-card elevation="8" class="pa-4">
+            <v-card-title class="text-h5 text-center mb-4">
+              <v-icon class="mr-2" color="primary">mdi-login</v-icon>
+              Authentication Required
+            </v-card-title>
+            <v-card-text class="text-center">
+              <p class="text-body-1 mb-4">
+                Please log in to access the Property Cleaning Scheduler.
+              </p>
+              <v-alert
+                type="info"
+                variant="tonal"
+                class="mb-4"
+              >
+                <strong>Development Mode:</strong><br>
+                Authentication is currently mocked for development.
+                Click "Mock Login" to continue.
+              </v-alert>
+              <v-btn
+                color="primary"
+                size="large"
+                block
+                @click="handleMockLogin"
+                :loading="authStore.loading"
+              >
+                <v-icon class="mr-2">mdi-account-circle</v-icon>
+                Mock Login (Admin)
+              </v-btn>
+              <v-btn
+                color="secondary"
+                variant="outlined"
+                size="large"
+                block
+                class="mt-2"
+                @click="handleMockOwnerLogin"
+                :loading="authStore.loading"
+              >
+                <v-icon class="mr-2">mdi-home-account</v-icon>
+                Mock Login (Owner)
+              </v-btn>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  `,
+  setup() {
+    const handleMockLogin = async () => {
+      await authStore.login('admin@example.com', 'password')
+    }
+    const handleMockOwnerLogin = async () => {
+      // Temporarily set user as owner for testing
+      await authStore.login('owner@example.com', 'password')
+      if (authStore.user) {
+        authStore.user.role = 'owner'
+        authStore.user.name = 'Property Owner'
+      }
+    }
+    return {
+      authStore,
+      handleMockLogin,
+      handleMockOwnerLogin
+    }
+  }
+}
+/**
+ * Role-based component selection
+ * This implements the multi-tenant architecture pattern where:
+ * - Property owners see HomeOwner.vue (filtered to their data only)
+ * - Business admins see HomeAdmin.vue (access to all data)
+ * - Unauthenticated users see AuthPrompt
+ * 
+ * Note: This is frontend filtering for UX only, not security.
+ * Real security will be implemented with backend RLS in Phase 2.
+ */
+const homeComponent = computed(() => {
+  // Show auth prompt for unauthenticated users
+  if (!authStore.isAuthenticated) {
+    return AuthPrompt
+  }
+  // Show admin interface for admin users
+  if (authStore.isAdmin) {
+    return HomeAdmin
+  }
+  // Show owner interface for property owners
+  if (authStore.isOwner) {
+    return HomeOwner
+  }
+  // Fallback for unknown roles or edge cases
+  console.warn('Unknown user role:', authStore.user?.role)
+  return AuthPrompt
+})
+</script>
 <style scoped>
+.loading-container {
+  min-height: 100vh;
+}
+/* Ensure smooth transitions between components */
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
 </style>
 `````
 
@@ -57108,27 +57537,45 @@ import { createRouter, createWebHistory } from 'vue-router'
   - Assigned to: Cursor
 
 ### **Page Structure Updates**
-- [ ] **TASK-039R**: Implement role-based routing in pages/index.vue
-  - Status: Not Started
+- [x] **TASK-039R**: Implement role-based routing in pages/index.vue
+  - Status: Complete
   - Requirements:
-    - Check user role in `setup()` function
-    - Route to `HomeOwner.vue` if user role is 'owner'
-    - Route to `HomeAdmin.vue` if user role is 'admin' 
-    - Add fallback routing for unauthenticated users
-    - Implement proper loading state during role check
+    - ✅ Check user role in `setup()` function
+    - ✅ Route to `HomeOwner.vue` if user role is 'owner'
+    - ✅ Route to `HomeAdmin.vue` if user role is 'admin' 
+    - ✅ Add fallback routing for unauthenticated users
+    - ✅ Implement proper loading state during role check
+  - Implementation Details:
+    - Updated auth store with role-specific computed properties (isOwner, isAdmin, isCleaner)
+    - Implemented dynamic component rendering using computed property
+    - Added loading state with progress spinner during authentication check
+    - Created inline AuthPrompt component for unauthenticated users with mock login buttons
+    - Added proper TypeScript typing and error handling for edge cases
+    - Implemented smooth transitions between role-based components
+    - Added comprehensive documentation about frontend filtering vs backend security
   - Code Pattern:
     ```vue
     <template>
-      <component :is="homeComponent" />
+      <div v-if="authStore.loading" class="loading-container">
+        <!-- Loading spinner -->
+      </div>
+      <component v-else :is="homeComponent" />
     </template>
     <script setup>
     const homeComponent = computed(() => {
+      if (!authStore.isAuthenticated) return AuthPrompt;
       if (authStore.isAdmin) return HomeAdmin;
       if (authStore.isOwner) return HomeOwner;
-      return AuthLogin; // fallback
+      return AuthPrompt; // fallback
     });
     </script>
     ```
+  - Security Notes: Frontend filtering for UX only - backend RLS required for real security
+  - Testing: Mock login buttons allow testing both admin and owner interfaces
+  - Files Modified:
+    - `src/pages/index.vue` - Main role-based routing implementation
+    - `src/stores/auth.ts` - Added role-specific computed properties
+    - `src/composables/owner/useOwnerProperties.ts` - Fixed TypeScript errors
   - Assigned to: Cursor
 
 - [ ] **TASK-039S**: Create owner-specific pages structure

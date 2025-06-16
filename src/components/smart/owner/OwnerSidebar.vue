@@ -2,7 +2,7 @@
   <v-navigation-drawer
     class="owner-sidebar"
     width="100%"
-    elevation="30"
+    :elevation="8"
     color="tertiary"
   >                                   
     <v-container class="py-2">
@@ -136,9 +136,9 @@
 
       <!-- Loading Overlay -->
       <v-overlay 
-        v-show="loading"
-        contained
-        persistent
+        :model-value="loading"
+        :contained="true"
+        :persistent="true"
         class="align-center justify-center"
       >
         <v-progress-circular

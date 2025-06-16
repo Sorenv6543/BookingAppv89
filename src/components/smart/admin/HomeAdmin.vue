@@ -989,19 +989,22 @@ onUnmounted(() => {
 
 <style scoped>
 .home-admin-container {
-  height: 100vh;
+  /* Remove fixed height to work with Vuetify layout */
+  min-height: calc(100vh - 64px); /* Account for app bar */
   overflow: hidden;
 }
 
 .sidebar-column {
-  height: 100vh;
+  /* Use min-height instead of fixed height */
+  min-height: calc(100vh - 64px);
   overflow-y: auto;
   border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   background-color: rgb(var(--v-theme-surface));
 }
 
 .calendar-column {
-  height: 100vh;
+  /* Use min-height instead of fixed height */
+  min-height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1045,12 +1048,13 @@ onUnmounted(() => {
 @media (max-width: 1024px) {
   .sidebar-column {
     position: fixed;
-    top: 0;
+    top: 64px; /* Account for app bar */
     left: 0;
     z-index: 1000;
     width: 100% !important;
     max-width: 400px;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    height: calc(100vh - 64px); /* Account for app bar */
   }
   
   .mobile-hidden {

@@ -1,16 +1,19 @@
 <template>
-  <div class="admin-page">
-    <h1>Admin Dashboard</h1>
-    <p>Admin controls and settings will be implemented here.</p>
+  <div class="admin-dashboard">
+    <HomeAdmin />
   </div>
 </template>
 
 <script setup lang="ts">
-// Admin page component
+import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
+
+// Admin dashboard page - uses HomeAdmin.vue as the main interface
+// This provides system-wide overview, metrics, and quick actions for business management
 </script>
 
 <style scoped>
-.admin-page {
-  padding: 1rem;
+.admin-dashboard {
+  /* Remove height constraint to work better with Vuetify layout */
+  width: 100%;
 }
 </style> 

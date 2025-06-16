@@ -474,7 +474,7 @@
     <v-row>
       <v-col cols="12">
         <v-alert
-          v-if="success"
+          v-if="success || composableSuccess"
           type="success"
           variant="outlined"
           closable
@@ -482,11 +482,11 @@
           class="mb-4"
         >
           <v-icon start>mdi-check-circle</v-icon>
-          {{ success }}
+          {{ success || composableSuccess }}
         </v-alert>
         
         <v-alert
-          v-if="error"
+          v-if="error || composableError"
           type="error"
           variant="outlined"
           closable
@@ -494,7 +494,7 @@
           class="mb-4"
         >
           <v-icon start>mdi-alert-circle</v-icon>
-          {{ error }}
+          {{ error || composableError }}
         </v-alert>
       </v-col>
     </v-row>
@@ -510,8 +510,8 @@ import type { PricingTier } from '@/types';
 const {
   // State
   loading,
-  error,
-  success,
+  error: composableError,
+  success: composableSuccess,
   
   // System-wide data (no filtering)
   allProperties,
@@ -536,6 +536,8 @@ const filterCriteria = ref({
   active: null as boolean | null
 });
 const filteredResults = ref<any[]>([]);
+const error = ref<string | null>(null);
+const success = ref<string | null>(null);
 
 // Computed properties for demo display
 const utilizationItems = computed(() => {

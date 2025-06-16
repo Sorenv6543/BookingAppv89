@@ -183,7 +183,7 @@ interface Props {
   variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   loading: false,
   disabled: false,
   elevation: 2,

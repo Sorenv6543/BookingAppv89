@@ -553,7 +553,7 @@ const handleEscalateAll = () => {
   }
 }
 
-const handleAutoRefreshToggle = (enabled: boolean) => {
+const handleAutoRefreshToggle = (enabled: boolean | null) => {
   if (enabled) {
     startAutoRefresh()
   } else {
@@ -634,5 +634,8 @@ watch(autoRefresh, (enabled) => {
 .turn-item:hover {
   background-color: rgb(var(--v-theme-surface-variant), 0.5);
 }
+ 
+
+
+
 </style>
-</rewritten_file>

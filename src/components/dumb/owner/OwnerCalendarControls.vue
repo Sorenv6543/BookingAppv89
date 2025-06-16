@@ -277,7 +277,7 @@ const currentDateSubtitle = computed(() => {
 })
 
 const propertyFilterItems = computed(() => {
-  const items = [
+  const items: { title: string; value: string | null }[] = [
     { title: 'All Properties', value: null }
   ]
   

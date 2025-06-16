@@ -11,21 +11,57 @@ const router = createRouter({
         layout: 'default'
       }
     },
+    // Owner-specific routes
+    {
+      path: '/owner/dashboard',
+      name: 'owner-dashboard',
+      component: () => import('@/pages/owner/dashboard.vue'),
+      meta: {
+        layout: 'default',
+        requiresAuth: true,
+        role: 'owner'
+      }
+    },
+    {
+      path: '/owner/properties',
+      name: 'owner-properties',
+      component: () => import('@/pages/owner/properties/index.vue'),
+      meta: {
+        layout: 'default',
+        requiresAuth: true,
+        role: 'owner'
+      }
+    },
+    {
+      path: '/owner/calendar',
+      name: 'owner-calendar',
+      component: () => import('@/pages/owner/calendar.vue'),
+      meta: {
+        layout: 'default',
+        requiresAuth: true,
+        role: 'owner'
+      }
+    },
+    {
+      path: '/owner/bookings',
+      name: 'owner-bookings',
+      component: () => import('@/pages/owner/bookings/index.vue'),
+      meta: {
+        layout: 'default',
+        requiresAuth: true,
+        role: 'owner'
+      }
+    },
+    // Legacy routes (redirect to owner-specific routes)
     {
       path: '/properties',
       name: 'properties',
-      component: () => import('@/pages/properties/index.vue'),
-      meta: {
-        layout: 'default'
-      }
+      redirect: '/owner/properties'
     },
     {
       path: '/calendar',
       name: 'calendar',
-      component: () => import('@/pages/calendar/index.vue'),
-      meta: {
-        layout: 'default'
-      }
+      redirect: '/owner/calendar'
     },
     {
       path: '/admin',
@@ -33,6 +69,56 @@ const router = createRouter({
       component: () => import('@/pages/admin/index.vue'),
       meta: {
         layout: 'admin'
+      }
+    },
+    {
+      path: '/admin/schedule',
+      name: 'admin-schedule',
+      component: () => import('@/pages/admin/schedule/index.vue'),
+      meta: {
+        layout: 'admin',
+        requiresAuth: true,
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/cleaners',
+      name: 'admin-cleaners',
+      component: () => import('@/pages/admin/cleaners/index.vue'),
+      meta: {
+        layout: 'admin',
+        requiresAuth: true,
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/properties',
+      name: 'admin-properties',
+      component: () => import('@/pages/admin/properties/index.vue'),
+      meta: {
+        layout: 'admin',
+        requiresAuth: true,
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/bookings',
+      name: 'admin-bookings',
+      component: () => import('@/pages/admin/bookings/index.vue'),
+      meta: {
+        layout: 'admin',
+        requiresAuth: true,
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/reports',
+      name: 'admin-reports',
+      component: () => import('@/pages/admin/reports/index.vue'),
+      meta: {
+        layout: 'admin',
+        requiresAuth: true,
+        role: 'admin'
       }
     },
     // Testing routes

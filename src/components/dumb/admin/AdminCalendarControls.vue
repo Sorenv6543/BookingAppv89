@@ -407,7 +407,7 @@ interface Emits {
   'bulk-assign': []
   'bulk-status-update': []
   'bulk-delete': []
-  'real-time-toggle': [enabled: boolean]
+  'real-time-toggle': [enabled: boolean | null]
 }
 
 const emit = defineEmits<Emits>()
@@ -571,7 +571,7 @@ const handleBulkDelete = () => {
   emit('bulk-delete')
 }
 
-const handleRealTimeToggle = (enabled: boolean) => {
+const handleRealTimeToggle = (enabled: boolean | null) => {
   emit('real-time-toggle', enabled)
 }
 
@@ -659,9 +659,11 @@ watch(() => props.currentDate, (newDate) => {
   background-color: rgb(var(--v-theme-surface-variant));
 }
 
-.v-btn-toggle {
+.v-btn-toggle { 
   width: 100%;
 }
 
 .v-btn-toggle .v-btn {
- 
+  flex: 1;
+}
+</style>

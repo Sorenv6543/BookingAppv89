@@ -27,7 +27,9 @@ export default defineConfig({
       '@layouts': path.resolve(__dirname, './src/layouts'),
       '@pages': path.resolve(__dirname, './src/pages'),
       '@plugins': path.resolve(__dirname, './src/plugins'),
-      '@assets': path.resolve(__dirname, './src/assets')
+      '@assets': path.resolve(__dirname, './src/assets'),
+      // Fix Vue runtime compilation warning by using full build with template compiler
+      'vue': 'vue/dist/vue.esm-bundler.js'
     }
   },
   server: {

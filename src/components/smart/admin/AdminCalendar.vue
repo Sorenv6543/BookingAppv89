@@ -150,7 +150,16 @@
       elevation="2"
       class="admin-calendar-card"
     >
+      <div v-if="!isMounted || !isCalendarReady" class="calendar-loading">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="64"
+        />
+        <p class="text-center mt-4">Loading calendar...</p>
+      </div>
       <FullCalendar
+        v-else
         ref="calendarRef"
         :options="adminCalendarOptions"
         class="admin-calendar"
@@ -245,7 +254,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
-import { computed, ref, watch, nextTick } from 'vue';
+import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useTheme } from 'vuetify';
 import type { Booking, Property, User, Cleaner } from '@/types';
 
@@ -280,6 +289,10 @@ const emit = defineEmits<Emits>();
 // Theme integration
 const theme = useTheme();
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+
+// Component mounting state
+const isMounted = ref(false);
+const isCalendarReady = ref(false);
 
 // Admin calendar state
 const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('timeGridWeek');
@@ -456,12 +469,23 @@ const getAdminEventTextColor = (booking: Booking): string => {
 };
 
 // Admin-focused calendar configuration with advanced features
-const adminCalendarOptions = computed<CalendarOptions>(() => ({
-  plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+const adminCalendarOptions = computed<CalendarOptions>(() => {
+  // Don't return options until component is ready
+  if (!isMounted.value || !isCalendarReady.value) {
+    return {
+      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+      initialView: 'dayGridMonth',
+      headerToolbar: false,
+      events: []
+    };
+  }
   
-  // View settings - all views available for admin
-  initialView: currentView.value,
-  headerToolbar: false, // We handle toolbar externally
+  return {
+    plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+    
+    // View settings - all views available for admin
+    initialView: currentView.value,
+    headerToolbar: false, // We handle toolbar externally
   
   // Event settings
   events: adminCalendarEvents.value,
@@ -539,7 +563,8 @@ const adminCalendarOptions = computed<CalendarOptions>(() => ({
       showContextMenu(e, info.event.extendedProps.booking);
     });
   }
-}));
+  };
+});
 
 // Admin-specific event handlers
 const handleAdminDateSelect = (selectInfo: DateSelectArg): void => {
@@ -886,12 +911,48 @@ defineExpose({
   refreshEvents,
   getApi: () => calendarRef.value?.getApi()
 });
+
+// Lifecycle hooks for proper DOM mounting
+onMounted(async () => {
+  isMounted.value = true;
+  
+  // Wait for DOM to be fully ready
+  await nextTick();
+  
+  // Add a small delay to ensure Vuetify layout is ready
+  setTimeout(() => {
+    isCalendarReady.value = true;
+  }, 100);
+});
+
+onBeforeUnmount(() => {
+  // Clean up calendar instance if needed
+  if (calendarRef.value) {
+    try {
+      const calendarApi = calendarRef.value.getApi();
+      if (calendarApi) {
+        calendarApi.destroy();
+      }
+    } catch (error) {
+      console.warn('Error cleaning up calendar:', error);
+    }
+  }
+});
 </script>
 
 <style scoped>
 .admin-calendar-container {
   height: 100%;
   width: 100%;
+}
+
+.calendar-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  min-height: 400px;
 }
 
 .admin-calendar-toolbar {
