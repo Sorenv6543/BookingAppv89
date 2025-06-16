@@ -128,6 +128,14 @@ const router = createRouter({
         layout: 'default'
       }
     },
+    {
+      path: '/demos/use-admin-calendar-state',
+      name: 'use-admin-calendar-state-demo',
+      component: () => import('@/components/smart/admin/UseAdminCalendarStateDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
 
 
     {

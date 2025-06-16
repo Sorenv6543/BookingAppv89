@@ -617,58 +617,124 @@
   - Notes: Successfully implemented admin-specific property management that provides access to ALL data across all clients. Includes comprehensive analytics, bulk operations, and business insights for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminSidebar.vue.
   - Assigned to: Cursor
 
-- [ ] **TASK-039N**: Create useAdminCalendarState.ts composable
-  - Status: Not Started
+- [x] **TASK-039N**: Create useAdminCalendarState.ts composable
+  - Status: Complete
   - Requirements:
-    - Extend base `useCalendarState.ts` functionality
-    - No filtering - access ALL calendar events across all owners
-    - Add admin-specific calendar features (cleaner views, advanced filters)
-    - Implement system-wide calendar management
-    - Add cleaner assignment calendar logic
+    - ✅ Extend base `useCalendarState.ts` functionality
+    - ✅ No filtering - access ALL calendar events across all owners
+    - ✅ Add admin-specific calendar features (cleaner views, advanced filters)
+    - ✅ Implement system-wide calendar management
+    - ✅ Add cleaner assignment calendar logic
   - Functions:
-    - `getAdminCalendarEvents()` - format ALL bookings for calendar
-    - `handleAdminEventClick()` - admin booking management interface
-    - `getCleanerSchedule(cleanerId)` - view specific cleaner's schedule
-    - `getSystemTurnAlerts()` - all urgent turns across all properties
-    - `filterByMultipleCriteria()` - advanced admin filtering
+    - ✅ `getAdminCalendarEvents()` - format ALL bookings for calendar
+    - ✅ `handleAdminEventClick()` - admin booking management interface
+    - ✅ `getCleanerSchedule(cleanerId)` - view specific cleaner's schedule
+    - ✅ `getSystemTurnAlerts()` - all urgent turns across all properties
+    - ✅ `filterByMultipleCriteria()` - advanced admin filtering
+  - Implementation Details:
+    - Created comprehensive admin-specific calendar state composable extending shared useCalendarState
+    - NO filtering - accesses ALL calendar events across all owners (key difference from owner version)
+    - Added admin-specific computed properties: allBookings, allProperties, systemTurnAlerts, cleanerSchedules
+    - Implemented admin calendar functions: getAdminCalendarEvents(), handleAdminEventClick(), getCleanerSchedule(), filterByMultipleCriteria()
+    - Added admin-specific event formatting with enhanced color coding and titles
+    - Implemented system-wide turn alerts with priority calculation and property details
+    - Added cleaner schedule management with metrics calculation
+    - Created comprehensive demo component `UseAdminCalendarStateDemo.vue`
+    - Added demo route `/demos/use-admin-calendar-state` for testing
+    - Follows Map collection patterns and proper TypeScript interfaces
+    - Extends shared composable using composition pattern
+    - All functions work with system-wide data scope for business admin interface
+  - Files Created:
+    - `src/composables/admin/useAdminCalendarState.ts` - Main admin calendar state composable
+    - `src/components/smart/admin/UseAdminCalendarStateDemo.vue` - Demo component with testing interface
+  - Demo Route: `/demos/use-admin-calendar-state`
+  - Notes: Successfully implemented admin-specific calendar state management that provides access to ALL data across all clients. Includes comprehensive calendar event formatting, system-wide turn alerts, cleaner schedule management, and advanced filtering capabilities for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminCalendar.vue.
   - Assigned to: Cursor
 
-- [ ] **TASK-039O**: Create useCleanerManagement.ts composable (Admin-only)
-  - Status: Not Started
+- [x] **TASK-039O**: Create useCleanerManagement.ts composable (Admin-only)
+  - Status: Complete
   - Requirements:
     - New admin-only composable for cleaner operations
     - Manage cleaner profiles, availability, and assignments
     - Implement cleaner scheduling logic
     - Add cleaner performance tracking
   - Functions:
-    - `fetchCleaners()` - get all cleaner profiles
-    - `createCleaner(data)` - add new cleaner
-    - `updateCleaner(id, data)` - update cleaner profile
-    - `assignCleanerToBooking(cleanerId, bookingId)` - make assignment
-    - `getCleanerAvailability(cleanerId, date)` - check availability
-    - `getCleanerPerformance(cleanerId)` - performance metrics
+    - `fetchCleaners()` - get all cleaner profiles ✅
+    - `createCleaner(data)` - add new cleaner ✅
+    - `updateCleaner(id, data)` - update cleaner profile ✅
+    - `assignCleanerToBooking(cleanerId, bookingId)` - make assignment ✅
+    - `getCleanerAvailability(cleanerId, date)` - check availability ✅
+    - `getCleanerPerformance(cleanerId)` - performance metrics ✅
+  - Implementation Notes:
+    - Created comprehensive admin-only composable with 935 lines of code
+    - Includes all required functions plus additional admin features:
+      - `deleteCleaner()` - remove cleaner profiles
+      - `unassignCleanerFromBooking()` - remove cleaner assignments
+      - `bulkAssignCleaner()` - bulk assignment operations
+      - `getCleanerSchedule()` - detailed schedule management
+      - `findAvailableCleaners()` - availability search with skill filtering
+      - `getSystemCleanerAnalytics()` - comprehensive business analytics
+      - `getCleanerUtilization()` - utilization reports and recommendations
+    - Follows role-based architecture patterns:
+      - Admin-only access with authentication validation
+      - System-wide data access (no owner filtering)
+      - Integration with existing stores (user, booking, property)
+      - Business impact error messaging
+      - Mock cleaner data for development (5 cleaners with different skills)
+    - TypeScript interfaces for all data structures:
+      - `CleanerFormData` - form input validation
+      - `CleanerAvailability` - availability checking
+      - `CleanerPerformance` - performance metrics
+      - `CleanerWorkload` - workload analysis
+    - Advanced features:
+      - Skill-based cleaner grouping and filtering
+      - Workload analysis with utilization tracking
+      - Performance analytics with monthly trends
+      - System-wide cleaner metrics and recommendations
+      - Conflict detection and availability management
+    - Ready for integration with admin components and pages
   - Assigned to: Cursor
 
 ### **Dumb Component Updates**
-- [ ] **TASK-039P**: Create owner-specific dumb components
-  - Status: Not Started
+- [x] **TASK-039P**: Create owner-specific dumb components
+  - Status: Complete
   - Requirements:
-    - Create `components/dumb/owner/OwnerBookingForm.vue` - simplified booking form
-    - Create `components/dumb/owner/OwnerPropertyForm.vue` - simplified property form
-    - Create `components/dumb/owner/OwnerQuickActions.vue` - owner action buttons
-    - Create `components/dumb/owner/OwnerCalendarControls.vue` - basic calendar controls
-  - Notes: Simplified versions focused on owner needs, no admin features
+    - ✅ Create `components/dumb/owner/OwnerBookingForm.vue` - simplified booking form
+    - ✅ Create `components/dumb/owner/OwnerPropertyForm.vue` - simplified property form
+    - ✅ Create `components/dumb/owner/OwnerQuickActions.vue` - owner action buttons
+    - ✅ Create `components/dumb/owner/OwnerCalendarControls.vue` - basic calendar controls
+  - Implementation Details:
+    - **OwnerBookingForm.vue**: Simplified booking form with owner-friendly language, auto-detection of turn bookings, mobile-optimized layout, removed admin features (cleaner assignment, advanced status management)
+    - **OwnerPropertyForm.vue**: Streamlined property form with basic property details (bedrooms, bathrooms, property type), simplified service level selection, owner-friendly validation messages
+    - **OwnerQuickActions.vue**: Mobile-first quick action buttons with primary actions (Schedule Cleaning, Add Property) and secondary actions (View Calendar, My Properties), collapsible additional actions
+    - **OwnerCalendarControls.vue**: Basic calendar navigation and view controls (month/week/day), property filtering, booking type filtering, mobile-responsive design with collapsible secondary controls
+  - Technical Features:
+    - All components use Vue 3 Composition API with TypeScript
+    - Vuetify 3 components with Material Design icons
+    - Mobile-first responsive design with breakpoint optimizations
+    - Consistent prop/emit patterns following project conventions
+    - Owner-specific language and simplified UX (no technical jargon)
+    - Error handling with user-friendly messages
+    - Form validation with appropriate rules for property owners
+  - Notes: Successfully created simplified versions focused on owner needs, removing all admin features while maintaining core functionality. Components are ready for integration with owner-specific smart components and composables.
   - Assigned to: Cursor
 
-- [ ] **TASK-039Q**: Create admin-specific dumb components
-  - Status: Not Started
+- [x] **TASK-039Q**: Create admin-specific dumb components
+  - Status: Complete
   - Requirements:
-    - Create `components/dumb/admin/AdminBookingForm.vue` - advanced booking form with cleaner assignment
-    - Create `components/dumb/admin/CleanerAssignmentModal.vue` - cleaner selection interface
-    - Create `components/dumb/admin/AdminCalendarControls.vue` - advanced calendar controls
-    - Create `components/dumb/admin/TurnPriorityPanel.vue` - system-wide turn management
-    - Create `components/dumb/admin/AdminQuickActions.vue` - admin action buttons
-  - Notes: Advanced versions with admin-specific features
+    - ✅ Create `components/dumb/admin/AdminBookingForm.vue` - advanced booking form with cleaner assignment
+    - ✅ Create `components/dumb/admin/CleanerAssignmentModal.vue` - cleaner selection interface
+    - ✅ Create `components/dumb/admin/AdminCalendarControls.vue` - advanced calendar controls
+    - ✅ Create `components/dumb/admin/TurnPriorityPanel.vue` - system-wide turn management
+    - ✅ Create `components/dumb/admin/AdminQuickActions.vue` - admin action buttons
+  - Notes: All admin-specific dumb components implemented with advanced features:
+    - AdminBookingForm: Advanced booking form with cleaner assignment, status management, business impact alerts
+    - CleanerAssignmentModal: Comprehensive cleaner selection with availability, skills, conflict detection
+    - AdminCalendarControls: Advanced calendar controls with filtering, bulk operations, export functionality
+    - TurnPriorityPanel: System-wide turn management with priority queue and business impact indicators
+    - AdminQuickActions: Admin action buttons with critical actions, bulk operations, management tools, and quick stats
+    - Created AdminQuickActionsDemo.vue for testing and demonstration
+    - All components follow role-based architecture patterns with admin-specific language and functionality
   - Assigned to: Cursor
 
 ### **Page Structure Updates**
