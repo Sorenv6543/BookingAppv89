@@ -587,20 +587,34 @@
   - Notes: Successfully implemented admin-specific booking management that provides access to ALL data across all clients. Includes comprehensive analytics, bulk operations, and business insights for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminCalendar.vue.
   - Assigned to: Cursor
 
-- [ ] **TASK-039M**: Create useAdminProperties.ts composable
-  - Status: Not Started
+- [x] **TASK-039M**: Create useAdminProperties.ts composable
+  - Status: Complete
   - Requirements:
-    - Extend base `useProperties.ts` functionality  
-    - No filtering - access ALL properties across all owners
-    - Add admin analytics and reporting functions
-    - Implement system-wide property management
-    - Add bulk operations and advanced filtering
+    - ✅ Extend base `useProperties.ts` functionality  
+    - ✅ No filtering - access ALL properties across all owners
+    - ✅ Add admin analytics and reporting functions
+    - ✅ Implement system-wide property management
+    - ✅ Add bulk operations and advanced filtering
   - Functions:
-    - `fetchAllProperties()` - get ALL properties (no owner filter)
-    - `getPropertyAnalytics()` - system-wide property metrics
-    - `getPropertiesByOwner(ownerId)` - filter properties by specific owner
-    - `getPropertyUtilization()` - booking frequency per property
-    - `bulkUpdateProperties(propertyIds, updates)` - bulk property updates
+    - ✅ `fetchAllProperties()` - get ALL properties (no owner filter)
+    - ✅ `getPropertyAnalytics()` - system-wide property metrics
+    - ✅ `getPropertiesByOwner(ownerId)` - filter properties by specific owner
+    - ✅ `getPropertyUtilization()` - booking frequency per property
+    - ✅ `bulkUpdateProperties(propertyIds, updates)` - bulk property updates
+  - Implementation Details:
+    - Created comprehensive admin-specific property composable extending shared useProperties
+    - NO filtering - accesses ALL properties across all owners (key difference from owner version)
+    - Added admin-specific computed properties: allProperties, allActiveProperties, propertiesByOwner, propertiesByPricingTier, systemPropertyMetrics, propertyUtilizationData
+    - Implemented admin CRUD operations: fetchAllProperties(), getPropertiesByOwner(), bulkUpdateProperties(), bulkTogglePropertyStatus()
+    - Added system-wide analytics: getPropertyAnalytics(), getPropertyUtilization(), getOwnerPerformanceReport()
+    - Implemented advanced filtering with multiple criteria: filterProperties()
+    - Created demo component `UseAdminPropertiesDemo.vue` with comprehensive testing interface
+    - Added demo route `/demos/use-admin-properties` for testing
+    - Follows Map collection patterns and proper TypeScript interfaces
+    - Extends shared composable using composition pattern
+    - Includes admin-specific error messaging with business impact context
+    - All functions work with system-wide data scope for business admin interface
+  - Notes: Successfully implemented admin-specific property management that provides access to ALL data across all clients. Includes comprehensive analytics, bulk operations, and business insights for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminSidebar.vue.
   - Assigned to: Cursor
 
 - [ ] **TASK-039N**: Create useAdminCalendarState.ts composable

@@ -120,6 +120,14 @@ const router = createRouter({
         layout: 'default'
       }
     },
+    {
+      path: '/demos/use-admin-properties',
+      name: 'use-admin-properties-demo',
+      component: () => import('@/components/smart/admin/UseAdminPropertiesDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
 
 
     {
