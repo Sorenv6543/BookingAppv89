@@ -1,7 +1,7 @@
 > Read @project_summary.md and @tasks.md to understand **role-based multi-tenant architecture** and current task structure.
 > Check @repomix-output.md for current project state and existing implementations.
 
-## For each task:
+## For TASK-039M
 1. **Context First**: Use Context7 tool to research relevant documentation from @context7_techstack_ids.md before starting
 2. **Plan**: Use sequential thinking to break down the task and plan im*role-based considerations**
 3. **Implement**: Build the feature following established **role-based patterns** from @project_summary.md
@@ -10,8 +10,6 @@
 6. **Update**: Change task status from "Not Started" to "Complete" in tasks.md
 7. **Document**: Add detailed notes about implementation decisions, **role-specific features**, and any challenges
 8. **Verify**: Check off task with [x] and ensure it enables future dependent tasks
-
----
 
 ## Key Patterns to Follow:
 

@@ -3,7 +3,6 @@ import { useCalendarState } from '@/composables/shared/useCalendarState';
 import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useAuthStore } from '@/stores/auth';
 import { useUIStore } from '@/stores/ui';
-import type { Booking } from '@/types';
 
 /**
  * Owner-specific calendar state composable
@@ -138,25 +137,13 @@ export function useOwnerCalendarState() {
     
     if (ownerBookings.myProperties.value.length === 0) {
       ownerError.value = 'You need to add a property before creating bookings';
-      uiStore.openModal('property-form', { mode: 'create' });
+      uiStore.openModal('property-form', 'create');
       return;
     }
     
     try {
-      // Open booking form with owner's properties pre-filtered
-      const modalData = {
-        mode: 'create',
-        selectedDates: {
-          checkout_date: selectInfo.startStr,
-          checkin_date: selectInfo.endStr
-        },
-        availableProperties: myPropertyOptions.value,
-        // Pre-select property if owner has only one
-        defaultPropertyId: myPropertyOptions.value.length === 1 ? myPropertyOptions.value[0].id : null,
-        ownerMode: true
-      };
-      
-      uiStore.openModal('booking-form', modalData);
+      // Open booking form for creating new booking
+      uiStore.openModal('booking-form', 'create');
       ownerError.value = null;
       ownerSuccess.value = 'Select your property and booking details';
     } catch (error) {
@@ -183,15 +170,7 @@ export function useOwnerCalendarState() {
     
     try {
       // Open booking form in edit mode
-      const modalData = {
-        mode: 'edit',
-        bookingId: booking.id,
-        bookingData: booking,
-        availableProperties: myPropertyOptions.value,
-        ownerMode: true
-      };
-      
-      uiStore.openModal('booking-form', modalData);
+      uiStore.openModal('booking-form', 'edit');
       ownerError.value = null;
     } catch (error) {
       ownerError.value = 'Unable to edit booking. Please try again.';
@@ -329,7 +308,7 @@ export function useOwnerCalendarState() {
     return ownerBookings.myBookings.value.filter(booking => {
       if (booking.status !== 'completed') return false;
       
-      const completedDate = new Date(booking.updated_at);
+      const completedDate = new Date(booking.updated_at || booking.created_at || new Date().toISOString());
       return completedDate >= startOfMonth && completedDate <= endOfMonth;
     }).length;
   }

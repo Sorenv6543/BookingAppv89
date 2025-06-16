@@ -71,6 +71,14 @@ const router = createRouter({
         layout: 'default'
       }
     },
+    {
+      path: '/components/smart/admin/use-admin-bookings',
+      name: 'use-admin-bookings-demo',
+      component: () => import('@/components/smart/admin/UseAdminBookingsDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
 
     {
       path: '/components/smart/admin/admin-calendar',
@@ -100,6 +108,14 @@ const router = createRouter({
       path: '/demos/use-owner-properties',
       name: 'use-owner-properties-demo',
       component: () => import('@/components/demos/UseOwnerPropertiesDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
+      path: '/demos/use-owner-calendar-state',
+      name: 'use-owner-calendar-state-demo',
+      component: () => import('@/components/smart/owner/UseOwnerCalendarStateDemo.vue'),
       meta: {
         layout: 'default'
       }

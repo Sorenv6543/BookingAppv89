@@ -120,6 +120,7 @@ src/components/smart/admin/AdminSidebarDemo.vue
 src/components/smart/admin/HomeAdmin.vue
 src/components/smart/admin/HomeAdminDemo.vue
 src/components/smart/admin/README.md
+src/components/smart/admin/UseAdminBookingsDemo.vue
 src/components/smart/FullCalendar.vue
 src/components/smart/Home.vue
 src/components/smart/owner/HomeOwner.vue
@@ -134,6 +135,7 @@ src/components/smart/shared/README.md
 src/components/smart/Sidebar.vue
 src/components/smart/SidebarDemo.vue
 src/composables/admin/README.md
+src/composables/admin/useAdminBookings.ts
 src/composables/owner/README.md
 src/composables/owner/useOwnerBookings.ts
 src/composables/owner/useOwnerCalendarState.ts
@@ -186,780 +188,800 @@ vitest.config.ts
 
 # Files
 
-## File: src/components/smart/owner/UseOwnerCalendarStateDemo.vue
+## File: src/components/smart/admin/UseAdminBookingsDemo.vue
 `````vue
 <template>
-  <v-container fluid class="pa-4">
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-4">
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2" color="primary">mdi-calendar-account</v-icon>
-            useOwnerCalendarState Demo
-            <v-spacer />
-            <v-chip color="success" variant="outlined">
-              Owner Role
-            </v-chip>
-          </v-card-title>
-          <v-card-subtitle>
-            Testing owner-specific calendar state management with role-based data filtering
-          </v-card-subtitle>
-        </v-card>
-      </v-col>
-    </v-row>
-    <!-- Owner Calendar Stats -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-chart-box</v-icon>
-            {{ ownerCalendarTitle }}
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-primary">{{ calendarStats.totalProperties }}</div>
-                  <div class="text-caption">Properties</div>
-                </v-card>
-              </v-col>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-info">{{ calendarStats.totalBookings }}</div>
-                  <div class="text-caption">Bookings</div>
-                </v-card>
-              </v-col>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-error">{{ calendarStats.urgentTurns }}</div>
-                  <div class="text-caption">Urgent Turns</div>
-                </v-card>
-              </v-col>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-warning">{{ calendarStats.upcomingCleanings }}</div>
-                  <div class="text-caption">Upcoming</div>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <!-- Owner Turn Alerts -->
-      <v-col cols="12" md="6">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2" color="error">mdi-fire</v-icon>
-            My Turn Alerts
-            <v-chip class="ml-2" color="error" size="small">
-              {{ myTurnAlerts.length }}
-            </v-chip>
-          </v-card-title>
-          <v-card-text>
-            <div v-if="myTurnAlerts.length === 0" class="text-center text-medium-emphasis py-4">
-              <v-icon size="48" color="success">mdi-check-circle</v-icon>
-              <div class="mt-2">No urgent turns today!</div>
+  <div class="use-admin-bookings-demo">
+    <h1>useAdminBookings Composable Demo</h1>
+    <p class="demo-description">
+      Testing admin-specific booking composable with system-wide data access (NO filtering)
+    </p>
+    <!-- Loading and Error States -->
+    <div v-if="loading" class="loading">
+      Loading admin booking data...
+    </div>
+    <div v-if="error" class="error">
+      Error: {{ error }}
+    </div>
+    <div v-if="success" class="success">
+      Success: {{ success }}
+    </div>
+    <!-- System Metrics Dashboard -->
+    <section class="metrics-section">
+      <h2>System-Wide Metrics</h2>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <h3>Total Bookings</h3>
+          <div class="metric-value">{{ systemMetrics.total }}</div>
+        </div>
+        <div class="metric-card">
+          <h3>Turn Bookings</h3>
+          <div class="metric-value">{{ systemMetrics.turns }}</div>
+          <div class="metric-subtitle">{{ systemMetrics.turnPercentage }}% of total</div>
+        </div>
+        <div class="metric-card">
+          <h3>Urgent Turns Today</h3>
+          <div class="metric-value urgent">{{ systemMetrics.urgentTurns }}</div>
+        </div>
+        <div class="metric-card">
+          <h3>Unassigned</h3>
+          <div class="metric-value warning">{{ systemMetrics.unassigned }}</div>
+        </div>
+        <div class="metric-card">
+          <h3>Completion Rate</h3>
+          <div class="metric-value">{{ systemMetrics.completionRate }}%</div>
+        </div>
+      </div>
+    </section>
+    <!-- Admin Actions -->
+    <section class="actions-section">
+      <h2>Admin Actions</h2>
+      <div class="action-buttons">
+        <button @click="handleFetchAllBookings" :disabled="loading">
+          Fetch All Bookings
+        </button>
+        <button @click="handleTestCleanerAssignment" :disabled="loading">
+          Test Cleaner Assignment
+        </button>
+        <button @click="handleTestStatusUpdate" :disabled="loading">
+          Test Status Update
+        </button>
+        <button @click="handleTestBulkAssignment" :disabled="loading">
+          Test Bulk Assignment
+        </button>
+      </div>
+    </section>
+    <!-- System Turn Alerts -->
+    <section class="alerts-section">
+      <h2>System Turn Alerts</h2>
+      <div class="turn-alerts">
+        <div class="alert-summary">
+          <p><strong>Total:</strong> {{ turnAlerts.total }}</p>
+          <p><strong>Assigned:</strong> {{ turnAlerts.assigned }}</p>
+          <p><strong>Unassigned:</strong> {{ turnAlerts.unassigned }}</p>
+        </div>
+        <div v-if="turnAlerts.alerts.length > 0" class="alert-list">
+          <div 
+            v-for="alert in turnAlerts.alerts" 
+            :key="alert.id"
+            class="alert-item"
+            :class="alert.priority"
+          >
+            <div class="alert-info">
+              <strong>{{ alert.id.substring(0, 8) }}</strong>
+              <span>{{ alert.checkout_date }} → {{ alert.checkin_date }}</span>
+              <span class="status">{{ alert.status }}</span>
             </div>
-            <v-list v-else density="compact">
-              <v-list-item
-                v-for="alert in myTurnAlerts"
-                :key="alert.id"
-                class="mb-2"
-              >
-                <template #prepend>
-                  <v-avatar :color="getUrgencyColor(alert.urgencyLevel)" size="small">
-                    <v-icon color="white">mdi-fire</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title>{{ alert.alertMessage }}</v-list-item-title>
-                <v-list-item-subtitle>{{ alert.timeUntilCheckout }}</v-list-item-subtitle>
-                <template #append>
-                  <v-chip :color="getUrgencyColor(alert.urgencyLevel)" size="small">
-                    {{ alert.urgencyLevel }}
-                  </v-chip>
-                </template>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <!-- Property Filter Controls -->
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-filter</v-icon>
-            Property Filters
-          </v-card-title>
-          <v-card-text>
-            <v-row align="center">
-              <v-col cols="12" md="6">
-                <v-select
-                  v-model="selectedPropertyFilter"
-                  :items="propertyFilterOptions"
-                  item-title="name"
-                  item-value="id"
-                  label="Filter by Property"
-                  clearable
-                  prepend-icon="mdi-home"
-                  @update:model-value="handlePropertyFilterChange"
-                >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-icon :color="item.raw.active ? 'success' : 'warning'">
-                          {{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
-                        </v-icon>
-                      </template>
-                      <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                      <v-list-item-subtitle>{{ item.raw.address }}</v-list-item-subtitle>
-                    </v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-btn
-                  color="primary"
-                  variant="outlined"
-                  @click="clearOwnerPropertyFilters"
-                  :disabled="!selectedPropertyFilter"
-                >
-                  <v-icon class="mr-2">mdi-filter-off</v-icon>
-                  Clear Filters
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <!-- Calendar Events Preview -->
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-calendar-month</v-icon>
-            My Calendar Events
-            <v-chip class="ml-2" color="info" size="small">
-              {{ myCalendarEvents.length }}
-            </v-chip>
-          </v-card-title>
-          <v-card-text>
-            <div v-if="myCalendarEvents.length === 0" class="text-center text-medium-emphasis py-8">
-              <v-icon size="64" color="info">mdi-calendar-blank</v-icon>
-              <div class="mt-4 text-h6">No bookings found</div>
-              <div class="text-body-2">Add some properties and bookings to see them here</div>
+            <div class="alert-impact" :class="alert.assigned_cleaner_id ? 'assigned' : 'unassigned'">
+              {{ alert.businessImpact }}
             </div>
-            <v-row v-else>
-              <v-col
-                v-for="event in myCalendarEvents.slice(0, 6)"
-                :key="event.id"
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-card
-                  variant="outlined"
-                  :color="event.backgroundColor"
-                  class="mb-2"
-                  @click="simulateEventClick(event)"
-                >
-                  <v-card-text class="pa-3">
-                    <div class="d-flex align-center mb-2">
-                      <v-icon class="mr-2" color="white">
-                        {{ event.extendedProps.booking_type === 'turn' ? 'mdi-fire' : 'mdi-home-clean' }}
-                      </v-icon>
-                      <span class="text-white font-weight-bold">{{ event.title }}</span>
-                    </div>
-                    <div class="text-white text-caption mb-1">
-                      <v-icon size="small" class="mr-1">mdi-home</v-icon>
-                      {{ event.extendedProps.propertyName }}
-                    </div>
-                    <div class="text-white text-caption mb-1">
-                      <v-icon size="small" class="mr-1">mdi-calendar</v-icon>
-                      {{ formatEventDate(event.start) }}
-                    </div>
-                    <div class="text-white text-caption">
-                      <v-icon size="small" class="mr-1">mdi-information</v-icon>
-                      {{ event.extendedProps.status }}
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-btn
-              v-if="myCalendarEvents.length > 6"
-              color="primary"
-              variant="text"
-              class="mt-2"
-              @click="showAllEvents = !showAllEvents"
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Bookings by Status -->
+    <section class="status-section">
+      <h2>Bookings by Status (System-Wide)</h2>
+      <div class="status-grid">
+        <div 
+          v-for="(bookings, status) in bookingsByStatus" 
+          :key="status"
+          class="status-card"
+        >
+          <h3>{{ status.replace('_', ' ').toUpperCase() }}</h3>
+          <div class="status-count">{{ bookings.length }}</div>
+          <div class="status-list">
+            <div 
+              v-for="booking in bookings.slice(0, 3)" 
+              :key="booking.id"
+              class="booking-item"
             >
-              {{ showAllEvents ? 'Show Less' : `Show All ${myCalendarEvents.length} Events` }}
-            </v-btn>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <!-- Function Testing -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-function</v-icon>
-            Function Testing
-          </v-card-title>
-          <v-card-text>
-            <v-btn
-              color="primary"
-              variant="outlined"
-              class="mb-2 mr-2"
-              @click="testDateSelect"
-            >
-              <v-icon class="mr-2">mdi-calendar-plus</v-icon>
-              Test Date Select
-            </v-btn>
-            <v-btn
-              color="secondary"
-              variant="outlined"
-              class="mb-2 mr-2"
-              @click="testEventClick"
-            >
-              <v-icon class="mr-2">mdi-calendar-edit</v-icon>
-              Test Event Click
-            </v-btn>
-            <v-btn
-              color="info"
-              variant="outlined"
-              class="mb-2 mr-2"
-              @click="testValidateAccess"
-            >
-              <v-icon class="mr-2">mdi-shield-check</v-icon>
-              Test Access Validation
-            </v-btn>
-            <v-btn
-              color="warning"
-              variant="outlined"
-              class="mb-2"
-              @click="generateSampleData"
-            >
-              <v-icon class="mr-2">mdi-database-plus</v-icon>
-              Generate Sample Data
-            </v-btn>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <!-- Status Messages -->
-      <v-col cols="12" md="6">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-message</v-icon>
-            Status Messages
-          </v-card-title>
-          <v-card-text>
-            <v-alert
-              v-if="ownerError"
-              type="error"
-              variant="outlined"
-              class="mb-2"
-              closable
-              @click:close="ownerError = null"
-            >
-              {{ ownerError }}
-            </v-alert>
-            <v-alert
-              v-if="ownerSuccess"
-              type="success"
-              variant="outlined"
-              class="mb-2"
-              closable
-              @click:close="ownerSuccess = null"
-            >
-              {{ ownerSuccess }}
-            </v-alert>
-            <v-alert
-              v-if="!ownerError && !ownerSuccess"
-              type="info"
-              variant="outlined"
-            >
-              No messages. Try testing the functions above.
-            </v-alert>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <!-- Debug Information -->
-    <v-row>
-      <v-col cols="12">
-        <v-expansion-panels>
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              <v-icon class="mr-2">mdi-bug</v-icon>
-              Debug Information
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <h4>Current User</h4>
-                  <pre class="text-caption">{{ JSON.stringify(currentUser, null, 2) }}</pre>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <h4>Calendar State</h4>
-                  <pre class="text-caption">{{ JSON.stringify({
-                    currentView,
-                    currentDate: currentDate?.toISOString(),
-                    selectedPropertyIds: Array.from(selectedPropertyIds),
-                    showTurnBookings,
-                    showStandardBookings
-                  }, null, 2) }}</pre>
-                </v-col>
-              </v-row>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
-    </v-row>
-  </v-container>
+              {{ booking.id.substring(0, 8) }} - {{ booking.booking_type }}
+            </div>
+            <div v-if="bookings.length > 3" class="more-items">
+              +{{ bookings.length - 3 }} more
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Cleaner Workload Analysis -->
+    <section class="workload-section">
+      <h2>Cleaner Workload Analysis</h2>
+      <div class="workload-summary">
+        <p><strong>Total Cleaners:</strong> {{ cleanerAnalysis.totalCleaners }}</p>
+        <p><strong>Unassigned Bookings:</strong> {{ cleanerAnalysis.unassignedCount }}</p>
+        <p><strong>Average Workload Score:</strong> {{ cleanerAnalysis.averageWorkload.toFixed(1) }}</p>
+      </div>
+      <div class="cleaner-workloads">
+        <div 
+          v-for="(workload, cleanerId) in cleanerAnalysis.cleanerWorkloads" 
+          :key="cleanerId"
+          class="cleaner-card"
+        >
+          <h4>Cleaner {{ cleanerId.substring(0, 8) }}</h4>
+          <div class="workload-stats">
+            <span>Assigned: {{ workload.assigned }}</span>
+            <span>Completed: {{ workload.completed }}</span>
+            <span>Pending: {{ workload.pending }}</span>
+            <span class="workload-score">Score: {{ workload.workloadScore }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Property Utilization Report -->
+    <section class="utilization-section">
+      <h2>Property Utilization Report</h2>
+      <div class="utilization-summary">
+        <p><strong>Total Properties:</strong> {{ propertyReport.totalProperties }}</p>
+        <p><strong>Average Utilization:</strong> {{ propertyReport.averageUtilization.toFixed(1) }}%</p>
+        <p><strong>Average Turn Rate:</strong> {{ propertyReport.averageTurnRate.toFixed(1) }}%</p>
+      </div>
+      <div class="property-stats">
+        <div 
+          v-for="[propertyId, stats] in Object.entries(propertyReport.propertyStats).slice(0, 5)" 
+          :key="propertyId"
+          class="property-card"
+        >
+          <h4>Property {{ propertyId.substring(0, 8) }}</h4>
+          <div class="property-metrics">
+            <span>Total: {{ stats.totalBookings }}</span>
+            <span>Turns: {{ stats.turnBookings }}</span>
+            <span>Completed: {{ stats.completedBookings }}</span>
+            <span>Utilization: {{ stats.utilizationRate }}%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Advanced Filtering Demo -->
+    <section class="filtering-section">
+      <h2>Advanced Filtering Demo</h2>
+      <div class="filter-controls">
+        <label>
+          <input 
+            type="checkbox" 
+            v-model="filterCriteria.unassignedOnly"
+            @change="applyFilters"
+          >
+          Unassigned Only
+        </label>
+        <select v-model="filterCriteria.status" @change="applyFilters">
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
+        <select v-model="filterCriteria.bookingType" @change="applyFilters">
+          <option value="">All Types</option>
+          <option value="standard">Standard</option>
+          <option value="turn">Turn</option>
+        </select>
+      </div>
+      <div class="filtered-results">
+        <h3>Filtered Results: {{ filteredBookings.length }} bookings</h3>
+        <div class="booking-list">
+          <div 
+            v-for="booking in filteredBookings.slice(0, 10)" 
+            :key="booking.id"
+            class="booking-card"
+          >
+            <div class="booking-header">
+              <strong>{{ booking.id.substring(0, 8) }}</strong>
+              <span class="booking-type">{{ booking.booking_type }}</span>
+              <span class="booking-status">{{ booking.status }}</span>
+            </div>
+            <div class="booking-details">
+              <span>{{ booking.checkout_date }} → {{ booking.checkin_date }}</span>
+              <span>{{ booking.assigned_cleaner_id ? 'Assigned' : 'Unassigned' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Raw Data Display -->
+    <section class="data-section">
+      <h2>Raw Data (First 5 Bookings)</h2>
+      <pre class="data-display">{{ JSON.stringify(allBookings.slice(0, 5), null, 2) }}</pre>
+    </section>
+  </div>
 </template>
 ⋮----
-<!-- Owner Calendar Stats -->
+<!-- Loading and Error States -->
 ⋮----
-{{ ownerCalendarTitle }}
+Error: {{ error }}
 ⋮----
-<div class="text-h4 text-primary">{{ calendarStats.totalProperties }}</div>
+Success: {{ success }}
 ⋮----
-<div class="text-h4 text-info">{{ calendarStats.totalBookings }}</div>
+<!-- System Metrics Dashboard -->
 ⋮----
-<div class="text-h4 text-error">{{ calendarStats.urgentTurns }}</div>
+<div class="metric-value">{{ systemMetrics.total }}</div>
 ⋮----
-<div class="text-h4 text-warning">{{ calendarStats.upcomingCleanings }}</div>
+<div class="metric-value">{{ systemMetrics.turns }}</div>
+<div class="metric-subtitle">{{ systemMetrics.turnPercentage }}% of total</div>
 ⋮----
-<!-- Owner Turn Alerts -->
+<div class="metric-value urgent">{{ systemMetrics.urgentTurns }}</div>
 ⋮----
-{{ myTurnAlerts.length }}
+<div class="metric-value warning">{{ systemMetrics.unassigned }}</div>
 ⋮----
-<template #prepend>
-                  <v-avatar :color="getUrgencyColor(alert.urgencyLevel)" size="small">
-                    <v-icon color="white">mdi-fire</v-icon>
-                  </v-avatar>
-                </template>
-<v-list-item-title>{{ alert.alertMessage }}</v-list-item-title>
-<v-list-item-subtitle>{{ alert.timeUntilCheckout }}</v-list-item-subtitle>
-<template #append>
-                  <v-chip :color="getUrgencyColor(alert.urgencyLevel)" size="small">
-                    {{ alert.urgencyLevel }}
-                  </v-chip>
-                </template>
+<div class="metric-value">{{ systemMetrics.completionRate }}%</div>
 ⋮----
-{{ alert.urgencyLevel }}
+<!-- Admin Actions -->
 ⋮----
-<!-- Property Filter Controls -->
+<!-- System Turn Alerts -->
 ⋮----
-<template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-icon :color="item.raw.active ? 'success' : 'warning'">
-                          {{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
-                        </v-icon>
-                      </template>
-                      <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                      <v-list-item-subtitle>{{ item.raw.address }}</v-list-item-subtitle>
-                    </v-list-item>
-                  </template>
+<p><strong>Total:</strong> {{ turnAlerts.total }}</p>
+<p><strong>Assigned:</strong> {{ turnAlerts.assigned }}</p>
+<p><strong>Unassigned:</strong> {{ turnAlerts.unassigned }}</p>
 ⋮----
-<template #prepend>
-                        <v-icon :color="item.raw.active ? 'success' : 'warning'">
-                          {{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
-                        </v-icon>
-                      </template>
+<strong>{{ alert.id.substring(0, 8) }}</strong>
+<span>{{ alert.checkout_date }} → {{ alert.checkin_date }}</span>
+<span class="status">{{ alert.status }}</span>
 ⋮----
-{{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
+{{ alert.businessImpact }}
 ⋮----
-<v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-<v-list-item-subtitle>{{ item.raw.address }}</v-list-item-subtitle>
+<!-- Bookings by Status -->
 ⋮----
-<!-- Calendar Events Preview -->
+<h3>{{ status.replace('_', ' ').toUpperCase() }}</h3>
+<div class="status-count">{{ bookings.length }}</div>
 ⋮----
-{{ myCalendarEvents.length }}
+{{ booking.id.substring(0, 8) }} - {{ booking.booking_type }}
 ⋮----
-{{ event.extendedProps.booking_type === 'turn' ? 'mdi-fire' : 'mdi-home-clean' }}
++{{ bookings.length - 3 }} more
 ⋮----
-<span class="text-white font-weight-bold">{{ event.title }}</span>
+<!-- Cleaner Workload Analysis -->
 ⋮----
-{{ event.extendedProps.propertyName }}
+<p><strong>Total Cleaners:</strong> {{ cleanerAnalysis.totalCleaners }}</p>
+<p><strong>Unassigned Bookings:</strong> {{ cleanerAnalysis.unassignedCount }}</p>
+<p><strong>Average Workload Score:</strong> {{ cleanerAnalysis.averageWorkload.toFixed(1) }}</p>
 ⋮----
-{{ formatEventDate(event.start) }}
+<h4>Cleaner {{ cleanerId.substring(0, 8) }}</h4>
 ⋮----
-{{ event.extendedProps.status }}
+<span>Assigned: {{ workload.assigned }}</span>
+<span>Completed: {{ workload.completed }}</span>
+<span>Pending: {{ workload.pending }}</span>
+<span class="workload-score">Score: {{ workload.workloadScore }}</span>
 ⋮----
-{{ showAllEvents ? 'Show Less' : `Show All ${myCalendarEvents.length} Events` }}
+<!-- Property Utilization Report -->
 ⋮----
-<!-- Function Testing -->
+<p><strong>Total Properties:</strong> {{ propertyReport.totalProperties }}</p>
+<p><strong>Average Utilization:</strong> {{ propertyReport.averageUtilization.toFixed(1) }}%</p>
+<p><strong>Average Turn Rate:</strong> {{ propertyReport.averageTurnRate.toFixed(1) }}%</p>
 ⋮----
-<!-- Status Messages -->
+<h4>Property {{ propertyId.substring(0, 8) }}</h4>
 ⋮----
-{{ ownerError }}
+<span>Total: {{ stats.totalBookings }}</span>
+<span>Turns: {{ stats.turnBookings }}</span>
+<span>Completed: {{ stats.completedBookings }}</span>
+<span>Utilization: {{ stats.utilizationRate }}%</span>
 ⋮----
-{{ ownerSuccess }}
+<!-- Advanced Filtering Demo -->
 ⋮----
-<!-- Debug Information -->
+<h3>Filtered Results: {{ filteredBookings.length }} bookings</h3>
 ⋮----
-<pre class="text-caption">{{ JSON.stringify(currentUser, null, 2) }}</pre>
+<strong>{{ booking.id.substring(0, 8) }}</strong>
+<span class="booking-type">{{ booking.booking_type }}</span>
+<span class="booking-status">{{ booking.status }}</span>
 ⋮----
-<pre class="text-caption">{{ JSON.stringify({
-                    currentView,
-                    currentDate: currentDate?.toISOString(),
-                    selectedPropertyIds: Array.from(selectedPropertyIds),
-                    showTurnBookings,
-                    showStandardBookings
-                  }, null, 2) }}</pre>
+<span>{{ booking.checkout_date }} → {{ booking.checkin_date }}</span>
+<span>{{ booking.assigned_cleaner_id ? 'Assigned' : 'Unassigned' }}</span>
+⋮----
+<!-- Raw Data Display -->
+⋮----
+<pre class="data-display">{{ JSON.stringify(allBookings.slice(0, 5), null, 2) }}</pre>
 ⋮----
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useOwnerCalendarState } from '@/composables/owner/useOwnerCalendarState';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
-import { useAuthStore } from '@/stores/auth';
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
-// Get composables and stores
-const ownerCalendarState = useOwnerCalendarState();
-const ownerBookings = useOwnerBookings();
-const authStore = useAuthStore();
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
-// Destructure owner calendar state
+import { useAdminBookings } from '@/composables/admin/useAdminBookings';
+import type { BookingStatus, BookingType } from '@/types';
+// Use the admin bookings composable
 const {
-  // Computed properties
-  myCalendarEvents,
-  myTurnAlerts,
-  myPropertyOptions,
-  ownerCalendarTitle,
-  // Functions
-  getOwnerCalendarEvents,
-  handleOwnerDateSelect,
-  handleOwnerEventClick,
-  getOwnerTurnAlerts,
-  filterByOwnerProperty,
-  clearOwnerPropertyFilters,
-  validateOwnerBookingAccess,
-  getOwnerCalendarStats,
   // State
-  ownerError,
-  ownerLoading,
-  ownerSuccess,
-  // Base calendar state
-  currentView,
-  currentDate,
-  selectedPropertyIds,
-  showTurnBookings,
-  showStandardBookings
-} = ownerCalendarState;
-// Demo-specific state
-const selectedPropertyFilter = ref<string | null>(null);
-const showAllEvents = ref(false);
-// Computed properties
-const currentUser = computed(() => authStore.user);
-const calendarStats = computed(() => getOwnerCalendarStats());
-const propertyFilterOptions = computed(() => [
-  { id: 'all', name: 'All Properties', address: 'Show all properties', active: true },
-  ...myPropertyOptions.value
-]);
-// Methods
-function handlePropertyFilterChange(propertyId: string | null) {
-  if (!propertyId || propertyId === 'all') {
-    clearOwnerPropertyFilters();
-    selectedPropertyFilter.value = null;
-  } else {
-    filterByOwnerProperty(propertyId);
+  loading,
+  error,
+  success,
+  // Computed properties (system-wide, no filtering)
+  allBookings,
+  systemMetrics,
+  bookingsByStatus,
+  // Admin operations
+  fetchAllBookings,
+  assignCleaner,
+  updateBookingStatus,
+  bulkAssignCleaner,
+  // Analytics
+  getSystemTurnAlerts,
+  getCleanerWorkloadAnalysis,
+  getPropertyUtilizationReport,
+  // Advanced filtering
+  filterBookings
+} = useAdminBookings();
+// Demo state
+const filterCriteria = ref<{
+  unassignedOnly: boolean;
+  status: BookingStatus | '';
+  bookingType: BookingType | '';
+}>({
+  unassignedOnly: false,
+  status: '',
+  bookingType: ''
+});
+const filteredBookings = ref(allBookings.value);
+// Computed analytics
+const turnAlerts = computed(() => getSystemTurnAlerts());
+const cleanerAnalysis = computed(() => getCleanerWorkloadAnalysis());
+const propertyReport = computed(() => getPropertyUtilizationReport());
+// Demo action handlers
+async function handleFetchAllBookings() {
+  await fetchAllBookings();
+}
+async function handleTestCleanerAssignment() {
+  if (allBookings.value.length > 0) {
+    const firstBooking = allBookings.value[0];
+    const testCleanerId = 'test-cleaner-123';
+    await assignCleaner(firstBooking.id, testCleanerId);
   }
 }
-function simulateEventClick(event: any) {
-  const mockClickInfo = {
-    event: {
-      id: event.id,
-      title: event.title,
-      extendedProps: event.extendedProps
-    }
-  };
-  handleOwnerEventClick(mockClickInfo);
-}
-function testDateSelect() {
-  const mockSelectInfo = {
-    startStr: new Date().toISOString().split('T')[0],
-    endStr: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-  };
-  handleOwnerDateSelect(mockSelectInfo);
-}
-function testEventClick() {
-  if (myCalendarEvents.value.length > 0) {
-    simulateEventClick(myCalendarEvents.value[0]);
-  } else {
-    ownerError.value = 'No events available to test with';
+async function handleTestStatusUpdate() {
+  if (allBookings.value.length > 0) {
+    const firstBooking = allBookings.value[0];
+    await updateBookingStatus(firstBooking.id, 'scheduled');
   }
 }
-function testValidateAccess() {
-  if (myCalendarEvents.value.length > 0) {
-    const bookingId = myCalendarEvents.value[0].id;
-    const hasAccess = validateOwnerBookingAccess(bookingId);
-    ownerSuccess.value = `Access validation for booking ${bookingId}: ${hasAccess ? 'ALLOWED' : 'DENIED'}`;
-  } else {
-    ownerError.value = 'No bookings available to test access validation';
+async function handleTestBulkAssignment() {
+  const unassignedBookingIds = allBookings.value
+    .filter(b => !b.assigned_cleaner_id)
+    .slice(0, 3)
+    .map(b => b.id);
+  if (unassignedBookingIds.length > 0) {
+    const testCleanerId = 'bulk-test-cleaner-456';
+    await bulkAssignCleaner(unassignedBookingIds, testCleanerId);
   }
 }
-function generateSampleData() {
-  // Generate sample properties for current user
-  const userId = authStore.user?.id;
-  if (!userId) {
-    ownerError.value = 'Please log in to generate sample data';
-    return;
+function applyFilters() {
+  const criteria: any = {};
+  if (filterCriteria.value.unassignedOnly) {
+    criteria.unassignedOnly = true;
   }
-  // Add sample properties
-  const sampleProperties = [
-    {
-      id: `prop-${Date.now()}-1`,
-      owner_id: userId,
-      name: 'Sunset Villa',
-      address: '123 Ocean Drive, Miami, FL',
-      cleaning_duration: 120,
-      pricing_tier: 'premium' as const,
-      active: true,
-      special_instructions: 'Pool cleaning required',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: `prop-${Date.now()}-2`,
-      owner_id: userId,
-      name: 'Downtown Loft',
-      address: '456 Main Street, Austin, TX',
-      cleaning_duration: 90,
-      pricing_tier: 'basic' as const,
-      active: true,
-      special_instructions: 'High-rise building, use service elevator',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ];
-  sampleProperties.forEach(property => {
-    propertyStore.addProperty(property);
-  });
-  // Add sample bookings
-  const sampleBookings = [
-    {
-      id: `booking-${Date.now()}-1`,
-      property_id: sampleProperties[0].id,
-      owner_id: userId,
-      checkout_date: new Date().toISOString(),
-      checkin_date: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours later
-      booking_type: 'turn' as const,
-      status: 'pending' as const,
-      guest_count: 4,
-      notes: 'Same-day turn - urgent cleaning needed',
-      priority: 'urgent' as const,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: `booking-${Date.now()}-2`,
-      property_id: sampleProperties[1].id,
-      owner_id: userId,
-      checkout_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-      checkin_date: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(), // Day after tomorrow
-      booking_type: 'standard' as const,
-      status: 'scheduled' as const,
-      guest_count: 2,
-      notes: 'Standard cleaning between guests',
-      priority: 'standard' as const,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ];
-  sampleBookings.forEach(booking => {
-    bookingStore.addBooking(booking);
-  });
-  ownerSuccess.value = `Generated ${sampleProperties.length} properties and ${sampleBookings.length} bookings for testing`;
-}
-function getUrgencyColor(urgency: string): string {
-  switch (urgency) {
-    case 'critical': return 'error';
-    case 'high': return 'warning';
-    case 'medium': return 'info';
-    case 'low': return 'success';
-    default: return 'grey';
+  if (filterCriteria.value.status) {
+    criteria.status = [filterCriteria.value.status];
   }
-}
-function formatEventDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit'
-  });
+  if (filterCriteria.value.bookingType) {
+    criteria.bookingType = [filterCriteria.value.bookingType];
+  }
+  filteredBookings.value = filterBookings(criteria);
 }
 // Initialize demo
-onMounted(() => {
-  // Ensure user is logged in for demo
-  if (!authStore.user) {
-    authStore.login('owner@example.com', 'password');
-  }
+onMounted(async () => {
+  await handleFetchAllBookings();
+  applyFilters();
 });
 </script>
 <style scoped>
-.v-card {
-  transition: all 0.3s ease;
+.use-admin-bookings-demo {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
-.v-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.demo-description {
+  color: #666;
+  margin-bottom: 30px;
+  font-style: italic;
 }
-pre {
-  background-color: rgba(0, 0, 0, 0.05);
-  padding: 8px;
+.loading {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 10px;
   border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
+  margin-bottom: 20px;
+}
+.error {
+  background: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+.success {
+  background: #e8f5e8;
+  color: #2e7d32;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+section {
+  margin-bottom: 40px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+h2 {
+  color: #333;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+.metric-card {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  text-align: center;
+}
+.metric-value {
+  font-size: 2em;
+  font-weight: bold;
+  color: #007bff;
+}
+.metric-value.urgent {
+  color: #dc3545;
+}
+.metric-value.warning {
+  color: #ffc107;
+}
+.metric-subtitle {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+}
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button:hover {
+  background: #0056b3;
+}
+button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+.alert-summary {
+  background: #fff3cd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+.alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.alert-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 4px;
+  background: #f8f9fa;
+}
+.alert-item.urgent {
+  border-left: 4px solid #dc3545;
+}
+.alert-item.high {
+  border-left: 4px solid #ffc107;
+}
+.alert-impact.unassigned {
+  color: #dc3545;
+  font-weight: bold;
+}
+.alert-impact.assigned {
+  color: #28a745;
+}
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+.status-card {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+}
+.status-count {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #007bff;
+  margin: 10px 0;
+}
+.booking-item {
+  font-size: 0.9em;
+  color: #666;
+  margin: 2px 0;
+}
+.cleaner-workloads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+.cleaner-card {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+}
+.workload-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+}
+.workload-score {
+  font-weight: bold;
+  color: #007bff;
+}
+.property-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+.property-card {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+}
+.property-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+}
+.filter-controls {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.filter-controls label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.filter-controls select {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.booking-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+}
+.booking-card {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+}
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.booking-type {
+  background: #007bff;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+}
+.booking-status {
+  background: #28a745;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+}
+.booking-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9em;
+  color: #666;
+}
+.data-display {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.9em;
 }
 </style>
 `````
 
-## File: src/composables/owner/useOwnerCalendarState.ts
+## File: src/composables/admin/useAdminBookings.ts
 `````typescript
 import { ref, computed } from 'vue';
-import { useCalendarState } from '@/composables/shared/useCalendarState';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useBookings } from '@/composables/shared/useBookings';
 import { useAuthStore } from '@/stores/auth';
-import { useUIStore } from '@/stores/ui';
-import type { Booking } from '@/types';
+import { useBookingStore } from '@/stores/booking';
+import { usePropertyStore } from '@/stores/property';
+import type { Booking, BookingFormData, BookingStatus, BookingType } from '@/types';
 /**
- * Owner-specific calendar state composable
- * Extends shared useCalendarState functionality with owner data filtering
+ * Admin-specific booking composable
+ * Extends shared useBookings functionality with admin system-wide access
  * 
  * Key Features:
- * - All calendar events filtered to current owner's bookings only
- * - Owner-specific event handling (create/edit only owner's bookings)
- * - Simplified calendar controls (no admin features)
- * - Owner-scoped turn alerts and property filtering
- * - Owner-friendly error messages and validation
+ * - NO filtering - access ALL bookings across all owners (key difference from owner version)
+ * - Admin-specific functions (cleaner assignment, status management)
+ * - System-wide analytics and reporting
+ * - Bulk operations for managing multiple bookings
+ * - Advanced filtering and business insights
  */
-export function useOwnerCalendarState()
+export function useAdminBookings()
 ⋮----
 // Get shared functionality and stores
 ⋮----
-// Owner-specific state
+// Admin-specific state
 ⋮----
-// Get current user ID
+// Get current admin user ID
 ⋮----
-// OWNER-SPECIFIC COMPUTED PROPERTIES
+// COMPUTED PROPERTIES - Admin system-wide data access (NO filtering)
 /**
-   * Get calendar events for current owner's bookings only
+   * Get ALL bookings across all owners (no filtering)
+   * This is the key difference from owner version
    */
 ⋮----
 /**
-   * Get filtered bookings for current owner only
+   * Get ALL properties across all owners (no filtering)
    */
 ⋮----
 /**
-   * Get today's turn alerts for current owner only
+   * Get ALL turn bookings across all properties (system-wide)
    */
 ⋮----
 /**
-   * Get property options for current owner (for filtering)
+   * Get today's turn bookings across ALL properties (system-wide)
    */
 ⋮----
 /**
-   * Get owner-specific calendar title
+   * Get unassigned bookings across all properties
    */
-⋮----
-// OWNER-SPECIFIC FUNCTIONS
-/**
-   * Get calendar events formatted for owner's bookings only
-   */
-function getOwnerCalendarEvents(): any[]
-⋮----
-// Add owner-specific styling
-⋮----
-// Add owner-specific title prefix
-⋮----
-// Add owner-specific extended properties
 ⋮----
 /**
-   * Handle date selection for creating new owner booking
+   * Get bookings grouped by status (system-wide)
    */
-function handleOwnerDateSelect(selectInfo: any)
-⋮----
-// Open booking form with owner's properties pre-filtered
-⋮----
-// Pre-select property if owner has only one
 ⋮----
 /**
-   * Handle event click for editing owner's booking
+   * Get bookings grouped by owner (admin view of all clients)
    */
-function handleOwnerEventClick(clickInfo: any)
-⋮----
-// Open booking form in edit mode
 ⋮----
 /**
-   * Get owner's turn alerts with priority and timing information
+   * Get bookings grouped by cleaner (admin workload view)
    */
-function getOwnerTurnAlerts()
-⋮----
-canAssignCleaner: false, // Owners can't assign cleaners
 ⋮----
 /**
-   * Filter calendar by specific owner property
+   * Get system-wide metrics and analytics
    */
-function filterByOwnerProperty(propertyId: string)
 ⋮----
-// Validate property belongs to owner
+// ADMIN-SPECIFIC CRUD OPERATIONS
+/**
+   * Fetch ALL bookings (no owner filter) - admin system-wide access
+   */
+async function fetchAllBookings(): Promise<boolean>
 ⋮----
-// Use base calendar state's property filter
+// In a real app, this would make an API call to get all bookings
+// For now, we simulate the call and rely on store data
 ⋮----
 /**
-   * Clear all property filters for owner
+   * Assign cleaner to a booking (admin-only operation)
    */
-function clearOwnerPropertyFilters()
-/**
-   * Validate if owner can access a specific booking
-   */
-function validateOwnerBookingAccess(bookingId: string): boolean
-/**
-   * Get owner-specific calendar statistics
-   */
-function getOwnerCalendarStats()
-// HELPER FUNCTIONS
-/**
-   * Get property name by ID
-   */
-function getPropertyName(propertyId: string): string
-/**
-   * Calculate time until checkout
-   */
-function getTimeUntilCheckout(checkoutDate: string): string
-/**
-   * Calculate urgency level based on time until checkout
-   */
-function calculateUrgencyLevel(checkoutDate: string): 'low' | 'medium' | 'high' | 'critical'
+async function assignCleaner(bookingId: string, cleanerId: string): Promise<boolean>
 ⋮----
-if (diffHours < 0) return 'critical'; // Overdue
-if (diffHours < 2) return 'critical'; // Less than 2 hours
-if (diffHours < 4) return 'high';     // Less than 4 hours
-if (diffHours < 8) return 'medium';   // Less than 8 hours
-return 'low';                         // More than 8 hours
+// Check if booking exists
+⋮----
+// Use base composable's assign cleaner function
 ⋮----
 /**
-   * Get completed bookings count for current month
+   * Update booking status (admin workflow management)
    */
-function getCompletedThisMonth(): number
+async function updateBookingStatus(bookingId: string, status: BookingStatus): Promise<boolean>
 ⋮----
-// Inherit base calendar state functionality
+// Check if booking exists
 ⋮----
-// Owner-specific computed properties
+// Use base composable's status change function
 ⋮----
-// Owner-specific functions
+/**
+   * Bulk assign cleaner to multiple bookings (admin efficiency operation)
+   */
+async function bulkAssignCleaner(bookingIds: string[], cleanerId: string): Promise<
 ⋮----
-// Owner-specific state
+// Process each booking assignment
 ⋮----
-// Helper functions
+/**
+   * Bulk update status for multiple bookings (admin workflow management)
+   */
+async function bulkUpdateStatus(bookingIds: string[], status: BookingStatus): Promise<
+⋮----
+// Process each booking status update
+⋮----
+// ADMIN ANALYTICS AND REPORTING
+/**
+   * Get system-wide turn alerts (admin business impact view)
+   */
+function getSystemTurnAlerts()
+/**
+   * Get cleaner workload analysis (admin resource management)
+   */
+function getCleanerWorkloadAnalysis()
+⋮----
+const workloadScore = pending * 2 + assigned; // Weighted score for workload
+⋮----
+/**
+   * Get property utilization report (admin business insights)
+   */
+function getPropertyUtilizationReport()
+// ADVANCED FILTERING AND SEARCH
+/**
+   * Advanced filtering for admin interface (multiple criteria)
+   */
+function filterBookings(criteria: {
+    status?: BookingStatus[];
+    bookingType?: BookingType[];
+    ownerId?: string;
+    cleanerId?: string;
+    dateRange?: { start: string; end: string };
+    propertyId?: string;
+    unassignedOnly?: boolean;
+})
+⋮----
+// Status filter
+⋮----
+// Booking type filter
+⋮----
+// Owner filter
+⋮----
+// Cleaner filter
+⋮----
+// Unassigned filter
+⋮----
+// Date range filter
+⋮----
+// Property filter
+⋮----
+// Return admin-specific interface
+⋮----
+// State
+⋮----
+// Computed properties (system-wide, no filtering)
+⋮----
+// Admin CRUD operations
+⋮----
+// Analytics and reporting
+⋮----
+// Advanced filtering
+⋮----
+// Expose base composable functions for admin use
 `````
 
 ## File: .cursorignore
@@ -18579,7 +18601,7 @@ of the problem that so context 7 can search for correct combination of tech docu
 > Read @project_summary.md and @tasks.md to understand **role-based multi-tenant architecture** and current task structure.
 > Check @repomix-output.md for current project state and existing implementations.
 
-## For each task:
+## For TASK-039M
 1. **Context First**: Use Context7 tool to research relevant documentation from @context7_techstack_ids.md before starting
 2. **Plan**: Use sequential thinking to break down the task and plan im*role-based considerations**
 3. **Implement**: Build the feature following established **role-based patterns** from @project_summary.md
@@ -18588,8 +18610,6 @@ of the problem that so context 7 can search for correct combination of tech docu
 6. **Update**: Change task status from "Not Started" to "Complete" in tasks.md
 7. **Document**: Add detailed notes about implementation decisions, **role-specific features**, and any challenges
 8. **Verify**: Check off task with [x] and ensure it enables future dependent tasks
-
----
 
 ## Key Patterns to Follow:
 
@@ -32983,6 +33003,642 @@ Property owners are the primary users (30-40 clients) who need to:
 - Access simple, fast interfaces without business management complexity
 `````
 
+## File: src/components/smart/owner/UseOwnerCalendarStateDemo.vue
+`````vue
+<template>
+  <v-container fluid class="pa-4">
+    <v-row>
+      <v-col cols="12">
+        <v-card class="mb-4">
+          <v-card-title class="d-flex align-center">
+            <v-icon class="mr-2" color="primary">mdi-calendar-account</v-icon>
+            useOwnerCalendarState Demo
+            <v-spacer />
+            <v-chip color="success" variant="outlined">
+              Owner Role
+            </v-chip>
+          </v-card-title>
+          <v-card-subtitle>
+            Testing owner-specific calendar state management with role-based data filtering
+          </v-card-subtitle>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Owner Calendar Stats -->
+    <v-row>
+      <v-col cols="12" md="6">
+        <v-card class="mb-4">
+          <v-card-title>
+            <v-icon class="mr-2">mdi-chart-box</v-icon>
+            {{ ownerCalendarTitle }}
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols="6" sm="3">
+                <v-card variant="outlined" class="text-center pa-2">
+                  <div class="text-h4 text-primary">{{ calendarStats.totalProperties }}</div>
+                  <div class="text-caption">Properties</div>
+                </v-card>
+              </v-col>
+              <v-col cols="6" sm="3">
+                <v-card variant="outlined" class="text-center pa-2">
+                  <div class="text-h4 text-info">{{ calendarStats.totalBookings }}</div>
+                  <div class="text-caption">Bookings</div>
+                </v-card>
+              </v-col>
+              <v-col cols="6" sm="3">
+                <v-card variant="outlined" class="text-center pa-2">
+                  <div class="text-h4 text-error">{{ calendarStats.urgentTurns }}</div>
+                  <div class="text-caption">Urgent Turns</div>
+                </v-card>
+              </v-col>
+              <v-col cols="6" sm="3">
+                <v-card variant="outlined" class="text-center pa-2">
+                  <div class="text-h4 text-warning">{{ calendarStats.upcomingCleanings }}</div>
+                  <div class="text-caption">Upcoming</div>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <!-- Owner Turn Alerts -->
+      <v-col cols="12" md="6">
+        <v-card class="mb-4">
+          <v-card-title>
+            <v-icon class="mr-2" color="error">mdi-fire</v-icon>
+            My Turn Alerts
+            <v-chip class="ml-2" color="error" size="small">
+              {{ myTurnAlerts.length }}
+            </v-chip>
+          </v-card-title>
+          <v-card-text>
+            <div v-if="myTurnAlerts.length === 0" class="text-center text-medium-emphasis py-4">
+              <v-icon size="48" color="success">mdi-check-circle</v-icon>
+              <div class="mt-2">No urgent turns today!</div>
+            </div>
+            <v-list v-else density="compact">
+              <v-list-item
+                v-for="alert in myTurnAlerts"
+                :key="alert.id"
+                class="mb-2"
+              >
+                <template #prepend>
+                  <v-avatar :color="getUrgencyColor(alert.urgencyLevel)" size="small">
+                    <v-icon color="white">mdi-fire</v-icon>
+                  </v-avatar>
+                </template>
+                <v-list-item-title>{{ alert.alertMessage }}</v-list-item-title>
+                <v-list-item-subtitle>{{ alert.timeUntilCheckout }}</v-list-item-subtitle>
+                <template #append>
+                  <v-chip :color="getUrgencyColor(alert.urgencyLevel)" size="small">
+                    {{ alert.urgencyLevel }}
+                  </v-chip>
+                </template>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Property Filter Controls -->
+    <v-row>
+      <v-col cols="12">
+        <v-card class="mb-4">
+          <v-card-title>
+            <v-icon class="mr-2">mdi-filter</v-icon>
+            Property Filters
+          </v-card-title>
+          <v-card-text>
+            <v-row align="center">
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="selectedPropertyFilter"
+                  :items="propertyFilterOptions"
+                  item-title="name"
+                  item-value="id"
+                  label="Filter by Property"
+                  clearable
+                  prepend-icon="mdi-home"
+                  @update:model-value="handlePropertyFilterChange"
+                >
+                  <template #item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <template #prepend>
+                        <v-icon :color="item.raw.active ? 'success' : 'warning'">
+                          {{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
+                        </v-icon>
+                      </template>
+                      <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                      <v-list-item-subtitle>{{ item.raw.address }}</v-list-item-subtitle>
+                    </v-list-item>
+                  </template>
+                </v-select>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-btn
+                  color="primary"
+                  variant="outlined"
+                  @click="clearOwnerPropertyFilters"
+                  :disabled="!selectedPropertyFilter"
+                >
+                  <v-icon class="mr-2">mdi-filter-off</v-icon>
+                  Clear Filters
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Calendar Events Preview -->
+    <v-row>
+      <v-col cols="12">
+        <v-card class="mb-4">
+          <v-card-title>
+            <v-icon class="mr-2">mdi-calendar-month</v-icon>
+            My Calendar Events
+            <v-chip class="ml-2" color="info" size="small">
+              {{ myCalendarEvents.length }}
+            </v-chip>
+          </v-card-title>
+          <v-card-text>
+            <div v-if="myCalendarEvents.length === 0" class="text-center text-medium-emphasis py-8">
+              <v-icon size="64" color="info">mdi-calendar-blank</v-icon>
+              <div class="mt-4 text-h6">No bookings found</div>
+              <div class="text-body-2">Add some properties and bookings to see them here</div>
+            </div>
+            <v-row v-else>
+              <v-col
+                v-for="event in myCalendarEvents.slice(0, 6)"
+                :key="event.id"
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <v-card
+                  variant="outlined"
+                  :color="event.backgroundColor"
+                  class="mb-2"
+                  @click="simulateEventClick(event)"
+                >
+                  <v-card-text class="pa-3">
+                    <div class="d-flex align-center mb-2">
+                      <v-icon class="mr-2" color="white">
+                        {{ event.extendedProps.booking_type === 'turn' ? 'mdi-fire' : 'mdi-home-clean' }}
+                      </v-icon>
+                      <span class="text-white font-weight-bold">{{ event.title }}</span>
+                    </div>
+                    <div class="text-white text-caption mb-1">
+                      <v-icon size="small" class="mr-1">mdi-home</v-icon>
+                      {{ event.extendedProps.propertyName }}
+                    </div>
+                    <div class="text-white text-caption mb-1">
+                      <v-icon size="small" class="mr-1">mdi-calendar</v-icon>
+                      {{ formatEventDate(event.start) }}
+                    </div>
+                    <div class="text-white text-caption">
+                      <v-icon size="small" class="mr-1">mdi-information</v-icon>
+                      {{ event.extendedProps.status }}
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-btn
+              v-if="myCalendarEvents.length > 6"
+              color="primary"
+              variant="text"
+              class="mt-2"
+              @click="showAllEvents = !showAllEvents"
+            >
+              {{ showAllEvents ? 'Show Less' : `Show All ${myCalendarEvents.length} Events` }}
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Function Testing -->
+    <v-row>
+      <v-col cols="12" md="6">
+        <v-card class="mb-4">
+          <v-card-title>
+            <v-icon class="mr-2">mdi-function</v-icon>
+            Function Testing
+          </v-card-title>
+          <v-card-text>
+            <v-btn
+              color="primary"
+              variant="outlined"
+              class="mb-2 mr-2"
+              @click="testDateSelect"
+            >
+              <v-icon class="mr-2">mdi-calendar-plus</v-icon>
+              Test Date Select
+            </v-btn>
+            <v-btn
+              color="secondary"
+              variant="outlined"
+              class="mb-2 mr-2"
+              @click="testEventClick"
+            >
+              <v-icon class="mr-2">mdi-calendar-edit</v-icon>
+              Test Event Click
+            </v-btn>
+            <v-btn
+              color="info"
+              variant="outlined"
+              class="mb-2 mr-2"
+              @click="testValidateAccess"
+            >
+              <v-icon class="mr-2">mdi-shield-check</v-icon>
+              Test Access Validation
+            </v-btn>
+            <v-btn
+              color="warning"
+              variant="outlined"
+              class="mb-2"
+              @click="generateSampleData"
+            >
+              <v-icon class="mr-2">mdi-database-plus</v-icon>
+              Generate Sample Data
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <!-- Status Messages -->
+      <v-col cols="12" md="6">
+        <v-card class="mb-4">
+          <v-card-title>
+            <v-icon class="mr-2">mdi-message</v-icon>
+            Status Messages
+          </v-card-title>
+          <v-card-text>
+            <v-alert
+              v-if="ownerError"
+              type="error"
+              variant="outlined"
+              class="mb-2"
+              closable
+              @click:close="ownerError = null"
+            >
+              {{ ownerError }}
+            </v-alert>
+            <v-alert
+              v-if="ownerSuccess"
+              type="success"
+              variant="outlined"
+              class="mb-2"
+              closable
+              @click:close="ownerSuccess = null"
+            >
+              {{ ownerSuccess }}
+            </v-alert>
+            <v-alert
+              v-if="!ownerError && !ownerSuccess"
+              type="info"
+              variant="outlined"
+            >
+              No messages. Try testing the functions above.
+            </v-alert>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Debug Information -->
+    <v-row>
+      <v-col cols="12">
+        <v-expansion-panels>
+          <v-expansion-panel>
+            <v-expansion-panel-title>
+              <v-icon class="mr-2">mdi-bug</v-icon>
+              Debug Information
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <h4>Current User</h4>
+                  <pre class="text-caption">{{ JSON.stringify(currentUser, null, 2) }}</pre>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <h4>Calendar State</h4>
+                  <pre class="text-caption">{{ JSON.stringify({
+                    currentView,
+                    currentDate: currentDate?.toISOString(),
+                    selectedPropertyIds: Array.from(selectedPropertyIds),
+                    showTurnBookings,
+                    showStandardBookings
+                  }, null, 2) }}</pre>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+⋮----
+<!-- Owner Calendar Stats -->
+⋮----
+{{ ownerCalendarTitle }}
+⋮----
+<div class="text-h4 text-primary">{{ calendarStats.totalProperties }}</div>
+⋮----
+<div class="text-h4 text-info">{{ calendarStats.totalBookings }}</div>
+⋮----
+<div class="text-h4 text-error">{{ calendarStats.urgentTurns }}</div>
+⋮----
+<div class="text-h4 text-warning">{{ calendarStats.upcomingCleanings }}</div>
+⋮----
+<!-- Owner Turn Alerts -->
+⋮----
+{{ myTurnAlerts.length }}
+⋮----
+<template #prepend>
+                  <v-avatar :color="getUrgencyColor(alert.urgencyLevel)" size="small">
+                    <v-icon color="white">mdi-fire</v-icon>
+                  </v-avatar>
+                </template>
+<v-list-item-title>{{ alert.alertMessage }}</v-list-item-title>
+<v-list-item-subtitle>{{ alert.timeUntilCheckout }}</v-list-item-subtitle>
+<template #append>
+                  <v-chip :color="getUrgencyColor(alert.urgencyLevel)" size="small">
+                    {{ alert.urgencyLevel }}
+                  </v-chip>
+                </template>
+⋮----
+{{ alert.urgencyLevel }}
+⋮----
+<!-- Property Filter Controls -->
+⋮----
+<template #item="{ props, item }">
+                    <v-list-item v-bind="props">
+                      <template #prepend>
+                        <v-icon :color="item.raw.active ? 'success' : 'warning'">
+                          {{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
+                        </v-icon>
+                      </template>
+                      <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                      <v-list-item-subtitle>{{ item.raw.address }}</v-list-item-subtitle>
+                    </v-list-item>
+                  </template>
+⋮----
+<template #prepend>
+                        <v-icon :color="item.raw.active ? 'success' : 'warning'">
+                          {{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
+                        </v-icon>
+                      </template>
+⋮----
+{{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
+⋮----
+<v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+<v-list-item-subtitle>{{ item.raw.address }}</v-list-item-subtitle>
+⋮----
+<!-- Calendar Events Preview -->
+⋮----
+{{ myCalendarEvents.length }}
+⋮----
+{{ event.extendedProps.booking_type === 'turn' ? 'mdi-fire' : 'mdi-home-clean' }}
+⋮----
+<span class="text-white font-weight-bold">{{ event.title }}</span>
+⋮----
+{{ event.extendedProps.propertyName }}
+⋮----
+{{ formatEventDate(event.start) }}
+⋮----
+{{ event.extendedProps.status }}
+⋮----
+{{ showAllEvents ? 'Show Less' : `Show All ${myCalendarEvents.length} Events` }}
+⋮----
+<!-- Function Testing -->
+⋮----
+<!-- Status Messages -->
+⋮----
+{{ ownerError }}
+⋮----
+{{ ownerSuccess }}
+⋮----
+<!-- Debug Information -->
+⋮----
+<pre class="text-caption">{{ JSON.stringify(currentUser, null, 2) }}</pre>
+⋮----
+<pre class="text-caption">{{ JSON.stringify({
+                    currentView,
+                    currentDate: currentDate?.toISOString(),
+                    selectedPropertyIds: Array.from(selectedPropertyIds),
+                    showTurnBookings,
+                    showStandardBookings
+                  }, null, 2) }}</pre>
+⋮----
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useOwnerCalendarState } from '@/composables/owner/useOwnerCalendarState';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useAuthStore } from '@/stores/auth';
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
+// Get composables and stores
+const ownerCalendarState = useOwnerCalendarState();
+const ownerBookings = useOwnerBookings();
+const authStore = useAuthStore();
+const propertyStore = usePropertyStore();
+const bookingStore = useBookingStore();
+// Destructure owner calendar state
+const {
+  // Computed properties
+  myCalendarEvents,
+  myTurnAlerts,
+  myPropertyOptions,
+  ownerCalendarTitle,
+  // Functions
+  getOwnerCalendarEvents,
+  handleOwnerDateSelect,
+  handleOwnerEventClick,
+  getOwnerTurnAlerts,
+  filterByOwnerProperty,
+  clearOwnerPropertyFilters,
+  validateOwnerBookingAccess,
+  getOwnerCalendarStats,
+  // State
+  ownerError,
+  ownerLoading,
+  ownerSuccess,
+  // Base calendar state
+  currentView,
+  currentDate,
+  selectedPropertyIds,
+  showTurnBookings,
+  showStandardBookings
+} = ownerCalendarState;
+// Demo-specific state
+const selectedPropertyFilter = ref<string | null>(null);
+const showAllEvents = ref(false);
+// Computed properties
+const currentUser = computed(() => authStore.user);
+const calendarStats = computed(() => getOwnerCalendarStats());
+const propertyFilterOptions = computed(() => [
+  { id: 'all', name: 'All Properties', address: 'Show all properties', active: true },
+  ...myPropertyOptions.value
+]);
+// Methods
+function handlePropertyFilterChange(propertyId: string | null) {
+  if (!propertyId || propertyId === 'all') {
+    clearOwnerPropertyFilters();
+    selectedPropertyFilter.value = null;
+  } else {
+    filterByOwnerProperty(propertyId);
+  }
+}
+function simulateEventClick(event: any) {
+  const mockClickInfo = {
+    event: {
+      id: event.id,
+      title: event.title,
+      extendedProps: event.extendedProps
+    }
+  };
+  handleOwnerEventClick(mockClickInfo);
+}
+function testDateSelect() {
+  const mockSelectInfo = {
+    startStr: new Date().toISOString().split('T')[0],
+    endStr: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  };
+  handleOwnerDateSelect(mockSelectInfo);
+}
+function testEventClick() {
+  if (myCalendarEvents.value.length > 0) {
+    simulateEventClick(myCalendarEvents.value[0]);
+  } else {
+    ownerError.value = 'No events available to test with';
+  }
+}
+function testValidateAccess() {
+  if (myCalendarEvents.value.length > 0) {
+    const bookingId = myCalendarEvents.value[0].id;
+    const hasAccess = validateOwnerBookingAccess(bookingId);
+    ownerSuccess.value = `Access validation for booking ${bookingId}: ${hasAccess ? 'ALLOWED' : 'DENIED'}`;
+  } else {
+    ownerError.value = 'No bookings available to test access validation';
+  }
+}
+function generateSampleData() {
+  // Generate sample properties for current user
+  const userId = authStore.user?.id;
+  if (!userId) {
+    ownerError.value = 'Please log in to generate sample data';
+    return;
+  }
+  // Add sample properties
+  const sampleProperties = [
+    {
+      id: `prop-${Date.now()}-1`,
+      owner_id: userId,
+      name: 'Sunset Villa',
+      address: '123 Ocean Drive, Miami, FL',
+      cleaning_duration: 120,
+      pricing_tier: 'premium' as const,
+      active: true,
+      special_instructions: 'Pool cleaning required',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: `prop-${Date.now()}-2`,
+      owner_id: userId,
+      name: 'Downtown Loft',
+      address: '456 Main Street, Austin, TX',
+      cleaning_duration: 90,
+      pricing_tier: 'basic' as const,
+      active: true,
+      special_instructions: 'High-rise building, use service elevator',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ];
+  sampleProperties.forEach(property => {
+    propertyStore.addProperty(property);
+  });
+  // Add sample bookings
+  const sampleBookings = [
+    {
+      id: `booking-${Date.now()}-1`,
+      property_id: sampleProperties[0].id,
+      owner_id: userId,
+      checkout_date: new Date().toISOString(),
+      checkin_date: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours later
+      booking_type: 'turn' as const,
+      status: 'pending' as const,
+      guest_count: 4,
+      notes: 'Same-day turn - urgent cleaning needed',
+      priority: 'urgent' as const,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: `booking-${Date.now()}-2`,
+      property_id: sampleProperties[1].id,
+      owner_id: userId,
+      checkout_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+      checkin_date: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(), // Day after tomorrow
+      booking_type: 'standard' as const,
+      status: 'scheduled' as const,
+      guest_count: 2,
+      notes: 'Standard cleaning between guests',
+      priority: 'standard' as const,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ];
+  sampleBookings.forEach(booking => {
+    bookingStore.addBooking(booking);
+  });
+  ownerSuccess.value = `Generated ${sampleProperties.length} properties and ${sampleBookings.length} bookings for testing`;
+}
+function getUrgencyColor(urgency: string): string {
+  switch (urgency) {
+    case 'critical': return 'error';
+    case 'high': return 'warning';
+    case 'medium': return 'info';
+    case 'low': return 'success';
+    default: return 'grey';
+  }
+}
+function formatEventDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  });
+}
+// Initialize demo
+onMounted(() => {
+  // Ensure user is logged in for demo
+  if (!authStore.user) {
+    authStore.login('owner@example.com', 'password');
+  }
+});
+</script>
+<style scoped>
+.v-card {
+  transition: all 0.3s ease;
+}
+.v-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+pre {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 8px;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+</style>
+`````
+
 ## File: src/components/smart/shared/README.md
 `````markdown
 # Shared Smart Components
@@ -33257,6 +33913,143 @@ function getMyBookingCleaningWindow(booking: Booking)
 ⋮----
 // Inherited from base composable (for compatibility)
 // Note: These work on all data, not owner-filtered
+`````
+
+## File: src/composables/owner/useOwnerCalendarState.ts
+`````typescript
+import { ref, computed } from 'vue';
+import { useCalendarState } from '@/composables/shared/useCalendarState';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useAuthStore } from '@/stores/auth';
+import { useUIStore } from '@/stores/ui';
+/**
+ * Owner-specific calendar state composable
+ * Extends shared useCalendarState functionality with owner data filtering
+ * 
+ * Key Features:
+ * - All calendar events filtered to current owner's bookings only
+ * - Owner-specific event handling (create/edit only owner's bookings)
+ * - Simplified calendar controls (no admin features)
+ * - Owner-scoped turn alerts and property filtering
+ * - Owner-friendly error messages and validation
+ */
+export function useOwnerCalendarState()
+⋮----
+// Get shared functionality and stores
+⋮----
+// Owner-specific state
+⋮----
+// Get current user ID
+⋮----
+// OWNER-SPECIFIC COMPUTED PROPERTIES
+/**
+   * Get calendar events for current owner's bookings only
+   */
+⋮----
+/**
+   * Get filtered bookings for current owner only
+   */
+⋮----
+/**
+   * Get today's turn alerts for current owner only
+   */
+⋮----
+/**
+   * Get property options for current owner (for filtering)
+   */
+⋮----
+/**
+   * Get owner-specific calendar title
+   */
+⋮----
+// OWNER-SPECIFIC FUNCTIONS
+/**
+   * Get calendar events formatted for owner's bookings only
+   */
+function getOwnerCalendarEvents(): any[]
+⋮----
+// Add owner-specific styling
+⋮----
+// Add owner-specific title prefix
+⋮----
+// Add owner-specific extended properties
+⋮----
+/**
+   * Handle date selection for creating new owner booking
+   */
+function handleOwnerDateSelect(selectInfo: any)
+⋮----
+// Open booking form for creating new booking
+⋮----
+/**
+   * Handle event click for editing owner's booking
+   */
+function handleOwnerEventClick(clickInfo: any)
+⋮----
+// Open booking form in edit mode
+⋮----
+/**
+   * Get owner's turn alerts with priority and timing information
+   */
+function getOwnerTurnAlerts()
+⋮----
+canAssignCleaner: false, // Owners can't assign cleaners
+⋮----
+/**
+   * Filter calendar by specific owner property
+   */
+function filterByOwnerProperty(propertyId: string)
+⋮----
+// Validate property belongs to owner
+⋮----
+// Use base calendar state's property filter
+⋮----
+/**
+   * Clear all property filters for owner
+   */
+function clearOwnerPropertyFilters()
+/**
+   * Validate if owner can access a specific booking
+   */
+function validateOwnerBookingAccess(bookingId: string): boolean
+/**
+   * Get owner-specific calendar statistics
+   */
+function getOwnerCalendarStats()
+// HELPER FUNCTIONS
+/**
+   * Get property name by ID
+   */
+function getPropertyName(propertyId: string): string
+/**
+   * Calculate time until checkout
+   */
+function getTimeUntilCheckout(checkoutDate: string): string
+/**
+   * Calculate urgency level based on time until checkout
+   */
+function calculateUrgencyLevel(checkoutDate: string): 'low' | 'medium' | 'high' | 'critical'
+⋮----
+if (diffHours < 0) return 'critical'; // Overdue
+if (diffHours < 2) return 'critical'; // Less than 2 hours
+if (diffHours < 4) return 'high';     // Less than 4 hours
+if (diffHours < 8) return 'medium';   // Less than 8 hours
+return 'low';                         // More than 8 hours
+⋮----
+/**
+   * Get completed bookings count for current month
+   */
+function getCompletedThisMonth(): number
+⋮----
+// Inherit base calendar state functionality
+⋮----
+// Owner-specific computed properties
+⋮----
+// Owner-specific functions
+⋮----
+// Owner-specific state
+⋮----
+// Helper functions
 `````
 
 ## File: src/composables/owner/useOwnerProperties.ts
@@ -48892,38 +49685,62 @@ import { createRouter, createWebHistory } from 'vue-router'
   - Notes: Successfully implemented owner-specific property composable that filters all data to current user's properties only. Provides owner-friendly interface with proper validation, error handling, and business insights. Ready for integration with owner-specific components like HomeOwner.vue and OwnerSidebar.vue.
   - Assigned to: Cursor
 
-- [ ] **TASK-039K**: Create useOwnerCalendarState.ts composable
-  - Status: Not Started
+- [x] **TASK-039K**: Create useOwnerCalendarState.ts composable
+  - Status: Complete
   - Requirements:
-    - Extend base `useCalendarState.ts` functionality
-    - Filter calendar data to current owner's events only
-    - Implement owner-specific calendar views and navigation
-    - Add owner-specific date/time utilities
-    - Remove admin calendar features
+    - ✅ Extend base `useCalendarState.ts` functionality
+    - ✅ Filter calendar data to current owner's events only
+    - ✅ Implement owner-specific calendar views and navigation
+    - ✅ Add owner-specific date/time utilities
+    - ✅ Remove admin calendar features
   - Functions:
-    - `getOwnerCalendarEvents()` - format owner's bookings for calendar
-    - `handleOwnerDateSelect()` - create booking for owner's property
-    - `handleOwnerEventClick()` - edit owner's booking
-    - `getOwnerTurnAlerts()` - owner's urgent turns only
-    - `filterByOwnerProperty(propertyId)` - filter owner's calendar
+    - ✅ `getOwnerCalendarEvents()` - format owner's bookings for calendar
+    - ✅ `handleOwnerDateSelect()` - create booking for owner's property
+    - ✅ `handleOwnerEventClick()` - edit owner's booking
+    - ✅ `getOwnerTurnAlerts()` - owner's urgent turns only
+    - ✅ `filterByOwnerProperty(propertyId)` - filter owner's calendar
+  - Implementation Details:
+    - Created comprehensive owner-specific calendar state composable extending shared useCalendarState
+    - All computed properties filter data by `owner_id === currentUser.id`
+    - Added owner-specific event handling with ownership validation
+    - Implemented owner-friendly error messages and validation
+    - Created demo component `UseOwnerCalendarStateDemo.vue` with comprehensive testing
+    - Added demo route `/demos/use-owner-calendar-state` for testing
+    - Follows Map collection patterns and proper TypeScript interfaces
+    - Extends shared composable using composition pattern
+    - Removes admin-only functions while maintaining core calendar functionality
+  - Notes: Successfully implemented owner-specific calendar state management that filters all data to current user's bookings only. Provides owner-friendly interface with proper validation, error handling, and business insights. Ready for integration with owner-specific components like HomeOwner.vue and OwnerCalendar.vue.
   - Assigned to: Cursor
 
 ### **Admin-Specific Composables**
-- [ ] **TASK-039L**: Create useAdminBookings.ts composable
-  - Status: Not Started
+- [x] **TASK-039L**: Create useAdminBookings.ts composable
+  - Status: Complete
   - Requirements:
-    - Extend base `useBookings.ts` functionality
-    - No filtering - access ALL bookings across all owners
-    - Add admin-specific functions (cleaner assignment, status management)
-    - Implement system-wide analytics and reporting
-    - Add bulk operations for managing multiple bookings
+    - ✅ Extend base `useBookings.ts` functionality
+    - ✅ No filtering - access ALL bookings across all owners
+    - ✅ Add admin-specific functions (cleaner assignment, status management)
+    - ✅ Implement system-wide analytics and reporting
+    - ✅ Add bulk operations for managing multiple bookings
   - Functions:
-    - `fetchAllBookings()` - get ALL bookings (no owner filter)
-    - `assignCleaner(bookingId, cleanerId)` - assign cleaner to booking
-    - `updateBookingStatus(bookingId, status)` - manage booking workflow
-    - `getSystemTurns()` - all urgent turns across all properties
-    - `getUnassignedBookings()` - bookings without assigned cleaners
-    - `bulkAssignCleaner(bookingIds, cleanerId)` - bulk cleaner assignment
+    - ✅ `fetchAllBookings()` - get ALL bookings (no owner filter)
+    - ✅ `assignCleaner(bookingId, cleanerId)` - assign cleaner to booking
+    - ✅ `updateBookingStatus(bookingId, status)` - manage booking workflow
+    - ✅ `getSystemTurns()` - all urgent turns across all properties
+    - ✅ `getUnassignedBookings()` - bookings without assigned cleaners
+    - ✅ `bulkAssignCleaner(bookingIds, cleanerId)` - bulk cleaner assignment
+  - Implementation Details:
+    - Created comprehensive admin-specific booking composable extending shared useBookings
+    - NO filtering - accesses ALL bookings across all owners (key difference from owner version)
+    - Added admin-specific computed properties: allBookings, systemTurns, systemTodayTurns, unassignedBookings, bookingsByStatus, bookingsByOwner, bookingsByCleaner, systemMetrics
+    - Implemented admin CRUD operations: fetchAllBookings(), assignCleaner(), updateBookingStatus(), bulkAssignCleaner(), bulkUpdateStatus()
+    - Added system-wide analytics: getSystemTurnAlerts(), getCleanerWorkloadAnalysis(), getPropertyUtilizationReport()
+    - Implemented advanced filtering with multiple criteria: filterBookings()
+    - Created demo component `UseAdminBookingsDemo.vue` with comprehensive testing interface
+    - Follows Map collection patterns and proper TypeScript interfaces
+    - Extends shared composable using composition pattern
+    - Includes admin-specific error messaging with business impact context
+    - All functions work with system-wide data scope for business admin interface
+  - Notes: Successfully implemented admin-specific booking management that provides access to ALL data across all clients. Includes comprehensive analytics, bulk operations, and business insights for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminCalendar.vue.
   - Assigned to: Cursor
 
 - [ ] **TASK-039M**: Create useAdminProperties.ts composable
