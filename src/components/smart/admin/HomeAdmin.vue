@@ -11,8 +11,15 @@
         xl="2" 
         class="sidebar-column"
         :class="{ 'mobile-hidden': !sidebarOpen }"
+
       >
-        <!-- TODO: Replace with AdminSidebar.vue when TASK-039G is complete -->
+          <v-btn
+            v-if="$vuetify.display.lgAndDown"
+            icon="mdi-menu"
+            variant="text"
+            class="mr-4"
+            @click="toggleSidebar"
+          /><!-- TODO: Replace with AdminSidebar.vue when TASK-039G is complete -->
         <Sidebar
           :today-turns="systemTodayTurns"
           :upcoming-cleanings="systemUpcomingCleanings"
@@ -34,13 +41,7 @@
         class="calendar-column"
       >
         <div class="calendar-header">
-          <v-btn
-            v-if="$vuetify.display.lgAndDown"
-            icon="mdi-menu"
-            variant="text"
-            class="mr-4"
-            @click="toggleSidebar"
-          />
+
           
           <!-- Admin-focused Calendar Controls -->
           <div class="d-flex align-center">

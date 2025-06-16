@@ -2,8 +2,9 @@
   <v-navigation-drawer
     class="owner-sidebar"
     width="100%"
-    :elevation="8"
+    :elevation="80"
     color="tertiary"
+
   >                                   
     <v-container class="py-2">
       <!-- Header with Owner-specific info -->

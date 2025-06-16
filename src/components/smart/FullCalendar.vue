@@ -50,6 +50,7 @@ const calendarEvents = computed(() => {
   return Array.from(props.bookings.values()).map(booking => {
     const property = props.properties.get(booking.property_id);
     const isTurn = booking.booking_type === 'turn';
+    const isUrgent = booking.priority === 'urgent';
     
     return {
       id: booking.id,
@@ -64,50 +65,91 @@ const calendarEvents = computed(() => {
         property,
         bookingType: booking.booking_type,
         status: booking.status,
+        priority: booking.priority,
         guestCount: booking.guest_count,
         notes: booking.notes
       },
       classNames: [
         `booking-${booking.booking_type}`,
         `status-${booking.status}`,
-        isTurn ? 'priority-high' : 'priority-normal'
-      ]
+        `priority-${booking.priority}`,
+        isTurn ? 'turn-booking-event' : 'standard-booking-event',
+        isUrgent && isTurn ? 'turn-urgent-event' : '',
+        isUrgent ? 'urgent-event' : ''
+      ].filter(Boolean)
     };
   });
 });
 
-// Dynamic color system based on booking type and status
+// Enhanced dynamic color system based on booking priority instead of status
 const getEventColor = (booking: Booking): string => {
   const isDark = theme.global.current.value.dark;
   
   if (booking.booking_type === 'turn') {
-    switch (booking.status) {
-      case 'pending': return isDark ? '#FF5252' : '#F44336';
-      case 'scheduled': return isDark ? '#FF9800' : '#FF6F00';
-      case 'in_progress': return isDark ? '#4CAF50' : '#2E7D32';
-      case 'completed': return isDark ? '#9E9E9E' : '#616161';
-      case 'cancelled': return isDark ? '#757575' : '#424242';
-      default: return isDark ? '#FF5252' : '#F44336';
+    switch (booking.priority) {
+      case 'urgent':
+        return isDark ? '#FF1744' : '#D32F2F'; // Bright red for urgent turns
+      case 'high':
+        return isDark ? '#FF6D00' : '#F57C00'; // Orange for high priority turns
+      case 'normal':
+        return isDark ? '#FF9800' : '#FF6F00'; // Amber for normal turns
+      case 'low':
+        return isDark ? '#FFC107' : '#FFA000'; // Yellow for low priority turns
+      default:
+        return isDark ? '#FF5252' : '#F44336';
     }
   } else {
-    switch (booking.status) {
-      case 'pending': return isDark ? '#2196F3' : '#1976D2';
-      case 'scheduled': return isDark ? '#00BCD4' : '#0097A7';
-      case 'in_progress': return isDark ? '#4CAF50' : '#388E3C';
-      case 'completed': return isDark ? '#9E9E9E' : '#757575';
-      case 'cancelled': return isDark ? '#757575' : '#424242';
-      default: return isDark ? '#2196F3' : '#1976D2';
+    switch (booking.priority) {
+      case 'urgent':
+        return isDark ? '#FF9800' : '#FF6F00'; // Orange for urgent standard
+      case 'high':
+        return isDark ? '#2196F3' : '#1976D2'; // Blue for high priority standard
+      case 'normal':
+        return isDark ? '#00BCD4' : '#0097A7'; // Cyan for normal
+      case 'low':
+        return isDark ? '#4CAF50' : '#388E3C'; // Green for low priority
+      default:
+        return isDark ? '#2196F3' : '#1976D2';
     }
   }
 };
 
 const getEventBorderColor = (booking: Booking): string => {
-  return booking.booking_type === 'turn' ? '#D32F2F' : '#1976D2';
+  if (booking.booking_type === 'turn') {
+    switch (booking.priority) {
+      case 'urgent':
+        return '#B71C1C'; // Dark red border for urgent turns
+      case 'high':
+        return '#E65100'; // Dark orange border for high priority turns
+      case 'normal':
+        return '#FF6F00'; // Orange border for normal turns
+      case 'low':
+        return '#F57F17'; // Dark yellow border for low priority turns
+      default:
+        return '#D32F2F';
+    }
+  } else {
+    switch (booking.priority) {
+      case 'urgent':
+        return '#E65100'; // Dark orange border for urgent standard
+      case 'high':
+        return '#0D47A1'; // Dark blue border for high priority standard
+      case 'normal':
+        return '#006064'; // Dark cyan border for normal
+      case 'low':
+        return '#1B5E20'; // Dark green border for low priority
+      default:
+        return '#1976D2';
+    }
+  }
 };
 
 const getEventTextColor = (booking: Booking): string => {
-  // Use a lighter text color for completed bookings
-  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
+  // Use white text for better contrast on colored backgrounds
+  if (booking.status === 'completed') {
+    return '#E0E0E0'; // Lighter text for completed bookings
+  }
+  return '#FFFFFF';
 };
 
 // Calendar configuration

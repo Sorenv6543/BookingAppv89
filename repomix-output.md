@@ -53,6 +53,7 @@ problemfix.md
 src/App.vue
 src/assets/main.css
 src/components/demos/AdminQuickActionsDemo.vue
+src/components/demos/ErrorHandlingDemo.vue
 src/components/demos/UseOwnerPropertiesDemo.vue
 src/components/dumb/admin/AdminBookingForm.vue
 src/components/dumb/admin/AdminCalendarControls.vue
@@ -68,7 +69,10 @@ src/components/dumb/owner/OwnerQuickActions.vue
 src/components/dumb/PropertyCardDemo.vue
 src/components/dumb/PropertyModal.vue
 src/components/dumb/shared/ConfirmationDialog.vue
+src/components/dumb/shared/ErrorAlert.vue
+src/components/dumb/shared/LoadingSpinner.vue
 src/components/dumb/shared/PropertyCard.vue
+src/components/dumb/shared/SkeletonLoader.vue
 src/components/dumb/shared/ThemePicker.vue
 src/components/dumb/shared/TurnAlerts.vue
 src/components/dumb/shared/UpcomingCleanings.vue
@@ -99,16 +103,20 @@ src/components/smart/SidebarDemo.vue
 src/composables/admin/README.md
 src/composables/admin/useAdminBookings.ts
 src/composables/admin/useAdminCalendarState.ts
+src/composables/admin/useAdminErrorHandler.ts
 src/composables/admin/useAdminProperties.ts
 src/composables/admin/useCleanerManagement.ts
 src/composables/owner/README.md
 src/composables/owner/useOwnerBookings.ts
 src/composables/owner/useOwnerCalendarState.ts
+src/composables/owner/useOwnerErrorHandler.ts
 src/composables/owner/useOwnerProperties.ts
 src/composables/shared/useAuth.ts
 src/composables/shared/useBookings.ts
 src/composables/shared/useCalendarState.ts
 src/composables/shared/useComponentEventLogger.ts
+src/composables/shared/useErrorHandler.ts
+src/composables/shared/useLoadingState.ts
 src/composables/shared/useProperties.ts
 src/layouts/admin.vue
 src/layouts/auth.vue
@@ -169,26 +177,6 @@ vitest.config.ts
 ```
 
 # Files
-
-## File: src/utils/errorMessages.ts
-````typescript
-import type { ErrorCategory, UserRole, BusinessImpact } from '@/types/ui';
-⋮----
-export function getErrorMessage(
-  category: ErrorCategory,
-  errorType: string,
-  role: UserRole,
-  context: Record<string, any> = {}
-): string
-export function getGenericErrorMessage(role: UserRole): string
-export function getBusinessImpactMessage(impact: BusinessImpact): string
-function replacePlaceholders(message: string, context: Record<string, any>): string
-export function getRetryMessage(role: UserRole, attempt: number, maxAttempts: number): string
-export function getLoadingMessage(role: UserRole, operation: string): string
-export function getSuccessMessage(role: UserRole, operation: string, context: Record<string, any> =
-⋮----
-export function getErrorCategory(errorCode?: string): ErrorCategory
-````
 
 ## File: .cursorignore
 ````
@@ -486,6 +474,598 @@ function formatActionType(actionType: string): string {
 }
 .v-list-item {
   min-height: 40px;
+}
+</style>
+````
+
+## File: src/components/demos/ErrorHandlingDemo.vue
+````vue
+<template>
+  <div class="error-handling-demo">
+    <v-container>
+      <v-row>
+        <v-col cols="12">
+          <h1 class="text-h4 mb-6">Error Handling & Loading States Demo</h1>
+          <v-card class="mb-6">
+            <v-card-title>Demo Configuration</v-card-title>
+            <v-card-text>
+              <v-radio-group
+                v-model="selectedRole"
+                inline
+                label="User Role:"
+              >
+                <v-radio label="Property Owner" value="owner" />
+                <v-radio label="Business Admin" value="admin" />
+              </v-radio-group>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-card class="mb-6">
+            <v-card-title>Loading States</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <h3 class="text-h6 mb-3">Loading Spinners</h3>
+                  <div class="demo-section mb-4">
+                    <h4 class="text-subtitle-1 mb-2">Inline Spinner</h4>
+                    <LoadingSpinner
+                      variant="inline"
+                      message="Loading data..."
+                      :size="32"
+                    />
+                  </div>
+                  <div class="demo-section mb-4">
+                    <h4 class="text-subtitle-1 mb-2">Button Spinner</h4>
+                    <LoadingSpinner
+                      variant="button"
+                      message="Saving..."
+                      :size="20"
+                    />
+                  </div>
+                  <div class="demo-section mb-4">
+                    <h4 class="text-subtitle-1 mb-2">Progress Spinner</h4>
+                    <LoadingSpinner
+                      :progress="loadingProgress"
+                      show-progress
+                      message="Processing..."
+                    />
+                    <v-btn
+                      @click="simulateProgress"
+                      size="small"
+                      class="mt-2"
+                    >
+                      Simulate Progress
+                    </v-btn>
+                  </div>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <h3 class="text-h6 mb-3">Skeleton Loaders</h3>
+                  <div class="demo-section mb-4">
+                    <h4 class="text-subtitle-1 mb-2">Property Card Skeleton</h4>
+                    <SkeletonLoader
+                      type="property-card"
+                      :loading="showSkeletons"
+                    >
+                      <v-card>
+                        <v-card-title>Sample Property</v-card-title>
+                        <v-card-text>Property details would go here...</v-card-text>
+                      </v-card>
+                    </SkeletonLoader>
+                  </div>
+                  <div class="demo-section mb-4">
+                    <h4 class="text-subtitle-1 mb-2">Booking List Skeleton</h4>
+                    <SkeletonLoader
+                      type="booking-item"
+                      :count="3"
+                      :loading="showSkeletons"
+                    >
+                      <div>Booking items would appear here...</div>
+                    </SkeletonLoader>
+                  </div>
+                  <v-btn
+                    @click="toggleSkeletons"
+                    size="small"
+                  >
+                    {{ showSkeletons ? 'Show Content' : 'Show Skeletons' }}
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-card class="mb-6">
+            <v-card-title>Error Handling</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <h3 class="text-h6 mb-3">Error Types</h3>
+                  <div class="demo-buttons">
+                    <v-btn
+                      @click="triggerValidationError"
+                      color="warning"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      Validation Error
+                    </v-btn>
+                    <v-btn
+                      @click="triggerNetworkError"
+                      color="error"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      Network Error
+                    </v-btn>
+                    <v-btn
+                      @click="triggerBusinessError"
+                      color="orange"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      Business Logic Error
+                    </v-btn>
+                    <v-btn
+                      @click="triggerSystemError"
+                      color="red-darken-2"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      System Error
+                    </v-btn>
+                  </div>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <h3 class="text-h6 mb-3">Role-Specific Handlers</h3>
+                  <div class="demo-buttons">
+                    <v-btn
+                      v-if="selectedRole === 'owner'"
+                      @click="triggerOwnerPropertyError"
+                      color="blue"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      Property Error (Owner)
+                    </v-btn>
+                    <v-btn
+                      v-if="selectedRole === 'owner'"
+                      @click="triggerOwnerBookingError"
+                      color="green"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      Booking Error (Owner)
+                    </v-btn>
+                    <v-btn
+                      v-if="selectedRole === 'admin'"
+                      @click="triggerAdminSystemError"
+                      color="purple"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      System Error (Admin)
+                    </v-btn>
+                    <v-btn
+                      v-if="selectedRole === 'admin'"
+                      @click="triggerAdminDataIntegrityError"
+                      color="red"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      Data Integrity Error
+                    </v-btn>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-card>
+            <v-card-title>Error Display</v-card-title>
+            <v-card-text>
+              <ErrorAlert
+                v-if="currentError"
+                :show="!!currentError"
+                :message="currentError.message"
+                :title="currentError.title"
+                :type="currentError.type"
+                :user-role="selectedRole"
+                :business-impact="currentError.businessImpact"
+                :error-details="currentError.errorDetails"
+                :affected-resources="currentError.affectedResources"
+                :retryable="currentError.retryable"
+                :escalatable="currentError.escalatable"
+                :help-text="currentError.helpText"
+                @close="clearCurrentError"
+                @retry="handleRetry"
+                @escalate="handleEscalate"
+              />
+              <div v-if="isLoading" class="loading-demo">
+                <LoadingSpinner
+                  variant="page"
+                  :message="loadingMessage"
+                  min-height="200px"
+                />
+              </div>
+              <v-alert
+                v-if="showSuccess"
+                type="success"
+                variant="tonal"
+                closable
+                @click:close="showSuccess = false"
+              >
+                {{ successMessage }}
+              </v-alert>
+              <div v-if="!currentError && !isLoading && !showSuccess" class="text-center py-8">
+                <v-icon icon="mdi-check-circle" size="64" color="success" class="mb-4" />
+                <h3 class="text-h6 mb-2">No Errors</h3>
+                <p class="text-body-2 text-medium-emphasis">
+                  Click the buttons above to test different error scenarios
+                </p>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-card class="mb-6">
+            <v-card-title>Loading State Management</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <h3 class="text-h6 mb-3">Active Loading Operations</h3>
+                  <div v-if="activeLoadingOps.length === 0" class="text-body-2 text-medium-emphasis">
+                    No active loading operations
+                  </div>
+                  <v-chip
+                    v-for="op in activeLoadingOps"
+                    :key="op"
+                    size="small"
+                    color="primary"
+                    variant="tonal"
+                    class="mr-2 mb-2"
+                  >
+                    {{ op }}
+                  </v-chip>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <h3 class="text-h6 mb-3">Loading Controls</h3>
+                  <div class="demo-buttons">
+                    <v-btn
+                      @click="simulateAsyncOperation('fetch-properties')"
+                      :loading="isOperationLoading('fetch-properties')"
+                      color="primary"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      Fetch Properties
+                    </v-btn>
+                    <v-btn
+                      @click="simulateAsyncOperation('save-booking')"
+                      :loading="isOperationLoading('save-booking')"
+                      color="success"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      Save Booking
+                    </v-btn>
+                    <v-btn
+                      @click="simulateAsyncOperation('sync-data')"
+                      :loading="isOperationLoading('sync-data')"
+                      color="info"
+                      variant="outlined"
+                      class="mb-2 mr-2"
+                    >
+                      Sync Data
+                    </v-btn>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+</template>
+⋮----
+{{ showSkeletons ? 'Show Content' : 'Show Skeletons' }}
+⋮----
+{{ successMessage }}
+⋮----
+{{ op }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useOwnerErrorHandler } from '@/composables/owner/useOwnerErrorHandler';
+import { useAdminErrorHandler } from '@/composables/admin/useAdminErrorHandler';
+import { useLoadingState } from '@/composables/shared/useLoadingState';
+import LoadingSpinner from '@/components/dumb/shared/LoadingSpinner.vue';
+import SkeletonLoader from '@/components/dumb/shared/SkeletonLoader.vue';
+import ErrorAlert from '@/components/dumb/shared/ErrorAlert.vue';
+import type { UserRole, BusinessImpact } from '@/types/ui';
+const selectedRole = ref<UserRole>('owner');
+const showSkeletons = ref(true);
+const loadingProgress = ref(0);
+const showSuccess = ref(false);
+const successMessage = ref('');
+// Error handlers
+const ownerErrorHandler = useOwnerErrorHandler();
+const adminErrorHandler = useAdminErrorHandler();
+// Loading state
+const {
+  loadingOperations,
+  withLoading
+} = useLoadingState();
+// Current error state
+interface DemoError {
+  message: string;
+  title?: string;
+  type: 'error' | 'warning' | 'info';
+  businessImpact?: BusinessImpact;
+  errorDetails?: string;
+  affectedResources?: string[];
+  retryable?: boolean;
+  escalatable?: boolean;
+  helpText?: string;
+}
+const currentError = ref<DemoError | null>(null);
+const isLoading = ref(false);
+const loadingMessage = ref('');
+// Computed
+const activeLoadingOps = computed(() =>
+  loadingOperations.value.map(op => op.id)
+);
+// Methods
+function clearCurrentError(): void {
+  currentError.value = null;
+}
+function showSuccessMessage(message: string): void {
+  successMessage.value = message;
+  showSuccess.value = true;
+  setTimeout(() => {
+    showSuccess.value = false;
+  }, 3000);
+}
+function isOperationLoading(operation: string): boolean {
+  return loadingOperations.value.some(op => op.id === operation);
+}
+async function simulateAsyncOperation(operation: string): Promise<void> {
+  await withLoading(operation, async () => {
+    // Simulate async work
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    if (Math.random() > 0.7) {
+      // 30% chance of error
+      throw new Error(`Failed to complete ${operation}`);
+    }
+    showSuccessMessage(`${operation} completed successfully!`);
+  });
+}
+function simulateProgress(): void {
+  loadingProgress.value = 0;
+  const interval = setInterval(() => {
+    loadingProgress.value += 10;
+    if (loadingProgress.value >= 100) {
+      clearInterval(interval);
+      setTimeout(() => {
+        loadingProgress.value = 0;
+      }, 1000);
+    }
+  }, 200);
+}
+function toggleSkeletons(): void {
+  showSkeletons.value = !showSkeletons.value;
+}
+// Error simulation methods
+async function triggerValidationError(): Promise<void> {
+  const error = new Error('Validation failed: Required fields are missing');
+  if (selectedRole.value === 'owner') {
+    await ownerErrorHandler.handleFormError([error], 'property');
+  } else {
+    await adminErrorHandler.handleSystemPropertyError(error, 'create', {
+      propertyIds: ['prop-123'],
+      affectedBookings: 0,
+      affectedCleaners: 0
+    });
+  }
+  currentError.value = {
+    message: selectedRole.value === 'owner'
+      ? 'Please fill in all required fields to continue.'
+      : 'Validation failed: Required field missing (name, address). Property creation blocked.',
+    title: 'Validation Error',
+    type: 'warning',
+    businessImpact: 'low',
+    errorDetails: selectedRole.value === 'admin' ? 'VALIDATION_ERROR: Missing required fields [name, address]' : undefined,
+    retryable: true,
+    helpText: selectedRole.value === 'owner' ? 'Make sure to fill in the property name and address before saving.' : undefined
+  };
+}
+async function triggerNetworkError(): Promise<void> {
+  const error = new Error('Network request failed');
+  if (selectedRole.value === 'owner') {
+    await ownerErrorHandler.handleNetworkError(error, 'save_property');
+  } else {
+    await adminErrorHandler.handleIntegrationError(error, 'PropertyAPI', 'create', {
+      endpoint: '/api/properties',
+      affectedFeatures: ['property-management'],
+      fallbackAvailable: false
+    });
+  }
+  currentError.value = {
+    message: selectedRole.value === 'owner'
+      ? 'Unable to connect to the server. Please check your internet connection and try again.'
+      : 'PropertyAPI integration failed. Service degraded. Features affected: property-management.',
+    title: 'Connection Error',
+    type: 'error',
+    businessImpact: 'medium',
+    errorDetails: selectedRole.value === 'admin' ? 'NETWORK_ERROR: Connection timeout to /api/properties (timeout: 30s)' : undefined,
+    retryable: true,
+    escalatable: selectedRole.value === 'admin',
+    helpText: selectedRole.value === 'owner' ? 'This usually resolves itself. Try again in a few moments.' : undefined
+  };
+}
+async function triggerBusinessError(): Promise<void> {
+  const error = new Error('Booking conflict detected');
+  if (selectedRole.value === 'owner') {
+    await ownerErrorHandler.handleBookingError(error, 'create');
+  } else {
+    await adminErrorHandler.handleBookingManagementError(error, 'create', {
+      bookingIds: ['booking-456'],
+      cleanerIds: ['cleaner-789'],
+      revenueImpact: 250,
+      clientsAffected: 1
+    });
+  }
+  currentError.value = {
+    message: selectedRole.value === 'owner'
+      ? 'This time slot is already booked. Please choose a different date or time.'
+      : 'Booking operation failed. Potential revenue impact: $250. Clients affected: 1.',
+    title: 'Booking Conflict',
+    type: 'warning',
+    businessImpact: 'medium',
+    errorDetails: selectedRole.value === 'admin' ? 'BUSINESS_LOGIC_ERROR: Overlapping booking detected [booking-456, cleaner-789]' : undefined,
+    affectedResources: selectedRole.value === 'admin' ? ['booking-456', 'cleaner-789'] : undefined,
+    retryable: false,
+    helpText: selectedRole.value === 'owner' ? 'Try selecting a different date or contact us for assistance.' : undefined
+  };
+}
+async function triggerSystemError(): Promise<void> {
+  const error = new Error('Database connection failed');
+  if (selectedRole.value === 'admin') {
+    await adminErrorHandler.handleDataIntegrityError(error, 'sync', {
+      affectedTables: ['properties', 'bookings'],
+      recordCount: 150,
+      dataLoss: false
+    });
+  }
+  currentError.value = {
+    message: selectedRole.value === 'owner'
+      ? 'Something went wrong on our end. Our team has been notified and will fix this soon.'
+      : 'Data integrity issue detected. 150 records affected. Investigation required.',
+    title: 'System Error',
+    type: 'error',
+    businessImpact: 'high',
+    errorDetails: selectedRole.value === 'admin' ? 'DB_CONNECTION_ERROR: Connection pool exhausted, sync operation failed' : undefined,
+    affectedResources: selectedRole.value === 'admin' ? ['properties', 'bookings'] : undefined,
+    retryable: false,
+    escalatable: selectedRole.value === 'admin',
+    helpText: selectedRole.value === 'owner' ? 'No action needed from you. We\'ll have this fixed shortly.' : undefined
+  };
+}
+async function triggerOwnerPropertyError(): Promise<void> {
+  const error = new Error('Property save failed');
+  await ownerErrorHandler.handlePropertyError(error, 'create');
+  currentError.value = {
+    message: 'Unable to save your property. Please try again.',
+    title: 'Save Error',
+    type: 'error',
+    retryable: true,
+    helpText: 'Make sure all fields are filled out correctly and you have a stable internet connection.'
+  };
+}
+async function triggerOwnerBookingError(): Promise<void> {
+  const error = new Error('Booking creation failed');
+  await ownerErrorHandler.handleBookingError(error, 'create');
+  currentError.value = {
+    message: 'Unable to create your booking. Please try again.',
+    title: 'Booking Error',
+    type: 'error',
+    retryable: true,
+    helpText: 'Check that your selected date and time are available and try again.'
+  };
+}
+async function triggerAdminSystemError(): Promise<void> {
+  const error = new Error('System-wide property update failed');
+  await adminErrorHandler.handleSystemPropertyError(error, 'bulk_update', {
+    propertyIds: ['prop-1', 'prop-2', 'prop-3'],
+    affectedBookings: 15,
+    affectedCleaners: 5
+  });
+  currentError.value = {
+    message: 'Property operation failed. 15 bookings affected. 5 cleaners impacted.',
+    title: 'Critical Property Error',
+    type: 'error',
+    businessImpact: 'high',
+    errorDetails: 'BULK_UPDATE_ERROR: Transaction rollback, 3 properties failed validation',
+    affectedResources: ['prop-1', 'prop-2', 'prop-3'],
+    retryable: false,
+    escalatable: true
+  };
+}
+async function triggerAdminDataIntegrityError(): Promise<void> {
+  const error = new Error('Data corruption detected');
+  await adminErrorHandler.handleDataIntegrityError(error, 'validation', {
+    affectedTables: ['bookings', 'cleaners', 'properties'],
+    recordCount: 500,
+    dataLoss: true
+  });
+  currentError.value = {
+    message: 'Data integrity issue detected. 500 records affected. Data loss risk!',
+    title: 'Data Integrity Alert',
+    type: 'error',
+    businessImpact: 'critical',
+    errorDetails: 'DATA_CORRUPTION: Checksum mismatch in 500 records across 3 tables',
+    affectedResources: ['bookings', 'cleaners', 'properties'],
+    retryable: false,
+    escalatable: true
+  };
+}
+async function handleRetry(): Promise<void> {
+  isLoading.value = true;
+  loadingMessage.value = 'Retrying operation...';
+  try {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    if (Math.random() > 0.5) {
+      clearCurrentError();
+      showSuccessMessage('Operation completed successfully!');
+    } else {
+      if (currentError.value) {
+        currentError.value.message += ' (Retry failed)';
+      }
+    }
+  } finally {
+    isLoading.value = false;
+  }
+}
+function handleEscalate(): void {
+  showSuccessMessage('Error has been escalated to the development team.');
+  clearCurrentError();
+}
+onMounted(() => {
+  console.log('Error Handling Demo initialized');
+});
+</script>
+<style scoped>
+.error-handling-demo {
+  padding: 20px 0;
+}
+.demo-section {
+  border: 1px solid rgba(var(--v-theme-outline), 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.loading-demo {
+  border: 2px dashed rgba(var(--v-theme-primary), 0.3);
+  border-radius: 8px;
+  margin: 16px 0;
+}
+.v-theme--dark .demo-section {
+  border-color: rgba(var(--v-theme-outline), 0.3);
 }
 </style>
 ````
@@ -3362,6 +3942,486 @@ function handleCancel(): void {
 </style>
 ````
 
+## File: src/components/dumb/shared/ErrorAlert.vue
+````vue
+<template>
+  <v-alert
+    v-if="show"
+    :type="alertType"
+    :variant="variant"
+    :closable="closable"
+    :prominent="prominent"
+    :density="density"
+    :class="alertClasses"
+    @click:close="handleClose"
+  >
+    <template #prepend>
+      <v-icon :icon="alertIcon" />
+    </template>
+    <template v-if="title" #title>
+      <span class="error-alert-title">{{ title }}</span>
+    </template>
+    <div class="error-alert-content">
+      <div class="error-message">
+        {{ displayMessage }}
+      </div>
+      <div
+        v-if="showBusinessImpact && businessImpact"
+        class="business-impact mt-2"
+      >
+        <v-chip
+          :color="businessImpactColor"
+          size="small"
+          variant="tonal"
+        >
+          {{ businessImpactText }}
+        </v-chip>
+      </div>
+      <v-expand-transition>
+        <div
+          v-if="showDetails && errorDetails"
+          class="error-details mt-3"
+        >
+          <v-divider class="mb-2" />
+          <div class="text-caption">
+            <strong>Error Details:</strong>
+          </div>
+          <div class="error-code text-caption text-medium-emphasis">
+            {{ errorDetails }}
+          </div>
+        </div>
+      </v-expand-transition>
+      <div
+        v-if="showAffectedResources && affectedResources?.length"
+        class="affected-resources mt-2"
+      >
+        <div class="text-caption mb-1">
+          <strong>Affected Resources:</strong>
+        </div>
+        <div class="resource-chips">
+          <v-chip
+            v-for="resource in affectedResources.slice(0, 3)"
+            :key="resource"
+            size="x-small"
+            variant="outlined"
+            class="mr-1 mb-1"
+          >
+            {{ resource }}
+          </v-chip>
+          <v-chip
+            v-if="affectedResources.length > 3"
+            size="x-small"
+            variant="outlined"
+            class="mr-1 mb-1"
+          >
+            +{{ affectedResources.length - 3 }} more
+          </v-chip>
+        </div>
+      </div>
+      <div
+        v-if="showActions"
+        class="error-actions mt-3"
+      >
+        <v-btn
+          v-if="retryable && !isRetrying"
+          size="small"
+          variant="outlined"
+          color="primary"
+          @click="handleRetry"
+        >
+          <v-icon start icon="mdi-refresh" />
+          Try Again
+        </v-btn>
+        <v-btn
+          v-if="isRetrying"
+          size="small"
+          variant="outlined"
+          color="primary"
+          loading
+          disabled
+        >
+          Retrying...
+        </v-btn>
+        <v-btn
+          v-if="showDetailsToggle && isAdmin"
+          size="small"
+          variant="text"
+          @click="toggleDetails"
+        >
+          {{ showDetails ? 'Hide' : 'Show' }} Details
+        </v-btn>
+        <v-btn
+          v-if="escalatable && isAdmin"
+          size="small"
+          variant="outlined"
+          color="warning"
+          @click="handleEscalate"
+        >
+          <v-icon start icon="mdi-alert-octagon" />
+          Escalate
+        </v-btn>
+      </div>
+      <div
+        v-if="showHelpText && helpText"
+        class="help-text mt-2"
+      >
+        <v-icon
+          icon="mdi-information-outline"
+          size="small"
+          class="mr-1"
+        />
+        <span class="text-caption">{{ helpText }}</span>
+      </div>
+    </div>
+  </v-alert>
+</template>
+⋮----
+<template #prepend>
+      <v-icon :icon="alertIcon" />
+    </template>
+<template v-if="title" #title>
+      <span class="error-alert-title">{{ title }}</span>
+    </template>
+⋮----
+<span class="error-alert-title">{{ title }}</span>
+⋮----
+{{ displayMessage }}
+⋮----
+{{ businessImpactText }}
+⋮----
+{{ errorDetails }}
+⋮----
+{{ resource }}
+⋮----
++{{ affectedResources.length - 3 }} more
+⋮----
+{{ showDetails ? 'Hide' : 'Show' }} Details
+⋮----
+<span class="text-caption">{{ helpText }}</span>
+⋮----
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import type { UserRole, BusinessImpact } from '@/types';
+interface Props {
+  show?: boolean;
+  message: string;
+  title?: string;
+  type?: 'error' | 'warning' | 'info';
+  userRole?: UserRole;
+  businessImpact?: BusinessImpact;
+  errorDetails?: string;
+  affectedResources?: string[];
+  retryable?: boolean;
+  escalatable?: boolean;
+  helpText?: string;
+  variant?: 'flat' | 'tonal' | 'outlined' | 'text' | 'elevated' | 'plain';
+  closable?: boolean;
+  prominent?: boolean;
+  density?: 'default' | 'comfortable' | 'compact';
+}
+const props = withDefaults(defineProps<Props>(), {
+  show: true,
+  type: 'error',
+  variant: 'tonal',
+  closable: true,
+  prominent: false,
+  density: 'default'
+});
+const emit = defineEmits<{
+  close: [];
+  retry: [];
+  escalate: [];
+}>();
+const showDetails = ref(false);
+const isRetrying = ref(false);
+const isAdmin = computed(() => props.userRole === 'admin');
+const isOwner = computed(() => props.userRole === 'owner');
+const alertType = computed(() => {
+  if (props.type === 'error') return 'error';
+  if (props.type === 'warning') return 'warning';
+  return 'info';
+});
+const alertIcon = computed(() => {
+  switch (props.type) {
+    case 'error': return 'mdi-alert-circle';
+    case 'warning': return 'mdi-alert';
+    default: return 'mdi-information';
+  }
+});
+const alertClasses = computed(() => [
+  'error-alert',
+  `error-alert--${props.userRole}`,
+  {
+    'error-alert--with-actions': showActions.value,
+    'error-alert--admin': isAdmin.value,
+    'error-alert--owner': isOwner.value
+  }
+]);
+const displayMessage = computed(() => {
+  if (isOwner.value) {
+    return props.message;
+  }
+  return props.message;
+});
+const businessImpactColor = computed(() => {
+  switch (props.businessImpact) {
+    case 'critical': return 'error';
+    case 'high': return 'warning';
+    case 'medium': return 'info';
+    case 'low': return 'success';
+    default: return 'grey';
+  }
+});
+const businessImpactText = computed(() => {
+  switch (props.businessImpact) {
+    case 'critical': return 'Critical Impact';
+    case 'high': return 'High Impact';
+    case 'medium': return 'Medium Impact';
+    case 'low': return 'Low Impact';
+    default: return 'Unknown Impact';
+  }
+});
+const showBusinessImpact = computed(() =>
+  isAdmin.value && props.businessImpact
+);
+const showAffectedResources = computed(() =>
+  isAdmin.value && props.affectedResources?.length
+);
+const showDetailsToggle = computed(() =>
+  isAdmin.value && props.errorDetails
+);
+const showActions = computed(() =>
+  props.retryable || (isAdmin.value && (props.escalatable || props.errorDetails))
+);
+const showHelpText = computed(() =>
+  isOwner.value && props.helpText
+);
+function handleClose(): void {
+  emit('close');
+}
+async function handleRetry(): Promise<void> {
+  isRetrying.value = true;
+  try {
+    emit('retry');
+    setTimeout(() => {
+      isRetrying.value = false;
+    }, 2000);
+  } catch (error) {
+    isRetrying.value = false;
+  }
+}
+function handleEscalate(): void {
+  emit('escalate');
+}
+function toggleDetails(): void {
+  showDetails.value = !showDetails.value;
+}
+</script>
+<style scoped>
+.error-alert {
+  margin-bottom: 16px;
+}
+.error-alert-title {
+  font-weight: 600;
+}
+.error-alert-content {
+  line-height: 1.5;
+}
+.error-message {
+  font-size: 0.875rem;
+}
+.business-impact {
+  display: flex;
+  align-items: center;
+}
+.error-details {
+  background-color: rgba(var(--v-theme-surface-variant), 0.3);
+  border-radius: 4px;
+  padding: 12px;
+  border-left: 3px solid rgba(var(--v-theme-error), 0.5);
+}
+.error-code {
+  font-family: 'Roboto Mono', monospace;
+  background-color: rgba(var(--v-theme-surface-variant), 0.5);
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+  word-break: break-all;
+}
+.affected-resources {
+  background-color: rgba(var(--v-theme-surface-variant), 0.2);
+  border-radius: 4px;
+  padding: 8px;
+}
+.resource-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.error-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.help-text {
+  display: flex;
+  align-items: flex-start;
+  background-color: rgba(var(--v-theme-info), 0.1);
+  border-radius: 4px;
+  padding: 8px;
+  border-left: 3px solid rgba(var(--v-theme-info), 0.5);
+}
+.error-alert--owner {
+}
+.error-alert--admin {
+}
+.error-alert--admin .error-message {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.8rem;
+}
+.v-theme--dark .error-details {
+  background-color: rgba(var(--v-theme-surface-variant), 0.2);
+}
+.v-theme--dark .error-code {
+  background-color: rgba(var(--v-theme-surface-variant), 0.3);
+}
+.v-theme--dark .affected-resources {
+  background-color: rgba(var(--v-theme-surface-variant), 0.1);
+}
+.v-theme--dark .help-text {
+  background-color: rgba(var(--v-theme-info), 0.05);
+}
+</style>
+````
+
+## File: src/components/dumb/shared/LoadingSpinner.vue
+````vue
+<template>
+  <div
+    :class="containerClasses"
+    :style="containerStyle"
+  >
+    <v-progress-circular
+      :size="size"
+      :width="width"
+      :color="color"
+      :indeterminate="!progress"
+      :model-value="progress"
+      class="loading-spinner"
+    />
+    <div
+      v-if="message"
+      :class="messageClasses"
+      class="loading-message"
+    >
+      {{ message }}
+    </div>
+    <div
+      v-if="showProgress && progress !== undefined"
+      class="loading-progress"
+    >
+      {{ Math.round(progress) }}%
+    </div>
+  </div>
+</template>
+⋮----
+{{ message }}
+⋮----
+{{ Math.round(progress) }}%
+⋮----
+<script setup lang="ts">
+import { computed } from 'vue';
+interface Props {
+  size?: number | string;
+  width?: number | string;
+  color?: string;
+  message?: string;
+  progress?: number;
+  showProgress?: boolean;
+  variant?: 'inline' | 'overlay' | 'page' | 'button';
+  centered?: boolean;
+  minHeight?: string;
+}
+const props = withDefaults(defineProps<Props>(), {
+  size: 40,
+  width: 4,
+  color: 'primary',
+  variant: 'inline',
+  centered: true,
+  minHeight: 'auto'
+});
+const containerClasses = computed(() => [
+  'loading-spinner-container',
+  `loading-spinner--${props.variant}`,
+  {
+    'loading-spinner--centered': props.centered,
+    'loading-spinner--with-message': props.message,
+    'loading-spinner--with-progress': props.showProgress && props.progress !== undefined
+  }
+]);
+const containerStyle = computed(() => ({
+  minHeight: props.minHeight
+}));
+const messageClasses = computed(() => [
+  'text-body-2',
+  {
+    'text-center': props.centered,
+    'mt-3': props.variant !== 'button'
+  }
+]);
+</script>
+<style scoped>
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.loading-spinner--inline {
+  display: inline-flex;
+  vertical-align: middle;
+}
+.loading-spinner--overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+.loading-spinner--page {
+  min-height: 200px;
+  width: 100%;
+}
+.loading-spinner--button {
+  flex-direction: row;
+  gap: 8px;
+}
+.loading-spinner--centered {
+  text-align: center;
+}
+.loading-message {
+  color: rgba(var(--v-theme-on-surface), 0.7);
+  max-width: 300px;
+  word-wrap: break-word;
+}
+.loading-progress {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(var(--v-theme-on-surface), 0.8);
+  margin-top: 8px;
+}
+.loading-spinner--button .loading-message {
+  margin-top: 0;
+  font-size: 0.875rem;
+}
+.v-theme--dark .loading-spinner--overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+</style>
+````
+
 ## File: src/components/dumb/shared/PropertyCard.vue
 ````vue
 <template>
@@ -3631,6 +4691,314 @@ const activeStatusColor = computed((): string => {
 }
 :deep(.v-divider) {
   border-color: rgba(var(--v-theme-on-surface), 0.12) !important;
+}
+</style>
+````
+
+## File: src/components/dumb/shared/SkeletonLoader.vue
+````vue
+<template>
+  <div :class="containerClasses">
+    <template v-if="type === 'card'">
+      <v-skeleton-loader
+        type="card"
+        :loading="loading"
+        :height="height"
+        class="skeleton-card"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+    <template v-else-if="type === 'list-item'">
+      <v-skeleton-loader
+        type="list-item-avatar-two-line"
+        :loading="loading"
+        class="skeleton-list-item"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+    <template v-else-if="type === 'table-row'">
+      <v-skeleton-loader
+        type="table-row"
+        :loading="loading"
+        class="skeleton-table-row"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+    <template v-else-if="type === 'property-card'">
+      <v-skeleton-loader
+        :loading="loading"
+        type="card-avatar, article, actions"
+        :height="height || 280"
+        class="skeleton-property-card"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+    <template v-else-if="type === 'booking-item'">
+      <v-skeleton-loader
+        :loading="loading"
+        type="list-item-avatar-three-line"
+        class="skeleton-booking-item"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+    <template v-else-if="type === 'calendar-event'">
+      <v-skeleton-loader
+        :loading="loading"
+        type="chip"
+        :height="height || 60"
+        class="skeleton-calendar-event"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+    <template v-else-if="type === 'form'">
+      <v-skeleton-loader
+        :loading="loading"
+        type="heading, text, text, text, button"
+        class="skeleton-form"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+    <template v-else-if="type === 'dashboard-stats'">
+      <v-skeleton-loader
+        :loading="loading"
+        type="card-heading, divider, list-item-three-line, card-heading, divider, list-item-three-line"
+        class="skeleton-dashboard-stats"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+    <template v-else>
+      <v-skeleton-loader
+        :type="type"
+        :loading="loading"
+        :height="height"
+        :width="width"
+        :class="skeletonClasses"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+    <template v-if="count > 1">
+      <v-skeleton-loader
+        v-for="i in count - 1"
+        :key="i"
+        :type="type === 'property-card' ? 'card-avatar, article, actions' :
+               type === 'booking-item' ? 'list-item-avatar-three-line' :
+               type === 'list-item' ? 'list-item-avatar-two-line' :
+               type === 'table-row' ? 'table-row' : type"
+        :loading="loading"
+        :height="type === 'property-card' ? height || 280 :
+                 type === 'calendar-event' ? height || 60 : height"
+        :width="width"
+        :class="skeletonClasses"
+        class="mt-2"
+      />
+    </template>
+  </div>
+</template>
+⋮----
+<template v-if="type === 'card'">
+      <v-skeleton-loader
+        type="card"
+        :loading="loading"
+        :height="height"
+        class="skeleton-card"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+<template v-else-if="type === 'list-item'">
+      <v-skeleton-loader
+        type="list-item-avatar-two-line"
+        :loading="loading"
+        class="skeleton-list-item"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+<template v-else-if="type === 'table-row'">
+      <v-skeleton-loader
+        type="table-row"
+        :loading="loading"
+        class="skeleton-table-row"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+<template v-else-if="type === 'property-card'">
+      <v-skeleton-loader
+        :loading="loading"
+        type="card-avatar, article, actions"
+        :height="height || 280"
+        class="skeleton-property-card"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+<template v-else-if="type === 'booking-item'">
+      <v-skeleton-loader
+        :loading="loading"
+        type="list-item-avatar-three-line"
+        class="skeleton-booking-item"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+<template v-else-if="type === 'calendar-event'">
+      <v-skeleton-loader
+        :loading="loading"
+        type="chip"
+        :height="height || 60"
+        class="skeleton-calendar-event"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+<template v-else-if="type === 'form'">
+      <v-skeleton-loader
+        :loading="loading"
+        type="heading, text, text, text, button"
+        class="skeleton-form"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+<template v-else-if="type === 'dashboard-stats'">
+      <v-skeleton-loader
+        :loading="loading"
+        type="card-heading, divider, list-item-three-line, card-heading, divider, list-item-three-line"
+        class="skeleton-dashboard-stats"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+<template v-else>
+      <v-skeleton-loader
+        :type="type"
+        :loading="loading"
+        :height="height"
+        :width="width"
+        :class="skeletonClasses"
+      >
+        <slot />
+      </v-skeleton-loader>
+    </template>
+<template v-if="count > 1">
+      <v-skeleton-loader
+        v-for="i in count - 1"
+        :key="i"
+        :type="type === 'property-card' ? 'card-avatar, article, actions' :
+               type === 'booking-item' ? 'list-item-avatar-three-line' :
+               type === 'list-item' ? 'list-item-avatar-two-line' :
+               type === 'table-row' ? 'table-row' : type"
+        :loading="loading"
+        :height="type === 'property-card' ? height || 280 :
+                 type === 'calendar-event' ? height || 60 : height"
+        :width="width"
+        :class="skeletonClasses"
+        class="mt-2"
+      />
+    </template>
+⋮----
+<script setup lang="ts">
+import { computed } from 'vue';
+interface Props {
+  loading?: boolean;
+  type?: 'card' | 'list-item' | 'table-row' | 'property-card' | 'booking-item' |
+         'calendar-event' | 'form' | 'dashboard-stats' | string;
+  count?: number;
+  height?: number | string;
+  width?: number | string;
+  class?: string;
+  variant?: 'default' | 'rounded' | 'elevated';
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: true,
+  type: 'card',
+  count: 1,
+  variant: 'default'
+});
+const containerClasses = computed(() => [
+  'skeleton-loader-container',
+  props.class
+]);
+const skeletonClasses = computed(() => [
+  'skeleton-loader',
+  `skeleton-loader--${props.variant}`,
+  {
+    'skeleton-loader--rounded': props.variant === 'rounded',
+    'skeleton-loader--elevated': props.variant === 'elevated'
+  }
+]);
+</script>
+<style scoped>
+.skeleton-loader-container {
+  width: 100%;
+}
+.skeleton-loader--rounded {
+  border-radius: 12px;
+}
+.skeleton-loader--elevated {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.skeleton-card {
+  margin-bottom: 16px;
+}
+.skeleton-list-item {
+  margin-bottom: 8px;
+}
+.skeleton-table-row {
+  margin-bottom: 4px;
+}
+.skeleton-property-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+}
+.skeleton-booking-item {
+  margin-bottom: 12px;
+  padding: 8px;
+}
+.skeleton-calendar-event {
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+.skeleton-form {
+  padding: 16px;
+}
+.skeleton-dashboard-stats {
+  padding: 16px;
+}
+:deep(.v-skeleton-loader__bone) {
+  background: linear-gradient(90deg,
+    rgba(var(--v-theme-surface-variant), 0.4) 25%,
+    rgba(var(--v-theme-surface-variant), 0.6) 50%,
+    rgba(var(--v-theme-surface-variant), 0.4) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.v-theme--dark :deep(.v-skeleton-loader__bone) {
+  background: linear-gradient(90deg,
+    rgba(var(--v-theme-surface-variant), 0.2) 25%,
+    rgba(var(--v-theme-surface-variant), 0.4) 50%,
+    rgba(var(--v-theme-surface-variant), 0.2) 75%
+  );
+  background-size: 200% 100%;
 }
 </style>
 ````
@@ -7904,6 +9272,127 @@ function filterByMultipleCriteria(criteria: {
 })
 ````
 
+## File: src/composables/admin/useAdminErrorHandler.ts
+````typescript
+import { computed } from 'vue';
+import { useErrorHandler } from '@/composables/shared/useErrorHandler';
+import { useAuthStore } from '@/stores/auth';
+import type { ErrorHandlingOptions, BusinessImpact } from '@/types/ui';
+import { useLoadingState } from '@/composables/shared/useLoadingState';
+import { useUIStore } from '@/stores/ui';
+import type { ErrorContext } from '@/types';
+export function useAdminErrorHandler()
+⋮----
+async function handleSystemPropertyError(
+    error: any,
+    operation: 'create' | 'update' | 'delete' | 'fetch' | 'bulk_update',
+    context: { propertyIds?: string[], affectedBookings?: number, affectedCleaners?: number } = {}
+): Promise<string>
+async function handleBookingManagementError(
+    error: any,
+    operation: 'create' | 'update' | 'delete' | 'assign_cleaner' | 'bulk_update',
+    context: {
+      bookingIds?: string[],
+      cleanerIds?: string[],
+      revenueImpact?: number,
+      clientsAffected?: number
+    } = {}
+): Promise<string>
+async function handleCleanerManagementError(
+    error: any,
+    operation: 'assign' | 'unassign' | 'schedule' | 'update_availability',
+    context: {
+      cleanerIds?: string[],
+      affectedBookings?: string[],
+      scheduleConflicts?: number
+    } = {}
+): Promise<string>
+async function handleDataIntegrityError(
+    error: any,
+    operation: 'validation' | 'sync' | 'backup' | 'restore',
+    context: {
+      affectedTables?: string[],
+      recordCount?: number,
+      dataLoss?: boolean
+    } = {}
+): Promise<string>
+async function handleIntegrationError(
+    error: any,
+    service: string,
+    operation: string,
+    context: {
+      endpoint?: string,
+      affectedFeatures?: string[],
+      fallbackAvailable?: boolean
+    } = {}
+): Promise<string>
+async function handleSecurityError(
+    error: any,
+    operation: 'authentication' | 'authorization' | 'audit' | 'breach_detection',
+    context: {
+      userId?: string,
+      ipAddress?: string,
+      severity?: 'low' | 'medium' | 'high' | 'critical',
+      attemptCount?: number
+    } = {}
+): Promise<string>
+async function handlePerformanceError(
+    error: any,
+    operation: string,
+    context: {
+      responseTime?: number,
+      threshold?: number,
+      affectedUsers?: number,
+      systemLoad?: number
+    } = {}
+): Promise<string>
+function showAdminSuccessMessage(
+    operation: string,
+    context: {
+      recordsAffected?: number,
+      revenueImpact?: number,
+      usersNotified?: number,
+      systemHealth?: number
+    } = {}
+): void
+function showSystemHealthReport(
+    metrics: {
+      uptime?: number,
+      errorRate?: number,
+      responseTime?: number,
+      activeUsers?: number,
+      systemLoad?: number
+    }
+): void
+function assessPropertyBusinessImpact(context: {
+    propertyIds?: string[],
+    affectedBookings?: number,
+    affectedCleaners?: number
+}): BusinessImpact
+function assessBookingBusinessImpact(context: {
+    revenueImpact?: number,
+    clientsAffected?: number
+}): BusinessImpact
+function assessCleanerBusinessImpact(context: {
+    cleanerIds?: string[],
+    affectedBookings?: string[],
+    scheduleConflicts?: number
+}): BusinessImpact
+function assessPerformanceBusinessImpact(context: {
+    responseTime?: number,
+    threshold?: number,
+    affectedUsers?: number,
+    systemLoad?: number
+}): BusinessImpact
+function calculateSystemHealth(metrics: {
+    uptime?: number,
+    errorRate?: number,
+    responseTime?: number,
+    systemLoad?: number
+}): number
+function clearAdminErrors(): void
+````
+
 ## File: src/composables/admin/useAdminProperties.ts
 ````typescript
 import { ref, computed } from 'vue';
@@ -8032,6 +9521,51 @@ function calculateMyBookingPriority(booking: Booking): 'low' | 'normal' | 'high'
 function getMyBookingCleaningWindow(booking: Booking)
 ````
 
+## File: src/composables/owner/useOwnerErrorHandler.ts
+````typescript
+import { useErrorHandler } from '@/composables/shared/useErrorHandler';
+import { useLoadingState } from '@/composables/shared/useLoadingState';
+import { useUIStore } from '@/stores/ui';
+import type { ErrorContext } from '@/types';
+export function useOwnerErrorHandler()
+⋮----
+async function handlePropertyError(
+    error: any,
+    operation: 'create' | 'update' | 'delete' | 'fetch',
+    propertyId?: string
+): Promise<string>
+async function handleBookingError(
+    error: any,
+    operation: 'create' | 'update' | 'delete' | 'fetch',
+    bookingId?: string
+): Promise<string>
+async function handleFormError(
+    validationErrors: any[],
+    formType: 'property' | 'booking' | 'profile'
+): Promise<string>
+async function handleAuthError(
+    error: any,
+    operation: 'login' | 'logout' | 'register' | 'reset_password'
+): Promise<string>
+async function handleCalendarError(
+    error: any,
+    operation: 'load' | 'navigate' | 'filter'
+): Promise<string>
+async function handleNetworkError(
+    error: any,
+    operation: string
+): Promise<string>
+function showSuccessMessage(
+    operation: string,
+    details?: string
+): void
+function showHelpfulTip(
+    category: 'booking' | 'property' | 'calendar' | 'general',
+    tip: string
+): void
+function clearOwnerErrors(): void
+````
+
 ## File: src/composables/shared/useAuth.ts
 ````typescript
 import { ref, computed } from 'vue';
@@ -8092,6 +9626,150 @@ function clearPropertyFilters()
 function filterBookings(bookings: Booking[]): Booking[]
 function getFormattedDateRange(): string
 function bookingsToEvents(bookings: Booking[])
+````
+
+## File: src/composables/shared/useErrorHandler.ts
+````typescript
+import { ref, computed } from 'vue';
+import { useUIStore } from '@/stores/ui';
+import { useUserStore } from '@/stores/user';
+import type {
+  ErrorInfo,
+  ErrorContext,
+  ErrorHandlingOptions,
+  ErrorCategory,
+  UserRole,
+  BusinessImpact,
+  ErrorRecoveryAction,
+  ApiError,
+  RetryConfig
+} from '@/types/ui';
+import {
+  getErrorMessage,
+  getGenericErrorMessage,
+  getBusinessImpactMessage,
+  getErrorCategory,
+  getRetryMessage,
+  getErrorTitle,
+  inferErrorCategory,
+  assessBusinessImpact,
+  extractErrorCode
+} from '@/utils/errorMessages';
+⋮----
+export function useErrorHandler()
+⋮----
+async function handleError(
+    error: any,
+    context: Partial<ErrorContext> = {},
+    options: Partial<ErrorHandlingOptions> = {}
+): Promise<string>
+function parseError(
+    error: any,
+    context: Partial<ErrorContext> = {},
+    options: Partial<ErrorHandlingOptions> = {}
+): ErrorInfo
+function getUserMessage(
+    category: ErrorCategory,
+    message: string,
+    role: UserRole,
+    context: ErrorContext
+): string
+function getAdminMessage(category: ErrorCategory, message: string, context: ErrorContext): string
+function inferErrorType(message: string): string | null
+function logError(errorInfo: ErrorInfo): void
+function showErrorNotification(errorInfo: ErrorInfo): void
+function showErrorDetails(errorInfo: ErrorInfo): void
+async function attemptRetry(
+    errorId: string,
+    errorInfo: ErrorInfo,
+    retryConfig: Partial<RetryConfig> = {}
+): Promise<boolean>
+function getSuggestedActions(category: ErrorCategory, role: UserRole): string[]
+async function reportError(errorInfo: ErrorInfo): Promise<void>
+async function escalateError(errorInfo: ErrorInfo): Promise<void>
+async function retryOperation(errorInfo: ErrorInfo): Promise<void>
+function scheduleRetry(errorId: string, errorInfo: ErrorInfo): void
+function clearError(errorId: string): void
+function clearAllErrors(): void
+function getError(errorId: string): ErrorInfo | undefined
+function getAllErrors(): ErrorInfo[]
+async function handleApiError(
+    error: any,
+    endpoint?: string,
+    method?: string,
+    context: Partial<ErrorContext> = {}
+): Promise<string>
+async function handleValidationError(
+    validationErrors: any[],
+    context: Partial<ErrorContext> = {}
+): Promise<string>
+async function handleBusinessError(
+    message: string,
+    code: string,
+    context: Partial<ErrorContext> = {}
+): Promise<string>
+function isOperationRetrying(errorId: string): boolean
+function getRetryCount(errorId: string): number
+````
+
+## File: src/composables/shared/useLoadingState.ts
+````typescript
+import { ref, computed, onBeforeUnmount } from 'vue';
+import { useUIStore } from '@/stores/ui';
+import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/user';
+import type {
+  LoadingOperation,
+  LoadingStateOptions,
+  LoadingState,
+  LoadingType,
+  UserRole
+} from '@/types/ui';
+import { getLoadingMessage } from '@/utils/errorMessages';
+⋮----
+export function useLoadingState()
+⋮----
+function startLoading(
+    operationId: string,
+    type: LoadingType = 'action',
+    options: LoadingStateOptions = {}
+): string
+function updateProgress(operationId: string, progress: number, message?: string): void
+function updateMessage(operationId: string, message: string): void
+function stopLoading(operationId: string): void
+function cancelLoading(operationId: string, reason?: string): void
+function handleTimeout(operationId: string): void
+function getRoleCancellationMessage(role: UserRole): string
+function getRoleTimeoutMessage(role: UserRole, operation: string): string
+function stopAllLoading(): void
+function getLoadingState(operationId: string): LoadingState
+function isOperationLoading(operationId: string): boolean
+function getOperationsByType(type: LoadingType): LoadingOperation[]
+function getLongestRunningOperation(): LoadingOperation | null
+function getLoadingDuration(operationId: string): number
+function withLoading<T>(
+    operationId: string,
+    asyncFn: () => Promise<T>,
+    options: LoadingStateOptions = {}
+): Promise<T>
+function withProgressLoading<T>(
+    operationId: string,
+    asyncFn: (updateProgress: (progress: number, message?: string) => void) => Promise<T>,
+    options: LoadingStateOptions = {}
+): Promise<T>
+⋮----
+const updateProgressFn = (progress: number, message?: string) =>
+⋮----
+export function useComponentLoadingState(componentName: string)
+⋮----
+const startComponentLoading = (operation: string, options: LoadingStateOptions =
+const stopComponentLoading = (operation: string) =>
+const isComponentLoading = (operation: string) =>
+const withComponentLoading = <T>(
+    operation: string,
+    asyncFn: () => Promise<T>,
+    options: LoadingStateOptions = {}
+) =>
 ````
 
 ## File: src/pages/admin/bookings/index.vue
@@ -12168,6 +13846,49 @@ export const validateBooking = (
 ):
 export const getAvailableStatusTransitions = (booking: Booking): BookingStatus[] =>
 export const canTransitionBookingStatus = (booking: Booking, newStatus: BookingStatus): boolean =>
+````
+
+## File: src/utils/errorMessages.ts
+````typescript
+import type { ErrorCategory, UserRole, BusinessImpact } from '@/types/ui';
+⋮----
+export function getErrorMessage(
+  category: ErrorCategory,
+  errorType: string,
+  role: UserRole,
+  context: Record<string, any> = {}
+): string
+export function getGenericErrorMessage(role: UserRole): string
+export function getBusinessImpactMessage(impact: BusinessImpact): string
+function replacePlaceholders(message: string, context: Record<string, any>): string
+export function getRetryMessage(role: UserRole, attempt: number, maxAttempts: number): string
+export function getLoadingMessage(role: UserRole, operation: string): string
+export function getSuccessMessage(role: UserRole, operation: string, context: Record<string, any> =
+⋮----
+export function getErrorCategory(errorCode?: string): ErrorCategory
+⋮----
+export function getErrorMessage(
+  category: ErrorCategory,
+  code: string,
+  role: UserRole = 'owner',
+  context: Record<string, any> = {}
+): string
+export function getLoadingMessage(
+  operation: string,
+  role: UserRole = 'owner'
+): string
+export function getSuccessMessage(
+  action: string,
+  role: UserRole = 'owner',
+  context: Record<string, any> = {}
+): string
+export function inferErrorCategory(code?: string, message?: string): ErrorCategory
+export function assessBusinessImpact(
+  category: ErrorCategory,
+  context: Record<string, any> = {}
+): BusinessImpact
+export function extractErrorCode(error: any): string | undefined
+export function getErrorTitle(category: ErrorCategory, role: UserRole = 'owner'): string
 ````
 
 ## File: tsconfig.node.json
@@ -26327,185 +28048,6 @@ function createUserFromRegistration(userData: {
 }): User
 ````
 
-## File: src/types/ui.ts
-````typescript
-export type ModalData = Record<string, unknown> | null | undefined;
-export type FilterValue = string | number | boolean | Date | string[] | null | undefined;
-export interface ModalState {
-  open: boolean;
-  mode: 'create' | 'edit' | 'view' | 'delete';
-  data?: ModalData;
-}
-export interface ConfirmDialogState {
-  open: boolean;
-  title: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  confirmColor?: string;
-  dangerous?: boolean;
-  data?: ModalData;
-}
-export type NotificationType = 'success' | 'info' | 'warning' | 'error';
-export interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-  autoClose?: boolean;
-  duration?: number;
-}
-export type CalendarView = 'month' | 'week' | 'day' | 'list';
-export interface FilterState {
-  propertyId?: string;
-  bookingType?: 'all' | 'standard' | 'turn';
-  status?: 'all' | 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-  dateRange?: {
-    start: string;
-    end: string;
-  };
-  searchTerm?: string;
-}
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  start: string;
-  end: string;
-  allDay: boolean;
-  classNames: string[];
-  backgroundColor?: string;
-  borderColor?: string;
-  textColor?: string;
-  extendedProps: {
-    booking: Record<string, unknown>;
-    type: 'standard' | 'turn';
-    status: string;
-  };
-}
-export type UserRole = 'owner' | 'admin' | 'cleaner';
-export type ErrorCategory =
-  | 'validation'
-  | 'network'
-  | 'business_logic'
-  | 'authentication'
-  | 'permission'
-  | 'system';
-export type BusinessImpact = 'low' | 'medium' | 'high' | 'critical';
-export interface ErrorContext {
-  operation: string;
-  userRole: UserRole;
-  component?: string;
-  data?: any;
-  timestamp: string;
-  sessionId?: string;
-}
-export interface ErrorHandlingOptions {
-  showNotification?: boolean;
-  logToConsole?: boolean;
-  retryable?: boolean;
-  businessImpact?: BusinessImpact;
-  autoRetry?: boolean;
-  maxRetries?: number;
-  retryDelay?: number;
-}
-export interface ErrorInfo {
-  code?: string;
-  category: ErrorCategory;
-  message: string;
-  technicalMessage?: string;
-  userMessage: string;
-  adminMessage?: string;
-  context: ErrorContext;
-  options: ErrorHandlingOptions;
-  stack?: string;
-  cause?: Error;
-}
-export interface ErrorRecoveryAction {
-  label: string;
-  action: () => void | Promise<void>;
-  primary?: boolean;
-  dangerous?: boolean;
-}
-export type LoadingType = 'global' | 'page' | 'component' | 'action';
-export interface LoadingOperation {
-  id: string;
-  type: LoadingType;
-  message?: string;
-  progress?: number;
-  cancellable?: boolean;
-  startTime: number;
-  timeout?: number;
-  role?: UserRole;
-}
-export interface LoadingStateOptions {
-  timeout?: number;
-  showProgress?: boolean;
-  overlay?: boolean;
-  role?: UserRole;
-  message?: string;
-  cancellable?: boolean;
-  onCancel?: () => void;
-}
-export interface LoadingState {
-  loading: boolean;
-  progress?: number;
-  message?: string;
-  cancellable?: boolean;
-  error?: ErrorInfo | null;
-}
-export interface RoleBasedNotification extends Notification {
-  role?: UserRole;
-  businessImpact?: BusinessImpact;
-  actions?: ErrorRecoveryAction[];
-  technical?: boolean;
-  retryable?: boolean;
-}
-export interface NotificationQueueConfig {
-  maxSize: number;
-  defaultDuration: number;
-  roleBasedStyling: boolean;
-  groupSimilar: boolean;
-}
-export interface ValidationError {
-  field: string;
-  message: string;
-  code?: string;
-  severity: 'error' | 'warning' | 'info';
-}
-export interface FormValidationState {
-  valid: boolean;
-  errors: ValidationError[];
-  warnings: ValidationError[];
-  touched: Set<string>;
-  dirty: Set<string>;
-}
-export interface ApiError {
-  status: number;
-  statusText: string;
-  code?: string;
-  message: string;
-  details?: any;
-  timestamp: string;
-  requestId?: string;
-}
-export interface RetryConfig {
-  maxAttempts: number;
-  baseDelay: number;
-  maxDelay: number;
-  backoffFactor: number;
-  retryableStatuses: number[];
-}
-export interface AccessibilityOptions {
-  announceErrors: boolean;
-  announceLoading: boolean;
-  highContrast: boolean;
-  reducedMotion: boolean;
-  screenReaderOptimized: boolean;
-}
-````
-
 ## File: src/layouts/default.vue
 ````vue
 <template>
@@ -26919,6 +28461,192 @@ onMounted(async () => {
   text-transform: none;
 }
 </style>
+````
+
+## File: src/types/ui.ts
+````typescript
+export type ModalData = Record<string, unknown> | null | undefined;
+export type FilterValue = string | number | boolean | Date | string[] | null | undefined;
+export interface ModalState {
+  open: boolean;
+  mode: 'create' | 'edit' | 'view' | 'delete';
+  data?: ModalData;
+}
+export interface ConfirmDialogState {
+  open: boolean;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  confirmColor?: string;
+  dangerous?: boolean;
+  data?: ModalData;
+}
+export type NotificationType = 'success' | 'info' | 'warning' | 'error';
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  autoClose?: boolean;
+  duration?: number;
+}
+export type CalendarView = 'month' | 'week' | 'day' | 'list';
+export interface FilterState {
+  propertyId?: string;
+  bookingType?: 'all' | 'standard' | 'turn';
+  status?: 'all' | 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  dateRange?: {
+    start: string;
+    end: string;
+  };
+  searchTerm?: string;
+}
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  allDay: boolean;
+  classNames: string[];
+  backgroundColor?: string;
+  borderColor?: string;
+  textColor?: string;
+  extendedProps: {
+    booking: Record<string, unknown>;
+    type: 'standard' | 'turn';
+    status: string;
+  };
+}
+export type UserRole = 'owner' | 'admin' | 'cleaner';
+export type ErrorCategory =
+  | 'validation'
+  | 'network'
+  | 'business_logic'
+  | 'authentication'
+  | 'permission'
+  | 'system';
+export type BusinessImpact = 'low' | 'medium' | 'high' | 'critical';
+export interface ErrorContext {
+  userId?: string;
+  userRole?: UserRole;
+  operation?: string;
+  component?: string;
+  timestamp: string;
+  sessionId?: string;
+  requestId?: string;
+}
+export interface ErrorHandlingOptions {
+  showToUser?: boolean;
+  autoRetry?: boolean;
+  maxRetries?: number;
+  retryDelay?: number;
+  logToConsole?: boolean;
+  reportToService?: boolean;
+  escalate?: boolean;
+}
+export interface ErrorInfo {
+  code?: string;
+  category: ErrorCategory;
+  message: string;
+  userMessage?: string;
+  technicalDetails?: string;
+  businessImpact?: BusinessImpact;
+  affectedResources?: string[];
+  suggestedActions?: string[];
+  context: ErrorContext;
+  options: ErrorHandlingOptions;
+}
+export interface ErrorRecoveryAction {
+  label: string;
+  action: () => void | Promise<void>;
+  primary?: boolean;
+  dangerous?: boolean;
+}
+export type LoadingType = 'global' | 'page' | 'component' | 'action';
+export interface LoadingOperation {
+  id: string;
+  type: LoadingType;
+  message?: string;
+  progress?: number;
+  cancellable?: boolean;
+  startTime: number;
+  timeout?: number;
+  role?: UserRole;
+}
+export interface LoadingStateOptions {
+  timeout?: number;
+  showProgress?: boolean;
+  overlay?: boolean;
+  role?: UserRole;
+  message?: string;
+  cancellable?: boolean;
+  onCancel?: () => void;
+}
+export interface LoadingState {
+  loading: boolean;
+  progress?: number;
+  message?: string;
+  cancellable?: boolean;
+  error?: ErrorInfo | null;
+}
+export interface NotificationAction {
+  label: string;
+  action: string;
+  color?: string;
+  icon?: string;
+}
+export interface RoleBasedNotification extends Notification {
+  userRole?: UserRole;
+  businessImpact?: BusinessImpact;
+  category?: ErrorCategory;
+  actions?: NotificationAction[];
+  escalationLevel?: number;
+}
+export interface NotificationQueueConfig {
+  maxSize: number;
+  defaultDuration: number;
+  roleBasedStyling: boolean;
+  groupSimilar: boolean;
+}
+export interface ValidationError {
+  field: string;
+  message: string;
+  code?: string;
+  value?: any;
+}
+export interface FormValidationState {
+  valid: boolean;
+  errors: ValidationError[];
+  warnings: ValidationError[];
+  touched: Set<string>;
+  dirty: Set<string>;
+}
+export interface ApiError {
+  status?: number;
+  statusText?: string;
+  code?: string;
+  message: string;
+  details?: any;
+  endpoint?: string;
+  method?: string;
+  timestamp: string;
+}
+export interface RetryConfig {
+  maxAttempts: number;
+  baseDelay: number;
+  maxDelay: number;
+  exponentialBackoff: boolean;
+  retryCondition?: (error: any) => boolean;
+}
+export interface AccessibilityOptions {
+  announceToScreenReader?: boolean;
+  focusManagement?: boolean;
+  highContrast?: boolean;
+  reducedMotion?: boolean;
+}
 ````
 
 ## File: src/components/smart/Home.vue
@@ -30081,10 +31809,22 @@ import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from 
   - Assigned to: Cursor
 
 ---
-- [ ] **TASK-038**: Implement loading states and error handling
-  - Status: Not Started
-  - Notes: 
-  - Requirements: loading spinners, error messages, user feedback
+- [x] **TASK-038**: Implement loading states and error handling
+  - Status: Complete
+  - Notes: Implemented comprehensive role-based error handling and loading state system including:
+    - Enhanced TypeScript types for error handling and loading states (src/types/ui.ts)
+    - Error message mapping utilities with role-specific templates (src/utils/errorMessages.ts)
+    - Shared error handler composable with role-aware messaging (src/composables/shared/useErrorHandler.ts)
+    - Shared loading state composable with centralized management (src/composables/shared/useLoadingState.ts)
+    - Owner-specific error handler with simple, encouraging messages (src/composables/owner/useOwnerErrorHandler.ts)
+    - Admin-specific error handler with technical details and business impact (src/composables/admin/useAdminErrorHandler.ts)
+    - UI components: LoadingSpinner, SkeletonLoader, ErrorAlert with role-aware display
+    - Comprehensive demo component for testing all error handling and loading scenarios
+    - Role-based error messaging: Owner (simple, user-friendly) vs Admin (technical, business-focused)
+    - Business impact assessment and escalation for admin errors
+    - Loading state hierarchy: global, page, component, action levels
+    - Integration with existing Map collection patterns and UI store
+  - Requirements: loading spinners, error messages, user feedback ✓
   - Assigned to: Cursor
 
 

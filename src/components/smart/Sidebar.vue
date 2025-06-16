@@ -147,11 +147,11 @@ import type { Booking, Property, BookingWithMetadata } from '@/types';
 // Import event logger
 import eventLogger from '@/composables/shared/useComponentEventLogger';
 
-// Define props with default values
+// Define props with default vales
 interface Props {
-  todayTurns?: Map<string, Booking> | Booking[];
-  upcomingCleanings?: Map<string, Booking> | Booking[];
-  properties?: Map<string, Property> | Property[];
+  todayTurns?: Map<string, Bookin> | Booking[];
+  upcomingCleanings?: Map<string,Booking> | Booking[];
+  properties?: Map<string Property> | Property[];
   loading?: boolean;
 }
 
