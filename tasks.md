@@ -529,38 +529,62 @@
   - Notes: Successfully implemented owner-specific property composable that filters all data to current user's properties only. Provides owner-friendly interface with proper validation, error handling, and business insights. Ready for integration with owner-specific components like HomeOwner.vue and OwnerSidebar.vue.
   - Assigned to: Cursor
 
-- [ ] **TASK-039K**: Create useOwnerCalendarState.ts composable
-  - Status: Not Started
+- [x] **TASK-039K**: Create useOwnerCalendarState.ts composable
+  - Status: Complete
   - Requirements:
-    - Extend base `useCalendarState.ts` functionality
-    - Filter calendar data to current owner's events only
-    - Implement owner-specific calendar views and navigation
-    - Add owner-specific date/time utilities
-    - Remove admin calendar features
+    - ✅ Extend base `useCalendarState.ts` functionality
+    - ✅ Filter calendar data to current owner's events only
+    - ✅ Implement owner-specific calendar views and navigation
+    - ✅ Add owner-specific date/time utilities
+    - ✅ Remove admin calendar features
   - Functions:
-    - `getOwnerCalendarEvents()` - format owner's bookings for calendar
-    - `handleOwnerDateSelect()` - create booking for owner's property
-    - `handleOwnerEventClick()` - edit owner's booking
-    - `getOwnerTurnAlerts()` - owner's urgent turns only
-    - `filterByOwnerProperty(propertyId)` - filter owner's calendar
+    - ✅ `getOwnerCalendarEvents()` - format owner's bookings for calendar
+    - ✅ `handleOwnerDateSelect()` - create booking for owner's property
+    - ✅ `handleOwnerEventClick()` - edit owner's booking
+    - ✅ `getOwnerTurnAlerts()` - owner's urgent turns only
+    - ✅ `filterByOwnerProperty(propertyId)` - filter owner's calendar
+  - Implementation Details:
+    - Created comprehensive owner-specific calendar state composable extending shared useCalendarState
+    - All computed properties filter data by `owner_id === currentUser.id`
+    - Added owner-specific event handling with ownership validation
+    - Implemented owner-friendly error messages and validation
+    - Created demo component `UseOwnerCalendarStateDemo.vue` with comprehensive testing
+    - Added demo route `/demos/use-owner-calendar-state` for testing
+    - Follows Map collection patterns and proper TypeScript interfaces
+    - Extends shared composable using composition pattern
+    - Removes admin-only functions while maintaining core calendar functionality
+  - Notes: Successfully implemented owner-specific calendar state management that filters all data to current user's bookings only. Provides owner-friendly interface with proper validation, error handling, and business insights. Ready for integration with owner-specific components like HomeOwner.vue and OwnerCalendar.vue.
   - Assigned to: Cursor
 
 ### **Admin-Specific Composables**
-- [ ] **TASK-039L**: Create useAdminBookings.ts composable
-  - Status: Not Started
+- [x] **TASK-039L**: Create useAdminBookings.ts composable
+  - Status: Complete
   - Requirements:
-    - Extend base `useBookings.ts` functionality
-    - No filtering - access ALL bookings across all owners
-    - Add admin-specific functions (cleaner assignment, status management)
-    - Implement system-wide analytics and reporting
-    - Add bulk operations for managing multiple bookings
+    - ✅ Extend base `useBookings.ts` functionality
+    - ✅ No filtering - access ALL bookings across all owners
+    - ✅ Add admin-specific functions (cleaner assignment, status management)
+    - ✅ Implement system-wide analytics and reporting
+    - ✅ Add bulk operations for managing multiple bookings
   - Functions:
-    - `fetchAllBookings()` - get ALL bookings (no owner filter)
-    - `assignCleaner(bookingId, cleanerId)` - assign cleaner to booking
-    - `updateBookingStatus(bookingId, status)` - manage booking workflow
-    - `getSystemTurns()` - all urgent turns across all properties
-    - `getUnassignedBookings()` - bookings without assigned cleaners
-    - `bulkAssignCleaner(bookingIds, cleanerId)` - bulk cleaner assignment
+    - ✅ `fetchAllBookings()` - get ALL bookings (no owner filter)
+    - ✅ `assignCleaner(bookingId, cleanerId)` - assign cleaner to booking
+    - ✅ `updateBookingStatus(bookingId, status)` - manage booking workflow
+    - ✅ `getSystemTurns()` - all urgent turns across all properties
+    - ✅ `getUnassignedBookings()` - bookings without assigned cleaners
+    - ✅ `bulkAssignCleaner(bookingIds, cleanerId)` - bulk cleaner assignment
+  - Implementation Details:
+    - Created comprehensive admin-specific booking composable extending shared useBookings
+    - NO filtering - accesses ALL bookings across all owners (key difference from owner version)
+    - Added admin-specific computed properties: allBookings, systemTurns, systemTodayTurns, unassignedBookings, bookingsByStatus, bookingsByOwner, bookingsByCleaner, systemMetrics
+    - Implemented admin CRUD operations: fetchAllBookings(), assignCleaner(), updateBookingStatus(), bulkAssignCleaner(), bulkUpdateStatus()
+    - Added system-wide analytics: getSystemTurnAlerts(), getCleanerWorkloadAnalysis(), getPropertyUtilizationReport()
+    - Implemented advanced filtering with multiple criteria: filterBookings()
+    - Created demo component `UseAdminBookingsDemo.vue` with comprehensive testing interface
+    - Follows Map collection patterns and proper TypeScript interfaces
+    - Extends shared composable using composition pattern
+    - Includes admin-specific error messaging with business impact context
+    - All functions work with system-wide data scope for business admin interface
+  - Notes: Successfully implemented admin-specific booking management that provides access to ALL data across all clients. Includes comprehensive analytics, bulk operations, and business insights for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminCalendar.vue.
   - Assigned to: Cursor
 
 - [ ] **TASK-039M**: Create useAdminProperties.ts composable
