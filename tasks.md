@@ -832,18 +832,36 @@
   - Assigned to: Cursor
 
 ### **Authentication & Route Guards**
-- [ ] **TASK-039U**: Implement role-based route guards
-  - Status: Not Started
+- [x] **TASK-039U**: Implement role-based route guards
+  - Status: Complete
   - Requirements:
-    - Create route guards that check user roles
-    - Redirect owners trying to access admin pages
-    - Redirect admins to admin interface by default
-    - Add proper error messages for unauthorized access
-    - Implement loading states during authentication check
+    - ✅ Create route guards that check user roles
+    - ✅ Redirect owners trying to access admin pages
+    - ✅ Redirect admins to admin interface by default
+    - ✅ Add proper error messages for unauthorized access
+    - ✅ Implement loading states during authentication check
   - Route Protection:
-    - `/owner/*` - requires 'owner' role
-    - `/admin/*` - requires 'admin' role
-    - `/` - routes based on role
+    - ✅ `/owner/*` - requires 'owner' role
+    - ✅ `/admin/*` - requires 'admin' role
+    - ✅ `/` - routes based on role
+  - Implementation Details:
+    - Created TypeScript route meta extensions in `src/types/router.ts`
+    - Implemented comprehensive route guards in `src/router/guards.ts`
+    - Added role-based authentication and authorization logic
+    - Business rule: Admin can access owner routes for support, but owners cannot access admin routes
+    - Integrated with existing UI store notification system for error messages
+    - Added loading states and proper error handling
+    - Created demo page at `/demos/route-guards` for testing different role scenarios
+    - Moved shared dumb components to `components/dumb/shared/` folder structure
+    - Guards include: authGuard, loadingGuard, afterNavigationGuard, developmentGuard
+  - Files Created/Modified:
+    - `src/types/router.ts` - TypeScript route meta extensions
+    - `src/router/guards.ts` - Route guard implementations
+    - `src/router/index.ts` - Applied guards to router
+    - `src/pages/demos/route-guards.vue` - Demo page for testing
+    - Reorganized shared components folder structure
+  - Testing: Demo page allows testing different user roles and route access scenarios
+  - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2
   - Assigned to: Cursor
 
 - [ ] **TASK-039V**: Update authentication flow for role-based routing
@@ -896,11 +914,7 @@
   - Notes: 
   - Requirements: loading spinners, error messages, user feedback
   - Assigned to: Cursor
-- [ ] **TASK-038**: Implement loading states and error handling
-  - Status: Not Started
-  - Notes: 
-  - Requirements: loading spinners, error messages, user feedback
-  - Assigned to: Cursor
+
 
 - [ ] **TASK-039**: Add turn booking visual indicators
   - Status: Not Started

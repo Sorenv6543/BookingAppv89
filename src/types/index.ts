@@ -16,3 +16,6 @@ export * from './ui';
 
 // API types
 export * from './api';
+
+// Router types
+export * from './router';

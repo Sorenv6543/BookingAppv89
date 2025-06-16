@@ -167,7 +167,7 @@ import OwnerSidebar from './OwnerSidebar.vue';
 import FullCalendar from '../FullCalendar.vue';
 import BookingForm from '@/components/dumb/BookingForm.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
-import ConfirmationDialog from '@/components/dumb/ConfirmationDialog.vue';
+import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
 
 // State management
 import { usePropertyStore } from '@/stores/property';

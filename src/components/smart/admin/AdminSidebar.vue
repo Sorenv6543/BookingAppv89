@@ -457,8 +457,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 // Removed unused useUIStore import
-import TurnAlerts from '@/components/dumb/TurnAlerts.vue';
-import UpcomingCleanings from '@/components/dumb/UpcomingCleanings.vue';
+import TurnAlerts from '@/components/dumb/shared/TurnAlerts.vue';
+import UpcomingCleanings from '@/components/dumb/shared/UpcomingCleanings.vue';
 
 // Import types
 import type { Booking, Property, User, BookingWithMetadata } from '@/types';

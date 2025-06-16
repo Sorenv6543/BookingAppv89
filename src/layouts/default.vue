@@ -160,7 +160,7 @@
   import { ref } from 'vue';
   import { watch } from 'vue';
   import { useDisplay } from 'vuetify';
-  import ThemePicker from '@/components/dumb/ThemePicker.vue';
+  import ThemePicker from '@/components/dumb/shared/ThemePicker.vue';
 
   // Reactive state for the navigation drawer
   const drawer = ref(true);
