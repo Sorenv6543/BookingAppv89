@@ -969,10 +969,22 @@
   - Assigned to: Cursor
 
 ---
-- [ ] **TASK-038**: Implement loading states and error handling
-  - Status: Not Started
-  - Notes: 
-  - Requirements: loading spinners, error messages, user feedback
+- [x] **TASK-038**: Implement loading states and error handling
+  - Status: Complete
+  - Notes: Implemented comprehensive role-based error handling and loading state system including:
+    - Enhanced TypeScript types for error handling and loading states (src/types/ui.ts)
+    - Error message mapping utilities with role-specific templates (src/utils/errorMessages.ts)
+    - Shared error handler composable with role-aware messaging (src/composables/shared/useErrorHandler.ts)
+    - Shared loading state composable with centralized management (src/composables/shared/useLoadingState.ts)
+    - Owner-specific error handler with simple, encouraging messages (src/composables/owner/useOwnerErrorHandler.ts)
+    - Admin-specific error handler with technical details and business impact (src/composables/admin/useAdminErrorHandler.ts)
+    - UI components: LoadingSpinner, SkeletonLoader, ErrorAlert with role-aware display
+    - Comprehensive demo component for testing all error handling and loading scenarios
+    - Role-based error messaging: Owner (simple, user-friendly) vs Admin (technical, business-focused)
+    - Business impact assessment and escalation for admin errors
+    - Loading state hierarchy: global, page, component, action levels
+    - Integration with existing Map collection patterns and UI store
+  - Requirements: loading spinners, error messages, user feedback ✓
   - Assigned to: Cursor
 
 
