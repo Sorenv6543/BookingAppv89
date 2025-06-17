@@ -1,8 +1,24 @@
+<!--
+ 🎭 COMPONENT SELECTION LAYER
+ src/pages/index.vue - 🎬 ROLE-BASED COMPONENT DIRECTOR
+ 
+✅ ROOT DECISION MAKER - chooses which UI to show
+✅ Renders different components based on role
+✅ Handles admin view-switching
+✅ Shows auth prompt for unauthenticated users
+ -->
+
 <template>
   <!-- Loading state while checking authentication -->
-  <div v-if="authStore.loading" class="loading-container">
+  <div
+    v-if="authStore.loading"
+    class="loading-container"
+  >
     <v-container class="fill-height">
-      <v-row justify="center" align="center">
+      <v-row
+        justify="center"
+        align="center"
+      >
         <v-col cols="auto">
           <v-progress-circular
             indeterminate
@@ -18,7 +34,10 @@
   </div>
 
   <!-- Role-based component rendering -->
-  <component v-else :is="homeComponent" />
+  <component
+    :is="homeComponent"
+    v-else
+  />
 </template>
 
 <script setup lang="ts">

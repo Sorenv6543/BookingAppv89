@@ -1,7 +1,7 @@
 <template>
   <v-navigation-drawer
     class="admin-sidebar"
-    width="100%"
+    permanent
     :elevation="80"
     color="tertiary"
   >                                   
@@ -915,6 +915,7 @@ onMounted(() => {
 .admin-sidebar {
   height: 100%;
   overflow-y: auto;
+  width: 100% !important; /* Fill parent column container */
 }
 
 .system-turn-alerts {
@@ -962,10 +963,6 @@ onMounted(() => {
 
 /* Desktop-optimized layout */
 @media (min-width: 1264px) {
-  .admin-sidebar {
-    width: 100% !important;
-  }
-  
   .business-analytics .v-col {
     padding: 4px 8px;
   }
@@ -973,10 +970,6 @@ onMounted(() => {
 
 /* Mobile optimizations */
 @media (max-width: 960px) {
-  .admin-sidebar {
-    width: 100% !important;
-  }
-  
   .admin-quick-actions .v-btn {
     font-size: 0.875rem;
   }

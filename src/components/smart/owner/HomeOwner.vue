@@ -1,3 +1,14 @@
+<!-- 
+🏠 ROLE-SPECIFIC INTERFACES
+👤 OWNER INTERFACE
+src/components/smart/owner/HomeOwner.vue - 
+
+✅ FILTERED VIEW - Owner sees only their data
+✅ Filters properties by owner_id
+✅ Filters bookings by owner_id
+✅ Prevents access to other owners' data
+ -->
+``
 <template>
   <div class="home-owner-container">
     <v-row

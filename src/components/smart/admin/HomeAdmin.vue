@@ -1,3 +1,12 @@
+<!-- 
+👑 ADMIN INTERFACE
+ src/components/smart/admin/HomeAdmin.vue - 
+
+✅ UNFILTERED VIEW - Admin sees all data
+✅ Access to all properties across all owners
+✅ System-wide metrics and controls
+✅ Can manage any owner's data 
+-->
 <template>
   <div class="home-admin-container">
     <v-row
@@ -11,16 +20,15 @@
         xl="2" 
         class="sidebar-column"
         :class="{ 'mobile-hidden': !sidebarOpen }"
-
       >
-          <v-btn
-            v-if="$vuetify.display.lgAndDown"
-            icon="mdi-menu"
-            variant="text"
-            class="mr-4"
-            @click="toggleSidebar"
-          /><!-- TODO: Replace with AdminSidebar.vue when TASK-039G is complete -->
-        <Sidebar
+        <v-btn
+          v-if="$vuetify.display.lgAndDown"
+          icon="mdi-menu"
+          variant="text"
+          class="mr-4"
+          @click="toggleSidebar"
+        /><!-- TODO: Replace with AdminSidebar.vue when TASK-039G is complete -->
+        <AdminSidebar
           :today-turns="systemTodayTurns"
           :upcoming-cleanings="systemUpcomingCleanings"
           :properties="allPropertiesMap"
@@ -41,8 +49,6 @@
         class="calendar-column"
       >
         <div class="calendar-header">
-
-          
           <!-- Admin-focused Calendar Controls -->
           <div class="d-flex align-center">
             <v-btn
@@ -122,13 +128,14 @@
         </div>
 
         <!-- TODO: Replace with AdminCalendar.vue when TASK-039H is complete -->
-        <FullCalendar
+        <AdminCalendar 
           ref="calendarRef"
           :bookings="adminFilteredBookings"
-          :properties="allPropertiesMap"
           :loading="loading"
           :current-view="currentView"
           :current-date="currentDate"
+          :properties="allPropertiesMap"
+          :users="allUsersMap"
           @date-select="handleDateSelect"
           @event-click="handleEventClick"
           @event-drop="handleEventDrop"
@@ -184,13 +191,15 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDisplay } from 'vuetify';
 
 // Admin components (using generic components for now)
-import Sidebar from '../Sidebar.vue';
-import FullCalendar from '../FullCalendar.vue';
+
+import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
+import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
 import BookingForm from '@/components/dumb/BookingForm.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
 import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
 
 // State management
+import { useUserStore } from '@/stores/user';
 import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
 import { useUIStore } from '@/stores/ui';
@@ -211,6 +220,7 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 // ============================================================================
 // STORE CONNECTIONS & STATE
 // ============================================================================
+const userStore = useUserStore();
 const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
@@ -252,7 +262,7 @@ const {
 // ============================================================================
 // LOCAL STATE
 // ============================================================================
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
 const sidebarOpen = ref(!xs.value);
 const selectedPropertyFilter = ref<string | null>(null);
 
@@ -305,6 +315,23 @@ const allPropertiesMap = computed(() => {
     });
     return map;
   }
+});
+
+// ALL users (no filtering for admin)
+const allUsersMap = computed(() => {
+  const map = new Map<string, any>();
+  
+  if (!isAdminAuthenticated.value) {
+    return map;
+  }
+
+  // For now, just include the current user
+  // TODO: Implement user management store for all users when needed
+  if (userStore.user) {
+    map.set(userStore.user.id, userStore.user);
+  }
+  
+  return map;
 });
 
 // ALL bookings (no owner filtering for admin)

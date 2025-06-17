@@ -1,13 +1,13 @@
+// 🔐 AUTHENTICATION LAYER
+
+// src/utils/authHelpers.ts - 🛠️ AUTH UTILITIES
+// ✅ Route mapping for each role
+// ✅ Role-specific UI messages
+// ✅ Navigation validation helpers
+// ✅ State cleanup utilities
+
 import type { UserRole } from '@/types'
 
-/**
- * Auth utilities for role-based multi-tenant architecture
- * Provides centralized helpers for authentication flows
- */
-
-/**
- * Get the default route for a user based on their role
- */
 export function getDefaultRouteForRole(userRole: UserRole | undefined): string {
   switch (userRole) {
     case 'owner':

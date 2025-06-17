@@ -988,6 +988,29 @@
   - Assigned to: Cursor
 
 
+- [x] **TASK-UI-FIX_ADMIN-SIDEBAR**: Fix AdminSidebar width responsiveness
+  - Status: Complete
+  - Requirements: 
+    - ✅ Desktop: Standard sidebar width controlled by parent column
+    - ✅ Mobile: Hidden sidebar (not visible)
+    - ✅ Responsive: Proper transitions between breakpoints
+  - Implementation Details:
+    - **Root Cause**: AdminSidebar.vue was forcing `width="100%"` on v-navigation-drawer, overriding parent HomeAdmin.vue column constraints (`lg="3" xl="2"`)
+    - **Solution**: Removed `width="100%"` prop and added `permanent` prop for embedded behavior within parent column
+    - **CSS Updates**: Updated styling to use `width: 100% !important` to fill parent column container (not viewport), removed redundant responsive width rules
+    - **Testing**: Created demo page at `/demos/admin-sidebar-width-test` for verification
+    - **Files Modified**: 
+      - `src/components/smart/admin/AdminSidebar.vue` - Updated v-navigation-drawer props and CSS
+      - `src/pages/demos/admin-sidebar-width-test.vue` - Created test page
+      - `src/router/index.ts` - Added demo route
+  - Results:
+    - **Desktop (lg)**: Sidebar respects parent column sizing = 25% width
+    - **Large Desktop (xl)**: Sidebar respects parent column sizing = 16.7% width  
+    - **Mobile**: Sidebar hidden using existing `mobile-hidden` class logic
+    - **Functionality**: All admin-specific features and data access preserved
+  - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2. Fix maintains role-based architecture patterns and multi-tenant data access.
+  - Assigned to: Cursor
+
 - [ ] **TASK-039**: Add turn booking visual indicators
   - Status: Not Started
   - Notes: 

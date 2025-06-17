@@ -1,3 +1,13 @@
+// 🛣️ ROUTING & GUARDS LAYER
+
+// src/router/guards.ts - 🛡️ ROUTE PROTECTION
+
+// ✅ Runs before EVERY route change
+// ✅ Checks if user is authenticated
+// ✅ Checks if user has required role
+// ✅ Redirects unauthorized users
+// ✅ Shows error messages
+
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUIStore } from '@/stores/ui'

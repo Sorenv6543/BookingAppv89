@@ -1,3 +1,12 @@
+// 🛣️ ROUTING & GUARDS LAYER
+
+// src/router/index.ts - 🗺️ ROUTE DEFINITIONS
+
+// ✅ Maps URLs to components
+// ✅ Declares auth requirements via meta.requiresAuth
+// ✅ Declares role requirements via meta.role
+// ✅ Applies navigation guards
+
 import { createRouter, createWebHistory } from 'vue-router'
 import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from './guards'
 
@@ -232,6 +241,17 @@ const router = createRouter({
         public: true,
         demo: true,
         title: 'Route Guards Demo'
+      }
+    },
+    {
+      path: '/demos/admin-sidebar-width-test',
+      name: 'admin-sidebar-width-test',
+      component: () => import('@/pages/demos/admin-sidebar-width-test.vue'),
+      meta: {
+        layout: 'default',
+        public: true,
+        demo: true,
+        title: 'Admin Sidebar Width Test'
       }
     },
 

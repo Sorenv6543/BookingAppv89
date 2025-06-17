@@ -184,800 +184,11 @@ src/utils/errorMessages.ts
 tasks.md
 tsconfig.json
 tsconfig.node.json
-typescript-navigation.md
 vite.config.ts
 vitest.config.ts
 ```
 
 # Files
-
-## File: typescript-navigation.md
-````markdown
-# Vue Router TypeScript Navigation
-
-This document provides comprehensive examples and patterns for implementing type-safe navigation in Vue Router with TypeScript.
-
-## Table of Contents
-
-1. [Basic TypeScript Setup](#basic-typescript-setup)
-2. [Typed Routes Configuration](#typed-routes-configuration)
-3. [Route Meta Fields Typing](#route-meta-fields-typing)
-4. [Programmatic Navigation](#programmatic-navigation)
-5. [Composition API with TypeScript](#composition-api-with-typescript)
-6. [Navigation Guards](#navigation-guards)
-7. [Data Fetching Patterns](#data-fetching-patterns)
-8. [Advanced TypeScript Patterns](#advanced-typescript-patterns)
-
-## Basic TypeScript Setup
-
-### Creating a Router Instance
-
-```typescript
-import { createMemoryHistory, createRouter } from 'vue-router'
-import HomeView from './HomeView.vue'
-import AboutView from './AboutView.vue'
-
-const routes = [
-  { path: '/', component: HomeView },
-  { path: '/about', component: AboutView },
-]
-
-const router = createRouter({
-  history: createMemoryHistory(),
-  routes,
-})
-```
-
-### Installing Vue Router
-
-```bash
-npm install vue-router@4
-# or
-yarn add vue-router@4
-# or
-pnpm add vue-router@4
-# or
-bun add vue-router@4
-```
-
-## Typed Routes Configuration
-
-### Manual Route Type Definition
-
-For complete type safety, you can manually define your routes using the `RouteRecordInfo` type:
-
-```typescript
-// import the `RouteRecordInfo` type from vue-router to type your routes
-import type { RouteRecordInfo } from 'vue-router'
-
-// Define an interface of routes
-export interface RouteNamedMap {
-  // each key is a name
-  home: RouteRecordInfo<
-    // here we have the same name
-    'home',
-    // this is the path, it will appear in autocompletion
-    '/',
-    // these are the raw params. In this case, there are no params allowed
-    Record<never, never>,
-    // these are the normalized params
-    Record<never, never>
-  >
-  // repeat for each route..
-  // Note you can name them whatever you want
-  'named-param': RouteRecordInfo<
-    'named-param',
-    '/:name',
-    { name: string | number }, // raw value
-    { name: string } // normalized value
-  >
-  'article-details': RouteRecordInfo<
-    'article-details',
-    '/articles/:id+',
-    { id: Array<number | string> },
-    { id: string[] }
-  >
-  'not-found': RouteRecordInfo<
-    'not-found',
-    '/:path(.*)',
-    { path: string },
-    { path: string }
-  >
-}
-
-// Last, you will need to augment the Vue Router types with this map of routes
-declare module 'vue-router' {
-  interface TypesConfig {
-    RouteNamedMap: RouteNamedMap
-  }
-}
-```
-
-### Named Routes
-
-```typescript
-const routes = [
-  {
-    path: '/user/:username',
-    name: 'profile',
-    component: User
-  }
-]
-```
-
-## Route Meta Fields Typing
-
-### Extending RouteMeta Interface
-
-To add type safety to custom meta fields, extend the `RouteMeta` interface:
-
-```typescript
-// This can be directly added to any of your `.ts` files like `router.ts`
-// It can also be added to a `.d.ts` file. Make sure it's included in
-// project's tsconfig.json "files"
-import 'vue-router'
-
-// To ensure it is treated as a module, add at least one `export` statement
-export {}
-
-declare module 'vue-router' {
-  interface RouteMeta {
-    // is optional
-    isAdmin?: boolean
-    // must be declared by every route
-    requiresAuth: boolean
-  }
-}
-```
-
-### Using Meta Fields in Route Configuration
-
-```typescript
-const routes = [
-  {
-    path: '/posts',
-    component: PostsLayout,
-    children: [
-      {
-        path: 'new',
-        component: PostsNew,
-        // Only authenticated users can create posts
-        meta: { requiresAuth: true },
-      },
-      {
-        path: ':id',
-        component: PostsDetail,
-        // Anyone can read posts
-        meta: { requiresAuth: false },
-      }
-    ]
-  }
-]
-```
-
-## Programmatic Navigation
-
-### Basic Navigation Methods
-
-```typescript
-// literal string path
-router.push('/users/eduardo')
-
-// object with path
-router.push({ path: '/users/eduardo' })
-
-// named route with params to let the router build the url
-router.push({ name: 'user', params: { username: 'eduardo' } })
-
-// with query, resulting in /register?plan=private
-router.push({ path: '/register', query: { plan: 'private' } })
-
-// with hash, resulting in /about#team
-router.push({ path: '/about', hash: '#team' })
-```
-
-### Handling Parameters
-
-```typescript
-const username = 'eduardo'
-// we can manually build the url but we will have to handle the encoding ourselves
-router.push(`/user/${username}`) // -> /user/eduardo
-// same as
-router.push({ path: `/user/${username}` }) // -> /user/eduardo
-// if possible use `name` and `params` to benefit from automatic URL encoding
-router.push({ name: 'user', params: { username } }) // -> /user/eduardo
-// `params` cannot be used alongside `path`
-router.push({ path: '/user', params: { username } }) // -> /user
-```
-
-### Async Navigation
-
-```typescript
-await router.push('/my-profile')
-this.isMenuOpen = false
-```
-
-### Navigation to Named Routes
-
-```typescript
-router.push({ name: 'profile', params: { username: 'erina' } })
-```
-
-### Catch-All Route Navigation
-
-```typescript
-router.push({
-  name: 'NotFound',
-  // preserve current path and remove the first char to avoid the target URL starting with `//`
-  params: { pathMatch: route.path.substring(1).split('/') },
-  // preserve existing query and hash if any
-  query: route.query,
-  hash: route.hash,
-})
-```
-
-## Composition API with TypeScript
-
-### Accessing Router and Route
-
-```vue
-<script setup lang="ts">
-import { useRouter, useRoute } from 'vue-router'
-
-const router = useRouter()
-const route = useRoute()
-
-function pushWithQuery(query: Record<string, any>) {
-  router.push({
-    name: 'search',
-    query: {
-      ...route.query,
-      ...query,
-    },
-  })
-}
-</script>
-```
-
-### Using useLink Composable
-
-```typescript
-import { RouterLink, useLink } from 'vue-router'
-
-export default {
-  name: 'AppLink',
-
-  props: {
-    // add @ts-ignore if using TypeScript
-    ...RouterLink.props,
-    inactiveClass: String,
-  },
-
-  setup(props) {
-    // `props` contains `to` and any other prop that can be passed to <router-link>
-    const { navigate, href, route, isActive, isExactActive } = useLink(props)
-
-    // profit!
-
-    return { isExternalLink }
-  },
-}
-```
-
-### Advanced useLink Usage
-
-```vue
-<script setup lang="ts">
-import { RouterLink, useLink } from 'vue-router'
-import { computed } from 'vue'
-
-const props = defineProps({
-  // If using TypeScript, add @ts-ignore
-  ...RouterLink.props,
-  inactiveClass: String,
-})
-
-const {
-  // resolved route object
-  route,
-  // href to use in links
-  href,
-  // boolean ref indicating if the link is active
-  isActive,
-  // boolean ref indicating if the link is exactly active
-  isExactActive,
-  // function to navigate to the link
-  navigate
-} = useLink(props)
-
-const isExternalLink = computed(
-  () => typeof props.to === 'string' && props.to.startsWith('http')
-)
-</script>
-```
-
-## Navigation Guards
-
-### Global Navigation Guards
-
-```typescript
-const router = createRouter({ ... })
-
-router.beforeEach((to, from) => {
-  // ...
-  // explicitly return false to cancel the navigation
-  return false
-})
-```
-
-### Async Navigation Guards
-
-```typescript
-router.beforeEach(async (to, from) => {
-  // canUserAccess() returns `true` or `false`
-  const canAccess = await canUserAccess(to)
-  if (!canAccess) return '/login'
-})
-```
-
-### Authentication Guard
-
-```typescript
-router.beforeEach(async (to, from) => {
-  if (
-    // make sure the user is authenticated
-    !isAuthenticated &&
-    // ❗️ Avoid an infinite redirect
-    to.name !== 'Login'
-  ) {
-    // redirect the user to the login page
-    return { name: 'Login' }
-  }
-})
-```
-
-### Using Meta Fields in Guards
-
-```typescript
-router.beforeEach((to, from) => {
-  // instead of having to check every route record with
-  // to.matched.some(record => record.meta.requiresAuth)
-  if (to.meta.requiresAuth && !auth.isLoggedIn()) {
-    // this route requires auth, check if logged in
-    // if not, redirect to login page.
-    return {
-      path: '/login',
-      // save the location we were at to come back later
-      query: { redirect: to.fullPath },
-    }
-  }
-})
-```
-
-### Global Resolve Guards
-
-```typescript
-router.beforeResolve(async to => {
-  if (to.meta.requiresCamera) {
-    try {
-      await askForCameraPermission()
-    } catch (error) {
-      if (error instanceof NotAllowedError) {
-        // ... handle the error and then cancel the navigation
-        return false
-      } else {
-        // unexpected error, cancel the navigation and pass the error to the global handler
-        throw error
-      }
-    }
-  }
-})
-```
-
-### Navigation Guards with Composition API
-
-```vue
-<script setup lang="ts">
-import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
-import { ref } from 'vue'
-
-// same as beforeRouteLeave option but with no access to `this`
-onBeforeRouteLeave((to, from) => {
-  const answer = window.confirm(
-    'Do you really want to leave? you have unsaved changes!'
-  )
-  // cancel the navigation and stay on the same page
-  if (!answer) return false
-})
-
-const userData = ref()
-
-// same as beforeRouteUpdate option but with no access to `this`
-onBeforeRouteUpdate(async (to, from) => {
-  // only fetch the user if the id changed as maybe only the query or the hash changed
-  if (to.params.id !== from.params.id) {
-    userData.value = await fetchUser(to.params.id)
-  }
-})
-</script>
-```
-
-### Component Navigation Guards (Options API)
-
-```vue
-<script lang="ts">
-export default {
-  beforeRouteEnter(to, from) {
-    // called before the route that renders this component is confirmed.
-    // does NOT have access to `this` component instance,
-    // because it has not been created yet when this guard is called!
-  },
-  beforeRouteUpdate(to, from) {
-    // called when the route that renders this component has changed, but this component is reused in the new route.
-    // For example, given a route with params `/users/:id`, when we navigate between `/users/1` and `/users/2`,
-    // the same `UserDetails` component instance will be reused, and this hook will be called when that happens.
-    // Because the component is mounted while this happens, the navigation guard has access to `this` component instance.
-  },
-  beforeRouteLeave(to, from) {
-    // called when the route that renders this component is about to be navigated away from.
-    // As with `beforeRouteUpdate`, it has access to `this` component instance.
-  },
-}
-</script>
-```
-
-### Accessing Component Instance in beforeRouteEnter
-
-```typescript
-beforeRouteEnter (to, from, next) {
-  next(vm => {
-    // access to component public instance via `vm`
-  })
-}
-```
-
-### Per-Route Guards
-
-```typescript
-const routes = [
-  {
-    path: '/users/:id',
-    component: UserDetails,
-    beforeEnter: (to, from) => {
-      // reject the navigation
-      return false
-    },
-  },
-]
-
-function removeQueryParams(to) {
-  if (Object.keys(to.query).length)
-    return { path: to.path, query: {}, hash: to.hash }
-}
-
-function removeHash(to) {
-  if (to.hash) return { path: to.path, query: to.query, hash: '' }
-}
-
-const routes = [
-  {
-    path: '/users/:id',
-    component: UserDetails,
-    beforeEnter: [removeQueryParams, removeHash],
-  },
-  {
-    path: '/about',
-    component: UserDetails,
-    beforeEnter: [removeQueryParams],
-  },
-]
-```
-
-## Data Fetching Patterns
-
-### Post-Navigation Data Fetching (Composition API)
-
-```vue
-<template>
-  <div class="post">
-    <div v-if="loading" class="loading">Loading...</div>
-
-    <div v-if="error" class="error">{{ error }}</div>
-
-    <div v-if="post" class="content">
-      <h2>{{ post.title }}</h2>
-      <p>{{ post.body }}</p>
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { getPost } from './api.js'
-
-const route = useRoute()
-
-const loading = ref(false)
-const post = ref(null)
-const error = ref(null)
-
-// watch the params of the route to fetch the data again
-watch(() => route.params.id, fetchData, { immediate: true })
-
-async function fetchData(id: string) {
-  error.value = post.value = null
-  loading.value = true
-  
-  try {
-    // replace `getPost` with your data fetching util / API wrapper
-    post.value = await getPost(id)  
-  } catch (err) {
-    error.value = err.toString()
-  } finally {
-    loading.value = false
-  }
-}
-</script>
-```
-
-### Post-Navigation Data Fetching (Options API)
-
-```vue
-<template>
-  <div class="post">
-    <div v-if="loading" class="loading">Loading...</div>
-
-    <div v-if="error" class="error">{{ error }}</div>
-
-    <div v-if="post" class="content">
-      <h2>{{ post.title }}</h2>
-      <p>{{ post.body }}</p>
-    </div>
-  </div>
-</template>
-
-<script lang="ts">
-import { getPost } from './api.js'
-
-export default {
-  data() {
-    return {
-      loading: false,
-      post: null,
-      error: null,
-    }
-  },
-  created() {
-    // watch the params of the route to fetch the data again
-    this.$watch(
-      () => this.$route.params.id,
-      this.fetchData,
-      // fetch the data when the view is created and the data is
-      // already being observed
-      { immediate: true }
-    )
-  },
-  methods: {
-    async fetchData(id: string) {
-      this.error = this.post = null
-      this.loading = true
-
-      try {
-        // replace `getPost` with your data fetching util / API wrapper
-        this.post = await getPost(id)
-      } catch (err) {
-        this.error = err.toString()
-      } finally {
-        this.loading = false
-      }
-    },
-  },
-}
-</script>
-```
-
-### Pre-Navigation Data Fetching
-
-```typescript
-export default {
-  data() {
-    return {
-      post: null,
-      error: null,
-    }
-  },
-  async beforeRouteEnter(to, from, next) {
-    try {
-      const post = await getPost(to.params.id)
-      // `setPost` is a method defined below
-      next(vm => vm.setPost(post))
-    } catch (err) {
-      // `setError` is a method defined below
-      next(vm => vm.setError(err))
-    }
-  },
-  // when route changes and this component is already rendered,
-  // the logic will be slightly different.
-  beforeRouteUpdate(to, from) {
-    this.post = null
-    getPost(to.params.id).then(this.setPost).catch(this.setError)
-  },
-  methods: {
-    setPost(post) {
-      this.post = post
-    },
-    setError(err) {
-      this.error = err.toString()
-    }
-  }
-}
-```
-
-### Watching Route Parameters
-
-```vue
-<script setup lang="ts">
-import { useRoute } from 'vue-router'
-import { ref, watch } from 'vue'
-
-const route = useRoute()
-const userData = ref()
-
-// fetch user info when params change
-watch(
-  () => route.params.id,
-  async newId => {
-    userData.value = await fetchUser(newId)
-  }
-)
-</script>
-```
-
-### Navigation Guard Data Fetching
-
-```vue
-<script setup lang="ts">
-import { onBeforeRouteUpdate } from 'vue-router'
-// ...
-
-onBeforeRouteUpdate(async (to, from) => {
-  // react to route changes...
-  userData.value = await fetchUser(to.params.id)
-})
-</script>
-```
-
-## Advanced TypeScript Patterns
-
-### Navigation Failure Handling
-
-```typescript
-import { NavigationFailureType, isNavigationFailure } from 'vue-router'
-
-// trying to leave the editing interface of an unsaved article
-const failure = await router.push('/articles/2')
-
-if (isNavigationFailure(failure, NavigationFailureType.aborted)) {
-  // show a small notification to the user
-  showToast('You have unsaved changes, discard and leave anyway?')
-}
-```
-
-### Global Navigation Failure Handling
-
-```typescript
-router.afterEach((to, from, failure) => {
-  if (failure) {
-    sendToAnalytics(to, from, failure)
-  }
-})
-```
-
-### Dynamic Route Addition
-
-```typescript
-// Adding a single route
-router.addRoute({ path: '/about', component: About })
-
-// Adding nested routes
-router.addRoute({ name: 'admin', path: '/admin', component: Admin })
-router.addRoute('admin', { path: 'settings', component: AdminSettings })
-
-// Refreshing current view after adding routes
-router.addRoute({ path: '/about', component: About })
-// we could also use this.$route or useRoute()
-router.replace(router.currentRoute.value.fullPath)
-```
-
-### Dynamic Route Addition in Guards
-
-```typescript
-router.beforeEach(to => {
-  if (!hasNecessaryRoute(to)) {
-    router.addRoute(generateRoute(to))
-    // trigger a redirection
-    return to.fullPath
-  }
-})
-```
-
-### Route Transitions
-
-```vue
-<router-view v-slot="{ Component }">
-  <transition name="fade">
-    <component :is="Component" />
-  </transition>
-</router-view>
-```
-
-### Scroll Behavior
-
-```typescript
-const router = createRouter({
-  scrollBehavior(to, from, savedPosition) {
-    // return desired position
-    if (savedPosition) {
-      return savedPosition
-    } else {
-      return { top: 0 }
-    }
-  },
-})
-```
-
-### Hash Anchor Scrolling
-
-```typescript
-const router = createRouter({
-  scrollBehavior(to, from, savedPosition) {
-    if (to.hash) {
-      return {
-        el: to.hash,
-      }
-    }
-  },
-})
-```
-
-### Server-Side Rendering Setup
-
-```typescript
-// router.js
-let history = isServer ? createMemoryHistory() : createWebHistory()
-let router = createRouter({ routes, history })
-
-// somewhere in your server-entry.js
-router.push(req.url) // request url
-router.isReady().then(() => {
-  // resolve the request
-})
-```
-
-### Waiting for Router Readiness
-
-```typescript
-app.use(router)
-// Note: on Server Side, you need to manually push the initial location
-router.isReady().then(() => app.mount('#app'))
-```
-
-## Best Practices
-
-1. **Always use TypeScript interfaces** for route meta fields to ensure type safety
-2. **Prefer named routes** over path strings for better maintainability
-3. **Use async/await** in navigation guards for cleaner code
-4. **Handle navigation failures** appropriately for better user experience
-5. **Use the Composition API** for better TypeScript integration
-6. **Type your route parameters** using the `RouteRecordInfo` interface
-7. **Implement proper error handling** in data fetching scenarios
-8. **Use navigation guards** for authentication and authorization
-9. **Always await router.isReady()** before mounting your app
-10. **Consider scroll behavior** for better user experience
-
-This guide covers the most important aspects of using Vue Router with TypeScript for type-safe navigation in your Vue.js applications.
-````
 
 ## File: .cursorignore
 ````
@@ -13250,210 +12461,6 @@ const exportReport = () => {
 </style>
 ````
 
-## File: src/pages/admin/schedule/index.vue
-````vue
-<template>
-  <div class="admin-schedule-page">
-    <div class="page-header">
-      <v-container fluid>
-        <v-row align="center">
-          <v-col>
-            <h1 class="text-h4 font-weight-bold">
-              Master Schedule
-            </h1>
-            <p class="text-subtitle-1 text-medium-emphasis">
-              System-wide calendar and cleaner assignment management
-            </p>
-          </v-col>
-          <v-col cols="auto">
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-plus"
-              @click="createBooking"
-            >
-              New Booking
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </div>
-    <div class="page-content">
-      <v-container fluid class="pa-0" style="height: 100%;">
-        <v-row no-gutters class="fill-height">
-          <v-col cols="12" md="3" class="sidebar-col">
-            <AdminSidebar
-              @property-selected="handlePropertySelected"
-              @turn-alert-clicked="handleTurnAlertClicked"
-              @quick-action="handleQuickAction"
-            />
-          </v-col>
-          <v-col cols="12" md="9" class="calendar-col">
-            <AdminCalendar
-              :bookings="bookingStore.bookings"
-              :properties="propertyStore.properties"
-              :users="new Map()"
-              @event-click="handleEventClick"
-              @date-select="handleDateSelect"
-              @event-drop="handleEventDrop"
-            />
-          </v-col>
-        </v-row>
-      </v-container>
-    </div>
-    <BookingForm
-      v-if="uiStore.modals.get('event')?.open"
-      :booking="selectedBooking || undefined"
-      :is-edit="isEditMode"
-      @save="handleBookingSave"
-      @close="closeBookingModal"
-    />
-    <CleanerAssignmentModal
-      v-if="uiStore.modals.get('cleanerAssignment')?.open"
-      :model-value="true"
-      :booking="selectedBooking"
-      :properties="Array.from(propertyStore.properties.values())"
-      :cleaners="[]"
-      @assign="handleCleanerAssign"
-      @update:model-value="closeCleanerAssignmentModal"
-    />
-  </div>
-</template>
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue'
-import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue'
-import BookingForm from '@/components/dumb/BookingForm.vue'
-import CleanerAssignmentModal from '@/components/dumb/admin/CleanerAssignmentModal.vue'
-import { useAdminBookings } from '@/composables/admin/useAdminBookings'
-import { useCleanerManagement } from '@/composables/admin/useCleanerManagement'
-import { useUIStore } from '@/stores/ui'
-import { useBookingStore } from '@/stores/booking'
-import { usePropertyStore } from '@/stores/property'
-import type { Booking, BookingFormData } from '@/types/booking'
-const uiStore = useUIStore()
-const bookingStore = useBookingStore()
-const propertyStore = usePropertyStore()
-const router = useRouter()
-const { createBooking: createBookingFn, updateBooking } = useAdminBookings()
-const { assignCleanerToBooking } = useCleanerManagement()
-const selectedPropertyId = ref<string | null>(null)
-const selectedBooking = ref<Booking | null>(null)
-const selectedDate = ref<string | null>(null)
-const isEditMode = ref(false)
-const handlePropertySelected = (propertyId: string | null) => {
-  selectedPropertyId.value = propertyId
-}
-const handleTurnAlertClicked = (booking: Booking) => {
-  selectedBooking.value = booking
-  isEditMode.value = true
-  uiStore.openModal('event')
-}
-const handleQuickAction = (action: string) => {
-  switch (action) {
-    case 'assign-cleaners':
-      router.push('/admin/cleaners')
-      break
-    case 'generate-report':
-      router.push('/admin/reports')
-      break
-    case 'manage-schedule':
-      break
-  }
-}
-const handleEventClick = (booking: Booking) => {
-  selectedBooking.value = booking
-  isEditMode.value = true
-  uiStore.openModal('event')
-}
-const handleDateSelect = (date: string) => {
-  selectedDate.value = date
-  selectedBooking.value = null
-  isEditMode.value = false
-  uiStore.openModal('event')
-}
-const handleEventDrop = async (booking: Booking, newDate: string) => {
-  try {
-    await updateBooking(booking.id, {
-      ...booking,
-      checkout_date: newDate
-    })
-  } catch (error) {
-    console.error('Failed to update booking:', error)
-  }
-}
-const createBooking = () => {
-  selectedBooking.value = null
-  isEditMode.value = false
-  uiStore.openModal('event')
-}
-const handleBookingSave = async (bookingData: Partial<Booking>) => {
-  try {
-    if (isEditMode.value && selectedBooking.value) {
-      await updateBooking(selectedBooking.value.id, bookingData)
-    } else {
-      if (bookingData.property_id && bookingData.checkout_date && bookingData.checkin_date) {
-        await createBookingFn(bookingData as BookingFormData)
-      }
-    }
-    closeBookingModal()
-  } catch (error) {
-    console.error('Failed to save booking:', error)
-  }
-}
-const closeBookingModal = () => {
-  uiStore.closeModal('event')
-  selectedBooking.value = null
-}
-const handleCleanerAssign = async (cleanerId: string) => {
-  if (selectedBooking.value) {
-    try {
-      await assignCleanerToBooking(cleanerId, selectedBooking.value.id)
-      closeCleanerAssignmentModal()
-    } catch (error) {
-      console.error('Failed to assign cleaner:', error)
-    }
-  }
-}
-const closeCleanerAssignmentModal = () => {
-  uiStore.closeModal('cleanerAssignment')
-  selectedBooking.value = null
-}
-</script>
-<style scoped>
-.admin-schedule-page {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.page-header {
-  flex-shrink: 0;
-  border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
-  background: rgb(var(--v-theme-surface));
-}
-.page-content {
-  flex: 1;
-  overflow: hidden;
-}
-.sidebar-col {
-  border-right: 1px solid rgb(var(--v-theme-surface-variant));
-  height: 100%;
-  overflow-y: auto;
-}
-.calendar-col {
-  height: 100%;
-  overflow: hidden;
-}
-@media (max-width: 960px) {
-  .sidebar-col {
-    border-right: none;
-    border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
-  }
-}
-</style>
-````
-
 ## File: src/pages/auth/signup.vue
 ````vue
 <template>
@@ -23923,6 +22930,210 @@ import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
 </style>
 ````
 
+## File: src/pages/admin/schedule/index.vue
+````vue
+<template>
+  <div class="admin-schedule-page">
+    <div class="page-header">
+      <v-container fluid>
+        <v-row align="center">
+          <v-col>
+            <h1 class="text-h4 font-weight-bold">
+              Master Schedule
+            </h1>
+            <p class="text-subtitle-1 text-medium-emphasis">
+              System-wide calendar and cleaner assignment management
+            </p>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-plus"
+              @click="createBooking"
+            >
+              New Booking
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
+    <div class="page-content">
+      <v-container fluid class="pa-0" style="height: 100%;">
+        <v-row no-gutters class="fill-height">
+          <v-col cols="12" md="3" class="sidebar-col">
+            <AdminSidebar
+              @property-selected="handlePropertySelected"
+              @turn-alert-clicked="handleTurnAlertClicked"
+              @quick-action="handleQuickAction"
+            />
+          </v-col>
+          <v-col cols="12" md="9" class="calendar-col">
+            <AdminCalendar
+              :bookings="bookingStore.bookings"
+              :properties="propertyStore.properties"
+              :users="new Map()"
+              @event-click="handleEventClick"
+              @date-select="handleDateSelect"
+              @event-drop="handleEventDrop"
+            />
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
+    <BookingForm
+      v-if="uiStore.modals.get('event')?.open"
+      :booking="selectedBooking || undefined"
+      :is-edit="isEditMode"
+      @save="handleBookingSave"
+      @close="closeBookingModal"
+    />
+    <CleanerAssignmentModal
+      v-if="uiStore.modals.get('cleanerAssignment')?.open"
+      :model-value="true"
+      :booking="selectedBooking"
+      :properties="Array.from(propertyStore.properties.values())"
+      :cleaners="[]"
+      @assign="handleCleanerAssign"
+      @update:model-value="closeCleanerAssignmentModal"
+    />
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue'
+import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue'
+import BookingForm from '@/components/dumb/BookingForm.vue'
+import CleanerAssignmentModal from '@/components/dumb/admin/CleanerAssignmentModal.vue'
+import { useAdminBookings } from '@/composables/admin/useAdminBookings'
+import { useCleanerManagement } from '@/composables/admin/useCleanerManagement'
+import { useUIStore } from '@/stores/ui'
+import { useBookingStore } from '@/stores/booking'
+import { usePropertyStore } from '@/stores/property'
+import type { Booking, BookingFormData } from '@/types/booking'
+const uiStore = useUIStore()
+const bookingStore = useBookingStore()
+const propertyStore = usePropertyStore()
+const router = useRouter()
+const { createBooking: createBookingFn, updateBooking } = useAdminBookings()
+const { assignCleanerToBooking } = useCleanerManagement()
+const selectedPropertyId = ref<string | null>(null)
+const selectedBooking = ref<Booking | null>(null)
+const selectedDate = ref<string | null>(null)
+const isEditMode = ref(false)
+const handlePropertySelected = (propertyId: string | null) => {
+  selectedPropertyId.value = propertyId
+}
+const handleTurnAlertClicked = (booking: Booking) => {
+  selectedBooking.value = booking
+  isEditMode.value = true
+  uiStore.openModal('event')
+}
+const handleQuickAction = (action: string) => {
+  switch (action) {
+    case 'assign-cleaners':
+      router.push('/admin/cleaners')
+      break
+    case 'generate-report':
+      router.push('/admin/reports')
+      break
+    case 'manage-schedule':
+      break
+  }
+}
+const handleEventClick = (booking: Booking) => {
+  selectedBooking.value = booking
+  isEditMode.value = true
+  uiStore.openModal('event')
+}
+const handleDateSelect = (date: string) => {
+  selectedDate.value = date
+  selectedBooking.value = null
+  isEditMode.value = false
+  uiStore.openModal('event')
+}
+const handleEventDrop = async (booking: Booking, newDate: string) => {
+  try {
+    await updateBooking(booking.id, {
+      ...booking,
+      checkout_date: newDate
+    })
+  } catch (error) {
+    console.error('Failed to update booking:', error)
+  }
+}
+const createBooking = () => {
+  selectedBooking.value = null
+  isEditMode.value = false
+  uiStore.openModal('event')
+}
+const handleBookingSave = async (bookingData: Partial<Booking>) => {
+  try {
+    if (isEditMode.value && selectedBooking.value) {
+      await updateBooking(selectedBooking.value.id, bookingData)
+    } else {
+      if (bookingData.property_id && bookingData.checkout_date && bookingData.checkin_date) {
+        await createBookingFn(bookingData as BookingFormData)
+      }
+    }
+    closeBookingModal()
+  } catch (error) {
+    console.error('Failed to save booking:', error)
+  }
+}
+const closeBookingModal = () => {
+  uiStore.closeModal('event')
+  selectedBooking.value = null
+}
+const handleCleanerAssign = async (cleanerId: string) => {
+  if (selectedBooking.value) {
+    try {
+      await assignCleanerToBooking(cleanerId, selectedBooking.value.id)
+      closeCleanerAssignmentModal()
+    } catch (error) {
+      console.error('Failed to assign cleaner:', error)
+    }
+  }
+}
+const closeCleanerAssignmentModal = () => {
+  uiStore.closeModal('cleanerAssignment')
+  selectedBooking.value = null
+}
+</script>
+<style scoped>
+.admin-schedule-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.page-header {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
+  background: rgb(var(--v-theme-surface));
+}
+.page-content {
+  flex: 1;
+  overflow: hidden;
+}
+.sidebar-col {
+  border-right: 1px solid rgb(var(--v-theme-surface-variant));
+  height: 100%;
+  overflow-y: auto;
+}
+.calendar-col {
+  height: 100%;
+  overflow: hidden;
+}
+@media (max-width: 960px) {
+  .sidebar-col {
+    border-right: none;
+    border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
+  }
+}
+</style>
+````
+
 ## File: src/pages/demos/calendar.vue
 ````vue
 <template>
@@ -24986,971 +24197,6 @@ watch(() => props.property, () => {
 }
 :deep(.v-divider) {
   border-color: rgba(var(--v-theme-on-surface), 0.12) !important;
-}
-</style>
-````
-
-## File: src/components/smart/admin/AdminCalendar.vue
-````vue
-<template>
-  <div class="admin-calendar-container">
-    <v-card
-      class="admin-calendar-toolbar mb-4"
-      elevation="2"
-    >
-      <v-card-text class="pb-2">
-        <v-row
-          align="center"
-          no-gutters
-        >
-          <v-col
-            cols="12"
-            md="3"
-            class="mb-2 mb-md-0"
-          >
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              variant="outlined"
-              density="compact"
-              class="admin-view-toggle"
-            >
-              <v-btn
-                value="dayGridMonth"
-                size="small"
-              >
-                Month
-              </v-btn>
-              <v-btn
-                value="timeGridWeek"
-                size="small"
-              >
-                Week
-              </v-btn>
-              <v-btn
-                value="timeGridDay"
-                size="small"
-              >
-                Day
-              </v-btn>
-              <v-btn
-                value="listWeek"
-                size="small"
-              >
-                List
-              </v-btn>
-            </v-btn-toggle>
-          </v-col>
-          <v-col
-            cols="12"
-            md="4"
-            class="mb-2 mb-md-0"
-          >
-            <div class="d-flex align-center justify-center">
-              <v-btn
-                icon="mdi-chevron-left"
-                variant="text"
-                size="small"
-                @click="navigateCalendar('prev')"
-              />
-              <v-btn
-                variant="text"
-                class="mx-2 admin-date-title"
-                @click="goToToday"
-              >
-                {{ currentDateTitle }}
-              </v-btn>
-              <v-btn
-                icon="mdi-chevron-right"
-                variant="text"
-                size="small"
-                @click="navigateCalendar('next')"
-              />
-            </div>
-          </v-col>
-          <v-col
-            cols="12"
-            md="5"
-          >
-            <div class="d-flex align-center justify-end flex-wrap ga-2">
-              <v-select
-                v-model="selectedCleaner"
-                :items="cleanerFilterOptions"
-                item-title="name"
-                item-value="id"
-                label="Filter by Cleaner"
-                density="compact"
-                variant="outlined"
-                style="min-width: 150px; max-width: 200px;"
-                clearable
-                hide-details
-              />
-              <v-select
-                v-model="selectedStatuses"
-                :items="statusFilterOptions"
-                item-title="label"
-                item-value="value"
-                label="Filter by Status"
-                density="compact"
-                variant="outlined"
-                style="min-width: 150px; max-width: 200px;"
-                multiple
-                clearable
-                hide-details
-              />
-              <v-select
-                v-model="selectedBookingTypes"
-                :items="bookingTypeOptions"
-                item-title="label"
-                item-value="value"
-                label="Booking Type"
-                density="compact"
-                variant="outlined"
-                style="min-width: 120px; max-width: 150px;"
-                multiple
-                clearable
-                hide-details
-              />
-              <v-btn
-                color="primary"
-                variant="elevated"
-                size="small"
-                prepend-icon="mdi-plus"
-                @click="createNewBooking"
-              >
-                New Booking
-              </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-    <v-card
-      elevation="2"
-      class="admin-calendar-card"
-    >
-      <div v-if="!isMounted || !isCalendarReady" class="calendar-loading">
-        <v-progress-circular
-          indeterminate
-          color="primary"
-          size="64"
-        />
-        <p class="text-center mt-4">Loading calendar...</p>
-      </div>
-      <FullCalendar
-        v-else
-        ref="calendarRef"
-        :options="adminCalendarOptions"
-        class="admin-calendar"
-      />
-    </v-card>
-    <v-menu
-      v-model="contextMenu.show"
-      :position-x="contextMenu.x"
-      :position-y="contextMenu.y"
-      absolute
-      offset-y
-    >
-      <v-list density="compact">
-        <v-list-item
-          v-for="action in contextMenuActions"
-          :key="action.key"
-          :prepend-icon="action.icon"
-          :title="action.title"
-          @click="handleContextAction(action.key)"
-        />
-      </v-list>
-    </v-menu>
-    <v-dialog
-      v-model="cleanerAssignmentModal.show"
-      max-width="500"
-    >
-      <v-card>
-        <v-card-title>
-          <span class="text-h6">Assign Cleaner</span>
-        </v-card-title>
-        <v-card-text>
-          <v-select
-            v-model="cleanerAssignmentModal.selectedCleaner"
-            :items="availableCleaners"
-            item-title="name"
-            item-value="id"
-            label="Select Cleaner"
-            variant="outlined"
-            :loading="cleanerAssignmentModal.loading"
-          >
-            <template #item="{ props, item }">
-              <v-list-item v-bind="props">
-                <template #prepend>
-                  <v-avatar size="32">
-                    <v-icon>mdi-account</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
-                </v-list-item-subtitle>
-              </v-list-item>
-            </template>
-          </v-select>
-          <v-textarea
-            v-model="cleanerAssignmentModal.notes"
-            label="Assignment Notes (Optional)"
-            variant="outlined"
-            rows="3"
-            class="mt-4"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            text
-            @click="cleanerAssignmentModal.show = false"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="primary"
-            :loading="cleanerAssignmentModal.loading"
-            @click="assignCleanerToBooking"
-          >
-            Assign
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
-</template>
-⋮----
-{{ currentDateTitle }}
-⋮----
-<template #item="{ props, item }">
-              <v-list-item v-bind="props">
-                <template #prepend>
-                  <v-avatar size="32">
-                    <v-icon>mdi-account</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
-                </v-list-item-subtitle>
-              </v-list-item>
-            </template>
-⋮----
-<template #prepend>
-                  <v-avatar size="32">
-                    <v-icon>mdi-account</v-icon>
-                  </v-avatar>
-                </template>
-<v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-⋮----
-{{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
-⋮----
-<script setup lang="ts">
-import FullCalendar from '@fullcalendar/vue3';
-import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg, EventResizeDoneArg } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import listPlugin from '@fullcalendar/list';
-import interactionPlugin from '@fullcalendar/interaction';
-import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
-import { useTheme } from 'vuetify';
-import type { Booking, Property, User, Cleaner } from '@/types';
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-interface Props {
-  bookings: Map<string, Booking>;
-  properties: Map<string, Property>;
-  users: Map<string, User>;
-  loading?: boolean;
-}
-interface Emits {
-  (e: 'dateSelect', selectInfo: DateSelectArg): void;
-  (e: 'eventClick', clickInfo: EventClickArg): void;
-  (e: 'eventDrop', dropInfo: EventDropArg): void;
-  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
-  (e: 'updateBooking', data: { id: string; updates: Partial<Booking> }): void;
-  (e: 'assignCleaner', data: { bookingId: string; cleanerId: string; notes?: string }): void;
-  (e: 'updateBookingStatus', data: { bookingId: string; status: Booking['status'] }): void;
-  (e: 'viewChange', view: string): void;
-  (e: 'dateChange', date: Date): void;
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
-});
-const emit = defineEmits<Emits>();
-const theme = useTheme();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-const isMounted = ref(false);
-const isCalendarReady = ref(false);
-const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('timeGridWeek');
-const currentDateTitle = ref('');
-// Admin filtering state
-const selectedCleaner = ref<string | null>(null);
-const selectedStatuses = ref<Booking['status'][]>([]);
-const selectedBookingTypes = ref<Booking['booking_type'][]>([]);
-const contextMenu = ref({
-  show: false,
-  x: 0,
-  y: 0,
-  booking: null as Booking | null
-});
-const cleanerAssignmentModal = ref({
-  show: false,
-  booking: null as Booking | null,
-  selectedCleaner: null as string | null,
-  notes: '',
-  loading: false
-});
-// Get all cleaners from users Map
-const availableCleaners = computed(() => {
-  return Array.from(props.users.values())
-    .filter(user => user.role === 'cleaner')
-    .map(cleaner => ({
-      id: cleaner.id,
-      name: cleaner.name,
-      email: cleaner.email,
-      max_daily_bookings: (cleaner as Cleaner).max_daily_bookings || 5
-    }));
-});
-const cleanerFilterOptions = computed(() => [
-  { id: 'unassigned', name: 'Unassigned Only' },
-  ...availableCleaners.value
-]);
-const statusFilterOptions = [
-  { label: 'Pending', value: 'pending' },
-  { label: 'Scheduled', value: 'scheduled' },
-  { label: 'In Progress', value: 'in_progress' },
-  { label: 'Completed', value: 'completed' }
-];
-const bookingTypeOptions = [
-  { label: 'Turn Bookings', value: 'turn' },
-  { label: 'Standard Bookings', value: 'standard' }
-];
-const allBookings = computed(() => {
-  return Array.from(props.bookings.values());
-});
-const filteredBookings = computed(() => {
-  let filtered = allBookings.value;
-  if (selectedCleaner.value) {
-    if (selectedCleaner.value === 'unassigned') {
-      filtered = filtered.filter(booking => !booking.assigned_cleaner_id);
-    } else {
-      filtered = filtered.filter(booking => booking.assigned_cleaner_id === selectedCleaner.value);
-    }
-  }
-  if (selectedStatuses.value.length > 0) {
-    filtered = filtered.filter(booking => selectedStatuses.value.includes(booking.status));
-  }
-  if (selectedBookingTypes.value.length > 0) {
-    filtered = filtered.filter(booking => selectedBookingTypes.value.includes(booking.booking_type));
-  }
-  return filtered;
-});
-const adminCalendarEvents = computed(() => {
-  return filteredBookings.value.map(booking => {
-    const property = props.properties.get(booking.property_id);
-    const owner = props.users.get(booking.owner_id);
-    const cleaner = booking.assigned_cleaner_id ? props.users.get(booking.assigned_cleaner_id) : undefined;
-    const isTurn = booking.booking_type === 'turn';
-    return {
-      id: booking.id,
-      title: getAdminEventTitle(booking, property, owner, cleaner),
-      start: booking.checkout_date,
-      end: booking.checkin_date,
-      backgroundColor: getAdminEventColor(booking),
-      borderColor: getAdminEventBorderColor(booking),
-      textColor: getAdminEventTextColor(booking),
-      extendedProps: {
-        booking,
-        property,
-        owner,
-        cleaner,
-        bookingType: booking.booking_type,
-        status: booking.status,
-        assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
-      },
-      classNames: [
-        `admin-booking-${booking.booking_type}`,
-        `admin-status-${booking.status}`,
-        `admin-assignment-${booking.assigned_cleaner_id ? 'assigned' : 'unassigned'}`,
-        isTurn ? 'admin-priority-urgent' : 'admin-priority-normal'
-      ]
-    };
-  });
-});
-const getAdminEventTitle = (booking: Booking, property?: Property, owner?: User, cleaner?: User): string => {
-  const isTurn = booking.booking_type === 'turn';
-  const propertyName = property?.name || 'Unknown Property';
-  const ownerName = owner?.name || 'Unknown Owner';
-  const cleanerName = cleaner?.name || 'Unassigned';
-  return `${isTurn ? '🔥 ' : ''}${propertyName} (${ownerName}) → ${cleanerName}`;
-};
-const getAdminEventColor = (booking: Booking): string => {
-  const isDark = theme.global.current.value.dark;
-  const isAssigned = !!booking.assigned_cleaner_id;
-  const isTurn = booking.booking_type === 'turn';
-  if (!isAssigned) {
-    return isTurn
-      ? (isDark ? '#FF5252' : '#F44336')
-      : (isDark ? '#FF9800' : '#FF6F00');
-  }
-  switch (booking.status) {
-    case 'pending':
-      return isDark ? '#2196F3' : '#1976D2';
-    case 'scheduled':
-      return isDark ? '#00BCD4' : '#0097A7';
-    case 'in_progress':
-      return isDark ? '#4CAF50' : '#388E3C';
-    case 'completed':
-      return isDark ? '#9E9E9E' : '#757575';
-    default:
-      return isDark ? '#2196F3' : '#1976D2';
-  }
-};
-const getAdminEventBorderColor = (booking: Booking): string => {
-  const isTurn = booking.booking_type === 'turn';
-  const isAssigned = !!booking.assigned_cleaner_id;
-  if (isTurn && !isAssigned) return '#D32F2F';
-  if (isTurn) return '#FF6F00';
-  if (!isAssigned) return '#F57C00';
-  return '#1976D2';
-};
-const getAdminEventTextColor = (booking: Booking): string => {
-  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
-};
-const adminCalendarOptions = computed<CalendarOptions>(() => {
-  if (!isMounted.value || !isCalendarReady.value) {
-    return {
-      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-      initialView: 'dayGridMonth',
-      headerToolbar: false,
-      events: []
-    };
-  }
-  return {
-    plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-    initialView: currentView.value,
-    headerToolbar: false,
-  events: adminCalendarEvents.value,
-  eventDisplay: 'block',
-  eventOverlap: true,
-  selectable: true,
-  selectMirror: true,
-  editable: true,
-  droppable: true,
-  eventResizable: true,
-  eventDurationEditable: true,
-  locale: 'en',
-  timeZone: 'local',
-  slotMinTime: '05:00:00',
-  slotMaxTime: '23:00:00',
-  slotDuration: '00:30:00',
-  height: 'auto',
-  aspectRatio: 1.6,
-  themeSystem: 'standard',
-  select: handleAdminDateSelect,
-  eventClick: handleAdminEventClick,
-  eventDrop: handleAdminEventDrop,
-  eventResize: handleAdminEventResize,
-  datesSet: handleDatesSet,
-  loading: handleLoading,
-  eventContent: renderAdminEventContent,
-  dayCellContent: renderAdminDayCell,
-  businessHours: {
-    daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
-    startTime: '06:00',
-    endTime: '20:00'
-  },
-  weekends: true,
-  dayMaxEvents: 5,
-  moreLinkClick: 'popover',
-  allDaySlot: false,
-  nowIndicator: true,
-  scrollTime: '07:00:00',
-  listDayFormat: { weekday: 'long', month: 'short', day: 'numeric' },
-  eventMouseEnter: (info) => {
-    info.el.style.cursor = 'pointer';
-  },
-  eventDidMount: (info) => {
-    info.el.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      showContextMenu(e, info.event.extendedProps.booking);
-    });
-  }
-  };
-});
-const handleAdminDateSelect = (selectInfo: DateSelectArg): void => {
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'emit'
-  );
-  emit('dateSelect', selectInfo);
-  emit('createBooking', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr
-  });
-  selectInfo.view.calendar.unselect();
-};
-const handleAdminEventClick = (clickInfo: EventClickArg): void => {
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'emit'
-  );
-  emit('eventClick', clickInfo);
-};
-const handleAdminEventDrop = (dropInfo: EventDropArg): void => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'eventDrop',
-    {
-      id: booking.id,
-      newStart: dropInfo.event.startStr,
-      newEnd: dropInfo.event.endStr
-    },
-    'emit'
-  );
-  emit('eventDrop', dropInfo);
-  emit('updateBooking', {
-    id: booking.id,
-    updates: {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-    }
-  });
-};
-const handleAdminEventResize = (resizeInfo: EventResizeDoneArg): void => {
-  const booking = resizeInfo.event.extendedProps.booking as Booking;
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'eventResize',
-    {
-      id: booking.id,
-      newEnd: resizeInfo.event.endStr
-    },
-    'emit'
-  );
-  emit('updateBooking', {
-    id: booking.id,
-    updates: {
-      checkin_date: resizeInfo.event.endStr
-    }
-  });
-};
-const handleDatesSet = (dateInfo: any): void => {
-  const newDate = new Date(dateInfo.start);
-  currentDateTitle.value = dateInfo.view.title;
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'dateChange',
-    { date: newDate.toISOString(), title: dateInfo.view.title },
-    'emit'
-  );
-  emit('dateChange', newDate);
-};
-const handleLoading = (isLoading: boolean): void => {
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'loadingState',
-    { isLoading },
-    'emit'
-  );
-};
-const showContextMenu = (event: MouseEvent, booking: Booking): void => {
-  contextMenu.value = {
-    show: true,
-    x: event.clientX,
-    y: event.clientY,
-    booking
-  };
-};
-const contextMenuActions = computed(() => {
-  const booking = contextMenu.value.booking;
-  if (!booking) return [];
-  const actions = [
-    { key: 'edit', title: 'Edit Booking', icon: 'mdi-pencil' },
-    { key: 'assign', title: 'Assign Cleaner', icon: 'mdi-account-plus' },
-    { key: 'status', title: 'Change Status', icon: 'mdi-check-circle' },
-    { key: 'duplicate', title: 'Duplicate', icon: 'mdi-content-copy' },
-    { key: 'delete', title: 'Delete', icon: 'mdi-delete' }
-  ];
-  if (booking.status === 'pending') {
-    actions.splice(2, 0, { key: 'schedule', title: 'Mark Scheduled', icon: 'mdi-calendar-check' });
-  }
-  if (booking.status === 'scheduled') {
-    actions.splice(2, 0, { key: 'start', title: 'Start Cleaning', icon: 'mdi-play' });
-  }
-  if (booking.status === 'in_progress') {
-    actions.splice(2, 0, { key: 'complete', title: 'Mark Complete', icon: 'mdi-check' });
-  }
-  return actions;
-});
-const handleContextAction = (action: string): void => {
-  const booking = contextMenu.value.booking;
-  if (!booking) return;
-  contextMenu.value.show = false;
-  switch (action) {
-    case 'edit':
-      emit('eventClick', { event: { id: booking.id, extendedProps: { booking } } } as any);
-      break;
-    case 'assign':
-      openCleanerAssignmentModal(booking);
-      break;
-    case 'schedule':
-      emit('updateBookingStatus', { bookingId: booking.id, status: 'scheduled' });
-      break;
-    case 'start':
-      emit('updateBookingStatus', { bookingId: booking.id, status: 'in_progress' });
-      break;
-    case 'complete':
-      emit('updateBookingStatus', { bookingId: booking.id, status: 'completed' });
-      break;
-    case 'status':
-      break;
-    case 'duplicate':
-      break;
-    case 'delete':
-      break;
-  }
-};
-const openCleanerAssignmentModal = (booking: Booking): void => {
-  cleanerAssignmentModal.value = {
-    show: true,
-    booking,
-    selectedCleaner: booking.assigned_cleaner_id || null,
-    notes: '',
-    loading: false
-  };
-};
-const assignCleanerToBooking = async (): Promise<void> => {
-  const modal = cleanerAssignmentModal.value;
-  if (!modal.booking || !modal.selectedCleaner) return;
-  modal.loading = true;
-  try {
-    emit('assignCleaner', {
-      bookingId: modal.booking.id,
-      cleanerId: modal.selectedCleaner,
-      notes: modal.notes
-    });
-    modal.show = false;
-  } catch (error) {
-    console.error('Failed to assign cleaner:', error);
-  } finally {
-    modal.loading = false;
-  }
-};
-const navigateCalendar = (direction: 'prev' | 'next'): void => {
-  if (calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    if (direction === 'prev') {
-      api.prev();
-    } else {
-      api.next();
-    }
-  }
-};
-const goToToday = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().today();
-  }
-};
-const createNewBooking = (): void => {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  emit('createBooking', {
-    start: today.toISOString().split('T')[0],
-    end: tomorrow.toISOString().split('T')[0]
-  });
-};
-const renderAdminEventContent = (eventInfo: any) => {
-  const booking = eventInfo.event.extendedProps.booking as Booking;
-  const property = eventInfo.event.extendedProps.property as Property;
-  const owner = eventInfo.event.extendedProps.owner as User;
-  const cleaner = eventInfo.event.extendedProps.cleaner as User;
-  const isTurn = booking.booking_type === 'turn';
-  const isAssigned = !!booking.assigned_cleaner_id;
-  return {
-    html: `
-      <div class="admin-event-content">
-        <div class="admin-event-title">
-          ${isTurn ? '🔥 ' : ''}${property?.name || 'Unknown Property'}
-        </div>
-        <div class="admin-event-owner">
-          Owner: ${owner?.name || 'Unknown'}
-        </div>
-        <div class="admin-event-cleaner ${isAssigned ? 'assigned' : 'unassigned'}">
-          ${isAssigned ? `👤 ${cleaner?.name}` : '⚠️ Unassigned'}
-        </div>
-        <div class="admin-event-status">
-          ${booking.status.toUpperCase()}
-        </div>
-        ${isTurn ? '<div class="admin-turn-badge">URGENT TURN</div>' : ''}
-      </div>
-    `
-  };
-};
-const renderAdminDayCell = (dayInfo: any) => {
-  const dayBookings = allBookings.value.filter(booking => {
-    const checkoutDate = new Date(booking.checkout_date).toDateString();
-    const dayDate = dayInfo.date.toDateString();
-    return checkoutDate === dayDate;
-  });
-  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
-  const unassignedCount = dayBookings.filter(b => !b.assigned_cleaner_id).length;
-  const totalCount = dayBookings.length;
-  return {
-    html: `
-      <div class="admin-day-number">
-        ${dayInfo.dayNumberText}
-        ${turnCount > 0 ? `<span class="admin-turn-indicator">${turnCount}</span>` : ''}
-        ${unassignedCount > 0 ? `<span class="admin-unassigned-indicator">${unassignedCount}</span>` : ''}
-        ${totalCount > 0 && turnCount === 0 && unassignedCount === 0 ? `<span class="admin-booking-indicator">${totalCount}</span>` : ''}
-      </div>
-    `
-  };
-};
-watch(currentView, (newView) => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().changeView(newView);
-    emit('viewChange', newView);
-  }
-});
-watch(() => theme.global.current.value.dark, () => {
-  nextTick(() => {
-    if (calendarRef.value) {
-      calendarRef.value.getApi().refetchEvents();
-    }
-  });
-});
-watch(() => props.bookings, (newBookings) => {
-  eventLogger.logEvent(
-    'HomeAdmin',
-    'AdminCalendar',
-    'bookingsUpdate',
-    { count: newBookings.size },
-    'receive'
-  );
-}, { deep: true });
-const goToDate = (date: string | Date): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(date);
-  }
-};
-const changeView = (viewName: string): void => {
-  currentView.value = viewName as any;
-};
-const refreshEvents = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().refetchEvents();
-  }
-};
-defineExpose({
-  goToDate,
-  changeView,
-  refreshEvents,
-  getApi: () => calendarRef.value?.getApi()
-});
-onMounted(async () => {
-  isMounted.value = true;
-  await nextTick();
-  setTimeout(() => {
-    isCalendarReady.value = true;
-  }, 100);
-});
-onBeforeUnmount(() => {
-  if (calendarRef.value) {
-    try {
-      const calendarApi = calendarRef.value.getApi();
-      if (calendarApi) {
-        calendarApi.destroy();
-      }
-    } catch (error) {
-      console.warn('Error cleaning up calendar:', error);
-    }
-  }
-});
-</script>
-<style scoped>
-.admin-calendar-container {
-  height: 100%;
-  width: 100%;
-}
-.calendar-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 400px;
-  min-height: 400px;
-}
-.admin-calendar-toolbar {
-  background: rgb(var(--v-theme-surface));
-  border: 1px solid rgb(var(--v-theme-outline), 0.12);
-}
-.admin-view-toggle {
-  border: 1px solid rgb(var(--v-theme-outline), 0.38);
-}
-.admin-date-title {
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: normal;
-}
-.admin-calendar-card {
-  background: rgb(var(--v-theme-surface));
-}
-.admin-calendar {
-  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
-  --fc-button-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-border-color: rgb(var(--v-theme-primary));
-  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
-  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
-  --fc-event-border-radius: 4px;
-}
-.fc-event.admin-booking-turn {
-  font-weight: bold;
-  border-width: 2px !important;
-}
-.fc-event.admin-priority-urgent {
-  animation: admin-pulse 3s infinite;
-  border-left: 4px solid rgb(var(--v-theme-error)) !important;
-}
-@keyframes admin-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0); }
-  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
-}
-.fc-event.admin-assignment-unassigned {
-  border-style: dashed !important;
-  border-width: 2px !important;
-}
-.fc-event.admin-assignment-assigned {
-  border-style: solid !important;
-}
-.fc-event.admin-status-pending {
-  opacity: 0.9;
-}
-.fc-event.admin-status-in_progress {
-  font-weight: bold;
-  border-width: 3px !important;
-}
-.fc-event.admin-status-completed {
-  opacity: 0.6;
-  text-decoration: line-through;
-}
-.admin-turn-indicator {
-  background: rgb(var(--v-theme-error));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 9px;
-  margin-left: 2px;
-  font-weight: bold;
-  animation: admin-pulse 3s infinite;
-}
-.admin-unassigned-indicator {
-  background: rgb(var(--v-theme-warning));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 9px;
-  margin-left: 2px;
-  font-weight: bold;
-}
-.admin-booking-indicator {
-  background: rgb(var(--v-theme-primary));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 9px;
-  margin-left: 2px;
-  font-weight: bold;
-}
-.admin-event-content {
-  padding: 2px;
-  font-size: 0.8em;
-}
-.admin-event-title {
-  font-weight: 600;
-  font-size: 0.9em;
-  margin-bottom: 1px;
-}
-.admin-event-owner {
-  font-size: 0.75em;
-  opacity: 0.8;
-  margin-bottom: 1px;
-}
-.admin-event-cleaner {
-  font-size: 0.75em;
-  font-weight: 500;
-  margin-bottom: 1px;
-}
-.admin-event-cleaner.unassigned {
-  color: rgb(var(--v-theme-warning));
-  font-weight: bold;
-}
-.admin-event-cleaner.assigned {
-  color: rgb(var(--v-theme-success));
-}
-.admin-event-status {
-  font-size: 0.7em;
-  opacity: 0.9;
-  font-weight: 500;
-}
-.admin-turn-badge {
-  background: rgba(var(--v-theme-error), 0.2);
-  color: rgb(var(--v-theme-error));
-  font-size: 0.65em;
-  padding: 1px 3px;
-  border-radius: 3px;
-  margin-top: 1px;
-  font-weight: bold;
-  text-align: center;
-}
-.admin-day-number {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-@media (max-width: 960px) {
-  .admin-calendar-toolbar .v-row {
-    flex-direction: column;
-  }
-  .admin-calendar-toolbar .v-col {
-    margin-bottom: 8px !important;
-  }
-  .admin-view-toggle {
-    width: 100%;
-  }
-  .admin-event-content {
-    font-size: 0.7em;
-  }
-}
-@media (max-width: 600px) {
-  .admin-calendar {
-    --fc-event-border-radius: 2px;
-  }
-  .admin-event-content {
-    font-size: 0.65em;
-    padding: 1px;
-  }
-  .admin-event-title {
-    font-size: 0.8em;
-  }
 }
 </style>
 ````
@@ -27094,6 +25340,1030 @@ describe('Multi-tenant data updates', () => {
 - **Security**: Frontend filtering for UX, future backend RLS for security
 ````
 
+## File: src/components/smart/admin/AdminCalendar.vue
+````vue
+<template>
+  <div class="admin-calendar-container">
+    <v-card
+      class="admin-calendar-toolbar mb-4"
+      elevation="2"
+    >
+      <v-card-text class="pb-2">
+        <v-row
+          align="center"
+          no-gutters
+        >
+          <v-col
+            cols="12"
+            md="3"
+            class="mb-2 mb-md-0"
+          >
+            <v-btn-toggle
+              v-model="currentView"
+              mandatory
+              variant="outlined"
+              density="compact"
+              class="admin-view-toggle"
+            >
+              <v-btn
+                value="dayGridMonth"
+                size="small"
+              >
+                Month
+              </v-btn>
+              <v-btn
+                value="timeGridWeek"
+                size="small"
+              >
+                Week
+              </v-btn>
+              <v-btn
+                value="timeGridDay"
+                size="small"
+              >
+                Day
+              </v-btn>
+              <v-btn
+                value="listWeek"
+                size="small"
+              >
+                List
+              </v-btn>
+            </v-btn-toggle>
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
+            class="mb-2 mb-md-0"
+          >
+            <div class="d-flex align-center justify-center">
+              <v-btn
+                icon="mdi-chevron-left"
+                variant="text"
+                size="small"
+                @click="navigateCalendar('prev')"
+              />
+              <v-btn
+                variant="text"
+                class="mx-2 admin-date-title"
+                @click="goToToday"
+              >
+                {{ currentDateTitle }}
+              </v-btn>
+              <v-btn
+                icon="mdi-chevron-right"
+                variant="text"
+                size="small"
+                @click="navigateCalendar('next')"
+              />
+            </div>
+          </v-col>
+          <v-col
+            cols="12"
+            md="5"
+          >
+            <div class="d-flex align-center justify-end flex-wrap ga-2">
+              <v-select
+                v-model="selectedCleaner"
+                :items="cleanerFilterOptions"
+                item-title="name"
+                item-value="id"
+                label="Filter by Cleaner"
+                density="compact"
+                variant="outlined"
+                style="min-width: 150px; max-width: 200px;"
+                clearable
+                hide-details
+              />
+              <v-select
+                v-model="selectedStatuses"
+                :items="statusFilterOptions"
+                item-title="label"
+                item-value="value"
+                label="Filter by Status"
+                density="compact"
+                variant="outlined"
+                style="min-width: 150px; max-width: 200px;"
+                multiple
+                clearable
+                hide-details
+              />
+              <v-select
+                v-model="selectedBookingTypes"
+                :items="bookingTypeOptions"
+                item-title="label"
+                item-value="value"
+                label="Booking Type"
+                density="compact"
+                variant="outlined"
+                style="min-width: 120px; max-width: 150px;"
+                multiple
+                clearable
+                hide-details
+              />
+              <v-btn
+                color="primary"
+                variant="elevated"
+                size="small"
+                prepend-icon="mdi-plus"
+                @click="createNewBooking"
+              >
+                New Booking
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+    <v-card
+      elevation="2"
+      class="admin-calendar-card"
+    >
+      <div
+        v-if="!isMounted || !isCalendarReady"
+        class="calendar-loading"
+      >
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="64"
+        />
+        <p class="text-center mt-4">
+          Loading calendar...
+        </p>
+      </div>
+      <FullCalendar
+        v-else
+        ref="calendarRef"
+        :options="adminCalendarOptions"
+        class="admin-calendar"
+      />
+    </v-card>
+    <v-menu
+      v-model="contextMenu.show"
+      :position-x="contextMenu.x"
+      :position-y="contextMenu.y"
+      absolute
+      offset-y
+    >
+      <v-list density="compact">
+        <v-list-item
+          v-for="action in contextMenuActions"
+          :key="action.key"
+          :prepend-icon="action.icon"
+          :title="action.title"
+          @click="handleContextAction(action.key)"
+        />
+      </v-list>
+    </v-menu>
+    <v-dialog
+      v-model="cleanerAssignmentModal.show"
+      max-width="500"
+    >
+      <v-card>
+        <v-card-title>
+          <span class="text-h6">Assign Cleaner</span>
+        </v-card-title>
+        <v-card-text>
+          <v-select
+            v-model="cleanerAssignmentModal.selectedCleaner"
+            :items="availableCleaners"
+            item-title="name"
+            item-value="id"
+            label="Select Cleaner"
+            variant="outlined"
+            :loading="cleanerAssignmentModal.loading"
+          >
+            <template #item="{ props, item }">
+              <v-list-item v-bind="props">
+                <template #prepend>
+                  <v-avatar size="32">
+                    <v-icon>mdi-account</v-icon>
+                  </v-avatar>
+                </template>
+                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
+                </v-list-item-subtitle>
+              </v-list-item>
+            </template>
+          </v-select>
+          <v-textarea
+            v-model="cleanerAssignmentModal.notes"
+            label="Assignment Notes (Optional)"
+            variant="outlined"
+            rows="3"
+            class="mt-4"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            @click="cleanerAssignmentModal.show = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            :loading="cleanerAssignmentModal.loading"
+            @click="assignCleanerToBooking"
+          >
+            Assign
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+⋮----
+{{ currentDateTitle }}
+⋮----
+<template #item="{ props, item }">
+              <v-list-item v-bind="props">
+                <template #prepend>
+                  <v-avatar size="32">
+                    <v-icon>mdi-account</v-icon>
+                  </v-avatar>
+                </template>
+                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
+                </v-list-item-subtitle>
+              </v-list-item>
+            </template>
+⋮----
+<template #prepend>
+                  <v-avatar size="32">
+                    <v-icon>mdi-account</v-icon>
+                  </v-avatar>
+                </template>
+<v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+⋮----
+{{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
+⋮----
+<script setup lang="ts">
+import FullCalendar from '@fullcalendar/vue3';
+import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg, EventApi, ViewApi, Duration } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+import interactionPlugin from '@fullcalendar/interaction';
+import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { useTheme } from 'vuetify';
+import type { Booking, Property, User, Cleaner } from '@/types';
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+interface EventResizeInfo {
+  event: EventApi;
+  relatedEvents: EventApi[];
+  oldEvent: EventApi;
+  endDelta: Duration;
+  startDelta: Duration;
+  revert: () => void;
+  view: ViewApi;
+  el: HTMLElement;
+  jsEvent: MouseEvent | TouchEvent;
+}
+interface DatesSetInfo {
+  view: ViewApi;
+  start: Date;
+  end: Date;
+  startStr: string;
+  endStr: string;
+  timeZone: string;
+}
+interface EventContentInfo {
+  event: EventApi;
+  timeText: string;
+  view: ViewApi;
+  el: HTMLElement;
+}
+interface DayCellContentInfo {
+  date: Date;
+  dateStr: string;
+  dayNumberText: string;
+  view: ViewApi;
+  isToday: boolean;
+  isPast: boolean;
+  isFuture: boolean;
+  isOther: boolean;
+}
+interface Props {
+  bookings: Map<string, Booking>;
+  properties: Map<string, Property>;
+  users: Map<string, User>;
+  loading?: boolean;
+}
+interface Emits {
+  (e: 'dateSelect', selectInfo: DateSelectArg): void;
+  (e: 'eventClick', clickInfo: EventClickArg): void;
+  (e: 'eventDrop', dropInfo: EventDropArg): void;
+  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
+  (e: 'updateBooking', data: { id: string; updates: Partial<Booking> }): void;
+  (e: 'assignCleaner', data: { bookingId: string; cleanerId: string; notes?: string }): void;
+  (e: 'updateBookingStatus', data: { bookingId: string; status: Booking['status'] }): void;
+  (e: 'viewChange', view: string): void;
+  (e: 'dateChange', date: Date): void;
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false
+});
+const emit = defineEmits<Emits>();
+const theme = useTheme();
+const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const isMounted = ref(false);
+const isCalendarReady = ref(false);
+const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('timeGridWeek');
+const currentDateTitle = ref('');
+// Admin filtering state
+const selectedCleaner = ref<string | null>(null);
+const selectedStatuses = ref<Booking['status'][]>([]);
+const selectedBookingTypes = ref<Booking['booking_type'][]>([]);
+const contextMenu = ref({
+  show: false,
+  x: 0,
+  y: 0,
+  booking: null as Booking | null
+});
+const cleanerAssignmentModal = ref({
+  show: false,
+  booking: null as Booking | null,
+  selectedCleaner: null as string | null,
+  notes: '',
+  loading: false
+});
+// Get all cleaners from users Map
+const availableCleaners = computed(() => {
+  return Array.from(props.users.values())
+    .filter(user => user.role === 'cleaner')
+    .map(cleaner => ({
+      id: cleaner.id,
+      name: cleaner.name,
+      email: cleaner.email,
+      max_daily_bookings: (cleaner as Cleaner).max_daily_bookings || 5
+    }));
+});
+const cleanerFilterOptions = computed(() => [
+  { id: 'unassigned', name: 'Unassigned Only' },
+  ...availableCleaners.value
+]);
+const statusFilterOptions = [
+  { label: 'Pending', value: 'pending' },
+  { label: 'Scheduled', value: 'scheduled' },
+  { label: 'In Progress', value: 'in_progress' },
+  { label: 'Completed', value: 'completed' }
+];
+const bookingTypeOptions = [
+  { label: 'Turn Bookings', value: 'turn' },
+  { label: 'Standard Bookings', value: 'standard' }
+];
+const allBookings = computed(() => {
+  return Array.from(props.bookings.values());
+});
+const filteredBookings = computed(() => {
+  let filtered = allBookings.value;
+  if (selectedCleaner.value) {
+    if (selectedCleaner.value === 'unassigned') {
+      filtered = filtered.filter(booking => !booking.assigned_cleaner_id);
+    } else {
+      filtered = filtered.filter(booking => booking.assigned_cleaner_id === selectedCleaner.value);
+    }
+  }
+  if (selectedStatuses.value.length > 0) {
+    filtered = filtered.filter(booking => selectedStatuses.value.includes(booking.status));
+  }
+  if (selectedBookingTypes.value.length > 0) {
+    filtered = filtered.filter(booking => selectedBookingTypes.value.includes(booking.booking_type));
+  }
+  return filtered;
+});
+const adminCalendarEvents = computed(() => {
+  return filteredBookings.value.map(booking => {
+    const property = props.properties.get(booking.property_id);
+    const owner = props.users.get(booking.owner_id);
+    const cleaner = booking.assigned_cleaner_id ? props.users.get(booking.assigned_cleaner_id) : undefined;
+    const isTurn = booking.booking_type === 'turn';
+    return {
+      id: booking.id,
+      title: getAdminEventTitle(booking, property, owner, cleaner),
+      start: booking.checkout_date,
+      end: booking.checkin_date,
+      backgroundColor: getAdminEventColor(booking),
+      borderColor: getAdminEventBorderColor(booking),
+      textColor: getAdminEventTextColor(booking),
+      extendedProps: {
+        booking,
+        property,
+        owner,
+        cleaner,
+        bookingType: booking.booking_type,
+        status: booking.status,
+        assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
+      },
+      classNames: [
+        `admin-booking-${booking.booking_type}`,
+        `admin-status-${booking.status}`,
+        `admin-assignment-${booking.assigned_cleaner_id ? 'assigned' : 'unassigned'}`,
+        isTurn ? 'admin-priority-urgent' : 'admin-priority-normal'
+      ]
+    };
+  });
+});
+const getAdminEventTitle = (booking: Booking, property?: Property, owner?: User, cleaner?: User): string => {
+  const isTurn = booking.booking_type === 'turn';
+  const propertyName = property?.name || 'Unknown Property';
+  const ownerName = owner?.name || 'Unknown Owner';
+  const cleanerName = cleaner?.name || 'Unassigned';
+  return `${isTurn ? '🔥 ' : ''}${propertyName} (${ownerName}) → ${cleanerName}`;
+};
+const getAdminEventColor = (booking: Booking): string => {
+  const isDark = theme.global.current.value.dark;
+  const isAssigned = !!booking.assigned_cleaner_id;
+  const isTurn = booking.booking_type === 'turn';
+  if (!isAssigned) {
+    return isTurn
+      ? (isDark ? '#FF5252' : '#F44336')
+      : (isDark ? '#FF9800' : '#FF6F00');
+  }
+  switch (booking.status) {
+    case 'pending':
+      return isDark ? '#2196F3' : '#1976D2';
+    case 'scheduled':
+      return isDark ? '#00BCD4' : '#0097A7';
+    case 'in_progress':
+      return isDark ? '#4CAF50' : '#388E3C';
+    case 'completed':
+      return isDark ? '#9E9E9E' : '#757575';
+    default:
+      return isDark ? '#2196F3' : '#1976D2';
+  }
+};
+const getAdminEventBorderColor = (booking: Booking): string => {
+  const isTurn = booking.booking_type === 'turn';
+  const isAssigned = !!booking.assigned_cleaner_id;
+  if (isTurn && !isAssigned) return '#D32F2F';
+  if (isTurn) return '#FF6F00';
+  if (!isAssigned) return '#F57C00';
+  return '#1976D2';
+};
+const getAdminEventTextColor = (booking: Booking): string => {
+  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
+};
+const adminCalendarOptions = computed<CalendarOptions>(() => {
+  if (!isMounted.value || !isCalendarReady.value) {
+    return {
+      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+      initialView: 'dayGridMonth',
+      headerToolbar: false,
+      events: []
+    };
+  }
+  return {
+    plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+    initialView: currentView.value,
+    headerToolbar: false,
+  events: adminCalendarEvents.value,
+  eventDisplay: 'block',
+  eventOverlap: true,
+  selectable: true,
+  selectMirror: true,
+  editable: true,
+  droppable: true,
+  eventResizable: true,
+  eventDurationEditable: true,
+  locale: 'en',
+  timeZone: 'local',
+  slotMinTime: '05:00:00',
+  slotMaxTime: '23:00:00',
+  slotDuration: '00:30:00',
+  height: 'auto',
+  aspectRatio: 1.6,
+  themeSystem: 'standard',
+  select: handleAdminDateSelect,
+  eventClick: handleAdminEventClick,
+  eventDrop: handleAdminEventDrop,
+  eventResize: handleAdminEventResize,
+  datesSet: handleDatesSet,
+  loading: handleLoading,
+  eventContent: renderAdminEventContent,
+  dayCellContent: renderAdminDayCell,
+  businessHours: {
+    daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
+    startTime: '06:00',
+    endTime: '20:00'
+  },
+  weekends: true,
+  dayMaxEvents: 5,
+  moreLinkClick: 'popover',
+  allDaySlot: false,
+  nowIndicator: true,
+  scrollTime: '07:00:00',
+  listDayFormat: { weekday: 'long', month: 'short', day: 'numeric' },
+  eventMouseEnter: (info) => {
+    info.el.style.cursor = 'pointer';
+  },
+  eventDidMount: (info) => {
+    info.el.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showContextMenu(e, info.event.extendedProps.booking);
+    });
+  }
+  };
+});
+const handleAdminDateSelect = (selectInfo: DateSelectArg): void => {
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'dateSelect',
+    { start: selectInfo.startStr, end: selectInfo.endStr },
+    'emit'
+  );
+  emit('dateSelect', selectInfo);
+  emit('createBooking', {
+    start: selectInfo.startStr,
+    end: selectInfo.endStr
+  });
+  selectInfo.view.calendar.unselect();
+};
+const handleAdminEventClick = (clickInfo: EventClickArg): void => {
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'eventClick',
+    { id: clickInfo.event.id },
+    'emit'
+  );
+  emit('eventClick', clickInfo);
+};
+const handleAdminEventDrop = (dropInfo: EventDropArg): void => {
+  const booking = dropInfo.event.extendedProps.booking as Booking;
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'eventDrop',
+    {
+      id: booking.id,
+      newStart: dropInfo.event.startStr,
+      newEnd: dropInfo.event.endStr
+    },
+    'emit'
+  );
+  emit('eventDrop', dropInfo);
+  emit('updateBooking', {
+    id: booking.id,
+    updates: {
+      checkout_date: dropInfo.event.startStr,
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+    }
+  });
+};
+const handleAdminEventResize = (resizeInfo: EventResizeInfo): void => {
+  const booking = resizeInfo.event.extendedProps.booking as Booking;
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'eventResize',
+    {
+      id: booking.id,
+      newEnd: resizeInfo.event.endStr
+    },
+    'emit'
+  );
+  emit('updateBooking', {
+    id: booking.id,
+    updates: {
+      checkin_date: resizeInfo.event.endStr || resizeInfo.event.end?.toISOString()
+    }
+  });
+};
+const handleDatesSet = (dateInfo: DatesSetInfo): void => {
+  const newDate = new Date(dateInfo.start);
+  currentDateTitle.value = dateInfo.view.title;
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'dateChange',
+    { date: newDate.toISOString(), title: dateInfo.view.title },
+    'emit'
+  );
+  emit('dateChange', newDate);
+};
+const handleLoading = (isLoading: boolean): void => {
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'loadingState',
+    { isLoading },
+    'emit'
+  );
+};
+const showContextMenu = (event: MouseEvent, booking: Booking): void => {
+  contextMenu.value = {
+    show: true,
+    x: event.clientX,
+    y: event.clientY,
+    booking
+  };
+};
+const contextMenuActions = computed(() => {
+  const booking = contextMenu.value.booking;
+  if (!booking) return [];
+  const actions = [
+    { key: 'edit', title: 'Edit Booking', icon: 'mdi-pencil' },
+    { key: 'assign', title: 'Assign Cleaner', icon: 'mdi-account-plus' },
+    { key: 'status', title: 'Change Status', icon: 'mdi-check-circle' },
+    { key: 'duplicate', title: 'Duplicate', icon: 'mdi-content-copy' },
+    { key: 'delete', title: 'Delete', icon: 'mdi-delete' }
+  ];
+  if (booking.status === 'pending') {
+    actions.splice(2, 0, { key: 'schedule', title: 'Mark Scheduled', icon: 'mdi-calendar-check' });
+  }
+  if (booking.status === 'scheduled') {
+    actions.splice(2, 0, { key: 'start', title: 'Start Cleaning', icon: 'mdi-play' });
+  }
+  if (booking.status === 'in_progress') {
+    actions.splice(2, 0, { key: 'complete', title: 'Mark Complete', icon: 'mdi-check' });
+  }
+  return actions;
+});
+const handleContextAction = (action: string): void => {
+  const booking = contextMenu.value.booking;
+  if (!booking) return;
+  contextMenu.value.show = false;
+  switch (action) {
+    case 'edit': {
+      const mockEvent = {
+        id: booking.id,
+        extendedProps: { booking },
+        start: booking.checkout_date,
+        end: booking.checkin_date,
+        title: `${booking.booking_type} - ${booking.id}`
+      };
+      emit('eventClick', {
+        event: mockEvent,
+        el: document.createElement('div'),
+        jsEvent: new MouseEvent('click'),
+        view: { type: 'timeGridWeek' }
+      } as unknown as EventClickArg);
+      break;
+    }
+    case 'assign':
+      openCleanerAssignmentModal(booking);
+      break;
+    case 'schedule':
+      emit('updateBookingStatus', { bookingId: booking.id, status: 'scheduled' });
+      break;
+    case 'start':
+      emit('updateBookingStatus', { bookingId: booking.id, status: 'in_progress' });
+      break;
+    case 'complete':
+      emit('updateBookingStatus', { bookingId: booking.id, status: 'completed' });
+      break;
+    case 'status':
+      break;
+    case 'duplicate':
+      break;
+    case 'delete':
+      break;
+  }
+};
+const openCleanerAssignmentModal = (booking: Booking): void => {
+  cleanerAssignmentModal.value = {
+    show: true,
+    booking,
+    selectedCleaner: booking.assigned_cleaner_id || null,
+    notes: '',
+    loading: false
+  };
+};
+const assignCleanerToBooking = async (): Promise<void> => {
+  const modal = cleanerAssignmentModal.value;
+  if (!modal.booking || !modal.selectedCleaner) return;
+  modal.loading = true;
+  try {
+    emit('assignCleaner', {
+      bookingId: modal.booking.id,
+      cleanerId: modal.selectedCleaner,
+      notes: modal.notes
+    });
+    modal.show = false;
+  } catch (error) {
+    console.error('Failed to assign cleaner:', error);
+  } finally {
+    modal.loading = false;
+  }
+};
+const navigateCalendar = (direction: 'prev' | 'next'): void => {
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    if (direction === 'prev') {
+      api.prev();
+    } else {
+      api.next();
+    }
+  }
+};
+const goToToday = (): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().today();
+  }
+};
+const createNewBooking = (): void => {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  emit('createBooking', {
+    start: today.toISOString().split('T')[0],
+    end: tomorrow.toISOString().split('T')[0]
+  });
+};
+const renderAdminEventContent = (eventInfo: EventContentInfo) => {
+  const booking = eventInfo.event.extendedProps.booking as Booking;
+  const property = eventInfo.event.extendedProps.property as Property;
+  const owner = eventInfo.event.extendedProps.owner as User;
+  const cleaner = eventInfo.event.extendedProps.cleaner as User;
+  const isTurn = booking.booking_type === 'turn';
+  const isAssigned = !!booking.assigned_cleaner_id;
+  return {
+    html: `
+      <div class="admin-event-content">
+        <div class="admin-event-title">
+          ${isTurn ? '🔥 ' : ''}${property?.name || 'Unknown Property'}
+        </div>
+        <div class="admin-event-owner">
+          Owner: ${owner?.name || 'Unknown'}
+        </div>
+        <div class="admin-event-cleaner ${isAssigned ? 'assigned' : 'unassigned'}">
+          ${isAssigned ? `👤 ${cleaner?.name}` : '⚠️ Unassigned'}
+        </div>
+        <div class="admin-event-status">
+          ${booking.status.toUpperCase()}
+        </div>
+        ${isTurn ? '<div class="admin-turn-badge">URGENT TURN</div>' : ''}
+      </div>
+    `
+  };
+};
+const renderAdminDayCell = (dayInfo: DayCellContentInfo) => {
+  const dayBookings = allBookings.value.filter(booking => {
+    const checkoutDate = new Date(booking.checkout_date).toDateString();
+    const dayDate = dayInfo.date.toDateString();
+    return checkoutDate === dayDate;
+  });
+  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
+  const unassignedCount = dayBookings.filter(b => !b.assigned_cleaner_id).length;
+  const totalCount = dayBookings.length;
+  return {
+    html: `
+      <div class="admin-day-number">
+        ${dayInfo.dayNumberText}
+        ${turnCount > 0 ? `<span class="admin-turn-indicator">${turnCount}</span>` : ''}
+        ${unassignedCount > 0 ? `<span class="admin-unassigned-indicator">${unassignedCount}</span>` : ''}
+        ${totalCount > 0 && turnCount === 0 && unassignedCount === 0 ? `<span class="admin-booking-indicator">${totalCount}</span>` : ''}
+      </div>
+    `
+  };
+};
+watch(currentView, (newView) => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().changeView(newView);
+    emit('viewChange', newView);
+  }
+});
+watch(() => theme.global.current.value.dark, () => {
+  nextTick(() => {
+    if (calendarRef.value) {
+      calendarRef.value.getApi().refetchEvents();
+    }
+  });
+});
+watch(() => props.bookings, (newBookings) => {
+  eventLogger.logEvent(
+    'HomeAdmin',
+    'AdminCalendar',
+    'bookingsUpdate',
+    { count: newBookings.size },
+    'receive'
+  );
+}, { deep: true });
+const goToDate = (date: string | Date): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().gotoDate(date);
+  }
+};
+const changeView = (viewName: string): void => {
+  const validViews: readonly string[] = ['dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listWeek'];
+  if (validViews.includes(viewName)) {
+    currentView.value = viewName as typeof currentView.value;
+  } else {
+    console.warn(`Invalid view name: ${viewName}. Using default 'timeGridWeek'.`);
+    currentView.value = 'timeGridWeek';
+  }
+};
+const refreshEvents = (): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().refetchEvents();
+  }
+};
+defineExpose({
+  goToDate,
+  changeView,
+  refreshEvents,
+  getApi: () => calendarRef.value?.getApi()
+});
+onMounted(async () => {
+  isMounted.value = true;
+  await nextTick();
+  setTimeout(() => {
+    isCalendarReady.value = true;
+  }, 100);
+});
+onBeforeUnmount(() => {
+  if (calendarRef.value) {
+    try {
+      const calendarApi = calendarRef.value.getApi();
+      if (calendarApi) {
+        calendarApi.destroy();
+      }
+    } catch (error) {
+      console.warn('Error cleaning up calendar:', error);
+    }
+  }
+});
+</script>
+<style scoped>
+.admin-calendar-container {
+  height: 100%;
+  width: 100%;
+}
+.calendar-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  min-height: 400px;
+}
+.admin-calendar-toolbar {
+  background: rgb(var(--v-theme-surface));
+  border: 1px solid rgb(var(--v-theme-outline), 0.12);
+}
+.admin-view-toggle {
+  border: 1px solid rgb(var(--v-theme-outline), 0.38);
+}
+.admin-date-title {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.admin-calendar-card {
+  background: rgb(var(--v-theme-surface));
+}
+.admin-calendar {
+  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
+  --fc-button-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-border-color: rgb(var(--v-theme-primary));
+  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
+  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
+  --fc-event-border-radius: 4px;
+}
+.fc-event.admin-booking-turn {
+  font-weight: bold;
+  border-width: 2px !important;
+}
+.fc-event.admin-priority-urgent {
+  animation: admin-pulse 3s infinite;
+  border-left: 4px solid rgb(var(--v-theme-error)) !important;
+}
+@keyframes admin-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
+}
+.fc-event.admin-assignment-unassigned {
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+.fc-event.admin-assignment-assigned {
+  border-style: solid !important;
+}
+.fc-event.admin-status-pending {
+  opacity: 0.9;
+}
+.fc-event.admin-status-in_progress {
+  font-weight: bold;
+  border-width: 3px !important;
+}
+.fc-event.admin-status-completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+.admin-turn-indicator {
+  background: rgb(var(--v-theme-error));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 9px;
+  margin-left: 2px;
+  font-weight: bold;
+  animation: admin-pulse 3s infinite;
+}
+.admin-unassigned-indicator {
+  background: rgb(var(--v-theme-warning));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 9px;
+  margin-left: 2px;
+  font-weight: bold;
+}
+.admin-booking-indicator {
+  background: rgb(var(--v-theme-primary));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 9px;
+  margin-left: 2px;
+  font-weight: bold;
+}
+.admin-event-content {
+  padding: 2px;
+  font-size: 0.8em;
+}
+.admin-event-title {
+  font-weight: 600;
+  font-size: 0.9em;
+  margin-bottom: 1px;
+}
+.admin-event-owner {
+  font-size: 0.75em;
+  opacity: 0.8;
+  margin-bottom: 1px;
+}
+.admin-event-cleaner {
+  font-size: 0.75em;
+  font-weight: 500;
+  margin-bottom: 1px;
+}
+.admin-event-cleaner.unassigned {
+  color: rgb(var(--v-theme-warning));
+  font-weight: bold;
+}
+.admin-event-cleaner.assigned {
+  color: rgb(var(--v-theme-success));
+}
+.admin-event-status {
+  font-size: 0.7em;
+  opacity: 0.9;
+  font-weight: 500;
+}
+.admin-turn-badge {
+  background: rgba(var(--v-theme-error), 0.2);
+  color: rgb(var(--v-theme-error));
+  font-size: 0.65em;
+  padding: 1px 3px;
+  border-radius: 3px;
+  margin-top: 1px;
+  font-weight: bold;
+  text-align: center;
+}
+.admin-day-number {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+@media (max-width: 960px) {
+  .admin-calendar-toolbar .v-row {
+    flex-direction: column;
+  }
+  .admin-calendar-toolbar .v-col {
+    margin-bottom: 8px !important;
+  }
+  .admin-view-toggle {
+    width: 100%;
+  }
+  .admin-event-content {
+    font-size: 0.7em;
+  }
+}
+@media (max-width: 600px) {
+  .admin-calendar {
+    --fc-event-border-radius: 2px;
+  }
+  .admin-event-content {
+    font-size: 0.65em;
+    padding: 1px;
+  }
+  .admin-event-title {
+    font-size: 0.8em;
+  }
+}
+</style>
+````
+
 ## File: src/components/smart/admin/HomeAdmin.vue
 ````vue
 <template>
@@ -27109,14 +26379,14 @@ describe('Multi-tenant data updates', () => {
         class="sidebar-column"
         :class="{ 'mobile-hidden': !sidebarOpen }"
       >
-          <v-btn
-            v-if="$vuetify.display.lgAndDown"
-            icon="mdi-menu"
-            variant="text"
-            class="mr-4"
-            @click="toggleSidebar"
-          />
-        <Sidebar
+        <v-btn
+          v-if="$vuetify.display.lgAndDown"
+          icon="mdi-menu"
+          variant="text"
+          class="mr-4"
+          @click="toggleSidebar"
+        />
+        <AdminSidebar
           :today-turns="systemTodayTurns"
           :upcoming-cleanings="systemUpcomingCleanings"
           :properties="allPropertiesMap"
@@ -27205,13 +26475,14 @@ describe('Multi-tenant data updates', () => {
             </v-btn-toggle>
           </div>
         </div>
-        <FullCalendar
+        <AdminCalendar
           ref="calendarRef"
           :bookings="adminFilteredBookings"
-          :properties="allPropertiesMap"
           :loading="loading"
           :current-view="currentView"
           :current-date="currentDate"
+          :properties="allPropertiesMap"
+          :users="allUsersMap"
           @date-select="handleDateSelect"
           @event-click="handleEventClick"
           @event-drop="handleEventDrop"
@@ -27260,11 +26531,12 @@ describe('Multi-tenant data updates', () => {
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDisplay } from 'vuetify';
-import Sidebar from '../Sidebar.vue';
-import FullCalendar from '../FullCalendar.vue';
+import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
+import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
 import BookingForm from '@/components/dumb/BookingForm.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
 import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
+import { useUserStore } from '@/stores/user';
 import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
 import { useUIStore } from '@/stores/ui';
@@ -27275,6 +26547,7 @@ import { useCalendarState } from '@/composables/shared/useCalendarState';
 import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 import eventLogger from '@/composables/shared/useComponentEventLogger';
+const userStore = useUserStore();
 const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
@@ -27306,7 +26579,7 @@ const {
   clearPropertyFilters,
   togglePropertyFilter
 } = useCalendarState();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
 const sidebarOpen = ref(!xs.value);
 const selectedPropertyFilter = ref<string | null>(null);
 const isAdminAuthenticated = computed(() => {
@@ -27343,6 +26616,16 @@ const allPropertiesMap = computed(() => {
     });
     return map;
   }
+});
+const allUsersMap = computed(() => {
+  const map = new Map<string, any>();
+  if (!isAdminAuthenticated.value) {
+    return map;
+  }
+  if (userStore.user) {
+    map.set(userStore.user.id, userStore.user);
+  }
+  return map;
 });
 const allBookingsMap = computed(() => {
   if (!isAdminAuthenticated.value) {
@@ -31218,9 +30501,15 @@ defineExpose({
 ## File: src/pages/index.vue
 ````vue
 <template>
-  <div v-if="authStore.loading" class="loading-container">
+  <div
+    v-if="authStore.loading"
+    class="loading-container"
+  >
     <v-container class="fill-height">
-      <v-row justify="center" align="center">
+      <v-row
+        justify="center"
+        align="center"
+      >
         <v-col cols="auto">
           <v-progress-circular
             indeterminate
@@ -31234,7 +30523,10 @@ defineExpose({
       </v-row>
     </v-container>
   </div>
-  <component v-else :is="homeComponent" />
+  <component
+    :is="homeComponent"
+    v-else
+  />
 </template>
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
@@ -32375,76 +31667,6 @@ function setFilter(key: string, value: FilterValue)
 function getFilter(key: string): FilterValue
 ````
 
-## File: package.json
-````json
-{
-  "name": "property-cleaning-scheduler",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@fullcalendar/core": "^6.1.17",
-    "@fullcalendar/daygrid": "^6.1.17",
-    "@fullcalendar/interaction": "^6.1.17",
-    "@fullcalendar/list": "^6.1.17",
-    "@fullcalendar/timegrid": "^6.1.17",
-    "@fullcalendar/vue3": "^6.1.17",
-    "@mdi/font": "^7.4.47",
-    "@mdit/plugin-uml": "^0.22.0",
-    "@supabase/supabase-js": "^2.50.0",
-    "@types/uuid": "^10.0.0",
-    "lint-staged": "^16.1.0",
-    "markdown-it-plantuml": "^1.4.1",
-    "ngrx-uml": "^1.0.2",
-    "pinia": "^2.1.7",
-    "prettier": "^3.5.3",
-    "uml": "^1.0.0",
-    "uuid": "^11.1.0",
-    "vite-plugin-vue-devtools": "^7.7.6",
-    "vue": "^3.4.15",
-    "vue-router": "^4.2.5"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.28.0",
-    "@testing-library/vue": "^8.1.0",
-    "@types/node": "^20.19.0",
-    "@typescript-eslint/eslint-plugin": "^8.34.0",
-    "@typescript-eslint/parser": "^8.34.0",
-    "@vitejs/plugin-vue": "^5.2.4",
-    "@vitest/coverage-v8": "^3.2.2",
-    "@vue/test-utils": "^2.4.6",
-    "eslint": "^9.29.0",
-    "eslint-plugin-vue": "^10.2.0",
-    "globals": "^15.1.0",
-    "happy-dom": "^17.6.3",
-    "jsdom": "^26.1.0",
-    "sass-embedded": "^1.89.2",
-    "typescript": "~5.3.3",
-    "v4": "^0.0.1",
-    "vite": "^5.0.12",
-    "vite-plugin-css-injected-by-js": "^3.5.2",
-    "vite-plugin-vuetify": "^2.1.1",
-    "vitest": "^3.2.2",
-    "vue-eslint-parser": "^10.1.3",
-    "vue-tsc": "^1.8.27",
-    "vuetify": "^3.8.8"
-  },
-  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
-}
-````
-
 ## File: src/components/smart/Sidebar.vue
 ````vue
 <template>
@@ -32829,6 +32051,76 @@ onMounted(() => {
   }
 }
 </style>
+````
+
+## File: package.json
+````json
+{
+  "name": "property-cleaning-scheduler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.17",
+    "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
+    "@fullcalendar/list": "^6.1.17",
+    "@fullcalendar/timegrid": "^6.1.17",
+    "@fullcalendar/vue3": "^6.1.17",
+    "@mdi/font": "^7.4.47",
+    "@mdit/plugin-uml": "^0.22.0",
+    "@supabase/supabase-js": "^2.50.0",
+    "@types/uuid": "^10.0.0",
+    "lint-staged": "^16.1.0",
+    "markdown-it-plantuml": "^1.4.1",
+    "ngrx-uml": "^1.0.2",
+    "pinia": "^2.1.7",
+    "prettier": "^3.5.3",
+    "uml": "^1.0.0",
+    "uuid": "^11.1.0",
+    "vite-plugin-vue-devtools": "^7.7.6",
+    "vue": "^3.4.15",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@testing-library/vue": "^8.1.0",
+    "@types/node": "^20.19.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vitest/coverage-v8": "^3.2.2",
+    "@vue/test-utils": "^2.4.6",
+    "eslint": "^9.29.0",
+    "eslint-plugin-vue": "^10.2.0",
+    "globals": "^15.1.0",
+    "happy-dom": "^17.6.3",
+    "jsdom": "^26.1.0",
+    "sass-embedded": "^1.89.2",
+    "typescript": "~5.3.3",
+    "v4": "^0.0.1",
+    "vite": "^5.0.12",
+    "vite-plugin-css-injected-by-js": "^3.5.2",
+    "vite-plugin-vuetify": "^2.1.1",
+    "vitest": "^3.2.2",
+    "vue-eslint-parser": "^10.1.3",
+    "vue-tsc": "^1.8.27",
+    "vuetify": "^3.8.8"
+  },
+  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
+}
 ````
 
 ## File: problemfix.md

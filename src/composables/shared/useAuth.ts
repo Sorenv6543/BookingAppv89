@@ -1,3 +1,11 @@
+// 🔐 AUTHENTICATION LAYER
+
+// src/composables/shared/useAuth.ts - 🔧 AUTH OPERATIONS
+// ✅ Contains actual authentication logic
+// ✅ Currently mock implementation
+// ✅ Called by auth store
+// ✅ Future: Will contain real Supabase calls (TODO: TASK-039O) - 
+
 import { ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user';
 import type { User, PropertyOwner, Admin, Cleaner, UserRole, UserSettings } from '@/types';

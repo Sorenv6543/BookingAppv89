@@ -1,3 +1,13 @@
+// 🔐 AUTHENTICATION LAYER
+
+// src/stores/auth.ts - 🏛️ CENTRAL AUTH STATE
+// ✅ Stores current user & auth state
+// ✅ Provides role-checking computed properties (isOwner, isAdmin)
+// ✅ Handles login/logout/registration
+// ✅ Manages admin view-switching
+// ✅ Used by ALL other components to check auth status
+
+
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { User, UserRole, PropertyOwner, Admin, Cleaner } from '@/types';
