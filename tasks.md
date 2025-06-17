@@ -1185,7 +1185,7 @@
   - Assigned to: Human + Cursor
 
 ### **Documentation & Cleanup**
-- [x] **TASK-055A**: Create UML diagrams to visualize codebase architecture
+- [] **TASK-055A**: Create UML diagrams to visualize codebase architecture
   - Status: Complete (needs update for role-based)
   - Requirements:
     - Update existing UML diagrams for role-based architecture
