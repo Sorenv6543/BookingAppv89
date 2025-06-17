@@ -988,7 +988,7 @@
   - Assigned to: Cursor
 
 
-- [x] **TASK-UI-FIX_ADMIN-SIDEBAR**: Fix AdminSidebar width responsiveness
+- [] **TASK-UI-FIX_ADMIN-SIDEBAR**: Fix AdminSidebar width responsiveness
   - Status: Complete
   - Requirements: 
     - ✅ Desktop: Standard sidebar width controlled by parent column

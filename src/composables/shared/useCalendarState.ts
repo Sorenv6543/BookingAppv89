@@ -12,7 +12,7 @@ export function useCalendarState() {
   const bookingStore = useBookingStore();
   
   // Calendar view state
-  const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'>('timeGridWeek');
+  const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'>('dayGridMonth');
   const currentDate = ref<Date>(new Date());
   const dateRange = ref<{ start: Date; end: Date }>({
     start: new Date(),

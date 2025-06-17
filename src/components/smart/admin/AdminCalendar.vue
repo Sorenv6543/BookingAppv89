@@ -341,7 +341,7 @@ const isMounted = ref(false);
 const isCalendarReady = ref(false);
 
 // Admin calendar state
-const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('timeGridWeek');
+const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('dayGridMonth');
 const currentDateTitle = ref('');
 
 // Admin filtering state
