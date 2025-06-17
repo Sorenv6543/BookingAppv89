@@ -7,7 +7,13 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          sourceMap: true
+        }
+      }
+    }),
     vuetify({ 
           autoImport: true, // Enable auto-import for Vuetify components
           styles: {
@@ -32,19 +38,37 @@ export default defineConfig({
       'vue': 'vue/dist/vue.esm-bundler.js'
     }
   },
+    // CSS and SCSS sourcemap configuration
+    css: {
+      devSourcemap: true, // Enable CSS sourcemaps in development
+      preprocessorOptions: {
+        scss: {
+          sourceMap: true, // Enable SCSS sourcemaps
+          sourceMapContents: true,
+          sourceMapEmbed: false
+        }
+      }
+    },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    sourcemapIgnoreList:false
   },
   build: {
     target: 'esnext',
+    sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden',
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['vue', 'vue-router', 'pinia'],
           vuetify: ['vuetify']
-        }
+        },
+        sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden'
       }
     }
+  },
+  optimizeDeps: {
+    include: ['vue', 'vue-router', 'pinia', 'vuetify'],
+    force: false
   }
 })

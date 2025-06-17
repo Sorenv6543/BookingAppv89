@@ -9,7 +9,7 @@
     </v-row>
     <v-row>
       <v-col cols="12">
-        <FullCalendar
+        <OwnerCalendar
           :bookings="bookingStore.bookings"
           :properties="propertyStore.properties"
           :loading="bookingStore.loading || propertyStore.loading"
@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import FullCalendar from '@/components/smart/FullCalendar.vue';
+import OwnerCalendar from '@/components/smart/owner/OwnerCalendar.vue';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
 import { useUIStore } from '@/stores/ui';

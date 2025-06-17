@@ -117,7 +117,7 @@ src/components/smart/owner/HomeOwner.vue -
         </div>
 
         <!-- TODO: Replace with OwnerCalendar.vue when TASK-039E is complete -->
-        <FullCalendar
+        <OwnerCalendar
           ref="calendarRef"
           :bookings="ownerFilteredBookings"
           :properties="ownerPropertiesMap"
@@ -198,6 +198,7 @@ import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/c
 
 // Import event logger for component communication
 import eventLogger from '@/composables/shared/useComponentEventLogger';
+import OwnerCalendar from '@/pages/demos/owner-calendar.vue';
 
 // ============================================================================
 // STORE CONNECTIONS & STATE

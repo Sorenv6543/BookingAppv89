@@ -243,27 +243,27 @@ const router = createRouter({
         title: 'Route Guards Demo'
       }
     },
-    {
-      path: '/demos/admin-sidebar-width-test',
-      name: 'admin-sidebar-width-test',
-      component: () => import('@/pages/demos/admin-sidebar-width-test.vue'),
-      meta: {
-        layout: 'default',
-        public: true,
-        demo: true,
-        title: 'Admin Sidebar Width Test'
-      }
-    },
+    // {
+    //   path: '/demos/admin-sidebar-width-test',
+    //   name: 'admin-sidebar-width-test',
+    //   component: () => import('@/pages/demos/admin-sidebar-width-test.vue'),
+    //   meta: {
+    //     layout: 'default',
+    //     public: true,
+    //     demo: true,
+    //     title: 'Admin Sidebar Width Test'
+    //   }
+    // },
 
 
-    {
-      path: '/testing/turn-alerts',
-      name: 'turn-alerts-demo',
-      component: () => import('@/components/dumb/TurnAlertsDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
+    // {
+    //   path: '/testing/turn-alerts',
+    //   name: 'turn-alerts-demo',
+    //   component: () => import('@/components/dumb/TurnAlertsDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
 
     // Auth routes
     {

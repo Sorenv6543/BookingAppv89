@@ -1,8 +1,8 @@
 <template>
   <v-navigation-drawer
     class="owner-sidebar"
-    width="100%"
-    :elevation="8"
+    permanent
+    :elevation="0"
     color="tertiary"
 
   >                                   
