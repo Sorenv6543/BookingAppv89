@@ -40,7 +40,7 @@
 ### **FullCalendar.io with Vue 3 and TypeScript**
 - **Library ID**: `/fullcalendar/fullcalendar`
 - **Trust Score**: 8.3 (67 code snippets)
-- **Suggested Topics**: `vue-integration`, `typescript`, `events`, `drag-drop`
+- **Suggested Topics**: `vue-integration`, `typescript`, `events`, `drag-drop`, `resizing`, `drag-drop-resizing`, `drag-drop-resizing-events`
 
 ### **Vite**
 - **Library ID**: `/vitejs/vite`

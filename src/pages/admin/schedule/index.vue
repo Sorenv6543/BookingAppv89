@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/max-attributes-per-line -->
 <template>
   <div class="admin-schedule-page">
     <!-- Page Header -->
@@ -5,7 +6,9 @@
       <v-container fluid>
         <v-row align="center">
           <v-col>
-            <h1 class="text-h4 font-weight-bold">Master Schedule</h1>
+            <h1 class="text-h4 font-weight-bold">
+              Master Schedule
+            </h1>
             <p class="text-subtitle-1 text-medium-emphasis">
               System-wide calendar and cleaner assignment management
             </p>
@@ -25,7 +28,7 @@
 
     <!-- Main Content -->
     <div class="page-content">
-      <v-container fluid class="pa-0">
+      <v-container fluid class="pa-0" style="height: 100%;">
         <v-row no-gutters class="fill-height">
           <!-- Sidebar -->
           <v-col cols="12" md="3" class="sidebar-col">
@@ -53,24 +56,27 @@
 
     <!-- Modals -->
     <BookingForm
-      v-if="uiStore.modals.get('event')?.isOpen"
-      :booking="selectedBooking"
+      v-if="uiStore.modals.get('event')?.open"
+      :booking="selectedBooking || undefined"
       :is-edit="isEditMode"
       @save="handleBookingSave"
       @close="closeBookingModal"
     />
 
     <CleanerAssignmentModal
-      v-if="uiStore.modals.get('cleanerAssignment')?.isOpen"
+      v-if="uiStore.modals.get('cleanerAssignment')?.open"
+      :model-value="true"
       :booking="selectedBooking"
+      :properties="Array.from(propertyStore.properties.values())"
+      :cleaners="[]"
       @assign="handleCleanerAssign"
-      @close="closeCleanerAssignmentModal"
+      @update:model-value="closeCleanerAssignmentModal"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue'
 import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue'
@@ -81,14 +87,12 @@ import { useCleanerManagement } from '@/composables/admin/useCleanerManagement'
 import { useUIStore } from '@/stores/ui'
 import { useBookingStore } from '@/stores/booking'
 import { usePropertyStore } from '@/stores/property'
-import { useUserStore } from '@/stores/user'
-import type { Booking } from '@/types/booking'
+import type { Booking, BookingFormData } from '@/types/booking'
 
 // Stores and composables
 const uiStore = useUIStore()
 const bookingStore = useBookingStore()
 const propertyStore = usePropertyStore()
-const userStore = useUserStore()
 const router = useRouter()
 const { createBooking: createBookingFn, updateBooking } = useAdminBookings()
 const { assignCleanerToBooking } = useCleanerManagement()
@@ -96,6 +100,7 @@ const { assignCleanerToBooking } = useCleanerManagement()
 // Reactive state
 const selectedPropertyId = ref<string | null>(null)
 const selectedBooking = ref<Booking | null>(null)
+const selectedDate = ref<string | null>(null)
 const isEditMode = ref(false)
 
 // Event handlers
@@ -133,6 +138,7 @@ const handleEventClick = (booking: Booking) => {
 
 const handleDateSelect = (date: string) => {
   // Create new booking for selected date
+  selectedDate.value = date
   selectedBooking.value = null
   isEditMode.value = false
   uiStore.openModal('event')
@@ -160,7 +166,10 @@ const handleBookingSave = async (bookingData: Partial<Booking>) => {
     if (isEditMode.value && selectedBooking.value) {
       await updateBooking(selectedBooking.value.id, bookingData)
     } else {
-      await createBookingFn(bookingData)
+      // Ensure required fields are present for creation
+      if (bookingData.property_id && bookingData.checkout_date && bookingData.checkin_date) {
+        await createBookingFn(bookingData as BookingFormData)
+      }
     }
     closeBookingModal()
   } catch (error) {

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-template-shadow -->
 <template>
   <div class="admin-calendar-container">
     <!-- Advanced Admin Calendar Toolbar -->
@@ -150,13 +151,18 @@
       elevation="2"
       class="admin-calendar-card"
     >
-      <div v-if="!isMounted || !isCalendarReady" class="calendar-loading">
+      <div
+        v-if="!isMounted || !isCalendarReady"
+        class="calendar-loading"
+      >
         <v-progress-circular
           indeterminate
           color="primary"
           size="64"
         />
-        <p class="text-center mt-4">Loading calendar...</p>
+        <p class="text-center mt-4">
+          Loading calendar...
+        </p>
       </div>
       <FullCalendar
         v-else
@@ -249,7 +255,7 @@
 
 <script setup lang="ts">
 import FullCalendar from '@fullcalendar/vue3';
-import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg, EventApi, ViewApi, Duration } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
@@ -260,6 +266,46 @@ import type { Booking, Property, User, Cleaner } from '@/types';
 
 // Import event logger for component communication
 import eventLogger from '@/composables/shared/useComponentEventLogger';
+
+// FullCalendar TypeScript interfaces based on documentation
+interface EventResizeInfo {
+  event: EventApi;
+  relatedEvents: EventApi[];
+  oldEvent: EventApi;
+  endDelta: Duration;
+  startDelta: Duration;
+  revert: () => void;
+  view: ViewApi;
+  el: HTMLElement;
+  jsEvent: MouseEvent | TouchEvent;
+}
+
+interface DatesSetInfo {
+  view: ViewApi;
+  start: Date;
+  end: Date;
+  startStr: string;
+  endStr: string;
+  timeZone: string;
+}
+
+interface EventContentInfo {
+  event: EventApi;
+  timeText: string;
+  view: ViewApi;
+  el: HTMLElement;
+}
+
+interface DayCellContentInfo {
+  date: Date;
+  dateStr: string;
+  dayNumberText: string;
+  view: ViewApi;
+  isToday: boolean;
+  isPast: boolean;
+  isFuture: boolean;
+  isOther: boolean;
+}
 
 interface Props {
   bookings: Map<string, Booking>;
@@ -624,7 +670,7 @@ const handleAdminEventDrop = (dropInfo: EventDropArg): void => {
   });
 };
 
-const handleAdminEventResize = (resizeInfo: any): void => {
+const handleAdminEventResize = (resizeInfo: EventResizeInfo): void => {
   const booking = resizeInfo.event.extendedProps.booking as Booking;
   
   eventLogger.logEvent(
@@ -642,12 +688,12 @@ const handleAdminEventResize = (resizeInfo: any): void => {
   emit('updateBooking', {
     id: booking.id,
     updates: {
-      checkin_date: resizeInfo.event.endStr
+      checkin_date: resizeInfo.event.endStr || resizeInfo.event.end?.toISOString()
     }
   });
 };
 
-const handleDatesSet = (dateInfo: any): void => {
+const handleDatesSet = (dateInfo: DatesSetInfo): void => {
   const newDate = new Date(dateInfo.start);
   currentDateTitle.value = dateInfo.view.title;
   
@@ -717,9 +763,23 @@ const handleContextAction = (action: string): void => {
   contextMenu.value.show = false;
   
   switch (action) {
-    case 'edit':
-      emit('eventClick', { event: { id: booking.id, extendedProps: { booking } } } as any);
+    case 'edit': {
+      // Create a minimal EventClickArg structure for the emit - only use required properties
+      const mockEvent = {
+        id: booking.id,
+        extendedProps: { booking },
+        start: booking.checkout_date,
+        end: booking.checkin_date,
+        title: `${booking.booking_type} - ${booking.id}`
+      };
+      emit('eventClick', { 
+        event: mockEvent,
+        el: document.createElement('div'), // Mock DOM element
+        jsEvent: new MouseEvent('click'), // Mock mouse event
+        view: { type: 'timeGridWeek' } // Mock view
+      } as unknown as EventClickArg);
       break;
+    }
     case 'assign':
       openCleanerAssignmentModal(booking);
       break;
@@ -806,7 +866,7 @@ const createNewBooking = (): void => {
 };
 
 // Admin-focused custom event rendering
-const renderAdminEventContent = (eventInfo: any) => {
+const renderAdminEventContent = (eventInfo: EventContentInfo) => {
   const booking = eventInfo.event.extendedProps.booking as Booking;
   const property = eventInfo.event.extendedProps.property as Property;
   const owner = eventInfo.event.extendedProps.owner as User;
@@ -836,7 +896,7 @@ const renderAdminEventContent = (eventInfo: any) => {
 };
 
 // Admin-focused day cell rendering
-const renderAdminDayCell = (dayInfo: any) => {
+const renderAdminDayCell = (dayInfo: DayCellContentInfo) => {
   const dayBookings = allBookings.value.filter(booking => {
     const checkoutDate = new Date(booking.checkout_date).toDateString();
     const dayDate = dayInfo.date.toDateString();
@@ -895,7 +955,13 @@ const goToDate = (date: string | Date): void => {
 };
 
 const changeView = (viewName: string): void => {
-  currentView.value = viewName as any;
+  const validViews: readonly string[] = ['dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listWeek'];
+  if (validViews.includes(viewName)) {
+    currentView.value = viewName as typeof currentView.value;
+  } else {
+    console.warn(`Invalid view name: ${viewName}. Using default 'timeGridWeek'.`);
+    currentView.value = 'timeGridWeek';
+  }
 };
 
 const refreshEvents = (): void => {
