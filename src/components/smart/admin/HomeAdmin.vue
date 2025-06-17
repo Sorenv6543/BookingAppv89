@@ -1072,8 +1072,8 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
-/* Responsive design */
-@media (max-width: 1024px) {
+/* Responsive design - Fixed to match Vuetify breakpoints */
+@media (max-width: 1279px) { /* Only apply mobile sidebar below lg breakpoint */
   .sidebar-column {
     position: fixed;
     top: 64px; /* Account for app bar */
@@ -1092,6 +1092,18 @@ onUnmounted(() => {
   
   .sidebar-column:not(.mobile-hidden) {
     transform: translateX(0);
+  }
+}
+
+/* Reset for desktop - let Vuetify grid take control */
+@media (min-width: 1280px) {
+  .sidebar-column {
+    position: static !important;
+    transform: none !important;
+    width: unset !important; /* Remove width override to let Vuetify flex work */
+    max-width: none !important;
+    box-shadow: none !important;
+    height: auto !important;
   }
 }
 
