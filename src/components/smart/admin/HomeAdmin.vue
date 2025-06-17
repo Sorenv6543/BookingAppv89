@@ -27,7 +27,7 @@
           variant="text"
           class="mr-4"
           @click="toggleSidebar"
-        /><!-- TODO: Replace with AdminSidebar.vue when TASK-039G is complete -->
+        />
         <AdminSidebar
           :today-turns="systemTodayTurns"
           :upcoming-cleanings="systemUpcomingCleanings"

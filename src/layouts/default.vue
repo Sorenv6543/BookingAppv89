@@ -2,86 +2,7 @@
 <template>
   <v-app>
     <!-- Navigation Drawer -->
-    <v-navigation-drawer
-      v-model="drawer"
-      :rail="(rail && !mobile) || (md && !mobile)"
-      :permanent="!mobile"
-      :temporary="mobile"
-      color="secondary"
-      class="border-r"
-      @click="rail = false"
-    >
-      <v-list>    
-        <v-list-item
-          title="Cleano"
-        >
-          <template #append>
-            <v-btn
-              icon="mdi-chevron-left"
-              variant="text"
-              @click.stop="closeDrawer"
-            />
-          </template>
-        </v-list-item>
-      </v-list>
-      <!-- App Logo and Title -->
-      <!-- <div class="pa-4 d-flex align-center">
-          <v-avatar color="primary" class="mr-3">
-            <v-icon color="white">mdi-broom</v-icon>
-          </v-avatar>
-          <h3 class="text-h5">Property Scheduler</h3>
-        </div> -->
-      <v-divider class="my-2" />
-      <!-- Navigation Links -->
-      <v-list
-        density="compact"
-        nav
-      >
-        <v-list-item
-          to="/"
-          prepend-icon="mdi-view-dashboard"
-          title="Dashboard"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/properties"
-          prepend-icon="mdi-home"
-          title="Properties"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/calendar"
-          prepend-icon="mdi-calendar"
-          title="Calendar"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/settings"
-          prepend-icon="mdi-cog"
-          title="Settings"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/integrations"
-          prepend-icon="mdi-link"
-          title="Integrations"
-          rounded="lg"
-        />
 
-        <v-list-item
-          to="/faq"
-          prepend-icon="mdi-help-circle"
-          title="FAQ"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/contact"
-          prepend-icon="mdi-email"
-          title="Contact Us"
-          rounded="lg"
-        />
-      </v-list>
-    </v-navigation-drawer>
     <!-- App Bar -->
     <v-app-bar
       app
@@ -158,7 +79,6 @@
   
   <script setup lang="ts">
   import { ref } from 'vue';
-  import { watch } from 'vue';
   import { useDisplay } from 'vuetify';
   import ThemePicker from '@/components/dumb/shared/ThemePicker.vue';
 
@@ -168,7 +88,7 @@
   
   
   // Store connections
-  const { mobile, md } = useDisplay();
+  const { mobile} = useDisplay();
   
   // Methods
   const toggleSidebar = (): void => {
@@ -181,27 +101,8 @@
     }
   };
 
-  const closeDrawer = (): void => {
-    if (mobile.value) {
-      // On mobile, close the drawer
-      drawer.value = false;
-    } else {
-      // On desktop, toggle rail mode
-      rail.value = !rail.value;
-    }
-  };
+
   
-  // Auto-adjust drawer behavior based on screen size
-  watch([mobile, md], ([isMobile]: [boolean, boolean]) => {
-    if (isMobile) {
-      drawer.value = false; // Hide drawer when switching to mobile
-      rail.value = false; // Reset rail mode on mobile
-    } else {
-      drawer.value = true; // Show drawer on tablet and desktop
-      // Don't set rail.value here - let the prop logic handle it automatically
-      // Rail mode will be controlled by: :rail="(rail && !mobile) || (md && !mobile)"
-    }
-  }, { immediate: true });
   </script>
   
   <style>
@@ -215,10 +116,7 @@
   }
   
   /* Navigation drawer theming */
-  .v-navigation-drawer {
-    background: rgb(var(--v-theme-surface)) !important;
-    color: rgb(var(--v-theme-on-surface)) !important;
-  }
+
   
   /* App bar theming */
   .v-app-bar {

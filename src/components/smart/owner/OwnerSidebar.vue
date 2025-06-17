@@ -2,7 +2,7 @@
   <v-navigation-drawer
     class="owner-sidebar"
     width="100%"
-    :elevation="80"
+    :elevation="8"
     color="tertiary"
 
   >                                   

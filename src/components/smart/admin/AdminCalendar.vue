@@ -543,7 +543,6 @@ const adminCalendarOptions = computed<CalendarOptions>(() => {
   selectMirror: true,
   editable: true, // Enable drag-and-drop for admin
   droppable: true, // Enable drag-to-assign
-  eventResizable: true, // Allow resizing events
   eventDurationEditable: true,
   
   // Date/time settings

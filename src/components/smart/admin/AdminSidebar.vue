@@ -2,7 +2,7 @@
   <v-navigation-drawer
     class="admin-sidebar"
     permanent
-    :elevation="80"
+    :elevation="8"
     color="tertiary"
   >                                   
     <v-container class="py-2">
