@@ -150,6 +150,7 @@
     <v-card
       elevation="2"
       class="admin-calendar-card"
+      :style="{ height: calendarCardHeight }"
     >
       <div
         v-if="!isMounted || !isCalendarReady"
@@ -169,6 +170,7 @@
         ref="calendarRef"
         :options="adminCalendarOptions"
         class="admin-calendar"
+        :style="{ height: fullCalendarHeight }"
       />
     </v-card>
 
@@ -396,6 +398,17 @@ const bookingTypeOptions = [
   { label: 'Standard Bookings', value: 'standard' }
 ];
 
+// Height calculations for responsive full-viewport calendar
+const calendarCardHeight = computed(() => {
+  // Calculate available height: viewport minus toolbar height (approx 120px)
+  return 'calc(100vh - 180px)';
+});
+
+const fullCalendarHeight = computed(() => {
+  // FullCalendar height should fill the card minus padding
+  return 'calc(100vh - 200px)';
+});
+
 // Admin sees ALL bookings (no owner filtering)
 const allBookings = computed(() => {
   return Array.from(props.bookings.values());
@@ -553,8 +566,8 @@ const adminCalendarOptions = computed<CalendarOptions>(() => {
   slotDuration: '00:30:00', // 30-minute slots for admin precision
   
   // Appearance - admin-focused
-  height: 'auto',
-  aspectRatio: 1.6,
+  height: '100%',
+  aspectRatio: undefined, // Let height control sizing
   
   // Custom styling based on theme
   themeSystem: 'standard',
@@ -977,6 +990,18 @@ defineExpose({
   getApi: () => calendarRef.value?.getApi()
 });
 
+// Window resize handler for calendar responsiveness
+const handleWindowResize = (): void => {
+  if (calendarRef.value) {
+    nextTick(() => {
+      const calendarApi = calendarRef.value?.getApi();
+      if (calendarApi) {
+        calendarApi.updateSize();
+      }
+    });
+  }
+};
+
 // Lifecycle hooks for proper DOM mounting
 onMounted(async () => {
   isMounted.value = true;
@@ -987,10 +1012,16 @@ onMounted(async () => {
   // Add a small delay to ensure Vuetify layout is ready
   setTimeout(() => {
     isCalendarReady.value = true;
+    
+    // Add resize listener after calendar is ready
+    window.addEventListener('resize', handleWindowResize);
   }, 100);
 });
 
 onBeforeUnmount(() => {
+  // Remove resize listener
+  window.removeEventListener('resize', handleWindowResize);
+  
   // Clean up calendar instance if needed
   if (calendarRef.value) {
     try {
@@ -1009,6 +1040,8 @@ onBeforeUnmount(() => {
 .admin-calendar-container {
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .calendar-loading {
@@ -1016,13 +1049,13 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 400px;
-  min-height: 400px;
+  height: 100%;
 }
 
 .admin-calendar-toolbar {
   background: rgb(var(--v-theme-surface));
   border: 1px solid rgb(var(--v-theme-outline), 0.12);
+  flex-shrink: 0;
 }
 
 .admin-view-toggle {
@@ -1037,6 +1070,9 @@ onBeforeUnmount(() => {
 
 .admin-calendar-card {
   background: rgb(var(--v-theme-surface));
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .admin-calendar {
@@ -1047,6 +1083,7 @@ onBeforeUnmount(() => {
   --fc-button-active-bg-color: rgb(var(--v-theme-primary));
   --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
   --fc-event-border-radius: 4px;
+  flex: 1;
 }
 
 /* Admin-specific turn booking highlighting */

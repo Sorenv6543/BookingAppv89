@@ -1,5 +1,5 @@
 This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
-The content has been processed where comments have been removed, empty lines have been removed, content has been formatted for parsing in markdown style, content has been compressed (code blocks are separated by ⋮---- delimiter).
+The content has been processed where comments have been removed, empty lines have been removed, content has been compressed (code blocks are separated by ⋮---- delimiter).
 
 # File Summary
 
@@ -29,17 +29,18 @@ The content is organized as follows:
 ## Notes
 - Some files may have been excluded based on .gitignore rules and Repomix's configuration
 - Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
-- Files matching these patterns are excluded: docs/**, node_modules/*
+- Files matching these patterns are excluded: /node_modules, src/__tests__, README.md, .git, docs/**, problemfix.md
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
 - Code comments have been removed from supported file types
 - Empty lines have been removed from all files
-- Content has been formatted for parsing in markdown style
 - Content has been compressed - code blocks are separated by ⋮---- delimiter
 - Files are sorted by Git change count (files with more changes are at the bottom)
 
 # Directory Structure
 ```
+src/pages/bookings/
+src/pages/settings/
 .cursor/rules/criticalprojectconcepts.mdc
 .cursorignore
 .eslintrc.json
@@ -48,17 +49,6 @@ The content is organized as follows:
 eslint.config.js
 index.html
 package.json
-problemfix.md
-README.md
-src/__tests__/components/HelloWorld.spec.ts
-src/__tests__/components/SimpleTest.spec.ts
-src/__tests__/setup/cssStub.js
-src/__tests__/setup/setupTests.ts
-src/__tests__/stores/booking.spec.ts
-src/__tests__/stores/property.spec.ts
-src/__tests__/stores/ui.spec.ts
-src/__tests__/stores/user.spec.ts
-src/__tests__/utils/test-utils.ts
 src/App.vue
 src/assets/main.css
 src/components/demos/AdminQuickActionsDemo.vue
@@ -145,6 +135,7 @@ src/pages/auth/register.vue
 src/pages/auth/signup.vue
 src/pages/calendar/index.vue
 src/pages/crud-testing.vue
+src/pages/demos/admin-sidebar-width-test.vue
 src/pages/demos/auth-flow.vue
 src/pages/demos/calendar.vue
 src/pages/demos/home-admin.vue
@@ -160,7 +151,6 @@ src/pages/owner/bookings/index.vue
 src/pages/owner/calendar.vue
 src/pages/owner/dashboard.vue
 src/pages/owner/properties/index.vue
-src/pages/properties/index.vue
 src/plugins/supabase.ts
 src/plugins/vuetify.ts
 src/router/guards.ts
@@ -241,380 +231,6 @@ vitest.config.ts
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
-````
-
-## File: README.md
-````markdown
-# Product Requirements Document: Property Cleaning Scheduler
-
-## 1. Executive Summary
-
-### Problem Statement
-A house cleaning business with 30-40 Airbnb/VRBO property owner clients currently experiences communication breakdowns that result in missed cleanings. Property owners manually coordinate checkout/checkin dates with the cleaning company, leading to inefficiencies and lost revenue.
-
-### Solution Overview
-A web-based scheduling platform that allows property owners to sync their Airbnb/VRBO calendars with the cleaning company's master dashboard, automatically scheduling cleaning windows based on checkout dates and cleaner availability.
-
-### Business Impact
-- **Eliminate missed cleanings** due to communication breakdowns
-- **Reduce manual coordination** between 30-40 clients and cleaning company
-- **Improve client retention** through better service reliability
-- **Enable business scaling** beyond current client base
-- **Platform Foundation**: Architecture designed for expansion to other service-based businesses (pest control, maintenance, landscaping, etc.)
-- **Revenue Diversification**: Framework for licensing platform to similar businesses
-
----
-
-## 2. Product Overview
-
-### Target Users
-**Primary Users:**
-- **Property Owners** (30-40 existing clients): Airbnb/VRBO hosts who need cleaning between guest stays
-- **Cleaning Company Admin**: Staff who coordinate and schedule cleaning teams
-
-**User Personas:**
-- **Property Owner "Sarah"**: Manages 2-3 Airbnb properties, checks booking calendar daily on mobile, wants automated solutions
-- **Cleaning Manager "Mike"**: Oversees scheduling for entire cleaning operation, needs visibility into all upcoming jobs
-
-### Core Value Propositions
-- **For Property Owners**: "Never worry about cleaning coordination again"
-- **For Cleaning Company**: "See all client needs in one master calendar"
-
----
-
-## 3. Functional Requirements
-
-### 3.1 Property Owner Portal
-
-#### Property Management
-- **Add New Property**: Name, address, cleaning duration estimate, special instructions
-- **Edit Property Details**: Update information, cleaning preferences
-- **Delete Properties**: Remove properties no longer managed
-- **Property Status**: Active/inactive toggle
-
-#### Booking Management
-- **Manual Booking Entry**: Add checkout/checkin dates, guest count, special requests
-- **Booking Types**: 
-  - **Standard Booking**: Regular checkout → checkin with gap between guests
-  - **Turn**: Same-day checkout and checkin (guest leaves, new guest arrives same day)
-- **Edit Bookings**: Modify existing booking details and booking type
-- **Delete Bookings**: Remove cancelled bookings
-- **Booking Calendar View**: Visual calendar showing all bookings with turn indicators
-- **Future Enhancement**: Connect Airbnb/VRBO calendars for automatic sync
-
-#### Cleaning Schedule View
-- **Personal Calendar**: View scheduled cleanings for their properties
-- **Cleaning Status**: Pending, Scheduled, In Progress, Completed
-- **Notifications**: Email alerts for upcoming cleanings
-
-### 3.2 Cleaning Company Dashboard
-
-#### Master Calendar View
-- **All Client Bookings**: Unified view of all checkout dates across all 30-40 clients
-- **Turn Identification**: Clear visual indicators for same-day turn bookings (high priority)
-- **Cleaning Windows**: Automatically calculated based on checkout → checkin timing
-- **Priority Scheduling**: 
-  - **Turns**: Highest priority (same-day cleaning required)
-  - **Standard**: Next checkin date determines cleaning urgency
-- **Cleaner Availability**: Assign available cleaners to properties
-- **Status Management**: Update cleaning status (Scheduled → In Progress → Complete)
-
-#### Client Management
-- **Client List**: All 30-40 property owners with their properties
-- **Property Overview**: Total properties per client, sync status
-- **Communication Log**: Notes and special instructions per property
-
-#### Reporting & Analytics
-- **Revenue Analytics**: Earnings tracking by property, client, and time period
-- **Payment Insights**: Outstanding payment trends and collection efficiency
-- **Equipment Usage**: Supply inventory optimization insights
-- **Growth Tracking**: New booking trends and platform usage statistics
-
----
-
-## 4. Technical Requirements
-
-### 4.1 Platform Architecture
-- **Frontend Framework**: Vue 3 with Vuetify 3 for UI components
-- **Database & Backend**: Supabase (PostgreSQL database with built-in APIs)
-- **Authentication**: Supabase Auth (built-in user management)
-- **Hosting**: Supabase hosting for backend, frontend hosting TBD
-- **Multi-tenant System**: Separate data isolation for each client using Supabase RLS (Row Level Security)
-- **Scalable Architecture**: Designed for horizontal scaling and feature expansion
-- **Modular Design**: Component-based architecture to support multiple service industries
-- **Configuration-Driven**: Business rules and workflows configurable for different service types
-
-### 4.2 Integrations
-**Priority 1 (MVP):**
-- Manual booking entry system
-- FullCalendar.io integration for calendar views
-- Email notifications (SendGrid/Mailgun)
-- Vuetify 3 UI components
-
-**Priority 2 (Phase 3):**
-- Airbnb API or iCal feed integration
-- VRBO iCal feed integration
-
-**Priority 3 (Phase 5):**
-- Stripe payment processing integration
-- Automated invoicing system
-- Property-specific instructions and special requests
-- Equipment tracking and capacity planning
-- Advanced notification system
-
-### 4.3 Data Requirements
-- **Property Data**: Name, address, cleaning duration, special instructions
-- **Booking Data**: Checkout dates, checkin dates, guest count, **booking type (Standard/Turn)**, special requests
-- **Property Data**: Name, address, cleaning duration, **property-specific instructions**, pricing tier
-- **Financial Data**: Invoices, payments, outstanding balances, service pricing
-- **Equipment Data**: Supply inventory, maintenance schedules, cleaner assignments
-- **Cleaning Data**: Scheduled times, assigned cleaners, completion status
-
-### 4.4 Security & Compliance
-- **Data Encryption**: Supabase handles encryption in transit and at rest
-- **User Authentication**: Supabase Auth with email/password authentication
-- **Row Level Security**: Supabase RLS policies to ensure data isolation between clients
-- **API Security**: Supabase built-in API security and rate limiting
-- **Data Backup**: Supabase automated daily backups
-
----
-
-## 5. User Experience Requirements
-
-### 5.1 Design Principles
-- **Simplicity First**: Non-tech-savvy users must find it intuitive
-- **Mobile-Responsive**: Property owners often check schedules on phones
-- **Clear Visual Hierarchy**: Easy to scan calendars and property lists
-- **Minimal Clicks**: Common tasks in 3 clicks or fewer
-
-### 5.2 Key User Flows
-
-#### Property Owner Onboarding
-1. Account creation with email verification
-2. Add first property with basic details
-3. Manually enter first booking (checkout/checkin dates)
-4. Confirm cleaning is automatically scheduled correctly
-
-#### Daily Usage - Property Owner
-1. Log in → View dashboard with upcoming cleanings
-2. Add new booking → Select booking type (Standard/Turn) → Enter dates → Save
-3. Manage properties → Add/edit/delete properties
-4. Update existing bookings and booking types as needed
-
-#### Daily Usage - Cleaning Company
-1. Log in → Master calendar view with all cleanings
-2. **Priority view**: See all "turns" highlighted for urgent same-day cleaning
-3. Assign cleaner to property → Update status
-4. Filter by date/client/booking type → Plan daily routes
-
----
-
-## 6. Success Metrics & KPIs
-
-### 6.1 User Adoption
-- **Property Owner Engagement**: % of clients actively using platform (target: 90%+)
-- **Properties Connected**: Average properties per client (baseline: current manual process)
-- **Calendar Sync Success**: % of successful calendar syncs (target: 95%+)
-
-### 6.2 Business Impact
-- **Revenue Growth**: Track earnings and payment collection efficiency
-- **Operational Efficiency**: Equipment usage optimization and cost control
-- **Platform Adoption**: Monitor new booking trends and usage patterns
-
-### 6.3 Business Impact
-- **Client Retention**: Maintain 95%+ of existing 30-40 clients
-- **New Client Acquisition**: Platform as competitive advantage
-- **Revenue Protection**: Eliminate lost revenue from missed cleanings
-
----
-
-## 7. Implementation Plan
-
-### Phase 1: MVP - Manual Booking System (Months 1-2)
-- Property owner portal with manual booking entry
-- Property management (add/edit/delete properties)
-- Basic cleaning company dashboard with master calendar view
-- Email notifications for scheduled cleanings
-- Booking management (add/edit/delete bookings)
-
-### Phase 2: Enhanced Dashboard & Reporting (Month 3)
-- Advanced dashboard filtering and search
-- Cleaning status management and tracking
-- Basic reporting and analytics
-- Mobile-responsive optimizations
-
-### Phase 3: Airbnb Integration (Month 4)
-- Airbnb API or iCal integration
-- Automated calendar sync from Airbnb
-- Sync status monitoring and error handling
-
-### Phase 4: VRBO Integration & Advanced Features (Month 5+)
-- VRBO iCal integration
-- SMS notifications
-- Advanced analytics and reporting
-- API for future integrations
-
-### Phase 5: Business Management Features (Months 6-8)
-**Financial Management:**
-- **Automated Invoicing**: Generate invoices based on completed cleanings
-- **Payment Processing**: Stripe integration for automated payment collection
-- **Payment Tracking**: Monitor outstanding payments, late fees
-
-**Service Customization:**
-- **Property-Specific Instructions**: Store detailed cleaning preferences per property
-- **Special Requests**: Handle one-time additions (inside oven, refrigerator, etc.)
-- **Pricing Tiers**: Different service levels (basic, deep clean, premium)
-
-**Communication & Quality:**
-- **Automated Notifications**: Send clients updates when cleaning starts/completes
-- **Equipment Tracking**: Monitor cleaning supplies, equipment maintenance schedules
-- **Capacity Planning**: Visualize team availability vs. booking demand
-
-### Phase 6: Analytics & Business Intelligence (Months 9-10)
-**Financial Analytics:**
-- **Revenue Analytics**: Track earnings by property, client, time period
-- **Payment Insights**: Outstanding payment trends, collection efficiency
-
-**Operational Intelligence:**
-- **Equipment Usage**: Supply inventory optimization insights
-- **Growth Metrics**: New booking trends, platform usage statistics
-
----
-
-## 8. Risk Assessment
-
-### Technical Risks
-- **API Reliability**: Airbnb/VRBO API changes or downtime
-- **Mitigation**: Fallback to manual entry, multiple sync methods
-
-### User Adoption Risks
-- **Tech Resistance**: Some property owners may resist new platform
-- **Mitigation**: Phased rollout, extensive onboarding support
-
-### Business Risks
-- **Scope Creep**: Adding features beyond core scheduling
-- **Mitigation**: Strict MVP focus, feature roadmap discipline
-
----
-
-## 9. Success Criteria
-
-**Launch Readiness:**
-- 100% of existing 30-40 clients onboarded
-- Manual booking system fully functional
-- Sub-2-second page load times
-- Zero critical bugs in core booking and scheduling flow
-
-**3-Month Post-Launch:**
-- 50% reduction in missed cleanings through better coordination
-- 80% reduction in manual scheduling coordination via phone/text
-- 95%+ client satisfaction with platform
-- All clients actively entering bookings manually
-- Platform foundation ready for Airbnb/VRBO integration (Phase 3)
-
----
-
-## 10. Appendix
-
-### Competitive Analysis
-- **Current State**: Manual phone/text coordination
-- **Alternative Solutions**: Generic calendar tools, property management software
-- **Competitive Advantage**: Purpose-built for cleaning service integration
-
-### Technical Specifications
-- **Frontend**: Vue 3 with Composition API + TypeScript
-- **UI Framework**: Vuetify 3 for Material Design components
-- **State Management**: Pinia for centralized state management with TypeScript
-- **Routing**: Vue Router 4 with automatic file-based routing (pages directory)
-- **Calendar Component**: FullCalendar.io Vue component for all calendar views
-- **Database**: Supabase (PostgreSQL) with real-time subscriptions
-- **Backend**: Supabase Edge Functions (if needed) or direct database API calls
-- **Authentication**: Supabase Auth with built-in user management
-- **Hosting**: Supabase for backend services, Netlify/Vercel for frontend deployment
-- **Real-time Updates**: Supabase real-time subscriptions for live calendar updates
-- **Type Safety**: TypeScript with interfaces and Map data structures
-
-### Frontend Architecture
-**State Management (Pinia Stores):**
-- **User Store**: User data, houses, user settings, calendar events (shared userId)
-- **UI Store**: Modal states, sidebar states, loading states
-- **Auth Store**: Authentication state and user session management
-
-**Component Architecture:**
-- **Layouts**: Header and persistent UI elements
-- **Pages**: Auto-routed components from pages/ directory
-- **Dumb Components**: Pure UI components that receive props
-- **Smart Components**: Home.vue as main state orchestrator
-
-**Business Logic (Composables):**
-- **useHouses**: CRUD operations for properties (database + UI)
-- **useAuth**: Authentication logic and user management
-- **useCalendar**: Calendar event management and UI interactions
-- **useBookings**: Booking creation, editing, deletion logic
-
-**Single Source of Truth:**
-- **Home.vue**: Main component orchestrating state flow
-- Receives/emits from FullCalendar and Sidebar
-- Manages props/state between stores and composables
-- Central hub for all data flow
-
-### Assumptions
-- Property owners primarily use Airbnb (majority) and VRBO
-- Current client base willing to adopt new technology with support
-- Cleaning company has 1-2 staff members who will use admin dashboard
-- No integration needed with existing cleaning company software systems
-````
-
-## File: src/__tests__/components/HelloWorld.spec.ts
-````typescript
-import { describe, it, expect } from 'vitest'
-import { mountWithContext } from '../utils/test-utils'
-import HelloWorld from '@/components/dumb/HelloWorld.vue'
-````
-
-## File: src/__tests__/components/SimpleTest.spec.ts
-````typescript
-import { describe, it, expect } from 'vitest'
-````
-
-## File: src/__tests__/setup/cssStub.js
-````javascript
-
-````
-
-## File: src/__tests__/setup/setupTests.ts
-````typescript
-import { beforeAll, afterAll, vi } from 'vitest'
-````
-
-## File: src/__tests__/stores/booking.spec.ts
-````typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useBookingStore } from '@/stores/booking';
-import type { Booking } from '@/types';
-````
-
-## File: src/__tests__/stores/property.spec.ts
-````typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { usePropertyStore } from '@/stores/property';
-import type { Property } from '@/types';
-````
-
-## File: src/__tests__/stores/ui.spec.ts
-````typescript
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useUIStore } from '@/stores/ui';
-````
-
-## File: src/__tests__/stores/user.spec.ts
-````typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useUserStore } from '@/stores/user';
 ````
 
 ## File: src/assets/main.css
@@ -10601,26 +10217,6 @@ function showHelpfulTip(
 function clearOwnerErrors(): void
 ````
 
-## File: src/composables/shared/useAuth.ts
-````typescript
-import { ref, computed } from 'vue';
-import { useUserStore } from '@/stores/user';
-import type { User, PropertyOwner, Admin, Cleaner, UserRole, UserSettings } from '@/types';
-import { v4 as uuidv4 } from 'uuid';
-export function useAuth()
-⋮----
-async function login(email: string, password: string): Promise<boolean>
-async function logout(): Promise<boolean>
-async function register(userData: {
-    email: string;
-    password: string;
-    name: string;
-    role: UserRole;
-    company_name?: string;
-}): Promise<boolean>
-async function updateUserSettings(settings: Partial<UserSettings>): Promise<boolean>
-````
-
 ## File: src/composables/shared/useBookings.ts
 ````typescript
 import { ref, computed } from 'vue';
@@ -10638,29 +10234,6 @@ async function assignCleaner(bookingId: string, cleanerId: string): Promise<bool
 function calculateCleaningWindow(booking: Booking)
 function calculateBookingPriority(booking: Booking): 'low' | 'normal' | 'high' | 'urgent'
 async function fetchAllBookings(): Promise<boolean>
-````
-
-## File: src/composables/shared/useCalendarState.ts
-````typescript
-import { ref, computed } from 'vue';
-import { useUIStore } from '@/stores/ui';
-import { useBookingStore } from '@/stores/booking';
-import type { Booking } from '@/types';
-export function useCalendarState()
-⋮----
-function setCalendarView(view: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay')
-function goToDate(date: Date)
-function goToToday()
-function next()
-function prev()
-function updateDateRange()
-function toggleStatusFilter(status: 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled')
-function toggleTypeFilter(type: 'turn' | 'standard')
-function togglePropertyFilter(propertyId: string)
-function clearPropertyFilters()
-function filterBookings(bookings: Booking[]): Booking[]
-function getFormattedDateRange(): string
-function bookingsToEvents(bookings: Booking[])
 ````
 
 ## File: src/composables/shared/useErrorHandler.ts
@@ -12809,6 +12382,205 @@ a {
 }
 a:hover {
   text-decoration: underline;
+}
+</style>
+````
+
+## File: src/pages/demos/admin-sidebar-width-test.vue
+````vue
+<template>
+  <div class="admin-sidebar-width-test">
+    <v-app-bar
+      title="Admin Sidebar Width Test"
+      color="primary"
+    />
+    <v-main>
+      <v-container fluid class="pa-0">
+        <div class="test-info mb-4 pa-4">
+          <h2>AdminSidebar Width Test</h2>
+          <p>This page tests the AdminSidebar width behavior:</p>
+          <ul>
+            <li><strong>Desktop (lg):</strong> Sidebar should be ~25% width (3/12 columns)</li>
+            <li><strong>Large Desktop (xl):</strong> Sidebar should be ~16.7% width (2/12 columns)</li>
+            <li><strong>Mobile:</strong> Sidebar should be hidden by default</li>
+          </ul>
+          <v-chip
+            :color="$vuetify.display.xl ? 'success' : 'default'"
+            class="mr-2"
+          >
+            XL: {{ $vuetify.display.xl }}
+          </v-chip>
+          <v-chip
+            :color="$vuetify.display.lg ? 'success' : 'default'"
+            class="mr-2"
+          >
+            LG: {{ $vuetify.display.lg }}
+          </v-chip>
+          <v-chip
+            :color="$vuetify.display.md ? 'success' : 'default'"
+            class="mr-2"
+          >
+            MD: {{ $vuetify.display.md }}
+          </v-chip>
+          <v-chip
+            :color="$vuetify.display.sm ? 'success' : 'default'"
+            class="mr-2"
+          >
+            SM: {{ $vuetify.display.sm }}
+          </v-chip>
+          <v-chip
+            :color="$vuetify.display.xs ? 'warning' : 'default'"
+          >
+            XS: {{ $vuetify.display.xs }}
+          </v-chip>
+        </div>
+        <v-row no-gutters class="fill-height test-layout">
+          <v-col
+            cols="12"
+            lg="3"
+            xl="2"
+            class="sidebar-column test-sidebar"
+            :class="{ 'mobile-hidden': !sidebarOpen }"
+          >
+            <div class="pa-2">
+              <v-btn
+                v-if="$vuetify.display.lgAndDown"
+                icon="mdi-menu"
+                variant="outlined"
+                class="mb-2"
+                @click="toggleSidebar"
+              >
+                <v-icon>mdi-menu</v-icon>
+              </v-btn>
+              <AdminSidebar
+                :today-turns="mockTodayTurns"
+                :upcoming-cleanings="mockUpcomingCleanings"
+                :properties="mockProperties"
+                :loading="false"
+                @navigate-to-booking="handleEvent"
+                @navigate-to-date="handleEvent"
+                @filter-by-property="handleEvent"
+                @create-booking="handleEvent"
+                @create-property="handleEvent"
+              />
+            </div>
+          </v-col>
+          <v-col
+            cols="12"
+            lg="9"
+            xl="10"
+            class="calendar-column test-main"
+          >
+            <div class="test-content pa-4">
+              <h3>Main Content Area</h3>
+              <p>This area simulates the calendar content.</p>
+              <p><strong>Current breakpoint:</strong>
+                <span v-if="$vuetify.display.xl">XL (≥1904px) - Sidebar should be 2/12 = ~16.7%</span>
+                <span v-else-if="$vuetify.display.lg">LG (≥1264px) - Sidebar should be 3/12 = 25%</span>
+                <span v-else-if="$vuetify.display.md">MD (≥960px) - Mobile layout</span>
+                <span v-else>Mobile - Sidebar hidden/overlay</span>
+              </p>
+              <v-btn
+                v-if="$vuetify.display.lgAndDown"
+                variant="outlined"
+                prepend-icon="mdi-menu"
+                @click="toggleSidebar"
+              >
+                Toggle Sidebar
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </div>
+</template>
+⋮----
+XL: {{ $vuetify.display.xl }}
+⋮----
+LG: {{ $vuetify.display.lg }}
+⋮----
+MD: {{ $vuetify.display.md }}
+⋮----
+SM: {{ $vuetify.display.sm }}
+⋮----
+XS: {{ $vuetify.display.xs }}
+⋮----
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useDisplay } from 'vuetify';
+import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
+const { xs } = useDisplay();
+const sidebarOpen = ref(!xs.value);
+const mockTodayTurns = new Map();
+const mockUpcomingCleanings = new Map();
+const mockProperties = new Map();
+const handleEvent = (data: unknown) => {
+  console.log('Event received:', data);
+};
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value;
+};
+</script>
+<style scoped>
+.admin-sidebar-width-test {
+  height: 100vh;
+  overflow: hidden;
+}
+.test-layout {
+  min-height: calc(100vh - 200px);
+}
+.test-info {
+  background-color: rgb(var(--v-theme-surface-variant));
+  border-radius: 8px;
+}
+.sidebar-column {
+  min-height: calc(100vh - 200px);
+  overflow-y: auto;
+  border-right: 2px solid rgb(var(--v-theme-primary));
+  background-color: rgb(var(--v-theme-surface));
+}
+.calendar-column {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.test-sidebar {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.1), rgba(var(--v-theme-secondary), 0.1));
+}
+.test-main {
+  background: linear-gradient(135deg, rgba(var(--v-theme-info), 0.05), rgba(var(--v-theme-success), 0.05));
+}
+.test-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.mobile-hidden {
+  display: none;
+}
+@media (max-width: 1024px) {
+  .sidebar-column {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    z-index: 1000;
+    width: 100% !important;
+    max-width: 400px;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    height: calc(100vh - 64px);
+  }
+  .mobile-hidden {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .sidebar-column:not(.mobile-hidden) {
+    transform: translateX(0);
+  }
 }
 </style>
 ````
@@ -15007,57 +14779,9 @@ onMounted(async () => {
 </style>
 ````
 
-## File: src/pages/properties/index.vue
-````vue
-<template>
-  <div class="properties-page">
-    <h1>Properties</h1>
-    <p>Properties management page will be implemented here.</p>
-  </div>
-</template>
-<script setup lang="ts">
-</script>
-<style scoped>
-.properties-page {
-  padding: 1rem;
-}
-</style>
-````
-
 ## File: src/plugins/supabase.ts
 ````typescript
 import { createClient } from '@supabase/supabase-js'
-````
-
-## File: src/router/guards.ts
-````typescript
-import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useUIStore } from '@/stores/ui'
-import type { UserRole, NavigationError } from '@/types/router'
-function hasRolePermission(userRole: UserRole | undefined, requiredRole: UserRole | undefined): boolean
-function getDefaultRouteForRole(userRole: UserRole | undefined): string
-function isPublicRoute(to: RouteLocationNormalized): boolean
-function showNavigationError(error: NavigationError)
-export async function authGuard(
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
-  next: NavigationGuardNext
-)
-export function loadingGuard(
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
-  next: NavigationGuardNext
-)
-export function afterNavigationGuard(
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized
-)
-export function developmentGuard(
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
-  next: NavigationGuardNext
-)
 ````
 
 ## File: src/types/router.ts
@@ -15125,20 +14849,6 @@ export interface Cleaner extends User {
 export function isPropertyOwner(user: User): user is PropertyOwner
 export function isAdmin(user: User): user is Admin
 export function isCleaner(user: User): user is Cleaner
-````
-
-## File: src/utils/authHelpers.ts
-````typescript
-import type { UserRole } from '@/types'
-export function getDefaultRouteForRole(userRole: UserRole | undefined): string
-export function getWelcomeMessageForRole(userRole: UserRole | undefined, userName?: string): string
-export function getRoleDisplayName(role: UserRole): string
-export function getAvailableRoles(): Array<
-export function canSwitchToRole(currentRole: UserRole, targetRole: UserRole): boolean
-export function getRoleSpecificErrorMessage(error: string, userRole?: UserRole): string
-export function clearAllRoleSpecificState()
-export function validateRoleNavigation(userRole: UserRole | undefined, targetPath: string):
-export function getRoleSpecificSuccessMessage(action: 'login' | 'logout' | 'register', userRole?: UserRole): string
 ````
 
 ## File: src/utils/businessLogic.ts
@@ -15267,11 +14977,6 @@ dist-ssr
 .cache
 .temp
 .tmp
-````
-
-## File: src/__tests__/utils/test-utils.ts
-````typescript
-
 ````
 
 ## File: src/components/dumb/admin/AdminCalendarControls.vue
@@ -20018,759 +19723,6 @@ onMounted(async () => {
 </style>
 ````
 
-## File: src/components/smart/owner/HomeOwner.vue
-````vue
-<template>
-  <div class="home-owner-container">
-    <v-row
-      no-gutters
-      class="fill-height"
-    >
-      <v-col
-        cols="12"
-        lg="3"
-        xl="2"
-        class="sidebar-column"
-        :class="{ 'mobile-hidden': !sidebarOpen }"
-      >
-        <OwnerSidebar
-          :today-turns="ownerTodayTurns"
-          :upcoming-cleanings="ownerUpcomingCleanings"
-          :properties="ownerPropertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        lg="9"
-        xl="10"
-        class="calendar-column"
-      >
-        <div class="calendar-header">
-          <v-btn
-            v-if="$vuetify.display.lgAndDown"
-            icon="mdi-menu"
-            variant="text"
-            class="mr-4"
-            @click="toggleSidebar"
-          />
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn
-              variant="outlined"
-              class="mr-2"
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6">
-              {{ formattedDate }}
-            </div>
-            <v-spacer />
-            <v-btn
-              color="primary"
-              variant="outlined"
-              prepend-icon="mdi-plus"
-              class="mr-2"
-              @click="handleCreateProperty"
-            >
-              Add Property
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-calendar-plus"
-              class="mr-4"
-              @click="handleCreateBooking"
-            >
-              Add Booking
-            </v-btn>
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              class="ml-4"
-            >
-              <v-btn value="dayGridMonth">
-                Month
-              </v-btn>
-              <v-btn value="timeGridWeek">
-                Week
-              </v-btn>
-              <v-btn value="timeGridDay">
-                Day
-              </v-btn>
-            </v-btn-toggle>
-          </div>
-        </div>
-        <FullCalendar
-          ref="calendarRef"
-          :bookings="ownerFilteredBookings"
-          :properties="ownerPropertiesMap"
-          :loading="loading"
-          :current-view="currentView"
-          :current-date="currentDate"
-          @date-select="handleDateSelect"
-          @event-click="handleEventClick"
-          @event-drop="handleEventDrop"
-          @event-resize="handleEventResize"
-          @view-change="handleCalendarViewChange"
-          @date-change="handleCalendarDateChange"
-          @create-booking="handleCreateBookingFromCalendar"
-          @update-booking="handleUpdateBooking"
-        />
-      </v-col>
-    </v-row>
-    <BookingForm
-      :open="eventModalOpen"
-      :mode="eventModalMode"
-      :booking="eventModalData"
-      @close="handleEventModalClose"
-      @save="handleEventModalSave"
-      @delete="handleEventModalDelete"
-    />
-    <PropertyModal
-      :open="propertyModalOpen"
-      :mode="propertyModalMode"
-      :property="propertyModalData"
-      @close="handlePropertyModalClose"
-      @save="handlePropertyModalSave"
-      @delete="handlePropertyModalDelete"
-    />
-    <ConfirmationDialog
-      :open="confirmDialogOpen"
-      :title="confirmDialogTitle"
-      :message="confirmDialogMessage"
-      :confirm-text="confirmDialogConfirmText"
-      :cancel-text="confirmDialogCancelText"
-      :dangerous="confirmDialogDangerous"
-      @confirm="handleConfirmDialogConfirm"
-      @cancel="handleConfirmDialogCancel"
-      @close="handleConfirmDialogClose"
-    />
-  </div>
-</template>
-⋮----
-{{ formattedDate }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useDisplay } from 'vuetify';
-import OwnerSidebar from './OwnerSidebar.vue';
-import FullCalendar from '../FullCalendar.vue';
-import BookingForm from '@/components/dumb/BookingForm.vue';
-import PropertyModal from '@/components/dumb/PropertyModal.vue';
-import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
-import { useUIStore } from '@/stores/ui';
-import { useAuthStore } from '@/stores/auth';
-import { useBookings } from '@/composables/shared/useBookings';
-import { useProperties } from '@/composables/shared/useProperties';
-import { useCalendarState } from '@/composables/shared/useCalendarState';
-import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
-const uiStore = useUIStore();
-const authStore = useAuthStore();
-const { xs } = useDisplay();
-const {
-  loading: bookingsLoading,
-  createBooking,
-  updateBooking,
-  deleteBooking,
-  fetchAllBookings
-} = useBookings();
-const {
-  loading: propertiesLoading,
-  createProperty,
-  updateProperty,
-  deleteProperty,
-  fetchAllProperties
-} = useProperties();
-const {
-  currentView,
-  currentDate,
-  filterBookings,
-  setCalendarView,
-  goToDate,
-  goToToday,
-  next,
-  prev,
-  clearPropertyFilters,
-  togglePropertyFilter
-} = useCalendarState();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-const sidebarOpen = ref(!xs.value);
-const selectedPropertyFilter = ref<string | null>(null);
-const currentOwnerId = computed(() => {
-  return authStore.user?.id;
-});
-const isOwnerAuthenticated = computed(() => {
-  return authStore.isAuthenticated &&
-         authStore.user?.role === 'owner' &&
-         currentOwnerId.value;
-});
-const loading = computed(() =>
-  bookingsLoading.value ||
-  propertiesLoading.value ||
-  uiStore.isLoading('bookings') ||
-  uiStore.isLoading('properties')
-);
-const formattedDate = computed(() => {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  };
-  return currentDate.value.toLocaleDateString('en-US', options);
-});
-const ownerPropertiesMap = computed(() => {
-  const map = new Map<string, Property>();
-  if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
-    return map;
-  }
-  if (propertyStore.properties instanceof Map) {
-    propertyStore.properties.forEach((property, id) => {
-      if (property.owner_id === currentOwnerId.value) {
-        map.set(id, property);
-      }
-    });
-  } else {
-    propertyStore.propertiesArray
-      .filter(property => property.owner_id === currentOwnerId.value)
-      .forEach(property => {
-        if (property && property.id) {
-          map.set(property.id, property);
-        }
-      });
-  }
-  return map;
-});
-const ownerBookingsMap = computed(() => {
-  const map = new Map<string, Booking>();
-  if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
-    return map;
-  }
-  bookingStore.bookingsArray
-    .filter(booking => booking.owner_id === currentOwnerId.value)
-    .forEach(booking => {
-      if (booking && booking.id) {
-        map.set(booking.id, booking);
-      }
-    });
-  return map;
-});
-const ownerTodayTurns = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const turns = new Map<string, Booking>();
-  if (!isOwnerAuthenticated.value) {
-    return turns;
-  }
-  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
-    if (
-      booking.booking_type === 'turn' &&
-      new Date(booking.checkout_date) >= today &&
-      new Date(booking.checkout_date) < tomorrow
-    ) {
-      turns.set(booking.id, booking);
-    }
-  });
-  return turns;
-});
-const ownerUpcomingCleanings = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const inOneWeek = new Date(today);
-  inOneWeek.setDate(inOneWeek.getDate() + 7);
-  const cleanings = new Map<string, Booking>();
-  if (!isOwnerAuthenticated.value) {
-    return cleanings;
-  }
-  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
-    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
-      cleanings.set(booking.id, booking);
-    }
-  });
-  return cleanings;
-});
-const ownerFilteredBookings = computed(() => {
-  let bookings = Array.from(ownerBookingsMap.value.values());
-  if (selectedPropertyFilter.value) {
-    bookings = bookings.filter(booking =>
-      booking.property_id === selectedPropertyFilter.value &&
-      ownerPropertiesMap.value.has(booking.property_id)
-    );
-  }
-  bookings = filterBookings(bookings);
-  const map = new Map<string, Booking>();
-  bookings.forEach(booking => {
-    map.set(booking.id, booking);
-  });
-  return map;
-});
-const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
-const eventModalMode = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const eventModalData = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return modal?.data as Booking | undefined;
-});
-const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
-const propertyModalMode = computed(() => {
-  const modal = uiStore.getModalState('propertyModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const propertyModalData = computed(() => {
-  const modal = uiStore.getModalState('propertyModal');
-  return modal?.data as Property | undefined;
-});
-const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirmDialog'));
-const confirmDialogTitle = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.title || 'Confirm';
-});
-const confirmDialogMessage = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.message || 'Are you sure you want to proceed?';
-});
-const confirmDialogConfirmText = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.confirmText || 'Confirm';
-});
-const confirmDialogCancelText = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.cancelText || 'Cancel';
-});
-const confirmDialogDangerous = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.dangerous || false;
-});
-const confirmDialogData = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.data || null;
-});
-const handleNavigateToBooking = (bookingId: string): void => {
-    eventLogger.logEvent(
-      'OwnerSidebar',
-    'HomeOwner',
-    'navigateToBooking',
-    bookingId,
-    'receive'
-  );
-  const booking = ownerBookingsMap.value.get(bookingId);
-  if (booking) {
-    const bookingDate = new Date(booking.checkout_date);
-    handleNavigateToDate(bookingDate);
-    setTimeout(() => {
-      const calendarApi = calendarRef.value?.getApi?.();
-      if (calendarApi) {
-        const event = calendarApi.getEventById(bookingId);
-        if (event) {
-          event.setProp('classNames', [...event.classNames, 'highlighted']);
-          setTimeout(() => {
-            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
-          }, 3000);
-        }
-      }
-    }, 100);
-  } else {
-    console.warn('Booking not found in your properties');
-  }
-};
-const handleNavigateToDate = (date: Date): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'navigateToDate',
-    date,
-    'receive'
-  );
-  goToDate(date);
-  eventLogger.logEvent(
-    'HomeOwner',
-    'FullCalendar',
-    'goToDate',
-    date,
-    'emit'
-  );
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(date);
-  }
-};
-const handleFilterByProperty = (propertyId: string | null): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'filterByProperty',
-    propertyId,
-    'receive'
-  );
-  if (propertyId && !ownerPropertiesMap.value.has(propertyId)) {
-    console.warn('Cannot filter by property not owned by current user');
-    return;
-  }
-  selectedPropertyFilter.value = propertyId;
-  if (propertyId) {
-    togglePropertyFilter(propertyId);
-  } else {
-    clearPropertyFilters();
-  }
-  uiStore.setPropertyFilter(propertyId);
-  eventLogger.logEvent(
-    'HomeOwner',
-    'FullCalendar',
-    'filteredBookingsUpdate',
-    { propertyId, count: ownerFilteredBookings.value.size },
-    'emit'
-  );
-};
-const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'createBooking',
-    data,
-    'receive'
-  );
-  const bookingData = {
-    ...data,
-    owner_id: currentOwnerId.value
-  };
-  uiStore.openModal('eventModal', 'create', bookingData);
-};
-const handleCreateProperty = (): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'createProperty',
-    null,
-    'receive'
-  );
-  const propertyData = {
-    owner_id: currentOwnerId.value
-  };
-  uiStore.openModal('propertyModal', 'create', propertyData);
-};
-const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  eventLogger.logEvent(
-    'FullCalendar',
-    'HomeOwner',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'receive'
-  );
-  const bookingData: Partial<BookingFormData> = {
-    checkout_date: selectInfo.startStr,
-    checkin_date: selectInfo.endStr,
-    owner_id: currentOwnerId.value
-  };
-  uiStore.openModal('eventModal', 'create', bookingData);
-};
-const handleEventClick = (clickInfo: EventClickArg): void => {
-  eventLogger.logEvent(
-    'FullCalendar',
-    'HomeOwner',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'receive'
-  );
-  const booking = ownerBookingsMap.value.get(clickInfo.event.id);
-  if (booking) {
-    uiStore.openModal('eventModal', 'edit', { booking });
-  } else {
-    console.warn('Cannot edit booking not owned by current user');
-  }
-};
-const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  if (!ownerBookingsMap.value.has(booking.id)) {
-    console.warn('Cannot modify booking not owned by current user');
-    dropInfo.revert();
-    return;
-  }
-  try {
-    await updateBooking(booking.id, {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-    });
-  } catch (error) {
-    console.error('Failed to update your booking:', error);
-    dropInfo.revert();
-  }
-};
-const handleEventResize = async (resizeInfo: any): Promise<void> => {
-  const booking = resizeInfo.event.extendedProps.booking as Booking;
-  if (!ownerBookingsMap.value.has(booking.id)) {
-    console.warn('Cannot modify booking not owned by current user');
-    resizeInfo.revert();
-    return;
-  }
-  try {
-    await updateBooking(booking.id, {
-      checkout_date: resizeInfo.event.startStr,
-      checkin_date: resizeInfo.event.endStr
-    });
-  } catch (error) {
-    console.error('Failed to update your booking:', error);
-    resizeInfo.revert();
-  }
-};
-const handlePrevious = (): void => {
-  prev();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.prev();
-  }
-};
-const handleNext = (): void => {
-  next();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.next();
-  }
-};
-const handleGoToday = (): void => {
-  goToToday();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.today();
-  }
-};
-const handleCalendarViewChange = (view: CalendarView): void => {
-  const calendarView = view === 'week' ? 'timeGridWeek' :
-                      view === 'day' ? 'timeGridDay' :
-                      'dayGridMonth';
-  setCalendarView(calendarView);
-};
-const handleCalendarDateChange = (date: Date): void => {
-  goToDate(date);
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(date);
-  }
-};
-const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string | undefined; }): void => {
-  const bookingData = {
-    ...data,
-    owner_id: currentOwnerId.value
-  };
-  uiStore.openModal('eventModal', 'create', bookingData);
-};
-const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
-  if (!ownerBookingsMap.value.has(data.id)) {
-    console.warn('Cannot update booking not owned by current user');
-    return;
-  }
-  updateBooking(data.id, {
-    checkout_date: data.start,
-    checkin_date: data.end
-  });
-};
-const handleEventModalClose = (): void => {
-  uiStore.closeModal('eventModal');
-};
-const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
-  try {
-    const bookingData = {
-      ...data,
-      owner_id: currentOwnerId.value
-    };
-    if (eventModalMode.value === 'create') {
-      await createBooking(bookingData as BookingFormData);
-    } else if (eventModalData.value) {
-      if (!ownerBookingsMap.value.has(eventModalData.value.id)) {
-        throw new Error('Cannot update booking not owned by current user');
-      }
-      await updateBooking(eventModalData.value.id, bookingData as Partial<BookingFormData>);
-    }
-    uiStore.closeModal('eventModal');
-  } catch (error) {
-    console.error('Failed to save your booking:', error);
-  }
-};
-const handleEventModalDelete = async (bookingId: string): Promise<void> => {
-  if (!ownerBookingsMap.value.has(bookingId)) {
-    console.warn('Cannot delete booking not owned by current user');
-    return;
-  }
-    uiStore.openConfirmDialog('confirmDialog', {
-    title: 'Delete Booking',
-    message: 'Are you sure you want to delete this booking? This action cannot be undone.',
-    confirmText: 'Delete',
-    cancelText: 'Cancel',
-    dangerous: true,
-    data: { type: 'booking', id: bookingId }
-  });
-};
-const handlePropertyModalClose = (): void => {
-  uiStore.closeModal('propertyModal');
-};
-const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
-  try {
-    const propertyData = {
-      ...data,
-      owner_id: currentOwnerId.value
-    };
-    if (propertyModalMode.value === 'create') {
-      await createProperty(propertyData as PropertyFormData);
-    } else if (propertyModalData.value) {
-      if (!ownerPropertiesMap.value.has(propertyModalData.value.id)) {
-        throw new Error('Cannot update property not owned by current user');
-      }
-      await updateProperty(propertyModalData.value.id, propertyData as Partial<PropertyFormData>);
-    }
-    uiStore.closeModal('propertyModal');
-  } catch (error) {
-    console.error('Failed to save your property:', error);
-  }
-};
-const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
-  if (!ownerPropertiesMap.value.has(propertyId)) {
-    console.warn('Cannot delete property not owned by current user');
-    return;
-  }
-  uiStore.openConfirmDialog('confirmDialog', {
-    title: 'Delete Property',
-    message: 'Are you sure you want to delete this property? This will also delete all associated bookings. This action cannot be undone.',
-    confirmText: 'Delete',
-    cancelText: 'Cancel',
-    dangerous: true,
-    data: { type: 'property', id: propertyId }
-  });
-};
-const handleConfirmDialogConfirm = async (): Promise<void> => {
-  const data = confirmDialogData.value;
-  if (data?.type === 'booking' && data?.id) {
-    try {
-      await deleteBooking(data.id as string);
-      uiStore.closeModal('eventModal');
-    } catch (error) {
-      console.error('Failed to delete your booking:', error);
-    }
-  } else if (data?.type === 'property' && data?.id) {
-    try {
-      await deleteProperty(data.id as string    );
-      uiStore.closeModal('propertyModal');
-    } catch (error) {
-      console.error('Failed to delete your property:', error);
-    }
-  }
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-const handleConfirmDialogCancel = (): void => {
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-const handleConfirmDialogClose = (): void => {
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-const toggleSidebar = (): void => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
-onMounted(async () => {
-  if (isOwnerAuthenticated.value) {
-    try {
-      await Promise.all([
-        fetchAllProperties(),
-        fetchAllBookings()
-      ]);
-    } catch (error) {
-      console.error('Failed to load your data:', error);
-    }
-  }
-});
-onUnmounted(() => {
-});
-watch(xs, (newValue) => {
-  if (newValue) {
-    sidebarOpen.value = false;
-  }
-});
-watch(isOwnerAuthenticated, (newValue) => {
-  if (newValue) {
-    fetchAllProperties();
-    fetchAllBookings();
-  }
-});
-</script>
-<style scoped>
-.home-owner-container {
-  height: 100vh;
-  overflow: hidden;
-}
-.sidebar-column {
-  height: 100vh;
-  overflow-y: auto;
-  border-right: 1px solid rgb(var(--v-theme-on-surface), 0.12);
-}
-.calendar-column {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-.calendar-header {
-  padding: 16px;
-  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
-  background: rgb(var(--v-theme-surface));
-  flex-shrink: 0;
-}
-.mobile-hidden {
-  display: none;
-}
-@media (min-width: 1024px) {
-  .mobile-hidden {
-    display: block;
-  }
-}
-.home-owner-container {
-  --owner-primary: rgb(var(--v-theme-primary));
-  --owner-accent: rgb(var(--v-theme-secondary));
-}
-:deep(.fc-event.highlighted) {
-  animation: owner-highlight 3s ease-in-out;
-  box-shadow: 0 0 0 3px var(--owner-primary);
-}
-@keyframes owner-highlight {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 var(--owner-primary);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 6px rgba(var(--v-theme-primary), 0.3);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 3px var(--owner-primary);
-  }
-}
-</style>
-````
-
 ## File: src/components/smart/owner/OwnerCalendarDemo.vue
 ````vue
 <template>
@@ -22741,6 +21693,49 @@ function getMyPropertyMetrics(id: string)
 function getMyPropertyRecommendations()
 ````
 
+## File: src/composables/shared/useAuth.ts
+````typescript
+import { ref, computed } from 'vue';
+import { useUserStore } from '@/stores/user';
+import type { User, PropertyOwner, Admin, Cleaner, UserRole, UserSettings } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
+export function useAuth()
+⋮----
+async function login(email: string, password: string): Promise<boolean>
+async function logout(): Promise<boolean>
+async function register(userData: {
+    email: string;
+    password: string;
+    name: string;
+    role: UserRole;
+    company_name?: string;
+}): Promise<boolean>
+async function updateUserSettings(settings: Partial<UserSettings>): Promise<boolean>
+````
+
+## File: src/composables/shared/useCalendarState.ts
+````typescript
+import { ref, computed } from 'vue';
+import { useUIStore } from '@/stores/ui';
+import { useBookingStore } from '@/stores/booking';
+import type { Booking } from '@/types';
+export function useCalendarState()
+⋮----
+function setCalendarView(view: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay')
+function goToDate(date: Date)
+function goToToday()
+function next()
+function prev()
+function updateDateRange()
+function toggleStatusFilter(status: 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled')
+function toggleTypeFilter(type: 'turn' | 'standard')
+function togglePropertyFilter(propertyId: string)
+function clearPropertyFilters()
+function filterBookings(bookings: Booking[]): Booking[]
+function getFormattedDateRange(): string
+function bookingsToEvents(bookings: Booking[])
+````
+
 ## File: src/composables/shared/useComponentEventLogger.ts
 ````typescript
 import { ref, reactive, computed } from 'vue';
@@ -23166,6 +22161,37 @@ import FullCalendarDemo from '@/components/smart/FullCalendarDemo.vue';
 </style>
 ````
 
+## File: src/router/guards.ts
+````typescript
+import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useUIStore } from '@/stores/ui'
+import type { UserRole, NavigationError } from '@/types/router'
+function hasRolePermission(userRole: UserRole | undefined, requiredRole: UserRole | undefined): boolean
+function getDefaultRouteForRole(userRole: UserRole | undefined): string
+function isPublicRoute(to: RouteLocationNormalized): boolean
+function showNavigationError(error: NavigationError)
+export async function authGuard(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext
+)
+export function loadingGuard(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext
+)
+export function afterNavigationGuard(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized
+)
+export function developmentGuard(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext
+)
+````
+
 ## File: src/stores/property.ts
 ````typescript
 import { defineStore } from 'pinia';
@@ -23271,6 +22297,20 @@ export function isBooking(obj: any): obj is Booking
 ## File: src/types/index.ts
 ````typescript
 
+````
+
+## File: src/utils/authHelpers.ts
+````typescript
+import type { UserRole } from '@/types'
+export function getDefaultRouteForRole(userRole: UserRole | undefined): string
+export function getWelcomeMessageForRole(userRole: UserRole | undefined, userName?: string): string
+export function getRoleDisplayName(role: UserRole): string
+export function getAvailableRoles(): Array<
+export function canSwitchToRole(currentRole: UserRole, targetRole: UserRole): boolean
+export function getRoleSpecificErrorMessage(error: string, userRole?: UserRole): string
+export function clearAllRoleSpecificState()
+export function validateRoleNavigation(userRole: UserRole | undefined, targetPath: string):
+export function getRoleSpecificSuccessMessage(action: 'login' | 'logout' | 'register', userRole?: UserRole): string
 ````
 
 ## File: tsconfig.json
@@ -25340,6 +24380,1977 @@ describe('Multi-tenant data updates', () => {
 - **Security**: Frontend filtering for UX, future backend RLS for security
 ````
 
+## File: src/components/smart/owner/HomeOwner.vue
+````vue
+<template>
+  <div class="home-owner-container">
+    <v-row
+      no-gutters
+      class="fill-height"
+    >
+      <v-col
+        cols="12"
+        lg="3"
+        xl="2"
+        class="sidebar-column"
+        :class="{ 'mobile-hidden': !sidebarOpen }"
+      >
+        <OwnerSidebar
+          :today-turns="ownerTodayTurns"
+          :upcoming-cleanings="ownerUpcomingCleanings"
+          :properties="ownerPropertiesMap"
+          :loading="loading"
+          @navigate-to-booking="handleNavigateToBooking"
+          @navigate-to-date="handleNavigateToDate"
+          @filter-by-property="handleFilterByProperty"
+          @create-booking="handleCreateBooking"
+          @create-property="handleCreateProperty"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        lg="9"
+        xl="10"
+        class="calendar-column"
+      >
+        <div class="calendar-header">
+          <v-btn
+            v-if="$vuetify.display.lgAndDown"
+            icon="mdi-menu"
+            variant="text"
+            class="mr-4"
+            @click="toggleSidebar"
+          />
+          <div class="d-flex align-center">
+            <v-btn
+              icon="mdi-arrow-left"
+              variant="text"
+              class="mr-2"
+              @click="handlePrevious"
+            />
+            <v-btn
+              variant="outlined"
+              class="mr-2"
+              @click="handleGoToday"
+            >
+              Today
+            </v-btn>
+            <v-btn
+              icon="mdi-arrow-right"
+              variant="text"
+              class="mr-4"
+              @click="handleNext"
+            />
+            <div class="text-h6">
+              {{ formattedDate }}
+            </div>
+            <v-spacer />
+            <v-btn
+              color="primary"
+              variant="outlined"
+              prepend-icon="mdi-plus"
+              class="mr-2"
+              @click="handleCreateProperty"
+            >
+              Add Property
+            </v-btn>
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-calendar-plus"
+              class="mr-4"
+              @click="handleCreateBooking"
+            >
+              Add Booking
+            </v-btn>
+            <v-btn-toggle
+              v-model="currentView"
+              mandatory
+              class="ml-4"
+            >
+              <v-btn value="dayGridMonth">
+                Month
+              </v-btn>
+              <v-btn value="timeGridWeek">
+                Week
+              </v-btn>
+              <v-btn value="timeGridDay">
+                Day
+              </v-btn>
+            </v-btn-toggle>
+          </div>
+        </div>
+        <OwnerCalendar
+          ref="calendarRef"
+          :bookings="ownerFilteredBookings"
+          :properties="ownerPropertiesMap"
+          :loading="loading"
+          :current-view="currentView"
+          :current-date="currentDate"
+          @date-select="handleDateSelect"
+          @event-click="handleEventClick"
+          @event-drop="handleEventDrop"
+          @event-resize="handleEventResize"
+          @view-change="handleCalendarViewChange"
+          @date-change="handleCalendarDateChange"
+          @create-booking="handleCreateBookingFromCalendar"
+          @update-booking="handleUpdateBooking"
+        />
+      </v-col>
+    </v-row>
+    <BookingForm
+      :open="eventModalOpen"
+      :mode="eventModalMode"
+      :booking="eventModalData"
+      @close="handleEventModalClose"
+      @save="handleEventModalSave"
+      @delete="handleEventModalDelete"
+    />
+    <PropertyModal
+      :open="propertyModalOpen"
+      :mode="propertyModalMode"
+      :property="propertyModalData"
+      @close="handlePropertyModalClose"
+      @save="handlePropertyModalSave"
+      @delete="handlePropertyModalDelete"
+    />
+    <ConfirmationDialog
+      :open="confirmDialogOpen"
+      :title="confirmDialogTitle"
+      :message="confirmDialogMessage"
+      :confirm-text="confirmDialogConfirmText"
+      :cancel-text="confirmDialogCancelText"
+      :dangerous="confirmDialogDangerous"
+      @confirm="handleConfirmDialogConfirm"
+      @cancel="handleConfirmDialogCancel"
+      @close="handleConfirmDialogClose"
+    />
+  </div>
+</template>
+⋮----
+{{ formattedDate }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { useDisplay } from 'vuetify';
+import OwnerSidebar from './OwnerSidebar.vue';
+import FullCalendar from '../FullCalendar.vue';
+import BookingForm from '@/components/dumb/BookingForm.vue';
+import PropertyModal from '@/components/dumb/PropertyModal.vue';
+import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
+import { useUIStore } from '@/stores/ui';
+import { useAuthStore } from '@/stores/auth';
+import { useBookings } from '@/composables/shared/useBookings';
+import { useProperties } from '@/composables/shared/useProperties';
+import { useCalendarState } from '@/composables/shared/useCalendarState';
+import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
+import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+import OwnerCalendar from '@/pages/demos/owner-calendar.vue';
+const propertyStore = usePropertyStore();
+const bookingStore = useBookingStore();
+const uiStore = useUIStore();
+const authStore = useAuthStore();
+const { xs } = useDisplay();
+const {
+  loading: bookingsLoading,
+  createBooking,
+  updateBooking,
+  deleteBooking,
+  fetchAllBookings
+} = useBookings();
+const {
+  loading: propertiesLoading,
+  createProperty,
+  updateProperty,
+  deleteProperty,
+  fetchAllProperties
+} = useProperties();
+const {
+  currentView,
+  currentDate,
+  filterBookings,
+  setCalendarView,
+  goToDate,
+  goToToday,
+  next,
+  prev,
+  clearPropertyFilters,
+  togglePropertyFilter
+} = useCalendarState();
+const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const sidebarOpen = ref(!xs.value);
+const selectedPropertyFilter = ref<string | null>(null);
+const currentOwnerId = computed(() => {
+  return authStore.user?.id;
+});
+const isOwnerAuthenticated = computed(() => {
+  return authStore.isAuthenticated &&
+         authStore.user?.role === 'owner' &&
+         currentOwnerId.value;
+});
+const loading = computed(() =>
+  bookingsLoading.value ||
+  propertiesLoading.value ||
+  uiStore.isLoading('bookings') ||
+  uiStore.isLoading('properties')
+);
+const formattedDate = computed(() => {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  };
+  return currentDate.value.toLocaleDateString('en-US', options);
+});
+const ownerPropertiesMap = computed(() => {
+  const map = new Map<string, Property>();
+  if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
+    return map;
+  }
+  if (propertyStore.properties instanceof Map) {
+    propertyStore.properties.forEach((property, id) => {
+      if (property.owner_id === currentOwnerId.value) {
+        map.set(id, property);
+      }
+    });
+  } else {
+    propertyStore.propertiesArray
+      .filter(property => property.owner_id === currentOwnerId.value)
+      .forEach(property => {
+        if (property && property.id) {
+          map.set(property.id, property);
+        }
+      });
+  }
+  return map;
+});
+const ownerBookingsMap = computed(() => {
+  const map = new Map<string, Booking>();
+  if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
+    return map;
+  }
+  bookingStore.bookingsArray
+    .filter(booking => booking.owner_id === currentOwnerId.value)
+    .forEach(booking => {
+      if (booking && booking.id) {
+        map.set(booking.id, booking);
+      }
+    });
+  return map;
+});
+const ownerTodayTurns = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const turns = new Map<string, Booking>();
+  if (!isOwnerAuthenticated.value) {
+    return turns;
+  }
+  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
+    if (
+      booking.booking_type === 'turn' &&
+      new Date(booking.checkout_date) >= today &&
+      new Date(booking.checkout_date) < tomorrow
+    ) {
+      turns.set(booking.id, booking);
+    }
+  });
+  return turns;
+});
+const ownerUpcomingCleanings = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const inOneWeek = new Date(today);
+  inOneWeek.setDate(inOneWeek.getDate() + 7);
+  const cleanings = new Map<string, Booking>();
+  if (!isOwnerAuthenticated.value) {
+    return cleanings;
+  }
+  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
+    const checkoutDate = new Date(booking.checkout_date);
+    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
+      cleanings.set(booking.id, booking);
+    }
+  });
+  return cleanings;
+});
+const ownerFilteredBookings = computed(() => {
+  let bookings = Array.from(ownerBookingsMap.value.values());
+  if (selectedPropertyFilter.value) {
+    bookings = bookings.filter(booking =>
+      booking.property_id === selectedPropertyFilter.value &&
+      ownerPropertiesMap.value.has(booking.property_id)
+    );
+  }
+  bookings = filterBookings(bookings);
+  const map = new Map<string, Booking>();
+  bookings.forEach(booking => {
+    map.set(booking.id, booking);
+  });
+  return map;
+});
+const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
+const eventModalMode = computed(() => {
+  const modal = uiStore.getModalState('eventModal');
+  return (modal?.mode as 'create' | 'edit') || 'create';
+});
+const eventModalData = computed(() => {
+  const modal = uiStore.getModalState('eventModal');
+  return modal?.data as Booking | undefined;
+});
+const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
+const propertyModalMode = computed(() => {
+  const modal = uiStore.getModalState('propertyModal');
+  return (modal?.mode as 'create' | 'edit') || 'create';
+});
+const propertyModalData = computed(() => {
+  const modal = uiStore.getModalState('propertyModal');
+  return modal?.data as Property | undefined;
+});
+const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirmDialog'));
+const confirmDialogTitle = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.title || 'Confirm';
+});
+const confirmDialogMessage = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.message || 'Are you sure you want to proceed?';
+});
+const confirmDialogConfirmText = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.confirmText || 'Confirm';
+});
+const confirmDialogCancelText = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.cancelText || 'Cancel';
+});
+const confirmDialogDangerous = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.dangerous || false;
+});
+const confirmDialogData = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.data || null;
+});
+const handleNavigateToBooking = (bookingId: string): void => {
+    eventLogger.logEvent(
+      'OwnerSidebar',
+    'HomeOwner',
+    'navigateToBooking',
+    bookingId,
+    'receive'
+  );
+  const booking = ownerBookingsMap.value.get(bookingId);
+  if (booking) {
+    const bookingDate = new Date(booking.checkout_date);
+    handleNavigateToDate(bookingDate);
+    setTimeout(() => {
+      const calendarApi = calendarRef.value?.getApi?.();
+      if (calendarApi) {
+        const event = calendarApi.getEventById(bookingId);
+        if (event) {
+          event.setProp('classNames', [...event.classNames, 'highlighted']);
+          setTimeout(() => {
+            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
+          }, 3000);
+        }
+      }
+    }, 100);
+  } else {
+    console.warn('Booking not found in your properties');
+  }
+};
+const handleNavigateToDate = (date: Date): void => {
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToDate',
+    date,
+    'receive'
+  );
+  goToDate(date);
+  eventLogger.logEvent(
+    'HomeOwner',
+    'FullCalendar',
+    'goToDate',
+    date,
+    'emit'
+  );
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(date);
+  }
+};
+const handleFilterByProperty = (propertyId: string | null): void => {
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'filterByProperty',
+    propertyId,
+    'receive'
+  );
+  if (propertyId && !ownerPropertiesMap.value.has(propertyId)) {
+    console.warn('Cannot filter by property not owned by current user');
+    return;
+  }
+  selectedPropertyFilter.value = propertyId;
+  if (propertyId) {
+    togglePropertyFilter(propertyId);
+  } else {
+    clearPropertyFilters();
+  }
+  uiStore.setPropertyFilter(propertyId);
+  eventLogger.logEvent(
+    'HomeOwner',
+    'FullCalendar',
+    'filteredBookingsUpdate',
+    { propertyId, count: ownerFilteredBookings.value.size },
+    'emit'
+  );
+};
+const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'createBooking',
+    data,
+    'receive'
+  );
+  const bookingData = {
+    ...data,
+    owner_id: currentOwnerId.value
+  };
+  uiStore.openModal('eventModal', 'create', bookingData);
+};
+const handleCreateProperty = (): void => {
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'createProperty',
+    null,
+    'receive'
+  );
+  const propertyData = {
+    owner_id: currentOwnerId.value
+  };
+  uiStore.openModal('propertyModal', 'create', propertyData);
+};
+const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  eventLogger.logEvent(
+    'FullCalendar',
+    'HomeOwner',
+    'dateSelect',
+    { start: selectInfo.startStr, end: selectInfo.endStr },
+    'receive'
+  );
+  const bookingData: Partial<BookingFormData> = {
+    checkout_date: selectInfo.startStr,
+    checkin_date: selectInfo.endStr,
+    owner_id: currentOwnerId.value
+  };
+  uiStore.openModal('eventModal', 'create', bookingData);
+};
+const handleEventClick = (clickInfo: EventClickArg): void => {
+  eventLogger.logEvent(
+    'FullCalendar',
+    'HomeOwner',
+    'eventClick',
+    { id: clickInfo.event.id },
+    'receive'
+  );
+  const booking = ownerBookingsMap.value.get(clickInfo.event.id);
+  if (booking) {
+    uiStore.openModal('eventModal', 'edit', { booking });
+  } else {
+    console.warn('Cannot edit booking not owned by current user');
+  }
+};
+const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
+  const booking = dropInfo.event.extendedProps.booking as Booking;
+  if (!ownerBookingsMap.value.has(booking.id)) {
+    console.warn('Cannot modify booking not owned by current user');
+    dropInfo.revert();
+    return;
+  }
+  try {
+    await updateBooking(booking.id, {
+      checkout_date: dropInfo.event.startStr,
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+    });
+  } catch (error) {
+    console.error('Failed to update your booking:', error);
+    dropInfo.revert();
+  }
+};
+const handleEventResize = async (resizeInfo: any): Promise<void> => {
+  const booking = resizeInfo.event.extendedProps.booking as Booking;
+  if (!ownerBookingsMap.value.has(booking.id)) {
+    console.warn('Cannot modify booking not owned by current user');
+    resizeInfo.revert();
+    return;
+  }
+  try {
+    await updateBooking(booking.id, {
+      checkout_date: resizeInfo.event.startStr,
+      checkin_date: resizeInfo.event.endStr
+    });
+  } catch (error) {
+    console.error('Failed to update your booking:', error);
+    resizeInfo.revert();
+  }
+};
+const handlePrevious = (): void => {
+  prev();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.prev();
+  }
+};
+const handleNext = (): void => {
+  next();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.next();
+  }
+};
+const handleGoToday = (): void => {
+  goToToday();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.today();
+  }
+};
+const handleCalendarViewChange = (view: CalendarView): void => {
+  const calendarView = view === 'week' ? 'timeGridWeek' :
+                      view === 'day' ? 'timeGridDay' :
+                      'dayGridMonth';
+  setCalendarView(calendarView);
+};
+const handleCalendarDateChange = (date: Date): void => {
+  goToDate(date);
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(date);
+  }
+};
+const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string | undefined; }): void => {
+  const bookingData = {
+    ...data,
+    owner_id: currentOwnerId.value
+  };
+  uiStore.openModal('eventModal', 'create', bookingData);
+};
+const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+  if (!ownerBookingsMap.value.has(data.id)) {
+    console.warn('Cannot update booking not owned by current user');
+    return;
+  }
+  updateBooking(data.id, {
+    checkout_date: data.start,
+    checkin_date: data.end
+  });
+};
+const handleEventModalClose = (): void => {
+  uiStore.closeModal('eventModal');
+};
+const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
+  try {
+    const bookingData = {
+      ...data,
+      owner_id: currentOwnerId.value
+    };
+    if (eventModalMode.value === 'create') {
+      await createBooking(bookingData as BookingFormData);
+    } else if (eventModalData.value) {
+      if (!ownerBookingsMap.value.has(eventModalData.value.id)) {
+        throw new Error('Cannot update booking not owned by current user');
+      }
+      await updateBooking(eventModalData.value.id, bookingData as Partial<BookingFormData>);
+    }
+    uiStore.closeModal('eventModal');
+  } catch (error) {
+    console.error('Failed to save your booking:', error);
+  }
+};
+const handleEventModalDelete = async (bookingId: string): Promise<void> => {
+  if (!ownerBookingsMap.value.has(bookingId)) {
+    console.warn('Cannot delete booking not owned by current user');
+    return;
+  }
+    uiStore.openConfirmDialog('confirmDialog', {
+    title: 'Delete Booking',
+    message: 'Are you sure you want to delete this booking? This action cannot be undone.',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    dangerous: true,
+    data: { type: 'booking', id: bookingId }
+  });
+};
+const handlePropertyModalClose = (): void => {
+  uiStore.closeModal('propertyModal');
+};
+const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
+  try {
+    const propertyData = {
+      ...data,
+      owner_id: currentOwnerId.value
+    };
+    if (propertyModalMode.value === 'create') {
+      await createProperty(propertyData as PropertyFormData);
+    } else if (propertyModalData.value) {
+      if (!ownerPropertiesMap.value.has(propertyModalData.value.id)) {
+        throw new Error('Cannot update property not owned by current user');
+      }
+      await updateProperty(propertyModalData.value.id, propertyData as Partial<PropertyFormData>);
+    }
+    uiStore.closeModal('propertyModal');
+  } catch (error) {
+    console.error('Failed to save your property:', error);
+  }
+};
+const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
+  if (!ownerPropertiesMap.value.has(propertyId)) {
+    console.warn('Cannot delete property not owned by current user');
+    return;
+  }
+  uiStore.openConfirmDialog('confirmDialog', {
+    title: 'Delete Property',
+    message: 'Are you sure you want to delete this property? This will also delete all associated bookings. This action cannot be undone.',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    dangerous: true,
+    data: { type: 'property', id: propertyId }
+  });
+};
+const handleConfirmDialogConfirm = async (): Promise<void> => {
+  const data = confirmDialogData.value;
+  if (data?.type === 'booking' && data?.id) {
+    try {
+      await deleteBooking(data.id as string);
+      uiStore.closeModal('eventModal');
+    } catch (error) {
+      console.error('Failed to delete your booking:', error);
+    }
+  } else if (data?.type === 'property' && data?.id) {
+    try {
+      await deleteProperty(data.id as string    );
+      uiStore.closeModal('propertyModal');
+    } catch (error) {
+      console.error('Failed to delete your property:', error);
+    }
+  }
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+const handleConfirmDialogCancel = (): void => {
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+const handleConfirmDialogClose = (): void => {
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+const toggleSidebar = (): void => {
+  sidebarOpen.value = !sidebarOpen.value;
+};
+onMounted(async () => {
+  if (isOwnerAuthenticated.value) {
+    try {
+      await Promise.all([
+        fetchAllProperties(),
+        fetchAllBookings()
+      ]);
+    } catch (error) {
+      console.error('Failed to load your data:', error);
+    }
+  }
+});
+onUnmounted(() => {
+});
+watch(xs, (newValue) => {
+  if (newValue) {
+    sidebarOpen.value = false;
+  }
+});
+watch(isOwnerAuthenticated, (newValue) => {
+  if (newValue) {
+    fetchAllProperties();
+    fetchAllBookings();
+  }
+});
+</script>
+<style scoped>
+.home-owner-container {
+  height: 100vh;
+  overflow: hidden;
+}
+.sidebar-column {
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid rgb(var(--v-theme-on-surface), 0.12);
+}
+.calendar-column {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.calendar-header {
+  padding: 16px;
+  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
+  background: rgb(var(--v-theme-surface));
+  flex-shrink: 0;
+}
+.mobile-hidden {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .mobile-hidden {
+    display: block;
+  }
+}
+.home-owner-container {
+  --owner-primary: rgb(var(--v-theme-primary));
+  --owner-accent: rgb(var(--v-theme-secondary));
+}
+:deep(.fc-event.highlighted) {
+  animation: owner-highlight 3s ease-in-out;
+  box-shadow: 0 0 0 3px var(--owner-primary);
+}
+@keyframes owner-highlight {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--owner-primary);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 6px rgba(var(--v-theme-primary), 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 3px var(--owner-primary);
+  }
+}
+</style>
+````
+
+## File: src/layouts/admin.vue
+````vue
+<template>
+  <v-app>
+    <v-app-bar
+      app
+      color="surface"
+      elevation="2"
+      class="admin-app-bar"
+    >
+      <div class="d-flex align-center">
+        <v-avatar
+          color="primary"
+          size="36"
+          class="mr-3"
+        >
+          <v-icon color="white">mdi-shield-crown</v-icon>
+        </v-avatar>
+        <div>
+          <div class="text-h6 font-weight-bold">
+            Property Scheduler
+          </div>
+          <div class="admin-badge">
+            Admin Dashboard
+          </div>
+        </div>
+      </div>
+      <v-spacer />
+      <div class="d-flex align-center mr-4">
+        <v-btn
+          to="/admin"
+          variant="text"
+          prepend-icon="mdi-view-dashboard"
+          class="mr-2"
+        >
+          Dashboard
+        </v-btn>
+        <v-btn
+          to="/admin/schedule"
+          variant="text"
+          prepend-icon="mdi-calendar-clock"
+          class="mr-2"
+        >
+          Schedule
+        </v-btn>
+        <v-btn
+          to="/admin/cleaners"
+          variant="text"
+          prepend-icon="mdi-account-hard-hat"
+          class="mr-2"
+        >
+          Cleaners
+        </v-btn>
+        <v-btn
+          to="/admin/properties"
+          variant="text"
+          prepend-icon="mdi-home-group"
+          class="mr-2"
+        >
+          Properties
+        </v-btn>
+        <v-btn
+          to="/admin/reports"
+          variant="text"
+          prepend-icon="mdi-chart-line"
+          class="mr-4"
+        >
+          Reports
+        </v-btn>
+      </div>
+      <v-menu
+        location="bottom end"
+        offset="5"
+      >
+        <template #activator="{ props: menuProps }">
+          <v-btn
+            icon
+            v-bind="menuProps"
+          >
+            <v-avatar size="36">
+              <v-icon>mdi-account-circle</v-icon>
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-list min-width="200">
+          <v-list-subheader>Admin Options</v-list-subheader>
+          <v-list-item
+            prepend-icon="mdi-account-outline"
+            title="Profile"
+          />
+          <v-list-item
+            prepend-icon="mdi-cog-outline"
+            title="System Settings"
+          />
+          <v-list-item
+            to="/"
+            prepend-icon="mdi-home"
+            title="Owner View"
+          />
+          <v-divider class="my-2" />
+          <v-list-item
+            prepend-icon="mdi-logout"
+            title="Logout"
+            color="error"
+            @click="logout"
+          />
+        </v-list>
+      </v-menu>
+    </v-app-bar>
+    <v-main class="admin-main">
+      <router-view />
+    </v-main>
+  </v-app>
+</template>
+⋮----
+<template #activator="{ props: menuProps }">
+          <v-btn
+            icon
+            v-bind="menuProps"
+          >
+            <v-avatar size="36">
+              <v-icon>mdi-account-circle</v-icon>
+            </v-avatar>
+          </v-btn>
+        </template>
+⋮----
+<script setup lang="ts">
+import { useAuth } from '@/composables/shared/useAuth'
+import { useRouter } from 'vue-router'
+const { logout: authLogout } = useAuth()
+const router = useRouter()
+const logout = async () => {
+  await authLogout()
+  router.push('/auth/login')
+}
+</script>
+<style scoped>
+.admin-app-bar {
+  border-bottom: 2px solid rgb(var(--v-theme-primary)) !important;
+}
+.admin-badge {
+  font-size: 0.75rem;
+  color: rgb(var(--v-theme-primary));
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.admin-main {
+  background: rgb(var(--v-theme-background)) !important;
+}
+.v-btn--variant-text {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+.v-btn--variant-text:hover {
+  background: rgba(var(--v-theme-primary), 0.08) !important;
+}
+.v-btn--variant-text.router-link-active {
+  background: rgba(var(--v-theme-primary), 0.12) !important;
+  color: rgb(var(--v-theme-primary)) !important;
+}
+.v-list-item:hover {
+  background: rgba(var(--v-theme-primary), 0.08) !important;
+}
+.v-list-item--active {
+  background: rgba(var(--v-theme-primary), 0.12) !important;
+  color: rgb(var(--v-theme-primary)) !important;
+}
+</style>
+````
+
+## File: src/pages/auth/login.vue
+````vue
+<template>
+  <v-container class="fill-height">
+    <v-row justify="center" align="center">
+      <v-col cols="12" sm="8" md="6" lg="4" xl="3">
+        <v-card elevation="8" class="pa-6">
+          <v-card-title class="text-h4 text-center mb-2">
+            <v-icon class="mr-3" color="primary" size="large">
+              mdi-login
+            </v-icon>
+            Welcome Back
+          </v-card-title>
+          <v-card-subtitle class="text-center mb-6">
+            Sign in to Property Cleaning Scheduler
+          </v-card-subtitle>
+          <v-alert
+            v-if="authStore.error"
+            type="error"
+            variant="tonal"
+            class="mb-4"
+            closable
+            @click:close="authStore.clearError"
+          >
+            {{ authStore.error }}
+          </v-alert>
+          <v-alert
+            v-if="successMessage"
+            type="success"
+            variant="tonal"
+            class="mb-4"
+            closable
+            @click:close="successMessage = ''"
+          >
+            {{ successMessage }}
+          </v-alert>
+          <v-alert
+            type="info"
+            variant="tonal"
+            class="mb-4"
+          >
+            <div class="text-body-2">
+              <strong>Development Mode:</strong><br>
+              Use the demo accounts below or enter any email/password.
+            </div>
+          </v-alert>
+          <v-form @submit.prevent="handleLogin" ref="loginForm">
+            <v-text-field
+              v-model="email"
+              label="Email"
+              type="email"
+              prepend-inner-icon="mdi-email"
+              variant="outlined"
+              :rules="emailRules"
+              :disabled="authStore.loading"
+              class="mb-3"
+              required
+            />
+            <v-text-field
+              v-model="password"
+              label="Password"
+              :type="showPassword ? 'text' : 'password'"
+              prepend-inner-icon="mdi-lock"
+              :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="showPassword = !showPassword"
+              variant="outlined"
+              :rules="passwordRules"
+              :disabled="authStore.loading"
+              class="mb-4"
+              required
+            />
+            <v-btn
+              type="submit"
+              color="primary"
+              size="large"
+              block
+              :loading="authStore.loading"
+              class="mb-4"
+            >
+              <v-icon class="mr-2">mdi-login</v-icon>
+              Sign In
+            </v-btn>
+          </v-form>
+          <v-divider class="my-4" />
+          <div class="text-center mb-3">
+            <v-chip color="info" variant="tonal" size="small">
+              Demo Accounts
+            </v-chip>
+          </div>
+          <v-row class="mb-4">
+            <v-col cols="6">
+              <v-btn
+                color="secondary"
+                variant="outlined"
+                size="small"
+                block
+                @click="loginAsOwner"
+                :loading="authStore.loading"
+              >
+                <v-icon class="mr-1" size="small">mdi-home-account</v-icon>
+                Owner Demo
+              </v-btn>
+            </v-col>
+            <v-col cols="6">
+              <v-btn
+                color="secondary"
+                variant="outlined"
+                size="small"
+                block
+                @click="loginAsAdmin"
+                :loading="authStore.loading"
+              >
+                <v-icon class="mr-1" size="small">mdi-shield-account</v-icon>
+                Admin Demo
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-divider class="my-4" />
+          <div class="text-center">
+            <p class="text-body-2 mb-2">
+              Don't have an account?
+            </p>
+            <v-btn
+              color="primary"
+              variant="text"
+              @click="goToRegister"
+              :disabled="authStore.loading"
+            >
+              Create Account
+            </v-btn>
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+⋮----
+{{ authStore.error }}
+⋮----
+{{ successMessage }}
+⋮----
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { getDefaultRouteForRole } from '@/utils/authHelpers'
+const router = useRouter()
+const authStore = useAuthStore()
+const email = ref('')
+const password = ref('')
+const showPassword = ref(false)
+const successMessage = ref('')
+const loginForm = ref()
+// Validation rules
+const emailRules = [
+  (v: string) => !!v || 'Email is required',
+  (v: string) => /.+@.+\..+/.test(v) || 'Email must be valid'
+]
+const passwordRules = [
+  (v: string) => !!v || 'Password is required',
+  (v: string) => v.length >= 3 || 'Password must be at least 3 characters (demo mode)'
+]
+async function handleLogin() {
+  const { valid } = await loginForm.value.validate()
+  if (!valid) return
+  try {
+    const success = await authStore.login(email.value, password.value)
+    if (success) {
+      successMessage.value = authStore.getSuccessMessage('login')
+      const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+      setTimeout(async () => {
+        await router.push(defaultRoute)
+      }, 1000)
+    }
+  } catch (error) {
+    console.error('Login error:', error)
+  }
+}
+async function loginAsOwner() {
+  email.value = 'owner@example.com'
+  password.value = 'password'
+  await handleLogin()
+}
+async function loginAsAdmin() {
+  email.value = 'admin@example.com'
+  password.value = 'password'
+  await handleLogin()
+}
+function goToRegister() {
+  router.push('/auth/signup')
+}
+authStore.clearError()
+</script>
+<style scoped>
+.fill-height {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.v-card {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+.v-btn {
+  text-transform: none;
+}
+.v-alert {
+  transition: all 0.3s ease;
+}
+.v-btn--variant-outlined {
+  border-width: 1px;
+}
+.v-text-field {
+  transition: all 0.2s ease;
+}
+.v-text-field:focus-within {
+  transform: translateY(-1px);
+}
+</style>
+````
+
+## File: src/plugins/vuetify.ts
+````typescript
+import { createVuetify } from 'vuetify';
+⋮----
+import { aliases, mdi } from 'vuetify/iconsets/mdi';
+import type { ThemeDefinition } from 'vuetify';
+````
+
+## File: src/types/property.ts
+````typescript
+export type PricingTier = 'basic' | 'standard' | 'premium' | 'luxury';
+export interface Property {
+  id: string;
+  owner_id: string;
+  name: string;
+  address: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  square_feet?: number;
+  property_type?: 'apartment' | 'house' | 'condo' | 'townhouse';
+  cleaning_duration: number;
+  special_instructions?: string;
+  pricing_tier: PricingTier;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+export interface PropertyWithMetrics extends Property {
+  metrics: {
+    utilizationRate: number;
+    averageGapBetweenBookings: number;
+    turnPercentage: number;
+    revenueProjection: number;
+    cleaningLoad: 'light' | 'moderate' | 'heavy';
+  };
+}
+export type PropertyFormData = Omit<Property, 'id' | 'created_at' | 'updated_at'>;
+export type PropertyMap = Map<string, Property>;
+export function isProperty(obj: unknown): obj is Property
+````
+
+## File: src/pages/calendar/index.vue
+````vue
+<template>
+  <div class="calendar-page">
+    <v-row>
+      <v-col cols="12">
+        <h1 class="text-h4 mb-4">
+          Booking Calendar
+        </h1>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
+        <OwnerCalendar
+          :bookings="bookingStore.bookings"
+          :properties="propertyStore.properties"
+          :loading="bookingStore.loading || propertyStore.loading"
+          @date-select="handleDateSelect"
+          @event-click="handleEventClick"
+          @event-drop="handleEventDrop"
+          @create-booking="handleCreateBooking"
+          @update-booking="handleUpdateBooking"
+        />
+      </v-col>
+    </v-row>
+  </div>
+</template>
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import OwnerCalendar from '@/components/smart/owner/OwnerCalendar.vue';
+import { useBookingStore } from '@/stores/booking';
+import { usePropertyStore } from '@/stores/property';
+import { useUIStore } from '@/stores/ui';
+import { useBookings } from '@/composables/shared/useBookings';
+import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+const bookingStore = useBookingStore();
+const propertyStore = usePropertyStore();
+const uiStore = useUIStore();
+const { updateBooking } = useBookings();
+const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  uiStore.openModal('eventModal', 'create', {
+    checkout_date: selectInfo.startStr,
+    checkin_date: selectInfo.endStr
+  });
+};
+const handleEventClick = (clickInfo: EventClickArg): void => {
+  const booking = clickInfo.event.extendedProps.booking;
+  uiStore.openModal('eventModal', 'edit', booking);
+};
+const handleEventDrop = (dropInfo: EventDropArg): void => {
+  const booking = dropInfo.event.extendedProps.booking;
+  updateBooking(booking.id, {
+    checkout_date: dropInfo.event.startStr,
+    checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+  });
+};
+const handleCreateBooking = (): void => {
+};
+const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+  updateBooking(data.id, {
+    checkout_date: data.start,
+    checkin_date: data.end
+  });
+};
+onMounted(async () => {
+  await Promise.all([
+    bookingStore.fetchBookings(),
+    propertyStore.fetchProperties()
+  ]);
+});
+</script>
+<style scoped>
+.calendar-page {
+  padding: 1rem;
+  height: calc(100vh - 64px);
+}
+</style>
+````
+
+## File: vite.config.ts
+````typescript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
+import path from 'path'
+import vueDevTools from 'vite-plugin-vue-devtools'
+````
+
+## File: src/App.vue
+````vue
+<template>
+  <component :is="layout">
+    <router-view />
+  </component>
+</template>
+<script setup lang="ts">
+import { computed, markRaw } from 'vue'
+import { useRoute } from 'vue-router'
+import DefaultLayout from '@/layouts/default.vue'
+import AuthLayout from '@/layouts/auth.vue'
+import AdminLayout from '@/layouts/admin.vue'
+const layouts = {
+  default: markRaw(DefaultLayout),
+  auth: markRaw(AuthLayout),
+  admin: markRaw(AdminLayout),
+}
+const route = useRoute()
+const layout = computed(() => {
+  const layoutName = route.meta.layout as string || 'default'
+  return layouts[layoutName as keyof typeof layouts] || layouts.default
+})
+</script>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease;
+}
+#app {
+  height: 100vh;
+  width: 100%;
+}
+.v-application {
+  font-family: 'Roboto', sans-serif !important;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgb(var(--v-theme-surface-variant));
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-on-surface-variant), 0.5);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--v-theme-primary));
+}
+.page-transition-enter-active,
+.page-transition-leave-active {
+  transition: opacity 0.3s ease;
+}
+.page-transition-enter-from,
+.page-transition-leave-to {
+  opacity: 0;
+}
+.urgent-priority {
+  border-left: 6px solid rgb(var(--v-theme-error)) !important;
+  background: linear-gradient(90deg, rgba(var(--v-theme-error), 0.1) 0%, transparent 100%) !important;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-error), 0.2), 0 4px 12px rgba(var(--v-theme-error), 0.15) !important;
+  animation: urgentPulse 2s ease-in-out infinite;
+}
+.urgent-priority::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(var(--v-theme-error), 0.05) 25%, transparent 25%, transparent 50%, rgba(var(--v-theme-error), 0.05) 50%, rgba(var(--v-theme-error), 0.05) 75%, transparent 75%);
+  background-size: 20px 20px;
+  animation: urgentStripes 2s linear infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.urgent-priority:hover {
+  animation: urgentGlow 1s ease-in-out infinite alternate, shake 0.5s ease-in-out;
+  transform-origin: center center;
+}
+.high-priority {
+  border-left: 4px solid rgb(var(--v-theme-warning)) !important;
+  background: linear-gradient(90deg, rgba(var(--v-theme-warning), 0.08) 0%, transparent 100%) !important;
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-warning), 0.15), 0 2px 8px rgba(var(--v-theme-warning), 0.1) !important;
+}
+.normal-priority {
+  border-left: 3px solid rgb(var(--v-theme-primary)) !important;
+  background: linear-gradient(90deg, rgba(var(--v-theme-primary), 0.05) 0%, transparent 100%) !important;
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-primary), 0.1), 0 2px 4px rgba(var(--v-theme-primary), 0.05) !important;
+}
+.low-priority {
+  border-left: 2px solid rgb(var(--v-theme-info)) !important;
+  background: linear-gradient(90deg, rgba(var(--v-theme-info), 0.03) 0%, transparent 100%) !important;
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-info), 0.08), 0 1px 2px rgba(var(--v-theme-info), 0.03) !important;
+}
+/* Enhanced Booking Type Indicators */
+.turn-booking {
+  border-left: 6px solid rgb(var(--v-theme-error)) !important;
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-error), 0.2), 0 2px 8px rgba(var(--v-theme-error), 0.15) !important;
+  position: relative;
+}
+.turn-booking::after {
+  content: '🚨 TURN';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgb(var(--v-theme-error));
+  color: rgb(var(--v-theme-on-error));
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  z-index: 1;
+  box-shadow: 0 2px 4px rgba(var(--v-theme-error), 0.3);
+}
+.standard-booking {
+  border-left: 4px solid rgb(var(--v-theme-primary)) !important;
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-primary), 0.1), 0 2px 4px rgba(var(--v-theme-primary), 0.1) !important;
+}
+.standard-booking::after {
+  content: '📅 STD';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  z-index: 1;
+  opacity: 0.8;
+}
+.owner-interface .urgent-priority {
+  border-left-color: rgb(var(--v-theme-warning)) !important;
+  background: linear-gradient(90deg, rgba(var(--v-theme-warning), 0.1) 0%, transparent 100%) !important;
+}
+.owner-interface .urgent-priority::before {
+  background: linear-gradient(45deg, rgba(var(--v-theme-warning), 0.05) 25%, transparent 25%, transparent 50%, rgba(var(--v-theme-warning), 0.05) 50%, rgba(var(--v-theme-warning), 0.05) 75%, transparent 75%);
+}
+.owner-interface .turn-booking {
+  border-left-color: rgb(var(--v-theme-warning)) !important;
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-warning), 0.2), 0 2px 8px rgba(var(--v-theme-warning), 0.15) !important;
+}
+.owner-interface .turn-booking::after {
+  content: '⚠️ TURN';
+  background: rgb(var(--v-theme-warning));
+  color: rgb(var(--v-theme-on-warning));
+}
+.admin-interface .urgent-priority {
+  border-left-color: rgb(var(--v-theme-error)) !important;
+  background: linear-gradient(90deg, rgba(var(--v-theme-error), 0.15) 0%, transparent 100%) !important;
+}
+.admin-interface .turn-booking {
+  border-left-color: rgb(var(--v-theme-error)) !important;
+  box-shadow: 0 0 0 2px rgba(var(--v-theme-error), 0.3), 0 4px 12px rgba(var(--v-theme-error), 0.2) !important;
+}
+@keyframes urgentPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(var(--v-theme-error), 0.2), 0 4px 12px rgba(var(--v-theme-error), 0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 2px rgba(var(--v-theme-error), 0.4), 0 6px 16px rgba(var(--v-theme-error), 0.3);
+  }
+}
+@keyframes urgentGlow {
+  0% {
+    box-shadow: 0 0 0 1px rgba(var(--v-theme-error), 0.2), 0 4px 12px rgba(var(--v-theme-error), 0.15), 0 0 20px rgba(var(--v-theme-error), 0.1);
+  }
+  100% {
+    box-shadow: 0 0 0 2px rgba(var(--v-theme-error), 0.4), 0 6px 16px rgba(var(--v-theme-error), 0.3), 0 0 30px rgba(var(--v-theme-error), 0.3);
+  }
+}
+@keyframes urgentStripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 0;
+  }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+@keyframes turnBookingPulse {
+  0%, 100% {
+    border-left-width: 6px;
+    border-left-color: rgb(var(--v-theme-error));
+  }
+  50% {
+    border-left-width: 8px;
+    border-left-color: rgba(var(--v-theme-error), 0.8);
+  }
+}
+.turn-booking.urgent-priority {
+  animation: urgentPulse 1.5s ease-in-out infinite, turnBookingPulse 3s ease-in-out infinite;
+}
+.turn-booking.urgent-priority::after {
+  animation: shake 3s ease-in-out infinite;
+}
+.fc-event.turn-booking-event {
+  border: 2px solid rgb(var(--v-theme-error)) !important;
+  background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.9) 0%, rgba(var(--v-theme-error), 0.7) 100%) !important;
+  box-shadow: 0 2px 8px rgba(var(--v-theme-error), 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  position: relative;
+  overflow: visible;
+}
+.fc-event.turn-booking-event::before {
+  content: '🚨';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: rgb(var(--v-theme-error));
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  z-index: 10;
+  animation: urgentPulse 2s ease-in-out infinite;
+}
+.fc-event.turn-urgent-event {
+  animation: urgentGlow 2s ease-in-out infinite alternate;
+  border-color: rgb(var(--v-theme-error)) !important;
+  border-width: 3px !important;
+}
+.fc-event.urgent-event {
+  box-shadow: 0 0 0 2px rgba(var(--v-theme-error), 0.5), 0 4px 12px rgba(var(--v-theme-error), 0.3) !important;
+}
+.priority-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+.priority-badge.urgent {
+  background: linear-gradient(135deg, rgb(var(--v-theme-error)) 0%, rgba(var(--v-theme-error), 0.8) 100%);
+  color: rgb(var(--v-theme-on-error));
+  box-shadow: 0 2px 8px rgba(var(--v-theme-error), 0.3);
+  animation: urgentPulse 2s ease-in-out infinite;
+}
+.priority-badge.high {
+  background: linear-gradient(135deg, rgb(var(--v-theme-warning)) 0%, rgba(var(--v-theme-warning), 0.8) 100%);
+  color: rgb(var(--v-theme-on-warning));
+  box-shadow: 0 2px 6px rgba(var(--v-theme-warning), 0.2);
+}
+.priority-badge.normal {
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgba(var(--v-theme-primary), 0.8) 100%);
+  color: rgb(var(--v-theme-on-primary));
+  box-shadow: 0 2px 4px rgba(var(--v-theme-primary), 0.15);
+}
+.priority-badge.low {
+  background: linear-gradient(135deg, rgb(var(--v-theme-info)) 0%, rgba(var(--v-theme-info), 0.8) 100%);
+  color: rgb(var(--v-theme-on-info));
+  box-shadow: 0 1px 3px rgba(var(--v-theme-info), 0.1);
+}
+@media (max-width: 768px) {
+  .urgent-priority {
+    border-left-width: 4px !important;
+  }
+  .turn-booking::after {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+  }
+  .priority-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+}
+.v-theme--dark .urgent-priority {
+  background: linear-gradient(90deg, rgba(var(--v-theme-error), 0.15) 0%, transparent 100%) !important;
+}
+.v-theme--dark .high-priority {
+  background: linear-gradient(90deg, rgba(var(--v-theme-warning), 0.12) 0%, transparent 100%) !important;
+}
+.v-theme--dark .turn-booking::after {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.v-theme--dark .priority-badge {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.admin-interface .turn-booking::after {
+  content: '🚨 CRITICAL';
+  background: rgb(var(--v-theme-error));
+  color: rgb(var(--v-theme-on-error));
+  animation: urgentPulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(var(--v-theme-error), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0);
+  }
+}
+@keyframes urgentPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0);
+    transform: scale(1.02);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0);
+    transform: scale(1);
+  }
+}
+@keyframes urgentStripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 0;
+  }
+}
+@keyframes urgentGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(var(--v-theme-error), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--v-theme-error), 0.8), 0 0 30px rgba(var(--v-theme-error), 0.6);
+  }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+@keyframes countdown {
+  0% {
+    background-color: rgba(var(--v-theme-success), 0.2);
+  }
+  50% {
+    background-color: rgba(var(--v-theme-warning), 0.2);
+  }
+  100% {
+    background-color: rgba(var(--v-theme-error), 0.2);
+  }
+}
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+.urgent-pulse-animation {
+  animation: urgentPulse 1.5s infinite;
+}
+.urgent-glow-animation {
+  animation: urgentGlow 2s infinite;
+}
+.urgent-shake-animation {
+  animation: shake 0.5s infinite;
+}
+.breathe-animation {
+  animation: breathe 3s infinite;
+}
+.countdown-animation {
+  animation: countdown 5s infinite;
+}
+.turn-urgent {
+  animation: urgentPulse 1.5s infinite, urgentGlow 2s infinite;
+}
+.turn-critical {
+  animation: urgentPulse 1s infinite, urgentGlow 1.5s infinite, shake 0.5s infinite;
+}
+.turn-countdown {
+  animation: countdown 3s infinite, breathe 2s infinite;
+}
+.elevation-transition {
+  transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-elevate {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-elevate:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(var(--v-theme-on-surface), 0.2) !important;
+}
+.hover-elevate-urgent {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-elevate-urgent:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(var(--v-theme-error), 0.3) !important;
+}
+.priority-badge-urgent {
+  background: linear-gradient(135deg, rgb(var(--v-theme-error)), rgba(var(--v-theme-error), 0.8)) !important;
+  color: rgb(var(--v-theme-on-error)) !important;
+  box-shadow: 0 2px 8px rgba(var(--v-theme-error), 0.4);
+  animation: urgentGlow 2s infinite;
+  position: relative;
+}
+.priority-badge-urgent::before {
+  content: '🚨';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+}
+.priority-badge-high {
+  background: linear-gradient(135deg, rgb(var(--v-theme-warning)), rgba(var(--v-theme-warning), 0.8)) !important;
+  color: rgb(var(--v-theme-on-warning)) !important;
+  box-shadow: 0 2px 6px rgba(var(--v-theme-warning), 0.3);
+  position: relative;
+}
+.priority-badge-high::before {
+  content: '⚠️';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+}
+.priority-badge-normal {
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)), rgba(var(--v-theme-primary), 0.8)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
+  box-shadow: 0 2px 4px rgba(var(--v-theme-primary), 0.2);
+  position: relative;
+}
+.priority-badge-normal::before {
+  content: '📅';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+}
+.priority-badge-low {
+  background: linear-gradient(135deg, rgb(var(--v-theme-info)), rgba(var(--v-theme-info), 0.8)) !important;
+  color: rgb(var(--v-theme-on-info)) !important;
+  box-shadow: 0 2px 4px rgba(var(--v-theme-info), 0.2);
+  position: relative;
+}
+.priority-badge-low::before {
+  content: '📋';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+}
+.turn-alert-critical {
+  border: 2px solid rgb(var(--v-theme-error)) !important;
+  background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.1), rgba(var(--v-theme-error), 0.05)) !important;
+  animation: urgentPulse 1.5s infinite;
+  position: relative;
+}
+.turn-alert-critical::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(var(--v-theme-error), 0.1) 25%, transparent 25%, transparent 50%, rgba(var(--v-theme-error), 0.1) 50%, rgba(var(--v-theme-error), 0.1) 75%, transparent 75%);
+  background-size: 15px 15px;
+  animation: urgentStripes 1.5s linear infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.turn-alert-urgent {
+  border: 2px solid rgb(var(--v-theme-warning)) !important;
+  background: linear-gradient(135deg, rgba(var(--v-theme-warning), 0.1), rgba(var(--v-theme-warning), 0.05)) !important;
+  animation: pulse 2s infinite;
+}
+/* Calendar Event Enhancements */
+.fc-event.turn-booking-event {
+  border: 2px solid rgb(var(--v-theme-error)) !important;
+  background: linear-gradient(135deg, rgb(var(--v-theme-error)), rgba(var(--v-theme-error), 0.8)) !important;
+  color: rgb(var(--v-theme-on-error)) !important;
+  font-weight: bold !important;
+  position: relative;
+  overflow: visible !important;
+}
+.fc-event.turn-booking-event::before {
+  content: '🚨';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 12px;
+  z-index: 10;
+  background: rgb(var(--v-theme-error));
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: urgentPulse 1.5s infinite;
+}
+.fc-event.turn-urgent-event {
+  animation: urgentGlow 2s infinite;
+  box-shadow: 0 0 10px rgba(var(--v-theme-error), 0.6) !important;
+}
+.fc-event.urgent-event {
+  border-color: rgb(var(--v-theme-error)) !important;
+  background: linear-gradient(135deg, rgb(var(--v-theme-error)), rgba(var(--v-theme-error), 0.9)) !important;
+  color: rgb(var(--v-theme-on-error)) !important;
+  animation: urgentGlow 2s infinite;
+}
+.fc-event.standard-booking-event {
+  border: 1px solid rgb(var(--v-theme-primary)) !important;
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)), rgba(var(--v-theme-primary), 0.8)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
+}
+/* Notification Enhancements */
+.urgent-notification {
+  background: linear-gradient(135deg, rgb(var(--v-theme-error)), rgba(var(--v-theme-error), 0.9)) !important;
+  color: rgb(var(--v-theme-on-error)) !important;
+  border-left: 6px solid rgba(var(--v-theme-on-error), 0.8) !important;
+  animation: urgentPulse 2s infinite;
+}
+.turn-notification {
+  background: linear-gradient(135deg, rgb(var(--v-theme-warning)), rgba(var(--v-theme-warning), 0.9)) !important;
+  color: rgb(var(--v-theme-on-warning)) !important;
+  border-left: 4px solid rgba(var(--v-theme-on-warning), 0.8) !important;
+}
+/* Time-based Visual Indicators */
+.time-critical {
+  animation: urgentPulse 1s infinite, shake 0.5s infinite;
+  border: 3px solid rgb(var(--v-theme-error)) !important;
+}
+.time-urgent {
+  animation: urgentGlow 1.5s infinite;
+  border: 2px solid rgb(var(--v-theme-warning)) !important;
+}
+.time-approaching {
+  animation: breathe 3s infinite;
+  border: 1px solid rgb(var(--v-theme-info)) !important;
+}
+/* Countdown Timer Styles */
+.countdown-timer {
+  background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.1), rgba(var(--v-theme-warning), 0.1));
+  border: 2px solid rgb(var(--v-theme-warning));
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.countdown-timer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(var(--v-theme-success), 0.3), rgba(var(--v-theme-warning), 0.3), rgba(var(--v-theme-error), 0.3));
+  animation: countdown 10s linear infinite;
+  z-index: -1;
+}
+.countdown-critical {
+  border-color: rgb(var(--v-theme-error)) !important;
+  color: rgb(var(--v-theme-error)) !important;
+  animation: urgentPulse 1s infinite;
+}
+.countdown-urgent {
+  border-color: rgb(var(--v-theme-warning)) !important;
+  color: rgb(var(--v-theme-warning)) !important;
+  animation: breathe 2s infinite;
+}
+:root {
+  --theme-transition-duration: 0.3s;
+}
+* {
+  transition: background-color var(--theme-transition-duration) ease,
+             border-color var(--theme-transition-duration) ease,
+             color var(--theme-transition-duration) ease,
+             box-shadow var(--theme-transition-duration) ease;
+}
+.v-progress-circular,
+.v-progress-linear,
+.v-btn__overlay,
+.v-overlay__scrim,
+svg,
+i {
+  transition: none !important;
+}
+@keyframes themeChange {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.v-application {
+  animation: themeChange 0.5s ease;
+}
+@media (max-width: 600px) {
+  .urgent-priority::before {
+    background-size: 15px 15px;
+  }
+  .turn-booking::after,
+  .standard-booking::after {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+  }
+  .priority-badge-urgent,
+  .priority-badge-high,
+  .priority-badge-normal,
+  .priority-badge-low {
+    font-size: 0.7rem;
+  }
+  .priority-badge-urgent::before,
+  .priority-badge-high::before,
+  .priority-badge-normal::before,
+  .priority-badge-low::before {
+    font-size: 0.7rem;
+    left: -6px;
+  }
+  .countdown-timer {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+}
+.v-theme--dark .urgent-priority {
+  background: linear-gradient(90deg, rgba(var(--v-theme-error), 0.2) 0%, transparent 100%) !important;
+}
+.v-theme--dark .turn-booking {
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-error), 0.4), 0 2px 8px rgba(var(--v-theme-error), 0.3) !important;
+}
+.v-theme--dark .fc-event.turn-booking-event {
+  box-shadow: 0 0 15px rgba(var(--v-theme-error), 0.8) !important;
+}
+.v-theme--dark .countdown-timer {
+  background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.15), rgba(var(--v-theme-warning), 0.15));
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-animation,
+  .urgent-pulse-animation,
+  .urgent-glow-animation,
+  .urgent-shake-animation,
+  .breathe-animation,
+  .countdown-animation,
+  .turn-urgent,
+  .turn-critical,
+  .turn-countdown {
+    animation: none !important;
+  }
+  .urgent-priority::before,
+  .turn-alert-critical::before {
+    animation: none !important;
+  }
+}
+@media (prefers-contrast: high) {
+  .urgent-priority {
+    border-left-width: 8px !important;
+  }
+  .turn-booking {
+    border-left-width: 8px !important;
+    border-right: 4px solid rgb(var(--v-theme-error)) !important;
+  }
+  .priority-badge-urgent,
+  .priority-badge-high,
+  .priority-badge-normal,
+  .priority-badge-low {
+    border: 2px solid currentColor !important;
+  }
+}
+</style>
+````
+
 ## File: src/components/smart/admin/AdminCalendar.vue
 ````vue
 <template>
@@ -25673,7 +26684,7 @@ const theme = useTheme();
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
 const isMounted = ref(false);
 const isCalendarReady = ref(false);
-const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('timeGridWeek');
+const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('dayGridMonth');
 const currentDateTitle = ref('');
 // Admin filtering state
 const selectedCleaner = ref<string | null>(null);
@@ -25829,7 +26840,6 @@ const adminCalendarOptions = computed<CalendarOptions>(() => {
   selectMirror: true,
   editable: true,
   droppable: true,
-  eventResizable: true,
   eventDurationEditable: true,
   locale: 'en',
   timeZone: 'local',
@@ -26364,871 +27374,377 @@ onBeforeUnmount(() => {
 </style>
 ````
 
-## File: src/components/smart/admin/HomeAdmin.vue
+## File: src/components/smart/FullCalendar.vue
 ````vue
 <template>
-  <div class="home-admin-container">
-    <v-row
-      no-gutters
-      class="fill-height"
-    >
-      <v-col
-        cols="12"
-        lg="3"
-        xl="2"
-        class="sidebar-column"
-        :class="{ 'mobile-hidden': !sidebarOpen }"
-      >
-        <v-btn
-          v-if="$vuetify.display.lgAndDown"
-          icon="mdi-menu"
-          variant="text"
-          class="mr-4"
-          @click="toggleSidebar"
-        />
-        <AdminSidebar
-          :today-turns="systemTodayTurns"
-          :upcoming-cleanings="systemUpcomingCleanings"
-          :properties="allPropertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        lg="9"
-        xl="10"
-        class="calendar-column"
-      >
-        <div class="calendar-header">
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn
-              variant="outlined"
-              class="mr-2"
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6">
-              {{ formattedDate }}
-            </div>
-            <div class="ml-4 text-caption text-medium-emphasis">
-              {{ systemMetricsText }}
-            </div>
-            <v-spacer />
-            <v-btn
-              color="warning"
-              variant="outlined"
-              prepend-icon="mdi-account-hard-hat"
-              class="mr-2"
-              @click="handleAssignCleaners"
-            >
-              Assign Cleaners
-            </v-btn>
-            <v-btn
-              color="info"
-              variant="outlined"
-              prepend-icon="mdi-chart-line"
-              class="mr-2"
-              @click="handleGenerateReports"
-            >
-              Reports
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-cog"
-              class="mr-4"
-              @click="handleManageSystem"
-            >
-              Manage System
-            </v-btn>
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              class="ml-4"
-            >
-              <v-btn value="dayGridMonth">
-                Month
-              </v-btn>
-              <v-btn value="timeGridWeek">
-                Week
-              </v-btn>
-              <v-btn value="timeGridDay">
-                Day
-              </v-btn>
-            </v-btn-toggle>
-          </div>
-        </div>
-        <AdminCalendar
-          ref="calendarRef"
-          :bookings="adminFilteredBookings"
-          :loading="loading"
-          :current-view="currentView"
-          :current-date="currentDate"
-          :properties="allPropertiesMap"
-          :users="allUsersMap"
-          @date-select="handleDateSelect"
-          @event-click="handleEventClick"
-          @event-drop="handleEventDrop"
-          @event-resize="handleEventResize"
-          @view-change="handleCalendarViewChange"
-          @date-change="handleCalendarDateChange"
-          @create-booking="handleCreateBookingFromCalendar"
-          @update-booking="handleUpdateBooking"
-        />
-      </v-col>
-    </v-row>
-    <BookingForm
-      :open="eventModalOpen"
-      :mode="eventModalMode"
-      :booking="eventModalData"
-      @close="handleEventModalClose"
-      @save="handleEventModalSave"
-      @delete="handleEventModalDelete"
-    />
-    <PropertyModal
-      :open="propertyModalOpen"
-      :mode="propertyModalMode"
-      :property="propertyModalData"
-      @close="handlePropertyModalClose"
-      @save="handlePropertyModalSave"
-      @delete="handlePropertyModalDelete"
-    />
-    <ConfirmationDialog
-      :open="confirmDialogOpen"
-      :title="confirmDialogTitle"
-      :message="confirmDialogMessage"
-      :confirm-text="confirmDialogConfirmText"
-      :cancel-text="confirmDialogCancelText"
-      :dangerous="confirmDialogDangerous"
-      @confirm="handleConfirmDialogConfirm"
-      @cancel="handleConfirmDialogCancel"
-      @close="handleConfirmDialogClose"
+  <div class="calendar-container">
+    <FullCalendar
+      ref="calendarRef"
+      :options="calendarOptions"
+      class="custom-calendar"
     />
   </div>
 </template>
-⋮----
-{{ formattedDate }}
-⋮----
-{{ systemMetricsText }}
-⋮----
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useDisplay } from 'vuetify';
-import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
-import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
-import BookingForm from '@/components/dumb/BookingForm.vue';
-import PropertyModal from '@/components/dumb/PropertyModal.vue';
-import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
-import { useUserStore } from '@/stores/user';
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
-import { useUIStore } from '@/stores/ui';
-import { useAuthStore } from '@/stores/auth';
-import { useBookings } from '@/composables/shared/useBookings';
-import { useProperties } from '@/composables/shared/useProperties';
-import { useCalendarState } from '@/composables/shared/useCalendarState';
-import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import FullCalendar from '@fullcalendar/vue3';
+import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import { computed, ref, watch } from 'vue';
+import { useTheme } from 'vuetify';
+import type { Booking, Property } from '@/types';
 import eventLogger from '@/composables/shared/useComponentEventLogger';
-const userStore = useUserStore();
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
-const uiStore = useUIStore();
-const authStore = useAuthStore();
-const { xs } = useDisplay();
-const {
-  loading: bookingsLoading,
-  createBooking,
-  updateBooking,
-  deleteBooking,
-  fetchAllBookings
-} = useBookings();
-const {
-  loading: propertiesLoading,
-  createProperty,
-  updateProperty,
-  deleteProperty,
-  fetchAllProperties
-} = useProperties();
-const {
-  currentView,
-  currentDate,
-  filterBookings,
-  setCalendarView,
-  goToDate,
-  goToToday,
-  next,
-  prev,
-  clearPropertyFilters,
-  togglePropertyFilter
-} = useCalendarState();
-const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
-const sidebarOpen = ref(!xs.value);
-const selectedPropertyFilter = ref<string | null>(null);
-const isAdminAuthenticated = computed(() => {
-  return authStore.isAuthenticated &&
-         authStore.user?.role === 'admin';
+interface Props {
+  bookings: Map<string, Booking>;
+  properties: Map<string, Property>;
+  loading?: boolean;
+}
+interface Emits {
+  (e: 'dateSelect', selectInfo: DateSelectArg): void;
+  (e: 'eventClick', clickInfo: EventClickArg): void;
+  (e: 'eventDrop', dropInfo: EventDropArg): void;
+  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
+  (e: 'updateBooking', data: { id: string; start: string; end: string }): void;
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false
 });
-const loading = computed(() =>
-  bookingsLoading.value ||
-  propertiesLoading.value ||
-  uiStore.isLoading('bookings') ||
-  uiStore.isLoading('properties')
-);
-const formattedDate = computed(() => {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  };
-  return currentDate.value.toLocaleDateString('en-US', options);
+const emit = defineEmits<Emits>();
+const theme = useTheme();
+const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const calendarEvents = computed(() => {
+  return Array.from(props.bookings.values()).map(booking => {
+    const property = props.properties.get(booking.property_id);
+    const isTurn = booking.booking_type === 'turn';
+    const isUrgent = booking.priority === 'urgent';
+    return {
+      id: booking.id,
+      title: `${property?.name || 'Unknown Property'} - ${isTurn ? 'TURN' : 'Standard'}`,
+      start: booking.checkout_date,
+      end: booking.checkin_date,
+      backgroundColor: getEventColor(booking),
+      borderColor: getEventBorderColor(booking),
+      textColor: getEventTextColor(booking),
+      extendedProps: {
+        booking,
+        property,
+        bookingType: booking.booking_type,
+        status: booking.status,
+        priority: booking.priority,
+        guestCount: booking.guest_count,
+        notes: booking.notes
+      },
+      classNames: [
+        `booking-${booking.booking_type}`,
+        `status-${booking.status}`,
+        `priority-${booking.priority}`,
+        isTurn ? 'turn-booking-event' : 'standard-booking-event',
+        isUrgent && isTurn ? 'turn-urgent-event' : '',
+        isUrgent ? 'urgent-event' : ''
+      ].filter(Boolean)
+    };
+  });
 });
-const allPropertiesMap = computed(() => {
-  if (!isAdminAuthenticated.value) {
-    return new Map<string, Property>();
-  }
-  if (propertyStore.properties instanceof Map) {
-    return propertyStore.properties;
+// Enhanced dynamic color system based on booking priority instead of status
+const getEventColor = (booking: Booking): string => {
+  const isDark = theme.global.current.value.dark;
+  if (booking.booking_type === 'turn') {
+    switch (booking.priority) {
+      case 'urgent':
+        return isDark ? '#FF1744' : '#D32F2F';
+      case 'high':
+        return isDark ? '#FF6D00' : '#F57C00';
+      case 'normal':
+        return isDark ? '#FF9800' : '#FF6F00';
+      case 'low':
+        return isDark ? '#FFC107' : '#FFA000';
+      default:
+        return isDark ? '#FF5252' : '#F44336';
+    }
   } else {
-    const map = new Map<string, Property>();
-    propertyStore.propertiesArray.forEach(property => {
-      if (property && property.id) {
-        map.set(property.id, property);
-      }
-    });
-    return map;
-  }
-});
-const allUsersMap = computed(() => {
-  const map = new Map<string, any>();
-  if (!isAdminAuthenticated.value) {
-    return map;
-  }
-  if (userStore.user) {
-    map.set(userStore.user.id, userStore.user);
-  }
-  return map;
-});
-const allBookingsMap = computed(() => {
-  if (!isAdminAuthenticated.value) {
-    return new Map<string, Booking>();
-  }
-  const map = new Map<string, Booking>();
-  bookingStore.bookingsArray.forEach(booking => {
-    if (booking && booking.id) {
-      map.set(booking.id, booking);
+    switch (booking.priority) {
+      case 'urgent':
+        return isDark ? '#FF9800' : '#FF6F00';
+      case 'high':
+        return isDark ? '#2196F3' : '#1976D2';
+      case 'normal':
+        return isDark ? '#00BCD4' : '#0097A7';
+      case 'low':
+        return isDark ? '#4CAF50' : '#388E3C';
+      default:
+        return isDark ? '#2196F3' : '#1976D2';
     }
-  });
-  return map;
-});
-const systemTodayTurns = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const turns = new Map<string, Booking>();
-  if (!isAdminAuthenticated.value) {
-    return turns;
   }
-  Array.from(allBookingsMap.value.values()).forEach(booking => {
-    if (
-      booking.booking_type === 'turn' &&
-      new Date(booking.checkout_date) >= today &&
-      new Date(booking.checkout_date) < tomorrow
-    ) {
-      turns.set(booking.id, booking);
+};
+const getEventBorderColor = (booking: Booking): string => {
+  if (booking.booking_type === 'turn') {
+    switch (booking.priority) {
+      case 'urgent':
+        return '#B71C1C';
+      case 'high':
+        return '#E65100';
+      case 'normal':
+        return '#FF6F00';
+      case 'low':
+        return '#F57F17';
+      default:
+        return '#D32F2F';
     }
-  });
-  return turns;
-});
-const systemUpcomingCleanings = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const inOneWeek = new Date(today);
-  inOneWeek.setDate(inOneWeek.getDate() + 7);
-  const cleanings = new Map<string, Booking>();
-  if (!isAdminAuthenticated.value) {
-    return cleanings;
-  }
-  Array.from(allBookingsMap.value.values()).forEach(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
-    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
-      cleanings.set(booking.id, booking);
+  } else {
+    switch (booking.priority) {
+      case 'urgent':
+        return '#E65100';
+      case 'high':
+        return '#0D47A1';
+      case 'normal':
+        return '#006064';
+      case 'low':
+        return '#1B5E20';
+      default:
+        return '#1976D2';
     }
-  });
-  return cleanings;
-});
-const adminFilteredBookings = computed(() => {
-  let bookings = Array.from(allBookingsMap.value.values());
-  if (selectedPropertyFilter.value) {
-    bookings = bookings.filter(booking =>
-      booking.property_id === selectedPropertyFilter.value
-    );
-  }
-  bookings = filterBookings(bookings);
-  const map = new Map<string, Booking>();
-  bookings.forEach(booking => {
-    map.set(booking.id, booking);
-  });
-  return map;
-});
-const systemMetricsText = computed(() => {
-  const totalProperties = allPropertiesMap.value.size;
-  const totalBookings = allBookingsMap.value.size;
-  const urgentTurns = systemTodayTurns.value.size;
-  const upcomingCleanings = systemUpcomingCleanings.value.size;
-  return `${totalProperties} properties • ${totalBookings} bookings • ${urgentTurns} urgent turns • ${upcomingCleanings} upcoming`;
-});
-const eventModalOpen = computed(() => uiStore.isModalOpen('event'));
-const eventModalMode = computed((): 'create' | 'edit' | undefined => {
-  const modalState = uiStore.getModalState('event');
-  const mode = modalState?.mode;
-  return (mode === 'create' || mode === 'edit') ? mode : undefined;
-});
-const eventModalData = computed((): Booking | undefined => {
-  const modalData = uiStore.getModalData('event') as any;
-  return modalData?.booking || undefined;
-});
-const propertyModalOpen = computed(() => uiStore.isModalOpen('property'));
-const propertyModalMode = computed((): 'create' | 'edit' | undefined => {
-  const modalState = uiStore.getModalState('property');
-  const mode = modalState?.mode;
-  return (mode === 'create' || mode === 'edit') ? mode : undefined;
-});
-const propertyModalData = computed((): Property | undefined => {
-  const modalData = uiStore.getModalData('property') as any;
-  return modalData?.property || undefined;
-});
-const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirm'));
-const confirmDialogTitle = computed((): string => {
-  const dialogState = uiStore.getConfirmDialogState('confirm');
-  return dialogState?.title || '';
-});
-const confirmDialogMessage = computed((): string => {
-  const dialogState = uiStore.getConfirmDialogState('confirm');
-  return dialogState?.message || '';
-});
-const confirmDialogConfirmText = computed((): string => {
-  const dialogState = uiStore.getConfirmDialogState('confirm');
-  return dialogState?.confirmText || 'Confirm';
-});
-const confirmDialogCancelText = computed((): string => {
-  const dialogState = uiStore.getConfirmDialogState('confirm');
-  return dialogState?.cancelText || 'Cancel';
-});
-const confirmDialogDangerous = computed((): boolean => {
-  const dialogState = uiStore.getConfirmDialogState('confirm');
-  return Boolean(dialogState?.dangerous) || false;
-});
-const handleNavigateToBooking = (bookingId: string): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'navigateToBooking',
-      bookingId,
-      'receive'
-    );
-    const booking = allBookingsMap.value.get(bookingId);
-    if (booking) {
-      uiStore.openModal('event', 'edit', {
-        booking: booking
-      });
-    } else {
-      console.warn(`Booking with ID ${bookingId} not found`);
-    }
-  } catch (error) {
-    console.error('Error navigating to booking:', error);
   }
 };
-const handleNavigateToDate = (date: Date): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'navigateToDate',
-      date,
-      'receive'
-    );
-    goToDate(date);
-  } catch (error) {
-    console.error('Error navigating to date:', error);
+const getEventTextColor = (booking: Booking): string => {
+  if (booking.status === 'completed') {
+    return '#E0E0E0';
   }
+  return '#FFFFFF';
 };
-const handleFilterByProperty = (propertyId: string | null): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'filterByProperty',
-      propertyId,
-      'receive'
-    );
-    selectedPropertyFilter.value = propertyId;
-    if (propertyId) {
-      togglePropertyFilter(propertyId);
-    } else {
-      clearPropertyFilters();
-    }
-  } catch (error) {
-    console.error('Error filtering by property:', error);
-  }
-};
-const handleAssignCleaners = (): void => {
-  try {
-    eventLogger.logEvent(
-      'HomeAdmin',
-      'HomeAdmin',
-      'assignCleaners',
-      null,
-      'emit'
-    );
-    console.log('Admin: Assign Cleaners clicked');
-  } catch (error) {
-    console.error('Error opening cleaner assignment:', error);
-  }
-};
-const handleGenerateReports = (): void => {
-  try {
-    eventLogger.logEvent(
-      'HomeAdmin',
-      'HomeAdmin',
-      'generateReports',
-      null,
-      'emit'
-    );
-    console.log('Admin: Generate Reports clicked');
-  } catch (error) {
-    console.error('Error opening reports:', error);
-  }
-};
-const handleManageSystem = (): void => {
-  try {
-    eventLogger.logEvent(
-      'HomeAdmin',
-      'HomeAdmin',
-      'manageSystem',
-      null,
-      'emit'
-    );
-    console.log('Admin: Manage System clicked');
-  } catch (error) {
-    console.error('Error opening system management:', error);
-  }
-};
-const handleCreateBooking = (): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'createBooking',
-      null,
-      'receive'
-    );
-    uiStore.openModal('event', 'create', {
-      booking: null
-    });
-  } catch (error) {
-    console.error('Error creating booking:', error);
-  }
-};
-const handleCreateProperty = (): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'createProperty',
-      null,
-      'receive'
-    );
-    uiStore.openModal('property', 'create', {
-      property: null
-    });
-  } catch (error) {
-    console.error('Error creating property:', error);
-  }
-};
-const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
-  try {
-    eventLogger.logEvent(
-      'FullCalendar',
-      'HomeAdmin',
-      'createBooking',
-      data,
-      'receive'
-    );
-    const bookingData: Partial<BookingFormData> = {
-      checkout_date: data.start,
-      checkin_date: data.end,
-      property_id: data.propertyId,
-      booking_type: 'standard',
-      status: 'pending'
-    };
-    uiStore.openModal('event', 'create', {
-      booking: bookingData
-    });
-  } catch (error) {
-    console.error('Error creating booking from calendar:', error);
-  }
-};
+const calendarOptions = computed<CalendarOptions>(() => ({
+  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+  initialView: 'dayGridMonth',
+  headerToolbar: false,
+  events: calendarEvents.value,
+  eventDisplay: 'block',
+  eventOverlap: false,
+  eventResizableFromStart: true,
+  selectable: true,
+  selectMirror: true,
+  editable: true,
+  droppable: true,
+  locale: 'en',
+  timeZone: 'local',
+  slotMinTime: '06:00:00',
+  slotMaxTime: '22:00:00',
+  slotDuration: '01:00:00',
+  snapDuration: '00:30:00',
+  height: 'auto',
+  aspectRatio: 1.8,
+  eventBackgroundColor: theme.global.current.value.colors.primary,
+  eventBorderColor: theme.global.current.value.colors.primary,
+  eventTextColor: '#FFFFFF',
+  themeSystem: 'standard',
+  select: handleDateSelect,
+  eventClick: handleEventClick,
+  eventDrop: handleEventDrop,
+  eventResize: handleEventResize,
+  loading: handleLoading,
+  eventContent: renderEventContent,
+  dayCellContent: renderDayCell,
+  businessHours: {
+    daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
+    startTime: '08:00',
+    endTime: '18:00'
+  },
+  weekends: true,
+  dayMaxEvents: 3,
+  moreLinkClick: 'popover',
+  allDaySlot: false,
+  nowIndicator: true,
+  scrollTime: '08:00:00'
+}));
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  try {
-    const data = {
-      start: selectInfo.startStr,
-      end: selectInfo.endStr
-    };
-    handleCreateBookingFromCalendar(data);
-  } catch (error) {
-    console.error('Error handling date select:', error);
-  }
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'dateSelect',
+    { start: selectInfo.startStr, end: selectInfo.endStr },
+    'emit'
+  );
+  emit('dateSelect', selectInfo);
+  emit('createBooking', {
+    start: selectInfo.startStr,
+    end: selectInfo.endStr
+  });
+  selectInfo.view.calendar.unselect();
 };
 const handleEventClick = (clickInfo: EventClickArg): void => {
-  try {
-    const bookingId = clickInfo.event.id;
-    const booking = allBookingsMap.value.get(bookingId);
-    if (booking) {
-      uiStore.openModal('event', 'edit', {
-        booking: booking
-      });
-    }
-  } catch (error) {
-    console.error('Error handling event click:', error);
-  }
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'eventClick',
+    { id: clickInfo.event.id },
+    'emit'
+  );
+  emit('eventClick', clickInfo);
 };
 const handleEventDrop = (dropInfo: EventDropArg): void => {
-  try {
-    const bookingId = dropInfo.event.id;
-    const booking = allBookingsMap.value.get(bookingId);
-    if (booking) {
-      const updatedBooking: Partial<BookingFormData> = {
-        ...booking,
-        checkout_date: dropInfo.event.startStr,
-        checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-      };
-      updateBooking(bookingId, updatedBooking);
-    }
-  } catch (error) {
-    console.error('Error handling event drop:', error);
-    dropInfo.revert();
-  }
+  const booking = dropInfo.event.extendedProps.booking as Booking;
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'eventDrop',
+    {
+      id: booking.id,
+      start: dropInfo.event.startStr,
+      end: dropInfo.event.endStr || dropInfo.event.startStr
+    },
+    'emit'
+  );
+  emit('eventDrop', dropInfo);
+  emit('updateBooking', {
+    id: booking.id,
+    start: dropInfo.event.startStr,
+    end: dropInfo.event.endStr || dropInfo.event.startStr
+  });
 };
 const handleEventResize = (resizeInfo: any): void => {
-  try {
-    const bookingId = resizeInfo.event.id;
-    const booking = allBookingsMap.value.get(bookingId);
-    if (booking) {
-      const updatedBooking: Partial<BookingFormData> = {
-        ...booking,
-        checkout_date: resizeInfo.event.startStr,
-        checkin_date: resizeInfo.event.endStr || resizeInfo.event.startStr
-      };
-      updateBooking(bookingId, updatedBooking);
-    }
-  } catch (error) {
-    console.error('Error handling event resize:', error);
-    resizeInfo.revert();
-  }
+  const booking = (resizeInfo as { event: { extendedProps: { booking: Booking }; startStr: string; endStr: string } }).event.extendedProps.booking;
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'eventResize',
+    {
+      id: booking.id,
+      start: resizeInfo.event.startStr,
+      end: resizeInfo.event.endStr
+    },
+    'emit'
+  );
+  emit('updateBooking', {
+    id: booking.id,
+    start: resizeInfo.event.startStr,
+    end: resizeInfo.event.endStr
+  });
 };
-const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
-  try {
-    const booking = allBookingsMap.value.get(data.id);
-    if (booking) {
-      const bookingData: Partial<BookingFormData> = {
-        ...booking,
-        checkout_date: data.start,
-        checkin_date: data.end
-      };
-      updateBooking(data.id, bookingData);
-    }
-  } catch (error) {
-    console.error('Error updating booking:', error);
-  }
+const renderEventContent = (eventInfo: any) => {
+  const booking = eventInfo.event.extendedProps.booking as Booking;
+  const property = eventInfo.event.extendedProps.property as Property;
+  const isTurn = booking.booking_type === 'turn';
+  return {
+    html: `
+      <div class="fc-event-content-wrapper">
+        <div class="fc-event-title">
+          ${isTurn ? '🔥 ' : ''}${property?.name || 'Property'}
+        </div>
+        <div class="fc-event-subtitle">
+          ${booking.status.toUpperCase()}
+          ${booking.guest_count ? ` • ${booking.guest_count} guests` : ''}
+        </div>
+      </div>
+    `
+  };
 };
-const handleCalendarViewChange = (view: CalendarView): void => {
-  try {
-    let fullCalendarView: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
-    switch (view) {
-      case 'month':
-        fullCalendarView = 'dayGridMonth';
-        break;
-      case 'week':
-        fullCalendarView = 'timeGridWeek';
-        break;
-      case 'day':
-        fullCalendarView = 'timeGridDay';
-        break;
-      default:
-        fullCalendarView = 'timeGridWeek';
-    }
-    setCalendarView(fullCalendarView);
-  } catch (error) {
-    console.error('Error changing calendar view:', error);
-  }
-};
-const handleCalendarDateChange = (date: Date): void => {
-  try {
-    goToDate(date);
-  } catch (error) {
-    console.error('Error changing calendar date:', error);
-  }
-};
-const handlePrevious = (): void => {
-  try {
-    prev();
-  } catch (error) {
-    console.error('Error going to previous:', error);
-  }
-};
-const handleNext = (): void => {
-  try {
-    next();
-  } catch (error) {
-    console.error('Error going to next:', error);
-  }
-};
-const handleGoToday = (): void => {
-  try {
-    goToToday();
-  } catch (error) {
-    console.error('Error going to today:', error);
-  }
-};
-const handleEventModalClose = (): void => {
-  try {
-    uiStore.closeModal('event');
-  } catch (error) {
-    console.error('Error closing event modal:', error);
-  }
-};
-const handleEventModalSave = async (bookingData: BookingFormData): Promise<void> => {
-  try {
-    if (eventModalMode.value === 'create') {
-      await createBooking(bookingData);
-    } else if (eventModalMode.value === 'edit') {
-      const modalData = uiStore.getModalData('event') as any;
-      const bookingId = modalData?.booking?.id;
-      if (bookingId) {
-        await updateBooking(bookingId, bookingData);
-      }
-    }
-    uiStore.closeModal('event');
-  } catch (error) {
-    console.error('Error saving booking:', error);
-  }
-};
-const handleEventModalDelete = (bookingId: string): void => {
-  try {
-    uiStore.openConfirmDialog('confirm', {
-      title: 'Delete Booking',
-      message: 'Are you sure you want to delete this booking? This action cannot be undone and will affect the property owner.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      dangerous: true,
-      data: {
-        onConfirm: () => {
-          deleteBooking(bookingId);
-          uiStore.closeModal('event');
-          uiStore.closeConfirmDialog('confirm');
-        }
-      }
+// Custom day cell rendering
+const renderDayCell = (dayInfo: any) => {
+  const dayBookings = Array.from(props.bookings.values())
+    .filter(booking => {
+      const checkoutDate = new Date(booking.checkout_date).toDateString();
+      const dayDate = dayInfo.date.toDateString();
+      return checkoutDate === dayDate;
     });
-  } catch (error) {
-    console.error('Error deleting booking:', error);
+  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
+  return {
+    html: `
+      <div class="fc-daygrid-day-number">
+        ${dayInfo.dayNumberText}
+        ${turnCount > 0 ? `<span class="turn-indicator">${turnCount}</span>` : ''}
+      </div>
+    `
+  };
+};
+const goToDate = (date: string | Date): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().gotoDate(date);
   }
 };
-const handlePropertyModalClose = (): void => {
-  try {
-    uiStore.closeModal('property');
-  } catch (error) {
-    console.error('Error closing property modal:', error);
+const changeView = (viewName: string): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().changeView(viewName);
   }
 };
-const handlePropertyModalSave = async (propertyData: PropertyFormData): Promise<void> => {
-  try {
-    if (propertyModalMode.value === 'create') {
-      await createProperty(propertyData);
-    } else if (propertyModalMode.value === 'edit') {
-      const modalData = uiStore.getModalData('property') as any;
-      const propertyId = modalData?.property?.id;
-      if (propertyId) {
-        await updateProperty(propertyId, propertyData);
-      }
-    }
-    uiStore.closeModal('property');
-  } catch (error) {
-    console.error('Error saving property:', error);
+const refreshEvents = (): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().refetchEvents();
   }
 };
-const handlePropertyModalDelete = (propertyId: string): void => {
-  try {
-    const property = allPropertiesMap.value.get(propertyId);
-    const relatedBookings = Array.from(allBookingsMap.value.values())
-      .filter(booking => booking.property_id === propertyId);
-    uiStore.openConfirmDialog('confirm', {
-      title: 'Delete Property',
-      message: `Are you sure you want to delete "${property?.name}"? This will affect ${relatedBookings.length} bookings and impact the property owner's business.`,
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      dangerous: true,
-      data: {
-        onConfirm: () => {
-          deleteProperty(propertyId);
-          uiStore.closeModal('property');
-          uiStore.closeConfirmDialog('confirm');
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error deleting property:', error);
-  }
-};
-const handleConfirmDialogConfirm = (): void => {
-  try {
-    const confirmData = uiStore.getConfirmDialogState('confirm');
-    const onConfirm = confirmData?.data?.onConfirm;
-    if (onConfirm && typeof onConfirm === 'function') {
-      onConfirm();
-    }
-  } catch (error) {
-    console.error('Error handling confirm dialog confirm:', error);
-  }
-};
-const handleConfirmDialogCancel = (): void => {
-  try {
-    const confirmData = uiStore.getConfirmDialogState('confirm');
-    const onCancel = confirmData?.data?.onCancel;
-    if (onCancel && typeof onCancel === 'function') {
-      onCancel();
-    }
-    uiStore.closeConfirmDialog('confirm');
-  } catch (error) {
-    console.error('Error handling confirm dialog cancel:', error);
-  }
-};
-const handleConfirmDialogClose = (): void => {
-  try {
-    uiStore.closeConfirmDialog('confirm');
-  } catch (error) {
-    console.error('Error closing confirm dialog:', error);
-  }
-};
-const toggleSidebar = (): void => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
-onMounted(async () => {
-  try {
-    await Promise.all([
-      fetchAllBookings(),
-      fetchAllProperties()
-    ]);
-    watch(xs, (newVal) => {
-      sidebarOpen.value = !newVal;
-    }, { immediate: true });
-  } catch (error) {
-    console.error('Error initializing HomeAdmin:', error);
-  }
+watch(() => theme.global.current.value.dark, () => {
+  refreshEvents();
 });
-onUnmounted(() => {
+watch(() => props.bookings, (newBookings) => {
+  eventLogger.logEvent(
+    'Home',
+    'FullCalendar',
+    'bookingsUpdate',
+    { count: newBookings.size },
+    'receive'
+  );
+}, { deep: true });
+const handleLoading = (isLoading: boolean): void => {
+  console.log('Calendar loading state:', isLoading);
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'loadingState',
+    { isLoading },
+    'emit'
+  );
+};
+defineExpose({
+  goToDate,
+  changeView,
+  refreshEvents,
+  getApi: () => calendarRef.value?.getApi()
 });
 </script>
 <style scoped>
-.home-admin-container {
-  min-height: calc(100vh - 64px);
-  overflow: hidden;
+.calendar-container {
+  height: 100%;
+  width: 100%;
 }
-.sidebar-column {
-  min-height: calc(100vh - 64px);
-  overflow-y: auto;
-  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  background-color: rgb(var(--v-theme-surface));
+.custom-calendar {
+  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
+  --fc-button-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-border-color: rgb(var(--v-theme-primary));
+  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
+  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
 }
-.calendar-column {
-  min-height: calc(100vh - 64px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+.fc-event.booking-turn {
+  font-weight: bold;
+  border-width: 2px !important;
+  animation: pulse 2s infinite;
 }
-.calendar-header {
-  padding: 16px;
-  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  background-color: rgb(var(--v-theme-surface));
-  flex-shrink: 0;
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
 }
-.mobile-hidden {
-  display: none;
+.fc-event.status-pending {
+  opacity: 0.8;
 }
-.home-admin-container .calendar-header {
-  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
-  color: rgb(var(--v-theme-on-primary));
+.fc-event.status-completed {
+  opacity: 0.6;
+  text-decoration: line-through;
 }
-.home-admin-container .calendar-header .v-btn {
-  color: rgb(var(--v-theme-on-primary));
+.turn-indicator {
+  background: rgb(var(--v-theme-error));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 10px;
+  margin-left: 4px;
+  font-weight: bold;
 }
-.home-admin-container .calendar-header .text-h6 {
-  color: rgb(var(--v-theme-on-primary));
-  font-weight: 600;
+.fc-event-content-wrapper {
+  padding: 2px;
 }
-.home-admin-container .text-caption {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 500;
-}
-@media (max-width: 1024px) {
-  .sidebar-column {
-    position: fixed;
-    top: 64px;
-    left: 0;
-    z-index: 1000;
-    width: 100% !important;
-    max-width: 400px;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-    height: calc(100vh - 64px);
-  }
-  .mobile-hidden {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-  .sidebar-column:not(.mobile-hidden) {
-    transform: translateX(0);
-  }
-}
-@media (max-width: 600px) {
-  .calendar-header {
-    padding: 8px;
-  }
-  .calendar-header .d-flex {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .calendar-header .v-btn-toggle {
-    margin-left: 0 !important;
-    margin-top: 8px;
-  }
-}
-.home-admin-container {
-  --admin-primary: rgb(var(--v-theme-primary));
-  --admin-secondary: rgb(var(--v-theme-secondary));
-  --admin-warning: rgb(var(--v-theme-warning));
-  --admin-info: rgb(var(--v-theme-info));
+.fc-event-subtitle {
+  font-size: 0.75em;
+  opacity: 0.9;
+  margin-top: 1px;
 }
 </style>
 ````
@@ -27238,8 +27754,8 @@ onUnmounted(() => {
 <template>
   <v-navigation-drawer
     class="owner-sidebar"
-    width="100%"
-    :elevation="80"
+    permanent
+    :elevation="0"
     color="tertiary"
   >
     <v-container class="py-2">
@@ -27690,523 +28206,226 @@ onMounted(() => {
 </style>
 ````
 
-## File: src/layouts/admin.vue
-````vue
-<template>
-  <v-app>
-    <v-app-bar
-      app
-      color="surface"
-      elevation="2"
-      class="admin-app-bar"
-    >
-      <div class="d-flex align-center">
-        <v-avatar
-          color="primary"
-          size="36"
-          class="mr-3"
-        >
-          <v-icon color="white">mdi-shield-crown</v-icon>
-        </v-avatar>
-        <div>
-          <div class="text-h6 font-weight-bold">
-            Property Scheduler
-          </div>
-          <div class="admin-badge">
-            Admin Dashboard
-          </div>
-        </div>
-      </div>
-      <v-spacer />
-      <div class="d-flex align-center mr-4">
-        <v-btn
-          to="/admin"
-          variant="text"
-          prepend-icon="mdi-view-dashboard"
-          class="mr-2"
-        >
-          Dashboard
-        </v-btn>
-        <v-btn
-          to="/admin/schedule"
-          variant="text"
-          prepend-icon="mdi-calendar-clock"
-          class="mr-2"
-        >
-          Schedule
-        </v-btn>
-        <v-btn
-          to="/admin/cleaners"
-          variant="text"
-          prepend-icon="mdi-account-hard-hat"
-          class="mr-2"
-        >
-          Cleaners
-        </v-btn>
-        <v-btn
-          to="/admin/properties"
-          variant="text"
-          prepend-icon="mdi-home-group"
-          class="mr-2"
-        >
-          Properties
-        </v-btn>
-        <v-btn
-          to="/admin/reports"
-          variant="text"
-          prepend-icon="mdi-chart-line"
-          class="mr-4"
-        >
-          Reports
-        </v-btn>
-      </div>
-      <v-menu
-        location="bottom end"
-        offset="5"
-      >
-        <template #activator="{ props: menuProps }">
-          <v-btn
-            icon
-            v-bind="menuProps"
-          >
-            <v-avatar size="36">
-              <v-icon>mdi-account-circle</v-icon>
-            </v-avatar>
-          </v-btn>
-        </template>
-        <v-list min-width="200">
-          <v-list-subheader>Admin Options</v-list-subheader>
-          <v-list-item
-            prepend-icon="mdi-account-outline"
-            title="Profile"
-          />
-          <v-list-item
-            prepend-icon="mdi-cog-outline"
-            title="System Settings"
-          />
-          <v-list-item
-            to="/"
-            prepend-icon="mdi-home"
-            title="Owner View"
-          />
-          <v-divider class="my-2" />
-          <v-list-item
-            prepend-icon="mdi-logout"
-            title="Logout"
-            color="error"
-            @click="logout"
-          />
-        </v-list>
-      </v-menu>
-    </v-app-bar>
-    <v-main class="admin-main">
-      <router-view />
-    </v-main>
-  </v-app>
-</template>
-⋮----
-<template #activator="{ props: menuProps }">
-          <v-btn
-            icon
-            v-bind="menuProps"
-          >
-            <v-avatar size="36">
-              <v-icon>mdi-account-circle</v-icon>
-            </v-avatar>
-          </v-btn>
-        </template>
-⋮----
-<script setup lang="ts">
-import { useAuth } from '@/composables/shared/useAuth'
-import { useRouter } from 'vue-router'
-const { logout: authLogout } = useAuth()
-const router = useRouter()
-const logout = async () => {
-  await authLogout()
-  router.push('/auth/login')
-}
-</script>
-<style scoped>
-.admin-app-bar {
-  border-bottom: 2px solid rgb(var(--v-theme-primary)) !important;
-}
-.admin-badge {
-  font-size: 0.75rem;
-  color: rgb(var(--v-theme-primary));
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.admin-main {
-  background: rgb(var(--v-theme-background)) !important;
-}
-.v-btn--variant-text {
-  color: rgb(var(--v-theme-on-surface)) !important;
-}
-.v-btn--variant-text:hover {
-  background: rgba(var(--v-theme-primary), 0.08) !important;
-}
-.v-btn--variant-text.router-link-active {
-  background: rgba(var(--v-theme-primary), 0.12) !important;
-  color: rgb(var(--v-theme-primary)) !important;
-}
-.v-list-item:hover {
-  background: rgba(var(--v-theme-primary), 0.08) !important;
-}
-.v-list-item--active {
-  background: rgba(var(--v-theme-primary), 0.12) !important;
-  color: rgb(var(--v-theme-primary)) !important;
-}
-</style>
-````
-
-## File: src/pages/auth/login.vue
-````vue
-<template>
-  <v-container class="fill-height">
-    <v-row justify="center" align="center">
-      <v-col cols="12" sm="8" md="6" lg="4" xl="3">
-        <v-card elevation="8" class="pa-6">
-          <v-card-title class="text-h4 text-center mb-2">
-            <v-icon class="mr-3" color="primary" size="large">
-              mdi-login
-            </v-icon>
-            Welcome Back
-          </v-card-title>
-          <v-card-subtitle class="text-center mb-6">
-            Sign in to Property Cleaning Scheduler
-          </v-card-subtitle>
-          <v-alert
-            v-if="authStore.error"
-            type="error"
-            variant="tonal"
-            class="mb-4"
-            closable
-            @click:close="authStore.clearError"
-          >
-            {{ authStore.error }}
-          </v-alert>
-          <v-alert
-            v-if="successMessage"
-            type="success"
-            variant="tonal"
-            class="mb-4"
-            closable
-            @click:close="successMessage = ''"
-          >
-            {{ successMessage }}
-          </v-alert>
-          <v-alert
-            type="info"
-            variant="tonal"
-            class="mb-4"
-          >
-            <div class="text-body-2">
-              <strong>Development Mode:</strong><br>
-              Use the demo accounts below or enter any email/password.
-            </div>
-          </v-alert>
-          <v-form @submit.prevent="handleLogin" ref="loginForm">
-            <v-text-field
-              v-model="email"
-              label="Email"
-              type="email"
-              prepend-inner-icon="mdi-email"
-              variant="outlined"
-              :rules="emailRules"
-              :disabled="authStore.loading"
-              class="mb-3"
-              required
-            />
-            <v-text-field
-              v-model="password"
-              label="Password"
-              :type="showPassword ? 'text' : 'password'"
-              prepend-inner-icon="mdi-lock"
-              :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append-inner="showPassword = !showPassword"
-              variant="outlined"
-              :rules="passwordRules"
-              :disabled="authStore.loading"
-              class="mb-4"
-              required
-            />
-            <v-btn
-              type="submit"
-              color="primary"
-              size="large"
-              block
-              :loading="authStore.loading"
-              class="mb-4"
-            >
-              <v-icon class="mr-2">mdi-login</v-icon>
-              Sign In
-            </v-btn>
-          </v-form>
-          <v-divider class="my-4" />
-          <div class="text-center mb-3">
-            <v-chip color="info" variant="tonal" size="small">
-              Demo Accounts
-            </v-chip>
-          </div>
-          <v-row class="mb-4">
-            <v-col cols="6">
-              <v-btn
-                color="secondary"
-                variant="outlined"
-                size="small"
-                block
-                @click="loginAsOwner"
-                :loading="authStore.loading"
-              >
-                <v-icon class="mr-1" size="small">mdi-home-account</v-icon>
-                Owner Demo
-              </v-btn>
-            </v-col>
-            <v-col cols="6">
-              <v-btn
-                color="secondary"
-                variant="outlined"
-                size="small"
-                block
-                @click="loginAsAdmin"
-                :loading="authStore.loading"
-              >
-                <v-icon class="mr-1" size="small">mdi-shield-account</v-icon>
-                Admin Demo
-              </v-btn>
-            </v-col>
-          </v-row>
-          <v-divider class="my-4" />
-          <div class="text-center">
-            <p class="text-body-2 mb-2">
-              Don't have an account?
-            </p>
-            <v-btn
-              color="primary"
-              variant="text"
-              @click="goToRegister"
-              :disabled="authStore.loading"
-            >
-              Create Account
-            </v-btn>
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-⋮----
-{{ authStore.error }}
-⋮----
-{{ successMessage }}
-⋮----
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { getDefaultRouteForRole } from '@/utils/authHelpers'
-const router = useRouter()
-const authStore = useAuthStore()
-const email = ref('')
-const password = ref('')
-const showPassword = ref(false)
-const successMessage = ref('')
-const loginForm = ref()
-// Validation rules
-const emailRules = [
-  (v: string) => !!v || 'Email is required',
-  (v: string) => /.+@.+\..+/.test(v) || 'Email must be valid'
-]
-const passwordRules = [
-  (v: string) => !!v || 'Password is required',
-  (v: string) => v.length >= 3 || 'Password must be at least 3 characters (demo mode)'
-]
-async function handleLogin() {
-  const { valid } = await loginForm.value.validate()
-  if (!valid) return
-  try {
-    const success = await authStore.login(email.value, password.value)
-    if (success) {
-      successMessage.value = authStore.getSuccessMessage('login')
-      const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
-      setTimeout(async () => {
-        await router.push(defaultRoute)
-      }, 1000)
-    }
-  } catch (error) {
-    console.error('Login error:', error)
-  }
-}
-async function loginAsOwner() {
-  email.value = 'owner@example.com'
-  password.value = 'password'
-  await handleLogin()
-}
-async function loginAsAdmin() {
-  email.value = 'admin@example.com'
-  password.value = 'password'
-  await handleLogin()
-}
-function goToRegister() {
-  router.push('/auth/signup')
-}
-authStore.clearError()
-</script>
-<style scoped>
-.fill-height {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-.v-card {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95);
-}
-.v-btn {
-  text-transform: none;
-}
-.v-alert {
-  transition: all 0.3s ease;
-}
-.v-btn--variant-outlined {
-  border-width: 1px;
-}
-.v-text-field {
-  transition: all 0.2s ease;
-}
-.v-text-field:focus-within {
-  transform: translateY(-1px);
-}
-</style>
-````
-
-## File: src/pages/calendar/index.vue
-````vue
-<template>
-  <div class="calendar-page">
-    <v-row>
-      <v-col cols="12">
-        <h1 class="text-h4 mb-4">
-          Booking Calendar
-        </h1>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <FullCalendar
-          :bookings="bookingStore.bookings"
-          :properties="propertyStore.properties"
-          :loading="bookingStore.loading || propertyStore.loading"
-          @date-select="handleDateSelect"
-          @event-click="handleEventClick"
-          @event-drop="handleEventDrop"
-          @create-booking="handleCreateBooking"
-          @update-booking="handleUpdateBooking"
-        />
-      </v-col>
-    </v-row>
-  </div>
-</template>
-<script setup lang="ts">
-import { onMounted } from 'vue';
-import FullCalendar from '@/components/smart/FullCalendar.vue';
-import { useBookingStore } from '@/stores/booking';
-import { usePropertyStore } from '@/stores/property';
-import { useUIStore } from '@/stores/ui';
-import { useBookings } from '@/composables/shared/useBookings';
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-const bookingStore = useBookingStore();
-const propertyStore = usePropertyStore();
-const uiStore = useUIStore();
-const { updateBooking } = useBookings();
-const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  uiStore.openModal('eventModal', 'create', {
-    checkout_date: selectInfo.startStr,
-    checkin_date: selectInfo.endStr
-  });
-};
-const handleEventClick = (clickInfo: EventClickArg): void => {
-  const booking = clickInfo.event.extendedProps.booking;
-  uiStore.openModal('eventModal', 'edit', booking);
-};
-const handleEventDrop = (dropInfo: EventDropArg): void => {
-  const booking = dropInfo.event.extendedProps.booking;
-  updateBooking(booking.id, {
-    checkout_date: dropInfo.event.startStr,
-    checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-  });
-};
-const handleCreateBooking = (): void => {
-};
-const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
-  updateBooking(data.id, {
-    checkout_date: data.start,
-    checkin_date: data.end
-  });
-};
-onMounted(async () => {
-  await Promise.all([
-    bookingStore.fetchBookings(),
-    propertyStore.fetchProperties()
-  ]);
-});
-</script>
-<style scoped>
-.calendar-page {
-  padding: 1rem;
-  height: calc(100vh - 64px);
-}
-</style>
-````
-
-## File: src/plugins/vuetify.ts
+## File: src/stores/auth.ts
 ````typescript
-import { createVuetify } from 'vuetify';
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import type { User, UserRole, PropertyOwner, Admin, Cleaner } from '@/types';
+import { useAuth } from '@/composables/shared/useAuth';
+import {
+  getDefaultRouteForRole,
+  getRoleSpecificSuccessMessage,
+  clearAllRoleSpecificState
+} from '@/utils/authHelpers';
 ⋮----
-import { aliases, mdi } from 'vuetify/iconsets/mdi';
-import type { ThemeDefinition } from 'vuetify';
+async function login(email: string, password: string): Promise<boolean>
+async function logout(): Promise<boolean>
+async function register(userData: {
+    email: string;
+    password: string;
+    name: string;
+    role: UserRole;
+    company_name?: string;
+}): Promise<boolean>
+function switchToOwnerView(ownerId?: string): boolean
+function switchToAdminView(): boolean
+async function checkAuth(): Promise<boolean>
+function clearError()
+function getSuccessMessage(action: 'login' | 'logout' | 'register'): string
+function getUserFromEmail(email: string): User | null
+function createUserFromRegistration(userData: {
+    email: string;
+    password: string;
+    name: string;
+    role: UserRole;
+    company_name?: string;
+}): User
 ````
 
-## File: src/types/property.ts
+## File: src/types/ui.ts
 ````typescript
-export type PricingTier = 'basic' | 'standard' | 'premium' | 'luxury';
-export interface Property {
+export type ModalData = Record<string, unknown> | null | undefined;
+export type FilterValue = string | number | boolean | Date | string[] | null | undefined;
+export interface ModalState {
+  open: boolean;
+  mode: 'create' | 'edit' | 'view' | 'delete';
+  data?: ModalData;
+}
+export interface ConfirmDialogState {
+  open: boolean;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  confirmColor?: string;
+  dangerous?: boolean;
+  data?: ModalData;
+}
+export type NotificationType = 'success' | 'info' | 'warning' | 'error';
+export interface Notification {
   id: string;
-  owner_id: string;
-  name: string;
-  address: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  square_feet?: number;
-  property_type?: 'apartment' | 'house' | 'condo' | 'townhouse';
-  cleaning_duration: number;
-  special_instructions?: string;
-  pricing_tier: PricingTier;
-  active: boolean;
-  created_at?: string;
-  updated_at?: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  autoClose?: boolean;
+  duration?: number;
 }
-export interface PropertyWithMetrics extends Property {
-  metrics: {
-    utilizationRate: number;
-    averageGapBetweenBookings: number;
-    turnPercentage: number;
-    revenueProjection: number;
-    cleaningLoad: 'light' | 'moderate' | 'heavy';
+export type CalendarView = 'month' | 'week' | 'day' | 'list';
+export interface FilterState {
+  propertyId?: string;
+  bookingType?: 'all' | 'standard' | 'turn';
+  status?: 'all' | 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  dateRange?: {
+    start: string;
+    end: string;
+  };
+  searchTerm?: string;
+}
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  allDay: boolean;
+  classNames: string[];
+  backgroundColor?: string;
+  borderColor?: string;
+  textColor?: string;
+  extendedProps: {
+    booking: Record<string, unknown>;
+    type: 'standard' | 'turn';
+    status: string;
   };
 }
-export type PropertyFormData = Omit<Property, 'id' | 'created_at' | 'updated_at'>;
-export type PropertyMap = Map<string, Property>;
-export function isProperty(obj: unknown): obj is Property
-````
-
-## File: vite.config.ts
-````typescript
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vuetify from 'vite-plugin-vuetify'
-import path from 'path'
-import vueDevTools from 'vite-plugin-vue-devtools'
+export type UserRole = 'owner' | 'admin' | 'cleaner';
+export type ErrorCategory =
+  | 'validation'
+  | 'network'
+  | 'business_logic'
+  | 'authentication'
+  | 'permission'
+  | 'system';
+export type BusinessImpact = 'low' | 'medium' | 'high' | 'critical';
+export interface ErrorContext {
+  userId?: string;
+  userRole?: UserRole;
+  operation?: string;
+  component?: string;
+  timestamp: string;
+  sessionId?: string;
+  requestId?: string;
+}
+export interface ErrorHandlingOptions {
+  showToUser?: boolean;
+  autoRetry?: boolean;
+  maxRetries?: number;
+  retryDelay?: number;
+  logToConsole?: boolean;
+  reportToService?: boolean;
+  escalate?: boolean;
+}
+export interface ErrorInfo {
+  code?: string;
+  category: ErrorCategory;
+  message: string;
+  userMessage?: string;
+  technicalDetails?: string;
+  businessImpact?: BusinessImpact;
+  affectedResources?: string[];
+  suggestedActions?: string[];
+  context: ErrorContext;
+  options: ErrorHandlingOptions;
+}
+export interface ErrorRecoveryAction {
+  label: string;
+  action: () => void | Promise<void>;
+  primary?: boolean;
+  dangerous?: boolean;
+}
+export type LoadingType = 'global' | 'page' | 'component' | 'action';
+export interface LoadingOperation {
+  id: string;
+  type: LoadingType;
+  message?: string;
+  progress?: number;
+  cancellable?: boolean;
+  startTime: number;
+  timeout?: number;
+  role?: UserRole;
+}
+export interface LoadingStateOptions {
+  timeout?: number;
+  showProgress?: boolean;
+  overlay?: boolean;
+  role?: UserRole;
+  message?: string;
+  cancellable?: boolean;
+  onCancel?: () => void;
+}
+export interface LoadingState {
+  loading: boolean;
+  progress?: number;
+  message?: string;
+  cancellable?: boolean;
+  error?: ErrorInfo | null;
+}
+export interface NotificationAction {
+  label: string;
+  action: string;
+  color?: string;
+  icon?: string;
+}
+export interface RoleBasedNotification extends Notification {
+  userRole?: UserRole;
+  businessImpact?: BusinessImpact;
+  category?: ErrorCategory;
+  actions?: NotificationAction[];
+  escalationLevel?: number;
+}
+export interface NotificationQueueConfig {
+  maxSize: number;
+  defaultDuration: number;
+  roleBasedStyling: boolean;
+  groupSimilar: boolean;
+}
+export interface ValidationError {
+  field: string;
+  message: string;
+  code?: string;
+  value?: any;
+}
+export interface FormValidationState {
+  valid: boolean;
+  errors: ValidationError[];
+  warnings: ValidationError[];
+  touched: Set<string>;
+  dirty: Set<string>;
+}
+export interface ApiError {
+  status?: number;
+  statusText?: string;
+  code?: string;
+  message: string;
+  details?: any;
+  endpoint?: string;
+  method?: string;
+  timestamp: string;
+}
+export interface RetryConfig {
+  maxAttempts: number;
+  baseDelay: number;
+  maxDelay: number;
+  exponentialBackoff: boolean;
+  retryCondition?: (error: any) => boolean;
+}
+export interface AccessibilityOptions {
+  announceToScreenReader?: boolean;
+  focusManagement?: boolean;
+  highContrast?: boolean;
+  reducedMotion?: boolean;
+}
 ````
 
 ## File: src/components/smart/admin/AdminSidebar.vue
@@ -28214,8 +28433,8 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 <template>
   <v-navigation-drawer
     class="admin-sidebar"
-    width="100%"
-    :elevation="80"
+    permanent
+    :elevation="8"
     color="tertiary"
   >
     <v-container class="py-2">
@@ -29093,6 +29312,7 @@ onMounted(() => {
 .admin-sidebar {
   height: 100%;
   overflow-y: auto;
+  width: 100% !important;
 }
 .system-turn-alerts {
   border-left: 4px solid rgb(var(--v-theme-warning));
@@ -29126,17 +29346,11 @@ onMounted(() => {
   font-size: 0.75rem;
 }
 @media (min-width: 1264px) {
-  .admin-sidebar {
-    width: 100% !important;
-  }
   .business-analytics .v-col {
     padding: 4px 8px;
   }
 }
 @media (max-width: 960px) {
-  .admin-sidebar {
-    width: 100% !important;
-  }
   .admin-quick-actions .v-btn {
     font-size: 0.875rem;
   }
@@ -29144,1111 +29358,881 @@ onMounted(() => {
 </style>
 ````
 
-## File: src/stores/auth.ts
-````typescript
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { User, UserRole, PropertyOwner, Admin, Cleaner } from '@/types';
-import { useAuth } from '@/composables/shared/useAuth';
-import {
-  getDefaultRouteForRole,
-  getRoleSpecificSuccessMessage,
-  clearAllRoleSpecificState
-} from '@/utils/authHelpers';
-⋮----
-async function login(email: string, password: string): Promise<boolean>
-async function logout(): Promise<boolean>
-async function register(userData: {
-    email: string;
-    password: string;
-    name: string;
-    role: UserRole;
-    company_name?: string;
-}): Promise<boolean>
-function switchToOwnerView(ownerId?: string): boolean
-function switchToAdminView(): boolean
-async function checkAuth(): Promise<boolean>
-function clearError()
-function getSuccessMessage(action: 'login' | 'logout' | 'register'): string
-function getUserFromEmail(email: string): User | null
-function createUserFromRegistration(userData: {
-    email: string;
-    password: string;
-    name: string;
-    role: UserRole;
-    company_name?: string;
-}): User
-````
-
-## File: src/App.vue
+## File: src/components/smart/admin/HomeAdmin.vue
 ````vue
 <template>
-  <component :is="layout">
-    <router-view />
-  </component>
-</template>
-<script setup lang="ts">
-import { computed, markRaw } from 'vue'
-import { useRoute } from 'vue-router'
-import DefaultLayout from '@/layouts/default.vue'
-import AuthLayout from '@/layouts/auth.vue'
-import AdminLayout from '@/layouts/admin.vue'
-const layouts = {
-  default: markRaw(DefaultLayout),
-  auth: markRaw(AuthLayout),
-  admin: markRaw(AdminLayout),
-}
-const route = useRoute()
-const layout = computed(() => {
-  const layoutName = route.meta.layout as string || 'default'
-  return layouts[layoutName as keyof typeof layouts] || layouts.default
-})
-</script>
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: 'Roboto', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease;
-}
-#app {
-  height: 100vh;
-  width: 100%;
-}
-.v-application {
-  font-family: 'Roboto', sans-serif !important;
-}
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: rgb(var(--v-theme-surface-variant));
-  border-radius: 8px;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(var(--v-theme-on-surface-variant), 0.5);
-  border-radius: 8px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--v-theme-primary));
-}
-.page-transition-enter-active,
-.page-transition-leave-active {
-  transition: opacity 0.3s ease;
-}
-.page-transition-enter-from,
-.page-transition-leave-to {
-  opacity: 0;
-}
-.urgent-priority {
-  border-left: 6px solid rgb(var(--v-theme-error)) !important;
-  background: linear-gradient(90deg, rgba(var(--v-theme-error), 0.1) 0%, transparent 100%) !important;
-  position: relative;
-  box-shadow: 0 0 0 1px rgba(var(--v-theme-error), 0.2), 0 4px 12px rgba(var(--v-theme-error), 0.15) !important;
-  animation: urgentPulse 2s ease-in-out infinite;
-}
-.urgent-priority::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(var(--v-theme-error), 0.05) 25%, transparent 25%, transparent 50%, rgba(var(--v-theme-error), 0.05) 50%, rgba(var(--v-theme-error), 0.05) 75%, transparent 75%);
-  background-size: 20px 20px;
-  animation: urgentStripes 2s linear infinite;
-  pointer-events: none;
-  border-radius: inherit;
-}
-.urgent-priority:hover {
-  animation: urgentGlow 1s ease-in-out infinite alternate, shake 0.5s ease-in-out;
-  transform-origin: center center;
-}
-.high-priority {
-  border-left: 4px solid rgb(var(--v-theme-warning)) !important;
-  background: linear-gradient(90deg, rgba(var(--v-theme-warning), 0.08) 0%, transparent 100%) !important;
-  box-shadow: 0 0 0 1px rgba(var(--v-theme-warning), 0.15), 0 2px 8px rgba(var(--v-theme-warning), 0.1) !important;
-}
-.normal-priority {
-  border-left: 3px solid rgb(var(--v-theme-primary)) !important;
-  background: linear-gradient(90deg, rgba(var(--v-theme-primary), 0.05) 0%, transparent 100%) !important;
-  box-shadow: 0 0 0 1px rgba(var(--v-theme-primary), 0.1), 0 2px 4px rgba(var(--v-theme-primary), 0.05) !important;
-}
-.low-priority {
-  border-left: 2px solid rgb(var(--v-theme-info)) !important;
-  background: linear-gradient(90deg, rgba(var(--v-theme-info), 0.03) 0%, transparent 100%) !important;
-  box-shadow: 0 0 0 1px rgba(var(--v-theme-info), 0.08), 0 1px 2px rgba(var(--v-theme-info), 0.03) !important;
-}
-/* Enhanced Booking Type Indicators */
-.turn-booking {
-  border-left: 6px solid rgb(var(--v-theme-error)) !important;
-  box-shadow: 0 0 0 1px rgba(var(--v-theme-error), 0.2), 0 2px 8px rgba(var(--v-theme-error), 0.15) !important;
-  position: relative;
-}
-.turn-booking::after {
-  content: '🚨 TURN';
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgb(var(--v-theme-error));
-  color: rgb(var(--v-theme-on-error));
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-  z-index: 1;
-  box-shadow: 0 2px 4px rgba(var(--v-theme-error), 0.3);
-}
-.standard-booking {
-  border-left: 4px solid rgb(var(--v-theme-primary)) !important;
-  box-shadow: 0 0 0 1px rgba(var(--v-theme-primary), 0.1), 0 2px 4px rgba(var(--v-theme-primary), 0.1) !important;
-}
-.standard-booking::after {
-  content: '📅 STD';
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-  z-index: 1;
-  opacity: 0.8;
-}
-.owner-interface .urgent-priority {
-  border-left-color: rgb(var(--v-theme-warning)) !important;
-  background: linear-gradient(90deg, rgba(var(--v-theme-warning), 0.1) 0%, transparent 100%) !important;
-}
-.owner-interface .urgent-priority::before {
-  background: linear-gradient(45deg, rgba(var(--v-theme-warning), 0.05) 25%, transparent 25%, transparent 50%, rgba(var(--v-theme-warning), 0.05) 50%, rgba(var(--v-theme-warning), 0.05) 75%, transparent 75%);
-}
-.owner-interface .turn-booking {
-  border-left-color: rgb(var(--v-theme-warning)) !important;
-  box-shadow: 0 0 0 1px rgba(var(--v-theme-warning), 0.2), 0 2px 8px rgba(var(--v-theme-warning), 0.15) !important;
-}
-.owner-interface .turn-booking::after {
-  content: '⚠️ TURN';
-  background: rgb(var(--v-theme-warning));
-  color: rgb(var(--v-theme-on-warning));
-}
-.admin-interface .urgent-priority {
-  border-left-color: rgb(var(--v-theme-error)) !important;
-  background: linear-gradient(90deg, rgba(var(--v-theme-error), 0.15) 0%, transparent 100%) !important;
-}
-.admin-interface .turn-booking {
-  border-left-color: rgb(var(--v-theme-error)) !important;
-  box-shadow: 0 0 0 2px rgba(var(--v-theme-error), 0.3), 0 4px 12px rgba(var(--v-theme-error), 0.2) !important;
-}
-@keyframes urgentPulse {
-  0%, 100% {
-    box-shadow: 0 0 0 1px rgba(var(--v-theme-error), 0.2), 0 4px 12px rgba(var(--v-theme-error), 0.15);
-  }
-  50% {
-    box-shadow: 0 0 0 2px rgba(var(--v-theme-error), 0.4), 0 6px 16px rgba(var(--v-theme-error), 0.3);
-  }
-}
-@keyframes urgentGlow {
-  0% {
-    box-shadow: 0 0 0 1px rgba(var(--v-theme-error), 0.2), 0 4px 12px rgba(var(--v-theme-error), 0.15), 0 0 20px rgba(var(--v-theme-error), 0.1);
-  }
-  100% {
-    box-shadow: 0 0 0 2px rgba(var(--v-theme-error), 0.4), 0 6px 16px rgba(var(--v-theme-error), 0.3), 0 0 30px rgba(var(--v-theme-error), 0.3);
-  }
-}
-@keyframes urgentStripes {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 40px 0;
-  }
-}
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-  20%, 40%, 60%, 80% { transform: translateX(2px); }
-}
-@keyframes turnBookingPulse {
-  0%, 100% {
-    border-left-width: 6px;
-    border-left-color: rgb(var(--v-theme-error));
-  }
-  50% {
-    border-left-width: 8px;
-    border-left-color: rgba(var(--v-theme-error), 0.8);
-  }
-}
-.turn-booking.urgent-priority {
-  animation: urgentPulse 1.5s ease-in-out infinite, turnBookingPulse 3s ease-in-out infinite;
-}
-.turn-booking.urgent-priority::after {
-  animation: shake 3s ease-in-out infinite;
-}
-.fc-event.turn-booking-event {
-  border: 2px solid rgb(var(--v-theme-error)) !important;
-  background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.9) 0%, rgba(var(--v-theme-error), 0.7) 100%) !important;
-  box-shadow: 0 2px 8px rgba(var(--v-theme-error), 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-  position: relative;
-  overflow: visible;
-}
-.fc-event.turn-booking-event::before {
-  content: '🚨';
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: rgb(var(--v-theme-error));
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  z-index: 10;
-  animation: urgentPulse 2s ease-in-out infinite;
-}
-.fc-event.turn-urgent-event {
-  animation: urgentGlow 2s ease-in-out infinite alternate;
-  border-color: rgb(var(--v-theme-error)) !important;
-  border-width: 3px !important;
-}
-.fc-event.urgent-event {
-  box-shadow: 0 0 0 2px rgba(var(--v-theme-error), 0.5), 0 4px 12px rgba(var(--v-theme-error), 0.3) !important;
-}
-.priority-badge {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.75rem;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  transition: all 0.3s ease;
-}
-.priority-badge.urgent {
-  background: linear-gradient(135deg, rgb(var(--v-theme-error)) 0%, rgba(var(--v-theme-error), 0.8) 100%);
-  color: rgb(var(--v-theme-on-error));
-  box-shadow: 0 2px 8px rgba(var(--v-theme-error), 0.3);
-  animation: urgentPulse 2s ease-in-out infinite;
-}
-.priority-badge.high {
-  background: linear-gradient(135deg, rgb(var(--v-theme-warning)) 0%, rgba(var(--v-theme-warning), 0.8) 100%);
-  color: rgb(var(--v-theme-on-warning));
-  box-shadow: 0 2px 6px rgba(var(--v-theme-warning), 0.2);
-}
-.priority-badge.normal {
-  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgba(var(--v-theme-primary), 0.8) 100%);
-  color: rgb(var(--v-theme-on-primary));
-  box-shadow: 0 2px 4px rgba(var(--v-theme-primary), 0.15);
-}
-.priority-badge.low {
-  background: linear-gradient(135deg, rgb(var(--v-theme-info)) 0%, rgba(var(--v-theme-info), 0.8) 100%);
-  color: rgb(var(--v-theme-on-info));
-  box-shadow: 0 1px 3px rgba(var(--v-theme-info), 0.1);
-}
-@media (max-width: 768px) {
-  .urgent-priority {
-    border-left-width: 4px !important;
-  }
-  .turn-booking::after {
-    font-size: 0.6rem;
-    padding: 1px 4px;
-  }
-  .priority-badge {
-    font-size: 0.7rem;
-    padding: 2px 6px;
-  }
-}
-.v-theme--dark .urgent-priority {
-  background: linear-gradient(90deg, rgba(var(--v-theme-error), 0.15) 0%, transparent 100%) !important;
-}
-.v-theme--dark .high-priority {
-  background: linear-gradient(90deg, rgba(var(--v-theme-warning), 0.12) 0%, transparent 100%) !important;
-}
-.v-theme--dark .turn-booking::after {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-}
-.v-theme--dark .priority-badge {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-.admin-interface .turn-booking::after {
-  content: '🚨 CRITICAL';
-  background: rgb(var(--v-theme-error));
-  color: rgb(var(--v-theme-on-error));
-  animation: urgentPulse 1.5s infinite;
-}
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 8px rgba(var(--v-theme-error), 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0);
-  }
-}
-@keyframes urgentPulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.6);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0);
-    transform: scale(1.02);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0);
-    transform: scale(1);
-  }
-}
-@keyframes urgentStripes {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 40px 0;
-  }
-}
-@keyframes urgentGlow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(var(--v-theme-error), 0.5);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(var(--v-theme-error), 0.8), 0 0 30px rgba(var(--v-theme-error), 0.6);
-  }
-}
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-  20%, 40%, 60%, 80% { transform: translateX(2px); }
-}
-@keyframes breathe {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.8;
-  }
-}
-@keyframes countdown {
-  0% {
-    background-color: rgba(var(--v-theme-success), 0.2);
-  }
-  50% {
-    background-color: rgba(var(--v-theme-warning), 0.2);
-  }
-  100% {
-    background-color: rgba(var(--v-theme-error), 0.2);
-  }
-}
-.pulse-animation {
-  animation: pulse 2s infinite;
-}
-.urgent-pulse-animation {
-  animation: urgentPulse 1.5s infinite;
-}
-.urgent-glow-animation {
-  animation: urgentGlow 2s infinite;
-}
-.urgent-shake-animation {
-  animation: shake 0.5s infinite;
-}
-.breathe-animation {
-  animation: breathe 3s infinite;
-}
-.countdown-animation {
-  animation: countdown 5s infinite;
-}
-.turn-urgent {
-  animation: urgentPulse 1.5s infinite, urgentGlow 2s infinite;
-}
-.turn-critical {
-  animation: urgentPulse 1s infinite, urgentGlow 1.5s infinite, shake 0.5s infinite;
-}
-.turn-countdown {
-  animation: countdown 3s infinite, breathe 2s infinite;
-}
-.elevation-transition {
-  transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.hover-elevate {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.hover-elevate:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 8px rgba(var(--v-theme-on-surface), 0.2) !important;
-}
-.hover-elevate-urgent {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.hover-elevate-urgent:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(var(--v-theme-error), 0.3) !important;
-}
-.priority-badge-urgent {
-  background: linear-gradient(135deg, rgb(var(--v-theme-error)), rgba(var(--v-theme-error), 0.8)) !important;
-  color: rgb(var(--v-theme-on-error)) !important;
-  box-shadow: 0 2px 8px rgba(var(--v-theme-error), 0.4);
-  animation: urgentGlow 2s infinite;
-  position: relative;
-}
-.priority-badge-urgent::before {
-  content: '🚨';
-  position: absolute;
-  left: -8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.8rem;
-}
-.priority-badge-high {
-  background: linear-gradient(135deg, rgb(var(--v-theme-warning)), rgba(var(--v-theme-warning), 0.8)) !important;
-  color: rgb(var(--v-theme-on-warning)) !important;
-  box-shadow: 0 2px 6px rgba(var(--v-theme-warning), 0.3);
-  position: relative;
-}
-.priority-badge-high::before {
-  content: '⚠️';
-  position: absolute;
-  left: -8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.8rem;
-}
-.priority-badge-normal {
-  background: linear-gradient(135deg, rgb(var(--v-theme-primary)), rgba(var(--v-theme-primary), 0.8)) !important;
-  color: rgb(var(--v-theme-on-primary)) !important;
-  box-shadow: 0 2px 4px rgba(var(--v-theme-primary), 0.2);
-  position: relative;
-}
-.priority-badge-normal::before {
-  content: '📅';
-  position: absolute;
-  left: -8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.8rem;
-}
-.priority-badge-low {
-  background: linear-gradient(135deg, rgb(var(--v-theme-info)), rgba(var(--v-theme-info), 0.8)) !important;
-  color: rgb(var(--v-theme-on-info)) !important;
-  box-shadow: 0 2px 4px rgba(var(--v-theme-info), 0.2);
-  position: relative;
-}
-.priority-badge-low::before {
-  content: '📋';
-  position: absolute;
-  left: -8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.8rem;
-}
-.turn-alert-critical {
-  border: 2px solid rgb(var(--v-theme-error)) !important;
-  background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.1), rgba(var(--v-theme-error), 0.05)) !important;
-  animation: urgentPulse 1.5s infinite;
-  position: relative;
-}
-.turn-alert-critical::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(var(--v-theme-error), 0.1) 25%, transparent 25%, transparent 50%, rgba(var(--v-theme-error), 0.1) 50%, rgba(var(--v-theme-error), 0.1) 75%, transparent 75%);
-  background-size: 15px 15px;
-  animation: urgentStripes 1.5s linear infinite;
-  pointer-events: none;
-  border-radius: inherit;
-}
-.turn-alert-urgent {
-  border: 2px solid rgb(var(--v-theme-warning)) !important;
-  background: linear-gradient(135deg, rgba(var(--v-theme-warning), 0.1), rgba(var(--v-theme-warning), 0.05)) !important;
-  animation: pulse 2s infinite;
-}
-/* Calendar Event Enhancements */
-.fc-event.turn-booking-event {
-  border: 2px solid rgb(var(--v-theme-error)) !important;
-  background: linear-gradient(135deg, rgb(var(--v-theme-error)), rgba(var(--v-theme-error), 0.8)) !important;
-  color: rgb(var(--v-theme-on-error)) !important;
-  font-weight: bold !important;
-  position: relative;
-  overflow: visible !important;
-}
-.fc-event.turn-booking-event::before {
-  content: '🚨';
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  font-size: 12px;
-  z-index: 10;
-  background: rgb(var(--v-theme-error));
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: urgentPulse 1.5s infinite;
-}
-.fc-event.turn-urgent-event {
-  animation: urgentGlow 2s infinite;
-  box-shadow: 0 0 10px rgba(var(--v-theme-error), 0.6) !important;
-}
-.fc-event.urgent-event {
-  border-color: rgb(var(--v-theme-error)) !important;
-  background: linear-gradient(135deg, rgb(var(--v-theme-error)), rgba(var(--v-theme-error), 0.9)) !important;
-  color: rgb(var(--v-theme-on-error)) !important;
-  animation: urgentGlow 2s infinite;
-}
-.fc-event.standard-booking-event {
-  border: 1px solid rgb(var(--v-theme-primary)) !important;
-  background: linear-gradient(135deg, rgb(var(--v-theme-primary)), rgba(var(--v-theme-primary), 0.8)) !important;
-  color: rgb(var(--v-theme-on-primary)) !important;
-}
-/* Notification Enhancements */
-.urgent-notification {
-  background: linear-gradient(135deg, rgb(var(--v-theme-error)), rgba(var(--v-theme-error), 0.9)) !important;
-  color: rgb(var(--v-theme-on-error)) !important;
-  border-left: 6px solid rgba(var(--v-theme-on-error), 0.8) !important;
-  animation: urgentPulse 2s infinite;
-}
-.turn-notification {
-  background: linear-gradient(135deg, rgb(var(--v-theme-warning)), rgba(var(--v-theme-warning), 0.9)) !important;
-  color: rgb(var(--v-theme-on-warning)) !important;
-  border-left: 4px solid rgba(var(--v-theme-on-warning), 0.8) !important;
-}
-/* Time-based Visual Indicators */
-.time-critical {
-  animation: urgentPulse 1s infinite, shake 0.5s infinite;
-  border: 3px solid rgb(var(--v-theme-error)) !important;
-}
-.time-urgent {
-  animation: urgentGlow 1.5s infinite;
-  border: 2px solid rgb(var(--v-theme-warning)) !important;
-}
-.time-approaching {
-  animation: breathe 3s infinite;
-  border: 1px solid rgb(var(--v-theme-info)) !important;
-}
-/* Countdown Timer Styles */
-.countdown-timer {
-  background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.1), rgba(var(--v-theme-warning), 0.1));
-  border: 2px solid rgb(var(--v-theme-warning));
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-weight: bold;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.countdown-timer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(var(--v-theme-success), 0.3), rgba(var(--v-theme-warning), 0.3), rgba(var(--v-theme-error), 0.3));
-  animation: countdown 10s linear infinite;
-  z-index: -1;
-}
-.countdown-critical {
-  border-color: rgb(var(--v-theme-error)) !important;
-  color: rgb(var(--v-theme-error)) !important;
-  animation: urgentPulse 1s infinite;
-}
-.countdown-urgent {
-  border-color: rgb(var(--v-theme-warning)) !important;
-  color: rgb(var(--v-theme-warning)) !important;
-  animation: breathe 2s infinite;
-}
-:root {
-  --theme-transition-duration: 0.3s;
-}
-* {
-  transition: background-color var(--theme-transition-duration) ease,
-             border-color var(--theme-transition-duration) ease,
-             color var(--theme-transition-duration) ease,
-             box-shadow var(--theme-transition-duration) ease;
-}
-.v-progress-circular,
-.v-progress-linear,
-.v-btn__overlay,
-.v-overlay__scrim,
-svg,
-i {
-  transition: none !important;
-}
-@keyframes themeChange {
-  0% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-.v-application {
-  animation: themeChange 0.5s ease;
-}
-@media (max-width: 600px) {
-  .urgent-priority::before {
-    background-size: 15px 15px;
-  }
-  .turn-booking::after,
-  .standard-booking::after {
-    font-size: 0.6rem;
-    padding: 1px 4px;
-  }
-  .priority-badge-urgent,
-  .priority-badge-high,
-  .priority-badge-normal,
-  .priority-badge-low {
-    font-size: 0.7rem;
-  }
-  .priority-badge-urgent::before,
-  .priority-badge-high::before,
-  .priority-badge-normal::before,
-  .priority-badge-low::before {
-    font-size: 0.7rem;
-    left: -6px;
-  }
-  .countdown-timer {
-    padding: 6px 8px;
-    font-size: 0.8rem;
-  }
-}
-.v-theme--dark .urgent-priority {
-  background: linear-gradient(90deg, rgba(var(--v-theme-error), 0.2) 0%, transparent 100%) !important;
-}
-.v-theme--dark .turn-booking {
-  box-shadow: 0 0 0 1px rgba(var(--v-theme-error), 0.4), 0 2px 8px rgba(var(--v-theme-error), 0.3) !important;
-}
-.v-theme--dark .fc-event.turn-booking-event {
-  box-shadow: 0 0 15px rgba(var(--v-theme-error), 0.8) !important;
-}
-.v-theme--dark .countdown-timer {
-  background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.15), rgba(var(--v-theme-warning), 0.15));
-}
-@media (prefers-reduced-motion: reduce) {
-  .pulse-animation,
-  .urgent-pulse-animation,
-  .urgent-glow-animation,
-  .urgent-shake-animation,
-  .breathe-animation,
-  .countdown-animation,
-  .turn-urgent,
-  .turn-critical,
-  .turn-countdown {
-    animation: none !important;
-  }
-  .urgent-priority::before,
-  .turn-alert-critical::before {
-    animation: none !important;
-  }
-}
-@media (prefers-contrast: high) {
-  .urgent-priority {
-    border-left-width: 8px !important;
-  }
-  .turn-booking {
-    border-left-width: 8px !important;
-    border-right: 4px solid rgb(var(--v-theme-error)) !important;
-  }
-  .priority-badge-urgent,
-  .priority-badge-high,
-  .priority-badge-normal,
-  .priority-badge-low {
-    border: 2px solid currentColor !important;
-  }
-}
-</style>
-````
-
-## File: src/components/smart/FullCalendar.vue
-````vue
-<template>
-  <div class="calendar-container">
-    <FullCalendar
-      ref="calendarRef"
-      :options="calendarOptions"
-      class="custom-calendar"
+  <div class="home-admin-container">
+    <v-row
+      no-gutters
+      class="fill-height"
+    >
+      <v-col
+        cols="12"
+        lg="3"
+        xl="2"
+        class="sidebar-column"
+        :class="{ 'mobile-hidden': !sidebarOpen }"
+      >
+        <v-btn
+          v-if="$vuetify.display.lgAndDown"
+          icon="mdi-menu"
+          variant="text"
+          class="mr-4"
+          @click="toggleSidebar"
+        />
+        <AdminSidebar
+          :today-turns="systemTodayTurns"
+          :upcoming-cleanings="systemUpcomingCleanings"
+          :properties="allPropertiesMap"
+          :loading="loading"
+          @navigate-to-booking="handleNavigateToBooking"
+          @navigate-to-date="handleNavigateToDate"
+          @filter-by-property="handleFilterByProperty"
+          @create-booking="handleCreateBooking"
+          @create-property="handleCreateProperty"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        lg="9"
+        xl="10"
+        class="calendar-column"
+      >
+        <div class="calendar-header">
+          <div class="d-flex align-center">
+            <v-btn
+              icon="mdi-arrow-left"
+              variant="text"
+              class="mr-2"
+              @click="handlePrevious"
+            />
+            <v-btn
+              variant="outlined"
+              class="mr-2"
+              @click="handleGoToday"
+            >
+              Today
+            </v-btn>
+            <v-btn
+              icon="mdi-arrow-right"
+              variant="text"
+              class="mr-4"
+              @click="handleNext"
+            />
+            <div class="text-h6">
+              {{ formattedDate }}
+            </div>
+            <div class="ml-4 text-caption text-medium-emphasis">
+              {{ systemMetricsText }}
+            </div>
+            <v-spacer />
+            <v-btn
+              color="warning"
+              variant="outlined"
+              prepend-icon="mdi-account-hard-hat"
+              class="mr-2"
+              @click="handleAssignCleaners"
+            >
+              Assign Cleaners
+            </v-btn>
+            <v-btn
+              color="info"
+              variant="outlined"
+              prepend-icon="mdi-chart-line"
+              class="mr-2"
+              @click="handleGenerateReports"
+            >
+              Reports
+            </v-btn>
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-cog"
+              class="mr-4"
+              @click="handleManageSystem"
+            >
+              Manage System
+            </v-btn>
+            <v-btn-toggle
+              v-model="currentView"
+              mandatory
+              class="ml-4"
+            >
+              <v-btn value="dayGridMonth">
+                Month
+              </v-btn>
+              <v-btn value="timeGridWeek">
+                Week
+              </v-btn>
+              <v-btn value="timeGridDay">
+                Day
+              </v-btn>
+            </v-btn-toggle>
+          </div>
+        </div>
+        <AdminCalendar
+          ref="calendarRef"
+          :bookings="adminFilteredBookings"
+          :loading="loading"
+          :current-view="currentView"
+          :current-date="currentDate"
+          :properties="allPropertiesMap"
+          :users="allUsersMap"
+          @date-select="handleDateSelect"
+          @event-click="handleEventClick"
+          @event-drop="handleEventDrop"
+          @event-resize="handleEventResize"
+          @view-change="handleCalendarViewChange"
+          @date-change="handleCalendarDateChange"
+          @create-booking="handleCreateBookingFromCalendar"
+          @update-booking="handleUpdateBooking"
+        />
+      </v-col>
+    </v-row>
+    <BookingForm
+      :open="eventModalOpen"
+      :mode="eventModalMode"
+      :booking="eventModalData"
+      @close="handleEventModalClose"
+      @save="handleEventModalSave"
+      @delete="handleEventModalDelete"
+    />
+    <PropertyModal
+      :open="propertyModalOpen"
+      :mode="propertyModalMode"
+      :property="propertyModalData"
+      @close="handlePropertyModalClose"
+      @save="handlePropertyModalSave"
+      @delete="handlePropertyModalDelete"
+    />
+    <ConfirmationDialog
+      :open="confirmDialogOpen"
+      :title="confirmDialogTitle"
+      :message="confirmDialogMessage"
+      :confirm-text="confirmDialogConfirmText"
+      :cancel-text="confirmDialogCancelText"
+      :dangerous="confirmDialogDangerous"
+      @confirm="handleConfirmDialogConfirm"
+      @cancel="handleConfirmDialogCancel"
+      @close="handleConfirmDialogClose"
     />
   </div>
 </template>
+⋮----
+{{ formattedDate }}
+⋮----
+{{ systemMetricsText }}
+⋮----
 <script setup lang="ts">
-import FullCalendar from '@fullcalendar/vue3';
-import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import { computed, ref, watch } from 'vue';
-import { useTheme } from 'vuetify';
-import type { Booking, Property } from '@/types';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { useDisplay } from 'vuetify';
+import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
+import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
+import BookingForm from '@/components/dumb/BookingForm.vue';
+import PropertyModal from '@/components/dumb/PropertyModal.vue';
+import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
+import { useUserStore } from '@/stores/user';
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
+import { useUIStore } from '@/stores/ui';
+import { useAuthStore } from '@/stores/auth';
+import { useBookings } from '@/composables/shared/useBookings';
+import { useProperties } from '@/composables/shared/useProperties';
+import { useCalendarState } from '@/composables/shared/useCalendarState';
+import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
+import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 import eventLogger from '@/composables/shared/useComponentEventLogger';
-interface Props {
-  bookings: Map<string, Booking>;
-  properties: Map<string, Property>;
-  loading?: boolean;
-}
-interface Emits {
-  (e: 'dateSelect', selectInfo: DateSelectArg): void;
-  (e: 'eventClick', clickInfo: EventClickArg): void;
-  (e: 'eventDrop', dropInfo: EventDropArg): void;
-  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
-  (e: 'updateBooking', data: { id: string; start: string; end: string }): void;
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
+const userStore = useUserStore();
+const propertyStore = usePropertyStore();
+const bookingStore = useBookingStore();
+const uiStore = useUIStore();
+const authStore = useAuthStore();
+const { xs } = useDisplay();
+const {
+  loading: bookingsLoading,
+  createBooking,
+  updateBooking,
+  deleteBooking,
+  fetchAllBookings
+} = useBookings();
+const {
+  loading: propertiesLoading,
+  createProperty,
+  updateProperty,
+  deleteProperty,
+  fetchAllProperties
+} = useProperties();
+const {
+  currentView,
+  currentDate,
+  filterBookings,
+  setCalendarView,
+  goToDate,
+  goToToday,
+  next,
+  prev,
+  clearPropertyFilters,
+  togglePropertyFilter
+} = useCalendarState();
+const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
+const sidebarOpen = ref(!xs.value);
+const selectedPropertyFilter = ref<string | null>(null);
+const isAdminAuthenticated = computed(() => {
+  return authStore.isAuthenticated &&
+         authStore.user?.role === 'admin';
 });
-const emit = defineEmits<Emits>();
-const theme = useTheme();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-const calendarEvents = computed(() => {
-  return Array.from(props.bookings.values()).map(booking => {
-    const property = props.properties.get(booking.property_id);
-    const isTurn = booking.booking_type === 'turn';
-    const isUrgent = booking.priority === 'urgent';
-    return {
-      id: booking.id,
-      title: `${property?.name || 'Unknown Property'} - ${isTurn ? 'TURN' : 'Standard'}`,
-      start: booking.checkout_date,
-      end: booking.checkin_date,
-      backgroundColor: getEventColor(booking),
-      borderColor: getEventBorderColor(booking),
-      textColor: getEventTextColor(booking),
-      extendedProps: {
-        booking,
-        property,
-        bookingType: booking.booking_type,
-        status: booking.status,
-        priority: booking.priority,
-        guestCount: booking.guest_count,
-        notes: booking.notes
-      },
-      classNames: [
-        `booking-${booking.booking_type}`,
-        `status-${booking.status}`,
-        `priority-${booking.priority}`,
-        isTurn ? 'turn-booking-event' : 'standard-booking-event',
-        isUrgent && isTurn ? 'turn-urgent-event' : '',
-        isUrgent ? 'urgent-event' : ''
-      ].filter(Boolean)
+const loading = computed(() =>
+  bookingsLoading.value ||
+  propertiesLoading.value ||
+  uiStore.isLoading('bookings') ||
+  uiStore.isLoading('properties')
+);
+const formattedDate = computed(() => {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  };
+  return currentDate.value.toLocaleDateString('en-US', options);
+});
+const allPropertiesMap = computed(() => {
+  if (!isAdminAuthenticated.value) {
+    return new Map<string, Property>();
+  }
+  if (propertyStore.properties instanceof Map) {
+    return propertyStore.properties;
+  } else {
+    const map = new Map<string, Property>();
+    propertyStore.propertiesArray.forEach(property => {
+      if (property && property.id) {
+        map.set(property.id, property);
+      }
+    });
+    return map;
+  }
+});
+const allUsersMap = computed(() => {
+  const map = new Map<string, any>();
+  if (!isAdminAuthenticated.value) {
+    return map;
+  }
+  if (userStore.user) {
+    map.set(userStore.user.id, userStore.user);
+  }
+  return map;
+});
+const allBookingsMap = computed(() => {
+  if (!isAdminAuthenticated.value) {
+    return new Map<string, Booking>();
+  }
+  const map = new Map<string, Booking>();
+  bookingStore.bookingsArray.forEach(booking => {
+    if (booking && booking.id) {
+      map.set(booking.id, booking);
+    }
+  });
+  return map;
+});
+const systemTodayTurns = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const turns = new Map<string, Booking>();
+  if (!isAdminAuthenticated.value) {
+    return turns;
+  }
+  Array.from(allBookingsMap.value.values()).forEach(booking => {
+    if (
+      booking.booking_type === 'turn' &&
+      new Date(booking.checkout_date) >= today &&
+      new Date(booking.checkout_date) < tomorrow
+    ) {
+      turns.set(booking.id, booking);
+    }
+  });
+  return turns;
+});
+const systemUpcomingCleanings = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const inOneWeek = new Date(today);
+  inOneWeek.setDate(inOneWeek.getDate() + 7);
+  const cleanings = new Map<string, Booking>();
+  if (!isAdminAuthenticated.value) {
+    return cleanings;
+  }
+  Array.from(allBookingsMap.value.values()).forEach(booking => {
+    const checkoutDate = new Date(booking.checkout_date);
+    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
+      cleanings.set(booking.id, booking);
+    }
+  });
+  return cleanings;
+});
+const adminFilteredBookings = computed(() => {
+  let bookings = Array.from(allBookingsMap.value.values());
+  if (selectedPropertyFilter.value) {
+    bookings = bookings.filter(booking =>
+      booking.property_id === selectedPropertyFilter.value
+    );
+  }
+  bookings = filterBookings(bookings);
+  const map = new Map<string, Booking>();
+  bookings.forEach(booking => {
+    map.set(booking.id, booking);
+  });
+  return map;
+});
+const systemMetricsText = computed(() => {
+  const totalProperties = allPropertiesMap.value.size;
+  const totalBookings = allBookingsMap.value.size;
+  const urgentTurns = systemTodayTurns.value.size;
+  const upcomingCleanings = systemUpcomingCleanings.value.size;
+  return `${totalProperties} properties • ${totalBookings} bookings • ${urgentTurns} urgent turns • ${upcomingCleanings} upcoming`;
+});
+const eventModalOpen = computed(() => uiStore.isModalOpen('event'));
+const eventModalMode = computed((): 'create' | 'edit' | undefined => {
+  const modalState = uiStore.getModalState('event');
+  const mode = modalState?.mode;
+  return (mode === 'create' || mode === 'edit') ? mode : undefined;
+});
+const eventModalData = computed((): Booking | undefined => {
+  const modalData = uiStore.getModalData('event') as any;
+  return modalData?.booking || undefined;
+});
+const propertyModalOpen = computed(() => uiStore.isModalOpen('property'));
+const propertyModalMode = computed((): 'create' | 'edit' | undefined => {
+  const modalState = uiStore.getModalState('property');
+  const mode = modalState?.mode;
+  return (mode === 'create' || mode === 'edit') ? mode : undefined;
+});
+const propertyModalData = computed((): Property | undefined => {
+  const modalData = uiStore.getModalData('property') as any;
+  return modalData?.property || undefined;
+});
+const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirm'));
+const confirmDialogTitle = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.title || '';
+});
+const confirmDialogMessage = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.message || '';
+});
+const confirmDialogConfirmText = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.confirmText || 'Confirm';
+});
+const confirmDialogCancelText = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.cancelText || 'Cancel';
+});
+const confirmDialogDangerous = computed((): boolean => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return Boolean(dialogState?.dangerous) || false;
+});
+const handleNavigateToBooking = (bookingId: string): void => {
+  try {
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeAdmin',
+      'navigateToBooking',
+      bookingId,
+      'receive'
+    );
+    const booking = allBookingsMap.value.get(bookingId);
+    if (booking) {
+      uiStore.openModal('event', 'edit', {
+        booking: booking
+      });
+    } else {
+      console.warn(`Booking with ID ${bookingId} not found`);
+    }
+  } catch (error) {
+    console.error('Error navigating to booking:', error);
+  }
+};
+const handleNavigateToDate = (date: Date): void => {
+  try {
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeAdmin',
+      'navigateToDate',
+      date,
+      'receive'
+    );
+    goToDate(date);
+  } catch (error) {
+    console.error('Error navigating to date:', error);
+  }
+};
+const handleFilterByProperty = (propertyId: string | null): void => {
+  try {
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeAdmin',
+      'filterByProperty',
+      propertyId,
+      'receive'
+    );
+    selectedPropertyFilter.value = propertyId;
+    if (propertyId) {
+      togglePropertyFilter(propertyId);
+    } else {
+      clearPropertyFilters();
+    }
+  } catch (error) {
+    console.error('Error filtering by property:', error);
+  }
+};
+const handleAssignCleaners = (): void => {
+  try {
+    eventLogger.logEvent(
+      'HomeAdmin',
+      'HomeAdmin',
+      'assignCleaners',
+      null,
+      'emit'
+    );
+    console.log('Admin: Assign Cleaners clicked');
+  } catch (error) {
+    console.error('Error opening cleaner assignment:', error);
+  }
+};
+const handleGenerateReports = (): void => {
+  try {
+    eventLogger.logEvent(
+      'HomeAdmin',
+      'HomeAdmin',
+      'generateReports',
+      null,
+      'emit'
+    );
+    console.log('Admin: Generate Reports clicked');
+  } catch (error) {
+    console.error('Error opening reports:', error);
+  }
+};
+const handleManageSystem = (): void => {
+  try {
+    eventLogger.logEvent(
+      'HomeAdmin',
+      'HomeAdmin',
+      'manageSystem',
+      null,
+      'emit'
+    );
+    console.log('Admin: Manage System clicked');
+  } catch (error) {
+    console.error('Error opening system management:', error);
+  }
+};
+const handleCreateBooking = (): void => {
+  try {
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeAdmin',
+      'createBooking',
+      null,
+      'receive'
+    );
+    uiStore.openModal('event', 'create', {
+      booking: null
+    });
+  } catch (error) {
+    console.error('Error creating booking:', error);
+  }
+};
+const handleCreateProperty = (): void => {
+  try {
+    eventLogger.logEvent(
+      'Sidebar',
+      'HomeAdmin',
+      'createProperty',
+      null,
+      'receive'
+    );
+    uiStore.openModal('property', 'create', {
+      property: null
+    });
+  } catch (error) {
+    console.error('Error creating property:', error);
+  }
+};
+const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
+  try {
+    eventLogger.logEvent(
+      'FullCalendar',
+      'HomeAdmin',
+      'createBooking',
+      data,
+      'receive'
+    );
+    const bookingData: Partial<BookingFormData> = {
+      checkout_date: data.start,
+      checkin_date: data.end,
+      property_id: data.propertyId,
+      booking_type: 'standard',
+      status: 'pending'
     };
-  });
-});
-// Enhanced dynamic color system based on booking priority instead of status
-const getEventColor = (booking: Booking): string => {
-  const isDark = theme.global.current.value.dark;
-  if (booking.booking_type === 'turn') {
-    switch (booking.priority) {
-      case 'urgent':
-        return isDark ? '#FF1744' : '#D32F2F';
-      case 'high':
-        return isDark ? '#FF6D00' : '#F57C00';
-      case 'normal':
-        return isDark ? '#FF9800' : '#FF6F00';
-      case 'low':
-        return isDark ? '#FFC107' : '#FFA000';
-      default:
-        return isDark ? '#FF5252' : '#F44336';
-    }
-  } else {
-    switch (booking.priority) {
-      case 'urgent':
-        return isDark ? '#FF9800' : '#FF6F00';
-      case 'high':
-        return isDark ? '#2196F3' : '#1976D2';
-      case 'normal':
-        return isDark ? '#00BCD4' : '#0097A7';
-      case 'low':
-        return isDark ? '#4CAF50' : '#388E3C';
-      default:
-        return isDark ? '#2196F3' : '#1976D2';
-    }
+    uiStore.openModal('event', 'create', {
+      booking: bookingData
+    });
+  } catch (error) {
+    console.error('Error creating booking from calendar:', error);
   }
 };
-const getEventBorderColor = (booking: Booking): string => {
-  if (booking.booking_type === 'turn') {
-    switch (booking.priority) {
-      case 'urgent':
-        return '#B71C1C';
-      case 'high':
-        return '#E65100';
-      case 'normal':
-        return '#FF6F00';
-      case 'low':
-        return '#F57F17';
-      default:
-        return '#D32F2F';
-    }
-  } else {
-    switch (booking.priority) {
-      case 'urgent':
-        return '#E65100';
-      case 'high':
-        return '#0D47A1';
-      case 'normal':
-        return '#006064';
-      case 'low':
-        return '#1B5E20';
-      default:
-        return '#1976D2';
-    }
-  }
-};
-const getEventTextColor = (booking: Booking): string => {
-  if (booking.status === 'completed') {
-    return '#E0E0E0';
-  }
-  return '#FFFFFF';
-};
-const calendarOptions = computed<CalendarOptions>(() => ({
-  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-  initialView: 'dayGridMonth',
-  headerToolbar: false,
-  events: calendarEvents.value,
-  eventDisplay: 'block',
-  eventOverlap: false,
-  eventResizableFromStart: true,
-  selectable: true,
-  selectMirror: true,
-  editable: true,
-  droppable: true,
-  locale: 'en',
-  timeZone: 'local',
-  slotMinTime: '06:00:00',
-  slotMaxTime: '22:00:00',
-  slotDuration: '01:00:00',
-  snapDuration: '00:30:00',
-  height: 'auto',
-  aspectRatio: 1.8,
-  eventBackgroundColor: theme.global.current.value.colors.primary,
-  eventBorderColor: theme.global.current.value.colors.primary,
-  eventTextColor: '#FFFFFF',
-  themeSystem: 'standard',
-  select: handleDateSelect,
-  eventClick: handleEventClick,
-  eventDrop: handleEventDrop,
-  eventResize: handleEventResize,
-  loading: handleLoading,
-  eventContent: renderEventContent,
-  dayCellContent: renderDayCell,
-  businessHours: {
-    daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
-    startTime: '08:00',
-    endTime: '18:00'
-  },
-  weekends: true,
-  dayMaxEvents: 3,
-  moreLinkClick: 'popover',
-  allDaySlot: false,
-  nowIndicator: true,
-  scrollTime: '08:00:00'
-}));
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'emit'
-  );
-  emit('dateSelect', selectInfo);
-  emit('createBooking', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr
-  });
-  selectInfo.view.calendar.unselect();
+  try {
+    const data = {
+      start: selectInfo.startStr,
+      end: selectInfo.endStr
+    };
+    handleCreateBookingFromCalendar(data);
+  } catch (error) {
+    console.error('Error handling date select:', error);
+  }
 };
 const handleEventClick = (clickInfo: EventClickArg): void => {
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'emit'
-  );
-  emit('eventClick', clickInfo);
+  try {
+    const bookingId = clickInfo.event.id;
+    const booking = allBookingsMap.value.get(bookingId);
+    if (booking) {
+      uiStore.openModal('event', 'edit', {
+        booking: booking
+      });
+    }
+  } catch (error) {
+    console.error('Error handling event click:', error);
+  }
 };
 const handleEventDrop = (dropInfo: EventDropArg): void => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'eventDrop',
-    {
-      id: booking.id,
-      start: dropInfo.event.startStr,
-      end: dropInfo.event.endStr || dropInfo.event.startStr
-    },
-    'emit'
-  );
-  emit('eventDrop', dropInfo);
-  emit('updateBooking', {
-    id: booking.id,
-    start: dropInfo.event.startStr,
-    end: dropInfo.event.endStr || dropInfo.event.startStr
-  });
+  try {
+    const bookingId = dropInfo.event.id;
+    const booking = allBookingsMap.value.get(bookingId);
+    if (booking) {
+      const updatedBooking: Partial<BookingFormData> = {
+        ...booking,
+        checkout_date: dropInfo.event.startStr,
+        checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+      };
+      updateBooking(bookingId, updatedBooking);
+    }
+  } catch (error) {
+    console.error('Error handling event drop:', error);
+    dropInfo.revert();
+  }
 };
 const handleEventResize = (resizeInfo: any): void => {
-  const booking = (resizeInfo as { event: { extendedProps: { booking: Booking }; startStr: string; endStr: string } }).event.extendedProps.booking;
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'eventResize',
-    {
-      id: booking.id,
-      start: resizeInfo.event.startStr,
-      end: resizeInfo.event.endStr
-    },
-    'emit'
-  );
-  emit('updateBooking', {
-    id: booking.id,
-    start: resizeInfo.event.startStr,
-    end: resizeInfo.event.endStr
-  });
+  try {
+    const bookingId = resizeInfo.event.id;
+    const booking = allBookingsMap.value.get(bookingId);
+    if (booking) {
+      const updatedBooking: Partial<BookingFormData> = {
+        ...booking,
+        checkout_date: resizeInfo.event.startStr,
+        checkin_date: resizeInfo.event.endStr || resizeInfo.event.startStr
+      };
+      updateBooking(bookingId, updatedBooking);
+    }
+  } catch (error) {
+    console.error('Error handling event resize:', error);
+    resizeInfo.revert();
+  }
 };
-const renderEventContent = (eventInfo: any) => {
-  const booking = eventInfo.event.extendedProps.booking as Booking;
-  const property = eventInfo.event.extendedProps.property as Property;
-  const isTurn = booking.booking_type === 'turn';
-  return {
-    html: `
-      <div class="fc-event-content-wrapper">
-        <div class="fc-event-title">
-          ${isTurn ? '🔥 ' : ''}${property?.name || 'Property'}
-        </div>
-        <div class="fc-event-subtitle">
-          ${booking.status.toUpperCase()}
-          ${booking.guest_count ? ` • ${booking.guest_count} guests` : ''}
-        </div>
-      </div>
-    `
-  };
+const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+  try {
+    const booking = allBookingsMap.value.get(data.id);
+    if (booking) {
+      const bookingData: Partial<BookingFormData> = {
+        ...booking,
+        checkout_date: data.start,
+        checkin_date: data.end
+      };
+      updateBooking(data.id, bookingData);
+    }
+  } catch (error) {
+    console.error('Error updating booking:', error);
+  }
 };
-// Custom day cell rendering
-const renderDayCell = (dayInfo: any) => {
-  const dayBookings = Array.from(props.bookings.values())
-    .filter(booking => {
-      const checkoutDate = new Date(booking.checkout_date).toDateString();
-      const dayDate = dayInfo.date.toDateString();
-      return checkoutDate === dayDate;
+const handleCalendarViewChange = (view: CalendarView): void => {
+  try {
+    let fullCalendarView: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
+    switch (view) {
+      case 'month':
+        fullCalendarView = 'dayGridMonth';
+        break;
+      case 'week':
+        fullCalendarView = 'timeGridWeek';
+        break;
+      case 'day':
+        fullCalendarView = 'timeGridDay';
+        break;
+      default:
+        fullCalendarView = 'timeGridWeek';
+    }
+    setCalendarView(fullCalendarView);
+  } catch (error) {
+    console.error('Error changing calendar view:', error);
+  }
+};
+const handleCalendarDateChange = (date: Date): void => {
+  try {
+    goToDate(date);
+  } catch (error) {
+    console.error('Error changing calendar date:', error);
+  }
+};
+const handlePrevious = (): void => {
+  try {
+    prev();
+  } catch (error) {
+    console.error('Error going to previous:', error);
+  }
+};
+const handleNext = (): void => {
+  try {
+    next();
+  } catch (error) {
+    console.error('Error going to next:', error);
+  }
+};
+const handleGoToday = (): void => {
+  try {
+    goToToday();
+  } catch (error) {
+    console.error('Error going to today:', error);
+  }
+};
+const handleEventModalClose = (): void => {
+  try {
+    uiStore.closeModal('event');
+  } catch (error) {
+    console.error('Error closing event modal:', error);
+  }
+};
+const handleEventModalSave = async (bookingData: BookingFormData): Promise<void> => {
+  try {
+    if (eventModalMode.value === 'create') {
+      await createBooking(bookingData);
+    } else if (eventModalMode.value === 'edit') {
+      const modalData = uiStore.getModalData('event') as any;
+      const bookingId = modalData?.booking?.id;
+      if (bookingId) {
+        await updateBooking(bookingId, bookingData);
+      }
+    }
+    uiStore.closeModal('event');
+  } catch (error) {
+    console.error('Error saving booking:', error);
+  }
+};
+const handleEventModalDelete = (bookingId: string): void => {
+  try {
+    uiStore.openConfirmDialog('confirm', {
+      title: 'Delete Booking',
+      message: 'Are you sure you want to delete this booking? This action cannot be undone and will affect the property owner.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      dangerous: true,
+      data: {
+        onConfirm: () => {
+          deleteBooking(bookingId);
+          uiStore.closeModal('event');
+          uiStore.closeConfirmDialog('confirm');
+        }
+      }
     });
-  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
-  return {
-    html: `
-      <div class="fc-daygrid-day-number">
-        ${dayInfo.dayNumberText}
-        ${turnCount > 0 ? `<span class="turn-indicator">${turnCount}</span>` : ''}
-      </div>
-    `
-  };
-};
-const goToDate = (date: string | Date): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(date);
+  } catch (error) {
+    console.error('Error deleting booking:', error);
   }
 };
-const changeView = (viewName: string): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().changeView(viewName);
+const handlePropertyModalClose = (): void => {
+  try {
+    uiStore.closeModal('property');
+  } catch (error) {
+    console.error('Error closing property modal:', error);
   }
 };
-const refreshEvents = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().refetchEvents();
+const handlePropertyModalSave = async (propertyData: PropertyFormData): Promise<void> => {
+  try {
+    if (propertyModalMode.value === 'create') {
+      await createProperty(propertyData);
+    } else if (propertyModalMode.value === 'edit') {
+      const modalData = uiStore.getModalData('property') as any;
+      const propertyId = modalData?.property?.id;
+      if (propertyId) {
+        await updateProperty(propertyId, propertyData);
+      }
+    }
+    uiStore.closeModal('property');
+  } catch (error) {
+    console.error('Error saving property:', error);
   }
 };
-watch(() => theme.global.current.value.dark, () => {
-  refreshEvents();
+const handlePropertyModalDelete = (propertyId: string): void => {
+  try {
+    const property = allPropertiesMap.value.get(propertyId);
+    const relatedBookings = Array.from(allBookingsMap.value.values())
+      .filter(booking => booking.property_id === propertyId);
+    uiStore.openConfirmDialog('confirm', {
+      title: 'Delete Property',
+      message: `Are you sure you want to delete "${property?.name}"? This will affect ${relatedBookings.length} bookings and impact the property owner's business.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      dangerous: true,
+      data: {
+        onConfirm: () => {
+          deleteProperty(propertyId);
+          uiStore.closeModal('property');
+          uiStore.closeConfirmDialog('confirm');
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting property:', error);
+  }
+};
+const handleConfirmDialogConfirm = (): void => {
+  try {
+    const confirmData = uiStore.getConfirmDialogState('confirm');
+    const onConfirm = confirmData?.data?.onConfirm;
+    if (onConfirm && typeof onConfirm === 'function') {
+      onConfirm();
+    }
+  } catch (error) {
+    console.error('Error handling confirm dialog confirm:', error);
+  }
+};
+const handleConfirmDialogCancel = (): void => {
+  try {
+    const confirmData = uiStore.getConfirmDialogState('confirm');
+    const onCancel = confirmData?.data?.onCancel;
+    if (onCancel && typeof onCancel === 'function') {
+      onCancel();
+    }
+    uiStore.closeConfirmDialog('confirm');
+  } catch (error) {
+    console.error('Error handling confirm dialog cancel:', error);
+  }
+};
+const handleConfirmDialogClose = (): void => {
+  try {
+    uiStore.closeConfirmDialog('confirm');
+  } catch (error) {
+    console.error('Error closing confirm dialog:', error);
+  }
+};
+const toggleSidebar = (): void => {
+  sidebarOpen.value = !sidebarOpen.value;
+};
+onMounted(async () => {
+  try {
+    await Promise.all([
+      fetchAllBookings(),
+      fetchAllProperties()
+    ]);
+    watch(xs, (newVal) => {
+      sidebarOpen.value = !newVal;
+    }, { immediate: true });
+  } catch (error) {
+    console.error('Error initializing HomeAdmin:', error);
+  }
 });
-watch(() => props.bookings, (newBookings) => {
-  eventLogger.logEvent(
-    'Home',
-    'FullCalendar',
-    'bookingsUpdate',
-    { count: newBookings.size },
-    'receive'
-  );
-}, { deep: true });
-const handleLoading = (isLoading: boolean): void => {
-  console.log('Calendar loading state:', isLoading);
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'loadingState',
-    { isLoading },
-    'emit'
-  );
-};
-defineExpose({
-  goToDate,
-  changeView,
-  refreshEvents,
-  getApi: () => calendarRef.value?.getApi()
+onUnmounted(() => {
 });
 </script>
 <style scoped>
-.calendar-container {
-  height: 100%;
-  width: 100%;
+.home-admin-container {
+  min-height: calc(100vh - 64px);
+  overflow: hidden;
 }
-.custom-calendar {
-  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
-  --fc-button-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-border-color: rgb(var(--v-theme-primary));
-  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
-  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
+.sidebar-column {
+  min-height: calc(100vh - 64px);
+  overflow-y: auto;
+  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  background-color: rgb(var(--v-theme-surface));
 }
-.fc-event.booking-turn {
-  font-weight: bold;
-  border-width: 2px !important;
-  animation: pulse 2s infinite;
+.calendar-column {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0); }
-  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
+.calendar-header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  background-color: rgb(var(--v-theme-surface));
+  flex-shrink: 0;
 }
-.fc-event.status-pending {
-  opacity: 0.8;
+.mobile-hidden {
+  display: none;
 }
-.fc-event.status-completed {
-  opacity: 0.6;
-  text-decoration: line-through;
+.home-admin-container .calendar-header {
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
+  color: rgb(var(--v-theme-on-primary));
 }
-.turn-indicator {
-  background: rgb(var(--v-theme-error));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 10px;
-  margin-left: 4px;
-  font-weight: bold;
+.home-admin-container .calendar-header .v-btn {
+  color: rgb(var(--v-theme-on-primary));
 }
-.fc-event-content-wrapper {
-  padding: 2px;
+.home-admin-container .calendar-header .text-h6 {
+  color: rgb(var(--v-theme-on-primary));
+  font-weight: 600;
 }
-.fc-event-subtitle {
-  font-size: 0.75em;
-  opacity: 0.9;
-  margin-top: 1px;
+.home-admin-container .text-caption {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+@media (max-width: 1279px) {
+  .sidebar-column {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    z-index: 1000;
+    width: 100% !important;
+    max-width: 400px;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    height: calc(100vh - 64px);
+  }
+  .mobile-hidden {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .sidebar-column:not(.mobile-hidden) {
+    transform: translateX(0);
+  }
+}
+@media (min-width: 1280px) {
+  .sidebar-column {
+    position: static !important;
+    transform: none !important;
+    width: unset !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    height: auto !important;
+  }
+}
+@media (max-width: 600px) {
+  .calendar-header {
+    padding: 8px;
+  }
+  .calendar-header .d-flex {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .calendar-header .v-btn-toggle {
+    margin-left: 0 !important;
+    margin-top: 8px;
+  }
+}
+.home-admin-container {
+  --admin-primary: rgb(var(--v-theme-primary));
+  --admin-secondary: rgb(var(--v-theme-secondary));
+  --admin-warning: rgb(var(--v-theme-warning));
+  --admin-info: rgb(var(--v-theme-info));
 }
 </style>
 ````
@@ -30257,77 +30241,6 @@ defineExpose({
 ````vue
 <template>
   <v-app>
-    <v-navigation-drawer
-      v-model="drawer"
-      :rail="(rail && !mobile) || (md && !mobile)"
-      :permanent="!mobile"
-      :temporary="mobile"
-      color="secondary"
-      class="border-r"
-      @click="rail = false"
-    >
-      <v-list>
-        <v-list-item
-          title="Cleano"
-        >
-          <template #append>
-            <v-btn
-              icon="mdi-chevron-left"
-              variant="text"
-              @click.stop="closeDrawer"
-            />
-          </template>
-        </v-list-item>
-      </v-list>
-      <v-divider class="my-2" />
-      <v-list
-        density="compact"
-        nav
-      >
-        <v-list-item
-          to="/"
-          prepend-icon="mdi-view-dashboard"
-          title="Dashboard"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/properties"
-          prepend-icon="mdi-home"
-          title="Properties"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/calendar"
-          prepend-icon="mdi-calendar"
-          title="Calendar"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/settings"
-          prepend-icon="mdi-cog"
-          title="Settings"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/integrations"
-          prepend-icon="mdi-link"
-          title="Integrations"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/faq"
-          prepend-icon="mdi-help-circle"
-          title="FAQ"
-          rounded="lg"
-        />
-        <v-list-item
-          to="/contact"
-          prepend-icon="mdi-email"
-          title="Contact Us"
-          rounded="lg"
-        />
-      </v-list>
-    </v-navigation-drawer>
     <v-app-bar
       app
       color="surface"
@@ -30386,14 +30299,6 @@ defineExpose({
   </v-app>
 </template>
 ⋮----
-<template #append>
-            <v-btn
-              icon="mdi-chevron-left"
-              variant="text"
-              @click.stop="closeDrawer"
-            />
-          </template>
-⋮----
 <template #activator="{ props: menuProps }">
           <v-btn
             icon
@@ -30408,12 +30313,11 @@ defineExpose({
 ⋮----
 <script setup lang="ts">
   import { ref } from 'vue';
-  import { watch } from 'vue';
   import { useDisplay } from 'vuetify';
   import ThemePicker from '@/components/dumb/shared/ThemePicker.vue';
   const drawer = ref(true);
   const rail = ref(false);
-  const { mobile, md } = useDisplay();
+  const { mobile} = useDisplay();
   const toggleSidebar = (): void => {
     if (mobile.value) {
       drawer.value = !drawer.value;
@@ -30421,21 +30325,6 @@ defineExpose({
       rail.value = !rail.value;
     }
   };
-  const closeDrawer = (): void => {
-    if (mobile.value) {
-      drawer.value = false;
-    } else {
-      rail.value = !rail.value;
-    }
-  };
-  watch([mobile, md], ([isMobile]: [boolean, boolean]) => {
-    if (isMobile) {
-      drawer.value = false;
-      rail.value = false;
-    } else {
-      drawer.value = true;
-    }
-  }, { immediate: true });
   </script>
 <style>
   .border-b {
@@ -30443,10 +30332,6 @@ defineExpose({
   }
   .border-r {
     border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
-  }
-  .v-navigation-drawer {
-    background: rgb(var(--v-theme-surface)) !important;
-    color: rgb(var(--v-theme-on-surface)) !important;
   }
   .v-app-bar {
     background: rgb(var(--v-theme-surface)) !important;
@@ -30675,192 +30560,6 @@ onMounted(async () => {
   text-transform: none;
 }
 </style>
-````
-
-## File: src/types/ui.ts
-````typescript
-export type ModalData = Record<string, unknown> | null | undefined;
-export type FilterValue = string | number | boolean | Date | string[] | null | undefined;
-export interface ModalState {
-  open: boolean;
-  mode: 'create' | 'edit' | 'view' | 'delete';
-  data?: ModalData;
-}
-export interface ConfirmDialogState {
-  open: boolean;
-  title: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  confirmColor?: string;
-  dangerous?: boolean;
-  data?: ModalData;
-}
-export type NotificationType = 'success' | 'info' | 'warning' | 'error';
-export interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-  autoClose?: boolean;
-  duration?: number;
-}
-export type CalendarView = 'month' | 'week' | 'day' | 'list';
-export interface FilterState {
-  propertyId?: string;
-  bookingType?: 'all' | 'standard' | 'turn';
-  status?: 'all' | 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-  dateRange?: {
-    start: string;
-    end: string;
-  };
-  searchTerm?: string;
-}
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  start: string;
-  end: string;
-  allDay: boolean;
-  classNames: string[];
-  backgroundColor?: string;
-  borderColor?: string;
-  textColor?: string;
-  extendedProps: {
-    booking: Record<string, unknown>;
-    type: 'standard' | 'turn';
-    status: string;
-  };
-}
-export type UserRole = 'owner' | 'admin' | 'cleaner';
-export type ErrorCategory =
-  | 'validation'
-  | 'network'
-  | 'business_logic'
-  | 'authentication'
-  | 'permission'
-  | 'system';
-export type BusinessImpact = 'low' | 'medium' | 'high' | 'critical';
-export interface ErrorContext {
-  userId?: string;
-  userRole?: UserRole;
-  operation?: string;
-  component?: string;
-  timestamp: string;
-  sessionId?: string;
-  requestId?: string;
-}
-export interface ErrorHandlingOptions {
-  showToUser?: boolean;
-  autoRetry?: boolean;
-  maxRetries?: number;
-  retryDelay?: number;
-  logToConsole?: boolean;
-  reportToService?: boolean;
-  escalate?: boolean;
-}
-export interface ErrorInfo {
-  code?: string;
-  category: ErrorCategory;
-  message: string;
-  userMessage?: string;
-  technicalDetails?: string;
-  businessImpact?: BusinessImpact;
-  affectedResources?: string[];
-  suggestedActions?: string[];
-  context: ErrorContext;
-  options: ErrorHandlingOptions;
-}
-export interface ErrorRecoveryAction {
-  label: string;
-  action: () => void | Promise<void>;
-  primary?: boolean;
-  dangerous?: boolean;
-}
-export type LoadingType = 'global' | 'page' | 'component' | 'action';
-export interface LoadingOperation {
-  id: string;
-  type: LoadingType;
-  message?: string;
-  progress?: number;
-  cancellable?: boolean;
-  startTime: number;
-  timeout?: number;
-  role?: UserRole;
-}
-export interface LoadingStateOptions {
-  timeout?: number;
-  showProgress?: boolean;
-  overlay?: boolean;
-  role?: UserRole;
-  message?: string;
-  cancellable?: boolean;
-  onCancel?: () => void;
-}
-export interface LoadingState {
-  loading: boolean;
-  progress?: number;
-  message?: string;
-  cancellable?: boolean;
-  error?: ErrorInfo | null;
-}
-export interface NotificationAction {
-  label: string;
-  action: string;
-  color?: string;
-  icon?: string;
-}
-export interface RoleBasedNotification extends Notification {
-  userRole?: UserRole;
-  businessImpact?: BusinessImpact;
-  category?: ErrorCategory;
-  actions?: NotificationAction[];
-  escalationLevel?: number;
-}
-export interface NotificationQueueConfig {
-  maxSize: number;
-  defaultDuration: number;
-  roleBasedStyling: boolean;
-  groupSimilar: boolean;
-}
-export interface ValidationError {
-  field: string;
-  message: string;
-  code?: string;
-  value?: any;
-}
-export interface FormValidationState {
-  valid: boolean;
-  errors: ValidationError[];
-  warnings: ValidationError[];
-  touched: Set<string>;
-  dirty: Set<string>;
-}
-export interface ApiError {
-  status?: number;
-  statusText?: string;
-  code?: string;
-  message: string;
-  details?: any;
-  endpoint?: string;
-  method?: string;
-  timestamp: string;
-}
-export interface RetryConfig {
-  maxAttempts: number;
-  baseDelay: number;
-  maxDelay: number;
-  exponentialBackoff: boolean;
-  retryCondition?: (error: any) => boolean;
-}
-export interface AccessibilityOptions {
-  announceToScreenReader?: boolean;
-  focusManagement?: boolean;
-  highContrast?: boolean;
-  reducedMotion?: boolean;
-}
 ````
 
 ## File: src/components/smart/Home.vue
@@ -32123,928 +31822,6 @@ onMounted(() => {
 }
 ````
 
-## File: problemfix.md
-````markdown
-# Problem Fix Documentation
-
-## TypeScript Const Assertion Error in AdminSidebar.vue
-
-### Problem Description
-**Error**: `A 'const' assertions can only be applied to references to enum members, or string, number, boolean, array, or object literals.ts(1355)`
-
-**Location**: `src/components/smart/admin/AdminSidebar.vue`, line 666
-
-**Code causing the error**:
-```typescript
-priority: (booking.booking_type === 'turn' ? 'high' : 'normal') as const,
-```
-
-### Root Cause Analysis
-The TypeScript `as const` assertion cannot be applied to conditional expressions. The `as const` assertion can only be used on:
-- Enum members
-- String literals
-- Number literals  
-- Boolean literals
-- Array literals
-- Object literals
-
-A conditional expression like `(condition ? 'value1' : 'value2')` is not a literal value, so TypeScript rejects the `as const` assertion.
-
-### Solution Applied
-Following the established pattern from the existing codebase (`src/components/smart/Sidebar.vue`), the solution is to:
-
-1. **Declare an explicitly typed variable** instead of using `as const`
-2. **Assign the conditional expression** to that variable
-3. **Use the variable** in the object construction
-
-**Before (incorrect)**:
-```typescript
-return {
-  ...booking,
-  priority: (booking.booking_type === 'turn' ? 'high' : 'normal') as const,
-  // ... other properties
-} as BookingWithMetadata;
-```
-
-**After (correct)**:
-```typescript
-// Explicit priority type declaration following established pattern
-const priority: 'low' | 'normal' | 'high' | 'urgent' = 
-  booking.booking_type === 'turn' ? 'high' : 'normal';
-
-return {
-  ...booking,
-  priority,
-  // ... other properties
-} as BookingWithMetadata;
-```
-
-### Files Modified
-1. **src/components/smart/admin/AdminSidebar.vue**:
-   - Fixed `systemTodayBookingsWithMetadata` computed property
-   - Fixed `systemUpcomingBookingsWithMetadata` computed property
-   - Removed unused `uiStore` variable (linter warning)
-
-### Established Pattern Reference
-This solution follows the pattern already established in:
-- `src/components/smart/Sidebar.vue` (lines 289-291)
-- `src/components/smart/owner/OwnerSidebar.vue` (similar pattern)
-
-### Type Safety Benefits
-The explicit type declaration approach provides:
-1. **Better type safety**: TypeScript can verify the assignment matches the expected union type
-2. **Clearer intent**: The code explicitly shows what priority values are allowed
-3. **Consistency**: Matches the established codebase patterns
-4. **Maintainability**: Easier to understand and modify
-
-### Business Logic Context
-This fix maintains the core business logic for the role-based multi-tenant architecture:
-- **Admin interface**: Shows system-wide data (all properties, all bookings)
-- **Priority calculation**: Turn bookings get 'high' priority, standard bookings get 'normal' priority
-- **Turn vs Standard distinction**: Core business logic preserved across role-based components
-
-### Prevention
-To prevent similar issues in the future:
-1. **Use explicit type declarations** for conditional expressions that need specific types
-2. **Follow established patterns** from existing codebase components
-3. **Avoid `as const` on computed/conditional values** - only use on literal values
-4. **Reference existing implementations** like Sidebar.vue for consistent patterns
-
-### Verification
-- [x] TypeScript compiles without errors
-- [x] Follows established naming conventions  
-- [x] Integrates with existing stores/composables
-- [x] Includes proper error handling
-- [x] Maintains role-based architecture patterns
-- [x] Preserves turn vs standard booking business logic
-
-## FullCalendar List Plugin Import Error
-
-### Problem Description
-The AdminCalendar.vue component was showing a TypeScript error:
-```
-Cannot find module '@fullcalendar/list' or its corresponding type declarations.
-```
-
-This error occurred on line 203 of `src/components/smart/admin/AdminCalendar.vue`:
-```typescript
-import listPlugin from '@fullcalendar/list';
-```
-
-### Root Cause Analysis
-The issue was that the `@fullcalendar/list` package was installed as a devDependency instead of a regular dependency. While the package was available during development, TypeScript was having trouble resolving the module correctly due to its placement in the wrong dependency section.
-
-### Solution Implemented
-
-#### 1. Package Dependency Fix
-**Problem**: `@fullcalendar/list` was in devDependencies instead of dependencies
-**Solution**: Moved the package to the correct dependencies section in package.json
-
-**Before**:
-```json
-{
-  "dependencies": {
-    "@fullcalendar/core": "^6.1.17",
-    "@fullcalendar/daygrid": "^6.1.17",
-    "@fullcalendar/interaction": "^6.1.17",
-    "@fullcalendar/timegrid": "^6.1.17",
-    "@fullcalendar/vue3": "^6.1.17"
-  },
-  "devDependencies": {
-    "@fullcalendar/list": "^6.1.17"
-  }
-}
-```
-
-**After**:
-```json
-{
-  "dependencies": {
-    "@fullcalendar/core": "^6.1.17",
-    "@fullcalendar/daygrid": "^6.1.17",
-    "@fullcalendar/interaction": "^6.1.17",
-    "@fullcalendar/list": "^6.1.17",
-    "@fullcalendar/timegrid": "^6.1.17",
-    "@fullcalendar/vue3": "^6.1.17"
-  }
-}
-```
-
-#### 2. Import Statement Verification
-**Verified**: The import statement follows the established pattern from other FullCalendar plugins:
-```typescript
-import listPlugin from '@fullcalendar/list';
-```
-
-This matches the pattern used in the existing FullCalendar.vue component:
-```typescript
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-```
-
-#### 3. Package Installation Verification
-**Confirmed**: The package is correctly installed with proper TypeScript declarations:
-- Package exists in `node_modules/@fullcalendar/list/`
-- TypeScript declarations available in `index.d.ts`
-- Runtime import test successful
-
-### Technical Details
-
-#### Context7 Documentation Reference
-Used FullCalendar documentation to confirm the correct usage of the list plugin:
-- List plugin provides list view functionality for FullCalendar
-- Supports listDay, listWeek, listMonth, and listYear views
-- Properly integrates with Vue 3 and TypeScript
-
-#### Established Project Patterns
-The fix follows the project's established patterns:
-- **Role-Based Architecture**: AdminCalendar.vue is part of the admin-specific components
-- **FullCalendar Integration**: Consistent with existing FullCalendar.vue component patterns
-- **TypeScript Support**: Maintains proper type safety and declarations
-- **Package Management**: Follows pnpm dependency management practices
-
-### Verification Steps
-1. ✅ Package moved to correct dependencies section
-2. ✅ pnpm install completed successfully
-3. ✅ Runtime import test passed
-4. ✅ TypeScript declarations available
-5. ✅ Import statement follows established patterns
-
-### Files Modified
-- `package.json`: Moved `@fullcalendar/list` from devDependencies to dependencies
-- `src/components/smart/admin/AdminCalendar.vue`: Import statement verified (no changes needed)
-
-### Impact
-- **Positive**: AdminCalendar.vue can now use list view functionality
-- **No Breaking Changes**: Existing FullCalendar functionality remains intact
-- **Consistency**: Maintains established import patterns across the project
-
-### Future Considerations
-- The list plugin enables additional calendar views (listDay, listWeek, listMonth, listYear)
-- AdminCalendar.vue can now provide list-based views for better data management
-- Follows the role-based architecture where admin users get advanced calendar features
-
-### Related Components
-- `src/components/smart/FullCalendar.vue`: Base calendar component
-- `src/components/smart/admin/AdminCalendar.vue`: Admin-specific calendar with list plugin
-- `src/components/smart/admin/AdminCalendarDemo.vue`: Demo component for testing
-
-### Notes
-- The TypeScript error may persist temporarily in some IDEs due to language server caching
-- The import is functionally correct and works at runtime
-- Package is properly installed with full TypeScript support
-
-# Problem Fix Documentation: UseAdminPropertiesDemo.vue TypeScript Warnings
-
-## **Problem Summary**
-Fixed TypeScript warnings in `src/components/smart/admin/UseAdminPropertiesDemo.vue` where three variables were declared but never used, causing linter errors.
-
-## **Specific TypeScript Errors**
-```typescript
-// Error 1: Line 396
-'allActiveProperties' is declared but its value is never read.
-
-// Error 2: Line 406  
-'getPropertyUtilization' is declared but its value is never read.
-
-// Error 3: Line 407
-'filterProperties' is declared but its value is never read.
-```
-
-## **Root Cause Analysis**
-
-### **Why This Occurred**
-1. **Incomplete Demo Implementation**: The demo component was destructuring more functionality from `useAdminProperties` than it was actually demonstrating
-2. **Redundant Function Import**: `getPropertyUtilization` was redundant since `propertyUtilizationData` was already being used
-3. **Missing Demo Sections**: The component wasn't showcasing the full capabilities of the admin properties composable
-
-### **Impact**
-- TypeScript compilation warnings
-- Incomplete demonstration of composable functionality
-- Reduced value of the demo component for testing and development
-
-## **Solution Implemented**
-
-### **Approach: Comprehensive Demo Enhancement**
-Instead of simply removing unused variables, I enhanced the demo to actually use them, making it more comprehensive and valuable.
-
-### **1. Active vs Inactive Properties Display**
-**Fixed**: `'allActiveProperties' is declared but its value is never read`
-
-**Implementation**:
-```vue
-<!-- Added Active vs Inactive Properties Section -->
-<v-row>
-  <v-col cols="12" md="6">
-    <v-card>
-      <v-card-title>
-        <v-icon class="mr-2" color="success">mdi-check-circle</v-icon>
-        Active Properties
-      </v-card-title>
-      <v-card-text>
-        <div class="text-h3 text-success">{{ allActiveProperties.length }}</div>
-        <div class="text-caption">Currently active properties</div>
-      </v-card-text>
-    </v-card>
-  </v-col>
-  <v-col cols="12" md="6">
-    <v-card>
-      <v-card-title>
-        <v-icon class="mr-2" color="warning">mdi-pause-circle</v-icon>
-        Inactive Properties
-      </v-card-title>
-      <v-card-text>
-        <div class="text-h3 text-warning">{{ allProperties.length - allActiveProperties.length }}</div>
-        <div class="text-caption">Currently inactive properties</div>
-      </v-card-text>
-    </v-card>
-  </v-col>
-</v-row>
-```
-
-**Benefits**:
-- Showcases the `allActiveProperties` computed property
-- Provides visual metrics for admin dashboard
-- Demonstrates role-based data access (admin sees ALL properties)
-
-### **2. Advanced Property Filtering Demo**
-**Fixed**: `'filterProperties' is declared but its value is never read`
-
-**Implementation**:
-```typescript
-// Added reactive filter state
-const filterCriteria = ref({
-  owner_id: '',
-  pricing_tier: '',
-  active: null as boolean | null
-});
-const filteredResults = ref<any[]>([]);
-
-// Added filter options
-const ownerOptions = computed(() => {
-  const owners = new Set(allProperties.value.map(p => p.owner_id));
-  return Array.from(owners).map(id => ({
-    title: `Owner ${id.slice(0, 8)}...`,
-    value: id
-  }));
-});
-
-// Added filter functions
-function testFilterProperties() {
-  const criteria: any = {};
-  
-  if (filterCriteria.value.owner_id) {
-    criteria.owner_id = filterCriteria.value.owner_id;
-  }
-  
-  if (filterCriteria.value.pricing_tier) {
-    criteria.pricing_tier = filterCriteria.value.pricing_tier;
-  }
-  
-  if (filterCriteria.value.active !== null) {
-    criteria.active = filterCriteria.value.active;
-  }
-  
-  filteredResults.value = filterProperties(criteria);
-  console.log('Filter results:', filteredResults.value);
-}
-
-function clearFilters() {
-  filterCriteria.value = {
-    owner_id: '',
-    pricing_tier: '',
-    active: null
-  };
-  filteredResults.value = [];
-}
-```
-
-**UI Components Added**:
-```vue
-<!-- Advanced Property Filtering Demo -->
-<v-row>
-  <v-col cols="12">
-    <v-card>
-      <v-card-title>
-        <v-icon class="mr-2" color="primary">mdi-filter</v-icon>
-        Advanced Property Filtering Demo
-      </v-card-title>
-      <v-card-text>
-        <!-- Filter Controls -->
-        <v-row>
-          <v-col cols="12" md="4">
-            <v-select
-              v-model="filterCriteria.owner_id"
-              :items="ownerOptions"
-              label="Filter by Owner"
-              clearable
-              variant="outlined"
-              density="compact"
-            />
-          </v-col>
-          <!-- More filter controls... -->
-        </v-row>
-        
-        <!-- Filter Results Display -->
-        <v-row v-if="filteredResults.length > 0">
-          <v-col cols="12">
-            <v-alert type="info" variant="outlined" class="mt-4">
-              Found {{ filteredResults.length }} properties matching your criteria
-            </v-alert>
-            <!-- Results list... -->
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-  </v-col>
-</v-row>
-```
-
-**Benefits**:
-- Demonstrates advanced filtering capabilities
-- Shows multi-criteria filtering (owner, tier, status)
-- Interactive testing of the `filterProperties` function
-- Showcases admin-specific functionality (filtering across all owners)
-
-### **3. Redundant Function Removal**
-**Fixed**: `'getPropertyUtilization' is declared but its value is never read`
-
-**Solution**: Removed `getPropertyUtilization` from destructuring since `propertyUtilizationData` was already being used.
-
-```typescript
-// Before (redundant)
-const {
-  // ...
-  getPropertyUtilization,  // ❌ Redundant
-  propertyUtilizationData, // ✅ Already used
-  // ...
-} = useAdminProperties();
-
-// After (clean)
-const {
-  // ...
-  propertyUtilizationData, // ✅ Only what's needed
-  // ...
-} = useAdminProperties();
-```
-
-### **4. Syntax Error Fix**
-**Additional Issue Found**: Extra closing brace in `testBulkUpdate()` function
-
-```typescript
-// Before (syntax error)
-async function testBulkUpdate() {
-  const propertyIds = allProperties.value.slice(0, 3).map(p => p.id);
-  if (propertyIds.length === 0) {
-    console.warn('No properties available for bulk update test');
-    return;
-  }
-  } // ❌ Extra closing brace
-  
-  const updates = { /* ... */ };
-  // ...
-}
-
-// After (fixed)
-async function testBulkUpdate() {
-  const propertyIds = allProperties.value.slice(0, 3).map(p => p.id);
-  
-  if (propertyIds.length === 0) {
-    error.value = 'No properties available for bulk update test';
-    return;
-  }
-  
-  const updates = { /* ... */ };
-  // ...
-}
-```
-
-## **Technical Patterns Followed**
-
-### **Vue 3 Composition API Patterns**
-- ✅ Used `ref()` for reactive state
-- ✅ Used `computed()` for derived state
-- ✅ Proper TypeScript typing with generics
-- ✅ Followed established naming conventions
-
-### **Role-Based Architecture Patterns**
-- ✅ Admin sees ALL data (no owner filtering)
-- ✅ System-wide metrics and analytics
-- ✅ Advanced filtering across all properties
-- ✅ Business-focused error messaging
-
-### **Component Demo Patterns**
-- ✅ Comprehensive functionality showcase
-- ✅ Interactive testing capabilities
-- ✅ Visual feedback and status display
-- ✅ Console logging for debugging
-
-## **Benefits of This Solution**
-
-### **1. Enhanced Demo Value**
-- **Before**: Basic demo with unused functionality
-- **After**: Comprehensive demo showcasing all composable features
-
-### **2. Better Testing Capabilities**
-- Interactive filtering for manual testing
-- Visual metrics display for verification
-- Multiple test scenarios in one component
-
-### **3. Improved Developer Experience**
-- Clear demonstration of admin-specific features
-- Examples of proper Vue 3 Composition API usage
-- Role-based architecture patterns showcase
-
-### **4. TypeScript Compliance**
-- ✅ All TypeScript warnings resolved
-- ✅ Proper type safety maintained
-- ✅ No unused variables or functions
-
-## **Verification Steps**
-
-### **1. TypeScript Compilation**
-```bash
-# All TypeScript errors resolved
-npm run type-check  # ✅ Passes
-```
-
-### **2. Demo Functionality**
-- ✅ Active/Inactive property counts display correctly
-- ✅ Filter controls work with all criteria combinations
-- ✅ Filter results display properly
-- ✅ Clear filters functionality works
-- ✅ All existing demo features still work
-
-### **3. Role-Based Architecture Compliance**
-- ✅ Admin sees ALL properties (no owner filtering)
-- ✅ System-wide metrics calculated correctly
-- ✅ Advanced filtering works across all data
-- ✅ Proper error handling with admin context
-
-## **Future Considerations**
-
-### **Demo Enhancement Opportunities**
-1. **Bulk Operations Demo**: Add interactive bulk update testing
-2. **Analytics Visualization**: Add charts for property metrics
-3. **Real-time Updates**: Add WebSocket simulation for live data
-4. **Export Functionality**: Add CSV/PDF export demos
-
-### **Performance Considerations**
-1. **Large Dataset Handling**: Consider pagination for filter results
-2. **Computed Property Optimization**: Monitor performance with large property sets
-3. **Memory Management**: Ensure proper cleanup of demo state
-
-## **Lessons Learned**
-
-### **1. Demo Component Best Practices**
-- Always showcase the full functionality of composables
-- Provide interactive testing capabilities
-- Include visual feedback and status indicators
-- Follow established architectural patterns
-
-### **2. TypeScript Warning Resolution**
-- Consider enhancing functionality rather than just removing unused code
-- Ensure demo components provide comprehensive testing capabilities
-- Maintain proper type safety throughout enhancements
-
-### **3. Role-Based Architecture**
-- Admin components should demonstrate system-wide capabilities
-- Filtering and analytics should reflect admin scope (all data)
-- Error handling should include business impact context
-
-## **Related Files Modified**
-- `src/components/smart/admin/UseAdminPropertiesDemo.vue` - Main fix implementation
-- `src/router/index.ts` - Demo route already existed
-- `src/composables/admin/useAdminProperties.ts` - No changes needed (composable was correct)
-
-## **Testing Completed**
-- ✅ TypeScript compilation passes
-- ✅ Demo component loads without errors  
-- ✅ All new functionality works as expected
-- ✅ Existing functionality remains intact
-- ✅ Role-based architecture patterns maintained
-
-## Issue: Duplicate Identifier Error in Admin Cleaners Page
-
-### Problem Description
-When accessing `/admin/cleaners`, the application threw a compilation error:
-```
-[plugin:vite:vue] [vue/compiler-sfc] Identifier 'deleteCleaner' has already been declared. (97:6)
-```
-
-### Root Cause Analysis
-The error occurred due to a **naming conflict** in the Vue component's script section:
-
-1. **Line 296**: The component destructured `deleteCleaner` from the `useCleanerManagement` composable:
-   ```typescript
-   const { allCleaners, loading, fetchCleaners, createCleaner, updateCleaner, deleteCleaner } = useCleanerManagement()
-   ```
-
-2. **Line 385**: The component then attempted to declare a local function with the same name:
-   ```typescript
-   const deleteCleaner = async (cleaner: Cleaner) => {
-     // ... function body
-   }
-   ```
-
-This created a **duplicate identifier** error because JavaScript/TypeScript doesn't allow two variables/functions with the same name in the same scope.
-
-### Why This Occurred
-This is a common pattern issue when:
-- A composable provides a function (like `deleteCleaner`)
-- The component needs to wrap that function with additional logic (like confirmation dialogs)
-- The developer accidentally uses the same name for both the imported function and the wrapper function
-
-### Solution Implemented
-**Renamed the local wrapper function** to follow Vue.js naming conventions:
-
-1. **Changed the local function name** from `deleteCleaner` to `handleDeleteCleaner`:
-   ```typescript
-   const handleDeleteCleaner = async (cleaner: Cleaner) => {
-     if (confirm(`Are you sure you want to delete ${cleaner.name}?`)) {
-       try {
-         await deleteCleaner(cleaner.id) // Still calls the composable function
-       } catch (error) {
-         console.error('Failed to delete cleaner:', error)
-       }
-     }
-   }
-   ```
-
-2. **Updated the template** to use the renamed function:
-   ```vue
-   <v-btn
-     variant="text"
-     size="small"
-     color="error"
-     icon="mdi-delete"
-     @click="handleDeleteCleaner(cleaner)"
-   />
-   ```
-
-### Architecture Patterns Followed
-This fix follows established project patterns:
-
-1. **Composable Integration**: Maintains proper use of the `useCleanerManagement` composable
-2. **Event Handler Naming**: Uses `handle` prefix for event handler functions (Vue.js convention)
-3. **Separation of Concerns**: 
-   - Composable provides the core business logic (`deleteCleaner`)
-   - Component provides the UI logic (`handleDeleteCleaner` with confirmation)
-4. **Error Handling**: Maintains proper error handling in the wrapper function
-
-### Prevention Strategy
-To prevent similar issues in the future:
-
-1. **Use descriptive names** for wrapper functions (e.g., `handleDeleteCleaner`, `onDeleteCleaner`)
-2. **Follow naming conventions**: Use `handle` or `on` prefixes for event handlers
-3. **Review destructured imports** when creating local functions with similar purposes
-4. **Use TypeScript/ESLint** to catch naming conflicts during development
-
-### Files Modified
-- `src/pages/admin/cleaners/index.vue`: Fixed duplicate identifier by renaming local function
-
-### Verification
-- ✅ **Duplicate identifier error resolved** - The specific compilation error is fixed
-- ✅ **No naming conflicts** - Local function renamed to `handleDeleteCleaner`
-- ✅ **Component follows established project patterns** - Uses `handle` prefix for event handlers
-- ✅ **Maintains integration with existing composables** - Still calls `deleteCleaner` from `useCleanerManagement`
-- ✅ **Proper error handling preserved** - Confirmation dialog and try/catch blocks maintained
-- ✅ **Template updated correctly** - Button click handler uses new function name
-
-### Test Results
-- **Before Fix**: `[plugin:vite:vue] [vue/compiler-sfc] Identifier 'deleteCleaner' has already been declared`
-- **After Fix**: Compilation error resolved, page loads successfully
-- **Functionality**: Delete cleaner functionality works as expected with confirmation dialog
-
-### Additional Notes
-- Other TypeScript errors in the project are unrelated to this specific fix
-- The core duplicate identifier issue has been completely resolved
-- The fix maintains all existing functionality while following Vue.js naming conventions
-
-## Issue: Vuetify Layout Injection Error in Admin Interface
-
-### Problem Description
-When accessing `/admin/`, the following error appeared in the console:
-```
-[Vue warn]: injection "Symbol(vuetify:layout)" not found. 
-  at <VNavigationDrawer class="sidebar" width="100%" elevation=8  ... > 
-  at <Sidebar today-turns= Map(0) {size: 0}[[Entries]]No propertiessize: 0[[Prototype]]: Map upcoming-cleanings= Map(0) {size: 0}[[Entries]]No propertiessize: 0[[Prototype]]: Map properties= Map(0) {size: 0}[[Entries]]No propertiessize: 0[[Prototype]]: Map  ... > 
-  at <VCol cols="12" lg="3" xl="2"  ... > 
-  at <VRow no-gutters="" class="fill-height" > 
-  at <HomeAdmin > 
-  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > > 
-  at <RouterView > 
-  at <Admin > 
-  at <App>
-```
-
-### Root Cause Analysis
-The error occurred because:
-1. The admin layout (`src/layouts/admin.vue`) was using a custom HTML/CSS layout structure instead of Vuetify's layout system
-2. The `VNavigationDrawer` component in the Sidebar requires Vuetify's layout context (provided by `v-app`) to function properly
-3. Without the proper layout injection, Vuetify components cannot access the layout context they need
-
-### Solution Implemented
-**TASK-039W**: Complete rewrite of admin layout to use Vuetify's layout system
-
-#### Changes Made:
-
-1. **Updated `src/layouts/admin.vue`**:
-   - Replaced custom HTML structure with proper Vuetify layout components
-   - Added `v-app` as root component to provide layout context
-   - Implemented `v-app-bar` for admin header with navigation
-   - Used `v-main` for content area
-   - Maintained admin-specific styling and branding
-
-2. **Updated `src/pages/admin/index.vue`**:
-   - Removed height constraints that conflicted with Vuetify layout
-   - Simplified styling to work with new layout system
-
-3. **Updated `src/components/smart/admin/HomeAdmin.vue`**:
-   - Changed fixed heights to min-heights with app bar offset (64px)
-   - Updated responsive design to account for app bar
-   - Maintained admin-specific functionality and styling
-
-#### Key Technical Details:
-- **Layout Context**: `v-app` provides the necessary injection context for all Vuetify components
-- **App Bar Height**: Accounted for 64px app bar height in component calculations
-- **Responsive Design**: Updated mobile sidebar positioning to work with new layout
-- **Consistency**: Now follows same patterns as default layout for maintainability
-
-### Verification
-- ✅ `/admin/` route loads without console errors
-- ✅ VNavigationDrawer works properly within layout context
-- ✅ Admin-specific styling and navigation maintained
-- ✅ Responsive design functions correctly
-- ✅ All Vuetify components have proper layout injection
-
-### Files Modified
-- `src/layouts/admin.vue` - Complete rewrite using Vuetify layout system
-- `src/pages/admin/index.vue` - Removed conflicting height constraints  
-- `src/components/smart/admin/HomeAdmin.vue` - Updated styling for new layout
-- `tasks.md` - Added TASK-039W documentation
-
-### Lessons Learned
-1. Always use Vuetify's layout system (`v-app`, `v-app-bar`, `v-main`) when using Vuetify components
-2. `VNavigationDrawer` and other layout-dependent components require proper injection context
-3. Custom HTML/CSS layouts can break Vuetify component functionality
-4. Consistency across layouts improves maintainability and reduces bugs
-
-### Status
-**COMPLETE** - Admin interface now works properly with all Vuetify components functioning as expected.
-
-# Problem Fix: DOM parentNode Error in Admin Schedule
-
-## Problem Description
-When navigating to `/admin/schedule`, the application throws a JavaScript error:
-```
-Uncaught (in promise) TypeError: Cannot read properties of null (reading 'parentNode')
-    at parentNode (chunk-ABTQUVVM.js?v=1e5b29e7:10594:30)
-    at ReactiveEffect.componentUpdateFn [as fn] (chunk-ABTQUVVM.js?v=1e5b29e7:7528:11)
-```
-
-## Root Cause Analysis
-The error occurs because:
-1. **FullCalendar DOM Access**: The AdminCalendar component imports FullCalendar directly and tries to access DOM elements before they are properly mounted
-2. **Vue Reactivity Timing**: The error happens during Vue's reactivity update cycle when FullCalendar attempts to access the `parentNode` property of a null DOM element
-3. **Layout Mounting Order**: The admin layout and calendar component have timing issues where the calendar tries to render before its container is ready
-
-## Solution Implementation
-
-### 1. Added DOM Mounting Guards
-**File**: `src/components/smart/admin/AdminCalendar.vue`
-
-```typescript
-// Component mounting state
-const isMounted = ref(false);
-const isCalendarReady = ref(false);
-
-// Lifecycle hooks for proper DOM mounting
-onMounted(async () => {
-  isMounted.value = true;
-  
-  // Wait for DOM to be fully ready
-  await nextTick();
-  
-  // Add a small delay to ensure Vuetify layout is ready
-  setTimeout(() => {
-    isCalendarReady.value = true;
-  }, 100);
-});
-```
-
-### 2. Added Conditional Rendering
-**Template**: Added loading state to prevent premature calendar rendering
-
-```vue
-<div v-if="!isMounted || !isCalendarReady" class="calendar-loading">
-  <v-progress-circular indeterminate color="primary" size="64" />
-  <p class="text-center mt-4">Loading calendar...</p>
-</div>
-<FullCalendar
-  v-else
-  ref="calendarRef"
-  :options="adminCalendarOptions"
-  class="admin-calendar"
-/>
-```
-
-### 3. Safe Calendar Options
-**Logic**: Return safe defaults until component is ready
-
-```typescript
-const adminCalendarOptions = computed<CalendarOptions>(() => {
-  // Don't return options until component is ready
-  if (!isMounted.value || !isCalendarReady.value) {
-    return {
-      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-      initialView: 'dayGridMonth',
-      headerToolbar: false,
-      events: []
-    };
-  }
-  
-  return {
-    // Full calendar configuration...
-  };
-});
-```
-
-### 4. Cleanup on Unmount
-**Lifecycle**: Proper cleanup to prevent memory leaks
-
-```typescript
-onBeforeUnmount(() => {
-  // Clean up calendar instance if needed
-  if (calendarRef.value) {
-    try {
-      const calendarApi = calendarRef.value.getApi();
-      if (calendarApi) {
-        calendarApi.destroy();
-      }
-    } catch (error) {
-      console.warn('Error cleaning up calendar:', error);
-    }
-  }
-});
-```
-
-### 5. Updated Schedule Page Props
-**File**: `src/pages/admin/schedule/index.vue`
-
-```vue
-<AdminCalendar
-  :bookings="bookingStore.bookings"
-  :properties="propertyStore.properties"
-  :users="new Map()"
-  @event-click="handleEventClick"
-  @date-select="handleDateSelect"
-  @event-drop="handleEventDrop"
-/>
-```
-
-## Technical Details
-
-### Why This Works
-1. **Mounting Order**: Ensures DOM elements exist before FullCalendar tries to access them
-2. **Vue Lifecycle**: Uses proper Vue 3 lifecycle hooks (`onMounted`, `onBeforeUnmount`)
-3. **Async Safety**: Uses `nextTick` and `setTimeout` to handle async DOM updates
-4. **Graceful Degradation**: Shows loading state while calendar initializes
-5. **Memory Management**: Properly cleans up calendar instance on unmount
-
-### Files Modified
-- `src/components/smart/admin/AdminCalendar.vue` - Added DOM mounting safety
-- `src/pages/admin/schedule/index.vue` - Updated props and imports
-- `src/layouts/admin.vue` - Fixed Vuetify layout context (previous fix)
-
-## Testing
-1. Navigate to `/admin/schedule` - should load without errors
-2. Calendar should show loading state briefly, then render properly
-3. No console errors related to parentNode access
-4. Calendar functionality (events, navigation) should work normally
-
-## Prevention
-This pattern should be used for any components that:
-- Import third-party DOM manipulation libraries directly
-- Access DOM elements in computed properties or reactive effects
-- Render complex UI components that depend on specific DOM structure
-
-## Status
-✅ **RESOLVED** - The DOM parentNode error has been fixed and the admin schedule page now loads correctly.
-
-# Problem Fix: VOverlay Directive Warning
-
-## Problem Description
-When loading the admin interface, Vue shows a warning:
-```
-[Vue warn]: Runtime directive used on component with non-element root node. The directives will not function as intended.
-  at <VOverlay contained="" persistent="" class="align-center justify-center" >
-```
-
-## Root Cause Analysis
-The warning occurs because:
-1. **Incorrect Prop Usage**: `contained` and `persistent` were being used as directives instead of props
-2. **VOverlay Structure**: VOverlay component may have multiple root nodes in Vuetify 3
-3. **Vue 3 Directive Rules**: Directives can only be applied to single DOM elements, not components with fragments
-
-## Solution Implementation
-
-### Fixed VOverlay Usage in All Sidebar Components
-
-**Before (incorrect)**:
-```vue
-<v-overlay 
-  v-show="loading"
-  contained
-  persistent
-  class="align-center justify-center"
->
-```
-
-**After (correct)**:
-```vue
-<v-overlay 
-  :model-value="loading"
-  :contained="true"
-  :persistent="true"
-  class="align-center justify-center"
->
-```
-
-### Key Changes
-1. **:model-value instead of v-model**: Proper one-way binding for prop values (loading is a prop, not writable)
-2. **Explicit prop binding**: `:contained="true"` and `:persistent="true"` instead of bare attributes
-3. **Consistent pattern**: Applied same fix across all sidebar components
-
-### Files Modified
-1. **src/components/smart/Sidebar.vue** - Fixed VOverlay prop usage
-2. **src/components/smart/admin/AdminSidebar.vue** - Fixed VOverlay prop usage  
-3. **src/components/smart/owner/OwnerSidebar.vue** - Fixed VOverlay prop usage
-
-## Technical Details
-
-### Why This Works
-- **Proper Props**: `contained` and `persistent` are props, not directives
-- **One-way Binding**: `:model-value` correctly handles read-only prop binding for visibility
-- **Vue 3 Compatibility**: Follows Vue 3 best practices - props are read-only, can't use v-model on them
-- **Vuetify 3 Standards**: Matches Vuetify 3 component API expectations
-
-### Vuetify VOverlay API
-- `contained`: Boolean prop to contain overlay within parent element
-- `persistent`: Boolean prop to prevent closing on outside click
-- `model-value`: Controls overlay visibility state (one-way binding for props)
-
-## Verification
-- ✅ No more Vue directive warnings in console
-- ✅ Loading overlays still function correctly
-- ✅ All sidebar components work as expected
-- ✅ Consistent implementation across role-based components
-
-## Status
-✅ **RESOLVED** - VOverlay directive warnings have been eliminated and all loading overlays function properly.
-````
-
 ## File: src/router/index.ts
 ````typescript
 import { createRouter, createWebHistory } from 'vue-router'
@@ -34043,6 +32820,29 @@ import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from 
   - Assigned to: Cursor
 
 
+- [] **TASK-UI-FIX_ADMIN-SIDEBAR**: Fix AdminSidebar width responsiveness
+  - Status: Complete
+  - Requirements: 
+    - ✅ Desktop: Standard sidebar width controlled by parent column
+    - ✅ Mobile: Hidden sidebar (not visible)
+    - ✅ Responsive: Proper transitions between breakpoints
+  - Implementation Details:
+    - **Root Cause**: AdminSidebar.vue was forcing `width="100%"` on v-navigation-drawer, overriding parent HomeAdmin.vue column constraints (`lg="3" xl="2"`)
+    - **Solution**: Removed `width="100%"` prop and added `permanent` prop for embedded behavior within parent column
+    - **CSS Updates**: Updated styling to use `width: 100% !important` to fill parent column container (not viewport), removed redundant responsive width rules
+    - **Testing**: Created demo page at `/demos/admin-sidebar-width-test` for verification
+    - **Files Modified**: 
+      - `src/components/smart/admin/AdminSidebar.vue` - Updated v-navigation-drawer props and CSS
+      - `src/pages/demos/admin-sidebar-width-test.vue` - Created test page
+      - `src/router/index.ts` - Added demo route
+  - Results:
+    - **Desktop (lg)**: Sidebar respects parent column sizing = 25% width
+    - **Large Desktop (xl)**: Sidebar respects parent column sizing = 16.7% width  
+    - **Mobile**: Sidebar hidden using existing `mobile-hidden` class logic
+    - **Functionality**: All admin-specific features and data access preserved
+  - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2. Fix maintains role-based architecture patterns and multi-tenant data access.
+  - Assigned to: Cursor
+
 - [ ] **TASK-039**: Add turn booking visual indicators
   - Status: Not Started
   - Notes: 
@@ -34217,7 +33017,7 @@ import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from 
   - Assigned to: Human + Cursor
 
 ### **Documentation & Cleanup**
-- [x] **TASK-055A**: Create UML diagrams to visualize codebase architecture
+- [] **TASK-055A**: Create UML diagrams to visualize codebase architecture
   - Status: Complete (needs update for role-based)
   - Requirements:
     - Update existing UML diagrams for role-based architecture

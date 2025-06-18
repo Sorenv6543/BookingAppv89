@@ -16,6 +16,22 @@
 - **Alternative**: `/jms301/vuetify-examples-md` (6.1 trust, 1106 snippets - more examples)
 - **Suggested Topics**: `components`, `theming`, `typescript`, `material-design`
 
+> **🎯 NEW: Vuetify RAG System Integration**
+> 
+> **Local RAG Server**: `http://localhost:8000` 
+> - ✅ **Status**: Active with 1,990 Vuetify documentation chunks
+> - ✅ **Coverage**: 224 components, API reference, examples, styling guides
+> - ✅ **Integration**: Context-aware coding assistant for Vue 3 + Vuetify
+> - ✅ **Usage**: See `docs/knowledgebase/vuetify-rag-integration-guide.md`
+> 
+> **Endpoints**:
+> - `POST /ask` - Main coding assistant (context + query)
+> - `GET /component/{name}` - Component-specific info
+> - `GET /search?q=query` - Fast documentation search
+> - `GET /health` - Server status
+> 
+> **Perfect for**: Role-based component optimization, responsive layouts, performance tuning
+
 ### **Pinia with TypeScript**
 - **Library ID**: `/vuejs/pinia`
 - **Trust Score**: 9.7 (231 code snippets)
@@ -81,6 +97,30 @@ get-library-docs /fullcalendar/fullcalendar --topic="vue-integration typescript"
 # Vite Documentation
 get-library-docs /vitejs/vite --topic="configuration vue typescript"
 ```
+
+## **🎯 Vuetify RAG System Commands**
+
+For immediate Vuetify help with your current components:
+
+```bash
+# Test server status
+curl http://localhost:8000/health
+
+# Get help with your current component
+curl -X POST "http://localhost:8000/ask" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "your vuetify question", "context": "your Vue component code", "type": "coding"}'
+
+# Quick component reference
+curl http://localhost:8000/component/v-navigation-drawer
+
+# Search documentation
+curl "http://localhost:8000/search?q=responsive layout&limit=5"
+```
+
+**Integration Files**:
+- `docs/knowledgebase/vuetify-rag-integration-guide.md` - HTTP request examples
+- `docs/knowledgebase/vuetify-rag-project-integration.md` - Complete integration guide
 
 
 

@@ -11,24 +11,36 @@
   <div class="home-admin-container">
     <v-row
       no-gutters
-      class="fill-height"
+      class="fill-height flex-nowrap"
+      style="height: 100vh;"
     >
       <!-- Sidebar Column -->
       <v-col 
         cols="12" 
-        lg="3" 
-        xl="2" 
+        lg="4" 
+        xl="3" 
         class="sidebar-column"
-        :class="{ 'mobile-hidden': !sidebarOpen }"
       >
-        <v-btn
-          v-if="$vuetify.display.lgAndDown"
-          icon="mdi-menu"
-          variant="text"
-          class="mr-4"
-          @click="toggleSidebar"
-        />
+        <!-- Mobile Menu Toggle -->
+        <v-app-bar
+          v-if="$vuetify.display.mdAndDown"
+          flat
+          color="transparent"
+          height="48"
+          class="px-0"
+        >
+          <v-app-bar-nav-icon
+            @click="sidebarOpen = !sidebarOpen"
+          />
+          <v-app-bar-title class="text-h6">
+            Business Management
+          </v-app-bar-title>
+        </v-app-bar>
+
+        <!-- Proper Navigation Drawer Implementation -->
         <AdminSidebar
+          v-model="sidebarOpen"
+          :rail="railMode"
           :today-turns="systemTodayTurns"
           :upcoming-cleanings="systemUpcomingCleanings"
           :properties="allPropertiesMap"
@@ -44,8 +56,8 @@
       <!-- Main Calendar Column -->
       <v-col 
         cols="12" 
-        lg="9" 
-        xl="10" 
+        lg="8" 
+        xl="9" 
         class="calendar-column"
       >
         <div class="calendar-header">
@@ -265,6 +277,12 @@ const {
 const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
 const sidebarOpen = ref(!xs.value);
 const selectedPropertyFilter = ref<string | null>(null);
+
+// Navigation drawer responsive behavior
+const railMode = computed(() => {
+  // Use rail mode on desktop when there's limited space
+  return !xs.value && !sidebarOpen.value;
+});
 
 // ============================================================================
 // ADMIN-SPECIFIC DATA ACCESS
@@ -1017,25 +1035,46 @@ onUnmounted(() => {
 
 <style scoped>
 .home-admin-container {
-  /* Remove fixed height to work with Vuetify layout */
-  min-height: calc(100vh - 64px); /* Account for app bar */
+  height: 100vh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-column {
-  /* Use min-height instead of fixed height */
-  min-height: calc(100vh - 64px);
-  overflow-y: auto;
-  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  position: relative;
   background-color: rgb(var(--v-theme-surface));
+  padding-right: 0 !important;
+  height: 100vh;
+}
+
+.sidebar-container {
+  height: 100%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.sidebar-desktop {
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.sidebar-mobile-hidden {
+  transform: translateX(-100%);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  background: rgb(var(--v-theme-surface));
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .calendar-column {
-  /* Use min-height instead of fixed height */
-  min-height: calc(100vh - 64px);
+  height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-left: 0 !important;
 }
 
 .calendar-header {
@@ -1043,10 +1082,7 @@ onUnmounted(() => {
   border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   background-color: rgb(var(--v-theme-surface));
   flex-shrink: 0;
-}
-
-.mobile-hidden {
-  display: none;
+  height: 80px;
 }
 
 /* Admin-specific styling */
@@ -1072,38 +1108,31 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
-/* Responsive design - Fixed to match Vuetify breakpoints */
-@media (max-width: 1279px) { /* Only apply mobile sidebar below lg breakpoint */
-  .sidebar-column {
-    position: fixed;
-    top: 64px; /* Account for app bar */
-    left: 0;
-    z-index: 1000;
-    width: 100% !important;
-    max-width: 400px;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-    height: calc(100vh - 64px); /* Account for app bar */
+/* Responsive design optimized for Vuetify grid system */
+@media (max-width: 959px) { /* md and down */
+  .home-admin-container {
+    position: relative;
   }
   
-  .mobile-hidden {
-    transform: translateX(-100%);
+  .calendar-column {
     transition: transform 0.3s ease;
   }
   
-  .sidebar-column:not(.mobile-hidden) {
+  .calendar-column.drawer-open {
     transform: translateX(0);
+  }
+  
+  .sidebar-column {
+    z-index: 1000;
   }
 }
 
-/* Reset for desktop - let Vuetify grid take control */
-@media (min-width: 1280px) {
-  .sidebar-column {
-    position: static !important;
+@media (min-width: 960px) { /* lg and up */
+  .sidebar-container {
     transform: none !important;
-    width: unset !important; /* Remove width override to let Vuetify flex work */
-    max-width: none !important;
+    position: static !important;
+    z-index: auto !important;
     box-shadow: none !important;
-    height: auto !important;
   }
 }
 

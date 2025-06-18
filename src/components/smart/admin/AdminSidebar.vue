@@ -1,10 +1,12 @@
 <template>
-  <v-navigation-drawer
-    class="admin-sidebar"
-    permanent
-    :elevation="8"
-    color="tertiary"
-  >                                   
+  <!-- Desktop: Grid-integrated sidebar -->
+  <v-card
+    v-if="lgAndUp"
+    class="admin-sidebar-desktop"
+    :elevation="0"
+    height="100%"
+    color="surface"
+  >
     <v-container class="py-2">
       <!-- Business Management Header -->
       <v-row class="mb-4">
@@ -437,26 +439,473 @@
           </v-card>
         </v-col>
       </v-row>
+    </v-container>
 
-      <!-- Loading Overlay -->
-      <v-overlay 
-        :model-value="loading"
-        :contained="true"
-        :persistent="true"
-        class="align-center justify-center"
-      >
-        <v-progress-circular
-          indeterminate
-          color="primary"
-        />
-      </v-overlay>
+    <!-- Loading Overlay -->
+    <v-overlay 
+      :model-value="loading"
+      :contained="true"
+      :persistent="true"
+      class="align-center justify-center"
+    >
+      <v-progress-circular
+        indeterminate
+        color="primary"
+      />
+    </v-overlay>
+  </v-card>
+
+  <!-- Mobile: Navigation drawer overlay -->
+  <v-navigation-drawer
+    v-else
+    :model-value="props.modelValue"
+    class="admin-sidebar-mobile"
+    :temporary="true"
+    :mobile-breakpoint="960"
+    :elevation="8"
+    color="surface"
+    width="320"
+    @update:model-value="emit('update:modelValue', $event)"
+  >
+    <v-container class="py-2">
+      <!-- Business Management Header -->
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <h2 class="text-h6 font-weight-bold">
+            Business Management
+          </h2>
+          <div class="text-subtitle-2 text-medium-emphasis">
+            {{ formattedDate }}
+          </div>
+          <!-- System Metrics Summary -->
+          <div class="mt-2">
+            <v-chip
+              size="small"
+              color="primary"
+              variant="outlined"
+              class="mr-1 mb-1"
+            >
+              {{ totalProperties }} Properties
+            </v-chip>
+            <v-chip
+              size="small"
+              color="warning"
+              variant="outlined"
+              class="mr-1 mb-1"
+            >
+              {{ urgentTurnsCount }} Urgent Turns
+            </v-chip>
+            <v-chip
+              size="small"
+              color="success"
+              variant="outlined"
+              class="mr-1 mb-1"
+            >
+              {{ availableCleanersCount }} Available Cleaners
+            </v-chip>
+          </div>
+        </v-col>
+      </v-row>
+
+      <!-- System-wide Turn Alerts -->
+      <v-row v-if="systemTodayTurnsArray.length > 0">
+        <v-col cols="12">
+          <v-card
+            class="system-turn-alerts mb-4"
+            variant="outlined"
+            color="warning"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-alert-circle"
+                class="mr-2"
+                color="warning"
+              />
+              System-wide Urgent Turns
+              <v-spacer />
+              <v-chip
+                size="small"
+                color="warning"
+                variant="flat"
+              >
+                {{ systemTodayTurnsArray.length }}
+              </v-chip>
+            </v-card-title>
+            <v-card-text>
+              <TurnAlerts 
+                :bookings="systemTodayBookingsWithMetadata" 
+                :properties="allPropertiesMap"
+                @view="$emit('navigateToBooking', $event)"
+                @assign="handleAssignCleaner"
+                @view-all="handleViewAll('turns')"
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- System-wide Upcoming Cleanings -->
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <v-card
+            class="system-upcoming-cleanings"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-calendar-clock"
+                class="mr-2"
+              />
+              System-wide Schedule
+              <v-spacer />
+              <v-chip
+                size="small"
+                color="info"
+                variant="flat"
+              >
+                {{ systemUpcomingCleaningsArray.length }}
+              </v-chip>
+            </v-card-title>
+            <v-card-text>
+              <UpcomingCleanings 
+                :bookings="systemUpcomingBookingsWithMetadata"
+                :properties="allPropertiesMap"
+                @view="$emit('navigateToBooking', $event)"
+                @assign="handleAssignCleaner"
+                @view-all="handleViewAll($event)"
+                @toggle-expanded="toggleUpcomingExpanded"
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- Advanced Property Filter -->
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <v-card
+            class="advanced-property-filter"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-filter-variant"
+                class="mr-2"
+              />
+              Advanced Filters
+            </v-card-title>
+            <v-card-text>
+              <!-- Property Filter -->
+              <v-select
+                v-model="selectedProperty"
+                :items="propertySelectItems"
+                label="Filter by Property"
+                clearable
+                class="mb-2"
+                @update:model-value="handlePropertyFilterChange"
+              >
+                <template #prepend-item>
+                  <v-list-item
+                    title="All Properties"
+                    value=""
+                    @click="selectedProperty = null"
+                  />
+                  <v-divider class="mt-2" />
+                </template>
+              </v-select>
+
+              <!-- Owner Filter -->
+              <v-select
+                v-model="selectedOwner"
+                :items="ownerSelectItems"
+                label="Filter by Property Owner"
+                clearable
+                class="mb-2"
+                @update:model-value="handleOwnerFilterChange"
+              >
+                <template #prepend-item>
+                  <v-list-item
+                    title="All Owners"
+                    value=""
+                    @click="selectedOwner = null"
+                  />
+                  <v-divider class="mt-2" />
+                </template>
+              </v-select>
+
+              <!-- Status Filter -->
+              <v-select
+                v-model="selectedStatus"
+                :items="statusSelectItems"
+                label="Filter by Status"
+                clearable
+                @update:model-value="handleStatusFilterChange"
+              >
+                <template #prepend-item>
+                  <v-list-item
+                    title="All Statuses"
+                    value=""
+                    @click="selectedStatus = null"
+                  />
+                  <v-divider class="mt-2" />
+                </template>
+              </v-select>
+
+              <!-- Clear All Filters -->
+              <v-btn
+                v-if="hasActiveFilters"
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-filter-remove"
+                class="mt-2"
+                @click="clearAllFilters"
+              >
+                Clear All Filters
+              </v-btn>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- Business Analytics Dashboard -->
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <v-card
+            class="business-analytics"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-chart-line"
+                class="mr-2"
+              />
+              Business Analytics
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="6">
+                  <div class="text-center">
+                    <div class="text-h4 font-weight-bold text-primary">
+                      {{ totalProperties }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Total Properties
+                    </div>
+                  </div>
+                </v-col>
+                <v-col cols="6">
+                  <div class="text-center">
+                    <div class="text-h4 font-weight-bold text-success">
+                      {{ activeCleaningsToday }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Active Today
+                    </div>
+                  </div>
+                </v-col>
+                <v-col cols="6">
+                  <div class="text-center">
+                    <div class="text-h4 font-weight-bold text-warning">
+                      {{ urgentTurnsCount }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Urgent Turns
+                    </div>
+                  </div>
+                </v-col>
+                <v-col cols="6">
+                  <div class="text-center">
+                    <div class="text-h4 font-weight-bold text-info">
+                      {{ totalPropertyOwners }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Property Owners
+                    </div>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- Cleaner Availability Status -->
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <v-card
+            class="cleaner-availability"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-account-hard-hat"
+                class="mr-2"
+              />
+              Cleaner Status
+              <v-spacer />
+              <v-chip
+                size="small"
+                color="success"
+                variant="flat"
+              >
+                {{ availableCleanersCount }} Available
+              </v-chip>
+            </v-card-title>
+            <v-card-text>
+              <div
+                v-if="cleanerStatusList.length === 0"
+                class="text-center text-medium-emphasis"
+              >
+                No cleaner data available
+              </div>
+              <div v-else>
+                <v-list density="compact">
+                  <v-list-item
+                    v-for="cleaner in cleanerStatusList.slice(0, 5)"
+                    :key="cleaner.id"
+                    :title="cleaner.name"
+                    :subtitle="cleaner.status"
+                  >
+                    <template #prepend>
+                      <v-avatar
+                        size="small"
+                        :color="cleaner.statusColor"
+                      >
+                        <v-icon
+                          :icon="cleaner.statusIcon"
+                          size="small"
+                        />
+                      </v-avatar>
+                    </template>
+                    <template #append>
+                      <v-btn
+                        v-if="cleaner.status === 'Available'"
+                        size="x-small"
+                        variant="outlined"
+                        color="primary"
+                        @click="handleQuickAssign(cleaner.id)"
+                      >
+                        Assign
+                      </v-btn>
+                    </template>
+                  </v-list-item>
+                </v-list>
+                <v-btn
+                  v-if="cleanerStatusList.length > 5"
+                  variant="text"
+                  size="small"
+                  class="mt-2"
+                  @click="$emit('manageSystem')"
+                >
+                  View All Cleaners ({{ cleanerStatusList.length }})
+                </v-btn>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- Admin Quick Actions -->
+      <v-row>
+        <v-col cols="12">
+          <v-card
+            class="admin-quick-actions"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-lightning-bolt"
+                class="mr-2"
+              />
+              Admin Actions
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12">
+                  <v-btn
+                    prepend-icon="mdi-account-hard-hat"
+                    color="warning"
+                    variant="tonal"
+                    block
+                    class="mb-2"
+                    @click="$emit('assignCleaner', { bookingId: '', cleanerId: '' })"
+                  >
+                    Assign Cleaners
+                  </v-btn>
+                </v-col>
+                <v-col cols="12">
+                  <v-btn
+                    prepend-icon="mdi-chart-line"
+                    color="info"
+                    variant="tonal"
+                    block
+                    class="mb-2"
+                    @click="$emit('generateReports')"
+                  >
+                    Generate Reports
+                  </v-btn>
+                </v-col>
+                <v-col cols="12">
+                  <v-btn
+                    prepend-icon="mdi-cog"
+                    color="primary"
+                    variant="tonal"
+                    block
+                    class="mb-2"
+                    @click="$emit('manageSystem')"
+                  >
+                    Manage System
+                  </v-btn>
+                </v-col>
+                <v-col cols="6">
+                  <v-btn
+                    prepend-icon="mdi-calendar-plus"
+                    color="secondary"
+                    variant="outlined"
+                    block
+                    size="small"
+                    @click="$emit('createBooking')"
+                  >
+                    New Booking
+                  </v-btn>
+                </v-col>
+                <v-col cols="6">
+                  <v-btn
+                    prepend-icon="mdi-home-plus"
+                    color="secondary"
+                    variant="outlined"
+                    block
+                    size="small"
+                    @click="$emit('createProperty')"
+                  >
+                    New Property
+                  </v-btn>
+                </v-col>
+                <v-col cols="12">
+                  <v-btn
+                    prepend-icon="mdi-alert-circle"
+                    color="error"
+                    variant="outlined"
+                    block
+                    size="small"
+                    class="mt-2"
+                    @click="$emit('emergencyResponse')"
+                  >
+                    Emergency Response
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-// Removed unused useUIStore import
+import { useDisplay } from 'vuetify';
 import TurnAlerts from '@/components/dumb/shared/TurnAlerts.vue';
 import UpcomingCleanings from '@/components/dumb/shared/UpcomingCleanings.vue';
 
@@ -468,6 +917,8 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 
 // Define props - Admin sees ALL data (no owner filtering)
 interface Props {
+  modelValue?: boolean; // v-model for drawer state
+  rail?: boolean; // Rail mode for responsive behavior
   todayTurns?: Map<string, Booking> | Booking[];
   upcomingCleanings?: Map<string, Booking> | Booking[];
   properties?: Map<string, Property> | Property[];
@@ -477,6 +928,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  modelValue: true,
+  rail: false,
   todayTurns: () => [],
   upcomingCleanings: () => [],
   properties: () => [],
@@ -487,6 +940,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Define emits - Admin-specific events
 interface Emits {
+  // v-model support
+  (e: 'update:modelValue', value: boolean): void;
+  
   // Navigation events
   (e: 'navigateToBooking', bookingId: string): void;
   (e: 'navigateToDate', date: Date): void;
@@ -511,6 +967,9 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 // Store connections (removed unused uiStore to fix linter warning)
+
+// Vuetify display composable for responsive behavior  
+const { lgAndUp } = useDisplay();
 
 // Local state for filters
 const selectedProperty = ref<string | null>(null);
@@ -912,10 +1371,32 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.admin-sidebar {
+.admin-sidebar-desktop {
   height: 100%;
   overflow-y: auto;
-  width: 100% !important; /* Fill parent column container */
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar-desktop .v-container {
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.admin-sidebar-mobile {
+  height: 100%;
+  overflow-y: auto;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1001 !important;
+}
+
+.admin-sidebar-mobile .v-container {
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .system-turn-alerts {
@@ -950,28 +1431,5 @@ onMounted(() => {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
-}
-
-/* Admin-specific styling */
-.admin-sidebar .v-card {
-  margin-bottom: 8px;
-}
-
-.admin-sidebar .v-chip {
-  font-size: 0.75rem;
-}
-
-/* Desktop-optimized layout */
-@media (min-width: 1264px) {
-  .business-analytics .v-col {
-    padding: 4px 8px;
-  }
-}
-
-/* Mobile optimizations */
-@media (max-width: 960px) {
-  .admin-quick-actions .v-btn {
-    font-size: 0.875rem;
-  }
 }
 </style> 
