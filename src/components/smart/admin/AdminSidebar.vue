@@ -1,7 +1,69 @@
 <template>
-  <!-- Desktop: Grid-integrated sidebar -->
+  <!-- Mobile/Tablet: Compact horizontal sidebar for small screens -->
   <v-card
-    v-if="lgAndUp"
+    v-if="!mdAndUp"
+    class="admin-sidebar-mobile mb-4"
+    :elevation="1"
+    color="surface"
+  >
+    <v-card-text class="py-2">
+      <v-row align="center" no-gutters>
+        <!-- Quick Stats -->
+        <v-col cols="auto" class="mr-4">
+          <div class="d-flex align-center">
+            <v-chip
+              size="small"
+              color="warning"
+              variant="flat"
+              class="mr-2"
+            >
+              {{ urgentTurnsCount }} Urgent
+            </v-chip>
+            <v-chip
+              size="small"
+              color="primary"
+              variant="outlined"
+              class="mr-2"
+            >
+              {{ totalProperties }} Properties
+            </v-chip>
+          </div>
+        </v-col>
+        
+        <!-- Quick Filters -->
+        <v-col>
+          <div class="d-flex align-center ga-2">
+            <v-select
+              v-model="selectedProperty"
+              :items="propertySelectItems"
+              label="Property"
+              density="compact"
+              variant="outlined"
+              style="min-width: 120px; max-width: 180px;"
+              clearable
+              hide-details
+              @update:model-value="handlePropertyFilterChange"
+            />
+            <v-select
+              v-model="selectedStatus"
+              :items="statusSelectItems"
+              label="Status"
+              density="compact"
+              variant="outlined"
+              style="min-width: 100px; max-width: 140px;"
+              clearable
+              hide-details
+              @update:model-value="handleStatusFilterChange"
+            />
+          </div>
+        </v-col>
+      </v-row>
+    </v-card-text>
+  </v-card>
+
+  <!-- Desktop: Grid-integrated sidebar (mdAndUp instead of lgAndUp) -->
+  <v-card
+    v-else
     class="admin-sidebar-desktop"
     :elevation="0"
     height="100%"
@@ -969,7 +1031,7 @@ const emit = defineEmits<Emits>();
 // Store connections (removed unused uiStore to fix linter warning)
 
 // Vuetify display composable for responsive behavior  
-const { lgAndUp } = useDisplay();
+const { mdAndUp } = useDisplay();
 
 // Local state for filters
 const selectedProperty = ref<string | null>(null);

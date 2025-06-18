@@ -150,7 +150,11 @@
     <v-card
       elevation="2"
       class="admin-calendar-card"
-      :style="{ height: calendarCardHeight }"
+      :style="{ 
+        height: calendarCardHeight,
+        minHeight: mobile ? '400px' : '600px',
+        maxHeight: mobile ? '70vh' : '80vh'
+      }"
     >
       <div
         v-if="!isMounted || !isCalendarReady"
@@ -170,7 +174,10 @@
         ref="calendarRef"
         :options="adminCalendarOptions"
         class="admin-calendar"
-        :style="{ height: fullCalendarHeight }"
+        :style="{ 
+          height: fullCalendarHeight,
+          minHeight: mobile ? '350px' : '550px'
+        }"
       />
     </v-card>
 
@@ -263,7 +270,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
-import { useTheme } from 'vuetify';
+import { useTheme, useDisplay } from 'vuetify';
 import type { Booking, Property, User, Cleaner } from '@/types';
 
 // Import event logger for component communication
@@ -336,6 +343,7 @@ const emit = defineEmits<Emits>();
 
 // Theme integration
 const theme = useTheme();
+const { mobile } = useDisplay();
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
 
 // Component mounting state

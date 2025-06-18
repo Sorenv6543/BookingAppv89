@@ -29,8 +29,31 @@
     <!-- Main Content -->
     <div class="page-content">
       <v-container fluid class="pa-0" style="height: 100%;">
-        <v-row no-gutters class="fill-height">
-          <!-- Sidebar -->
+        <!-- Mobile Layout: Stacked sidebar and calendar -->
+        <div v-if="!mdAndUp" class="mobile-layout">
+          <!-- Mobile Sidebar -->
+          <AdminSidebar 
+            @property-selected="handlePropertySelected"
+            @turn-alert-clicked="handleTurnAlertClicked"
+            @quick-action="handleQuickAction"
+            class="mb-4"
+          />
+          
+          <!-- Mobile Calendar -->
+          <AdminCalendar
+            :bookings="bookingStore.bookings"
+            :properties="propertyStore.properties"
+            :users="new Map()"
+            @event-click="handleEventClick"
+            @date-select="handleDateSelect"
+            @event-drop="handleEventDrop"
+            class="mobile-calendar"
+          />
+        </div>
+
+        <!-- Desktop Layout: Side-by-side layout -->
+        <v-row v-else no-gutters class="fill-height">
+          <!-- Desktop Sidebar -->
           <v-col cols="12" md="3" class="sidebar-col">
             <AdminSidebar 
               @property-selected="handlePropertySelected"
@@ -39,7 +62,7 @@
             />
           </v-col>
           
-          <!-- Calendar -->
+          <!-- Desktop Calendar -->
           <v-col cols="12" md="9" class="calendar-col">
             <AdminCalendar
               :bookings="bookingStore.bookings"
@@ -78,6 +101,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
 import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue'
 import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue'
 import BookingForm from '@/components/dumb/BookingForm.vue'
@@ -88,6 +112,9 @@ import { useUIStore } from '@/stores/ui'
 import { useBookingStore } from '@/stores/booking'
 import { usePropertyStore } from '@/stores/property'
 import type { Booking, BookingFormData } from '@/types/booking'
+
+// Responsive display
+const { mdAndUp } = useDisplay()
 
 // Stores and composables
 const uiStore = useUIStore()
@@ -204,35 +231,72 @@ const closeCleanerAssignmentModal = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .page-header {
   flex-shrink: 0;
-  border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
   background: rgb(var(--v-theme-surface));
+  border-bottom: 1px solid rgb(var(--v-theme-outline-variant));
+  padding: 16px 0;
 }
 
 .page-content {
   flex: 1;
   overflow: hidden;
+  background: rgb(var(--v-theme-background));
+}
+
+.mobile-layout {
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-calendar {
+  flex: 1;
+  min-height: 0;
 }
 
 .sidebar-col {
-  border-right: 1px solid rgb(var(--v-theme-surface-variant));
-  height: 100%;
+  border-right: 1px solid rgb(var(--v-theme-outline-variant));
+  background: rgb(var(--v-theme-surface));
   overflow-y: auto;
+  max-height: calc(100vh - 120px);
 }
 
 .calendar-col {
-  height: 100%;
+  background: rgb(var(--v-theme-background));
   overflow: hidden;
 }
 
-@media (max-width: 960px) {
+/* Mobile responsive adjustments */
+@media (max-width: 959px) {
+  .page-header {
+    padding: 12px 0;
+  }
+  
+  .page-header h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  .mobile-layout {
+    padding: 8px;
+  }
+}
+
+/* Tablet specific adjustments */
+@media (min-width: 600px) and (max-width: 959px) {
+  .mobile-layout {
+    padding: 12px;
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 960px) {
   .sidebar-col {
-    border-right: none;
-    border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
+    max-width: 320px;
+    min-width: 280px;
   }
 }
 </style> 

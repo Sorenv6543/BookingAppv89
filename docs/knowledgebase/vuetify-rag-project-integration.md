@@ -76,7 +76,7 @@ Content-Type: application/json
 
 ## 🔧 Integration Methods for Your Workflow
 
-### **Method 1: REST Client Extension (Recommended)**
+### **Method 1:  REST ClientExtension (Recommended)**
 1. Install "REST Client" extension in Cursor
 2. Open `docs/knowledgebase/vuetify-rag-integration-guide.md`
 3. Click "Send Request" on any example

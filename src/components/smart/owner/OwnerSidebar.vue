@@ -3,23 +3,88 @@
     class="owner-sidebar"
     permanent
     :elevation="0"
-    color="tertiary"
-
+    color="surface"
   >                                   
     <v-container class="py-2">
       <!-- Header with Owner-specific info -->
       <v-row class="mb-4">
         <v-col cols="12">
-          <h2 class="text-h6 font-weight-bold">
+          <h2 class="text-h6 font-weight-bold text-primary">
             My Properties
           </h2>
           <div class="text-subtitle-2 text-medium-emphasis">
             {{ formattedDate }}
           </div>
           <!-- Owner-specific metrics -->
-          <div class="text-caption text-medium-emphasis mt-1">
-            {{ ownerPropertiesCount }} properties • {{ ownerBookingsCount }} bookings
+          <div class="mt-2">
+            <v-chip
+              size="small"
+              color="primary"
+              variant="outlined"
+              class="mr-1 mb-1"
+            >
+              {{ ownerPropertiesCount }} Properties
+            </v-chip>
+            <v-chip
+              size="small"
+              color="secondary"
+              variant="outlined"
+              class="mr-1 mb-1"
+            >
+              {{ ownerBookingsCount }} Bookings
+            </v-chip>
           </div>
+        </v-col>
+      </v-row>
+
+      <!-- Owner Navigation Menu -->
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <v-card
+            class="owner-navigation"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-menu"
+                class="mr-2"
+                color="primary"
+              />
+              Quick Navigation
+            </v-card-title>
+            <v-card-text class="pa-2">
+              <v-list density="compact" nav>
+                <v-list-item
+                  prepend-icon="mdi-home-group"
+                  title="My Properties"
+                  subtitle="Manage your properties"
+                  @click="handleNavigateToProperties"
+                  color="primary"
+                />
+                <v-list-item
+                  prepend-icon="mdi-clipboard-list"
+                  title="My Bookings"
+                  subtitle="View your cleaning schedule"
+                  @click="handleNavigateToBookings"
+                  color="primary"
+                />
+                <v-list-item
+                  prepend-icon="mdi-calendar-month"
+                  title="Calendar"
+                  subtitle="Schedule and timeline"
+                  @click="handleNavigateToCalendar"
+                  color="primary"
+                />
+                <v-list-item
+                  prepend-icon="mdi-cog"
+                  title="Settings"
+                  subtitle="Account preferences"
+                  @click="handleNavigateToSettings"
+                  color="primary"
+                />
+              </v-list>
+            </v-card-text>
+          </v-card>
         </v-col>
       </v-row>
 
@@ -61,6 +126,7 @@
               <v-icon
                 icon="mdi-filter-variant"
                 class="mr-2"
+                color="secondary"
               />
               Filter My Properties
             </v-card-title>
@@ -86,52 +152,16 @@
         </v-col>
       </v-row>
 
-      <!-- Quick Actions (owner-specific) -->
+      <!-- Owner Quick Actions Integration -->
       <v-row>
         <v-col cols="12">
-          <v-card
-            class="quick-actions"
+          <OwnerQuickActions 
+            :loading="loading"
+            :disabled="false"
+            :elevation="1"
             variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-lightning-bolt"
-                class="mr-2"
-              />
-              Quick Actions
-            </v-card-title>
-            <v-card-text class="d-flex gap-2">
-              <v-btn
-                prepend-icon="mdi-calendar-plus"
-                color="primary"
-                variant="tonal"
-                block
-                @click="$emit('createBooking')"
-              >
-                Add Booking
-              </v-btn>
-              <v-btn
-                prepend-icon="mdi-home-plus"
-                color="secondary"
-                variant="tonal"
-                block
-                @click="$emit('createProperty')"
-              >
-                Add Property
-              </v-btn>
-            </v-card-text>
-            <v-card-text class="pt-0">
-              <v-btn
-                prepend-icon="mdi-calendar-month"
-                color="info"
-                variant="outlined"
-                block
-                @click="handleViewCalendar"
-              >
-                View My Calendar
-              </v-btn>
-            </v-card-text>
-          </v-card>
+            @action="handleOwnerAction"
+          />
         </v-col>
       </v-row>
 
@@ -157,9 +187,19 @@ import { useUIStore } from '@/stores/ui';
 import { useAuthStore } from '@/stores/auth';
 import TurnAlerts from '@/components/dumb/shared/TurnAlerts.vue';
 import UpcomingCleanings from '@/components/dumb/shared/UpcomingCleanings.vue';
+import OwnerQuickActions from '@/components/dumb/owner/OwnerQuickActions.vue';
 
 // Import types
 import type { Booking, Property, BookingWithMetadata } from '@/types';
+
+// Define owner action type locally to avoid import issues
+type OwnerActionType = 
+  | 'add-booking' 
+  | 'add-property' 
+  | 'view-calendar' 
+  | 'view-properties' 
+  | 'view-bookings' 
+  | 'contact-support';
 
 // Import event logger
 import eventLogger from '@/composables/shared/useComponentEventLogger';
@@ -183,6 +223,10 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits {
   (e: 'navigateToBooking', bookingId: string): void;
   (e: 'navigateToDate', date: Date): void;
+  (e: 'navigateToProperties'): void;
+  (e: 'navigateToBookings'): void;
+  (e: 'navigateToCalendar'): void;
+  (e: 'navigateToSettings'): void;
   (e: 'filterByProperty', propertyId: string | null): void;
   (e: 'createBooking'): void;
   (e: 'createProperty'): void;
@@ -196,6 +240,67 @@ const authStore = useAuthStore();
 
 // Local state - initialize from UI store
 const selectedProperty = ref<string | null>(uiStore.selectedPropertyFilter || null);
+
+// Owner-specific navigation methods (defined early to avoid template errors)
+const handleNavigateToProperties = (): void => {
+  try {
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToProperties',
+      null,
+      'emit'
+    );
+    emit('navigateToProperties');
+  } catch (error) {
+    console.error('Error navigating to properties:', error);
+  }
+};
+
+const handleNavigateToBookings = (): void => {
+  try {
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToBookings',
+      null,
+      'emit'
+    );
+    emit('navigateToBookings');
+  } catch (error) {
+    console.error('Error navigating to bookings:', error);
+  }
+};
+
+const handleNavigateToCalendar = (): void => {
+  try {
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToCalendar',
+      null,
+      'emit'
+    );
+    emit('navigateToCalendar');
+  } catch (error) {
+    console.error('Error navigating to calendar:', error);
+  }
+};
+
+const handleNavigateToSettings = (): void => {
+  try {
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToSettings',
+      null,
+      'emit'
+    );
+    emit('navigateToSettings');
+  } catch (error) {
+    console.error('Error navigating to settings:', error);
+  }
+};
 
 // Computed properties
 const formattedDate = computed(() => {
@@ -396,6 +501,45 @@ const handlePropertyFilterChange = (propertyId: string | null): void => {
   }
 };
 
+// Owner Quick Actions handler
+const handleOwnerAction = (actionType: OwnerActionType): void => {
+  try {
+    eventLogger.logEvent(
+      'OwnerSidebar',
+      'OwnerQuickActions',
+      'action',
+      actionType,
+      'receive'
+    );
+
+    switch (actionType) {
+      case 'add-booking':
+        emit('createBooking');
+        break;
+      case 'add-property':
+        emit('createProperty');
+        break;
+      case 'view-calendar':
+        handleNavigateToCalendar();
+        break;
+      case 'view-properties':
+        handleNavigateToProperties();
+        break;
+      case 'view-bookings':
+        handleNavigateToBookings();
+        break;
+      case 'contact-support':
+        // Could emit a support action or navigate to help page
+        console.log('Contact support action triggered');
+        break;
+      default:
+        console.warn('Unknown owner action type:', actionType);
+    }
+  } catch (error) {
+    console.error('Error handling owner action:', error);
+  }
+};
+
 // Owner-specific: View booking instead of assign cleaner
 const handleViewBooking = (bookingId: string): void => {
   try {
@@ -456,26 +600,6 @@ const handleViewAll = (period: string): void => {
   }
 };
 
-const handleViewCalendar = (): void => {
-  try {
-    // Navigate to owner's calendar view
-    const today = new Date();
-    
-    // Log event
-    eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'navigateToDate',
-      today,
-      'emit'
-    );
-    
-    emit('navigateToDate', today);
-  } catch (error) {
-    console.error('Error handling view calendar:', error);
-  }
-};
-
 const toggleUpcomingExpanded = (expanded: boolean): void => {
   // This method can be used if needed
   console.log('Owner upcoming cleanings expanded:', expanded);
@@ -501,12 +625,6 @@ onMounted(() => {
 .owner-sidebar {
   height: 100%;
   overflow-y: auto;
-}
-
-.quick-actions .v-card-text {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
 }
 
 /* Custom scrollbar for better UX */
@@ -535,11 +653,30 @@ onMounted(() => {
 }
 
 /* Owner-specific styling */
-.property-filter .v-card-title {
+.owner-navigation .v-card-title {
   color: rgb(var(--v-theme-primary));
 }
 
-.quick-actions .v-card-title {
+.property-filter .v-card-title {
   color: rgb(var(--v-theme-secondary));
+}
+
+/* Navigation list styling */
+.owner-navigation .v-list-item {
+  margin-bottom: 4px;
+  border-radius: 8px;
+}
+
+.owner-navigation .v-list-item:hover {
+  background-color: rgba(var(--v-theme-primary), 0.08);
+}
+
+/* Enhanced visual hierarchy */
+.owner-navigation {
+  border: 1px solid rgba(var(--v-theme-primary), 0.2);
+}
+
+.property-filter {
+  border: 1px solid rgba(var(--v-theme-secondary), 0.2);
 }
 </style> 

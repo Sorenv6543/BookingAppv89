@@ -1240,20 +1240,25 @@
 ---## **Phase 1F: Critical Architecture Completion** 
 **(URGENT - Complete Role-Based Migration)** -->
 
+# 📋 Additional Tasks for tasks.md - Critical Issues & Improvements
+
+## **Phase 1F: Critical Architecture Completion** 
+**(URGENT - Complete Role-Based Migration)**
+
 ### **Complete Missing Role-Based Components**
-- [ ] **TASK-060**: Create OwnerSidebar.vue component
-  - Status: Not Started
+- [x] **TASK-060**: Create OwnerSidebar.vue component
+  - Status: Complete ✅
   - Requirements:
-    - Create `src/components/smart/owner/OwnerSidebar.vue`
-    - Filter navigation to owner-specific features only
-    - Remove admin-only navigation items (cleaner management, system reports)
-    - Add owner-specific quick actions (Add Property, View My Bookings)
-    - Implement owner-friendly navigation labels and icons
-    - Use owner-specific color scheme and styling
-    - Integrate with existing OwnerQuickActions component
-  - Notes: Replace generic Sidebar.vue for owner role
+    - ✅ Create `src/components/smart/owner/OwnerSidebar.vue`
+    - ✅ Filter navigation to owner-specific features only
+    - ✅ Remove admin-only navigation items (cleaner management, system reports)
+    - ✅ Add owner-specific quick actions (Add Property, View My Bookings)
+    - ✅ Implement owner-friendly navigation labels and icons
+    - ✅ Use owner-specific color scheme and styling
+    - ✅ Integrate with existing OwnerQuickActions component
+  - Notes: ✅ Complete implementation with owner-specific navigation menu, data filtering, OwnerQuickActions integration, and owner-only features
   - Files: src/components/smart/owner/OwnerSidebar.vue
-  - Verification: Owner sees only relevant navigation, no admin features
+  - Verification: ✅ Owner sees only relevant navigation, no admin features, all data properly filtered by owner_id
   - Assigned to: Cursor
 
 - [ ] **TASK-061**: Create OwnerCalendar.vue component
@@ -1287,59 +1292,61 @@
   - Verification: Admin sees full system navigation and controls
   - Assigned to: Cursor
 
-- [ ] **TASK-063**: Fix TypeScript issues in HomeOwner.vue
+- [ ] **TASK-063**: Fix TypeScript errors in existing components
   - Status: Not Started
   - Requirements:
-    - Resolve all TypeScript compilation errors in HomeOwner.vue
-    - Add proper type definitions for role-based data filtering
-    - Fix prop type definitions and component interfaces
-    - Add proper error handling type annotations
-    - Ensure type safety for owner-specific data access
-    - Add comprehensive JSDoc comments for complex functions
-  - Notes: Critical for production stability
-  - Files: src/components/smart/owner/HomeOwner.vue, src/types/
-  - Verification: TypeScript compiles without errors, proper IntelliSense
+    - Fix all TypeScript compilation errors in role-based components
+    - Add proper type definitions for component props and events
+    - Update existing components to use strict TypeScript compliance
+    - Add type guards for role-based data validation
+    - Fix any eslint errors related to TypeScript usage
+    - Add comprehensive type documentation
+  - Notes: Essential for code quality and maintainability
+  - Files: All TypeScript files with compilation errors
+  - Verification: TypeScript compiles without errors
   - Assigned to: Cursor
 
-- [ ] **TASK-064**: Fix AdminCalendar.vue DOM mounting issues
+- [ ] **TASK-064**: Fix AdminCalendar.vue implementation issues
   - Status: Not Started
   - Requirements:
-    - Resolve "Cannot read properties of null (reading 'parentNode')" error
-    - Add proper DOM mounting safety checks and guards
-    - Implement proper component lifecycle management
-    - Add error boundaries for calendar component failures
-    - Ensure proper cleanup on component unmount
-    - Add retry mechanisms for calendar initialization failures
-  - Notes: Critical for /admin/schedule route stability
+    - Fix existing bugs in AdminCalendar.vue component
+    - Implement proper admin-specific calendar features
+    - Add admin calendar controls (AdminCalendarControls)
+    - Fix calendar event filtering for admin view
+    - Add admin-specific event management features
+    - Implement cleaner assignment integration
+  - Notes: Complete admin calendar functionality
   - Files: src/components/smart/admin/AdminCalendar.vue
-  - Verification: Admin calendar route loads without errors
+  - Dependencies: AdminCalendarControls component
+  - Verification: Admin calendar works with full functionality
   - Assigned to: Cursor
 
-### **Update Component Integration**
-- [ ] **TASK-065**: Update HomeOwner.vue to use new role-specific components
+### **Integration and Testing**
+- [ ] **TASK-065**: Integrate new owner components into HomeOwner.vue
   - Status: Not Started
   - Requirements:
-    - Replace generic Sidebar with OwnerSidebar
-    - Replace generic FullCalendar with OwnerCalendar
-    - Update component imports and references
-    - Ensure proper prop passing to new components
-    - Test integration of owner-specific workflows
-    - Verify data filtering consistency across components
-  - Notes: Final integration of owner role components
+    - Update HomeOwner.vue to use OwnerSidebar component
+    - Integrate OwnerCalendar into owner home page
+    - Test owner component integration thoroughly
+    - Verify role-based data filtering works correctly
+    - Test owner-specific workflows end-to-end
+    - Update owner page routing and navigation
+  - Notes: Complete owner interface with all role-based components
   - Files: src/components/smart/owner/HomeOwner.vue
   - Dependencies: TASK-060, TASK-061
   - Verification: Owner interface uses all role-specific components
   - Assigned to: Cursor
 
-- [ ] **TASK-066**: Update HomeAdmin.vue to use AdminSidebar
+- [ ] **TASK-066**: Integrate new admin components into HomeAdmin.vue
   - Status: Not Started
   - Requirements:
-    - Replace generic Sidebar with AdminSidebar (if not already done)
-    - Ensure AdminCalendar integration works properly
-    - Update component imports and references
-    - Test admin-specific workflow integration
-    - Verify system-wide data access functionality
-  - Notes: Complete admin role component integration
+    - Update HomeAdmin.vue to use AdminSidebar component
+    - Integrate fixed AdminCalendar into admin home page
+    - Test admin component integration thoroughly
+    - Verify admin access to all system features
+    - Test admin-specific workflows end-to-end
+    - Update admin page routing and navigation
+  - Notes: Complete admin interface with all role-based components
   - Files: src/components/smart/admin/HomeAdmin.vue
   - Dependencies: TASK-062, TASK-064
   - Verification: Admin interface uses all role-specific components
@@ -1400,57 +1407,56 @@
   - Verification: tasks.md is organized and current
   - Assigned to: Human + Cursor
 
-### **Import Path Optimization**
-- [ ] **TASK-070**: Audit and fix import paths after composables migration
+### **Build and Deployment Optimization**
+- [ ] **TASK-070**: Optimize build configuration for role-based architecture
   - Status: Not Started
   - Requirements:
-    - Run comprehensive search for old import paths: `grep -r "from '@/composables/use" src/ --exclude-dir=shared`
-    - Fix any remaining non-shared composable imports
-    - Verify all imports use correct `@/composables/shared/` path
-    - Add linting rules to prevent future incorrect imports
-    - Create import path documentation for developers
-    - Test that all imports resolve correctly
-  - Notes: Ensure consistency after recent composables reorganization
-  - Files: All source files with composable imports
-  - Verification: No old import paths remain, linting passes
+    - Configure Vite for optimal role-based component bundling
+    - Add build-time role-based feature flags
+    - Optimize bundle sizes for production deployment
+    - Add build-time type checking for role-based components
+    - Configure source maps for development debugging
+    - Add build performance monitoring and optimization
+  - Notes: Ensure efficient production builds
+  - Files: vite.config.ts, build scripts, optimization configs
+  - Verification: Optimized production builds with role-based features
   - Assigned to: Cursor
 
-- [ ] **TASK-071**: Optimize component import structure
+- [ ] **TASK-071**: Update deployment documentation for role-based system
   - Status: Not Started
   - Requirements:
-    - Create barrel exports for component folders (index.ts files)
-    - Standardize import naming conventions across the project
-    - Group imports by category (Vue, external libs, internal, types)
-    - Add automated import sorting with ESLint/Prettier
-    - Create component import guidelines documentation
-    - Update existing components to follow new import standards
-  - Notes: Improve developer experience and code consistency
-  - Files: All component files, new index.ts barrel exports
-  - Verification: Consistent import patterns, improved IntelliSense
-  - Assigned to: Cursor
+    - Update deployment guides for role-based architecture
+    - Add environment configuration for role-based features
+    - Document role-based testing procedures for deployment
+    - Add rollback procedures for role-based deployments
+    - Create production checklist for role-based features
+    - Update CI/CD pipeline documentation
+  - Notes: Ensure smooth deployments with role-based changes
+  - Files: Deployment docs, CI/CD configs, operations guides
+  - Verification: Clear deployment procedures for role-based system
+  - Assigned to: Human + Cursor
 
 ---
 
 ## **Phase 1H: Architecture Improvements** 
-**(MEDIUM PRIORITY - Performance & Maintainability)**
+**(HIGH PRIORITY - System Optimization)**
 
-### **State Management Optimization**
-- [ ] **TASK-072**: Move role-based filtering to store level
+### **Store and State Management Optimization**
+- [ ] **TASK-072**: Optimize role-based store architecture
   - Status: Not Started
   - Requirements:
-    - Create `src/stores/ownerData.ts` store for owner-scoped data
-    - Create `src/stores/adminData.ts` store for admin-scoped data
-    - Move filtering logic from components to stores
-    - Implement role-based data access patterns in stores
-    - Add role-based cache invalidation strategies
-    - Create composables that automatically apply role filtering
-    - Update components to use role-specific stores
-  - Notes: Centralize data access control and improve performance
-  - Files: New store files, updated composables, component updates
-  - Verification: Role filtering happens at store level, better performance
+    - Refactor stores for optimal role-based data filtering
+    - Implement store-level role access control
+    - Add caching strategies for role-specific data
+    - Optimize state updates for role-based components
+    - Add state persistence for role-based user preferences
+    - Implement store performance monitoring and optimization
+  - Notes: Improve performance and maintainability of role-based stores
+  - Files: src/stores/, store optimization utilities, performance monitoring
+  - Verification: Optimized store performance with role-based filtering
   - Assigned to: Cursor
 
-- [ ] **TASK-073**: Implement role-based data access controls
+- [ ] **TASK-073**: Implement role-based data access control
   - Status: Not Started
   - Requirements:
     - Create data access control middleware for stores
@@ -1505,125 +1511,160 @@
     - Add bundle analysis and monitoring tools
     - Create performance budgets for bundle sizes
   - Notes: Improve initial load time and user experience
-  - Files: router configuration, vite.config.ts, component imports
-  - Verification: Smaller initial bundle size, faster load times
+  - Files: router configuration, vite.config.ts, performance monitoring
+  - Verification: Optimized bundle sizes and load times
   - Assigned to: Cursor
 
-- [ ] **TASK-077**: Optimize component re-rendering and memoization
+- [ ] **TASK-077**: Add performance monitoring and optimization
   - Status: Not Started
   - Requirements:
-    - Add Vue 3 memoization patterns where appropriate
-    - Optimize computed property dependencies
-    - Implement proper component key strategies
-    - Add performance profiling for component updates
-    - Optimize store subscriptions and reactive patterns
-    - Create performance monitoring dashboard
-  - Notes: Improve runtime performance and responsiveness
-  - Files: All components, stores, performance monitoring
-  - Verification: Improved application responsiveness
+    - Implement client-side performance monitoring
+    - Add role-based performance metrics tracking
+    - Create performance dashboards for role-based features
+    - Add automated performance regression testing
+    - Implement performance alerts and notifications
+    - Create performance optimization guidelines
+  - Notes: Monitor and maintain application performance
+  - Files: Performance monitoring tools, dashboards, alerting configs
+  - Verification: Comprehensive performance monitoring system
   - Assigned to: Cursor
 
-### **Build and Configuration Optimization**
-- [ ] **TASK-078**: Configure build optimization for production
+- [ ] **TASK-078**: Optimize build and development workflow
   - Status: Not Started
   - Requirements:
-    - Configure Vite for optimal production builds
-    - Exclude development components from production bundle
-    - Add compression and minification optimizations
-    - Configure proper caching strategies for assets
-    - Add build-time environment variable handling
-    - Create production deployment checklist
-  - Notes: Optimize production deployment
-  - Files: vite.config.ts, build scripts, deployment configuration
-  - Verification: Optimized production builds, excluded dev code
+    - Optimize Vite dev server for role-based development
+    - Add hot module replacement for role-specific components
+    - Create development shortcuts and productivity tools
+    - Add debugging utilities for role-based data flow
+    - Optimize build times for development workflow
+    - Create developer productivity documentation
+  - Notes: Improve developer experience and productivity
+  - Files: vite.config.ts, dev tools, productivity guides
+  - Verification: Faster development cycle, better DX
   - Assigned to: Cursor
 
 ---
 
 ## **Phase 1I: Testing & Quality Assurance** 
-**(MEDIUM PRIORITY - Comprehensive Testing)**
+**(HIGH PRIORITY - System Reliability)**
 
-### **Role-Based Component Testing**
-- [ ] **TASK-079**: Create role-based testing utilities
+### **Testing Infrastructure**
+- [ ] **TASK-079**: Create comprehensive testing utilities for role-based components
   - Status: Not Started
   - Requirements:
-    - Create test utilities for mounting owner components with mock data
-    - Create test utilities for mounting admin components with mock data
-    - Add role-based mock factories for realistic test data
-    - Create shared test helpers for role-based workflows
-    - Add visual regression testing for role-specific interfaces
-    - Create accessibility testing utilities for both roles
-  - Notes: Expand existing Vitest setup for role-based testing
-  - Files: src/test/utils/, mock factories, test helpers
-  - Verification: Easy testing of role-based components
+    - Create test utilities for role-based component testing
+    - Add mock data generators for owner and admin roles
+    - Implement role-based test fixtures and factories
+    - Create shared testing utilities for role-based workflows
+    - Add test helpers for role switching and authentication
+    - Create visual regression testing for role-based interfaces
+  - Notes: Foundation for comprehensive testing strategy
+  - Files: tests/utils/, test fixtures, testing documentation
+  - Verification: Comprehensive testing infrastructure for role-based features
   - Assigned to: Cursor
 
-- [ ] **TASK-080**: Add comprehensive unit tests for owner components
+- [ ] **TASK-080**: Add comprehensive tests for owner-specific components
   - Status: Not Started
   - Requirements:
-    - Test HomeOwner.vue with proper data filtering
-    - Test OwnerSidebar.vue navigation and permissions
-    - Test OwnerCalendar.vue event filtering and interactions
-    - Test owner-specific error handling and edge cases
-    - Test owner data isolation and security
-    - Achieve 80%+ coverage for owner-specific code paths
-  - Notes: Critical for owner role stability
-  - Files: Test files for all owner components
-  - Dependencies: TASK-079, completion of owner components
-  - Verification: High test coverage for owner functionality
+    - Create unit tests for OwnerSidebar.vue
+    - Add integration tests for OwnerCalendar.vue
+    - Test OwnerQuickActions component thoroughly
+    - Add end-to-end tests for owner workflows
+    - Test role-based data filtering for owner components
+    - Add accessibility tests for owner interface
+  - Notes: Ensure reliability of owner-specific functionality
+  - Files: tests/owner/, component test files, e2e test suites
+  - Dependencies: TASK-079 (test utilities)
+  - Verification: Complete test coverage for owner components
   - Assigned to: Cursor
 
-- [ ] **TASK-081**: Add comprehensive unit tests for admin components
+- [ ] **TASK-081**: Add comprehensive tests for admin-specific components
   - Status: Not Started
   - Requirements:
-    - Test HomeAdmin.vue with system-wide data access
-    - Test AdminSidebar.vue full functionality and permissions
-    - Test AdminCalendar.vue system management features
-    - Test admin-specific error handling and business logic
-    - Test admin system control workflows
-    - Achieve 80%+ coverage for admin-specific code paths
-  - Notes: Critical for admin role stability
-  - Files: Test files for all admin components
-  - Dependencies: TASK-079, completion of admin components
-  - Verification: High test coverage for admin functionality
+    - Create unit tests for AdminSidebar.vue
+    - Add integration tests for AdminCalendar.vue
+    - Test AdminQuickActions component thoroughly
+    - Add end-to-end tests for admin workflows
+    - Test admin access to all system features
+    - Add performance tests for admin data processing
+  - Notes: Ensure reliability of admin-specific functionality
+  - Files: tests/admin/, component test files, e2e test suites
+  - Dependencies: TASK-079 (test utilities)
+  - Verification: Complete test coverage for admin components
   - Assigned to: Cursor
 
-### **Integration and E2E Testing**
-- [ ] **TASK-082**: Create role-based integration tests
+### **Integration and System Testing**
+- [ ] **TASK-082**: Create integration tests for role-based system
   - Status: Not Started
   - Requirements:
-    - Test complete owner workflows (property → booking → calendar)
-    - Test complete admin workflows (system management → reports)
-    - Test role switching and permission boundaries
-    - Test cross-role data updates and synchronization
-    - Test role-based error scenarios and recovery
-    - Add automated testing for critical business workflows
-  - Notes: Ensure role-based system works end-to-end
-  - Files: Integration test suite, workflow test scenarios
-  - Verification: Critical workflows work correctly for both roles
+    - Test role switching functionality end-to-end
+    - Add integration tests for role-based data isolation
+    - Test role-based authentication and authorization
+    - Add cross-role integration tests for shared components
+    - Test role-based error handling and recovery
+    - Add load testing for role-based data filtering
+  - Notes: Ensure overall system reliability and security
+  - Files: tests/integration/, system test suites, load test configs
+  - Dependencies: TASK-080, TASK-081 (component tests)
+  - Verification: Comprehensive integration test coverage
   - Assigned to: Cursor
 
-- [ ] **TASK-083**: Add accessibility testing for role-based interfaces
+- [ ] **TASK-083**: Add automated quality assurance pipeline
   - Status: Not Started
   - Requirements:
-    - Test keyboard navigation for owner interface
-    - Test keyboard navigation for admin interface
-    - Add screen reader compatibility testing
-    - Test color contrast and visual accessibility
-    - Add ARIA label validation for role-specific components
-    - Create accessibility compliance reports
-  - Notes: Ensure application is accessible to all users
-  - Files: Accessibility test suite, compliance documentation
-  - Verification: WCAG 2.1 AA compliance for both interfaces
+    - Set up automated testing in CI/CD pipeline
+    - Add code quality checks for role-based components
+    - Implement automated accessibility testing
+    - Add automated security testing for role-based features
+    - Create automated performance regression testing
+    - Add automated deployment testing procedures
+  - Notes: Ensure consistent quality across all changes
+  - Files: CI/CD configs, quality assurance scripts, automation tools
+  - Verification: Automated quality assurance for all role-based features
   - Assigned to: Cursor
 
 ---
 
 ## **Phase 1J: Documentation & Developer Experience** 
-**(LOW PRIORITY - Long-term Maintenance)**
+**(MEDIUM PRIORITY - Long-term Maintenance)**
+
+### **Developer Productivity Tools**
+- [ ] **TASK-084**: Integrate Vuettify RAG API for Cursor
+  - Status: Not Started
+  - Requirements:
+    - Set up Vuettify RAG API server for Cursor AI integration
+    - Configure Cursor to use local Vuettify documentation API
+    - Create Vuettify-specific coding assistant workflows
+    - Add code generation templates for role-based Vuetify components
+    - Implement context-aware Vuettify component suggestions
+    - Create Vuettify best practices automation in Cursor
+    - Add automated code review for Vuettify patterns
+    - Create documentation for team Vuettify RAG usage
+  - API Features:
+    - **Component Usage**: "How do I use v-data-table?"
+    - **Code Generation**: "Create a responsive navigation"
+    - **Props & API**: "What props does v-card accept?"
+    - **Examples**: "Show me form validation patterns"
+    - **Best Practices**: "Make this component accessible"
+    - **Troubleshooting**: "Why isn't my v-btn working?"
+  - Implementation Steps:
+    1. Deploy `Cursor AI Assistant API Server.txt` as local FastAPI server
+    2. Configure Cursor to connect to local RAG endpoint
+    3. Set up Vuettify documentation chunk processing (1,990 chunks available)
+    4. Create role-based component templates (Owner/Admin patterns)
+    5. Add Vuettify 3.x TypeScript integration
+    6. Configure context-aware suggestions for project structure
+  - Files: 
+    - `tools/vuettify-rag-api/` (API server)
+    - `.cursor/` (Cursor configuration)
+    - `docs/vuettify-rag-setup.md` (setup guide)
+    - `templates/vuettify/` (component templates)
+  - Notes: Transform Vuettify development with AI-powered coding assistance
+  - Verification: Cursor provides accurate Vuettify suggestions and code generation
+  - Assigned to: Cursor
 
 ### **Architecture Documentation**
-- [ ] **TASK-084**: Create comprehensive role-based architecture documentation
+- [ ] **TASK-085**: Create comprehensive role-based architecture documentation
   - Status: Not Started
   - Requirements:
     - Document role-based component patterns and conventions
@@ -1637,7 +1678,7 @@
   - Verification: Clear documentation for role-based system
   - Assigned to: Human + Cursor
 
-- [ ] **TASK-085**: Update project README and documentation
+- [ ] **TASK-086**: Update project README and documentation
   - Status: Not Started
   - Requirements:
     - Update README.md with role-based architecture explanation
@@ -1652,7 +1693,7 @@
   - Assigned to: Human + Cursor
 
 ### **Code Quality and Standards**
-- [ ] **TASK-086**: Establish role-based coding standards
+- [ ] **TASK-087**: Establish role-based coding standards
   - Status: Not Started
   - Requirements:
     - Create coding standards document for role-based components
@@ -1666,7 +1707,7 @@
   - Verification: Automated code quality enforcement
   - Assigned to: Cursor
 
-- [ ] **TASK-087**: Create development environment optimization
+- [ ] **TASK-088**: Create development environment optimization
   - Status: Not Started
   - Requirements:
     - Optimize Vite dev server for role-based development
@@ -1686,7 +1727,7 @@
 **(LOW PRIORITY - Production Readiness)**
 
 ### **Security Hardening**
-- [ ] **TASK-088**: Implement client-side security for role-based access
+- [ ] **TASK-089**: Implement client-side security for role-based access
   - Status: Not Started
   - Requirements:
     - Add route guards for role-based access control
@@ -1700,7 +1741,7 @@
   - Verification: Security audit passes, no role-based vulnerabilities
   - Assigned to: Cursor
 
-- [ ] **TASK-089**: Add audit logging and monitoring
+- [ ] **TASK-090**: Add audit logging and monitoring
   - Status: Not Started
   - Requirements:
     - Implement audit logging for role-based actions
@@ -1715,7 +1756,7 @@
   - Assigned to: Cursor
 
 ### **Production Deployment**
-- [ ] **TASK-090**: Configure production deployment for role-based system
+- [ ] **TASK-091**: Configure production deployment for role-based system
   - Status: Not Started
   - Requirements:
     - Configure environment-specific builds for role-based features
@@ -1742,8 +1783,8 @@
 4. **Phase 1I**: Testing and quality assurance (TASK-079 to TASK-083)
 
 ### **MEDIUM PRIORITY (Future Iterations)**
-5. **Phase 1J**: Documentation and developer experience (TASK-084 to TASK-087)
-6. **Phase 1K**: Security and deployment (TASK-088 to TASK-090)
+5. **Phase 1J**: Documentation and developer experience (TASK-084 to TASK-088)
+6. **Phase 1K**: Security and deployment (TASK-089 to TASK-091)
 
 ---
 
@@ -1760,6 +1801,7 @@ TASK-065, TASK-066 → TASK-068 (Remove old components)
 TASK-067 (Move demos) → TASK-078 (Build optimization)
 TASK-072 (Store optimization) → TASK-082 (Integration tests)
 TASK-079 (Test utilities) → TASK-080, TASK-081 (Component tests)
+TASK-084 (Vuettify RAG API) → All future Vuettify development tasks
 ```
 
 ---
@@ -1771,6 +1813,7 @@ TASK-079 (Test utilities) → TASK-080, TASK-081 (Component tests)
 - 🔒 **ALWAYS** verify role-based data isolation after each change
 - 📊 **TEST** each component individually before integration
 - 🧹 **CLEAN UP** one phase completely before starting the next
+- 🤖 **LEVERAGE** Vuettify RAG API for faster, more accurate development
 
 ### **Development Guidelines**
 - Use existing coding standards and patterns
@@ -1778,39 +1821,12 @@ TASK-079 (Test utilities) → TASK-080, TASK-081 (Component tests)
 - Document all breaking changes and migration steps
 - Test role switching functionality after each major change
 - Keep demo components functional in development environment
+- **NEW**: Use Vuettify RAG API for component development and troubleshooting
 
-## **Updated Notes Section**
-
-### **General Notes:**
-- **Role-Based Architecture**: Property owners see only their data, admins see all data
-- **Data Filtering**: Implement at composable level, not component level
-- **Shared Components**: Maximize reuse of dumb components across roles
-- **Business Logic**: Maintain shared business rules, customize per role
-- Reference docs/summary.md for overall architecture
-- Use "use context7" in Cursor for up-to-date library documentation
-- Follow Map collection patterns throughout the project
-- Focus on turn vs standard booking distinction as core business logic
-- **Error Handling**: Implement role-specific graceful failures and user feedback
-- **Testing**: Aim for 80%+ test coverage on role-specific business logic and critical paths
-- **Security**: Ensure owners cannot access other owners' data
-
-### **Current Priority Order:**
-1. **Phase 1D.5**: Complete role-based architecture split (TASK-039A through TASK-039V)
-2. **Phase 1E**: Implement role-aware error handling and testing (TASK-040 through TASK-059)  
-3. **Future Phases**: Supabase integration with RLS for multi-tenant security
-
-### **Technical Decisions Made:**
-- Vue 3 + Vite + TypeScript stack confirmed
-- Map collections for state management (shared across roles)
-- Role-based component architecture (Owner vs Admin interfaces)
-- Composable-level data filtering for role separation
-- Vuetify 3 for UI components (shared across roles)
-- Folder structure: `owner/`, `admin/`, `shared/` pattern
-
-### **Success Criteria for Role-Based MVP:**
-- **Property Owner Experience**: Can manage their properties and bookings with simple, focused interface
-- **Admin Experience**: Can manage all properties, bookings, and cleaners with advanced features
-- **Data Isolation**: Owners see only their data, admins see all data
-- **Role Security**: Proper authentication and authorization for each role
-- **Shared Business Logic**: Turn vs standard booking logic works for both roles
-- **Mobile Responsive**: Both interfaces work on all device sizes
+### **Vuettify RAG API Benefits**
+- 🚀 **Instant Vuettify expertise** in Cursor
+- 💻 **Context-aware code generation** for role-based components
+- 📚 **Always up-to-date documentation** (1,990 chunks processed)
+- ⚡ **Faster development** with smart suggestions
+- 🎯 **Accurate answers** based on processed documentation chunks
+- 🔧 **Perfect for** beginners learning Vuettify and experienced developers wanting faster coding

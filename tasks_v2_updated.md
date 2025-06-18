@@ -546,6 +546,45 @@
 
 ---
 
+## **Task Dependencies Map**
 
 ```
+TASK-060 (OwnerSidebar) → TASK-065 (Integration)
+TASK-061 (OwnerCalendar) → TASK-065 (Integration) → TASK-080 (Owner Tests)
+TASK-062 (AdminSidebar) → TASK-066 (Integration)
+TASK-063 (TypeScript fixes) → TASK-074 (Strict mode)
+TASK-064 (AdminCalendar fixes) → TASK-066 (Integration) → TASK-081 (Admin Tests)
 
+TASK-065, TASK-066 → TASK-068 (Remove old components)
+TASK-067 (Move demos) → TASK-078 (Build optimization)
+TASK-072 (Store optimization) → TASK-082 (Integration tests)
+TASK-079 (Test utilities) → TASK-080, TASK-081 (Component tests)
+TASK-084 (Vuettify RAG API) → All future Vuettify development tasks
+```
+
+---
+
+## **Notes for Implementation**
+
+### **Critical Success Factors**
+- ⚠️ **DO NOT** remove old components until new ones are complete and tested
+- 🔒 **ALWAYS** verify role-based data isolation after each change
+- 📊 **TEST** each component individually before integration
+- 🧹 **CLEAN UP** one phase completely before starting the next
+- 🤖 **LEVERAGE** Vuettify RAG API for faster, more accurate development
+
+### **Development Guidelines**
+- Use existing coding standards and patterns
+- Maintain backward compatibility during migration
+- Document all breaking changes and migration steps
+- Test role switching functionality after each major change
+- Keep demo components functional in development environment
+- **NEW**: Use Vuettify RAG API for component development and troubleshooting
+
+### **Vuettify RAG API Benefits**
+- 🚀 **Instant Vuettify expertise** in Cursor
+- 💻 **Context-aware code generation** for role-based components
+- 📚 **Always up-to-date documentation** (1,990 chunks processed)
+- ⚡ **Faster development** with smart suggestions
+- 🎯 **Accurate answers** based on processed documentation chunks
+- 🔧 **Perfect for** beginners learning Vuettify and experienced developers wanting faster coding

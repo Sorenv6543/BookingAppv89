@@ -46,6 +46,9 @@ src/pages/settings/
 .eslintrc.json
 .gitignore
 .repomix/bundles.json
+additional_task_examples.md
+comprehensive_tasks.md
+enhanced_task_list.md
 eslint.config.js
 index.html
 package.json
@@ -171,6 +174,9 @@ src/types/user.ts
 src/utils/authHelpers.ts
 src/utils/businessLogic.ts
 src/utils/errorMessages.ts
+task_documentation.md
+task_specific_prompts.md
+tasks_v2.md
 tasks.md
 tsconfig.json
 tsconfig.node.json
@@ -214,6 +220,1195 @@ vitest.config.ts
 {
   "bundles": {}
 }
+````
+
+## File: additional_task_examples.md
+````markdown
+# 📚 Additional Task Examples & Quick Reference
+
+## **TASK-061: Create OwnerCalendar.vue Component**
+
+### **Quick Implementation Pattern**
+
+```vue
+<!-- src/components/smart/owner/OwnerCalendar.vue -->
+<template>
+  <div class="owner-calendar">
+    <!-- Calendar Header with Owner Controls -->
+    <OwnerCalendarControls
+      v-model:view="calendarView"
+      v-model:selected-property="selectedPropertyId"
+      :properties="ownerProperties"
+      :loading="loading"
+      @add-booking="showAddBookingDialog = true"
+      @export-calendar="handleExport"
+    />
+    
+    <!-- FullCalendar Integration -->
+    <FullCalendar
+      ref="calendarRef"
+      :options="calendarOptions"
+      class="owner-calendar__content"
+    />
+    
+    <!-- Owner Booking Dialog -->
+    <v-dialog v-model="showAddBookingDialog" max-width="600">
+      <OwnerBookingForm
+        :properties="ownerProperties"
+        :selected-date="selectedDate"
+        @save="handleBookingSave"
+        @cancel="showAddBookingDialog = false"
+      />
+    </v-dialog>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import FullCalendar from '@fullcalendar/vue3'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import timeGridPlugin from '@fullcalendar/timegrid'
+import interactionPlugin from '@fullcalendar/interaction'
+import { useOwnerDataStore } from '@/stores/ownerData'
+import { useCalendarState } from '@/composables/shared/useCalendarState'
+import OwnerCalendarControls from '@/components/dumb/owner/OwnerCalendarControls.vue'
+import OwnerBookingForm from '@/components/dumb/owner/OwnerBookingForm.vue'
+import type { CalendarOptions, EventInput } from '@fullcalendar/core'
+
+// Owner data store
+const ownerData = useOwnerDataStore()
+const { calendarView, selectedDate } = useCalendarState()
+
+// Local state
+const calendarRef = ref()
+const selectedPropertyId = ref<string | null>(null)
+const showAddBookingDialog = ref(false)
+const loading = ref(false)
+
+// Owner-specific data (pre-filtered by store)
+const ownerProperties = computed(() => ownerData.ownerProperties)
+const ownerBookings = computed(() => {
+  // Further filter by selected property if needed
+  if (selectedPropertyId.value) {
+    return ownerData.getPropertyBookings(selectedPropertyId.value)
+  }
+  return ownerData.ownerBookings
+})
+
+// Calendar configuration
+const calendarOptions = computed((): CalendarOptions => ({
+  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+  initialView: calendarView.value,
+  headerToolbar: false, // Use custom header
+  events: ownerBookings.value.map(booking => ({
+    id: booking.id,
+    title: `${booking.property_name} - ${booking.guest_count} guests`,
+    start: booking.checkin_date,
+    end: booking.checkout_date,
+    backgroundColor: booking.booking_type === 'turn' ? '#ff9800' : '#2196f3',
+    borderColor: booking.booking_type === 'turn' ? '#f57c00' : '#1976d2',
+    extendedProps: {
+      booking,
+      bookingType: booking.booking_type,
+      status: booking.status
+    }
+  })),
+  selectable: true,
+  selectMirror: true,
+  dayMaxEvents: true,
+  weekends: true,
+  select: handleDateSelect,
+  eventClick: handleEventClick,
+  height: 'auto'
+}))
+
+// Event handlers
+const handleDateSelect = (selectInfo: any) => {
+  selectedDate.value = new Date(selectInfo.start)
+  showAddBookingDialog.value = true
+}
+
+const handleEventClick = (clickInfo: any) => {
+  const booking = clickInfo.event.extendedProps.booking
+  // Navigate to booking details or show edit dialog
+  navigateToBooking(booking.id)
+}
+
+const handleBookingSave = async (bookingData: any) => {
+  try {
+    loading.value = true
+    await ownerData.createBooking(bookingData)
+    showAddBookingDialog.value = false
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleExport = () => {
+  // Export owner's calendar data
+  exportOwnerCalendar(ownerBookings.value)
+}
+</script>
+```
+
+---
+
+## **TASK-062: Create AdminSidebar.vue Component**
+
+### **Quick Implementation Pattern**
+
+```vue
+<!-- src/components/smart/admin/AdminSidebar.vue -->
+<template>
+  <v-navigation-drawer
+    v-model="isOpen"
+    :rail="isRail"
+    app
+    class="admin-sidebar"
+  >
+    <!-- Admin Profile with Role Indicator -->
+    <v-list-item class="admin-profile">
+      <template #prepend>
+        <v-avatar color="primary">
+          <v-icon>mdi-shield-account</v-icon>
+        </v-avatar>
+      </template>
+      <v-list-item-title>{{ authStore.user?.name }}</v-list-item-title>
+      <v-list-item-subtitle>System Administrator</v-list-item-subtitle>
+    </v-list-item>
+
+    <!-- System Overview Dashboard -->
+    <v-list-item v-if="!isRail" class="system-overview">
+      <div class="admin-metrics">
+        <div class="metric-item">
+          <div class="metric-value">{{ systemMetrics.totalProperties }}</div>
+          <div class="metric-label">Total Properties</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value">{{ systemMetrics.activeBookings }}</div>
+          <div class="metric-label">Active Bookings</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value text-warning">{{ systemMetrics.urgentTurns }}</div>
+          <div class="metric-label">Urgent Turns</div>
+        </div>
+      </div>
+    </v-list-item>
+
+    <!-- Admin Navigation -->
+    <v-list density="compact" nav>
+      <!-- System Dashboard -->
+      <v-list-item
+        prepend-icon="mdi-view-dashboard-variant"
+        title="System Dashboard"
+        @click="navigateTo('/admin')"
+      />
+
+      <!-- Property Management -->
+      <v-list-group value="properties">
+        <template #activator="{ props }">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-home-group"
+            title="All Properties"
+          />
+        </template>
+        <v-list-item title="Property List" @click="navigateTo('/admin/properties')" />
+        <v-list-item title="Add Property" @click="showAddPropertyDialog = true" />
+        <v-list-item title="Property Analytics" @click="navigateTo('/admin/properties/analytics')" />
+      </v-list-group>
+
+      <!-- Booking Management -->
+      <v-list-item
+        prepend-icon="mdi-calendar-multiple"
+        title="All Bookings"
+        @click="navigateTo('/admin/bookings')"
+      />
+
+      <!-- Cleaner Management -->
+      <v-list-item
+        prepend-icon="mdi-account-hard-hat"
+        title="Cleaner Management"
+        @click="navigateTo('/admin/cleaners')"
+      />
+
+      <!-- Turn Management -->
+      <v-list-item
+        prepend-icon="mdi-swap-horizontal"
+        title="Turn Management"
+        @click="navigateTo('/admin/turns')"
+      />
+
+      <!-- Reports & Analytics -->
+      <v-list-group value="reports">
+        <template #activator="{ props }">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-chart-box"
+            title="Reports"
+          />
+        </template>
+        <v-list-item title="Revenue Report" @click="navigateTo('/admin/reports/revenue')" />
+        <v-list-item title="Occupancy Report" @click="navigateTo('/admin/reports/occupancy')" />
+        <v-list-item title="Cleaner Performance" @click="navigateTo('/admin/reports/cleaners')" />
+      </v-list-group>
+
+      <!-- System Settings -->
+      <v-list-item
+        prepend-icon="mdi-cog"
+        title="System Settings"
+        @click="navigateTo('/admin/settings')"
+      />
+    </v-list>
+
+    <!-- Critical Alerts -->
+    <template #append>
+      <v-alert
+        v-if="criticalAlerts.length > 0"
+        type="warning"
+        variant="tonal"
+        density="compact"
+        class="ma-2"
+      >
+        <div class="text-caption">
+          {{ criticalAlerts.length }} Critical Alert{{ criticalAlerts.length > 1 ? 's' : '' }}
+        </div>
+        <v-btn
+          size="small"
+          variant="text"
+          @click="showAlertsDialog = true"
+        >
+          View Details
+        </v-btn>
+      </v-alert>
+    </template>
+  </v-navigation-drawer>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useAdminDataStore } from '@/stores/adminData'
+import { useAuthStore } from '@/stores/auth'
+
+// Admin sees ALL data - no filtering
+const adminData = useAdminDataStore()
+const authStore = useAuthStore()
+
+const systemMetrics = computed(() => adminData.systemMetrics)
+const criticalAlerts = computed(() => adminData.criticalAlerts)
+</script>
+```
+
+---
+
+## **TASK-067: Move Demo Components Script**
+
+### **Automated Demo Component Organization**
+
+```bash
+#!/bin/bash
+# scripts/organize-demo-components.sh
+
+echo "🚀 Organizing demo components..."
+
+# Create dev folder structure
+mkdir -p src/dev/demos
+mkdir -p src/dev/pages
+mkdir -p src/dev/components
+
+# Move demo components
+echo "📁 Moving demo components..."
+mv src/components/demos/* src/dev/demos/ 2>/dev/null || echo "No demo components to move"
+mv src/pages/demos/* src/dev/pages/ 2>/dev/null || echo "No demo pages to move"
+
+# Move demo-specific components
+echo "📁 Moving demo-specific files..."
+mv src/components/dumb/PropertyCardDemo.vue src/dev/demos/ 2>/dev/null || echo "PropertyCardDemo.vue not found"
+
+# Update vite.config.ts to exclude dev folder from production
+echo "⚙️ Updating vite.config.ts..."
+cat >> vite.config.ts << 'EOF'
+
+// Exclude dev folder from production builds
+if (process.env.NODE_ENV === 'production') {
+  config.build = config.build || {}
+  config.build.rollupOptions = config.build.rollupOptions || {}
+  config.build.rollupOptions.external = config.build.rollupOptions.external || []
+  
+  if (Array.isArray(config.build.rollupOptions.external)) {
+    config.build.rollupOptions.external.push(/^\/src\/dev\/.*/)
+  }
+}
+EOF
+
+# Update router to conditionally include dev routes
+echo "🛣️ Creating dev router..."
+cat > src/dev/router.ts << 'EOF'
+// src/dev/router.ts - Development-only routes
+import type { RouteRecordRaw } from 'vue-router'
+
+export const devRoutes: RouteRecordRaw[] = [
+  {
+    path: '/dev',
+    name: 'dev-index',
+    component: () => import('./pages/index.vue'),
+    meta: { requiresAuth: false, devOnly: true }
+  },
+  {
+    path: '/dev/demos',
+    name: 'dev-demos',
+    component: () => import('./pages/demos.vue'),
+    meta: { requiresAuth: false, devOnly: true }
+  }
+]
+
+// Only include dev routes in development
+export const getDevRoutes = (): RouteRecordRaw[] => {
+  return import.meta.env.DEV ? devRoutes : []
+}
+EOF
+
+echo "✅ Demo components organized!"
+echo "📋 Summary:"
+echo "   - Demo components moved to src/dev/"
+echo "   - Production builds will exclude dev folder"
+echo "   - Dev routes only available in development"
+```
+
+---
+
+## **TASK-078: Build Optimization Configuration**
+
+### **Enhanced Vite Configuration**
+
+```typescript
+// vite.config.ts - Enhanced configuration
+import { defineConfig, loadEnv } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
+import { fileURLToPath, URL } from 'node:url'
+
+export default defineConfig(({ command, mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  
+  return {
+    plugins: [
+      vue(),
+      vuetify({
+        autoImport: true,
+        styles: {
+          configFile: 'src/styles/variables.scss'
+        }
+      })
+    ],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+      }
+    },
+    build: {
+      // Optimize for production
+      target: 'esnext',
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: mode === 'production',
+          drop_debugger: mode === 'production'
+        }
+      },
+      rollupOptions: {
+        // Code splitting
+        output: {
+          manualChunks: {
+            // Vendor chunks
+            vue: ['vue', 'vue-router', 'pinia'],
+            vuetify: ['vuetify'],
+            
+            // Role-based chunks
+            'owner-components': [
+              './src/components/smart/owner/HomeOwner.vue',
+              './src/components/smart/owner/OwnerSidebar.vue',
+              './src/components/smart/owner/OwnerCalendar.vue'
+            ],
+            'admin-components': [
+              './src/components/smart/admin/HomeAdmin.vue',
+              './src/components/smart/admin/AdminSidebar.vue',
+              './src/components/smart/admin/AdminCalendar.vue'
+            ],
+            
+            // Shared utilities
+            'shared-utils': [
+              './src/composables/shared/useAuth.ts',
+              './src/composables/shared/useBookings.ts',
+              './src/composables/shared/useProperties.ts'
+            ]
+          }
+        },
+        
+        // Exclude dev folder from production
+        external: mode === 'production' ? [/^\/src\/dev\/.*$/] : []
+      },
+      
+      // Chunk size warnings
+      chunkSizeWarningLimit: 1000,
+      
+      // Generate source maps for debugging
+      sourcemap: mode !== 'production'
+    },
+    
+    // Development server optimization
+    server: {
+      hmr: {
+        overlay: false
+      }
+    },
+    
+    // Define global constants
+    define: {
+      __DEV__: mode !== 'production',
+      __APP_VERSION__: JSON.stringify(process.env.npm_package_version)
+    }
+  }
+})
+```
+
+---
+
+## **TASK-081: Admin Component Testing Example**
+
+### **Admin Component Test Pattern**
+
+```typescript
+// src/components/smart/admin/__tests__/AdminSidebar.test.ts
+import { describe, it, expect, beforeEach } from 'vitest'
+import AdminSidebar from '../AdminSidebar.vue'
+import { mountAdminComponent, expectAdminDataAccess } from '@/test/utils/roleBasedMounting'
+
+describe('AdminSidebar.vue', () => {
+  it('should display system-wide metrics', async () => {
+    const wrapper = await mountAdminComponent(AdminSidebar, {
+      adminData: {
+        allProperties: [
+          { name: 'Property 1', owner_id: 'owner1' },
+          { name: 'Property 2', owner_id: 'owner2' },
+          { name: 'Property 3', owner_id: 'owner1' }
+        ],
+        allBookings: [
+          { property_id: 'prop1', owner_id: 'owner1', status: 'confirmed' },
+          { property_id: 'prop2', owner_id: 'owner2', status: 'pending' }
+        ]
+      }
+    })
+
+    // Admin should see ALL properties and bookings
+    expect(wrapper.find('[data-testid="total-properties"]').text()).toContain('3')
+    expect(wrapper.find('[data-testid="total-bookings"]').text()).toContain('2')
+    
+    // Verify admin has access to system-wide data
+    expectAdminDataAccess(wrapper)
+  })
+
+  it('should show admin-specific navigation', async () => {
+    const wrapper = await mountAdminComponent(AdminSidebar)
+
+    // Should show admin-only features
+    expect(wrapper.find('[data-testid="cleaner-management"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="system-reports"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="admin-settings"]').exists()).toBe(true)
+  })
+
+  it('should display critical system alerts', async () => {
+    const wrapper = await mountAdminComponent(AdminSidebar, {
+      adminData: {
+        allBookings: [
+          {
+            booking_type: 'turn',
+            status: 'pending',
+            checkout_date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Overdue
+            assigned_cleaner_id: null
+          }
+        ]
+      }
+    })
+
+    // Should show critical alerts
+    const alertsSection = wrapper.find('[data-testid="critical-alerts"]')
+    expect(alertsSection.exists()).toBe(true)
+    expect(alertsSection.text()).toContain('Critical Alert')
+  })
+})
+```
+
+---
+
+## **Quick Reference Commands**
+
+### **Development Workflow**
+
+```bash
+# Start development
+npm run dev
+
+# Run tests for specific role
+npm run test src/components/smart/owner/
+npm run test src/components/smart/admin/
+
+# Type checking
+npm run type-check
+
+# Build for production
+npm run build
+
+# Organize demo components
+./scripts/organize-demo-components.sh
+
+# Audit imports
+npm run audit:imports
+
+# Fix import paths
+./scripts/fix-imports.sh
+```
+
+### **File Structure Quick Reference**
+
+```
+src/
+├── components/
+│   ├── smart/
+│   │   ├── owner/          # Owner-specific smart components
+│   │   ├── admin/          # Admin-specific smart components
+│   │   └── shared/         # Shared smart components
+│   └── dumb/
+│       ├── owner/          # Owner-specific UI components
+│       ├── admin/          # Admin-specific UI components
+│       └── shared/         # Shared UI components
+├── composables/
+│   ├── owner/              # Owner-specific composables
+│   ├── admin/              # Admin-specific composables
+│   └── shared/             # Shared composables ✅
+├── stores/
+│   ├── ownerData.ts        # Owner-filtered data store
+│   ├── adminData.ts        # Admin system-wide data store
+│   └── [existing stores]   # Your current stores
+├── dev/                    # Development-only code
+│   ├── demos/              # Demo components
+│   └── pages/              # Demo pages
+└── test/
+    └── utils/
+        └── roleBasedMounting.ts # Role-based testing utilities
+```
+
+This additional documentation provides quick implementation patterns and examples for the remaining critical tasks, helping you maintain consistency and speed up development.
+````
+
+## File: comprehensive_tasks.md
+````markdown
+# 📋 Additional Tasks for tasks.md - Critical Issues & Improvements
+
+## **Phase 1F: Critical Architecture Completion** 
+**(URGENT - Complete Role-Based Migration)**
+
+### **Complete Missing Role-Based Components**
+- [ ] **TASK-060**: Create OwnerSidebar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Create `src/components/smart/owner/OwnerSidebar.vue`
+    - Filter navigation to owner-specific features only
+    - Remove admin-only navigation items (cleaner management, system reports)
+    - Add owner-specific quick actions (Add Property, View My Bookings)
+    - Implement owner-friendly navigation labels and icons
+    - Use owner-specific color scheme and styling
+    - Integrate with existing OwnerQuickActions component
+  - Notes: Replace generic Sidebar.vue for owner role
+  - Files: src/components/smart/owner/OwnerSidebar.vue
+  - Verification: Owner sees only relevant navigation, no admin features
+  - Assigned to: Cursor
+
+- [ ] **TASK-061**: Create OwnerCalendar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Create `src/components/smart/owner/OwnerCalendar.vue`
+    - Filter calendar events to owner's properties only
+    - Implement owner-specific calendar controls (OwnerCalendarControls)
+    - Add owner-specific event creation workflows
+    - Remove admin-only features (cleaner assignment, system-wide view)
+    - Add owner-specific calendar views (My Properties, My Bookings)
+    - Implement owner-specific event styling and indicators
+  - Notes: Replace generic FullCalendar.vue for owner role
+  - Files: src/components/smart/owner/OwnerCalendar.vue
+  - Dependencies: OwnerCalendarControls.vue component
+  - Verification: Owner sees only their property events and bookings
+  - Assigned to: Cursor
+
+- [ ] **TASK-062**: Create AdminSidebar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Create `src/components/smart/admin/AdminSidebar.vue`
+    - Include full admin navigation (cleaners, reports, system management)
+    - Add admin-specific quick actions and system controls
+    - Implement admin-focused styling and iconography
+    - Add system status indicators and alerts
+    - Include business metrics in sidebar summary
+    - Add role switcher component integration
+  - Notes: Comprehensive admin navigation interface
+  - Files: src/components/smart/admin/AdminSidebar.vue
+  - Verification: Admin sees full system navigation and controls
+  - Assigned to: Cursor
+
+- [ ] **TASK-063**: Fix TypeScript issues in HomeOwner.vue
+  - Status: Not Started
+  - Requirements:
+    - Resolve all TypeScript compilation errors in HomeOwner.vue
+    - Add proper type definitions for role-based data filtering
+    - Fix prop type definitions and component interfaces
+    - Add proper error handling type annotations
+    - Ensure type safety for owner-specific data access
+    - Add comprehensive JSDoc comments for complex functions
+  - Notes: Critical for production stability
+  - Files: src/components/smart/owner/HomeOwner.vue, src/types/
+  - Verification: TypeScript compiles without errors, proper IntelliSense
+  - Assigned to: Cursor
+
+- [ ] **TASK-064**: Fix AdminCalendar.vue DOM mounting issues
+  - Status: Not Started
+  - Requirements:
+    - Resolve "Cannot read properties of null (reading 'parentNode')" error
+    - Add proper DOM mounting safety checks and guards
+    - Implement proper component lifecycle management
+    - Add error boundaries for calendar component failures
+    - Ensure proper cleanup on component unmount
+    - Add retry mechanisms for calendar initialization failures
+  - Notes: Critical for /admin/schedule route stability
+  - Files: src/components/smart/admin/AdminCalendar.vue
+  - Verification: Admin calendar route loads without errors
+  - Assigned to: Cursor
+
+### **Update Component Integration**
+- [ ] **TASK-065**: Update HomeOwner.vue to use new role-specific components
+  - Status: Not Started
+  - Requirements:
+    - Replace generic Sidebar with OwnerSidebar
+    - Replace generic FullCalendar with OwnerCalendar
+    - Update component imports and references
+    - Ensure proper prop passing to new components
+    - Test integration of owner-specific workflows
+    - Verify data filtering consistency across components
+  - Notes: Final integration of owner role components
+  - Files: src/components/smart/owner/HomeOwner.vue
+  - Dependencies: TASK-060, TASK-061
+  - Verification: Owner interface uses all role-specific components
+  - Assigned to: Cursor
+
+- [ ] **TASK-066**: Update HomeAdmin.vue to use AdminSidebar
+  - Status: Not Started
+  - Requirements:
+    - Replace generic Sidebar with AdminSidebar (if not already done)
+    - Ensure AdminCalendar integration works properly
+    - Update component imports and references
+    - Test admin-specific workflow integration
+    - Verify system-wide data access functionality
+  - Notes: Complete admin role component integration
+  - Files: src/components/smart/admin/HomeAdmin.vue
+  - Dependencies: TASK-062, TASK-064
+  - Verification: Admin interface uses all role-specific components
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1G: Code Cleanup & Organization** 
+**(HIGH PRIORITY - Remove Technical Debt)**
+
+### **Remove Development Artifacts**
+- [ ] **TASK-067**: Move demo components to development folder
+  - Status: Not Started
+  - Requirements:
+    - Create `src/dev/` folder for development-only components
+    - Move all demo components to `src/dev/demos/`
+    - Update import paths for any remaining demo references
+    - Configure build to exclude `src/dev/` from production bundle
+    - Update .gitignore to handle development artifacts appropriately
+    - Create README.md in dev folder explaining purpose
+  - Files to Move:
+    ```
+    src/components/demos/ → src/dev/demos/
+    src/pages/demos/ → src/dev/pages/
+    src/components/dumb/PropertyCardDemo.vue → src/dev/demos/
+    ```
+  - Notes: Clean separation of dev vs production code
+  - Verification: Production build excludes demo components, dev server still includes them
+  - Assigned to: Cursor
+
+- [ ] **TASK-068**: Remove redundant generic components after migration
+  - Status: Not Started
+  - Requirements:
+    - ⚠️ ONLY after TASK-060, TASK-061, TASK-062 are complete
+    - Remove `src/components/smart/Home.vue` (replaced by HomeOwner/HomeAdmin)
+    - Remove `src/components/smart/Sidebar.vue` (replaced by role-specific versions)
+    - Remove `src/components/smart/FullCalendar.vue` (if replaced by role-specific)
+    - Update any remaining references to removed components
+    - Verify no broken imports or references remain
+    - Archive removed components in git history
+  - Notes: Final cleanup after successful migration
+  - Files: List of generic components to remove
+  - Dependencies: Complete role-based component migration
+  - Verification: Application works without old generic components
+  - Assigned to: Cursor
+
+- [ ] **TASK-069**: Clean up tasks.md file
+  - Status: Not Started
+  - Requirements:
+    - Archive completed tasks to `docs/completed-tasks.md`
+    - Remove obsolete or superseded tasks
+    - Reorganize remaining tasks by current priority
+    - Update task numbering for consistency
+    - Add cross-references between related tasks
+    - Update status for partially completed items
+  - Notes: Improve project management clarity
+  - Files: tasks.md, docs/completed-tasks.md
+  - Verification: tasks.md is organized and current
+  - Assigned to: Human + Cursor
+
+### **Import Path Optimization**
+- [ ] **TASK-070**: Audit and fix import paths after composables migration
+  - Status: Not Started
+  - Requirements:
+    - Run comprehensive search for old import paths: `grep -r "from '@/composables/use" src/ --exclude-dir=shared`
+    - Fix any remaining non-shared composable imports
+    - Verify all imports use correct `@/composables/shared/` path
+    - Add linting rules to prevent future incorrect imports
+    - Create import path documentation for developers
+    - Test that all imports resolve correctly
+  - Notes: Ensure consistency after recent composables reorganization
+  - Files: All source files with composable imports
+  - Verification: No old import paths remain, linting passes
+  - Assigned to: Cursor
+
+- [ ] **TASK-071**: Optimize component import structure
+  - Status: Not Started
+  - Requirements:
+    - Create barrel exports for component folders (index.ts files)
+    - Standardize import naming conventions across the project
+    - Group imports by category (Vue, external libs, internal, types)
+    - Add automated import sorting with ESLint/Prettier
+    - Create component import guidelines documentation
+    - Update existing components to follow new import standards
+  - Notes: Improve developer experience and code consistency
+  - Files: All component files, new index.ts barrel exports
+  - Verification: Consistent import patterns, improved IntelliSense
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1H: Architecture Improvements** 
+**(MEDIUM PRIORITY - Performance & Maintainability)**
+
+### **State Management Optimization**
+- [ ] **TASK-072**: Move role-based filtering to store level
+  - Status: Not Started
+  - Requirements:
+    - Create `src/stores/ownerData.ts` store for owner-scoped data
+    - Create `src/stores/adminData.ts` store for admin-scoped data
+    - Move filtering logic from components to stores
+    - Implement role-based data access patterns in stores
+    - Add role-based cache invalidation strategies
+    - Create composables that automatically apply role filtering
+    - Update components to use role-specific stores
+  - Notes: Centralize data access control and improve performance
+  - Files: New store files, updated composables, component updates
+  - Verification: Role filtering happens at store level, better performance
+  - Assigned to: Cursor
+
+- [ ] **TASK-073**: Implement role-based data access controls
+  - Status: Not Started
+  - Requirements:
+    - Create data access control middleware for stores
+    - Add runtime checks for role-based data access
+    - Implement data sanitization for role-based views
+    - Add audit logging for data access patterns
+    - Create role-based data validation utilities
+    - Add tests for data access control compliance
+  - Notes: Enhance security and data isolation
+  - Files: src/middleware/, src/utils/dataAccess.ts, test files
+  - Verification: Owners cannot access other owners' data
+  - Assigned to: Cursor
+
+### **Type Safety & Error Handling**
+- [ ] **TASK-074**: Complete TypeScript strict mode compliance
+  - Status: Not Started
+  - Requirements:
+    - Enable strict TypeScript mode in tsconfig.json
+    - Fix all TypeScript errors and warnings
+    - Add comprehensive type definitions for all interfaces
+    - Implement runtime type validation for critical data flows
+    - Add type guards for external data sources
+    - Create comprehensive type documentation
+  - Notes: Improve code quality and catch bugs early
+  - Files: tsconfig.json, all TypeScript files, new type definitions
+  - Verification: TypeScript strict mode compiles without errors
+  - Assigned to: Cursor
+
+- [ ] **TASK-075**: Implement comprehensive error handling system
+  - Status: Not Started
+  - Requirements:
+    - Create global error boundary component
+    - Implement role-specific error message templates
+    - Add error reporting and analytics integration
+    - Create error recovery workflows for common failures
+    - Add user-friendly error display components
+    - Implement automatic error retry mechanisms
+  - Notes: Build on existing error foundations
+  - Files: src/components/ErrorBoundary.vue, error handling utilities
+  - Dependencies: Existing error handling tasks (TASK-040 to TASK-043)
+  - Verification: Graceful error handling throughout application
+  - Assigned to: Cursor
+
+### **Performance Optimization**
+- [ ] **TASK-076**: Implement code splitting and lazy loading
+  - Status: Not Started
+  - Requirements:
+    - Split owner vs admin bundles using dynamic imports
+    - Implement lazy loading for route-based components
+    - Add preloading strategies for critical routes
+    - Optimize component bundle sizes with tree shaking
+    - Add bundle analysis and monitoring tools
+    - Create performance budgets for bundle sizes
+  - Notes: Improve initial load time and user experience
+  - Files: router configuration, vite.config.ts, component imports
+  - Verification: Smaller initial bundle size, faster load times
+  - Assigned to: Cursor
+
+- [ ] **TASK-077**: Optimize component re-rendering and memoization
+  - Status: Not Started
+  - Requirements:
+    - Add Vue 3 memoization patterns where appropriate
+    - Optimize computed property dependencies
+    - Implement proper component key strategies
+    - Add performance profiling for component updates
+    - Optimize store subscriptions and reactive patterns
+    - Create performance monitoring dashboard
+  - Notes: Improve runtime performance and responsiveness
+  - Files: All components, stores, performance monitoring
+  - Verification: Improved application responsiveness
+  - Assigned to: Cursor
+
+### **Build and Configuration Optimization**
+- [ ] **TASK-078**: Configure build optimization for production
+  - Status: Not Started
+  - Requirements:
+    - Configure Vite for optimal production builds
+    - Exclude development components from production bundle
+    - Add compression and minification optimizations
+    - Configure proper caching strategies for assets
+    - Add build-time environment variable handling
+    - Create production deployment checklist
+  - Notes: Optimize production deployment
+  - Files: vite.config.ts, build scripts, deployment configuration
+  - Verification: Optimized production builds, excluded dev code
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1I: Testing & Quality Assurance** 
+**(MEDIUM PRIORITY - Comprehensive Testing)**
+
+### **Role-Based Component Testing**
+- [ ] **TASK-079**: Create role-based testing utilities
+  - Status: Not Started
+  - Requirements:
+    - Create test utilities for mounting owner components with mock data
+    - Create test utilities for mounting admin components with mock data
+    - Add role-based mock factories for realistic test data
+    - Create shared test helpers for role-based workflows
+    - Add visual regression testing for role-specific interfaces
+    - Create accessibility testing utilities for both roles
+  - Notes: Expand existing Vitest setup for role-based testing
+  - Files: src/test/utils/, mock factories, test helpers
+  - Verification: Easy testing of role-based components
+  - Assigned to: Cursor
+
+- [ ] **TASK-080**: Add comprehensive unit tests for owner components
+  - Status: Not Started
+  - Requirements:
+    - Test HomeOwner.vue with proper data filtering
+    - Test OwnerSidebar.vue navigation and permissions
+    - Test OwnerCalendar.vue event filtering and interactions
+    - Test owner-specific error handling and edge cases
+    - Test owner data isolation and security
+    - Achieve 80%+ coverage for owner-specific code paths
+  - Notes: Critical for owner role stability
+  - Files: Test files for all owner components
+  - Dependencies: TASK-079, completion of owner components
+  - Verification: High test coverage for owner functionality
+  - Assigned to: Cursor
+
+- [ ] **TASK-081**: Add comprehensive unit tests for admin components
+  - Status: Not Started
+  - Requirements:
+    - Test HomeAdmin.vue with system-wide data access
+    - Test AdminSidebar.vue full functionality and permissions
+    - Test AdminCalendar.vue system management features
+    - Test admin-specific error handling and business logic
+    - Test admin system control workflows
+    - Achieve 80%+ coverage for admin-specific code paths
+  - Notes: Critical for admin role stability
+  - Files: Test files for all admin components
+  - Dependencies: TASK-079, completion of admin components
+  - Verification: High test coverage for admin functionality
+  - Assigned to: Cursor
+
+### **Integration and E2E Testing**
+- [ ] **TASK-082**: Create role-based integration tests
+  - Status: Not Started
+  - Requirements:
+    - Test complete owner workflows (property → booking → calendar)
+    - Test complete admin workflows (system management → reports)
+    - Test role switching and permission boundaries
+    - Test cross-role data updates and synchronization
+    - Test role-based error scenarios and recovery
+    - Add automated testing for critical business workflows
+  - Notes: Ensure role-based system works end-to-end
+  - Files: Integration test suite, workflow test scenarios
+  - Verification: Critical workflows work correctly for both roles
+  - Assigned to: Cursor
+
+- [ ] **TASK-083**: Add accessibility testing for role-based interfaces
+  - Status: Not Started
+  - Requirements:
+    - Test keyboard navigation for owner interface
+    - Test keyboard navigation for admin interface
+    - Add screen reader compatibility testing
+    - Test color contrast and visual accessibility
+    - Add ARIA label validation for role-specific components
+    - Create accessibility compliance reports
+  - Notes: Ensure application is accessible to all users
+  - Files: Accessibility test suite, compliance documentation
+  - Verification: WCAG 2.1 AA compliance for both interfaces
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1J: Documentation & Developer Experience** 
+**(LOW PRIORITY - Long-term Maintenance)**
+
+### **Architecture Documentation**
+- [ ] **TASK-084**: Create comprehensive role-based architecture documentation
+  - Status: Not Started
+  - Requirements:
+    - Document role-based component patterns and conventions
+    - Create diagrams showing role-based data flow
+    - Document role-based security and permission patterns
+    - Add guidelines for extending role-based functionality
+    - Create onboarding guide for new developers
+    - Document role-based testing strategies
+  - Notes: Enable future development and maintenance
+  - Files: docs/architecture/, README updates, developer guides
+  - Verification: Clear documentation for role-based system
+  - Assigned to: Human + Cursor
+
+- [ ] **TASK-085**: Update project README and documentation
+  - Status: Not Started
+  - Requirements:
+    - Update README.md with role-based architecture explanation
+    - Add setup instructions for role-based development
+    - Document environment variables and configuration
+    - Add troubleshooting guide for common role-based issues
+    - Create development workflow documentation
+    - Add links to all relevant documentation
+  - Notes: Improve project onboarding and maintenance
+  - Files: README.md, docs/ folder updates
+  - Verification: Clear project documentation and setup instructions
+  - Assigned to: Human + Cursor
+
+### **Code Quality and Standards**
+- [ ] **TASK-086**: Establish role-based coding standards
+  - Status: Not Started
+  - Requirements:
+    - Create coding standards document for role-based components
+    - Add ESLint rules for role-based patterns
+    - Create component templates for consistent structure
+    - Add automated code quality checks in CI/CD
+    - Create code review checklist for role-based features
+    - Add pre-commit hooks for code quality enforcement
+  - Notes: Ensure consistent code quality across team
+  - Files: .eslintrc.json, coding standards doc, templates
+  - Verification: Automated code quality enforcement
+  - Assigned to: Cursor
+
+- [ ] **TASK-087**: Create development environment optimization
+  - Status: Not Started
+  - Requirements:
+    - Optimize Vite dev server for role-based development
+    - Add hot module replacement for role-specific components
+    - Create development shortcuts and productivity tools
+    - Add debugging utilities for role-based data flow
+    - Optimize build times for development workflow
+    - Create developer productivity documentation
+  - Notes: Improve developer experience and productivity
+  - Files: vite.config.ts, dev tools, productivity guides
+  - Verification: Faster development cycle, better DX
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1K: Security & Deployment** 
+**(LOW PRIORITY - Production Readiness)**
+
+### **Security Hardening**
+- [ ] **TASK-088**: Implement client-side security for role-based access
+  - Status: Not Started
+  - Requirements:
+    - Add route guards for role-based access control
+    - Implement session validation for role permissions
+    - Add CSRF protection for role-based forms
+    - Create security audit utilities for role-based features
+    - Add penetration testing for role-based vulnerabilities
+    - Document security best practices for role-based development
+  - Notes: Harden application against security vulnerabilities
+  - Files: src/security/, route guards, security documentation
+  - Verification: Security audit passes, no role-based vulnerabilities
+  - Assigned to: Cursor
+
+- [ ] **TASK-089**: Add audit logging and monitoring
+  - Status: Not Started
+  - Requirements:
+    - Implement audit logging for role-based actions
+    - Add monitoring for role-based performance metrics
+    - Create alerting for role-based security events
+    - Add user activity tracking for compliance
+    - Create audit report generation utilities
+    - Add GDPR compliance features for data handling
+  - Notes: Enable monitoring and compliance for production
+  - Files: src/audit/, monitoring configuration, compliance docs
+  - Verification: Comprehensive audit trail and monitoring
+  - Assigned to: Cursor
+
+### **Production Deployment**
+- [ ] **TASK-090**: Configure production deployment for role-based system
+  - Status: Not Started
+  - Requirements:
+    - Configure environment-specific builds for role-based features
+    - Add production deployment scripts and automation
+    - Configure monitoring and logging for production
+    - Add health checks for role-based functionality
+    - Create rollback procedures for role-based deployments
+    - Add production testing and validation procedures
+  - Notes: Ensure smooth production deployment
+  - Files: Deployment scripts, CI/CD configuration, ops documentation
+  - Verification: Successful production deployment with monitoring
+  - Assigned to: Human + Cursor
+
+---
+
+## **Updated Priority Order**
+
+### **CRITICAL (Complete Immediately)**
+1. **Phase 1F**: Complete role-based architecture (TASK-060 to TASK-066)
+2. **Phase 1G**: Code cleanup and organization (TASK-067 to TASK-071)
+
+### **HIGH PRIORITY (Next Sprint)**
+3. **Phase 1H**: Architecture improvements (TASK-072 to TASK-078)
+4. **Phase 1I**: Testing and quality assurance (TASK-079 to TASK-083)
+
+### **MEDIUM PRIORITY (Future Iterations)**
+5. **Phase 1J**: Documentation and developer experience (TASK-084 to TASK-087)
+6. **Phase 1K**: Security and deployment (TASK-088 to TASK-090)
+
+---
+
+## **Task Dependencies Map**
+
+```
+TASK-060 (OwnerSidebar) → TASK-065 (Integration)
+TASK-061 (OwnerCalendar) → TASK-065 (Integration) → TASK-080 (Owner Tests)
+TASK-062 (AdminSidebar) → TASK-066 (Integration)
+TASK-063 (TypeScript fixes) → TASK-074 (Strict mode)
+TASK-064 (AdminCalendar fixes) → TASK-066 (Integration) → TASK-081 (Admin Tests)
+
+TASK-065, TASK-066 → TASK-068 (Remove old components)
+TASK-067 (Move demos) → TASK-078 (Build optimization)
+TASK-072 (Store optimization) → TASK-082 (Integration tests)
+TASK-079 (Test utilities) → TASK-080, TASK-081 (Component tests)
+```
+
+---
+
+## **Notes for Implementation**
+
+### **Critical Success Factors**
+- ⚠️ **DO NOT** remove old components until new ones are complete and tested
+- 🔒 **ALWAYS** verify role-based data isolation after each change
+- 📊 **TEST** each component individually before integration
+- 🧹 **CLEAN UP** one phase completely before starting the next
+
+### **Development Guidelines**
+- Use existing coding standards and patterns
+- Maintain backward compatibility during migration
+- Document all breaking changes and migration steps
+- Test role switching functionality after each major change
+- Keep demo components functional in development environment
+````
+
+## File: enhanced_task_list.md
+````markdown
+# 📋 Enhanced Task List - Property Cleaning Scheduler
+## Complexity Levels & Implementation Guidance
+
+### **Complexity Legend**
+- 🟢 **Low**: Simple implementation, follows existing patterns, 1-2 hours
+- 🟡 **Medium**: Moderate complexity, some new patterns, 4-8 hours  
+- 🔴 **High**: Complex implementation, new architecture, 1-2 days
+- 🔥 **Very High**: Very complex, affects multiple systems, 3+ days
+
+---
+
+## **Phase 1F: Critical Architecture Completion** 
+**(URGENT - Complete Role-Based Migration)**
+
+### **🔴 TASK-060: Create OwnerSidebar.vue Component**
+**Complexity: High** | **Priority: Critical** | **Estimated Time: 1-2 days**
+
+**Why High Complexity:**
+- Establishes new role-based component patterns
+- Requires integration with multiple stores and composables
+- Sets architectural precedent for other role-based components
+- Complex data filtering and state management
+
+**📚 Documentation Reference:**
+- **Main Implementation Guide**: See "TASK-060: Create OwnerSidebar.vue Component" in Critical Task Implementation Guide
+- **Complete working example** with 200+ lines of production-ready code
+- **Integration patterns** for Pinia stores and Vuetify components
+
+**🔍 Context7 Commands:**
+```bash
+# Vue 3 Composition API patterns
+get-library-docs /vuejs/docs --topic "composition api components sidebar navigation"
+
+# Vuetify navigation drawer
+get-library-docs /vuetifyjs/vuetify --topic "navigation drawer sidebar menu"
+
+# Pinia store integration
+get-library-docs /vuejs/pinia --topic "stores composition api filtering"
+```
+
+**Implementation Dependencies:**
+- ✅ Existing: useAuthStore, usePropertyStore, useBookingStore
+- ✅ Existing: OwnerQuickActions, OwnerPropertyForm, OwnerBookingForm components
+- ⚠️ Required: Role-based error handling (useOwnerErrorHandler)
+
+**Key Implementation Points:**
+1. **Role-based data filtering**: `ownerProperties.filter(p => p.owner_id === user.id)`
+2. **Vuetify navigation patterns**: v-navigation-drawer with v-list-group
+3. **Store integration**: Uses existing Pinia stores with computed filtering
+4. **Error handling**: Owner-friendly error messages and fallbacks
+
+---
+
+### **🔴 TASK-061: Create OwnerCalendar.vue Component**
+**Complexity: High** | **Priority: Critical** | **Estimated Time: 1-2 days**
+
+<function_calls>
+<invoke name="sequentialthinking">
+<parameter name="nextThoughtNeeded">true
 ````
 
 ## File: index.html
@@ -14918,6 +16113,2501 @@ export function extractErrorCode(error: any): string | undefined
 export function getErrorTitle(category: ErrorCategory, role: UserRole = 'owner'): string
 ````
 
+## File: task_documentation.md
+````markdown
+# 🚀 Critical Task Implementation Guide
+## Property Cleaning Scheduler - Role-Based Architecture
+
+This guide provides comprehensive documentation and examples for implementing the critical tasks in your role-based architecture migration. All examples follow your existing Vue 3 + Pinia + Vuetify + TypeScript patterns.
+
+---
+
+## 📝 **TASK-060: Create OwnerSidebar.vue Component**
+
+### **Overview**
+Create a role-specific sidebar that shows only owner-relevant navigation and filters data appropriately.
+
+### **Implementation Pattern**
+
+```vue
+<!-- src/components/smart/owner/OwnerSidebar.vue -->
+<template>
+  <v-navigation-drawer
+    v-model="isOpen"
+    :rail="isRail"
+    :permanent="!isMobile"
+    :temporary="isMobile"
+    app
+    class="owner-sidebar"
+  >
+    <!-- User Profile Section -->
+    <v-list-item
+      :prepend-avatar="authStore.user?.avatar || undefined"
+      :title="authStore.user?.name || 'Property Owner'"
+      :subtitle="authStore.user?.email"
+      class="owner-profile"
+    >
+      <template #append>
+        <v-btn
+          variant="text"
+          icon="mdi-chevron-left"
+          size="small"
+          @click="toggleRail"
+        />
+      </template>
+    </v-list-item>
+
+    <v-divider />
+
+    <!-- Owner Quick Stats -->
+    <v-list-item v-if="!isRail" class="owner-stats">
+      <v-list-item-title class="text-caption text-medium-emphasis">
+        Quick Stats
+      </v-list-item-title>
+      <div class="d-flex justify-space-between text-body-2 mt-2">
+        <div class="text-center">
+          <div class="text-h6 text-primary">{{ ownerProperties.length }}</div>
+          <div class="text-caption">Properties</div>
+        </div>
+        <div class="text-center">
+          <div class="text-h6 text-success">{{ upcomingBookings.length }}</div>
+          <div class="text-caption">Upcoming</div>
+        </div>
+        <div class="text-center">
+          <div class="text-h6 text-warning">{{ urgentTurns.length }}</div>
+          <div class="text-caption">Urgent Turns</div>
+        </div>
+      </div>
+    </v-list-item>
+
+    <v-divider />
+
+    <!-- Owner Navigation -->
+    <v-list density="compact" nav>
+      <!-- Dashboard -->
+      <v-list-item
+        prepend-icon="mdi-view-dashboard"
+        title="Dashboard"
+        :active="currentRoute === 'owner-dashboard'"
+        @click="navigateTo('/owner/dashboard')"
+      />
+
+      <!-- My Properties -->
+      <v-list-group value="properties">
+        <template #activator="{ props }">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-home-group"
+            title="My Properties"
+          />
+        </template>
+
+        <v-list-item
+          prepend-icon="mdi-plus-circle"
+          title="Add Property"
+          @click="showAddPropertyDialog = true"
+        />
+        
+        <v-list-item
+          v-for="property in ownerProperties"
+          :key="property.id"
+          :prepend-icon="property.active ? 'mdi-home' : 'mdi-home-off'"
+          :title="property.name"
+          :subtitle="`${property.address?.city} • ${property.pricing_tier}`"
+          @click="filterByProperty(property.id)"
+        >
+          <template #append>
+            <v-chip
+              v-if="getPropertyBookingsCount(property.id) > 0"
+              size="x-small"
+              color="primary"
+            >
+              {{ getPropertyBookingsCount(property.id) }}
+            </v-chip>
+          </template>
+        </v-list-item>
+      </v-list-group>
+
+      <!-- My Bookings -->
+      <v-list-item
+        prepend-icon="mdi-calendar-check"
+        title="My Bookings"
+        :active="currentRoute === 'owner-bookings'"
+        @click="navigateTo('/owner/bookings')"
+      >
+        <template #append>
+          <v-chip
+            v-if="ownerBookings.length > 0"
+            size="x-small"
+            color="primary"
+          >
+            {{ ownerBookings.length }}
+          </v-chip>
+        </template>
+      </v-list-item>
+
+      <!-- Calendar View -->
+      <v-list-item
+        prepend-icon="mdi-calendar"
+        title="Calendar"
+        :active="currentRoute === 'owner-calendar'"
+        @click="navigateTo('/owner/calendar')"
+      />
+
+      <v-divider class="my-2" />
+
+      <!-- Turn Alerts (Owner-specific) -->
+      <v-list-item
+        prepend-icon="mdi-alert-circle"
+        :title="`Turn Alerts (${urgentTurns.length})`"
+        :class="{ 'text-warning': urgentTurns.length > 0 }"
+        @click="showTurnAlerts = true"
+      />
+
+      <!-- Settings -->
+      <v-list-item
+        prepend-icon="mdi-cog"
+        title="Settings"
+        @click="navigateTo('/owner/settings')"
+      />
+    </v-list>
+
+    <!-- Owner Quick Actions -->
+    <template #append>
+      <div class="pa-2">
+        <v-btn
+          block
+          color="primary"
+          prepend-icon="mdi-plus"
+          text="Add Booking"
+          variant="elevated"
+          @click="showAddBookingDialog = true"
+        />
+      </div>
+    </template>
+  </v-navigation-drawer>
+
+  <!-- Add Property Dialog -->
+  <v-dialog v-model="showAddPropertyDialog" max-width="600">
+    <OwnerPropertyForm
+      mode="create"
+      @save="handlePropertySave"
+      @cancel="showAddPropertyDialog = false"
+    />
+  </v-dialog>
+
+  <!-- Add Booking Dialog -->
+  <v-dialog v-model="showAddBookingDialog" max-width="800">
+    <OwnerBookingForm
+      :properties="ownerProperties"
+      mode="create"
+      @save="handleBookingSave"
+      @cancel="showAddBookingDialog = false"
+    />
+  </v-dialog>
+
+  <!-- Turn Alerts Dialog -->
+  <v-dialog v-model="showTurnAlerts" max-width="500">
+    <TurnAlertsPanel
+      :turns="urgentTurns"
+      role="owner"
+      @close="showTurnAlerts = false"
+    />
+  </v-dialog>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
+import { useAuthStore } from '@/stores/auth'
+import { usePropertyStore } from '@/stores/property'
+import { useBookingStore } from '@/stores/booking'
+import { useOwnerErrorHandler } from '@/composables/owner/useOwnerErrorHandler'
+import OwnerPropertyForm from '@/components/dumb/owner/OwnerPropertyForm.vue'
+import OwnerBookingForm from '@/components/dumb/owner/OwnerBookingForm.vue'
+import TurnAlertsPanel from '@/components/dumb/shared/TurnAlertsPanel.vue'
+import type { Property, Booking } from '@/types'
+
+// Props
+interface Props {
+  modelValue?: boolean
+  rail?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: true,
+  rail: false
+})
+
+// Emits
+interface Emits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'update:rail', value: boolean): void
+  (e: 'property-selected', propertyId: string): void
+}
+
+const emit = defineEmits<Emits>()
+
+// Composables
+const route = useRoute()
+const router = useRouter()
+const { mobile: isMobile } = useDisplay()
+const authStore = useAuthStore()
+const propertyStore = usePropertyStore()
+const bookingStore = useBookingStore()
+const { handleError, showSuccess } = useOwnerErrorHandler()
+
+// Local state
+const showAddPropertyDialog = ref(false)
+const showAddBookingDialog = ref(false)
+const showTurnAlerts = ref(false)
+
+// Computed
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
+
+const isRail = computed({
+  get: () => props.rail,
+  set: (value) => emit('update:rail', value)
+})
+
+const currentRoute = computed(() => route.name as string)
+
+// ROLE-BASED DATA FILTERING - Owner sees only their data
+const ownerProperties = computed((): Property[] => {
+  if (!authStore.user?.id) return []
+  return propertyStore.propertiesByOwner(authStore.user.id)
+})
+
+const ownerBookings = computed((): Booking[] => {
+  if (!authStore.user?.id) return []
+  return bookingStore.bookingsByOwner(authStore.user.id)
+})
+
+const upcomingBookings = computed((): Booking[] => {
+  const now = new Date()
+  return ownerBookings.value.filter(booking => 
+    new Date(booking.checkin_date) > now &&
+    booking.status === 'confirmed'
+  )
+})
+
+const urgentTurns = computed((): Booking[] => {
+  return ownerBookings.value.filter(booking =>
+    booking.booking_type === 'turn' &&
+    booking.status === 'pending' &&
+    new Date(booking.checkout_date) <= new Date(Date.now() + 24 * 60 * 60 * 1000) // Within 24 hours
+  )
+})
+
+// Methods
+const toggleRail = (): void => {
+  isRail.value = !isRail.value
+}
+
+const navigateTo = (path: string): void => {
+  router.push(path)
+}
+
+const filterByProperty = (propertyId: string): void => {
+  emit('property-selected', propertyId)
+  navigateTo('/owner/calendar')
+}
+
+const getPropertyBookingsCount = (propertyId: string): number => {
+  return ownerBookings.value.filter(booking => 
+    booking.property_id === propertyId &&
+    ['confirmed', 'pending'].includes(booking.status)
+  ).length
+}
+
+const handlePropertySave = async (propertyData: any): Promise<void> => {
+  try {
+    await propertyStore.createProperty({
+      ...propertyData,
+      owner_id: authStore.user?.id
+    })
+    showAddPropertyDialog.value = false
+    showSuccess('Property added successfully!')
+  } catch (error) {
+    handleError(error, 'Failed to add property')
+  }
+}
+
+const handleBookingSave = async (bookingData: any): Promise<void> => {
+  try {
+    await bookingStore.createBooking({
+      ...bookingData,
+      owner_id: authStore.user?.id
+    })
+    showAddBookingDialog.value = false
+    showSuccess('Booking added successfully!')
+  } catch (error) {
+    handleError(error, 'Failed to add booking')
+  }
+}
+</script>
+
+<style scoped>
+.owner-sidebar {
+  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.owner-profile {
+  background: rgba(var(--v-theme-primary), 0.05);
+  margin: 4px;
+  border-radius: 8px;
+}
+
+.owner-stats {
+  background: rgba(var(--v-theme-surface-variant), 0.3);
+  margin: 4px;
+  border-radius: 8px;
+}
+
+.v-list-item--active {
+  background: rgba(var(--v-theme-primary), 0.12) !important;
+}
+
+.text-warning .v-list-item__prepend .v-icon {
+  color: rgb(var(--v-theme-warning)) !important;
+}
+</style>
+```
+
+### **Key Implementation Points**
+
+1. **Role-Based Data Filtering**: Uses computed properties to filter data by `owner_id`
+2. **Integration with Existing Stores**: Uses your existing Pinia stores
+3. **Vuetify Patterns**: Follows your established Vuetify component usage
+4. **TypeScript Safety**: Proper typing for all props, emits, and data
+5. **Error Handling**: Uses role-specific error handler for owner-friendly messages
+
+---
+
+## 📝 **TASK-072: Store-Level Role Filtering Architecture**
+
+### **Overview**
+Move role-based filtering from components to Pinia stores for better performance and consistency.
+
+### **Implementation Pattern**
+
+```typescript
+// src/stores/ownerData.ts - Owner-specific data store
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import { useAuthStore } from './auth'
+import { usePropertyStore } from './property'
+import { useBookingStore } from './booking'
+import type { Property, Booking, User } from '@/types'
+
+export const useOwnerDataStore = defineStore('ownerData', () => {
+  // Dependencies
+  const authStore = useAuthStore()
+  const propertyStore = usePropertyStore()
+  const bookingStore = useBookingStore()
+
+  // Cache for performance
+  const lastOwnerId = ref<string | null>(null)
+  const cachedProperties = ref<Property[]>([])
+  const cachedBookings = ref<Booking[]>([])
+  const cacheTimestamp = ref<number>(0)
+  const CACHE_TTL = 30000 // 30 seconds
+
+  // Cache management
+  const isCacheValid = computed(() => {
+    const now = Date.now()
+    return (
+      lastOwnerId.value === authStore.user?.id &&
+      (now - cacheTimestamp.value) < CACHE_TTL
+    )
+  })
+
+  const invalidateCache = (): void => {
+    lastOwnerId.value = null
+    cachedProperties.value = []
+    cachedBookings.value = []
+    cacheTimestamp.value = 0
+  }
+
+  // Core owner data getters with caching
+  const ownerProperties = computed((): Property[] => {
+    if (!authStore.user?.id) return []
+
+    // Return cached data if valid
+    if (isCacheValid.value) {
+      return cachedProperties.value
+    }
+
+    // Filter and cache new data
+    const filtered = propertyStore.propertiesArray.filter(
+      property => property.owner_id === authStore.user?.id
+    )
+
+    cachedProperties.value = filtered
+    lastOwnerId.value = authStore.user.id
+    cacheTimestamp.value = Date.now()
+
+    return filtered
+  })
+
+  const ownerBookings = computed((): Booking[] => {
+    if (!authStore.user?.id) return []
+
+    // Return cached data if valid for bookings
+    if (isCacheValid.value && cachedBookings.value.length > 0) {
+      return cachedBookings.value
+    }
+
+    // Filter and cache new data
+    const filtered = bookingStore.bookingsArray.filter(
+      booking => booking.owner_id === authStore.user?.id
+    )
+
+    cachedBookings.value = filtered
+    return filtered
+  })
+
+  // Derived owner data
+  const activeProperties = computed((): Property[] => {
+    return ownerProperties.value.filter(property => property.active)
+  })
+
+  const upcomingBookings = computed((): Booking[] => {
+    const now = new Date()
+    return ownerBookings.value.filter(booking =>
+      new Date(booking.checkin_date) > now &&
+      ['confirmed', 'pending'].includes(booking.status)
+    )
+  })
+
+  const recentBookings = computed((): Booking[] => {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    return ownerBookings.value.filter(booking =>
+      new Date(booking.checkout_date) >= thirtyDaysAgo
+    ).sort((a, b) => 
+      new Date(b.checkout_date).getTime() - new Date(a.checkout_date).getTime()
+    )
+  })
+
+  const urgentTurns = computed((): Booking[] => {
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    return ownerBookings.value.filter(booking =>
+      booking.booking_type === 'turn' &&
+      booking.status === 'pending' &&
+      new Date(booking.checkout_date) <= tomorrow
+    )
+  })
+
+  // Property-specific helpers
+  const getPropertyBookings = (propertyId: string): Booking[] => {
+    return ownerBookings.value.filter(booking => 
+      booking.property_id === propertyId
+    )
+  }
+
+  const getPropertyStats = (propertyId: string) => {
+    const bookings = getPropertyBookings(propertyId)
+    const thisMonth = new Date()
+    thisMonth.setDate(1)
+    
+    const thisMonthBookings = bookings.filter(booking =>
+      new Date(booking.checkin_date) >= thisMonth
+    )
+
+    return {
+      totalBookings: bookings.length,
+      thisMonthBookings: thisMonthBookings.length,
+      avgNightly: bookings.length > 0 
+        ? bookings.reduce((sum, b) => sum + (b.nightly_rate || 0), 0) / bookings.length
+        : 0,
+      occupancyRate: calculateOccupancyRate(propertyId)
+    }
+  }
+
+  const calculateOccupancyRate = (propertyId: string): number => {
+    const bookings = getPropertyBookings(propertyId)
+    if (bookings.length === 0) return 0
+
+    const now = new Date()
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    
+    const bookedDays = bookings
+      .filter(booking => 
+        new Date(booking.checkin_date) >= lastMonth &&
+        new Date(booking.checkout_date) <= thisMonth
+      )
+      .reduce((total, booking) => {
+        const checkin = new Date(booking.checkin_date)
+        const checkout = new Date(booking.checkout_date)
+        return total + Math.ceil((checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60 * 24))
+      }, 0)
+
+    const totalDays = Math.ceil((thisMonth.getTime() - lastMonth.getTime()) / (1000 * 60 * 60 * 24))
+    return Math.round((bookedDays / totalDays) * 100)
+  }
+
+  // Actions
+  const refreshOwnerData = async (): Promise<void> => {
+    invalidateCache()
+    await Promise.all([
+      propertyStore.fetchProperties(),
+      bookingStore.fetchBookings()
+    ])
+  }
+
+  // Watch for auth changes to invalidate cache
+  authStore.$subscribe((mutation, state) => {
+    if (mutation.storeId === 'auth' && state.user?.id !== lastOwnerId.value) {
+      invalidateCache()
+    }
+  })
+
+  return {
+    // Core data
+    ownerProperties,
+    ownerBookings,
+    activeProperties,
+    upcomingBookings,
+    recentBookings,
+    urgentTurns,
+    
+    // Helpers
+    getPropertyBookings,
+    getPropertyStats,
+    
+    // Actions
+    refreshOwnerData,
+    invalidateCache,
+    
+    // Cache info (for debugging)
+    isCacheValid,
+    cacheTimestamp: computed(() => cacheTimestamp.value)
+  }
+})
+```
+
+```typescript
+// src/stores/adminData.ts - Admin-specific data store
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import { usePropertyStore } from './property'
+import { useBookingStore } from './booking'
+import type { Property, Booking, SystemMetrics } from '@/types'
+
+export const useAdminDataStore = defineStore('adminData', () => {
+  // Dependencies
+  const propertyStore = usePropertyStore()
+  const bookingStore = useBookingStore()
+
+  // Admin sees ALL data - no filtering
+  const allProperties = computed((): Property[] => {
+    return propertyStore.propertiesArray
+  })
+
+  const allBookings = computed((): Booking[] => {
+    return bookingStore.bookingsArray
+  })
+
+  // System-wide metrics
+  const systemMetrics = computed((): SystemMetrics => {
+    const properties = allProperties.value
+    const bookings = allBookings.value
+    const now = new Date()
+    
+    return {
+      totalProperties: properties.length,
+      activeProperties: properties.filter(p => p.active).length,
+      totalBookings: bookings.length,
+      upcomingBookings: bookings.filter(b => 
+        new Date(b.checkin_date) > now && b.status === 'confirmed'
+      ).length,
+      urgentTurns: bookings.filter(b =>
+        b.booking_type === 'turn' &&
+        b.status === 'pending' &&
+        new Date(b.checkout_date) <= new Date(now.getTime() + 24 * 60 * 60 * 1000)
+      ).length,
+      revenue: bookings
+        .filter(b => b.status === 'completed')
+        .reduce((sum, b) => sum + (b.total_cost || 0), 0)
+    }
+  })
+
+  // Owner performance analytics
+  const ownerAnalytics = computed(() => {
+    const ownerStats = new Map<string, any>()
+    
+    allProperties.value.forEach(property => {
+      const ownerId = property.owner_id
+      if (!ownerStats.has(ownerId)) {
+        ownerStats.set(ownerId, {
+          ownerId,
+          ownerName: property.owner_name || 'Unknown',
+          properties: [],
+          bookings: [],
+          revenue: 0,
+          avgOccupancy: 0
+        })
+      }
+      ownerStats.get(ownerId).properties.push(property)
+    })
+
+    allBookings.value.forEach(booking => {
+      const ownerId = booking.owner_id
+      if (ownerStats.has(ownerId)) {
+        const stats = ownerStats.get(ownerId)
+        stats.bookings.push(booking)
+        if (booking.status === 'completed') {
+          stats.revenue += booking.total_cost || 0
+        }
+      }
+    })
+
+    return Array.from(ownerStats.values())
+  })
+
+  // Critical alerts for admin
+  const criticalAlerts = computed(() => {
+    const alerts = []
+    const now = new Date()
+    const twentyFourHours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+
+    // Unassigned cleanings
+    const unassignedCleanings = allBookings.value.filter(booking =>
+      !booking.assigned_cleaner_id &&
+      booking.cleaning_scheduled &&
+      new Date(booking.checkout_date) <= twentyFourHours
+    )
+
+    if (unassignedCleanings.length > 0) {
+      alerts.push({
+        type: 'warning',
+        title: 'Unassigned Cleanings',
+        message: `${unassignedCleanings.length} cleanings need cleaner assignment`,
+        count: unassignedCleanings.length,
+        action: 'assign-cleaners'
+      })
+    }
+
+    // Overdue turns
+    const overdueTurns = allBookings.value.filter(booking =>
+      booking.booking_type === 'turn' &&
+      booking.status === 'pending' &&
+      new Date(booking.checkout_date) < now
+    )
+
+    if (overdueTurns.length > 0) {
+      alerts.push({
+        type: 'error',
+        title: 'Overdue Turns',
+        message: `${overdueTurns.length} turns are overdue`,
+        count: overdueTurns.length,
+        action: 'urgent-turns'
+      })
+    }
+
+    return alerts
+  })
+
+  return {
+    // System data
+    allProperties,
+    allBookings,
+    systemMetrics,
+    ownerAnalytics,
+    criticalAlerts
+  }
+})
+```
+
+### **Updated Component Usage Pattern**
+
+```vue
+<!-- src/components/smart/owner/HomeOwner.vue - Updated to use store filtering -->
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useOwnerDataStore } from '@/stores/ownerData'
+import { useOwnerErrorHandler } from '@/composables/owner/useOwnerErrorHandler'
+
+// Use owner data store instead of component-level filtering
+const ownerData = useOwnerDataStore()
+const { handleError } = useOwnerErrorHandler()
+
+// Data comes pre-filtered from store
+const properties = computed(() => ownerData.ownerProperties)
+const bookings = computed(() => ownerData.ownerBookings)
+const urgentTurns = computed(() => ownerData.urgentTurns)
+
+// Property-specific data
+const getPropertyStats = (propertyId: string) => {
+  return ownerData.getPropertyStats(propertyId)
+}
+</script>
+```
+
+---
+
+## 📝 **TASK-079: Role-Based Testing Utilities**
+
+### **Overview**
+Create comprehensive testing utilities that support role-based component testing.
+
+### **Implementation Pattern**
+
+```typescript
+// src/test/utils/roleBasedMounting.ts
+import { mount, VueWrapper } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { createVuetify } from 'vuetify'
+import { createRouter, createWebHistory } from 'vue-router'
+import type { ComponentMountingOptions } from '@vue/test-utils'
+import type { User, Property, Booking } from '@/types'
+import { useAuthStore } from '@/stores/auth'
+import { usePropertyStore } from '@/stores/property'
+import { useBookingStore } from '@/stores/booking'
+
+// Mock data factories
+export const createMockOwner = (overrides?: Partial<User>): User => ({
+  id: 'owner-123',
+  name: 'Test Owner',
+  email: 'owner@test.com',
+  role: 'owner',
+  created_at: new Date().toISOString(),
+  ...overrides
+})
+
+export const createMockAdmin = (overrides?: Partial<User>): User => ({
+  id: 'admin-456',
+  name: 'Test Admin',
+  email: 'admin@test.com',
+  role: 'admin',
+  created_at: new Date().toISOString(),
+  ...overrides
+})
+
+export const createMockProperty = (ownerId: string, overrides?: Partial<Property>): Property => ({
+  id: `prop-${Math.random().toString(36).substr(2, 9)}`,
+  name: 'Test Property',
+  owner_id: ownerId,
+  owner_name: 'Test Owner',
+  address: {
+    street: '123 Test St',
+    city: 'Test City',
+    state: 'TS',
+    zip: '12345'
+  },
+  pricing_tier: 'premium',
+  nightly_rate: 150,
+  cleaning_fee: 75,
+  active: true,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  ...overrides
+})
+
+export const createMockBooking = (ownerId: string, propertyId: string, overrides?: Partial<Booking>): Booking => ({
+  id: `booking-${Math.random().toString(36).substr(2, 9)}`,
+  property_id: propertyId,
+  owner_id: ownerId,
+  checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  checkout_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+  booking_type: 'standard',
+  guest_count: 2,
+  status: 'confirmed',
+  cleaning_scheduled: true,
+  total_cost: 450,
+  nightly_rate: 150,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  ...overrides
+})
+
+// Role-based mounting utilities
+interface OwnerMountOptions extends ComponentMountingOptions<any> {
+  ownerData?: {
+    user?: Partial<User>
+    properties?: Partial<Property>[]
+    bookings?: Partial<Booking>[]
+  }
+}
+
+interface AdminMountOptions extends ComponentMountingOptions<any> {
+  adminData?: {
+    user?: Partial<User>
+    allProperties?: Partial<Property>[]
+    allBookings?: Partial<Booking>[]
+  }
+}
+
+export const mountOwnerComponent = async (
+  component: any,
+  options: OwnerMountOptions = {}
+): Promise<VueWrapper<any>> => {
+  // Setup testing environment
+  const pinia = createPinia()
+  setActivePinia(pinia)
+  
+  const vuetify = createVuetify({
+    theme: { defaultTheme: 'light' }
+  })
+  
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+      { path: '/', component: { template: '<div>Home</div>' } },
+      { path: '/owner/dashboard', component: { template: '<div>Dashboard</div>' } }
+    ]
+  })
+
+  // Setup stores with owner data
+  const authStore = useAuthStore()
+  const propertyStore = usePropertyStore()
+  const bookingStore = useBookingStore()
+
+  // Create mock owner
+  const mockOwner = createMockOwner(options.ownerData?.user)
+  authStore.user = mockOwner
+
+  // Setup owner properties
+  if (options.ownerData?.properties) {
+    options.ownerData.properties.forEach(propertyData => {
+      const property = createMockProperty(mockOwner.id, propertyData)
+      propertyStore.properties.set(property.id, property)
+    })
+  }
+
+  // Setup owner bookings
+  if (options.ownerData?.bookings) {
+    options.ownerData.bookings.forEach(bookingData => {
+      const booking = createMockBooking(
+        mockOwner.id,
+        Array.from(propertyStore.properties.keys())[0] || 'default-property',
+        bookingData
+      )
+      bookingStore.bookings.set(booking.id, booking)
+    })
+  }
+
+  // Mount component
+  return mount(component, {
+    global: {
+      plugins: [pinia, vuetify, router],
+      stubs: {
+        'router-link': true,
+        'router-view': true
+      }
+    },
+    ...options
+  })
+}
+
+export const mountAdminComponent = async (
+  component: any,
+  options: AdminMountOptions = {}
+): Promise<VueWrapper<any>> => {
+  // Setup testing environment
+  const pinia = createPinia()
+  setActivePinia(pinia)
+  
+  const vuetify = createVuetify({
+    theme: { defaultTheme: 'light' }
+  })
+  
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+      { path: '/', component: { template: '<div>Home</div>' } },
+      { path: '/admin/dashboard', component: { template: '<div>Admin Dashboard</div>' } }
+    ]
+  })
+
+  // Setup stores with admin data
+  const authStore = useAuthStore()
+  const propertyStore = usePropertyStore()
+  const bookingStore = useBookingStore()
+
+  // Create mock admin
+  const mockAdmin = createMockAdmin(options.adminData?.user)
+  authStore.user = mockAdmin
+
+  // Setup all properties (admin sees everything)
+  if (options.adminData?.allProperties) {
+    options.adminData.allProperties.forEach(propertyData => {
+      const property = createMockProperty('various-owners', propertyData)
+      propertyStore.properties.set(property.id, property)
+    })
+  }
+
+  // Setup all bookings (admin sees everything)
+  if (options.adminData?.allBookings) {
+    options.adminData.allBookings.forEach(bookingData => {
+      const booking = createMockBooking(
+        'various-owners',
+        Array.from(propertyStore.properties.keys())[0] || 'default-property',
+        bookingData
+      )
+      bookingStore.bookings.set(booking.id, booking)
+    })
+  }
+
+  // Mount component
+  return mount(component, {
+    global: {
+      plugins: [pinia, vuetify, router],
+      stubs: {
+        'router-link': true,
+        'router-view': true
+      }
+    },
+    ...options
+  })
+}
+
+// Role-based assertion helpers
+export const expectOwnerDataScoping = (wrapper: VueWrapper<any>, ownerId: string) => {
+  // Find all property elements and verify they belong to owner
+  const propertyElements = wrapper.findAll('[data-testid*="property-"]')
+  propertyElements.forEach(element => {
+    expect(element.attributes('data-owner-id')).toBe(ownerId)
+  })
+
+  // Find all booking elements and verify they belong to owner
+  const bookingElements = wrapper.findAll('[data-testid*="booking-"]')
+  bookingElements.forEach(element => {
+    expect(element.attributes('data-owner-id')).toBe(ownerId)
+  })
+}
+
+export const expectAdminDataAccess = (wrapper: VueWrapper<any>) => {
+  // Admin should see system-wide stats
+  expect(wrapper.find('[data-testid="total-properties"]').exists()).toBe(true)
+  expect(wrapper.find('[data-testid="total-bookings"]').exists()).toBe(true)
+  expect(wrapper.find('[data-testid="system-metrics"]').exists()).toBe(true)
+}
+```
+
+### **Example Test Implementation**
+
+```typescript
+// src/components/smart/owner/__tests__/OwnerSidebar.test.ts
+import { describe, it, expect, beforeEach } from 'vitest'
+import { nextTick } from 'vue'
+import OwnerSidebar from '../OwnerSidebar.vue'
+import { mountOwnerComponent, expectOwnerDataScoping, createMockProperty, createMockBooking } from '@/test/utils/roleBasedMounting'
+
+describe('OwnerSidebar.vue', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should display only owner properties', async () => {
+    const wrapper = await mountOwnerComponent(OwnerSidebar, {
+      ownerData: {
+        user: { name: 'John Owner' },
+        properties: [
+          { name: 'Beach House', active: true },
+          { name: 'Mountain Cabin', active: false }
+        ]
+      }
+    })
+
+    await nextTick()
+
+    // Should show owner's properties
+    expect(wrapper.text()).toContain('Beach House')
+    expect(wrapper.text()).toContain('Mountain Cabin')
+    
+    // Verify data scoping
+    expectOwnerDataScoping(wrapper, 'owner-123')
+  })
+
+  it('should show correct booking counts', async () => {
+    const wrapper = await mountOwnerComponent(OwnerSidebar, {
+      ownerData: {
+        properties: [
+          { name: 'Test Property' }
+        ],
+        bookings: [
+          { status: 'confirmed' },
+          { status: 'pending' },
+          { status: 'completed' }
+        ]
+      }
+    })
+
+    await nextTick()
+
+    // Should show booking count in nav
+    const bookingNavItem = wrapper.find('[data-testid="owner-bookings-nav"]')
+    expect(bookingNavItem.text()).toContain('3') // Total bookings
+  })
+
+  it('should handle turn alerts correctly', async () => {
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    
+    const wrapper = await mountOwnerComponent(OwnerSidebar, {
+      ownerData: {
+        bookings: [
+          {
+            booking_type: 'turn',
+            status: 'pending',
+            checkout_date: tomorrow
+          }
+        ]
+      }
+    })
+
+    await nextTick()
+
+    // Should show turn alert
+    const turnAlert = wrapper.find('[data-testid="turn-alerts"]')
+    expect(turnAlert.text()).toContain('Turn Alerts (1)')
+  })
+
+  it('should not show admin-only features', async () => {
+    const wrapper = await mountOwnerComponent(OwnerSidebar, {
+      ownerData: {
+        user: { role: 'owner' }
+      }
+    })
+
+    await nextTick()
+
+    // Should not show admin features
+    expect(wrapper.find('[data-testid="admin-reports"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="cleaner-management"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="system-settings"]').exists()).toBe(false)
+  })
+})
+```
+
+---
+
+## 📝 **TASK-070: Import Path Optimization Guide**
+
+### **Overview**
+Standardize import paths and fix any remaining inconsistencies after the composables reorganization.
+
+### **Current Import Patterns**
+
+```typescript
+// ✅ CORRECT - Shared composables
+import { useAuth } from '@/composables/shared/useAuth'
+import { useBookings } from '@/composables/shared/useBookings'
+import { useProperties } from '@/composables/shared/useProperties'
+
+// ✅ CORRECT - Role-specific composables (future)
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings'
+import { useAdminReports } from '@/composables/admin/useAdminReports'
+
+// ✅ CORRECT - Components
+import OwnerSidebar from '@/components/smart/owner/OwnerSidebar.vue'
+import PropertyCard from '@/components/dumb/shared/PropertyCard.vue'
+
+// ✅ CORRECT - Stores
+import { useAuthStore } from '@/stores/auth'
+import { usePropertyStore } from '@/stores/property'
+
+// ❌ INCORRECT - Old patterns to fix
+import { useAuth } from '@/composables/useAuth' // Missing /shared/
+import { useBookings } from '../composables/useBookings' // Relative path
+```
+
+### **Automated Import Path Audit Script**
+
+```typescript
+// scripts/audit-imports.ts
+import { readdir, readFile, writeFile } from 'fs/promises'
+import { join } from 'path'
+
+interface ImportIssue {
+  file: string
+  line: number
+  issue: string
+  suggestion: string
+}
+
+const CORRECT_PATTERNS = {
+  // Shared composables
+  'useAuth': '@/composables/shared/useAuth',
+  'useBookings': '@/composables/shared/useBookings',
+  'useProperties': '@/composables/shared/useProperties',
+  'useCalendarState': '@/composables/shared/useCalendarState',
+  'useErrorHandler': '@/composables/shared/useErrorHandler',
+  'useLoadingState': '@/composables/shared/useLoadingState',
+  
+  // Stores
+  'useAuthStore': '@/stores/auth',
+  'usePropertyStore': '@/stores/property',
+  'useBookingStore': '@/stores/booking',
+  'useUIStore': '@/stores/ui',
+  
+  // Types
+  'types': '@/types'
+}
+
+const auditImports = async (dirPath: string): Promise<ImportIssue[]> => {
+  const issues: ImportIssue[] = []
+  
+  const files = await readdir(dirPath, { recursive: true })
+  
+  for (const file of files) {
+    if (!(file.endsWith('.vue') || file.endsWith('.ts'))) continue
+    
+    const filePath = join(dirPath, file)
+    const content = await readFile(filePath, 'utf-8')
+    const lines = content.split('\n')
+    
+    lines.forEach((line, index) => {
+      // Check for import statements
+      const importMatch = line.match(/import\s+.*from\s+['"]([^'"]+)['"]/)
+      if (!importMatch) return
+      
+      const importPath = importMatch[1]
+      
+      // Check for incorrect patterns
+      for (const [composable, correctPath] of Object.entries(CORRECT_PATTERNS)) {
+        if (importPath.includes(composable) && importPath !== correctPath) {
+          // Skip relative imports from within same directory
+          if (importPath.startsWith('./') || importPath.startsWith('../')) {
+            const isSharedToShared = filePath.includes('/shared/') && importPath.includes('/shared/')
+            if (isSharedToShared) continue
+          }
+          
+          issues.push({
+            file: filePath,
+            line: index + 1,
+            issue: `Incorrect import path: ${importPath}`,
+            suggestion: `Should be: ${correctPath}`
+          })
+        }
+      }
+      
+      // Check for old composable patterns
+      if (importPath.match(/@\/composables\/use[A-Z]/) && !importPath.includes('/shared/')) {
+        issues.push({
+          file: filePath,
+          line: index + 1,
+          issue: `Missing /shared/ in composable import: ${importPath}`,
+          suggestion: `Should be: ${importPath.replace('/composables/', '/composables/shared/')}`
+        })
+      }
+    })
+  }
+  
+  return issues
+}
+
+// Run audit
+const runAudit = async () => {
+  console.log('🔍 Auditing import paths...')
+  
+  const issues = await auditImports('./src')
+  
+  if (issues.length === 0) {
+    console.log('✅ All import paths are correct!')
+    return
+  }
+  
+  console.log(`❌ Found ${issues.length} import path issues:`)
+  
+  issues.forEach(issue => {
+    console.log(`\n📁 ${issue.file}:${issue.line}`)
+    console.log(`   Issue: ${issue.issue}`)
+    console.log(`   Fix:   ${issue.suggestion}`)
+  })
+  
+  // Generate fix script
+  await generateFixScript(issues)
+}
+
+const generateFixScript = async (issues: ImportIssue[]) => {
+  const fixScript = `#!/bin/bash
+# Auto-generated import path fix script
+
+echo "🔧 Fixing import paths..."
+
+${issues.map(issue => {
+  const oldPath = issue.issue.match(/: (.+)$/)?.[1] || ''
+  const newPath = issue.suggestion.match(/: (.+)$/)?.[1] || ''
+  
+  if (oldPath && newPath) {
+    return `sed -i 's|${oldPath.replace(/[/.*+?^${}()|[\\]\\]/g, '\\\\$&')}|${newPath}|g' "${issue.file}"`
+  }
+  return `# TODO: Manually fix ${issue.file}:${issue.line}`
+}).join('\n')}
+
+echo "✅ Import paths fixed!"
+`
+  
+  await writeFile('./scripts/fix-imports.sh', fixScript, 'utf-8')
+  console.log('\n📝 Generated fix script: ./scripts/fix-imports.sh')
+  console.log('Run: chmod +x ./scripts/fix-imports.sh && ./scripts/fix-imports.sh')
+}
+
+runAudit().catch(console.error)
+```
+
+### **ESLint Rules for Import Consistency**
+
+```javascript
+// .eslintrc.js - Add these rules
+module.exports = {
+  // ... existing config
+  rules: {
+    // ... existing rules
+    
+    // Import path consistency
+    'import/no-relative-parent-imports': 'error',
+    'import/order': [
+      'error',
+      {
+        'groups': [
+          'builtin',
+          'external',
+          'internal',
+          'parent',
+          'sibling',
+          'index'
+        ],
+        'pathGroups': [
+          {
+            'pattern': '@/composables/shared/**',
+            'group': 'internal',
+            'position': 'before'
+          },
+          {
+            'pattern': '@/composables/owner/**',
+            'group': 'internal',
+            'position': 'before'
+          },
+          {
+            'pattern': '@/composables/admin/**',
+            'group': 'internal',
+            'position': 'before'
+          },
+          {
+            'pattern': '@/stores/**',
+            'group': 'internal',
+            'position': 'before'
+          },
+          {
+            'pattern': '@/components/**',
+            'group': 'internal',
+            'position': 'after'
+          },
+          {
+            'pattern': '@/types/**',
+            'group': 'internal',
+            'position': 'after'
+          }
+        ],
+        'pathGroupsExcludedImportTypes': ['builtin']
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 📝 **TASK-063: TypeScript Integration Patterns**
+
+### **Overview**
+Fix TypeScript issues in role-based components and establish consistent typing patterns.
+
+### **Common TypeScript Patterns**
+
+```typescript
+// src/types/roleBasedComponents.ts
+import type { Component } from 'vue'
+import type { User, Property, Booking } from '@/types'
+
+// Role-based component props
+export interface OwnerComponentProps {
+  user: User & { role: 'owner' }
+  properties: Property[]
+  bookings: Booking[]
+}
+
+export interface AdminComponentProps {
+  user: User & { role: 'admin' }
+  allProperties: Property[]
+  allBookings: Booking[]
+  systemMetrics: SystemMetrics
+}
+
+// Generic role-based component
+export interface RoleBasedComponent<TRole extends 'owner' | 'admin'> {
+  role: TRole
+  user: User & { role: TRole }
+  data: TRole extends 'owner' ? OwnerComponentProps : AdminComponentProps
+}
+
+// Component event types
+export interface OwnerComponentEvents {
+  'property-selected': [propertyId: string]
+  'booking-created': [booking: Booking]
+  'error-occurred': [error: Error]
+}
+
+export interface AdminComponentEvents {
+  'cleaner-assigned': [bookingId: string, cleanerId: string]
+  'bulk-action': [action: string, items: string[]]
+  'system-alert': [alert: SystemAlert]
+}
+
+// Store typing helpers
+export type FilteredStore<T, TRole> = TRole extends 'owner' 
+  ? T & { data: T[] }
+  : T & { allData: T[] }
+```
+
+### **TypeScript Component Template**
+
+```vue
+<!-- Template for role-based components -->
+<template>
+  <div :class="componentClasses">
+    <!-- Component content -->
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, type Ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { RouteLocationNormalized, Router } from 'vue-router'
+
+// Store imports with proper typing
+import { useAuthStore } from '@/stores/auth'
+import type { AuthStore } from '@/types/stores'
+
+// Component-specific types
+interface Props {
+  modelValue?: boolean
+  variant?: 'default' | 'compact' | 'expanded'
+  disabled?: boolean
+}
+
+interface Emits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'action', action: string, payload?: any): void
+  (e: 'error', error: Error): void
+}
+
+// Props with defaults
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: false,
+  variant: 'default',
+  disabled: false
+})
+
+// Emits definition
+const emit = defineEmits<Emits>()
+
+// Composables with explicit typing
+const route: RouteLocationNormalized = useRoute()
+const router: Router = useRouter()
+const authStore = useAuthStore()
+
+// Reactive state with proper typing
+const loading: Ref<boolean> = ref(false)
+const error: Ref<Error | null> = ref(null)
+const selectedItems: Ref<string[]> = ref([])
+
+// Computed properties with explicit return types
+const isOwner = computed((): boolean => {
+  return authStore.user?.role === 'owner'
+})
+
+const componentClasses = computed((): string[] => {
+  return [
+    'role-based-component',
+    `role-based-component--${props.variant}`,
+    {
+      'role-based-component--disabled': props.disabled,
+      'role-based-component--loading': loading.value
+    }
+  ]
+})
+
+// Methods with proper typing
+const handleAction = async (action: string, payload?: any): Promise<void> => {
+  try {
+    loading.value = true
+    error.value = null
+    
+    // Process action
+    await processAction(action, payload)
+    
+    emit('action', action, payload)
+  } catch (err) {
+    const errorObj = err instanceof Error ? err : new Error(String(err))
+    error.value = errorObj
+    emit('error', errorObj)
+  } finally {
+    loading.value = false
+  }
+}
+
+const processAction = async (action: string, payload?: any): Promise<void> => {
+  // Implementation
+}
+
+// Expose for template ref access
+defineExpose({
+  handleAction,
+  loading: computed(() => loading.value),
+  error: computed(() => error.value)
+})
+</script>
+```
+
+### **Store TypeScript Patterns**
+
+```typescript
+// src/stores/typedStore.ts - Enhanced store typing
+import { defineStore } from 'pinia'
+import { ref, computed, type Ref, type ComputedRef } from 'vue'
+import type { User, Property, Booking } from '@/types'
+
+// Store state interface
+interface StoreState {
+  data: Map<string, any>
+  loading: boolean
+  error: Error | null
+  lastUpdated: number | null
+}
+
+// Store getters interface
+interface StoreGetters {
+  hasData: ComputedRef<boolean>
+  dataArray: ComputedRef<any[]>
+  isLoading: ComputedRef<boolean>
+  lastError: ComputedRef<Error | null>
+}
+
+// Store actions interface
+interface StoreActions {
+  fetchData(): Promise<void>
+  createItem(item: any): Promise<any>
+  updateItem(id: string, updates: Partial<any>): Promise<void>
+  deleteItem(id: string): Promise<void>
+  clearError(): void
+}
+
+// Complete store interface
+export interface TypedStore extends StoreState, StoreGetters, StoreActions {}
+
+export const useTypedStore = defineStore('typed', (): TypedStore => {
+  // State with explicit types
+  const data: Ref<Map<string, any>> = ref(new Map())
+  const loading: Ref<boolean> = ref(false)
+  const error: Ref<Error | null> = ref(null)
+  const lastUpdated: Ref<number | null> = ref(null)
+
+  // Getters with explicit return types
+  const hasData: ComputedRef<boolean> = computed(() => data.value.size > 0)
+  const dataArray: ComputedRef<any[]> = computed(() => Array.from(data.value.values()))
+  const isLoading: ComputedRef<boolean> = computed(() => loading.value)
+  const lastError: ComputedRef<Error | null> = computed(() => error.value)
+
+  // Actions with proper typing
+  const fetchData = async (): Promise<void> => {
+    try {
+      loading.value = true
+      error.value = null
+      
+      // Fetch implementation
+      
+      lastUpdated.value = Date.now()
+    } catch (err) {
+      error.value = err instanceof Error ? err : new Error(String(err))
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const createItem = async (item: any): Promise<any> => {
+    try {
+      loading.value = true
+      
+      // Create implementation
+      const created = { ...item, id: generateId() }
+      data.value.set(created.id, created)
+      
+      return created
+    } catch (err) {
+      error.value = err instanceof Error ? err : new Error(String(err))
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const updateItem = async (id: string, updates: Partial<any>): Promise<void> => {
+    const existing = data.value.get(id)
+    if (!existing) {
+      throw new Error(`Item with id ${id} not found`)
+    }
+
+    try {
+      loading.value = true
+      
+      const updated = { ...existing, ...updates, updated_at: new Date().toISOString() }
+      data.value.set(id, updated)
+    } catch (err) {
+      error.value = err instanceof Error ? err : new Error(String(err))
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const deleteItem = async (id: string): Promise<void> => {
+    try {
+      loading.value = true
+      
+      if (!data.value.has(id)) {
+        throw new Error(`Item with id ${id} not found`)
+      }
+      
+      data.value.delete(id)
+    } catch (err) {
+      error.value = err instanceof Error ? err : new Error(String(err))
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const clearError = (): void => {
+    error.value = null
+  }
+
+  return {
+    // State
+    data,
+    loading,
+    error,
+    lastUpdated,
+    
+    // Getters
+    hasData,
+    dataArray,
+    isLoading,
+    lastError,
+    
+    // Actions
+    fetchData,
+    createItem,
+    updateItem,
+    deleteItem,
+    clearError
+  }
+})
+
+// Helper to generate IDs
+const generateId = (): string => {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+}
+```
+
+---
+
+## 🚀 **Getting Started**
+
+### **Implementation Order**
+
+1. **Start with TASK-060** (OwnerSidebar) using the provided template
+2. **Apply the patterns** from the store filtering guide (TASK-072)
+3. **Set up testing utilities** (TASK-079) for your new components
+4. **Run the import audit** (TASK-070) to clean up any inconsistencies
+5. **Fix TypeScript issues** (TASK-063) using the typing patterns
+
+### **Quick Start Commands**
+
+```bash
+# 1. Create the component
+cp docs/examples/OwnerSidebar.vue src/components/smart/owner/OwnerSidebar.vue
+
+# 2. Run import audit
+npm run audit:imports
+
+# 3. Fix any import issues
+chmod +x scripts/fix-imports.sh && ./scripts/fix-imports.sh
+
+# 4. Run tests
+npm run test src/components/smart/owner/
+
+# 5. Type check
+npm run type-check
+```
+
+### **Verification Checklist**
+
+- [ ] Component follows your existing Vue 3 + TypeScript patterns
+- [ ] Uses proper Pinia store integration
+- [ ] Implements role-based data filtering
+- [ ] Includes comprehensive TypeScript typing
+- [ ] Has corresponding unit tests
+- [ ] Follows your Vuetify theming conventions
+- [ ] Uses correct import paths
+
+This documentation provides the foundation for implementing your critical role-based architecture tasks while maintaining consistency with your existing codebase patterns.
+````
+
+## File: task_specific_prompts.md
+````markdown
+# 🎯 TASK-SPECIFIC PROMPTS - Phase 1F Priority Tasks
+
+## 📋 **TASK-060: Create OwnerSidebar.vue Component**
+
+### **Context Research Phase**
+```bash
+# Get Vue 3 and Vuetify documentation for sidebar components
+get-library-docs /vuejs/docs --topic="composition-api components props"
+get-library-docs /vuetifyjs/vuetify --topic="navigation-drawer list-item theming"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Owner-only navigation items (no cleaner management, no system reports)
+- Integration with OwnerQuickActions component
+- Owner-specific color scheme and styling
+- Filter navigation to owner-specific features only
+- Add owner-specific quick actions (Add Property, View My Bookings)
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/owner/OwnerSidebar.vue`
+- **Base Pattern**: Study existing `src/components/smart/Sidebar.vue` for structure
+- **Key Integrations**: OwnerQuickActions component, auth store for owner data
+- **Navigation Items**: Properties, My Bookings, Calendar, Settings (NO admin items)
+
+### **Verification Checklist**
+- [ ] Owner sees only relevant navigation (Properties, Bookings, Calendar)
+- [ ] No admin features visible (Cleaner Management, System Reports)
+- [ ] OwnerQuickActions properly integrated
+- [ ] Owner-specific styling applied
+- [ ] Navigation state syncs with current route
+
+---
+
+## 📋 **TASK-061: Create OwnerCalendar.vue Component**
+
+### **Context Research Phase**
+```bash
+# Get FullCalendar and Vue documentation for calendar integration
+get-library-docs /fullcalendar/fullcalendar --topic="vue-integration events drag-drop"
+get-library-docs /vuejs/docs --topic="composition-api computed reactive"
+get-library-docs /vuetifyjs/vuetify --topic="components theming"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Filter calendar events to owner's properties only
+- Implement OwnerCalendarControls integration
+- Add owner-specific event creation workflows
+- Remove admin-only features (cleaner assignment, system-wide view)
+- Owner-specific calendar views and styling
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/owner/OwnerCalendar.vue`
+- **Base Pattern**: Study existing `src/components/smart/FullCalendar.vue`
+- **Data Filtering**: Only show events for authenticated owner's properties
+- **Dependencies**: OwnerCalendarControls.vue component (create if missing)
+
+### **Verification Checklist**
+- [ ] Owner sees only their property events and bookings
+- [ ] OwnerCalendarControls properly integrated
+- [ ] No admin-only features (cleaner assignment views)
+- [ ] Owner-specific event styling and indicators work
+- [ ] Event creation workflow is owner-optimized
+
+---
+
+## 📋 **TASK-062: Create AdminSidebar.vue Component**
+
+### **Context Research Phase**
+```bash
+# Get Vuetify and Vue documentation for comprehensive admin navigation
+get-library-docs /vuetifyjs/vuetify --topic="navigation-drawer expansion-panels badges"
+get-library-docs /vuejs/docs --topic="composition-api computed dynamic-components"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Full admin navigation (cleaners, reports, system management)
+- Admin-specific quick actions and system controls
+- System status indicators and alerts
+- Business metrics in sidebar summary
+- Role switcher component integration
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/admin/AdminSidebar.vue`
+- **Full Feature Set**: Cleaners, Properties, Bookings, Reports, System Settings
+- **System Controls**: Status indicators, role switcher, business metrics
+- **Admin Styling**: Professional admin-focused UI with comprehensive navigation
+
+### **Verification Checklist**
+- [ ] Admin sees full system navigation and controls
+- [ ] System status indicators functional
+- [ ] Business metrics displayed in sidebar
+- [ ] Role switcher integration works
+- [ ] All admin features accessible from navigation
+
+---
+
+## 📋 **TASK-063: Fix TypeScript Errors in Admin Components**
+
+### **Context Research Phase**
+```bash
+# Get TypeScript documentation for error resolution
+get-library-docs /microsoft/typescript --topic="interfaces type-guards error-handling"
+get-library-docs /vuejs/docs --topic="typescript composition-api"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Identify all TypeScript errors in admin components
+- Fix type definitions and interfaces
+- Ensure proper typing for admin-specific data
+- Update import paths and type exports
+- Verify compilation with strict mode
+
+### **Implementation Specifics**
+- **Scope**: All files in `src/components/smart/admin/` and `src/components/dumb/admin/`
+- **Common Issues**: Missing type definitions, incorrect prop types, store typing
+- **Tools**: Use `npm run type-check` to identify specific errors
+
+### **Verification Checklist**
+- [ ] `npm run type-check` passes without errors
+- [ ] All admin components have proper TypeScript interfaces
+- [ ] Props and emits are correctly typed
+- [ ] Store integrations are properly typed
+- [ ] Import/export statements are correct
+
+---
+
+## 📋 **TASK-064: Fix AdminCalendar.vue Component**
+
+### **Context Research Phase**
+```bash
+# Get FullCalendar and TypeScript documentation for admin calendar
+get-library-docs /fullcalendar/fullcalendar --topic="vue-integration drag-drop resources"
+get-library-docs /microsoft/typescript --topic="interfaces generics"
+get-library-docs /vuejs/docs --topic="composition-api reactive"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Fix existing TypeScript errors in AdminCalendar.vue
+- Ensure admin-specific features work (cleaner assignment, system-wide view)
+- Fix integration with admin stores and composables
+- Verify all calendar functionality for admin role
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/admin/AdminCalendar.vue`
+- **Admin Features**: System-wide calendar view, cleaner assignment, drag-drop
+- **Data Scope**: All properties and bookings across all owners
+- **Integration**: Admin stores, cleaner management, booking assignment
+
+### **Verification Checklist**
+- [ ] TypeScript compilation passes for AdminCalendar
+- [ ] Admin sees all properties and bookings on calendar
+- [ ] Cleaner assignment functionality works
+- [ ] Drag-drop operations function correctly
+- [ ] System-wide calendar view displays properly
+
+---
+
+## 📋 **TASK-065: Integrate Owner Components in HomeOwner.vue**
+
+### **Context Research Phase**
+```bash
+# Get Vue documentation for component integration and orchestration
+get-library-docs /vuejs/docs --topic="composition-api components props-emit"
+get-library-docs /vuetifyjs/vuetify --topic="layout grid responsive"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Integrate OwnerSidebar and OwnerCalendar into HomeOwner.vue
+- Ensure proper data flow between owner components
+- Maintain existing HomeOwner orchestrator pattern
+- Test role-based data filtering works end-to-end
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/owner/HomeOwner.vue`
+- **Dependencies**: TASK-060 (OwnerSidebar), TASK-061 (OwnerCalendar)
+- **Integration Pattern**: Central orchestrator with role-specific components
+- **Data Flow**: Auth store → HomeOwner → child components
+
+### **Verification Checklist**
+- [ ] OwnerSidebar and OwnerCalendar properly integrated
+- [ ] Owner interface shows only owner-scoped data
+- [ ] Component communication works correctly
+- [ ] Role-based data isolation maintained
+- [ ] UI store integration for modals/sidebars works
+
+---
+
+## 📋 **TASK-066: Integrate Admin Components in HomeAdmin.vue**
+
+### **Context Research Phase**
+```bash
+# Get Vue documentation for complex admin interface orchestration
+get-library-docs /vuejs/docs --topic="composition-api dynamic-components provide-inject"
+get-library-docs /vuetifyjs/vuetify --topic="layout complex-ui admin-panels"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Integrate AdminSidebar and AdminCalendar into HomeAdmin.vue
+- Ensure admin interface uses all role-specific components
+- Maintain comprehensive admin functionality
+- Test system-wide data access and role switching
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/admin/HomeAdmin.vue`
+- **Dependencies**: TASK-062 (AdminSidebar), TASK-064 (AdminCalendar)
+- **Full Admin Features**: System management, cleaner assignment, all-owner data
+- **Role Switching**: Support admin viewing as owner mode
+
+### **Verification Checklist**
+- [ ] AdminSidebar and AdminCalendar properly integrated
+- [ ] Admin interface shows system-wide data
+- [ ] Role switching functionality works (admin can view as owner)
+- [ ] All admin-specific features accessible
+- [ ] Complex admin workflows function correctly
+
+---
+
+## 🔄 **TASK DEPENDENCY EXECUTION ORDER**
+
+### **Parallel Track A: Owner Components**
+1. **TASK-060** (OwnerSidebar) → 
+2. **TASK-061** (OwnerCalendar) → 
+3. **TASK-065** (HomeOwner Integration)
+
+### **Parallel Track B: Admin Components**  
+1. **TASK-062** (AdminSidebar) + **TASK-063** (TypeScript fixes) →
+2. **TASK-064** (AdminCalendar fixes) →
+3. **TASK-066** (HomeAdmin Integration)
+
+### **Critical Success Path**
+- Complete both tracks before moving to Phase 1G cleanup
+- Test role switching after TASK-065 and TASK-066 completion
+- Verify data isolation after each integration task
+
+## ⚠️ **SHARED CRITICAL NOTES FOR ALL TASKS**
+
+1. **Role-Based Data Filtering**: Always implement at component level first, document need for backend RLS
+2. **Existing Pattern Preservation**: Don't break current demo functionality during development
+3. **TypeScript Strict Mode**: All new components must compile without errors
+4. **Component Naming**: Follow `Role + ComponentType.vue` convention
+5. **Testing Strategy**: Test each component individually before integration tasks
+````
+
+## File: tasks_v2.md
+````markdown
+# 📋 Additional Tasks for tasks.md - Critical Issues & Improvements
+
+## **Phase 1F: Critical Architecture Completion** 
+**(URGENT - Complete Role-Based Migration)**
+
+### **Complete Missing Role-Based Components**
+- [ ] **TASK-060**: Create OwnerSidebar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Create `src/components/smart/owner/OwnerSidebar.vue`
+    - Filter navigation to owner-specific features only
+    - Remove admin-only navigation items (cleaner management, system reports)
+    - Add owner-specific quick actions (Add Property, View My Bookings)
+    - Implement owner-friendly navigation labels and icons
+    - Use owner-specific color scheme and styling
+    - Integrate with existing OwnerQuickActions component
+  - Notes: Replace generic Sidebar.vue for owner role
+  - Files: src/components/smart/owner/OwnerSidebar.vue
+  - Verification: Owner sees only relevant navigation, no admin features
+  - Assigned to: Cursor
+
+- [ ] **TASK-061**: Create OwnerCalendar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Create `src/components/smart/owner/OwnerCalendar.vue`
+    - Filter calendar events to owner's properties only
+    - Implement owner-specific calendar controls (OwnerCalendarControls)
+    - Add owner-specific event creation workflows
+    - Remove admin-only features (cleaner assignment, system-wide view)
+    - Add owner-specific calendar views (My Properties, My Bookings)
+    - Implement owner-specific event styling and indicators
+  - Notes: Replace generic FullCalendar.vue for owner role
+  - Files: src/components/smart/owner/OwnerCalendar.vue
+  - Dependencies: OwnerCalendarControls.vue component
+  - Verification: Owner sees only their property events and bookings
+  - Assigned to: Cursor
+
+- [ ] **TASK-062**: Create AdminSidebar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Create `src/components/smart/admin/AdminSidebar.vue`
+    - Include full admin navigation (cleaners, reports, system management)
+    - Add admin-specific quick actions and system controls
+    - Implement admin-focused styling and iconography
+    - Add system status indicators and alerts
+    - Include business metrics in sidebar summary
+    - Add role switcher component integration
+  - Notes: Comprehensive admin navigation interface
+  - Files: src/components/smart/admin/AdminSidebar.vue
+  - Verification: Admin sees full system navigation and controls
+  - Assigned to: Cursor
+
+- [ ] **TASK-063**: Fix TypeScript errors in existing components
+  - Status: Not Started
+  - Requirements:
+    - Fix all TypeScript compilation errors in role-based components
+    - Add proper type definitions for component props and events
+    - Update existing components to use strict TypeScript compliance
+    - Add type guards for role-based data validation
+    - Fix any eslint errors related to TypeScript usage
+    - Add comprehensive type documentation
+  - Notes: Essential for code quality and maintainability
+  - Files: All TypeScript files with compilation errors
+  - Verification: TypeScript compiles without errors
+  - Assigned to: Cursor
+
+- [ ] **TASK-064**: Fix AdminCalendar.vue implementation issues
+  - Status: Not Started
+  - Requirements:
+    - Fix existing bugs in AdminCalendar.vue component
+    - Implement proper admin-specific calendar features
+    - Add admin calendar controls (AdminCalendarControls)
+    - Fix calendar event filtering for admin view
+    - Add admin-specific event management features
+    - Implement cleaner assignment integration
+  - Notes: Complete admin calendar functionality
+  - Files: src/components/smart/admin/AdminCalendar.vue
+  - Dependencies: AdminCalendarControls component
+  - Verification: Admin calendar works with full functionality
+  - Assigned to: Cursor
+
+### **Integration and Testing**
+- [ ] **TASK-065**: Integrate new owner components into HomeOwner.vue
+  - Status: Not Started
+  - Requirements:
+    - Update HomeOwner.vue to use OwnerSidebar component
+    - Integrate OwnerCalendar into owner home page
+    - Test owner component integration thoroughly
+    - Verify role-based data filtering works correctly
+    - Test owner-specific workflows end-to-end
+    - Update owner page routing and navigation
+  - Notes: Complete owner interface with all role-based components
+  - Files: src/components/smart/owner/HomeOwner.vue
+  - Dependencies: TASK-060, TASK-061
+  - Verification: Owner interface uses all role-specific components
+  - Assigned to: Cursor
+
+- [ ] **TASK-066**: Integrate new admin components into HomeAdmin.vue
+  - Status: Not Started
+  - Requirements:
+    - Update HomeAdmin.vue to use AdminSidebar component
+    - Integrate fixed AdminCalendar into admin home page
+    - Test admin component integration thoroughly
+    - Verify admin access to all system features
+    - Test admin-specific workflows end-to-end
+    - Update admin page routing and navigation
+  - Notes: Complete admin interface with all role-based components
+  - Files: src/components/smart/admin/HomeAdmin.vue
+  - Dependencies: TASK-062, TASK-064
+  - Verification: Admin interface uses all role-specific components
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1G: Code Cleanup & Organization** 
+**(HIGH PRIORITY - Remove Technical Debt)**
+
+### **Remove Development Artifacts**
+- [ ] **TASK-067**: Move demo components to development folder
+  - Status: Not Started
+  - Requirements:
+    - Create `src/dev/` folder for development-only components
+    - Move all demo components to `src/dev/demos/`
+    - Update import paths for any remaining demo references
+    - Configure build to exclude `src/dev/` from production bundle
+    - Update .gitignore to handle development artifacts appropriately
+    - Create README.md in dev folder explaining purpose
+  - Files to Move:
+    ```
+    src/components/demos/ → src/dev/demos/
+    src/pages/demos/ → src/dev/pages/
+    src/components/dumb/PropertyCardDemo.vue → src/dev/demos/
+    ```
+  - Notes: Clean separation of dev vs production code
+  - Verification: Production build excludes demo components, dev server still includes them
+  - Assigned to: Cursor
+
+- [ ] **TASK-068**: Remove redundant generic components after migration
+  - Status: Not Started
+  - Requirements:
+    - ⚠️ ONLY after TASK-060, TASK-061, TASK-062 are complete
+    - Remove `src/components/smart/Home.vue` (replaced by HomeOwner/HomeAdmin)
+    - Remove `src/components/smart/Sidebar.vue` (replaced by role-specific versions)
+    - Remove `src/components/smart/FullCalendar.vue` (if replaced by role-specific)
+    - Update any remaining references to removed components
+    - Verify no broken imports or references remain
+    - Archive removed components in git history
+  - Notes: Final cleanup after successful migration
+  - Files: List of generic components to remove
+  - Dependencies: Complete role-based component migration
+  - Verification: Application works without old generic components
+  - Assigned to: Cursor
+
+- [ ] **TASK-069**: Clean up tasks.md file
+  - Status: Not Started
+  - Requirements:
+    - Archive completed tasks to `docs/completed-tasks.md`
+    - Remove obsolete or superseded tasks
+    - Reorganize remaining tasks by current priority
+    - Update task numbering for consistency
+    - Add cross-references between related tasks
+    - Update status for partially completed items
+  - Notes: Improve project management clarity
+  - Files: tasks.md, docs/completed-tasks.md
+  - Verification: tasks.md is organized and current
+  - Assigned to: Human + Cursor
+
+### **Build and Deployment Optimization**
+- [ ] **TASK-070**: Optimize build configuration for role-based architecture
+  - Status: Not Started
+  - Requirements:
+    - Configure Vite for optimal role-based component bundling
+    - Add build-time role-based feature flags
+    - Optimize bundle sizes for production deployment
+    - Add build-time type checking for role-based components
+    - Configure source maps for development debugging
+    - Add build performance monitoring and optimization
+  - Notes: Ensure efficient production builds
+  - Files: vite.config.ts, build scripts, optimization configs
+  - Verification: Optimized production builds with role-based features
+  - Assigned to: Cursor
+
+- [ ] **TASK-071**: Update deployment documentation for role-based system
+  - Status: Not Started
+  - Requirements:
+    - Update deployment guides for role-based architecture
+    - Add environment configuration for role-based features
+    - Document role-based testing procedures for deployment
+    - Add rollback procedures for role-based deployments
+    - Create production checklist for role-based features
+    - Update CI/CD pipeline documentation
+  - Notes: Ensure smooth deployments with role-based changes
+  - Files: Deployment docs, CI/CD configs, operations guides
+  - Verification: Clear deployment procedures for role-based system
+  - Assigned to: Human + Cursor
+
+---
+
+## **Phase 1H: Architecture Improvements** 
+**(HIGH PRIORITY - System Optimization)**
+
+### **Store and State Management Optimization**
+- [ ] **TASK-072**: Optimize role-based store architecture
+  - Status: Not Started
+  - Requirements:
+    - Refactor stores for optimal role-based data filtering
+    - Implement store-level role access control
+    - Add caching strategies for role-specific data
+    - Optimize state updates for role-based components
+    - Add state persistence for role-based user preferences
+    - Implement store performance monitoring and optimization
+  - Notes: Improve performance and maintainability of role-based stores
+  - Files: src/stores/, store optimization utilities, performance monitoring
+  - Verification: Optimized store performance with role-based filtering
+  - Assigned to: Cursor
+
+- [ ] **TASK-073**: Implement role-based data access control
+  - Status: Not Started
+  - Requirements:
+    - Create data access control middleware for stores
+    - Add runtime checks for role-based data access
+    - Implement data sanitization for role-based views
+    - Add audit logging for data access patterns
+    - Create role-based data validation utilities
+    - Add tests for data access control compliance
+  - Notes: Enhance security and data isolation
+  - Files: src/middleware/, src/utils/dataAccess.ts, test files
+  - Verification: Owners cannot access other owners' data
+  - Assigned to: Cursor
+
+### **Type Safety & Error Handling**
+- [ ] **TASK-074**: Complete TypeScript strict mode compliance
+  - Status: Not Started
+  - Requirements:
+    - Enable strict TypeScript mode in tsconfig.json
+    - Fix all TypeScript errors and warnings
+    - Add comprehensive type definitions for all interfaces
+    - Implement runtime type validation for critical data flows
+    - Add type guards for external data sources
+    - Create comprehensive type documentation
+  - Notes: Improve code quality and catch bugs early
+  - Files: tsconfig.json, all TypeScript files, new type definitions
+  - Verification: TypeScript strict mode compiles without errors
+  - Assigned to: Cursor
+
+- [ ] **TASK-075**: Implement comprehensive error handling system
+  - Status: Not Started
+  - Requirements:
+    - Create global error boundary component
+    - Implement role-specific error message templates
+    - Add error reporting and analytics integration
+    - Create error recovery workflows for common failures
+    - Add user-friendly error display components
+    - Implement automatic error retry mechanisms
+  - Notes: Build on existing error foundations
+  - Files: src/components/ErrorBoundary.vue, error handling utilities
+  - Dependencies: Existing error handling tasks (TASK-040 to TASK-043)
+  - Verification: Graceful error handling throughout application
+  - Assigned to: Cursor
+
+### **Performance Optimization**
+- [ ] **TASK-076**: Implement code splitting and lazy loading
+  - Status: Not Started
+  - Requirements:
+    - Split owner vs admin bundles using dynamic imports
+    - Implement lazy loading for route-based components
+    - Add preloading strategies for critical routes
+    - Optimize component bundle sizes with tree shaking
+    - Add bundle analysis and monitoring tools
+    - Create performance budgets for bundle sizes
+  - Notes: Improve initial load time and user experience
+  - Files: router configuration, vite.config.ts, performance monitoring
+  - Verification: Optimized bundle sizes and load times
+  - Assigned to: Cursor
+
+- [ ] **TASK-077**: Add performance monitoring and optimization
+  - Status: Not Started
+  - Requirements:
+    - Implement client-side performance monitoring
+    - Add role-based performance metrics tracking
+    - Create performance dashboards for role-based features
+    - Add automated performance regression testing
+    - Implement performance alerts and notifications
+    - Create performance optimization guidelines
+  - Notes: Monitor and maintain application performance
+  - Files: Performance monitoring tools, dashboards, alerting configs
+  - Verification: Comprehensive performance monitoring system
+  - Assigned to: Cursor
+
+- [ ] **TASK-078**: Optimize build and development workflow
+  - Status: Not Started
+  - Requirements:
+    - Optimize Vite dev server for role-based development
+    - Add hot module replacement for role-specific components
+    - Create development shortcuts and productivity tools
+    - Add debugging utilities for role-based data flow
+    - Optimize build times for development workflow
+    - Create developer productivity documentation
+  - Notes: Improve developer experience and productivity
+  - Files: vite.config.ts, dev tools, productivity guides
+  - Verification: Faster development cycle, better DX
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1I: Testing & Quality Assurance** 
+**(HIGH PRIORITY - System Reliability)**
+
+### **Testing Infrastructure**
+- [ ] **TASK-079**: Create comprehensive testing utilities for role-based components
+  - Status: Not Started
+  - Requirements:
+    - Create test utilities for role-based component testing
+    - Add mock data generators for owner and admin roles
+    - Implement role-based test fixtures and factories
+    - Create shared testing utilities for role-based workflows
+    - Add test helpers for role switching and authentication
+    - Create visual regression testing for role-based interfaces
+  - Notes: Foundation for comprehensive testing strategy
+  - Files: tests/utils/, test fixtures, testing documentation
+  - Verification: Comprehensive testing infrastructure for role-based features
+  - Assigned to: Cursor
+
+- [ ] **TASK-080**: Add comprehensive tests for owner-specific components
+  - Status: Not Started
+  - Requirements:
+    - Create unit tests for OwnerSidebar.vue
+    - Add integration tests for OwnerCalendar.vue
+    - Test OwnerQuickActions component thoroughly
+    - Add end-to-end tests for owner workflows
+    - Test role-based data filtering for owner components
+    - Add accessibility tests for owner interface
+  - Notes: Ensure reliability of owner-specific functionality
+  - Files: tests/owner/, component test files, e2e test suites
+  - Dependencies: TASK-079 (test utilities)
+  - Verification: Complete test coverage for owner components
+  - Assigned to: Cursor
+
+- [ ] **TASK-081**: Add comprehensive tests for admin-specific components
+  - Status: Not Started
+  - Requirements:
+    - Create unit tests for AdminSidebar.vue
+    - Add integration tests for AdminCalendar.vue
+    - Test AdminQuickActions component thoroughly
+    - Add end-to-end tests for admin workflows
+    - Test admin access to all system features
+    - Add performance tests for admin data processing
+  - Notes: Ensure reliability of admin-specific functionality
+  - Files: tests/admin/, component test files, e2e test suites
+  - Dependencies: TASK-079 (test utilities)
+  - Verification: Complete test coverage for admin components
+  - Assigned to: Cursor
+
+### **Integration and System Testing**
+- [ ] **TASK-082**: Create integration tests for role-based system
+  - Status: Not Started
+  - Requirements:
+    - Test role switching functionality end-to-end
+    - Add integration tests for role-based data isolation
+    - Test role-based authentication and authorization
+    - Add cross-role integration tests for shared components
+    - Test role-based error handling and recovery
+    - Add load testing for role-based data filtering
+  - Notes: Ensure overall system reliability and security
+  - Files: tests/integration/, system test suites, load test configs
+  - Dependencies: TASK-080, TASK-081 (component tests)
+  - Verification: Comprehensive integration test coverage
+  - Assigned to: Cursor
+
+- [ ] **TASK-083**: Add automated quality assurance pipeline
+  - Status: Not Started
+  - Requirements:
+    - Set up automated testing in CI/CD pipeline
+    - Add code quality checks for role-based components
+    - Implement automated accessibility testing
+    - Add automated security testing for role-based features
+    - Create automated performance regression testing
+    - Add automated deployment testing procedures
+  - Notes: Ensure consistent quality across all changes
+  - Files: CI/CD configs, quality assurance scripts, automation tools
+  - Verification: Automated quality assurance for all role-based features
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1J: Documentation & Developer Experience** 
+**(MEDIUM PRIORITY - Long-term Maintenance)**
+
+### **Developer Productivity Tools**
+- [ ] **TASK-084**: Integrate Vuettify RAG API for Cursor
+  - Status: Not Started
+  - Requirements:
+    - Set up Vuettify RAG API server for Cursor AI integration
+    - Configure Cursor to use local Vuettify documentation API
+    - Create Vuettify-specific coding assistant workflows
+    - Add code generation templates for role-based Vuetify components
+    - Implement context-aware Vuettify component suggestions
+    - Create Vuettify best practices automation in Cursor
+    - Add automated code review for Vuettify patterns
+    - Create documentation for team Vuettify RAG usage
+  - API Features:
+    - **Component Usage**: "How do I use v-data-table?"
+    - **Code Generation**: "Create a responsive navigation"
+    - **Props & API**: "What props does v-card accept?"
+    - **Examples**: "Show me form validation patterns"
+    - **Best Practices**: "Make this component accessible"
+    - **Troubleshooting**: "Why isn't my v-btn working?"
+  - Implementation Steps:
+    1. Deploy `Cursor AI Assistant API Server.txt` as local FastAPI server
+    2. Configure Cursor to connect to local RAG endpoint
+    3. Set up Vuettify documentation chunk processing (1,990 chunks available)
+    4. Create role-based component templates (Owner/Admin patterns)
+    5. Add Vuettify 3.x TypeScript integration
+    6. Configure context-aware suggestions for project structure
+  - Files: 
+    - `tools/vuettify-rag-api/` (API server)
+    - `.cursor/` (Cursor configuration)
+    - `docs/vuettify-rag-setup.md` (setup guide)
+    - `templates/vuettify/` (component templates)
+  - Notes: Transform Vuettify development with AI-powered coding assistance
+  - Verification: Cursor provides accurate Vuettify suggestions and code generation
+  - Assigned to: Cursor
+
+### **Architecture Documentation**
+- [ ] **TASK-085**: Create comprehensive role-based architecture documentation
+  - Status: Not Started
+  - Requirements:
+    - Document role-based component patterns and conventions
+    - Create diagrams showing role-based data flow
+    - Document role-based security and permission patterns
+    - Add guidelines for extending role-based functionality
+    - Create onboarding guide for new developers
+    - Document role-based testing strategies
+  - Notes: Enable future development and maintenance
+  - Files: docs/architecture/, README updates, developer guides
+  - Verification: Clear documentation for role-based system
+  - Assigned to: Human + Cursor
+
+- [ ] **TASK-086**: Update project README and documentation
+  - Status: Not Started
+  - Requirements:
+    - Update README.md with role-based architecture explanation
+    - Add setup instructions for role-based development
+    - Document environment variables and configuration
+    - Add troubleshooting guide for common role-based issues
+    - Create development workflow documentation
+    - Add links to all relevant documentation
+  - Notes: Improve project onboarding and maintenance
+  - Files: README.md, docs/ folder updates
+  - Verification: Clear project documentation and setup instructions
+  - Assigned to: Human + Cursor
+
+### **Code Quality and Standards**
+- [ ] **TASK-087**: Establish role-based coding standards
+  - Status: Not Started
+  - Requirements:
+    - Create coding standards document for role-based components
+    - Add ESLint rules for role-based patterns
+    - Create component templates for consistent structure
+    - Add automated code quality checks in CI/CD
+    - Create code review checklist for role-based features
+    - Add pre-commit hooks for code quality enforcement
+  - Notes: Ensure consistent code quality across team
+  - Files: .eslintrc.json, coding standards doc, templates
+  - Verification: Automated code quality enforcement
+  - Assigned to: Cursor
+
+- [ ] **TASK-088**: Create development environment optimization
+  - Status: Not Started
+  - Requirements:
+    - Optimize Vite dev server for role-based development
+    - Add hot module replacement for role-specific components
+    - Create development shortcuts and productivity tools
+    - Add debugging utilities for role-based data flow
+    - Optimize build times for development workflow
+    - Create developer productivity documentation
+  - Notes: Improve developer experience and productivity
+  - Files: vite.config.ts, dev tools, productivity guides
+  - Verification: Faster development cycle, better DX
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1K: Security & Deployment** 
+**(LOW PRIORITY - Production Readiness)**
+
+### **Security Hardening**
+- [ ] **TASK-089**: Implement client-side security for role-based access
+  - Status: Not Started
+  - Requirements:
+    - Add route guards for role-based access control
+    - Implement session validation for role permissions
+    - Add CSRF protection for role-based forms
+    - Create security audit utilities for role-based features
+    - Add penetration testing for role-based vulnerabilities
+    - Document security best practices for role-based development
+  - Notes: Harden application against security vulnerabilities
+  - Files: src/security/, route guards, security documentation
+  - Verification: Security audit passes, no role-based vulnerabilities
+  - Assigned to: Cursor
+
+- [ ] **TASK-090**: Add audit logging and monitoring
+  - Status: Not Started
+  - Requirements:
+    - Implement audit logging for role-based actions
+    - Add monitoring for role-based performance metrics
+    - Create alerting for role-based security events
+    - Add user activity tracking for compliance
+    - Create audit report generation utilities
+    - Add GDPR compliance features for data handling
+  - Notes: Enable monitoring and compliance for production
+  - Files: src/audit/, monitoring configuration, compliance docs
+  - Verification: Comprehensive audit trail and monitoring
+  - Assigned to: Cursor
+
+### **Production Deployment**
+- [ ] **TASK-091**: Configure production deployment for role-based system
+  - Status: Not Started
+  - Requirements:
+    - Configure environment-specific builds for role-based features
+    - Add production deployment scripts and automation
+    - Configure monitoring and logging for production
+    - Add health checks for role-based functionality
+    - Create rollback procedures for role-based deployments
+    - Add production testing and validation procedures
+  - Notes: Ensure smooth production deployment
+  - Files: Deployment scripts, CI/CD configuration, ops documentation
+  - Verification: Successful production deployment with monitoring
+  - Assigned to: Human + Cursor
+
+---
+
+## **Updated Priority Order**
+
+### **CRITICAL (Complete Immediately)**
+1. **Phase 1F**: Complete role-based architecture (TASK-060 to TASK-066)
+2. **Phase 1G**: Code cleanup and organization (TASK-067 to TASK-071)
+
+### **HIGH PRIORITY (Next Sprint)**
+3. **Phase 1H**: Architecture improvements (TASK-072 to TASK-078)
+4. **Phase 1I**: Testing and quality assurance (TASK-079 to TASK-083)
+
+### **MEDIUM PRIORITY (Future Iterations)**
+5. **Phase 1J**: Documentation and developer experience (TASK-084 to TASK-088)
+6. **Phase 1K**: Security and deployment (TASK-089 to TASK-091)
+
+---
+
+## **Task Dependencies Map**
+
+```
+TASK-060 (OwnerSidebar) → TASK-065 (Integration)
+TASK-061 (OwnerCalendar) → TASK-065 (Integration) → TASK-080 (Owner Tests)
+TASK-062 (AdminSidebar) → TASK-066 (Integration)
+TASK-063 (TypeScript fixes) → TASK-074 (Strict mode)
+TASK-064 (AdminCalendar fixes) → TASK-066 (Integration) → TASK-081 (Admin Tests)
+
+TASK-065, TASK-066 → TASK-068 (Remove old components)
+TASK-067 (Move demos) → TASK-078 (Build optimization)
+TASK-072 (Store optimization) → TASK-082 (Integration tests)
+TASK-079 (Test utilities) → TASK-080, TASK-081 (Component tests)
+TASK-084 (Vuettify RAG API) → All future Vuettify development tasks
+```
+
+---
+
+## **Notes for Implementation**
+
+### **Critical Success Factors**
+- ⚠️ **DO NOT** remove old components until new ones are complete and tested
+- 🔒 **ALWAYS** verify role-based data isolation after each change
+- 📊 **TEST** each component individually before integration
+- 🧹 **CLEAN UP** one phase completely before starting the next
+- 🤖 **LEVERAGE** Vuettify RAG API for faster, more accurate development
+
+### **Development Guidelines**
+- Use existing coding standards and patterns
+- Maintain backward compatibility during migration
+- Document all breaking changes and migration steps
+- Test role switching functionality after each major change
+- Keep demo components functional in development environment
+- **NEW**: Use Vuettify RAG API for component development and troubleshooting
+
+### **Vuettify RAG API Benefits**
+- 🚀 **Instant Vuettify expertise** in Cursor
+- 💻 **Context-aware code generation** for role-based components
+- 📚 **Always up-to-date documentation** (1,990 chunks processed)
+- ⚡ **Faster development** with smart suggestions
+- 🎯 **Accurate answers** based on processed documentation chunks
+- 🔧 **Perfect for** beginners learning Vuettify and experienced developers wanting faster coding
+````
+
 ## File: tsconfig.node.json
 ````json
 {
@@ -21954,7 +25644,24 @@ import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
     </div>
     <div class="page-content">
       <v-container fluid class="pa-0" style="height: 100%;">
-        <v-row no-gutters class="fill-height">
+        <div v-if="!mdAndUp" class="mobile-layout">
+          <AdminSidebar
+            @property-selected="handlePropertySelected"
+            @turn-alert-clicked="handleTurnAlertClicked"
+            @quick-action="handleQuickAction"
+            class="mb-4"
+          />
+          <AdminCalendar
+            :bookings="bookingStore.bookings"
+            :properties="propertyStore.properties"
+            :users="new Map()"
+            @event-click="handleEventClick"
+            @date-select="handleDateSelect"
+            @event-drop="handleEventDrop"
+            class="mobile-calendar"
+          />
+        </div>
+        <v-row v-else no-gutters class="fill-height">
           <v-col cols="12" md="3" class="sidebar-col">
             <AdminSidebar
               @property-selected="handlePropertySelected"
@@ -21996,6 +25703,7 @@ import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
 import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue'
 import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue'
 import BookingForm from '@/components/dumb/BookingForm.vue'
@@ -22006,6 +25714,7 @@ import { useUIStore } from '@/stores/ui'
 import { useBookingStore } from '@/stores/booking'
 import { usePropertyStore } from '@/stores/property'
 import type { Booking, BookingFormData } from '@/types/booking'
+const { mdAndUp } = useDisplay()
 const uiStore = useUIStore()
 const bookingStore = useBookingStore()
 const propertyStore = usePropertyStore()
@@ -22100,30 +25809,58 @@ const closeCleanerAssignmentModal = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 .page-header {
   flex-shrink: 0;
-  border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
   background: rgb(var(--v-theme-surface));
+  border-bottom: 1px solid rgb(var(--v-theme-outline-variant));
+  padding: 16px 0;
 }
 .page-content {
   flex: 1;
   overflow: hidden;
+  background: rgb(var(--v-theme-background));
+}
+.mobile-layout {
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.mobile-calendar {
+  flex: 1;
+  min-height: 0;
 }
 .sidebar-col {
-  border-right: 1px solid rgb(var(--v-theme-surface-variant));
-  height: 100%;
+  border-right: 1px solid rgb(var(--v-theme-outline-variant));
+  background: rgb(var(--v-theme-surface));
   overflow-y: auto;
+  max-height: calc(100vh - 120px);
 }
 .calendar-col {
-  height: 100%;
+  background: rgb(var(--v-theme-background));
   overflow: hidden;
 }
-@media (max-width: 960px) {
+@media (max-width: 959px) {
+  .page-header {
+    padding: 12px 0;
+  }
+  .page-header h1 {
+    font-size: 1.5rem !important;
+  }
+  .mobile-layout {
+    padding: 8px;
+  }
+}
+@media (min-width: 600px) and (max-width: 959px) {
+  .mobile-layout {
+    padding: 12px;
+  }
+}
+@media (min-width: 960px) {
   .sidebar-col {
-    border-right: none;
-    border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
+    max-width: 320px;
+    min-width: 280px;
   }
 }
 </style>
@@ -24089,7 +27826,7 @@ alwaysApply: true
 # Cursor Global Rules - Role-Based Property Cleaning Scheduler
 
 > Read @project_summary.md and @tasks.md to understand **role-based multi-tenant architecture** and current task structure.
-> Check @repomix-output.md for current project state and existing implementations.
+> Check for current project state for context
 
 ## For each task:
 1. **Context First**: Use Context7 tool to research relevant documentation from @context7_techstack_ids.md before starting
@@ -25144,6 +28881,11 @@ watch(isOwnerAuthenticated, (newValue) => {
       elevation="2"
       class="admin-app-bar"
     >
+      <v-app-bar-nav-icon
+        v-if="!mdAndUp"
+        @click="drawer = !drawer"
+        class="mr-2"
+      />
       <div class="d-flex align-center">
         <v-avatar
           color="primary"
@@ -25162,7 +28904,7 @@ watch(isOwnerAuthenticated, (newValue) => {
         </div>
       </div>
       <v-spacer />
-      <div class="d-flex align-center mr-4">
+      <div v-if="mdAndUp" class="d-flex align-center mr-4">
         <v-btn
           to="/admin"
           variant="text"
@@ -25243,6 +28985,109 @@ watch(isOwnerAuthenticated, (newValue) => {
         </v-list>
       </v-menu>
     </v-app-bar>
+    <v-navigation-drawer
+      v-model="drawer"
+      :temporary="!mdAndUp"
+      :permanent="false"
+      app
+      color="surface"
+      width="280"
+      class="admin-nav-drawer"
+    >
+      <v-list-item class="px-4 py-4">
+        <template #prepend>
+          <v-avatar color="primary" size="40">
+            <v-icon color="white">mdi-shield-crown</v-icon>
+          </v-avatar>
+        </template>
+        <v-list-item-title class="text-h6 font-weight-bold">
+          Admin Panel
+        </v-list-item-title>
+        <v-list-item-subtitle>
+          Business Management
+        </v-list-item-subtitle>
+      </v-list-item>
+      <v-divider />
+      <v-list nav>
+        <v-list-item
+          to="/admin"
+          prepend-icon="mdi-view-dashboard"
+          title="Dashboard"
+          @click="closeMobileDrawer"
+        />
+        <v-list-item
+          to="/admin/schedule"
+          prepend-icon="mdi-calendar-clock"
+          title="Master Schedule"
+          @click="closeMobileDrawer"
+        />
+        <v-list-item
+          to="/admin/cleaners"
+          prepend-icon="mdi-account-hard-hat"
+          title="Cleaner Management"
+          @click="closeMobileDrawer"
+        />
+        <v-list-item
+          to="/admin/properties"
+          prepend-icon="mdi-home-group"
+          title="All Properties"
+          @click="closeMobileDrawer"
+        />
+        <v-list-item
+          to="/admin/bookings"
+          prepend-icon="mdi-calendar-edit"
+          title="All Bookings"
+          @click="closeMobileDrawer"
+        />
+        <v-list-item
+          to="/admin/reports"
+          prepend-icon="mdi-chart-line"
+          title="Business Reports"
+          @click="closeMobileDrawer"
+        />
+      </v-list>
+      <v-divider class="my-2" />
+      <v-list density="compact">
+        <v-list-subheader>Quick Actions</v-list-subheader>
+        <v-list-item
+          prepend-icon="mdi-plus"
+          title="New Booking"
+          @click="createBooking"
+        />
+        <v-list-item
+          prepend-icon="mdi-home-plus"
+          title="Add Property"
+          @click="createProperty"
+        />
+        <v-list-item
+          prepend-icon="mdi-account-plus"
+          title="Add Cleaner"
+          @click="addCleaner"
+        />
+      </v-list>
+      <template #append>
+        <div class="pa-4">
+          <v-btn
+            to="/"
+            variant="outlined"
+            block
+            prepend-icon="mdi-home"
+            class="mb-2"
+          >
+            Switch to Owner View
+          </v-btn>
+          <v-btn
+            variant="text"
+            block
+            prepend-icon="mdi-logout"
+            color="error"
+            @click="logout"
+          >
+            Logout
+          </v-btn>
+        </div>
+      </template>
+    </v-navigation-drawer>
     <v-main class="admin-main">
       <router-view />
     </v-main>
@@ -25260,14 +29105,64 @@ watch(isOwnerAuthenticated, (newValue) => {
           </v-btn>
         </template>
 ⋮----
+<template #prepend>
+          <v-avatar color="primary" size="40">
+            <v-icon color="white">mdi-shield-crown</v-icon>
+          </v-avatar>
+        </template>
+⋮----
+<template #append>
+        <div class="pa-4">
+          <v-btn
+            to="/"
+            variant="outlined"
+            block
+            prepend-icon="mdi-home"
+            class="mb-2"
+          >
+            Switch to Owner View
+          </v-btn>
+          <v-btn
+            variant="text"
+            block
+            prepend-icon="mdi-logout"
+            color="error"
+            @click="logout"
+          >
+            Logout
+          </v-btn>
+        </div>
+      </template>
+⋮----
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useDisplay } from 'vuetify'
 import { useAuth } from '@/composables/shared/useAuth'
 import { useRouter } from 'vue-router'
+const { mdAndUp } = useDisplay()
+const drawer = ref(false)
 const { logout: authLogout } = useAuth()
 const router = useRouter()
 const logout = async () => {
   await authLogout()
   router.push('/auth/login')
+}
+const closeMobileDrawer = () => {
+  if (!mdAndUp.value) {
+    drawer.value = false
+  }
+}
+const createBooking = () => {
+  router.push('/admin/schedule')
+  closeMobileDrawer()
+}
+const createProperty = () => {
+  router.push('/admin/properties')
+  closeMobileDrawer()
+}
+const addCleaner = () => {
+  router.push('/admin/cleaners')
+  closeMobileDrawer()
 }
 </script>
 <style scoped>
@@ -25283,6 +29178,9 @@ const logout = async () => {
 }
 .admin-main {
   background: rgb(var(--v-theme-background)) !important;
+}
+.admin-nav-drawer {
+  border-right: 1px solid rgb(var(--v-theme-outline-variant)) !important;
 }
 .v-btn--variant-text {
   color: rgb(var(--v-theme-on-surface)) !important;
@@ -25300,6 +29198,12 @@ const logout = async () => {
 .v-list-item--active {
   background: rgba(var(--v-theme-primary), 0.12) !important;
   color: rgb(var(--v-theme-primary)) !important;
+}
+@media (max-width: 959px) {
+  .admin-app-bar .v-toolbar__content {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
 }
 </style>
 ````
@@ -26346,1029 +30250,6 @@ i {
   .priority-badge-normal,
   .priority-badge-low {
     border: 2px solid currentColor !important;
-  }
-}
-</style>
-````
-
-## File: src/components/smart/admin/AdminCalendar.vue
-````vue
-<template>
-  <div class="admin-calendar-container">
-    <v-card
-      class="admin-calendar-toolbar mb-4"
-      elevation="2"
-    >
-      <v-card-text class="pb-2">
-        <v-row
-          align="center"
-          no-gutters
-        >
-          <v-col
-            cols="12"
-            md="3"
-            class="mb-2 mb-md-0"
-          >
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              variant="outlined"
-              density="compact"
-              class="admin-view-toggle"
-            >
-              <v-btn
-                value="dayGridMonth"
-                size="small"
-              >
-                Month
-              </v-btn>
-              <v-btn
-                value="timeGridWeek"
-                size="small"
-              >
-                Week
-              </v-btn>
-              <v-btn
-                value="timeGridDay"
-                size="small"
-              >
-                Day
-              </v-btn>
-              <v-btn
-                value="listWeek"
-                size="small"
-              >
-                List
-              </v-btn>
-            </v-btn-toggle>
-          </v-col>
-          <v-col
-            cols="12"
-            md="4"
-            class="mb-2 mb-md-0"
-          >
-            <div class="d-flex align-center justify-center">
-              <v-btn
-                icon="mdi-chevron-left"
-                variant="text"
-                size="small"
-                @click="navigateCalendar('prev')"
-              />
-              <v-btn
-                variant="text"
-                class="mx-2 admin-date-title"
-                @click="goToToday"
-              >
-                {{ currentDateTitle }}
-              </v-btn>
-              <v-btn
-                icon="mdi-chevron-right"
-                variant="text"
-                size="small"
-                @click="navigateCalendar('next')"
-              />
-            </div>
-          </v-col>
-          <v-col
-            cols="12"
-            md="5"
-          >
-            <div class="d-flex align-center justify-end flex-wrap ga-2">
-              <v-select
-                v-model="selectedCleaner"
-                :items="cleanerFilterOptions"
-                item-title="name"
-                item-value="id"
-                label="Filter by Cleaner"
-                density="compact"
-                variant="outlined"
-                style="min-width: 150px; max-width: 200px;"
-                clearable
-                hide-details
-              />
-              <v-select
-                v-model="selectedStatuses"
-                :items="statusFilterOptions"
-                item-title="label"
-                item-value="value"
-                label="Filter by Status"
-                density="compact"
-                variant="outlined"
-                style="min-width: 150px; max-width: 200px;"
-                multiple
-                clearable
-                hide-details
-              />
-              <v-select
-                v-model="selectedBookingTypes"
-                :items="bookingTypeOptions"
-                item-title="label"
-                item-value="value"
-                label="Booking Type"
-                density="compact"
-                variant="outlined"
-                style="min-width: 120px; max-width: 150px;"
-                multiple
-                clearable
-                hide-details
-              />
-              <v-btn
-                color="primary"
-                variant="elevated"
-                size="small"
-                prepend-icon="mdi-plus"
-                @click="createNewBooking"
-              >
-                New Booking
-              </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-    <v-card
-      elevation="2"
-      class="admin-calendar-card"
-    >
-      <div
-        v-if="!isMounted || !isCalendarReady"
-        class="calendar-loading"
-      >
-        <v-progress-circular
-          indeterminate
-          color="primary"
-          size="64"
-        />
-        <p class="text-center mt-4">
-          Loading calendar...
-        </p>
-      </div>
-      <FullCalendar
-        v-else
-        ref="calendarRef"
-        :options="adminCalendarOptions"
-        class="admin-calendar"
-      />
-    </v-card>
-    <v-menu
-      v-model="contextMenu.show"
-      :position-x="contextMenu.x"
-      :position-y="contextMenu.y"
-      absolute
-      offset-y
-    >
-      <v-list density="compact">
-        <v-list-item
-          v-for="action in contextMenuActions"
-          :key="action.key"
-          :prepend-icon="action.icon"
-          :title="action.title"
-          @click="handleContextAction(action.key)"
-        />
-      </v-list>
-    </v-menu>
-    <v-dialog
-      v-model="cleanerAssignmentModal.show"
-      max-width="500"
-    >
-      <v-card>
-        <v-card-title>
-          <span class="text-h6">Assign Cleaner</span>
-        </v-card-title>
-        <v-card-text>
-          <v-select
-            v-model="cleanerAssignmentModal.selectedCleaner"
-            :items="availableCleaners"
-            item-title="name"
-            item-value="id"
-            label="Select Cleaner"
-            variant="outlined"
-            :loading="cleanerAssignmentModal.loading"
-          >
-            <template #item="{ props, item }">
-              <v-list-item v-bind="props">
-                <template #prepend>
-                  <v-avatar size="32">
-                    <v-icon>mdi-account</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
-                </v-list-item-subtitle>
-              </v-list-item>
-            </template>
-          </v-select>
-          <v-textarea
-            v-model="cleanerAssignmentModal.notes"
-            label="Assignment Notes (Optional)"
-            variant="outlined"
-            rows="3"
-            class="mt-4"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            text
-            @click="cleanerAssignmentModal.show = false"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="primary"
-            :loading="cleanerAssignmentModal.loading"
-            @click="assignCleanerToBooking"
-          >
-            Assign
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
-</template>
-⋮----
-{{ currentDateTitle }}
-⋮----
-<template #item="{ props, item }">
-              <v-list-item v-bind="props">
-                <template #prepend>
-                  <v-avatar size="32">
-                    <v-icon>mdi-account</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
-                </v-list-item-subtitle>
-              </v-list-item>
-            </template>
-⋮----
-<template #prepend>
-                  <v-avatar size="32">
-                    <v-icon>mdi-account</v-icon>
-                  </v-avatar>
-                </template>
-<v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-⋮----
-{{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
-⋮----
-<script setup lang="ts">
-import FullCalendar from '@fullcalendar/vue3';
-import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg, EventApi, ViewApi, Duration } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import listPlugin from '@fullcalendar/list';
-import interactionPlugin from '@fullcalendar/interaction';
-import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
-import { useTheme } from 'vuetify';
-import type { Booking, Property, User, Cleaner } from '@/types';
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-interface EventResizeInfo {
-  event: EventApi;
-  relatedEvents: EventApi[];
-  oldEvent: EventApi;
-  endDelta: Duration;
-  startDelta: Duration;
-  revert: () => void;
-  view: ViewApi;
-  el: HTMLElement;
-  jsEvent: MouseEvent | TouchEvent;
-}
-interface DatesSetInfo {
-  view: ViewApi;
-  start: Date;
-  end: Date;
-  startStr: string;
-  endStr: string;
-  timeZone: string;
-}
-interface EventContentInfo {
-  event: EventApi;
-  timeText: string;
-  view: ViewApi;
-  el: HTMLElement;
-}
-interface DayCellContentInfo {
-  date: Date;
-  dateStr: string;
-  dayNumberText: string;
-  view: ViewApi;
-  isToday: boolean;
-  isPast: boolean;
-  isFuture: boolean;
-  isOther: boolean;
-}
-interface Props {
-  bookings: Map<string, Booking>;
-  properties: Map<string, Property>;
-  users: Map<string, User>;
-  loading?: boolean;
-}
-interface Emits {
-  (e: 'dateSelect', selectInfo: DateSelectArg): void;
-  (e: 'eventClick', clickInfo: EventClickArg): void;
-  (e: 'eventDrop', dropInfo: EventDropArg): void;
-  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
-  (e: 'updateBooking', data: { id: string; updates: Partial<Booking> }): void;
-  (e: 'assignCleaner', data: { bookingId: string; cleanerId: string; notes?: string }): void;
-  (e: 'updateBookingStatus', data: { bookingId: string; status: Booking['status'] }): void;
-  (e: 'viewChange', view: string): void;
-  (e: 'dateChange', date: Date): void;
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
-});
-const emit = defineEmits<Emits>();
-const theme = useTheme();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-const isMounted = ref(false);
-const isCalendarReady = ref(false);
-const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('dayGridMonth');
-const currentDateTitle = ref('');
-// Admin filtering state
-const selectedCleaner = ref<string | null>(null);
-const selectedStatuses = ref<Booking['status'][]>([]);
-const selectedBookingTypes = ref<Booking['booking_type'][]>([]);
-const contextMenu = ref({
-  show: false,
-  x: 0,
-  y: 0,
-  booking: null as Booking | null
-});
-const cleanerAssignmentModal = ref({
-  show: false,
-  booking: null as Booking | null,
-  selectedCleaner: null as string | null,
-  notes: '',
-  loading: false
-});
-// Get all cleaners from users Map
-const availableCleaners = computed(() => {
-  return Array.from(props.users.values())
-    .filter(user => user.role === 'cleaner')
-    .map(cleaner => ({
-      id: cleaner.id,
-      name: cleaner.name,
-      email: cleaner.email,
-      max_daily_bookings: (cleaner as Cleaner).max_daily_bookings || 5
-    }));
-});
-const cleanerFilterOptions = computed(() => [
-  { id: 'unassigned', name: 'Unassigned Only' },
-  ...availableCleaners.value
-]);
-const statusFilterOptions = [
-  { label: 'Pending', value: 'pending' },
-  { label: 'Scheduled', value: 'scheduled' },
-  { label: 'In Progress', value: 'in_progress' },
-  { label: 'Completed', value: 'completed' }
-];
-const bookingTypeOptions = [
-  { label: 'Turn Bookings', value: 'turn' },
-  { label: 'Standard Bookings', value: 'standard' }
-];
-const allBookings = computed(() => {
-  return Array.from(props.bookings.values());
-});
-const filteredBookings = computed(() => {
-  let filtered = allBookings.value;
-  if (selectedCleaner.value) {
-    if (selectedCleaner.value === 'unassigned') {
-      filtered = filtered.filter(booking => !booking.assigned_cleaner_id);
-    } else {
-      filtered = filtered.filter(booking => booking.assigned_cleaner_id === selectedCleaner.value);
-    }
-  }
-  if (selectedStatuses.value.length > 0) {
-    filtered = filtered.filter(booking => selectedStatuses.value.includes(booking.status));
-  }
-  if (selectedBookingTypes.value.length > 0) {
-    filtered = filtered.filter(booking => selectedBookingTypes.value.includes(booking.booking_type));
-  }
-  return filtered;
-});
-const adminCalendarEvents = computed(() => {
-  return filteredBookings.value.map(booking => {
-    const property = props.properties.get(booking.property_id);
-    const owner = props.users.get(booking.owner_id);
-    const cleaner = booking.assigned_cleaner_id ? props.users.get(booking.assigned_cleaner_id) : undefined;
-    const isTurn = booking.booking_type === 'turn';
-    return {
-      id: booking.id,
-      title: getAdminEventTitle(booking, property, owner, cleaner),
-      start: booking.checkout_date,
-      end: booking.checkin_date,
-      backgroundColor: getAdminEventColor(booking),
-      borderColor: getAdminEventBorderColor(booking),
-      textColor: getAdminEventTextColor(booking),
-      extendedProps: {
-        booking,
-        property,
-        owner,
-        cleaner,
-        bookingType: booking.booking_type,
-        status: booking.status,
-        assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
-      },
-      classNames: [
-        `admin-booking-${booking.booking_type}`,
-        `admin-status-${booking.status}`,
-        `admin-assignment-${booking.assigned_cleaner_id ? 'assigned' : 'unassigned'}`,
-        isTurn ? 'admin-priority-urgent' : 'admin-priority-normal'
-      ]
-    };
-  });
-});
-const getAdminEventTitle = (booking: Booking, property?: Property, owner?: User, cleaner?: User): string => {
-  const isTurn = booking.booking_type === 'turn';
-  const propertyName = property?.name || 'Unknown Property';
-  const ownerName = owner?.name || 'Unknown Owner';
-  const cleanerName = cleaner?.name || 'Unassigned';
-  return `${isTurn ? '🔥 ' : ''}${propertyName} (${ownerName}) → ${cleanerName}`;
-};
-const getAdminEventColor = (booking: Booking): string => {
-  const isDark = theme.global.current.value.dark;
-  const isAssigned = !!booking.assigned_cleaner_id;
-  const isTurn = booking.booking_type === 'turn';
-  if (!isAssigned) {
-    return isTurn
-      ? (isDark ? '#FF5252' : '#F44336')
-      : (isDark ? '#FF9800' : '#FF6F00');
-  }
-  switch (booking.status) {
-    case 'pending':
-      return isDark ? '#2196F3' : '#1976D2';
-    case 'scheduled':
-      return isDark ? '#00BCD4' : '#0097A7';
-    case 'in_progress':
-      return isDark ? '#4CAF50' : '#388E3C';
-    case 'completed':
-      return isDark ? '#9E9E9E' : '#757575';
-    default:
-      return isDark ? '#2196F3' : '#1976D2';
-  }
-};
-const getAdminEventBorderColor = (booking: Booking): string => {
-  const isTurn = booking.booking_type === 'turn';
-  const isAssigned = !!booking.assigned_cleaner_id;
-  if (isTurn && !isAssigned) return '#D32F2F';
-  if (isTurn) return '#FF6F00';
-  if (!isAssigned) return '#F57C00';
-  return '#1976D2';
-};
-const getAdminEventTextColor = (booking: Booking): string => {
-  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
-};
-const adminCalendarOptions = computed<CalendarOptions>(() => {
-  if (!isMounted.value || !isCalendarReady.value) {
-    return {
-      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-      initialView: 'dayGridMonth',
-      headerToolbar: false,
-      events: []
-    };
-  }
-  return {
-    plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-    initialView: currentView.value,
-    headerToolbar: false,
-  events: adminCalendarEvents.value,
-  eventDisplay: 'block',
-  eventOverlap: true,
-  selectable: true,
-  selectMirror: true,
-  editable: true,
-  droppable: true,
-  eventDurationEditable: true,
-  locale: 'en',
-  timeZone: 'local',
-  slotMinTime: '05:00:00',
-  slotMaxTime: '23:00:00',
-  slotDuration: '00:30:00',
-  height: 'auto',
-  aspectRatio: 1.6,
-  themeSystem: 'standard',
-  select: handleAdminDateSelect,
-  eventClick: handleAdminEventClick,
-  eventDrop: handleAdminEventDrop,
-  eventResize: handleAdminEventResize,
-  datesSet: handleDatesSet,
-  loading: handleLoading,
-  eventContent: renderAdminEventContent,
-  dayCellContent: renderAdminDayCell,
-  businessHours: {
-    daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
-    startTime: '06:00',
-    endTime: '20:00'
-  },
-  weekends: true,
-  dayMaxEvents: 5,
-  moreLinkClick: 'popover',
-  allDaySlot: false,
-  nowIndicator: true,
-  scrollTime: '07:00:00',
-  listDayFormat: { weekday: 'long', month: 'short', day: 'numeric' },
-  eventMouseEnter: (info) => {
-    info.el.style.cursor = 'pointer';
-  },
-  eventDidMount: (info) => {
-    info.el.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      showContextMenu(e, info.event.extendedProps.booking);
-    });
-  }
-  };
-});
-const handleAdminDateSelect = (selectInfo: DateSelectArg): void => {
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'emit'
-  );
-  emit('dateSelect', selectInfo);
-  emit('createBooking', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr
-  });
-  selectInfo.view.calendar.unselect();
-};
-const handleAdminEventClick = (clickInfo: EventClickArg): void => {
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'emit'
-  );
-  emit('eventClick', clickInfo);
-};
-const handleAdminEventDrop = (dropInfo: EventDropArg): void => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'eventDrop',
-    {
-      id: booking.id,
-      newStart: dropInfo.event.startStr,
-      newEnd: dropInfo.event.endStr
-    },
-    'emit'
-  );
-  emit('eventDrop', dropInfo);
-  emit('updateBooking', {
-    id: booking.id,
-    updates: {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-    }
-  });
-};
-const handleAdminEventResize = (resizeInfo: EventResizeInfo): void => {
-  const booking = resizeInfo.event.extendedProps.booking as Booking;
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'eventResize',
-    {
-      id: booking.id,
-      newEnd: resizeInfo.event.endStr
-    },
-    'emit'
-  );
-  emit('updateBooking', {
-    id: booking.id,
-    updates: {
-      checkin_date: resizeInfo.event.endStr || resizeInfo.event.end?.toISOString()
-    }
-  });
-};
-const handleDatesSet = (dateInfo: DatesSetInfo): void => {
-  const newDate = new Date(dateInfo.start);
-  currentDateTitle.value = dateInfo.view.title;
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'dateChange',
-    { date: newDate.toISOString(), title: dateInfo.view.title },
-    'emit'
-  );
-  emit('dateChange', newDate);
-};
-const handleLoading = (isLoading: boolean): void => {
-  eventLogger.logEvent(
-    'AdminCalendar',
-    'HomeAdmin',
-    'loadingState',
-    { isLoading },
-    'emit'
-  );
-};
-const showContextMenu = (event: MouseEvent, booking: Booking): void => {
-  contextMenu.value = {
-    show: true,
-    x: event.clientX,
-    y: event.clientY,
-    booking
-  };
-};
-const contextMenuActions = computed(() => {
-  const booking = contextMenu.value.booking;
-  if (!booking) return [];
-  const actions = [
-    { key: 'edit', title: 'Edit Booking', icon: 'mdi-pencil' },
-    { key: 'assign', title: 'Assign Cleaner', icon: 'mdi-account-plus' },
-    { key: 'status', title: 'Change Status', icon: 'mdi-check-circle' },
-    { key: 'duplicate', title: 'Duplicate', icon: 'mdi-content-copy' },
-    { key: 'delete', title: 'Delete', icon: 'mdi-delete' }
-  ];
-  if (booking.status === 'pending') {
-    actions.splice(2, 0, { key: 'schedule', title: 'Mark Scheduled', icon: 'mdi-calendar-check' });
-  }
-  if (booking.status === 'scheduled') {
-    actions.splice(2, 0, { key: 'start', title: 'Start Cleaning', icon: 'mdi-play' });
-  }
-  if (booking.status === 'in_progress') {
-    actions.splice(2, 0, { key: 'complete', title: 'Mark Complete', icon: 'mdi-check' });
-  }
-  return actions;
-});
-const handleContextAction = (action: string): void => {
-  const booking = contextMenu.value.booking;
-  if (!booking) return;
-  contextMenu.value.show = false;
-  switch (action) {
-    case 'edit': {
-      const mockEvent = {
-        id: booking.id,
-        extendedProps: { booking },
-        start: booking.checkout_date,
-        end: booking.checkin_date,
-        title: `${booking.booking_type} - ${booking.id}`
-      };
-      emit('eventClick', {
-        event: mockEvent,
-        el: document.createElement('div'),
-        jsEvent: new MouseEvent('click'),
-        view: { type: 'timeGridWeek' }
-      } as unknown as EventClickArg);
-      break;
-    }
-    case 'assign':
-      openCleanerAssignmentModal(booking);
-      break;
-    case 'schedule':
-      emit('updateBookingStatus', { bookingId: booking.id, status: 'scheduled' });
-      break;
-    case 'start':
-      emit('updateBookingStatus', { bookingId: booking.id, status: 'in_progress' });
-      break;
-    case 'complete':
-      emit('updateBookingStatus', { bookingId: booking.id, status: 'completed' });
-      break;
-    case 'status':
-      break;
-    case 'duplicate':
-      break;
-    case 'delete':
-      break;
-  }
-};
-const openCleanerAssignmentModal = (booking: Booking): void => {
-  cleanerAssignmentModal.value = {
-    show: true,
-    booking,
-    selectedCleaner: booking.assigned_cleaner_id || null,
-    notes: '',
-    loading: false
-  };
-};
-const assignCleanerToBooking = async (): Promise<void> => {
-  const modal = cleanerAssignmentModal.value;
-  if (!modal.booking || !modal.selectedCleaner) return;
-  modal.loading = true;
-  try {
-    emit('assignCleaner', {
-      bookingId: modal.booking.id,
-      cleanerId: modal.selectedCleaner,
-      notes: modal.notes
-    });
-    modal.show = false;
-  } catch (error) {
-    console.error('Failed to assign cleaner:', error);
-  } finally {
-    modal.loading = false;
-  }
-};
-const navigateCalendar = (direction: 'prev' | 'next'): void => {
-  if (calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    if (direction === 'prev') {
-      api.prev();
-    } else {
-      api.next();
-    }
-  }
-};
-const goToToday = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().today();
-  }
-};
-const createNewBooking = (): void => {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  emit('createBooking', {
-    start: today.toISOString().split('T')[0],
-    end: tomorrow.toISOString().split('T')[0]
-  });
-};
-const renderAdminEventContent = (eventInfo: EventContentInfo) => {
-  const booking = eventInfo.event.extendedProps.booking as Booking;
-  const property = eventInfo.event.extendedProps.property as Property;
-  const owner = eventInfo.event.extendedProps.owner as User;
-  const cleaner = eventInfo.event.extendedProps.cleaner as User;
-  const isTurn = booking.booking_type === 'turn';
-  const isAssigned = !!booking.assigned_cleaner_id;
-  return {
-    html: `
-      <div class="admin-event-content">
-        <div class="admin-event-title">
-          ${isTurn ? '🔥 ' : ''}${property?.name || 'Unknown Property'}
-        </div>
-        <div class="admin-event-owner">
-          Owner: ${owner?.name || 'Unknown'}
-        </div>
-        <div class="admin-event-cleaner ${isAssigned ? 'assigned' : 'unassigned'}">
-          ${isAssigned ? `👤 ${cleaner?.name}` : '⚠️ Unassigned'}
-        </div>
-        <div class="admin-event-status">
-          ${booking.status.toUpperCase()}
-        </div>
-        ${isTurn ? '<div class="admin-turn-badge">URGENT TURN</div>' : ''}
-      </div>
-    `
-  };
-};
-const renderAdminDayCell = (dayInfo: DayCellContentInfo) => {
-  const dayBookings = allBookings.value.filter(booking => {
-    const checkoutDate = new Date(booking.checkout_date).toDateString();
-    const dayDate = dayInfo.date.toDateString();
-    return checkoutDate === dayDate;
-  });
-  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
-  const unassignedCount = dayBookings.filter(b => !b.assigned_cleaner_id).length;
-  const totalCount = dayBookings.length;
-  return {
-    html: `
-      <div class="admin-day-number">
-        ${dayInfo.dayNumberText}
-        ${turnCount > 0 ? `<span class="admin-turn-indicator">${turnCount}</span>` : ''}
-        ${unassignedCount > 0 ? `<span class="admin-unassigned-indicator">${unassignedCount}</span>` : ''}
-        ${totalCount > 0 && turnCount === 0 && unassignedCount === 0 ? `<span class="admin-booking-indicator">${totalCount}</span>` : ''}
-      </div>
-    `
-  };
-};
-watch(currentView, (newView) => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().changeView(newView);
-    emit('viewChange', newView);
-  }
-});
-watch(() => theme.global.current.value.dark, () => {
-  nextTick(() => {
-    if (calendarRef.value) {
-      calendarRef.value.getApi().refetchEvents();
-    }
-  });
-});
-watch(() => props.bookings, (newBookings) => {
-  eventLogger.logEvent(
-    'HomeAdmin',
-    'AdminCalendar',
-    'bookingsUpdate',
-    { count: newBookings.size },
-    'receive'
-  );
-}, { deep: true });
-const goToDate = (date: string | Date): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(date);
-  }
-};
-const changeView = (viewName: string): void => {
-  const validViews: readonly string[] = ['dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listWeek'];
-  if (validViews.includes(viewName)) {
-    currentView.value = viewName as typeof currentView.value;
-  } else {
-    console.warn(`Invalid view name: ${viewName}. Using default 'timeGridWeek'.`);
-    currentView.value = 'timeGridWeek';
-  }
-};
-const refreshEvents = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().refetchEvents();
-  }
-};
-defineExpose({
-  goToDate,
-  changeView,
-  refreshEvents,
-  getApi: () => calendarRef.value?.getApi()
-});
-onMounted(async () => {
-  isMounted.value = true;
-  await nextTick();
-  setTimeout(() => {
-    isCalendarReady.value = true;
-  }, 100);
-});
-onBeforeUnmount(() => {
-  if (calendarRef.value) {
-    try {
-      const calendarApi = calendarRef.value.getApi();
-      if (calendarApi) {
-        calendarApi.destroy();
-      }
-    } catch (error) {
-      console.warn('Error cleaning up calendar:', error);
-    }
-  }
-});
-</script>
-<style scoped>
-.admin-calendar-container {
-  height: 100%;
-  width: 100%;
-}
-.calendar-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 400px;
-  min-height: 400px;
-}
-.admin-calendar-toolbar {
-  background: rgb(var(--v-theme-surface));
-  border: 1px solid rgb(var(--v-theme-outline), 0.12);
-}
-.admin-view-toggle {
-  border: 1px solid rgb(var(--v-theme-outline), 0.38);
-}
-.admin-date-title {
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: normal;
-}
-.admin-calendar-card {
-  background: rgb(var(--v-theme-surface));
-}
-.admin-calendar {
-  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
-  --fc-button-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-border-color: rgb(var(--v-theme-primary));
-  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
-  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
-  --fc-event-border-radius: 4px;
-}
-.fc-event.admin-booking-turn {
-  font-weight: bold;
-  border-width: 2px !important;
-}
-.fc-event.admin-priority-urgent {
-  animation: admin-pulse 3s infinite;
-  border-left: 4px solid rgb(var(--v-theme-error)) !important;
-}
-@keyframes admin-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0); }
-  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
-}
-.fc-event.admin-assignment-unassigned {
-  border-style: dashed !important;
-  border-width: 2px !important;
-}
-.fc-event.admin-assignment-assigned {
-  border-style: solid !important;
-}
-.fc-event.admin-status-pending {
-  opacity: 0.9;
-}
-.fc-event.admin-status-in_progress {
-  font-weight: bold;
-  border-width: 3px !important;
-}
-.fc-event.admin-status-completed {
-  opacity: 0.6;
-  text-decoration: line-through;
-}
-.admin-turn-indicator {
-  background: rgb(var(--v-theme-error));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 9px;
-  margin-left: 2px;
-  font-weight: bold;
-  animation: admin-pulse 3s infinite;
-}
-.admin-unassigned-indicator {
-  background: rgb(var(--v-theme-warning));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 9px;
-  margin-left: 2px;
-  font-weight: bold;
-}
-.admin-booking-indicator {
-  background: rgb(var(--v-theme-primary));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 9px;
-  margin-left: 2px;
-  font-weight: bold;
-}
-.admin-event-content {
-  padding: 2px;
-  font-size: 0.8em;
-}
-.admin-event-title {
-  font-weight: 600;
-  font-size: 0.9em;
-  margin-bottom: 1px;
-}
-.admin-event-owner {
-  font-size: 0.75em;
-  opacity: 0.8;
-  margin-bottom: 1px;
-}
-.admin-event-cleaner {
-  font-size: 0.75em;
-  font-weight: 500;
-  margin-bottom: 1px;
-}
-.admin-event-cleaner.unassigned {
-  color: rgb(var(--v-theme-warning));
-  font-weight: bold;
-}
-.admin-event-cleaner.assigned {
-  color: rgb(var(--v-theme-success));
-}
-.admin-event-status {
-  font-size: 0.7em;
-  opacity: 0.9;
-  font-weight: 500;
-}
-.admin-turn-badge {
-  background: rgba(var(--v-theme-error), 0.2);
-  color: rgb(var(--v-theme-error));
-  font-size: 0.65em;
-  padding: 1px 3px;
-  border-radius: 3px;
-  margin-top: 1px;
-  font-weight: bold;
-  text-align: center;
-}
-.admin-day-number {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-@media (max-width: 960px) {
-  .admin-calendar-toolbar .v-row {
-    flex-direction: column;
-  }
-  .admin-calendar-toolbar .v-col {
-    margin-bottom: 8px !important;
-  }
-  .admin-view-toggle {
-    width: 100%;
-  }
-  .admin-event-content {
-    font-size: 0.7em;
-  }
-}
-@media (max-width: 600px) {
-  .admin-calendar {
-    --fc-event-border-radius: 2px;
-  }
-  .admin-event-content {
-    font-size: 0.65em;
-    padding: 1px;
-  }
-  .admin-event-title {
-    font-size: 0.8em;
   }
 }
 </style>
@@ -28428,14 +31309,1454 @@ export interface AccessibilityOptions {
 }
 ````
 
+## File: src/components/smart/admin/AdminCalendar.vue
+````vue
+<template>
+  <div class="admin-calendar-container">
+    <v-card
+      class="admin-calendar-toolbar mb-4"
+      elevation="2"
+    >
+      <v-card-text class="pb-2">
+        <v-row
+          align="center"
+          no-gutters
+        >
+          <v-col
+            cols="12"
+            md="3"
+            class="mb-2 mb-md-0"
+          >
+            <v-btn-toggle
+              v-model="currentView"
+              mandatory
+              variant="outlined"
+              density="compact"
+              class="admin-view-toggle"
+            >
+              <v-btn
+                value="dayGridMonth"
+                size="small"
+              >
+                Month
+              </v-btn>
+              <v-btn
+                value="timeGridWeek"
+                size="small"
+              >
+                Week
+              </v-btn>
+              <v-btn
+                value="timeGridDay"
+                size="small"
+              >
+                Day
+              </v-btn>
+              <v-btn
+                value="listWeek"
+                size="small"
+              >
+                List
+              </v-btn>
+            </v-btn-toggle>
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
+            class="mb-2 mb-md-0"
+          >
+            <div class="d-flex align-center justify-center">
+              <v-btn
+                icon="mdi-chevron-left"
+                variant="text"
+                size="small"
+                @click="navigateCalendar('prev')"
+              />
+              <v-btn
+                variant="text"
+                class="mx-2 admin-date-title"
+                @click="goToToday"
+              >
+                {{ currentDateTitle }}
+              </v-btn>
+              <v-btn
+                icon="mdi-chevron-right"
+                variant="text"
+                size="small"
+                @click="navigateCalendar('next')"
+              />
+            </div>
+          </v-col>
+          <v-col
+            cols="12"
+            md="5"
+          >
+            <div class="d-flex align-center justify-end flex-wrap ga-2">
+              <v-select
+                v-model="selectedCleaner"
+                :items="cleanerFilterOptions"
+                item-title="name"
+                item-value="id"
+                label="Filter by Cleaner"
+                density="compact"
+                variant="outlined"
+                style="min-width: 150px; max-width: 200px;"
+                clearable
+                hide-details
+              />
+              <v-select
+                v-model="selectedStatuses"
+                :items="statusFilterOptions"
+                item-title="label"
+                item-value="value"
+                label="Filter by Status"
+                density="compact"
+                variant="outlined"
+                style="min-width: 150px; max-width: 200px;"
+                multiple
+                clearable
+                hide-details
+              />
+              <v-select
+                v-model="selectedBookingTypes"
+                :items="bookingTypeOptions"
+                item-title="label"
+                item-value="value"
+                label="Booking Type"
+                density="compact"
+                variant="outlined"
+                style="min-width: 120px; max-width: 150px;"
+                multiple
+                clearable
+                hide-details
+              />
+              <v-btn
+                color="primary"
+                variant="elevated"
+                size="small"
+                prepend-icon="mdi-plus"
+                @click="createNewBooking"
+              >
+                New Booking
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+    <v-card
+      elevation="2"
+      class="admin-calendar-card"
+      :style="{
+        height: calendarCardHeight,
+        minHeight: mobile ? '400px' : '600px',
+        maxHeight: mobile ? '70vh' : '80vh'
+      }"
+    >
+      <div
+        v-if="!isMounted || !isCalendarReady"
+        class="calendar-loading"
+      >
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="64"
+        />
+        <p class="text-center mt-4">
+          Loading calendar...
+        </p>
+      </div>
+      <FullCalendar
+        v-else
+        ref="calendarRef"
+        :options="adminCalendarOptions"
+        class="admin-calendar"
+        :style="{
+          height: fullCalendarHeight,
+          minHeight: mobile ? '350px' : '550px'
+        }"
+      />
+    </v-card>
+    <v-menu
+      v-model="contextMenu.show"
+      :position-x="contextMenu.x"
+      :position-y="contextMenu.y"
+      absolute
+      offset-y
+    >
+      <v-list density="compact">
+        <v-list-item
+          v-for="action in contextMenuActions"
+          :key="action.key"
+          :prepend-icon="action.icon"
+          :title="action.title"
+          @click="handleContextAction(action.key)"
+        />
+      </v-list>
+    </v-menu>
+    <v-dialog
+      v-model="cleanerAssignmentModal.show"
+      max-width="500"
+    >
+      <v-card>
+        <v-card-title>
+          <span class="text-h6">Assign Cleaner</span>
+        </v-card-title>
+        <v-card-text>
+          <v-select
+            v-model="cleanerAssignmentModal.selectedCleaner"
+            :items="availableCleaners"
+            item-title="name"
+            item-value="id"
+            label="Select Cleaner"
+            variant="outlined"
+            :loading="cleanerAssignmentModal.loading"
+          >
+            <template #item="{ props, item }">
+              <v-list-item v-bind="props">
+                <template #prepend>
+                  <v-avatar size="32">
+                    <v-icon>mdi-account</v-icon>
+                  </v-avatar>
+                </template>
+                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
+                </v-list-item-subtitle>
+              </v-list-item>
+            </template>
+          </v-select>
+          <v-textarea
+            v-model="cleanerAssignmentModal.notes"
+            label="Assignment Notes (Optional)"
+            variant="outlined"
+            rows="3"
+            class="mt-4"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            @click="cleanerAssignmentModal.show = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            :loading="cleanerAssignmentModal.loading"
+            @click="assignCleanerToBooking"
+          >
+            Assign
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+⋮----
+{{ currentDateTitle }}
+⋮----
+<template #item="{ props, item }">
+              <v-list-item v-bind="props">
+                <template #prepend>
+                  <v-avatar size="32">
+                    <v-icon>mdi-account</v-icon>
+                  </v-avatar>
+                </template>
+                <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
+                </v-list-item-subtitle>
+              </v-list-item>
+            </template>
+⋮----
+<template #prepend>
+                  <v-avatar size="32">
+                    <v-icon>mdi-account</v-icon>
+                  </v-avatar>
+                </template>
+<v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+⋮----
+{{ item.raw.email }} • Max: {{ item.raw.max_daily_bookings || 'N/A' }} bookings/day
+⋮----
+<script setup lang="ts">
+import FullCalendar from '@fullcalendar/vue3';
+import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg, EventApi, ViewApi, Duration } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+import interactionPlugin from '@fullcalendar/interaction';
+import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { useTheme, useDisplay } from 'vuetify';
+import type { Booking, Property, User, Cleaner } from '@/types';
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+interface EventResizeInfo {
+  event: EventApi;
+  relatedEvents: EventApi[];
+  oldEvent: EventApi;
+  endDelta: Duration;
+  startDelta: Duration;
+  revert: () => void;
+  view: ViewApi;
+  el: HTMLElement;
+  jsEvent: MouseEvent | TouchEvent;
+}
+interface DatesSetInfo {
+  view: ViewApi;
+  start: Date;
+  end: Date;
+  startStr: string;
+  endStr: string;
+  timeZone: string;
+}
+interface EventContentInfo {
+  event: EventApi;
+  timeText: string;
+  view: ViewApi;
+  el: HTMLElement;
+}
+interface DayCellContentInfo {
+  date: Date;
+  dateStr: string;
+  dayNumberText: string;
+  view: ViewApi;
+  isToday: boolean;
+  isPast: boolean;
+  isFuture: boolean;
+  isOther: boolean;
+}
+interface Props {
+  bookings: Map<string, Booking>;
+  properties: Map<string, Property>;
+  users: Map<string, User>;
+  loading?: boolean;
+}
+interface Emits {
+  (e: 'dateSelect', selectInfo: DateSelectArg): void;
+  (e: 'eventClick', clickInfo: EventClickArg): void;
+  (e: 'eventDrop', dropInfo: EventDropArg): void;
+  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
+  (e: 'updateBooking', data: { id: string; updates: Partial<Booking> }): void;
+  (e: 'assignCleaner', data: { bookingId: string; cleanerId: string; notes?: string }): void;
+  (e: 'updateBookingStatus', data: { bookingId: string; status: Booking['status'] }): void;
+  (e: 'viewChange', view: string): void;
+  (e: 'dateChange', date: Date): void;
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false
+});
+const emit = defineEmits<Emits>();
+const theme = useTheme();
+const { mobile } = useDisplay();
+const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const isMounted = ref(false);
+const isCalendarReady = ref(false);
+const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('dayGridMonth');
+const currentDateTitle = ref('');
+// Admin filtering state
+const selectedCleaner = ref<string | null>(null);
+const selectedStatuses = ref<Booking['status'][]>([]);
+const selectedBookingTypes = ref<Booking['booking_type'][]>([]);
+const contextMenu = ref({
+  show: false,
+  x: 0,
+  y: 0,
+  booking: null as Booking | null
+});
+const cleanerAssignmentModal = ref({
+  show: false,
+  booking: null as Booking | null,
+  selectedCleaner: null as string | null,
+  notes: '',
+  loading: false
+});
+// Get all cleaners from users Map
+const availableCleaners = computed(() => {
+  return Array.from(props.users.values())
+    .filter(user => user.role === 'cleaner')
+    .map(cleaner => ({
+      id: cleaner.id,
+      name: cleaner.name,
+      email: cleaner.email,
+      max_daily_bookings: (cleaner as Cleaner).max_daily_bookings || 5
+    }));
+});
+const cleanerFilterOptions = computed(() => [
+  { id: 'unassigned', name: 'Unassigned Only' },
+  ...availableCleaners.value
+]);
+const statusFilterOptions = [
+  { label: 'Pending', value: 'pending' },
+  { label: 'Scheduled', value: 'scheduled' },
+  { label: 'In Progress', value: 'in_progress' },
+  { label: 'Completed', value: 'completed' }
+];
+const bookingTypeOptions = [
+  { label: 'Turn Bookings', value: 'turn' },
+  { label: 'Standard Bookings', value: 'standard' }
+];
+const calendarCardHeight = computed(() => {
+  return 'calc(100vh - 180px)';
+});
+const fullCalendarHeight = computed(() => {
+  return 'calc(100vh - 200px)';
+});
+const allBookings = computed(() => {
+  return Array.from(props.bookings.values());
+});
+const filteredBookings = computed(() => {
+  let filtered = allBookings.value;
+  if (selectedCleaner.value) {
+    if (selectedCleaner.value === 'unassigned') {
+      filtered = filtered.filter(booking => !booking.assigned_cleaner_id);
+    } else {
+      filtered = filtered.filter(booking => booking.assigned_cleaner_id === selectedCleaner.value);
+    }
+  }
+  if (selectedStatuses.value.length > 0) {
+    filtered = filtered.filter(booking => selectedStatuses.value.includes(booking.status));
+  }
+  if (selectedBookingTypes.value.length > 0) {
+    filtered = filtered.filter(booking => selectedBookingTypes.value.includes(booking.booking_type));
+  }
+  return filtered;
+});
+const adminCalendarEvents = computed(() => {
+  return filteredBookings.value.map(booking => {
+    const property = props.properties.get(booking.property_id);
+    const owner = props.users.get(booking.owner_id);
+    const cleaner = booking.assigned_cleaner_id ? props.users.get(booking.assigned_cleaner_id) : undefined;
+    const isTurn = booking.booking_type === 'turn';
+    return {
+      id: booking.id,
+      title: getAdminEventTitle(booking, property, owner, cleaner),
+      start: booking.checkout_date,
+      end: booking.checkin_date,
+      backgroundColor: getAdminEventColor(booking),
+      borderColor: getAdminEventBorderColor(booking),
+      textColor: getAdminEventTextColor(booking),
+      extendedProps: {
+        booking,
+        property,
+        owner,
+        cleaner,
+        bookingType: booking.booking_type,
+        status: booking.status,
+        assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
+      },
+      classNames: [
+        `admin-booking-${booking.booking_type}`,
+        `admin-status-${booking.status}`,
+        `admin-assignment-${booking.assigned_cleaner_id ? 'assigned' : 'unassigned'}`,
+        isTurn ? 'admin-priority-urgent' : 'admin-priority-normal'
+      ]
+    };
+  });
+});
+const getAdminEventTitle = (booking: Booking, property?: Property, owner?: User, cleaner?: User): string => {
+  const isTurn = booking.booking_type === 'turn';
+  const propertyName = property?.name || 'Unknown Property';
+  const ownerName = owner?.name || 'Unknown Owner';
+  const cleanerName = cleaner?.name || 'Unassigned';
+  return `${isTurn ? '🔥 ' : ''}${propertyName} (${ownerName}) → ${cleanerName}`;
+};
+const getAdminEventColor = (booking: Booking): string => {
+  const isDark = theme.global.current.value.dark;
+  const isAssigned = !!booking.assigned_cleaner_id;
+  const isTurn = booking.booking_type === 'turn';
+  if (!isAssigned) {
+    return isTurn
+      ? (isDark ? '#FF5252' : '#F44336')
+      : (isDark ? '#FF9800' : '#FF6F00');
+  }
+  switch (booking.status) {
+    case 'pending':
+      return isDark ? '#2196F3' : '#1976D2';
+    case 'scheduled':
+      return isDark ? '#00BCD4' : '#0097A7';
+    case 'in_progress':
+      return isDark ? '#4CAF50' : '#388E3C';
+    case 'completed':
+      return isDark ? '#9E9E9E' : '#757575';
+    default:
+      return isDark ? '#2196F3' : '#1976D2';
+  }
+};
+const getAdminEventBorderColor = (booking: Booking): string => {
+  const isTurn = booking.booking_type === 'turn';
+  const isAssigned = !!booking.assigned_cleaner_id;
+  if (isTurn && !isAssigned) return '#D32F2F';
+  if (isTurn) return '#FF6F00';
+  if (!isAssigned) return '#F57C00';
+  return '#1976D2';
+};
+const getAdminEventTextColor = (booking: Booking): string => {
+  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
+};
+const adminCalendarOptions = computed<CalendarOptions>(() => {
+  if (!isMounted.value || !isCalendarReady.value) {
+    return {
+      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+      initialView: 'dayGridMonth',
+      headerToolbar: false,
+      events: []
+    };
+  }
+  return {
+    plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+    initialView: currentView.value,
+    headerToolbar: false,
+  events: adminCalendarEvents.value,
+  eventDisplay: 'block',
+  eventOverlap: true,
+  selectable: true,
+  selectMirror: true,
+  editable: true,
+  droppable: true,
+  eventDurationEditable: true,
+  locale: 'en',
+  timeZone: 'local',
+  slotMinTime: '05:00:00',
+  slotMaxTime: '23:00:00',
+  slotDuration: '00:30:00',
+  height: '100%',
+  aspectRatio: undefined,
+  themeSystem: 'standard',
+  select: handleAdminDateSelect,
+  eventClick: handleAdminEventClick,
+  eventDrop: handleAdminEventDrop,
+  eventResize: handleAdminEventResize,
+  datesSet: handleDatesSet,
+  loading: handleLoading,
+  eventContent: renderAdminEventContent,
+  dayCellContent: renderAdminDayCell,
+  businessHours: {
+    daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
+    startTime: '06:00',
+    endTime: '20:00'
+  },
+  weekends: true,
+  dayMaxEvents: 5,
+  moreLinkClick: 'popover',
+  allDaySlot: false,
+  nowIndicator: true,
+  scrollTime: '07:00:00',
+  listDayFormat: { weekday: 'long', month: 'short', day: 'numeric' },
+  eventMouseEnter: (info) => {
+    info.el.style.cursor = 'pointer';
+  },
+  eventDidMount: (info) => {
+    info.el.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showContextMenu(e, info.event.extendedProps.booking);
+    });
+  }
+  };
+});
+const handleAdminDateSelect = (selectInfo: DateSelectArg): void => {
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'dateSelect',
+    { start: selectInfo.startStr, end: selectInfo.endStr },
+    'emit'
+  );
+  emit('dateSelect', selectInfo);
+  emit('createBooking', {
+    start: selectInfo.startStr,
+    end: selectInfo.endStr
+  });
+  selectInfo.view.calendar.unselect();
+};
+const handleAdminEventClick = (clickInfo: EventClickArg): void => {
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'eventClick',
+    { id: clickInfo.event.id },
+    'emit'
+  );
+  emit('eventClick', clickInfo);
+};
+const handleAdminEventDrop = (dropInfo: EventDropArg): void => {
+  const booking = dropInfo.event.extendedProps.booking as Booking;
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'eventDrop',
+    {
+      id: booking.id,
+      newStart: dropInfo.event.startStr,
+      newEnd: dropInfo.event.endStr
+    },
+    'emit'
+  );
+  emit('eventDrop', dropInfo);
+  emit('updateBooking', {
+    id: booking.id,
+    updates: {
+      checkout_date: dropInfo.event.startStr,
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+    }
+  });
+};
+const handleAdminEventResize = (resizeInfo: EventResizeInfo): void => {
+  const booking = resizeInfo.event.extendedProps.booking as Booking;
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'eventResize',
+    {
+      id: booking.id,
+      newEnd: resizeInfo.event.endStr
+    },
+    'emit'
+  );
+  emit('updateBooking', {
+    id: booking.id,
+    updates: {
+      checkin_date: resizeInfo.event.endStr || resizeInfo.event.end?.toISOString()
+    }
+  });
+};
+const handleDatesSet = (dateInfo: DatesSetInfo): void => {
+  const newDate = new Date(dateInfo.start);
+  currentDateTitle.value = dateInfo.view.title;
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'dateChange',
+    { date: newDate.toISOString(), title: dateInfo.view.title },
+    'emit'
+  );
+  emit('dateChange', newDate);
+};
+const handleLoading = (isLoading: boolean): void => {
+  eventLogger.logEvent(
+    'AdminCalendar',
+    'HomeAdmin',
+    'loadingState',
+    { isLoading },
+    'emit'
+  );
+};
+const showContextMenu = (event: MouseEvent, booking: Booking): void => {
+  contextMenu.value = {
+    show: true,
+    x: event.clientX,
+    y: event.clientY,
+    booking
+  };
+};
+const contextMenuActions = computed(() => {
+  const booking = contextMenu.value.booking;
+  if (!booking) return [];
+  const actions = [
+    { key: 'edit', title: 'Edit Booking', icon: 'mdi-pencil' },
+    { key: 'assign', title: 'Assign Cleaner', icon: 'mdi-account-plus' },
+    { key: 'status', title: 'Change Status', icon: 'mdi-check-circle' },
+    { key: 'duplicate', title: 'Duplicate', icon: 'mdi-content-copy' },
+    { key: 'delete', title: 'Delete', icon: 'mdi-delete' }
+  ];
+  if (booking.status === 'pending') {
+    actions.splice(2, 0, { key: 'schedule', title: 'Mark Scheduled', icon: 'mdi-calendar-check' });
+  }
+  if (booking.status === 'scheduled') {
+    actions.splice(2, 0, { key: 'start', title: 'Start Cleaning', icon: 'mdi-play' });
+  }
+  if (booking.status === 'in_progress') {
+    actions.splice(2, 0, { key: 'complete', title: 'Mark Complete', icon: 'mdi-check' });
+  }
+  return actions;
+});
+const handleContextAction = (action: string): void => {
+  const booking = contextMenu.value.booking;
+  if (!booking) return;
+  contextMenu.value.show = false;
+  switch (action) {
+    case 'edit': {
+      const mockEvent = {
+        id: booking.id,
+        extendedProps: { booking },
+        start: booking.checkout_date,
+        end: booking.checkin_date,
+        title: `${booking.booking_type} - ${booking.id}`
+      };
+      emit('eventClick', {
+        event: mockEvent,
+        el: document.createElement('div'),
+        jsEvent: new MouseEvent('click'),
+        view: { type: 'timeGridWeek' }
+      } as unknown as EventClickArg);
+      break;
+    }
+    case 'assign':
+      openCleanerAssignmentModal(booking);
+      break;
+    case 'schedule':
+      emit('updateBookingStatus', { bookingId: booking.id, status: 'scheduled' });
+      break;
+    case 'start':
+      emit('updateBookingStatus', { bookingId: booking.id, status: 'in_progress' });
+      break;
+    case 'complete':
+      emit('updateBookingStatus', { bookingId: booking.id, status: 'completed' });
+      break;
+    case 'status':
+      break;
+    case 'duplicate':
+      break;
+    case 'delete':
+      break;
+  }
+};
+const openCleanerAssignmentModal = (booking: Booking): void => {
+  cleanerAssignmentModal.value = {
+    show: true,
+    booking,
+    selectedCleaner: booking.assigned_cleaner_id || null,
+    notes: '',
+    loading: false
+  };
+};
+const assignCleanerToBooking = async (): Promise<void> => {
+  const modal = cleanerAssignmentModal.value;
+  if (!modal.booking || !modal.selectedCleaner) return;
+  modal.loading = true;
+  try {
+    emit('assignCleaner', {
+      bookingId: modal.booking.id,
+      cleanerId: modal.selectedCleaner,
+      notes: modal.notes
+    });
+    modal.show = false;
+  } catch (error) {
+    console.error('Failed to assign cleaner:', error);
+  } finally {
+    modal.loading = false;
+  }
+};
+const navigateCalendar = (direction: 'prev' | 'next'): void => {
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    if (direction === 'prev') {
+      api.prev();
+    } else {
+      api.next();
+    }
+  }
+};
+const goToToday = (): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().today();
+  }
+};
+const createNewBooking = (): void => {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  emit('createBooking', {
+    start: today.toISOString().split('T')[0],
+    end: tomorrow.toISOString().split('T')[0]
+  });
+};
+const renderAdminEventContent = (eventInfo: EventContentInfo) => {
+  const booking = eventInfo.event.extendedProps.booking as Booking;
+  const property = eventInfo.event.extendedProps.property as Property;
+  const owner = eventInfo.event.extendedProps.owner as User;
+  const cleaner = eventInfo.event.extendedProps.cleaner as User;
+  const isTurn = booking.booking_type === 'turn';
+  const isAssigned = !!booking.assigned_cleaner_id;
+  return {
+    html: `
+      <div class="admin-event-content">
+        <div class="admin-event-title">
+          ${isTurn ? '🔥 ' : ''}${property?.name || 'Unknown Property'}
+        </div>
+        <div class="admin-event-owner">
+          Owner: ${owner?.name || 'Unknown'}
+        </div>
+        <div class="admin-event-cleaner ${isAssigned ? 'assigned' : 'unassigned'}">
+          ${isAssigned ? `👤 ${cleaner?.name}` : '⚠️ Unassigned'}
+        </div>
+        <div class="admin-event-status">
+          ${booking.status.toUpperCase()}
+        </div>
+        ${isTurn ? '<div class="admin-turn-badge">URGENT TURN</div>' : ''}
+      </div>
+    `
+  };
+};
+const renderAdminDayCell = (dayInfo: DayCellContentInfo) => {
+  const dayBookings = allBookings.value.filter(booking => {
+    const checkoutDate = new Date(booking.checkout_date).toDateString();
+    const dayDate = dayInfo.date.toDateString();
+    return checkoutDate === dayDate;
+  });
+  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
+  const unassignedCount = dayBookings.filter(b => !b.assigned_cleaner_id).length;
+  const totalCount = dayBookings.length;
+  return {
+    html: `
+      <div class="admin-day-number">
+        ${dayInfo.dayNumberText}
+        ${turnCount > 0 ? `<span class="admin-turn-indicator">${turnCount}</span>` : ''}
+        ${unassignedCount > 0 ? `<span class="admin-unassigned-indicator">${unassignedCount}</span>` : ''}
+        ${totalCount > 0 && turnCount === 0 && unassignedCount === 0 ? `<span class="admin-booking-indicator">${totalCount}</span>` : ''}
+      </div>
+    `
+  };
+};
+watch(currentView, (newView) => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().changeView(newView);
+    emit('viewChange', newView);
+  }
+});
+watch(() => theme.global.current.value.dark, () => {
+  nextTick(() => {
+    if (calendarRef.value) {
+      calendarRef.value.getApi().refetchEvents();
+    }
+  });
+});
+watch(() => props.bookings, (newBookings) => {
+  eventLogger.logEvent(
+    'HomeAdmin',
+    'AdminCalendar',
+    'bookingsUpdate',
+    { count: newBookings.size },
+    'receive'
+  );
+}, { deep: true });
+const goToDate = (date: string | Date): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().gotoDate(date);
+  }
+};
+const changeView = (viewName: string): void => {
+  const validViews: readonly string[] = ['dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listWeek'];
+  if (validViews.includes(viewName)) {
+    currentView.value = viewName as typeof currentView.value;
+  } else {
+    console.warn(`Invalid view name: ${viewName}. Using default 'timeGridWeek'.`);
+    currentView.value = 'timeGridWeek';
+  }
+};
+const refreshEvents = (): void => {
+  if (calendarRef.value) {
+    calendarRef.value.getApi().refetchEvents();
+  }
+};
+defineExpose({
+  goToDate,
+  changeView,
+  refreshEvents,
+  getApi: () => calendarRef.value?.getApi()
+});
+const handleWindowResize = (): void => {
+  if (calendarRef.value) {
+    nextTick(() => {
+      const calendarApi = calendarRef.value?.getApi();
+      if (calendarApi) {
+        calendarApi.updateSize();
+      }
+    });
+  }
+};
+onMounted(async () => {
+  isMounted.value = true;
+  await nextTick();
+  setTimeout(() => {
+    isCalendarReady.value = true;
+    window.addEventListener('resize', handleWindowResize);
+  }, 100);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleWindowResize);
+  if (calendarRef.value) {
+    try {
+      const calendarApi = calendarRef.value.getApi();
+      if (calendarApi) {
+        calendarApi.destroy();
+      }
+    } catch (error) {
+      console.warn('Error cleaning up calendar:', error);
+    }
+  }
+});
+</script>
+<style scoped>
+.admin-calendar-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.calendar-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.admin-calendar-toolbar {
+  background: rgb(var(--v-theme-surface));
+  border: 1px solid rgb(var(--v-theme-outline), 0.12);
+  flex-shrink: 0;
+}
+.admin-view-toggle {
+  border: 1px solid rgb(var(--v-theme-outline), 0.38);
+}
+.admin-date-title {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.admin-calendar-card {
+  background: rgb(var(--v-theme-surface));
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.admin-calendar {
+  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
+  --fc-button-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-border-color: rgb(var(--v-theme-primary));
+  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
+  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
+  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
+  --fc-event-border-radius: 4px;
+  flex: 1;
+}
+.fc-event.admin-booking-turn {
+  font-weight: bold;
+  border-width: 2px !important;
+}
+.fc-event.admin-priority-urgent {
+  animation: admin-pulse 3s infinite;
+  border-left: 4px solid rgb(var(--v-theme-error)) !important;
+}
+@keyframes admin-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
+}
+.fc-event.admin-assignment-unassigned {
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+.fc-event.admin-assignment-assigned {
+  border-style: solid !important;
+}
+.fc-event.admin-status-pending {
+  opacity: 0.9;
+}
+.fc-event.admin-status-in_progress {
+  font-weight: bold;
+  border-width: 3px !important;
+}
+.fc-event.admin-status-completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+.admin-turn-indicator {
+  background: rgb(var(--v-theme-error));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 9px;
+  margin-left: 2px;
+  font-weight: bold;
+  animation: admin-pulse 3s infinite;
+}
+.admin-unassigned-indicator {
+  background: rgb(var(--v-theme-warning));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 9px;
+  margin-left: 2px;
+  font-weight: bold;
+}
+.admin-booking-indicator {
+  background: rgb(var(--v-theme-primary));
+  color: white;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 9px;
+  margin-left: 2px;
+  font-weight: bold;
+}
+.admin-event-content {
+  padding: 2px;
+  font-size: 0.8em;
+}
+.admin-event-title {
+  font-weight: 600;
+  font-size: 0.9em;
+  margin-bottom: 1px;
+}
+.admin-event-owner {
+  font-size: 0.75em;
+  opacity: 0.8;
+  margin-bottom: 1px;
+}
+.admin-event-cleaner {
+  font-size: 0.75em;
+  font-weight: 500;
+  margin-bottom: 1px;
+}
+.admin-event-cleaner.unassigned {
+  color: rgb(var(--v-theme-warning));
+  font-weight: bold;
+}
+.admin-event-cleaner.assigned {
+  color: rgb(var(--v-theme-success));
+}
+.admin-event-status {
+  font-size: 0.7em;
+  opacity: 0.9;
+  font-weight: 500;
+}
+.admin-turn-badge {
+  background: rgba(var(--v-theme-error), 0.2);
+  color: rgb(var(--v-theme-error));
+  font-size: 0.65em;
+  padding: 1px 3px;
+  border-radius: 3px;
+  margin-top: 1px;
+  font-weight: bold;
+  text-align: center;
+}
+.admin-day-number {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+@media (max-width: 960px) {
+  .admin-calendar-toolbar .v-row {
+    flex-direction: column;
+  }
+  .admin-calendar-toolbar .v-col {
+    margin-bottom: 8px !important;
+  }
+  .admin-view-toggle {
+    width: 100%;
+  }
+  .admin-event-content {
+    font-size: 0.7em;
+  }
+}
+@media (max-width: 600px) {
+  .admin-calendar {
+    --fc-event-border-radius: 2px;
+  }
+  .admin-event-content {
+    font-size: 0.65em;
+    padding: 1px;
+  }
+  .admin-event-title {
+    font-size: 0.8em;
+  }
+}
+</style>
+````
+
+## File: src/layouts/default.vue
+````vue
+<template>
+  <v-app>
+    <v-app-bar
+      app
+      color="surface"
+      elevation="1"
+      class="border-b"
+    >
+      <v-app-bar-nav-icon
+        @click="toggleSidebar"
+      />
+      <v-app-bar-title class="font-weight-medium">
+        Property Cleaning Scheduler
+      </v-app-bar-title>
+      <v-spacer />
+      <ThemePicker />
+      <v-menu
+        location="bottom end"
+        offset="5"
+      >
+        <template #activator="{ props: menuProps }">
+          <v-btn
+            icon
+            v-bind="menuProps"
+            class="ml-2"
+          >
+            <v-avatar size="36">
+              <v-icon>mdi-account-circle</v-icon>
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-list min-width="200">
+          <v-list-subheader>User Options</v-list-subheader>
+          <v-list-item
+            prepend-icon="mdi-account-outline"
+            title="Profile"
+          />
+          <v-list-item
+            prepend-icon="mdi-cog-outline"
+            title="Settings"
+          />
+          <v-divider class="my-2" />
+          <v-list-item
+            prepend-icon="mdi-logout"
+            title="Logout"
+            color="error"
+          />
+        </v-list>
+      </v-menu>
+    </v-app-bar>
+    <v-main class="bg-background bg-gradient">
+      <router-view />
+    </v-main>
+    <div id="notification-area">
+    </div>
+    <div id="modal-area">
+    </div>
+  </v-app>
+</template>
+⋮----
+<template #activator="{ props: menuProps }">
+          <v-btn
+            icon
+            v-bind="menuProps"
+            class="ml-2"
+          >
+            <v-avatar size="36">
+              <v-icon>mdi-account-circle</v-icon>
+            </v-avatar>
+          </v-btn>
+        </template>
+⋮----
+<script setup lang="ts">
+  import { ref } from 'vue';
+  import { useDisplay } from 'vuetify';
+  import ThemePicker from '@/components/dumb/shared/ThemePicker.vue';
+  const drawer = ref(true);
+  const rail = ref(false);
+  const { mobile} = useDisplay();
+  const toggleSidebar = (): void => {
+    if (mobile.value) {
+      drawer.value = !drawer.value;
+    } else {
+      rail.value = !rail.value;
+    }
+  };
+  </script>
+<style>
+  .border-b {
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+  }
+  .border-r {
+    border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+  }
+  .v-app-bar {
+    background: rgb(var(--v-theme-surface)) !important;
+    color: rgb(var(--v-theme-on-surface)) !important;
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+  }
+  .v-main {
+    background: rgb(var(--v-theme-background)) !important;
+    color: rgb(var(--v-theme-on-background)) !important;
+  }
+  .v-list-item {
+    color: rgb(var(--v-theme-on-surface)) !important;
+  }
+  .v-list-item:hover {
+    background: rgba(var(--v-theme-primary), 0.08) !important;
+  }
+  .v-list-item--active {
+    background: rgba(var(--v-theme-primary), 0.12) !important;
+    color: rgb(var(--v-theme-primary)) !important;
+  }
+  .v-avatar {
+    background: rgb(var(--v-theme-primary)) !important;
+  }
+  .v-menu .v-list {
+    background: rgb(var(--v-theme-surface)) !important;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+  .fade-in {
+    animation: fadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+  .v-btn {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .v-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 16px rgba(33, 150, 243, 0.15);
+  }
+  </style>
+````
+
+## File: src/pages/index.vue
+````vue
+<template>
+  <div
+    v-if="authStore.loading"
+    class="loading-container"
+  >
+    <v-container class="fill-height">
+      <v-row
+        justify="center"
+        align="center"
+      >
+        <v-col cols="auto">
+          <v-progress-circular
+            indeterminate
+            size="64"
+            color="primary"
+          />
+          <div class="text-h6 mt-4 text-center">
+            Loading...
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+  <component
+    :is="homeComponent"
+    v-else
+  />
+</template>
+<script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useUIStore } from '@/stores/ui'
+import HomeOwner from '@/components/smart/owner/HomeOwner.vue'
+import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
+const authStore = useAuthStore()
+const uiStore = useUIStore()
+const AuthPrompt = {
+  template: `
+    <v-container class="fill-height">
+      <v-row justify="center" align="center">
+        <v-col cols="12" sm="8" md="6" lg="4">
+          <v-card elevation="8" class="pa-4">
+            <v-card-title class="text-h5 text-center mb-4">
+              <v-icon class="mr-2" color="primary">mdi-login</v-icon>
+              Authentication Required
+            </v-card-title>
+            <v-card-text class="text-center">
+              <p class="text-body-1 mb-4">
+                Please log in to access the Property Cleaning Scheduler.
+              </p>
+              <v-alert
+                type="info"
+                variant="tonal"
+                class="mb-4"
+              >
+                <strong>Development Mode:</strong><br>
+                Authentication is currently mocked for development.
+                Click "Mock Login" to continue.
+              </v-alert>
+              <v-btn
+                color="primary"
+                size="large"
+                block
+                @click="handleMockLogin"
+                :loading="authStore.loading"
+                class="mb-2"
+              >
+                <v-icon class="mr-2">mdi-shield-account</v-icon>
+                Mock Login (Admin)
+              </v-btn>
+              <v-btn
+                color="secondary"
+                variant="outlined"
+                size="large"
+                block
+                @click="handleMockOwnerLogin"
+                :loading="authStore.loading"
+                class="mb-4"
+              >
+                <v-icon class="mr-2">mdi-home-account</v-icon>
+                Mock Login (Owner)
+              </v-btn>
+              <v-divider class="my-4" />
+              <div class="text-center">
+                <p class="text-body-2 mb-2">
+                  Or use the full authentication flow:
+                </p>
+                <v-btn
+                  color="primary"
+                  variant="text"
+                  @click="goToLogin"
+                  :disabled="authStore.loading"
+                >
+                  Go to Login Page
+                </v-btn>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  `,
+  setup() {
+    const handleMockLogin = async () => {
+      const success = await authStore.login('admin@example.com', 'password')
+      if (success) {
+        uiStore.addNotification('success', 'Welcome!', authStore.getSuccessMessage('login'))
+      }
+    }
+    const handleMockOwnerLogin = async () => {
+      const success = await authStore.login('owner@example.com', 'password')
+      if (success) {
+        uiStore.addNotification('success', 'Welcome!', authStore.getSuccessMessage('login'))
+      }
+    }
+    const goToLogin = () => {
+      window.location.href = '/auth/login'
+    }
+    return {
+      authStore,
+      uiStore,
+      handleMockLogin,
+      handleMockOwnerLogin,
+      goToLogin
+    }
+  }
+}
+const homeComponent = computed(() => {
+  if (!authStore.isAuthenticated) {
+    return AuthPrompt
+  }
+  if (authStore.isAdmin) {
+    if (authStore.tempViewMode?.role === 'owner') {
+      return HomeOwner
+    }
+    return HomeAdmin
+  }
+  if (authStore.isOwner) {
+    return HomeOwner
+  }
+  console.warn('Unknown user role:', authStore.user?.role)
+  return AuthPrompt
+})
+onMounted(async () => {
+  try {
+    await authStore.checkAuth()
+  } catch (error) {
+    console.error('Auth check failed:', error)
+  }
+})
+</script>
+<style scoped>
+.loading-container {
+  min-height: 100vh;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+.fill-height {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.v-card {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+.v-btn {
+  text-transform: none;
+}
+</style>
+````
+
 ## File: src/components/smart/admin/AdminSidebar.vue
 ````vue
 <template>
-  <v-navigation-drawer
-    class="admin-sidebar"
-    permanent
-    :elevation="8"
-    color="tertiary"
+  <v-card
+    v-if="!mdAndUp"
+    class="admin-sidebar-mobile mb-4"
+    :elevation="1"
+    color="surface"
+  >
+    <v-card-text class="py-2">
+      <v-row align="center" no-gutters>
+        <v-col cols="auto" class="mr-4">
+          <div class="d-flex align-center">
+            <v-chip
+              size="small"
+              color="warning"
+              variant="flat"
+              class="mr-2"
+            >
+              {{ urgentTurnsCount }} Urgent
+            </v-chip>
+            <v-chip
+              size="small"
+              color="primary"
+              variant="outlined"
+              class="mr-2"
+            >
+              {{ totalProperties }} Properties
+            </v-chip>
+          </div>
+        </v-col>
+        <v-col>
+          <div class="d-flex align-center ga-2">
+            <v-select
+              v-model="selectedProperty"
+              :items="propertySelectItems"
+              label="Property"
+              density="compact"
+              variant="outlined"
+              style="min-width: 120px; max-width: 180px;"
+              clearable
+              hide-details
+              @update:model-value="handlePropertyFilterChange"
+            />
+            <v-select
+              v-model="selectedStatus"
+              :items="statusSelectItems"
+              label="Status"
+              density="compact"
+              variant="outlined"
+              style="min-width: 100px; max-width: 140px;"
+              clearable
+              hide-details
+              @update:model-value="handleStatusFilterChange"
+            />
+          </div>
+        </v-col>
+      </v-row>
+    </v-card-text>
+  </v-card>
+  <v-card
+    v-else
+    class="admin-sidebar-desktop"
+    :elevation="0"
+    height="100%"
+    color="surface"
   >
     <v-container class="py-2">
       <v-row class="mb-4">
@@ -28848,20 +33169,522 @@ export interface AccessibilityOptions {
           </v-card>
         </v-col>
       </v-row>
-      <v-overlay
-        :model-value="loading"
-        :contained="true"
-        :persistent="true"
-        class="align-center justify-center"
-      >
-        <v-progress-circular
-          indeterminate
-          color="primary"
-        />
-      </v-overlay>
+    </v-container>
+    <v-overlay
+      :model-value="loading"
+      :contained="true"
+      :persistent="true"
+      class="align-center justify-center"
+    >
+      <v-progress-circular
+        indeterminate
+        color="primary"
+      />
+    </v-overlay>
+  </v-card>
+  <v-navigation-drawer
+    v-else
+    :model-value="props.modelValue"
+    class="admin-sidebar-mobile"
+    :temporary="true"
+    :mobile-breakpoint="960"
+    :elevation="8"
+    color="surface"
+    width="320"
+    @update:model-value="emit('update:modelValue', $event)"
+  >
+    <v-container class="py-2">
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <h2 class="text-h6 font-weight-bold">
+            Business Management
+          </h2>
+          <div class="text-subtitle-2 text-medium-emphasis">
+            {{ formattedDate }}
+          </div>
+          <div class="mt-2">
+            <v-chip
+              size="small"
+              color="primary"
+              variant="outlined"
+              class="mr-1 mb-1"
+            >
+              {{ totalProperties }} Properties
+            </v-chip>
+            <v-chip
+              size="small"
+              color="warning"
+              variant="outlined"
+              class="mr-1 mb-1"
+            >
+              {{ urgentTurnsCount }} Urgent Turns
+            </v-chip>
+            <v-chip
+              size="small"
+              color="success"
+              variant="outlined"
+              class="mr-1 mb-1"
+            >
+              {{ availableCleanersCount }} Available Cleaners
+            </v-chip>
+          </div>
+        </v-col>
+      </v-row>
+      <v-row v-if="systemTodayTurnsArray.length > 0">
+        <v-col cols="12">
+          <v-card
+            class="system-turn-alerts mb-4"
+            variant="outlined"
+            color="warning"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-alert-circle"
+                class="mr-2"
+                color="warning"
+              />
+              System-wide Urgent Turns
+              <v-spacer />
+              <v-chip
+                size="small"
+                color="warning"
+                variant="flat"
+              >
+                {{ systemTodayTurnsArray.length }}
+              </v-chip>
+            </v-card-title>
+            <v-card-text>
+              <TurnAlerts
+                :bookings="systemTodayBookingsWithMetadata"
+                :properties="allPropertiesMap"
+                @view="$emit('navigateToBooking', $event)"
+                @assign="handleAssignCleaner"
+                @view-all="handleViewAll('turns')"
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <v-card
+            class="system-upcoming-cleanings"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-calendar-clock"
+                class="mr-2"
+              />
+              System-wide Schedule
+              <v-spacer />
+              <v-chip
+                size="small"
+                color="info"
+                variant="flat"
+              >
+                {{ systemUpcomingCleaningsArray.length }}
+              </v-chip>
+            </v-card-title>
+            <v-card-text>
+              <UpcomingCleanings
+                :bookings="systemUpcomingBookingsWithMetadata"
+                :properties="allPropertiesMap"
+                @view="$emit('navigateToBooking', $event)"
+                @assign="handleAssignCleaner"
+                @view-all="handleViewAll($event)"
+                @toggle-expanded="toggleUpcomingExpanded"
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <v-card
+            class="advanced-property-filter"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-filter-variant"
+                class="mr-2"
+              />
+              Advanced Filters
+            </v-card-title>
+            <v-card-text>
+              <v-select
+                v-model="selectedProperty"
+                :items="propertySelectItems"
+                label="Filter by Property"
+                clearable
+                class="mb-2"
+                @update:model-value="handlePropertyFilterChange"
+              >
+                <template #prepend-item>
+                  <v-list-item
+                    title="All Properties"
+                    value=""
+                    @click="selectedProperty = null"
+                  />
+                  <v-divider class="mt-2" />
+                </template>
+              </v-select>
+              <v-select
+                v-model="selectedOwner"
+                :items="ownerSelectItems"
+                label="Filter by Property Owner"
+                clearable
+                class="mb-2"
+                @update:model-value="handleOwnerFilterChange"
+              >
+                <template #prepend-item>
+                  <v-list-item
+                    title="All Owners"
+                    value=""
+                    @click="selectedOwner = null"
+                  />
+                  <v-divider class="mt-2" />
+                </template>
+              </v-select>
+              <v-select
+                v-model="selectedStatus"
+                :items="statusSelectItems"
+                label="Filter by Status"
+                clearable
+                @update:model-value="handleStatusFilterChange"
+              >
+                <template #prepend-item>
+                  <v-list-item
+                    title="All Statuses"
+                    value=""
+                    @click="selectedStatus = null"
+                  />
+                  <v-divider class="mt-2" />
+                </template>
+              </v-select>
+              <v-btn
+                v-if="hasActiveFilters"
+                variant="outlined"
+                size="small"
+                prepend-icon="mdi-filter-remove"
+                class="mt-2"
+                @click="clearAllFilters"
+              >
+                Clear All Filters
+              </v-btn>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <v-card
+            class="business-analytics"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-chart-line"
+                class="mr-2"
+              />
+              Business Analytics
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="6">
+                  <div class="text-center">
+                    <div class="text-h4 font-weight-bold text-primary">
+                      {{ totalProperties }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Total Properties
+                    </div>
+                  </div>
+                </v-col>
+                <v-col cols="6">
+                  <div class="text-center">
+                    <div class="text-h4 font-weight-bold text-success">
+                      {{ activeCleaningsToday }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Active Today
+                    </div>
+                  </div>
+                </v-col>
+                <v-col cols="6">
+                  <div class="text-center">
+                    <div class="text-h4 font-weight-bold text-warning">
+                      {{ urgentTurnsCount }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Urgent Turns
+                    </div>
+                  </div>
+                </v-col>
+                <v-col cols="6">
+                  <div class="text-center">
+                    <div class="text-h4 font-weight-bold text-info">
+                      {{ totalPropertyOwners }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Property Owners
+                    </div>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row class="mb-4">
+        <v-col cols="12">
+          <v-card
+            class="cleaner-availability"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-account-hard-hat"
+                class="mr-2"
+              />
+              Cleaner Status
+              <v-spacer />
+              <v-chip
+                size="small"
+                color="success"
+                variant="flat"
+              >
+                {{ availableCleanersCount }} Available
+              </v-chip>
+            </v-card-title>
+            <v-card-text>
+              <div
+                v-if="cleanerStatusList.length === 0"
+                class="text-center text-medium-emphasis"
+              >
+                No cleaner data available
+              </div>
+              <div v-else>
+                <v-list density="compact">
+                  <v-list-item
+                    v-for="cleaner in cleanerStatusList.slice(0, 5)"
+                    :key="cleaner.id"
+                    :title="cleaner.name"
+                    :subtitle="cleaner.status"
+                  >
+                    <template #prepend>
+                      <v-avatar
+                        size="small"
+                        :color="cleaner.statusColor"
+                      >
+                        <v-icon
+                          :icon="cleaner.statusIcon"
+                          size="small"
+                        />
+                      </v-avatar>
+                    </template>
+                    <template #append>
+                      <v-btn
+                        v-if="cleaner.status === 'Available'"
+                        size="x-small"
+                        variant="outlined"
+                        color="primary"
+                        @click="handleQuickAssign(cleaner.id)"
+                      >
+                        Assign
+                      </v-btn>
+                    </template>
+                  </v-list-item>
+                </v-list>
+                <v-btn
+                  v-if="cleanerStatusList.length > 5"
+                  variant="text"
+                  size="small"
+                  class="mt-2"
+                  @click="$emit('manageSystem')"
+                >
+                  View All Cleaners ({{ cleanerStatusList.length }})
+                </v-btn>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-card
+            class="admin-quick-actions"
+            variant="outlined"
+          >
+            <v-card-title class="d-flex align-center">
+              <v-icon
+                icon="mdi-lightning-bolt"
+                class="mr-2"
+              />
+              Admin Actions
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12">
+                  <v-btn
+                    prepend-icon="mdi-account-hard-hat"
+                    color="warning"
+                    variant="tonal"
+                    block
+                    class="mb-2"
+                    @click="$emit('assignCleaner', { bookingId: '', cleanerId: '' })"
+                  >
+                    Assign Cleaners
+                  </v-btn>
+                </v-col>
+                <v-col cols="12">
+                  <v-btn
+                    prepend-icon="mdi-chart-line"
+                    color="info"
+                    variant="tonal"
+                    block
+                    class="mb-2"
+                    @click="$emit('generateReports')"
+                  >
+                    Generate Reports
+                  </v-btn>
+                </v-col>
+                <v-col cols="12">
+                  <v-btn
+                    prepend-icon="mdi-cog"
+                    color="primary"
+                    variant="tonal"
+                    block
+                    class="mb-2"
+                    @click="$emit('manageSystem')"
+                  >
+                    Manage System
+                  </v-btn>
+                </v-col>
+                <v-col cols="6">
+                  <v-btn
+                    prepend-icon="mdi-calendar-plus"
+                    color="secondary"
+                    variant="outlined"
+                    block
+                    size="small"
+                    @click="$emit('createBooking')"
+                  >
+                    New Booking
+                  </v-btn>
+                </v-col>
+                <v-col cols="6">
+                  <v-btn
+                    prepend-icon="mdi-home-plus"
+                    color="secondary"
+                    variant="outlined"
+                    block
+                    size="small"
+                    @click="$emit('createProperty')"
+                  >
+                    New Property
+                  </v-btn>
+                </v-col>
+                <v-col cols="12">
+                  <v-btn
+                    prepend-icon="mdi-alert-circle"
+                    color="error"
+                    variant="outlined"
+                    block
+                    size="small"
+                    class="mt-2"
+                    @click="$emit('emergencyResponse')"
+                  >
+                    Emergency Response
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
   </v-navigation-drawer>
 </template>
+⋮----
+{{ urgentTurnsCount }} Urgent
+⋮----
+{{ totalProperties }} Properties
+⋮----
+{{ formattedDate }}
+⋮----
+{{ totalProperties }} Properties
+⋮----
+{{ urgentTurnsCount }} Urgent Turns
+⋮----
+{{ availableCleanersCount }} Available Cleaners
+⋮----
+{{ systemTodayTurnsArray.length }}
+⋮----
+{{ systemUpcomingCleaningsArray.length }}
+⋮----
+<template #prepend-item>
+                  <v-list-item
+                    title="All Properties"
+                    value=""
+                    @click="selectedProperty = null"
+                  />
+                  <v-divider class="mt-2" />
+                </template>
+⋮----
+<template #prepend-item>
+                  <v-list-item
+                    title="All Owners"
+                    value=""
+                    @click="selectedOwner = null"
+                  />
+                  <v-divider class="mt-2" />
+                </template>
+⋮----
+<template #prepend-item>
+                  <v-list-item
+                    title="All Statuses"
+                    value=""
+                    @click="selectedStatus = null"
+                  />
+                  <v-divider class="mt-2" />
+                </template>
+⋮----
+{{ totalProperties }}
+⋮----
+{{ activeCleaningsToday }}
+⋮----
+{{ urgentTurnsCount }}
+⋮----
+{{ totalPropertyOwners }}
+⋮----
+{{ availableCleanersCount }} Available
+⋮----
+<template #prepend>
+                      <v-avatar
+                        size="small"
+                        :color="cleaner.statusColor"
+                      >
+                        <v-icon
+                          :icon="cleaner.statusIcon"
+                          size="small"
+                        />
+                      </v-avatar>
+                    </template>
+<template #append>
+                      <v-btn
+                        v-if="cleaner.status === 'Available'"
+                        size="x-small"
+                        variant="outlined"
+                        color="primary"
+                        @click="handleQuickAssign(cleaner.id)"
+                      >
+                        Assign
+                      </v-btn>
+                    </template>
+⋮----
+View All Cleaners ({{ cleanerStatusList.length }})
 ⋮----
 {{ formattedDate }}
 ⋮----
@@ -28939,11 +33762,14 @@ View All Cleaners ({{ cleanerStatusList.length }})
 ⋮----
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useDisplay } from 'vuetify';
 import TurnAlerts from '@/components/dumb/shared/TurnAlerts.vue';
 import UpcomingCleanings from '@/components/dumb/shared/UpcomingCleanings.vue';
 import type { Booking, Property, User, BookingWithMetadata } from '@/types';
 import eventLogger from '@/composables/shared/useComponentEventLogger';
 interface Props {
+  modelValue?: boolean;
+  rail?: boolean;
   todayTurns?: Map<string, Booking> | Booking[];
   upcomingCleanings?: Map<string, Booking> | Booking[];
   properties?: Map<string, Property> | Property[];
@@ -28952,6 +33778,8 @@ interface Props {
   loading?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
+  modelValue: true,
+  rail: false,
   todayTurns: () => [],
   upcomingCleanings: () => [],
   properties: () => [],
@@ -28960,6 +33788,7 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false
 });
 interface Emits {
+  (e: 'update:modelValue', value: boolean): void;
   (e: 'navigateToBooking', bookingId: string): void;
   (e: 'navigateToDate', date: Date): void;
   (e: 'navigateToProperty', propertyId: string): void;
@@ -28974,6 +33803,7 @@ interface Emits {
   (e: 'createProperty'): void;
 }
 const emit = defineEmits<Emits>();
+const { mdAndUp } = useDisplay();
 const selectedProperty = ref<string | null>(null);
 const selectedOwner = ref<string | null>(null);
 const selectedStatus = ref<string | null>(null);
@@ -29309,10 +34139,29 @@ onMounted(() => {
 });
 </script>
 <style scoped>
-.admin-sidebar {
+.admin-sidebar-desktop {
   height: 100%;
   overflow-y: auto;
-  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+}
+.admin-sidebar-desktop .v-container {
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
+}
+.admin-sidebar-mobile {
+  height: 100%;
+  overflow-y: auto;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1001 !important;
+}
+.admin-sidebar-mobile .v-container {
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
 }
 .system-turn-alerts {
   border-left: 4px solid rgb(var(--v-theme-warning));
@@ -29339,22 +34188,6 @@ onMounted(() => {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
 }
-.admin-sidebar .v-card {
-  margin-bottom: 8px;
-}
-.admin-sidebar .v-chip {
-  font-size: 0.75rem;
-}
-@media (min-width: 1264px) {
-  .business-analytics .v-col {
-    padding: 4px 8px;
-  }
-}
-@media (max-width: 960px) {
-  .admin-quick-actions .v-btn {
-    font-size: 0.875rem;
-  }
-}
 </style>
 ````
 
@@ -29364,23 +34197,32 @@ onMounted(() => {
   <div class="home-admin-container">
     <v-row
       no-gutters
-      class="fill-height"
+      class="fill-height flex-nowrap"
+      style="height: 100vh;"
     >
       <v-col
         cols="12"
-        lg="3"
-        xl="2"
+        lg="4"
+        xl="3"
         class="sidebar-column"
-        :class="{ 'mobile-hidden': !sidebarOpen }"
       >
-        <v-btn
-          v-if="$vuetify.display.lgAndDown"
-          icon="mdi-menu"
-          variant="text"
-          class="mr-4"
-          @click="toggleSidebar"
-        />
+        <v-app-bar
+          v-if="$vuetify.display.mdAndDown"
+          flat
+          color="transparent"
+          height="48"
+          class="px-0"
+        >
+          <v-app-bar-nav-icon
+            @click="sidebarOpen = !sidebarOpen"
+          />
+          <v-app-bar-title class="text-h6">
+            Business Management
+          </v-app-bar-title>
+        </v-app-bar>
         <AdminSidebar
+          v-model="sidebarOpen"
+          :rail="railMode"
           :today-turns="systemTodayTurns"
           :upcoming-cleanings="systemUpcomingCleanings"
           :properties="allPropertiesMap"
@@ -29394,8 +34236,8 @@ onMounted(() => {
       </v-col>
       <v-col
         cols="12"
-        lg="9"
-        xl="10"
+        lg="8"
+        xl="9"
         class="calendar-column"
       >
         <div class="calendar-header">
@@ -29576,6 +34418,9 @@ const {
 const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
 const sidebarOpen = ref(!xs.value);
 const selectedPropertyFilter = ref<string | null>(null);
+const railMode = computed(() => {
+  return !xs.value && !sidebarOpen.value;
+});
 const isAdminAuthenticated = computed(() => {
   return authStore.isAuthenticated &&
          authStore.user?.role === 'admin';
@@ -30145,29 +34990,48 @@ onUnmounted(() => {
 </script>
 <style scoped>
 .home-admin-container {
-  min-height: calc(100vh - 64px);
+  height: 100vh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .sidebar-column {
-  min-height: calc(100vh - 64px);
-  overflow-y: auto;
-  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  position: relative;
   background-color: rgb(var(--v-theme-surface));
+  padding-right: 0 !important;
+  height: 100vh;
+}
+.sidebar-container {
+  height: 100%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+}
+.sidebar-desktop {
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+.sidebar-mobile-hidden {
+  transform: translateX(-100%);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  background: rgb(var(--v-theme-surface));
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 .calendar-column {
-  min-height: calc(100vh - 64px);
+  height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-left: 0 !important;
 }
 .calendar-header {
   padding: 16px;
   border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   background-color: rgb(var(--v-theme-surface));
   flex-shrink: 0;
-}
-.mobile-hidden {
-  display: none;
+  height: 80px;
 }
 .home-admin-container .calendar-header {
   background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
@@ -30186,33 +35050,26 @@ onUnmounted(() => {
   border-radius: 4px;
   font-weight: 500;
 }
-@media (max-width: 1279px) {
-  .sidebar-column {
-    position: fixed;
-    top: 64px;
-    left: 0;
-    z-index: 1000;
-    width: 100% !important;
-    max-width: 400px;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-    height: calc(100vh - 64px);
+@media (max-width: 959px) {
+  .home-admin-container {
+    position: relative;
   }
-  .mobile-hidden {
-    transform: translateX(-100%);
+  .calendar-column {
     transition: transform 0.3s ease;
   }
-  .sidebar-column:not(.mobile-hidden) {
+  .calendar-column.drawer-open {
     transform: translateX(0);
   }
-}
-@media (min-width: 1280px) {
   .sidebar-column {
-    position: static !important;
+    z-index: 1000;
+  }
+}
+@media (min-width: 960px) {
+  .sidebar-container {
     transform: none !important;
-    width: unset !important;
-    max-width: none !important;
+    position: static !important;
+    z-index: auto !important;
     box-shadow: none !important;
-    height: auto !important;
   }
 }
 @media (max-width: 600px) {
@@ -30233,331 +35090,6 @@ onUnmounted(() => {
   --admin-secondary: rgb(var(--v-theme-secondary));
   --admin-warning: rgb(var(--v-theme-warning));
   --admin-info: rgb(var(--v-theme-info));
-}
-</style>
-````
-
-## File: src/layouts/default.vue
-````vue
-<template>
-  <v-app>
-    <v-app-bar
-      app
-      color="surface"
-      elevation="1"
-      class="border-b"
-    >
-      <v-app-bar-nav-icon
-        @click="toggleSidebar"
-      />
-      <v-app-bar-title class="font-weight-medium">
-        Property Cleaning Scheduler
-      </v-app-bar-title>
-      <v-spacer />
-      <ThemePicker />
-      <v-menu
-        location="bottom end"
-        offset="5"
-      >
-        <template #activator="{ props: menuProps }">
-          <v-btn
-            icon
-            v-bind="menuProps"
-            class="ml-2"
-          >
-            <v-avatar size="36">
-              <v-icon>mdi-account-circle</v-icon>
-            </v-avatar>
-          </v-btn>
-        </template>
-        <v-list min-width="200">
-          <v-list-subheader>User Options</v-list-subheader>
-          <v-list-item
-            prepend-icon="mdi-account-outline"
-            title="Profile"
-          />
-          <v-list-item
-            prepend-icon="mdi-cog-outline"
-            title="Settings"
-          />
-          <v-divider class="my-2" />
-          <v-list-item
-            prepend-icon="mdi-logout"
-            title="Logout"
-            color="error"
-          />
-        </v-list>
-      </v-menu>
-    </v-app-bar>
-    <v-main class="bg-background bg-gradient">
-      <router-view />
-    </v-main>
-    <div id="notification-area">
-    </div>
-    <div id="modal-area">
-    </div>
-  </v-app>
-</template>
-⋮----
-<template #activator="{ props: menuProps }">
-          <v-btn
-            icon
-            v-bind="menuProps"
-            class="ml-2"
-          >
-            <v-avatar size="36">
-              <v-icon>mdi-account-circle</v-icon>
-            </v-avatar>
-          </v-btn>
-        </template>
-⋮----
-<script setup lang="ts">
-  import { ref } from 'vue';
-  import { useDisplay } from 'vuetify';
-  import ThemePicker from '@/components/dumb/shared/ThemePicker.vue';
-  const drawer = ref(true);
-  const rail = ref(false);
-  const { mobile} = useDisplay();
-  const toggleSidebar = (): void => {
-    if (mobile.value) {
-      drawer.value = !drawer.value;
-    } else {
-      rail.value = !rail.value;
-    }
-  };
-  </script>
-<style>
-  .border-b {
-    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
-  }
-  .border-r {
-    border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
-  }
-  .v-app-bar {
-    background: rgb(var(--v-theme-surface)) !important;
-    color: rgb(var(--v-theme-on-surface)) !important;
-    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
-  }
-  .v-main {
-    background: rgb(var(--v-theme-background)) !important;
-    color: rgb(var(--v-theme-on-background)) !important;
-  }
-  .v-list-item {
-    color: rgb(var(--v-theme-on-surface)) !important;
-  }
-  .v-list-item:hover {
-    background: rgba(var(--v-theme-primary), 0.08) !important;
-  }
-  .v-list-item--active {
-    background: rgba(var(--v-theme-primary), 0.12) !important;
-    color: rgb(var(--v-theme-primary)) !important;
-  }
-  .v-avatar {
-    background: rgb(var(--v-theme-primary)) !important;
-  }
-  .v-menu .v-list {
-    background: rgb(var(--v-theme-surface)) !important;
-  }
-  .glass-card {
-    background: rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 16px !important;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-  }
-  .fade-in {
-    animation: fadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1);
-  }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px);}
-    to { opacity: 1; transform: translateY(0);}
-  }
-  .v-btn {
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .v-btn:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 16px rgba(33, 150, 243, 0.15);
-  }
-  </style>
-````
-
-## File: src/pages/index.vue
-````vue
-<template>
-  <div
-    v-if="authStore.loading"
-    class="loading-container"
-  >
-    <v-container class="fill-height">
-      <v-row
-        justify="center"
-        align="center"
-      >
-        <v-col cols="auto">
-          <v-progress-circular
-            indeterminate
-            size="64"
-            color="primary"
-          />
-          <div class="text-h6 mt-4 text-center">
-            Loading...
-          </div>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-  <component
-    :is="homeComponent"
-    v-else
-  />
-</template>
-<script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useUIStore } from '@/stores/ui'
-import HomeOwner from '@/components/smart/owner/HomeOwner.vue'
-import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
-const authStore = useAuthStore()
-const uiStore = useUIStore()
-const AuthPrompt = {
-  template: `
-    <v-container class="fill-height">
-      <v-row justify="center" align="center">
-        <v-col cols="12" sm="8" md="6" lg="4">
-          <v-card elevation="8" class="pa-4">
-            <v-card-title class="text-h5 text-center mb-4">
-              <v-icon class="mr-2" color="primary">mdi-login</v-icon>
-              Authentication Required
-            </v-card-title>
-            <v-card-text class="text-center">
-              <p class="text-body-1 mb-4">
-                Please log in to access the Property Cleaning Scheduler.
-              </p>
-              <v-alert
-                type="info"
-                variant="tonal"
-                class="mb-4"
-              >
-                <strong>Development Mode:</strong><br>
-                Authentication is currently mocked for development.
-                Click "Mock Login" to continue.
-              </v-alert>
-              <v-btn
-                color="primary"
-                size="large"
-                block
-                @click="handleMockLogin"
-                :loading="authStore.loading"
-                class="mb-2"
-              >
-                <v-icon class="mr-2">mdi-shield-account</v-icon>
-                Mock Login (Admin)
-              </v-btn>
-              <v-btn
-                color="secondary"
-                variant="outlined"
-                size="large"
-                block
-                @click="handleMockOwnerLogin"
-                :loading="authStore.loading"
-                class="mb-4"
-              >
-                <v-icon class="mr-2">mdi-home-account</v-icon>
-                Mock Login (Owner)
-              </v-btn>
-              <v-divider class="my-4" />
-              <div class="text-center">
-                <p class="text-body-2 mb-2">
-                  Or use the full authentication flow:
-                </p>
-                <v-btn
-                  color="primary"
-                  variant="text"
-                  @click="goToLogin"
-                  :disabled="authStore.loading"
-                >
-                  Go to Login Page
-                </v-btn>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  `,
-  setup() {
-    const handleMockLogin = async () => {
-      const success = await authStore.login('admin@example.com', 'password')
-      if (success) {
-        uiStore.addNotification('success', 'Welcome!', authStore.getSuccessMessage('login'))
-      }
-    }
-    const handleMockOwnerLogin = async () => {
-      const success = await authStore.login('owner@example.com', 'password')
-      if (success) {
-        uiStore.addNotification('success', 'Welcome!', authStore.getSuccessMessage('login'))
-      }
-    }
-    const goToLogin = () => {
-      window.location.href = '/auth/login'
-    }
-    return {
-      authStore,
-      uiStore,
-      handleMockLogin,
-      handleMockOwnerLogin,
-      goToLogin
-    }
-  }
-}
-const homeComponent = computed(() => {
-  if (!authStore.isAuthenticated) {
-    return AuthPrompt
-  }
-  if (authStore.isAdmin) {
-    if (authStore.tempViewMode?.role === 'owner') {
-      return HomeOwner
-    }
-    return HomeAdmin
-  }
-  if (authStore.isOwner) {
-    return HomeOwner
-  }
-  console.warn('Unknown user role:', authStore.user?.role)
-  return AuthPrompt
-})
-onMounted(async () => {
-  try {
-    await authStore.checkAuth()
-  } catch (error) {
-    console.error('Auth check failed:', error)
-  }
-})
-</script>
-<style scoped>
-.loading-container {
-  min-height: 100vh;
-}
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.3s ease;
-}
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
-}
-.fill-height {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-.v-card {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95);
-}
-.v-btn {
-  text-transform: none;
 }
 </style>
 ````
@@ -32820,7 +37352,7 @@ import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from 
   - Assigned to: Cursor
 
 
-- [] **TASK-UI-FIX_ADMIN-SIDEBAR**: Fix AdminSidebar width responsiveness
+<!-- - [] **TASK-UI-FIX_ADMIN-SIDEBAR**: Fix AdminSidebar width responsiveness
   - Status: Complete
   - Requirements: 
     - ✅ Desktop: Standard sidebar width controlled by parent column
@@ -33069,7 +37601,547 @@ import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from 
   - Notes: Deployment preparation with role-based considerations
   - Assigned to: Cursor
 
+---## **Phase 1F: Critical Architecture Completion** 
+**(URGENT - Complete Role-Based Migration)** -->
+
+### **Complete Missing Role-Based Components**
+- [ ] **TASK-060**: Create OwnerSidebar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Create `src/components/smart/owner/OwnerSidebar.vue`
+    - Filter navigation to owner-specific features only
+    - Remove admin-only navigation items (cleaner management, system reports)
+    - Add owner-specific quick actions (Add Property, View My Bookings)
+    - Implement owner-friendly navigation labels and icons
+    - Use owner-specific color scheme and styling
+    - Integrate with existing OwnerQuickActions component
+  - Notes: Replace generic Sidebar.vue for owner role
+  - Files: src/components/smart/owner/OwnerSidebar.vue
+  - Verification: Owner sees only relevant navigation, no admin features
+  - Assigned to: Cursor
+
+- [ ] **TASK-061**: Create OwnerCalendar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Create `src/components/smart/owner/OwnerCalendar.vue`
+    - Filter calendar events to owner's properties only
+    - Implement owner-specific calendar controls (OwnerCalendarControls)
+    - Add owner-specific event creation workflows
+    - Remove admin-only features (cleaner assignment, system-wide view)
+    - Add owner-specific calendar views (My Properties, My Bookings)
+    - Implement owner-specific event styling and indicators
+  - Notes: Replace generic FullCalendar.vue for owner role
+  - Files: src/components/smart/owner/OwnerCalendar.vue
+  - Dependencies: OwnerCalendarControls.vue component
+  - Verification: Owner sees only their property events and bookings
+  - Assigned to: Cursor
+
+- [ ] **TASK-062**: Create AdminSidebar.vue component
+  - Status: Not Started
+  - Requirements:
+    - Create `src/components/smart/admin/AdminSidebar.vue`
+    - Include full admin navigation (cleaners, reports, system management)
+    - Add admin-specific quick actions and system controls
+    - Implement admin-focused styling and iconography
+    - Add system status indicators and alerts
+    - Include business metrics in sidebar summary
+    - Add role switcher component integration
+  - Notes: Comprehensive admin navigation interface
+  - Files: src/components/smart/admin/AdminSidebar.vue
+  - Verification: Admin sees full system navigation and controls
+  - Assigned to: Cursor
+
+- [ ] **TASK-063**: Fix TypeScript issues in HomeOwner.vue
+  - Status: Not Started
+  - Requirements:
+    - Resolve all TypeScript compilation errors in HomeOwner.vue
+    - Add proper type definitions for role-based data filtering
+    - Fix prop type definitions and component interfaces
+    - Add proper error handling type annotations
+    - Ensure type safety for owner-specific data access
+    - Add comprehensive JSDoc comments for complex functions
+  - Notes: Critical for production stability
+  - Files: src/components/smart/owner/HomeOwner.vue, src/types/
+  - Verification: TypeScript compiles without errors, proper IntelliSense
+  - Assigned to: Cursor
+
+- [ ] **TASK-064**: Fix AdminCalendar.vue DOM mounting issues
+  - Status: Not Started
+  - Requirements:
+    - Resolve "Cannot read properties of null (reading 'parentNode')" error
+    - Add proper DOM mounting safety checks and guards
+    - Implement proper component lifecycle management
+    - Add error boundaries for calendar component failures
+    - Ensure proper cleanup on component unmount
+    - Add retry mechanisms for calendar initialization failures
+  - Notes: Critical for /admin/schedule route stability
+  - Files: src/components/smart/admin/AdminCalendar.vue
+  - Verification: Admin calendar route loads without errors
+  - Assigned to: Cursor
+
+### **Update Component Integration**
+- [ ] **TASK-065**: Update HomeOwner.vue to use new role-specific components
+  - Status: Not Started
+  - Requirements:
+    - Replace generic Sidebar with OwnerSidebar
+    - Replace generic FullCalendar with OwnerCalendar
+    - Update component imports and references
+    - Ensure proper prop passing to new components
+    - Test integration of owner-specific workflows
+    - Verify data filtering consistency across components
+  - Notes: Final integration of owner role components
+  - Files: src/components/smart/owner/HomeOwner.vue
+  - Dependencies: TASK-060, TASK-061
+  - Verification: Owner interface uses all role-specific components
+  - Assigned to: Cursor
+
+- [ ] **TASK-066**: Update HomeAdmin.vue to use AdminSidebar
+  - Status: Not Started
+  - Requirements:
+    - Replace generic Sidebar with AdminSidebar (if not already done)
+    - Ensure AdminCalendar integration works properly
+    - Update component imports and references
+    - Test admin-specific workflow integration
+    - Verify system-wide data access functionality
+  - Notes: Complete admin role component integration
+  - Files: src/components/smart/admin/HomeAdmin.vue
+  - Dependencies: TASK-062, TASK-064
+  - Verification: Admin interface uses all role-specific components
+  - Assigned to: Cursor
+
 ---
+
+## **Phase 1G: Code Cleanup & Organization** 
+**(HIGH PRIORITY - Remove Technical Debt)**
+
+### **Remove Development Artifacts**
+- [ ] **TASK-067**: Move demo components to development folder
+  - Status: Not Started
+  - Requirements:
+    - Create `src/dev/` folder for development-only components
+    - Move all demo components to `src/dev/demos/`
+    - Update import paths for any remaining demo references
+    - Configure build to exclude `src/dev/` from production bundle
+    - Update .gitignore to handle development artifacts appropriately
+    - Create README.md in dev folder explaining purpose
+  - Files to Move:
+    ```
+    src/components/demos/ → src/dev/demos/
+    src/pages/demos/ → src/dev/pages/
+    src/components/dumb/PropertyCardDemo.vue → src/dev/demos/
+    ```
+  - Notes: Clean separation of dev vs production code
+  - Verification: Production build excludes demo components, dev server still includes them
+  - Assigned to: Cursor
+
+- [ ] **TASK-068**: Remove redundant generic components after migration
+  - Status: Not Started
+  - Requirements:
+    - ⚠️ ONLY after TASK-060, TASK-061, TASK-062 are complete
+    - Remove `src/components/smart/Home.vue` (replaced by HomeOwner/HomeAdmin)
+    - Remove `src/components/smart/Sidebar.vue` (replaced by role-specific versions)
+    - Remove `src/components/smart/FullCalendar.vue` (if replaced by role-specific)
+    - Update any remaining references to removed components
+    - Verify no broken imports or references remain
+    - Archive removed components in git history
+  - Notes: Final cleanup after successful migration
+  - Files: List of generic components to remove
+  - Dependencies: Complete role-based component migration
+  - Verification: Application works without old generic components
+  - Assigned to: Cursor
+
+- [ ] **TASK-069**: Clean up tasks.md file
+  - Status: Not Started
+  - Requirements:
+    - Archive completed tasks to `docs/completed-tasks.md`
+    - Remove obsolete or superseded tasks
+    - Reorganize remaining tasks by current priority
+    - Update task numbering for consistency
+    - Add cross-references between related tasks
+    - Update status for partially completed items
+  - Notes: Improve project management clarity
+  - Files: tasks.md, docs/completed-tasks.md
+  - Verification: tasks.md is organized and current
+  - Assigned to: Human + Cursor
+
+### **Import Path Optimization**
+- [ ] **TASK-070**: Audit and fix import paths after composables migration
+  - Status: Not Started
+  - Requirements:
+    - Run comprehensive search for old import paths: `grep -r "from '@/composables/use" src/ --exclude-dir=shared`
+    - Fix any remaining non-shared composable imports
+    - Verify all imports use correct `@/composables/shared/` path
+    - Add linting rules to prevent future incorrect imports
+    - Create import path documentation for developers
+    - Test that all imports resolve correctly
+  - Notes: Ensure consistency after recent composables reorganization
+  - Files: All source files with composable imports
+  - Verification: No old import paths remain, linting passes
+  - Assigned to: Cursor
+
+- [ ] **TASK-071**: Optimize component import structure
+  - Status: Not Started
+  - Requirements:
+    - Create barrel exports for component folders (index.ts files)
+    - Standardize import naming conventions across the project
+    - Group imports by category (Vue, external libs, internal, types)
+    - Add automated import sorting with ESLint/Prettier
+    - Create component import guidelines documentation
+    - Update existing components to follow new import standards
+  - Notes: Improve developer experience and code consistency
+  - Files: All component files, new index.ts barrel exports
+  - Verification: Consistent import patterns, improved IntelliSense
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1H: Architecture Improvements** 
+**(MEDIUM PRIORITY - Performance & Maintainability)**
+
+### **State Management Optimization**
+- [ ] **TASK-072**: Move role-based filtering to store level
+  - Status: Not Started
+  - Requirements:
+    - Create `src/stores/ownerData.ts` store for owner-scoped data
+    - Create `src/stores/adminData.ts` store for admin-scoped data
+    - Move filtering logic from components to stores
+    - Implement role-based data access patterns in stores
+    - Add role-based cache invalidation strategies
+    - Create composables that automatically apply role filtering
+    - Update components to use role-specific stores
+  - Notes: Centralize data access control and improve performance
+  - Files: New store files, updated composables, component updates
+  - Verification: Role filtering happens at store level, better performance
+  - Assigned to: Cursor
+
+- [ ] **TASK-073**: Implement role-based data access controls
+  - Status: Not Started
+  - Requirements:
+    - Create data access control middleware for stores
+    - Add runtime checks for role-based data access
+    - Implement data sanitization for role-based views
+    - Add audit logging for data access patterns
+    - Create role-based data validation utilities
+    - Add tests for data access control compliance
+  - Notes: Enhance security and data isolation
+  - Files: src/middleware/, src/utils/dataAccess.ts, test files
+  - Verification: Owners cannot access other owners' data
+  - Assigned to: Cursor
+
+### **Type Safety & Error Handling**
+- [ ] **TASK-074**: Complete TypeScript strict mode compliance
+  - Status: Not Started
+  - Requirements:
+    - Enable strict TypeScript mode in tsconfig.json
+    - Fix all TypeScript errors and warnings
+    - Add comprehensive type definitions for all interfaces
+    - Implement runtime type validation for critical data flows
+    - Add type guards for external data sources
+    - Create comprehensive type documentation
+  - Notes: Improve code quality and catch bugs early
+  - Files: tsconfig.json, all TypeScript files, new type definitions
+  - Verification: TypeScript strict mode compiles without errors
+  - Assigned to: Cursor
+
+- [ ] **TASK-075**: Implement comprehensive error handling system
+  - Status: Not Started
+  - Requirements:
+    - Create global error boundary component
+    - Implement role-specific error message templates
+    - Add error reporting and analytics integration
+    - Create error recovery workflows for common failures
+    - Add user-friendly error display components
+    - Implement automatic error retry mechanisms
+  - Notes: Build on existing error foundations
+  - Files: src/components/ErrorBoundary.vue, error handling utilities
+  - Dependencies: Existing error handling tasks (TASK-040 to TASK-043)
+  - Verification: Graceful error handling throughout application
+  - Assigned to: Cursor
+
+### **Performance Optimization**
+- [ ] **TASK-076**: Implement code splitting and lazy loading
+  - Status: Not Started
+  - Requirements:
+    - Split owner vs admin bundles using dynamic imports
+    - Implement lazy loading for route-based components
+    - Add preloading strategies for critical routes
+    - Optimize component bundle sizes with tree shaking
+    - Add bundle analysis and monitoring tools
+    - Create performance budgets for bundle sizes
+  - Notes: Improve initial load time and user experience
+  - Files: router configuration, vite.config.ts, component imports
+  - Verification: Smaller initial bundle size, faster load times
+  - Assigned to: Cursor
+
+- [ ] **TASK-077**: Optimize component re-rendering and memoization
+  - Status: Not Started
+  - Requirements:
+    - Add Vue 3 memoization patterns where appropriate
+    - Optimize computed property dependencies
+    - Implement proper component key strategies
+    - Add performance profiling for component updates
+    - Optimize store subscriptions and reactive patterns
+    - Create performance monitoring dashboard
+  - Notes: Improve runtime performance and responsiveness
+  - Files: All components, stores, performance monitoring
+  - Verification: Improved application responsiveness
+  - Assigned to: Cursor
+
+### **Build and Configuration Optimization**
+- [ ] **TASK-078**: Configure build optimization for production
+  - Status: Not Started
+  - Requirements:
+    - Configure Vite for optimal production builds
+    - Exclude development components from production bundle
+    - Add compression and minification optimizations
+    - Configure proper caching strategies for assets
+    - Add build-time environment variable handling
+    - Create production deployment checklist
+  - Notes: Optimize production deployment
+  - Files: vite.config.ts, build scripts, deployment configuration
+  - Verification: Optimized production builds, excluded dev code
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1I: Testing & Quality Assurance** 
+**(MEDIUM PRIORITY - Comprehensive Testing)**
+
+### **Role-Based Component Testing**
+- [ ] **TASK-079**: Create role-based testing utilities
+  - Status: Not Started
+  - Requirements:
+    - Create test utilities for mounting owner components with mock data
+    - Create test utilities for mounting admin components with mock data
+    - Add role-based mock factories for realistic test data
+    - Create shared test helpers for role-based workflows
+    - Add visual regression testing for role-specific interfaces
+    - Create accessibility testing utilities for both roles
+  - Notes: Expand existing Vitest setup for role-based testing
+  - Files: src/test/utils/, mock factories, test helpers
+  - Verification: Easy testing of role-based components
+  - Assigned to: Cursor
+
+- [ ] **TASK-080**: Add comprehensive unit tests for owner components
+  - Status: Not Started
+  - Requirements:
+    - Test HomeOwner.vue with proper data filtering
+    - Test OwnerSidebar.vue navigation and permissions
+    - Test OwnerCalendar.vue event filtering and interactions
+    - Test owner-specific error handling and edge cases
+    - Test owner data isolation and security
+    - Achieve 80%+ coverage for owner-specific code paths
+  - Notes: Critical for owner role stability
+  - Files: Test files for all owner components
+  - Dependencies: TASK-079, completion of owner components
+  - Verification: High test coverage for owner functionality
+  - Assigned to: Cursor
+
+- [ ] **TASK-081**: Add comprehensive unit tests for admin components
+  - Status: Not Started
+  - Requirements:
+    - Test HomeAdmin.vue with system-wide data access
+    - Test AdminSidebar.vue full functionality and permissions
+    - Test AdminCalendar.vue system management features
+    - Test admin-specific error handling and business logic
+    - Test admin system control workflows
+    - Achieve 80%+ coverage for admin-specific code paths
+  - Notes: Critical for admin role stability
+  - Files: Test files for all admin components
+  - Dependencies: TASK-079, completion of admin components
+  - Verification: High test coverage for admin functionality
+  - Assigned to: Cursor
+
+### **Integration and E2E Testing**
+- [ ] **TASK-082**: Create role-based integration tests
+  - Status: Not Started
+  - Requirements:
+    - Test complete owner workflows (property → booking → calendar)
+    - Test complete admin workflows (system management → reports)
+    - Test role switching and permission boundaries
+    - Test cross-role data updates and synchronization
+    - Test role-based error scenarios and recovery
+    - Add automated testing for critical business workflows
+  - Notes: Ensure role-based system works end-to-end
+  - Files: Integration test suite, workflow test scenarios
+  - Verification: Critical workflows work correctly for both roles
+  - Assigned to: Cursor
+
+- [ ] **TASK-083**: Add accessibility testing for role-based interfaces
+  - Status: Not Started
+  - Requirements:
+    - Test keyboard navigation for owner interface
+    - Test keyboard navigation for admin interface
+    - Add screen reader compatibility testing
+    - Test color contrast and visual accessibility
+    - Add ARIA label validation for role-specific components
+    - Create accessibility compliance reports
+  - Notes: Ensure application is accessible to all users
+  - Files: Accessibility test suite, compliance documentation
+  - Verification: WCAG 2.1 AA compliance for both interfaces
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1J: Documentation & Developer Experience** 
+**(LOW PRIORITY - Long-term Maintenance)**
+
+### **Architecture Documentation**
+- [ ] **TASK-084**: Create comprehensive role-based architecture documentation
+  - Status: Not Started
+  - Requirements:
+    - Document role-based component patterns and conventions
+    - Create diagrams showing role-based data flow
+    - Document role-based security and permission patterns
+    - Add guidelines for extending role-based functionality
+    - Create onboarding guide for new developers
+    - Document role-based testing strategies
+  - Notes: Enable future development and maintenance
+  - Files: docs/architecture/, README updates, developer guides
+  - Verification: Clear documentation for role-based system
+  - Assigned to: Human + Cursor
+
+- [ ] **TASK-085**: Update project README and documentation
+  - Status: Not Started
+  - Requirements:
+    - Update README.md with role-based architecture explanation
+    - Add setup instructions for role-based development
+    - Document environment variables and configuration
+    - Add troubleshooting guide for common role-based issues
+    - Create development workflow documentation
+    - Add links to all relevant documentation
+  - Notes: Improve project onboarding and maintenance
+  - Files: README.md, docs/ folder updates
+  - Verification: Clear project documentation and setup instructions
+  - Assigned to: Human + Cursor
+
+### **Code Quality and Standards**
+- [ ] **TASK-086**: Establish role-based coding standards
+  - Status: Not Started
+  - Requirements:
+    - Create coding standards document for role-based components
+    - Add ESLint rules for role-based patterns
+    - Create component templates for consistent structure
+    - Add automated code quality checks in CI/CD
+    - Create code review checklist for role-based features
+    - Add pre-commit hooks for code quality enforcement
+  - Notes: Ensure consistent code quality across team
+  - Files: .eslintrc.json, coding standards doc, templates
+  - Verification: Automated code quality enforcement
+  - Assigned to: Cursor
+
+- [ ] **TASK-087**: Create development environment optimization
+  - Status: Not Started
+  - Requirements:
+    - Optimize Vite dev server for role-based development
+    - Add hot module replacement for role-specific components
+    - Create development shortcuts and productivity tools
+    - Add debugging utilities for role-based data flow
+    - Optimize build times for development workflow
+    - Create developer productivity documentation
+  - Notes: Improve developer experience and productivity
+  - Files: vite.config.ts, dev tools, productivity guides
+  - Verification: Faster development cycle, better DX
+  - Assigned to: Cursor
+
+---
+
+## **Phase 1K: Security & Deployment** 
+**(LOW PRIORITY - Production Readiness)**
+
+### **Security Hardening**
+- [ ] **TASK-088**: Implement client-side security for role-based access
+  - Status: Not Started
+  - Requirements:
+    - Add route guards for role-based access control
+    - Implement session validation for role permissions
+    - Add CSRF protection for role-based forms
+    - Create security audit utilities for role-based features
+    - Add penetration testing for role-based vulnerabilities
+    - Document security best practices for role-based development
+  - Notes: Harden application against security vulnerabilities
+  - Files: src/security/, route guards, security documentation
+  - Verification: Security audit passes, no role-based vulnerabilities
+  - Assigned to: Cursor
+
+- [ ] **TASK-089**: Add audit logging and monitoring
+  - Status: Not Started
+  - Requirements:
+    - Implement audit logging for role-based actions
+    - Add monitoring for role-based performance metrics
+    - Create alerting for role-based security events
+    - Add user activity tracking for compliance
+    - Create audit report generation utilities
+    - Add GDPR compliance features for data handling
+  - Notes: Enable monitoring and compliance for production
+  - Files: src/audit/, monitoring configuration, compliance docs
+  - Verification: Comprehensive audit trail and monitoring
+  - Assigned to: Cursor
+
+### **Production Deployment**
+- [ ] **TASK-090**: Configure production deployment for role-based system
+  - Status: Not Started
+  - Requirements:
+    - Configure environment-specific builds for role-based features
+    - Add production deployment scripts and automation
+    - Configure monitoring and logging for production
+    - Add health checks for role-based functionality
+    - Create rollback procedures for role-based deployments
+    - Add production testing and validation procedures
+  - Notes: Ensure smooth production deployment
+  - Files: Deployment scripts, CI/CD configuration, ops documentation
+  - Verification: Successful production deployment with monitoring
+  - Assigned to: Human + Cursor
+
+---
+
+## **Updated Priority Order**
+
+### **CRITICAL (Complete Immediately)**
+1. **Phase 1F**: Complete role-based architecture (TASK-060 to TASK-066)
+2. **Phase 1G**: Code cleanup and organization (TASK-067 to TASK-071)
+
+### **HIGH PRIORITY (Next Sprint)**
+3. **Phase 1H**: Architecture improvements (TASK-072 to TASK-078)
+4. **Phase 1I**: Testing and quality assurance (TASK-079 to TASK-083)
+
+### **MEDIUM PRIORITY (Future Iterations)**
+5. **Phase 1J**: Documentation and developer experience (TASK-084 to TASK-087)
+6. **Phase 1K**: Security and deployment (TASK-088 to TASK-090)
+
+---
+
+## **Task Dependencies Map**
+
+```
+TASK-060 (OwnerSidebar) → TASK-065 (Integration)
+TASK-061 (OwnerCalendar) → TASK-065 (Integration) → TASK-080 (Owner Tests)
+TASK-062 (AdminSidebar) → TASK-066 (Integration)
+TASK-063 (TypeScript fixes) → TASK-074 (Strict mode)
+TASK-064 (AdminCalendar fixes) → TASK-066 (Integration) → TASK-081 (Admin Tests)
+
+TASK-065, TASK-066 → TASK-068 (Remove old components)
+TASK-067 (Move demos) → TASK-078 (Build optimization)
+TASK-072 (Store optimization) → TASK-082 (Integration tests)
+TASK-079 (Test utilities) → TASK-080, TASK-081 (Component tests)
+```
+
+---
+
+## **Notes for Implementation**
+
+### **Critical Success Factors**
+- ⚠️ **DO NOT** remove old components until new ones are complete and tested
+- 🔒 **ALWAYS** verify role-based data isolation after each change
+- 📊 **TEST** each component individually before integration
+- 🧹 **CLEAN UP** one phase completely before starting the next
+
+### **Development Guidelines**
+- Use existing coding standards and patterns
+- Maintain backward compatibility during migration
+- Document all breaking changes and migration steps
+- Test role switching functionality after each major change
+- Keep demo components functional in development environment
 
 ## **Updated Notes Section**
 
