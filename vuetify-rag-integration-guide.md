@@ -1,4 +1,3 @@
-### Vuetify RAG API Examples - Property Cleaning Scheduler
 
 ### Server: http: //localhost:8000
 

@@ -1,0 +1,7 @@
+# Simple uptime script (run locally or in GitHub Actions)
+#!/bin/bash
+while true; do
+  curl -s "https://vuetify-rag-api.onrender.com" > /dev/null
+  echo "Pinged at $(date)"
+  sleep 300  # Every 5 minutes
+done
