@@ -189,109 +189,6 @@ vitest.config.ts
 
 # Files
 
-## File: .cursor/rules/settings.json
-````json
-{
-  "tools": [
-    {
-      "name": "vuetify_rag",
-      "description": "Query Vuettify documentation using RAG API",
-      "command": "curl",
-      "args": [
-        "-X", "POST",
-        "http://localhost:8000/ask",
-        "-H", "Content-Type: application/json",
-        "-d", "{\"query\": \"$1\", \"context\": \"$2\", \"type\": \"coding\"}"
-      ],
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "query": {"type": "string", "description": "Vuettify question"},
-          "context": {"type": "string", "description": "Current code context"}
-        }
-      }
-    }
-  ]
-}
-````
-
-## File: .cursor/vuetify_component_help.md
-````markdown
-🎯 VUETTIFY RAG REQUEST
-
-Query my API @vuetify-rag
-- Question: "[QUESTION]"
-- Context: "[CURRENT_COMPONENT_CODE]"
-- Focus: Role-based architecture (Owner/Admin)
-
-Format response as:
-1. ✅ Direct answer
-2. 🔧 Working code example
-3. 🏗️ Integration with my role-based components
-4. 📚 Related Vuettify components
-````
-
-## File: .cursor/vuetify_context_call_.md
-````markdown
-Using my Vuettify RAG API context (1,990 documentation chunks), help me:
-
-1. Create OwnerSidebar.vue component
-2. Use role-based navigation patterns
-3. Implement responsive design
-4. Follow TypeScript best practices
-
-Current context:
-- Building TASK-060 from tasks_v2.md
-- Need owner-specific navigation only
-- Integration with existing OwnerQuickActions
-
-Suggest the most appropriate Vuettify components and provide working examples.
-````
-
-## File: .cursor/vuetify_troubleshooting.md
-````markdown
-Template 2: Troubleshooting
-🐛 VUETTIFY TROUBLESHOOTING
-
-Call my API @vuetify-rag to debug:
-- Issue: "[DESCRIBE_PROBLEM]"
-- Current code: "[PASTE_CODE]"
-- Component: "[COMPONENT_NAME]"
-- Role context: [Owner/Admin]
-
-Provide:
-1. Root cause analysis
-2. Fixed code
-3. Best practices for role-based components
-````
-
-## File: src/composables/owner/useOwnersDashboard.ts
-````typescript
-import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useOwnerBookings } from './useOwnerBookings';
-import { useOwnerProperties } from './useOwnerProperties';
-import { useOwnerCalendarState } from './useOwnerCalendarState';
-import { useOwnerErrorHandler } from './useOwnerErrorHandler';
-import { useAuth } from '@/composables/shared/useAuth';
-import { useUIStore } from '@/stores/ui';
-import type {
-  Booking,
-  Property,
-  BookingFormData,
-  PropertyFormData,
-  CalendarView
-} from '@/types';
-import type {
-  DateSelectArg,
-  EventClickArg,
-  EventDropArg
-} from '@fullcalendar/core';
-export function useOwnerDashboard()
-⋮----
-const initializeDashboard = async () =>
-````
-
 ## File: .cursor/rules/askvuetifyexpert.mdc
 ````
 ---
@@ -443,6 +340,32 @@ Every layout recommendation must include:
 
 
 Always prioritize user experience while maintaining technical excellence.
+````
+
+## File: .cursor/rules/settings.json
+````json
+{
+  "tools": [
+    {
+      "name": "vuetify_rag",
+      "description": "Query Vuettify documentation using RAG API",
+      "command": "curl",
+      "args": [
+        "-X", "POST",
+        "http://localhost:8000/ask",
+        "-H", "Content-Type: application/json",
+        "-d", "{\"query\": \"$1\", \"context\": \"$2\", \"type\": \"coding\"}"
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "description": "Vuettify question"},
+          "context": {"type": "string", "description": "Current code context"}
+        }
+      }
+    }
+  ]
+}
 ````
 
 ## File: .cursor/rules/taskexecutor.mdc
@@ -618,6 +541,56 @@ Additional: "role switching + system status"
 
 
 This rule provides a flexible template that adapts based on the parameters you provide in chat!
+````
+
+## File: .cursor/vuetify_component_help.md
+````markdown
+🎯 VUETTIFY RAG REQUEST
+
+Query my API @vuetify-rag
+- Question: "[QUESTION]"
+- Context: "[CURRENT_COMPONENT_CODE]"
+- Focus: Role-based architecture (Owner/Admin)
+
+Format response as:
+1. ✅ Direct answer
+2. 🔧 Working code example
+3. 🏗️ Integration with my role-based components
+4. 📚 Related Vuettify components
+````
+
+## File: .cursor/vuetify_context_call_.md
+````markdown
+Using my Vuettify RAG API context (1,990 documentation chunks), help me:
+
+1. Create OwnerSidebar.vue component
+2. Use role-based navigation patterns
+3. Implement responsive design
+4. Follow TypeScript best practices
+
+Current context:
+- Building TASK-060 from tasks_v2.md
+- Need owner-specific navigation only
+- Integration with existing OwnerQuickActions
+
+Suggest the most appropriate Vuettify components and provide working examples.
+````
+
+## File: .cursor/vuetify_troubleshooting.md
+````markdown
+Template 2: Troubleshooting
+🐛 VUETTIFY TROUBLESHOOTING
+
+Call my API @vuetify-rag to debug:
+- Issue: "[DESCRIBE_PROBLEM]"
+- Current code: "[PASTE_CODE]"
+- Component: "[COMPONENT_NAME]"
+- Role context: [Owner/Admin]
+
+Provide:
+1. Root cause analysis
+2. Fixed code
+3. Best practices for role-based components
 ````
 
 ## File: .cursorignore
@@ -10293,6 +10266,33 @@ function showHelpfulTip(
 function clearOwnerErrors(): void
 ````
 
+## File: src/composables/owner/useOwnersDashboard.ts
+````typescript
+import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useOwnerBookings } from './useOwnerBookings';
+import { useOwnerProperties } from './useOwnerProperties';
+import { useOwnerCalendarState } from './useOwnerCalendarState';
+import { useOwnerErrorHandler } from './useOwnerErrorHandler';
+import { useAuth } from '@/composables/shared/useAuth';
+import { useUIStore } from '@/stores/ui';
+import type {
+  Booking,
+  Property,
+  BookingFormData,
+  PropertyFormData,
+  CalendarView
+} from '@/types';
+import type {
+  DateSelectArg,
+  EventClickArg,
+  EventDropArg
+} from '@fullcalendar/core';
+export function useOwnerDashboard()
+⋮----
+const initializeDashboard = async () =>
+````
+
 ## File: src/composables/shared/useBookings.ts
 ````typescript
 import { ref, computed } from 'vue';
@@ -16641,271 +16641,6 @@ npm run type-check
 - [ ] Uses correct import paths
 
 This documentation provides the foundation for implementing your critical role-based architecture tasks while maintaining consistency with your existing codebase patterns.
-````
-
-## File: task_specific_prompts.md
-````markdown
-# 🎯 TASK-SPECIFIC PROMPTS - Phase 1F Priority Tasks
-
-## 📋 **TASK-060: Create OwnerSidebar.vue Component**
-
-### **Context Research Phase**
-```bash
-# Get Vue 3 and Vuetify documentation for sidebar components
-get-library-docs /vuejs/docs --topic="composition-api components props"
-get-library-docs /vuetifyjs/vuetify --topic="navigation-drawer list-item theming"
-```
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Owner-only navigation items (no cleaner management, no system reports)
-- Integration with OwnerQuickActions component
-- Owner-specific color scheme and styling
-- Filter navigation to owner-specific features only
-- Add owner-specific quick actions (Add Property, View My Bookings)
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/owner/OwnerSidebar.vue`
-- **Base Pattern**: Study existing `src/components/smart/Sidebar.vue` for structure
-- **Key Integrations**: OwnerQuickActions component, auth store for owner data
-- **Navigation Items**: Properties, My Bookings, Calendar, Settings (NO admin items)
-
-### **Verification Checklist**
-- [ ] Owner sees only relevant navigation (Properties, Bookings, Calendar)
-- [ ] No admin features visible (Cleaner Management, System Reports)
-- [ ] OwnerQuickActions properly integrated
-- [ ] Owner-specific styling applied
-- [ ] Navigation state syncs with current route
-
----
-
-## 📋 **TASK-061: Create OwnerCalendar.vue Component**
-
-### **Context Research Phase**
-```bash
-# Get FullCalendar and Vue documentation for calendar integration
-project_knowledge_search "calendar vuetify layout examples responsive"
-project_knowledge_search "owner calendar controls date picker"
-
-get-library-docs /fullcalendar/fullcalendar --topic="vue-integration events"
-get-library-docs /vuejs/docs --topic="composition-api computed reactive"
-get-library-docs /fullcalendar/fullcalendar --topic="vue-integration events drag-drop"
-get-library-docs /vuetifyjs/vuetify --topic="components theming"
-```
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Filter calendar events to owner's properties only
-- Implement OwnerCalendarControls integration
-- Add owner-specific event creation workflows
-- Remove admin-only features (cleaner assignment, system-wide view)
-- Owner-specific calendar views and styling
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/owner/OwnerCalendar.vue`
-- **Base Pattern**: Study existing `src/components/smart/FullCalendar.vue`
-- **Data Filtering**: Only show events for authenticated owner's properties
-- **Dependencies**: OwnerCalendarControls.vue component (create if missing)
-
-### **Verification Checklist**
-- [ ] Owner sees only their property events and bookings
-- [ ] OwnerCalendarControls properly integrated
-- [ ] No admin-only features (cleaner assignment views)
-- [ ] Owner-specific event styling and indicators work
-- [ ] Event creation workflow is owner-optimized
-
----
-
-## 📋 **TASK-062: Create AdminSidebar.vue Component**
-
-### **Context Research Phase**
-```bash
-# Get Vuetify and Vue documentation for comprehensive admin navigation
-project_knowledge_search "admin dashboard navigation vuetify complex layout"
-project_knowledge_search "expansion panels badges sidebar examples"
-
-get-library-docs /vuetifyjs/vuetify --topic="navigation-drawer "
-get-library-docs /vuejs/docs --topic="composition-api computed dynamic-components"
-```
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Full admin navigation (cleaners, reports, system management)
-- Admin-specific quick actions and system controls
-- System status indicators and alerts
-- Business metrics in sidebar summary
-- Role switcher component integration
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/admin/AdminSidebar.vue`
-- **Full Feature Set**: Cleaners, Properties, Bookings, Reports, System Settings
-- **System Controls**: Status indicators, role switcher, business metrics
-- **Admin Styling**: Professional admin-focused UI with comprehensive navigation
-
-### **Verification Checklist**
-- [ ] Admin sees full system navigation and controls
-- [ ] System status indicators functional
-- [ ] Business metrics displayed in sidebar
-- [ ] Role switcher integration works
-- [ ] All admin features accessible from navigation
-
----
-
-## 📋 **TASK-063: Fix TypeScript Errors in Admin Components**
-
-### **Context Research Phase**
-get-library-docs /microsoft/typescript --topic="interfaces type-guards error-handling"
-get-library-docs /vuejs/docs --topic="typescript composition-api"
-
-# Your project context for existing patterns
-project_knowledge_search "typescript interfaces admin components"
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Identify all TypeScript errors in admin components
-- Fix type definitions and interfaces
-- Ensure proper typing for admin-specific data
-- Update import paths and type exports
-- Verify compilation with strict mode
-
-### **Implementation Specifics**
-- **Scope**: All files in `src/components/smart/admin/` and `src/components/dumb/admin/`
-- **Common Issues**: Missing type definitions, incorrect prop types, store typing
-- **Tools**: Use `npm run type-check` to identify specific errors
-
-### **Verification Checklist**
-- [ ] `npm run type-check` passes without errors
-- [ ] All admin components have proper TypeScript interfaces
-- [ ] Props and emits are correctly typed
-- [ ] Store integrations are properly typed
-- [ ] Import/export statements are correct
-
----
-
-## 📋 **TASK-064: Fix AdminCalendar.vue Component**
-
-### **Context Research Phase**
-```bash
-# Get FullCalendar and TypeScript documentation for admin calendar
-project_knowledge_search "calendar admin interface data table complex vuetify"
-project_knowledge_search "drag drop calendar vuetify examples"
-
-# Official docs for technical details
-get-library-docs /fullcalendar/fullcalendar --topic="vue-integration drag-drop resources"
-get-library-docs /microsoft/typescript --topic="interfaces generics"
-```
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Fix existing TypeScript errors in AdminCalendar.vue
-- Ensure admin-specific features work (cleaner assignment, system-wide view)
-- Fix integration with admin stores and composables
-- Verify all calendar functionality for admin role
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/admin/AdminCalendar.vue`
-- **Admin Features**: System-wide calendar view, cleaner assignment, drag-drop
-- **Data Scope**: All properties and bookings across all owners
-- **Integration**: Admin stores, cleaner management, booking assignment
-
-### **Verification Checklist**
-- [ ] TypeScript compilation passes for AdminCalendar
-- [ ] Admin sees all properties and bookings on calendar
-- [ ] Cleaner assignment functionality works
-- [ ] Drag-drop operations function correctly
-- [ ] System-wide calendar view displays properly
-
----
-
-## 📋 **TASK-065: Integrate Owner Components in HomeOwner.vue**
-```
-### **Context Research Phase**
-project_knowledge_search "layout responsive dashboard owner interface"
-project_knowledge_search "component integration homeowner patterns"
-
-# Official docs for orchestration patterns
-get-library-docs /vuejs/docs --topic="composition-api components props-emit"
-```
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Integrate OwnerSidebar and OwnerCalendar into HomeOwner.vue
-- Ensure proper data flow between owner components
-- Maintain existing HomeOwner orchestrator pattern
-- Test role-based data filtering works end-to-end
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/owner/HomeOwner.vue`
-- **Dependencies**: TASK-060 (OwnerSidebar), TASK-061 (OwnerCalendar)
-- **Integration Pattern**: Central orchestrator with role-specific components
-- **Data Flow**: Auth store → HomeOwner → child components
-
-### **Verification Checklist**
-- [ ] OwnerSidebar and OwnerCalendar properly integrated
-- [ ] Owner interface shows only owner-scoped data
-- [ ] Component communication works correctly
-- [ ] Role-based data isolation maintained
-- [ ] UI store integration for modals/sidebars works
-
----
-
-## 📋 **TASK-066: Integrate Admin Components in HomeAdmin.vue**
-
-### **Context Research Phase**
-```bash
-# Your custom RAG for complex admin layouts
-project_knowledge_search "admin dashboard complex layout integration vuetify"
-project_knowledge_search "homeadmin component orchestration patterns"
-
-# Official docs for advanced integration
-get-library-docs /vuejs/docs --topic="composition-api provide-inject dynamic-components"
-```
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Integrate AdminSidebar and AdminCalendar into HomeAdmin.vue
-- Ensure admin interface uses all role-specific components
-- Maintain comprehensive admin functionality
-- Test system-wide data access and role switching
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/admin/HomeAdmin.vue`
-- **Dependencies**: TASK-062 (AdminSidebar), TASK-064 (AdminCalendar)
-- **Full Admin Features**: System management, cleaner assignment, all-owner data
-- **Role Switching**: Support admin viewing as owner mode
-
-### **Verification Checklist**
-- [ ] AdminSidebar and AdminCalendar properly integrated
-- [ ] Admin interface shows system-wide data
-- [ ] Role switching functionality works (admin can view as owner)
-- [ ] All admin-specific features accessible
-- [ ] Complex admin workflows function correctly
-
----
-
-## 🔄 **TASK DEPENDENCY EXECUTION ORDER**
-
-### **Parallel Track A: Owner Components**
-1. **TASK-060** (OwnerSidebar) → 
-2. **TASK-061** (OwnerCalendar) → 
-3. **TASK-065** (HomeOwner Integration)
-
-### **Parallel Track B: Admin Components**  
-1. **TASK-062** (AdminSidebar) + **TASK-063** (TypeScript fixes) →
-2. **TASK-064** (AdminCalendar fixes) →
-3. **TASK-066** (HomeAdmin Integration)
-
-### **Critical Success Path**
-- Complete both tracks before moving to Phase 1G cleanup
-- Test role switching after TASK-065 and TASK-066 completion
-- Verify data isolation after each integration task
-
-## ⚠️ **SHARED CRITICAL NOTES FOR ALL TASKS**
-
-1. **Role-Based Data Filtering**: Always implement at component level first, document need for backend RLS
-2. **Existing Pattern Preservation**: Don't break current demo functionality during development
-3. **TypeScript Strict Mode**: All new components must compile without errors
-4. **Component Naming**: Follow `Role + ComponentType.vue` convention
-5. **Testing Strategy**: Test each component individually before integration tasks
 ````
 
 ## File: tsconfig.node.json
@@ -24690,6 +24425,271 @@ export function validateRoleNavigation(userRole: UserRole | undefined, targetPat
 export function getRoleSpecificSuccessMessage(action: 'login' | 'logout' | 'register', userRole?: UserRole): string
 ````
 
+## File: task_specific_prompts.md
+````markdown
+# 🎯 TASK-SPECIFIC PROMPTS - Phase 1F Priority Tasks
+
+## 📋 **TASK-060: Create OwnerSidebar.vue Component**
+
+### **Context Research Phase**
+```bash
+# Get Vue 3 and Vuetify documentation for sidebar components
+get-library-docs /vuejs/docs --topic="composition-api components props"
+get-library-docs /vuetifyjs/vuetify --topic="navigation-drawer list-item theming"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Owner-only navigation items (no cleaner management, no system reports)
+- Integration with OwnerQuickActions component
+- Owner-specific color scheme and styling
+- Filter navigation to owner-specific features only
+- Add owner-specific quick actions (Add Property, View My Bookings)
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/owner/OwnerSidebar.vue`
+- **Base Pattern**: Study existing `src/components/smart/Sidebar.vue` for structure
+- **Key Integrations**: OwnerQuickActions component, auth store for owner data
+- **Navigation Items**: Properties, My Bookings, Calendar, Settings (NO admin items)
+
+### **Verification Checklist**
+- [ ] Owner sees only relevant navigation (Properties, Bookings, Calendar)
+- [ ] No admin features visible (Cleaner Management, System Reports)
+- [ ] OwnerQuickActions properly integrated
+- [ ] Owner-specific styling applied
+- [ ] Navigation state syncs with current route
+
+---
+
+## 📋 **TASK-061: Create OwnerCalendar.vue Component**
+
+### **Context Research Phase**
+```bash
+# Get FullCalendar and Vue documentation for calendar integration
+project_knowledge_search "calendar vuetify layout examples responsive"
+project_knowledge_search "owner calendar controls date picker"
+
+get-library-docs /fullcalendar/fullcalendar --topic="vue-integration events"
+get-library-docs /vuejs/docs --topic="composition-api computed reactive"
+get-library-docs /fullcalendar/fullcalendar --topic="vue-integration events drag-drop"
+get-library-docs /vuetifyjs/vuetify --topic="components theming"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Filter calendar events to owner's properties only
+- Implement OwnerCalendarControls integration
+- Add owner-specific event creation workflows
+- Remove admin-only features (cleaner assignment, system-wide view)
+- Owner-specific calendar views and styling
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/owner/OwnerCalendar.vue`
+- **Base Pattern**: Study existing `src/components/smart/FullCalendar.vue`
+- **Data Filtering**: Only show events for authenticated owner's properties
+- **Dependencies**: OwnerCalendarControls.vue component (create if missing)
+
+### **Verification Checklist**
+- [ ] Owner sees only their property events and bookings
+- [ ] OwnerCalendarControls properly integrated
+- [ ] No admin-only features (cleaner assignment views)
+- [ ] Owner-specific event styling and indicators work
+- [ ] Event creation workflow is owner-optimized
+
+---
+
+## 📋 **TASK-062: Create AdminSidebar.vue Component**
+
+### **Context Research Phase**
+```bash
+# Get Vuetify and Vue documentation for comprehensive admin navigation
+project_knowledge_search "admin dashboard navigation vuetify complex layout"
+project_knowledge_search "expansion panels badges sidebar examples"
+
+get-library-docs /vuetifyjs/vuetify --topic="navigation-drawer "
+get-library-docs /vuejs/docs --topic="composition-api computed dynamic-components"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Full admin navigation (cleaners, reports, system management)
+- Admin-specific quick actions and system controls
+- System status indicators and alerts
+- Business metrics in sidebar summary
+- Role switcher component integration
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/admin/AdminSidebar.vue`
+- **Full Feature Set**: Cleaners, Properties, Bookings, Reports, System Settings
+- **System Controls**: Status indicators, role switcher, business metrics
+- **Admin Styling**: Professional admin-focused UI with comprehensive navigation
+
+### **Verification Checklist**
+- [ ] Admin sees full system navigation and controls
+- [ ] System status indicators functional
+- [ ] Business metrics displayed in sidebar
+- [ ] Role switcher integration works
+- [ ] All admin features accessible from navigation
+
+---
+
+## 📋 **TASK-063: Fix TypeScript Errors in Admin Components**
+
+### **Context Research Phase**
+get-library-docs /microsoft/typescript --topic="interfaces type-guards error-handling"
+get-library-docs /vuejs/docs --topic="typescript composition-api"
+
+# Your project context for existing patterns
+project_knowledge_search "typescript interfaces admin components"
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Identify all TypeScript errors in admin components
+- Fix type definitions and interfaces
+- Ensure proper typing for admin-specific data
+- Update import paths and type exports
+- Verify compilation with strict mode
+
+### **Implementation Specifics**
+- **Scope**: All files in `src/components/smart/admin/` and `src/components/dumb/admin/`
+- **Common Issues**: Missing type definitions, incorrect prop types, store typing
+- **Tools**: Use `npm run type-check` to identify specific errors
+
+### **Verification Checklist**
+- [ ] `npm run type-check` passes without errors
+- [ ] All admin components have proper TypeScript interfaces
+- [ ] Props and emits are correctly typed
+- [ ] Store integrations are properly typed
+- [ ] Import/export statements are correct
+
+---
+
+## 📋 **TASK-064: Fix AdminCalendar.vue Component**
+
+### **Context Research Phase**
+```bash
+# Get FullCalendar and TypeScript documentation for admin calendar
+project_knowledge_search "calendar admin interface data table complex vuetify"
+project_knowledge_search "drag drop calendar vuetify examples"
+
+# Official docs for technical details
+get-library-docs /fullcalendar/fullcalendar --topic="vue-integration drag-drop resources"
+get-library-docs /microsoft/typescript --topic="interfaces generics"
+```
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Fix existing TypeScript errors in AdminCalendar.vue
+- Ensure admin-specific features work (cleaner assignment, system-wide view)
+- Fix integration with admin stores and composables
+- Verify all calendar functionality for admin role
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/admin/AdminCalendar.vue`
+- **Admin Features**: System-wide calendar view, cleaner assignment, drag-drop
+- **Data Scope**: All properties and bookings across all owners
+- **Integration**: Admin stores, cleaner management, booking assignment
+
+### **Verification Checklist**
+- [ ] TypeScript compilation passes for AdminCalendar
+- [ ] Admin sees all properties and bookings on calendar
+- [ ] Cleaner assignment functionality works
+- [ ] Drag-drop operations function correctly
+- [ ] System-wide calendar view displays properly
+
+---
+
+## 📋 **TASK-065: Integrate Owner Components in HomeOwner.vue**
+```
+### **Context Research Phase**
+project_knowledge_search "layout responsive dashboard owner interface"
+project_knowledge_search "component integration homeowner patterns"
+
+# Official docs for orchestration patterns
+get-library-docs /vuejs/docs --topic="composition-api components props-emit"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Integrate OwnerSidebar and OwnerCalendar into HomeOwner.vue
+- Ensure proper data flow between owner components
+- Maintain existing HomeOwner orchestrator pattern
+- Test role-based data filtering works end-to-end
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/owner/HomeOwner.vue`
+- **Dependencies**: TASK-060 (OwnerSidebar), TASK-061 (OwnerCalendar)
+- **Integration Pattern**: Central orchestrator with role-specific components
+- **Data Flow**: Auth store → HomeOwner → child components
+
+### **Verification Checklist**
+- [ ] OwnerSidebar and OwnerCalendar properly integrated
+- [ ] Owner interface shows only owner-scoped data
+- [ ] Component communication works correctly
+- [ ] Role-based data isolation maintained
+- [ ] UI store integration for modals/sidebars works
+
+---
+
+## 📋 **TASK-066: Integrate Admin Components in HomeAdmin.vue**
+
+### **Context Research Phase**
+```bash
+# Your custom RAG for complex admin layouts
+project_knowledge_search "admin dashboard complex layout integration vuetify"
+project_knowledge_search "homeadmin component orchestration patterns"
+
+# Official docs for advanced integration
+get-library-docs /vuejs/docs --topic="composition-api provide-inject dynamic-components"
+```
+
+### **Sequential Thinking Focus**
+Break down these specific requirements:
+- Integrate AdminSidebar and AdminCalendar into HomeAdmin.vue
+- Ensure admin interface uses all role-specific components
+- Maintain comprehensive admin functionality
+- Test system-wide data access and role switching
+
+### **Implementation Specifics**
+- **File Location**: `src/components/smart/admin/HomeAdmin.vue`
+- **Dependencies**: TASK-062 (AdminSidebar), TASK-064 (AdminCalendar)
+- **Full Admin Features**: System management, cleaner assignment, all-owner data
+- **Role Switching**: Support admin viewing as owner mode
+
+### **Verification Checklist**
+- [ ] AdminSidebar and AdminCalendar properly integrated
+- [ ] Admin interface shows system-wide data
+- [ ] Role switching functionality works (admin can view as owner)
+- [ ] All admin-specific features accessible
+- [ ] Complex admin workflows function correctly
+
+---
+
+## 🔄 **TASK DEPENDENCY EXECUTION ORDER**
+
+### **Parallel Track A: Owner Components**
+1. **TASK-060** (OwnerSidebar) → 
+2. **TASK-061** (OwnerCalendar) → 
+3. **TASK-065** (HomeOwner Integration)
+
+### **Parallel Track B: Admin Components**  
+1. **TASK-062** (AdminSidebar) + **TASK-063** (TypeScript fixes) →
+2. **TASK-064** (AdminCalendar fixes) →
+3. **TASK-066** (HomeAdmin Integration)
+
+### **Critical Success Path**
+- Complete both tracks before moving to Phase 1G cleanup
+- Test role switching after TASK-065 and TASK-066 completion
+- Verify data isolation after each integration task
+
+## ⚠️ **SHARED CRITICAL NOTES FOR ALL TASKS**
+
+1. **Role-Based Data Filtering**: Always implement at component level first, document need for backend RLS
+2. **Existing Pattern Preservation**: Don't break current demo functionality during development
+3. **TypeScript Strict Mode**: All new components must compile without errors
+4. **Component Naming**: Follow `Role + ComponentType.vue` convention
+5. **Testing Strategy**: Test each component individually before integration tasks
+````
+
 ## File: tsconfig.json
 ````json
 {
@@ -31538,6 +31538,769 @@ onBeforeUnmount(() => {
 </style>
 ````
 
+## File: src/components/smart/Home.vue
+````vue
+<template>
+  <div class="home-container">
+    <v-row
+      no-gutters
+      class="fill-height"
+    >
+      <v-col
+        cols="12"
+        lg="3"
+        xl="2"
+        class="sidebar-column"
+        :class="{ 'mobile-hidden': !sidebarOpen }"
+      >
+        <Sidebar
+          :today-turns="todayTurns"
+          :upcoming-cleanings="upcomingCleanings"
+          :properties="propertiesMap"
+          :loading="loading"
+          @navigate-to-booking="handleNavigateToBooking"
+          @navigate-to-date="handleNavigateToDate"
+          @filter-by-property="handleFilterByProperty"
+          @create-booking="handleCreateBooking"
+          @create-property="handleCreateProperty"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        lg="9"
+        xl="10"
+        class="calendar-column"
+      >
+        <div class="calendar-header">
+          <v-btn
+            v-if="$vuetify.display.lgAndDown"
+            icon="mdi-menu"
+            variant="text"
+            class="mr-4"
+            @click="toggleSidebar"
+          />
+          <div class="d-flex align-center">
+            <v-btn
+              icon="mdi-arrow-left"
+              variant="text"
+              class="mr-2"
+              @click="handlePrevious"
+            />
+            <v-btn
+              variant="outlined"
+              class="mr-2"
+              @click="handleGoToday"
+            >
+              Today
+            </v-btn>
+            <v-btn
+              icon="mdi-arrow-right"
+              variant="text"
+              class="mr-4"
+              @click="handleNext"
+            />
+            <div class="text-h6">
+              {{ formattedDate }}
+            </div>
+            <v-spacer />
+            <v-btn-toggle
+              v-model="currentView"
+              mandatory
+              class="ml-4"
+            >
+              <v-btn value="dayGridMonth">
+                Month
+              </v-btn>
+              <v-btn value="timeGridWeek">
+                Week
+              </v-btn>
+              <v-btn value="timeGridDay">
+                Day
+              </v-btn>
+            </v-btn-toggle>
+          </div>
+        </div>
+        <FullCalendar
+          ref="calendarRef"
+          :bookings="filteredBookings"
+          :properties="propertiesMap"
+          :loading="loading"
+          :current-view="currentView"
+          :current-date="currentDate"
+          @date-select="handleDateSelect"
+          @event-click="handleEventClick"
+          @event-drop="handleEventDrop"
+          @event-resize="handleEventResize"
+          @view-change="handleCalendarViewChange"
+          @date-change="handleCalendarDateChange"
+          @create-booking="handleCreateBookingFromCalendar"
+          @update-booking="handleUpdateBooking"
+        />
+      </v-col>
+    </v-row>
+    <BookingForm
+      :open="eventModalOpen"
+      :mode="eventModalMode"
+      :booking="eventModalData"
+      @close="handleEventModalClose"
+      @save="handleEventModalSave"
+      @delete="handleEventModalDelete"
+    />
+    <PropertyModal
+      :open="propertyModalOpen"
+      :mode="propertyModalMode"
+      :property="propertyModalData"
+      @close="handlePropertyModalClose"
+      @save="handlePropertyModalSave"
+      @delete="handlePropertyModalDelete"
+    />
+    <ConfirmationDialog
+      :open="confirmDialogOpen"
+      :title="confirmDialogTitle"
+      :message="confirmDialogMessage"
+      :confirm-text="confirmDialogConfirmText"
+      :cancel-text="confirmDialogCancelText"
+      :dangerous="confirmDialogDangerous"
+      @confirm="handleConfirmDialogConfirm"
+      @cancel="handleConfirmDialogCancel"
+      @close="handleConfirmDialogClose"
+    />
+  </div>
+</template>
+⋮----
+{{ formattedDate }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { useDisplay } from 'vuetify';
+import Sidebar from './Sidebar.vue';
+import FullCalendar from './FullCalendar.vue';
+import BookingForm from '@/components/dumb/BookingForm.vue';
+import PropertyModal from '@/components/dumb/PropertyModal.vue';
+import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
+import { useUIStore } from '@/stores/ui';
+import { useUserStore } from '@/stores/user';
+import { useAuthStore } from '@/stores/auth';
+import { useBookings } from '@/composables/shared/useBookings';
+import { useProperties } from '@/composables/shared/useProperties';
+import { useCalendarState } from '@/composables/shared/useCalendarState';
+import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
+import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+const propertyStore = usePropertyStore();
+const bookingStore = useBookingStore();
+const uiStore = useUIStore();
+const userStore = useUserStore();
+const authStore = useAuthStore();
+const { xs } = useDisplay();
+const {
+  loading: bookingsLoading,
+  createBooking,
+  updateBooking,
+  deleteBooking,
+  fetchAllBookings
+} = useBookings();
+const {
+  loading: propertiesLoading,
+  createProperty,
+  updateProperty,
+  deleteProperty,
+  fetchAllProperties
+} = useProperties();
+const {
+  currentView,
+  currentDate,
+  filterBookings,
+  setCalendarView,
+  goToDate,
+  goToToday,
+  next,
+  prev,
+  clearPropertyFilters,
+  togglePropertyFilter
+} = useCalendarState();
+const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const sidebarOpen = ref(!xs.value);
+const selectedPropertyFilter = ref<string | null>(null);
+const loading = computed(() =>
+  bookingsLoading.value ||
+  propertiesLoading.value ||
+  uiStore.isLoading('bookings') ||
+  uiStore.isLoading('properties')
+);
+const formattedDate = computed(() => {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  };
+  return currentDate.value.toLocaleDateString('en-US', options);
+});
+const propertiesMap = computed(() => {
+  const map = new Map<string, Property>();
+  if (propertyStore.properties instanceof Map) {
+    return propertyStore.properties;
+  }
+  propertyStore.propertiesArray.forEach(property => {
+    if (property && property.id) {
+      map.set(property.id, property);
+    }
+  });
+  return map;
+});
+const todayTurns = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const turns = new Map<string, Booking>();
+  bookingStore.bookingsArray.forEach(booking => {
+    if (
+      booking.booking_type === 'turn' &&
+      new Date(booking.checkout_date) >= today &&
+      new Date(booking.checkout_date) < tomorrow
+    ) {
+      turns.set(booking.id, booking);
+    }
+  });
+  return turns;
+});
+const upcomingCleanings = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const inOneWeek = new Date(today);
+  inOneWeek.setDate(inOneWeek.getDate() + 7);
+  const cleanings = new Map<string, Booking>();
+  bookingStore.bookingsArray.forEach(booking => {
+    const checkoutDate = new Date(booking.checkout_date);
+    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
+      cleanings.set(booking.id, booking);
+    }
+  });
+  return cleanings;
+});
+const filteredBookings = computed(() => {
+  let bookings = Array.from(bookingStore.bookings.values());
+  if (selectedPropertyFilter.value) {
+    bookings = bookings.filter(booking => booking.property_id === selectedPropertyFilter.value);
+  }
+  bookings = filterBookings(bookings);
+  const map = new Map<string, Booking>();
+  bookings.forEach(booking => {
+    map.set(booking.id, booking);
+  });
+  return map;
+});
+const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
+const eventModalMode = computed(() => {
+  const modal = uiStore.getModalState('eventModal');
+  return (modal?.mode as 'create' | 'edit') || 'create';
+});
+const eventModalData = computed(() => {
+  const modal = uiStore.getModalState('eventModal');
+  return modal?.data as Booking | undefined;
+});
+const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
+const propertyModalMode = computed(() => {
+  const modal = uiStore.getModalState('propertyModal');
+  return (modal?.mode as 'create' | 'edit') || 'create';
+});
+const propertyModalData = computed(() => {
+  const modal = uiStore.getModalState('propertyModal');
+  return modal?.data as Property | undefined;
+});
+const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirmDialog'));
+const confirmDialogTitle = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.title || 'Confirm';
+});
+const confirmDialogMessage = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.message || 'Are you sure you want to proceed?';
+});
+const confirmDialogConfirmText = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.confirmText || 'Confirm';
+});
+const confirmDialogCancelText = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.cancelText || 'Cancel';
+});
+const confirmDialogDangerous = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.dangerous || false;
+});
+const confirmDialogData = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.data || null;
+});
+const handleNavigateToBooking = (bookingId: string): void => {
+  eventLogger.logEvent(
+    'Sidebar',
+    'Home',
+    'navigateToBooking',
+    bookingId,
+    'receive'
+  );
+  const booking = bookingStore.getBookingById(bookingId);
+  if (booking) {
+    const bookingDate = new Date(booking.checkout_date);
+    handleNavigateToDate(bookingDate);
+    setTimeout(() => {
+      const calendarApi = calendarRef.value?.getApi?.();
+      if (calendarApi) {
+        const event = calendarApi.getEventById(bookingId);
+        if (event) {
+          event.setProp('classNames', [...event.classNames, 'highlighted']);
+          setTimeout(() => {
+            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
+          }, 3000);
+        }
+      }
+    }, 100);
+  }
+};
+const handleNavigateToDate = (date: Date): void => {
+  eventLogger.logEvent(
+    'Sidebar',
+    'Home',
+    'navigateToDate',
+    date,
+    'receive'
+  );
+  goToDate(date);
+  eventLogger.logEvent(
+    'Home',
+    'FullCalendar',
+    'goToDate',
+    date,
+    'emit'
+  );
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(date);
+  }
+};
+const handleFilterByProperty = (propertyId: string | null): void => {
+  eventLogger.logEvent(
+    'Sidebar',
+    'Home',
+    'filterByProperty',
+    propertyId,
+    'receive'
+  );
+  selectedPropertyFilter.value = propertyId;
+  if (propertyId) {
+    togglePropertyFilter(propertyId);
+  } else {
+    clearPropertyFilters();
+  }
+  uiStore.setPropertyFilter(propertyId);
+  eventLogger.logEvent(
+    'Home',
+    'FullCalendar',
+    'filteredBookingsUpdate',
+    { propertyId, count: filteredBookings.value.size },
+    'emit'
+  );
+};
+const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
+  eventLogger.logEvent(
+    'Sidebar',
+    'Home',
+    'createBooking',
+    data,
+    'receive'
+  );
+  uiStore.openModal('eventModal', 'create', data);
+};
+const handleCreateProperty = (): void => {
+  eventLogger.logEvent(
+    'Sidebar',
+    'Home',
+    'createProperty',
+    null,
+    'receive'
+  );
+  uiStore.openModal('propertyModal', 'create');
+};
+const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'dateSelect',
+    { start: selectInfo.startStr, end: selectInfo.endStr },
+    'receive'
+  );
+  const bookingData: Partial<BookingFormData> = {
+    checkout_date: selectInfo.startStr,
+    checkin_date: selectInfo.endStr,
+  };
+  uiStore.openModal('eventModal', 'create', bookingData);
+};
+const handleEventClick = (clickInfo: EventClickArg): void => {
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'eventClick',
+    { id: clickInfo.event.id },
+    'receive'
+  );
+  const booking = bookingStore.getBookingById(clickInfo.event.id);
+  if (booking) {
+    uiStore.openModal('eventModal', 'edit', { booking });
+  }
+};
+const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
+  const booking = dropInfo.event.extendedProps.booking as Booking;
+  try {
+    await updateBooking(booking.id, {
+      checkout_date: dropInfo.event.startStr,
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+    });
+    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
+  } catch (error) {
+    console.error('Failed to update booking:', error);
+    dropInfo.revert();
+    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking dates. Please try again.');
+  }
+};
+const handleEventResize = async (resizeInfo: any): Promise<void> => {
+  const booking = resizeInfo.event.extendedProps.booking as Booking;
+  try {
+    await updateBooking(booking.id, {
+      checkout_date: resizeInfo.event.startStr,
+      checkin_date: resizeInfo.event.endStr
+    });
+    uiStore.addNotification('success', 'Booking Updated', 'Booking duration has been updated successfully.');
+  } catch (error) {
+    console.error('Failed to resize booking:', error);
+    resizeInfo.revert();
+    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking duration. Please try again.');
+  }
+};
+const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
+  const bookingData: Partial<BookingFormData> = {
+    checkout_date: data.start,
+    checkin_date: data.end,
+    property_id: data.propertyId,
+    booking_type: 'standard'
+  };
+  handleCreateBooking(bookingData);
+};
+const handleUpdateBooking = async (data: { id: string; start: string; end: string }): Promise<void> => {
+  try {
+    await updateBooking(data.id, {
+      checkout_date: data.start,
+      checkin_date: data.end
+    });
+    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
+  } catch (error) {
+    console.error('Failed to update booking:', error);
+    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking. Please try again.');
+    calendarRef.value?.refreshEvents?.();
+  }
+};
+const handleCalendarViewChange = (view: string): void => {
+  currentView.value = view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
+  setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
+};
+const handleCalendarDateChange = (date: Date): void => {
+  currentDate.value = date;
+};
+const handleGoToday = (): void => {
+  goToToday();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(currentDate.value);
+  }
+};
+const handlePrevious = (): void => {
+  prev();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(currentDate.value);
+  }
+};
+const handleNext = (): void => {
+  next();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(currentDate.value);
+  }
+};
+const toggleSidebar = (): void => {
+  sidebarOpen.value = !sidebarOpen.value;
+};
+const handleEventModalClose = (): void => {
+  uiStore.closeModal('eventModal');
+};
+const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
+  try {
+    if (eventModalMode.value === 'create') {
+      await createBooking(data);
+      uiStore.addNotification('success', 'Booking Created', 'New booking has been created successfully.');
+    } else {
+      const booking = eventModalData.value as Booking;
+      await updateBooking(booking.id, data);
+      uiStore.addNotification('success', 'Booking Updated', 'Booking has been updated successfully.');
+    }
+    uiStore.closeModal('eventModal');
+    calendarRef.value?.refreshEvents?.();
+  } catch (error) {
+    console.error('Failed to save booking:', error);
+    uiStore.addNotification('error', 'Save Failed', 'Failed to save booking. Please try again.');
+  }
+};
+const handleEventModalDelete = async (bookingId: string): Promise<void> => {
+  uiStore.openConfirmDialog(
+    'confirmDialog',
+    {
+      title: 'Delete Booking',
+      message: 'Are you sure you want to delete this booking? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      dangerous: true,
+      data: { action: 'deleteBooking', id: bookingId }
+    }
+  );
+  uiStore.closeModal('eventModal');
+};
+const handlePropertyModalClose = (): void => {
+  uiStore.closeModal('propertyModal');
+};
+const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
+  try {
+    if (propertyModalMode.value === 'create') {
+      await createProperty(data);
+      uiStore.addNotification('success', 'Property Created', 'New property has been created successfully.');
+    } else {
+      const property = propertyModalData.value as Property;
+      await updateProperty(property.id, data);
+      uiStore.addNotification('success', 'Property Updated', 'Property has been updated successfully.');
+    }
+    uiStore.closeModal('propertyModal');
+  } catch (error) {
+    console.error('Failed to save property:', error);
+    uiStore.addNotification('error', 'Save Failed', 'Failed to save property. Please try again.');
+  }
+};
+const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
+  uiStore.openConfirmDialog(
+    'confirmDialog',
+    {
+      title: 'Delete Property',
+      message: 'Are you sure you want to delete this property? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      dangerous: true,
+      data: { action: 'deleteProperty', id: propertyId }
+    }
+  );
+};
+const handleConfirmDialogConfirm = (): void => {
+  const data = confirmDialogData.value;
+  if (!data) return;
+  switch (data.action) {
+    case 'deleteProperty':
+      deleteProperty(data.id as string)
+        .then(() => {
+          uiStore.addNotification('success', 'Property Deleted', 'Property has been deleted successfully.');
+        })
+        .catch((error) => {
+          console.error('Failed to delete property:', error);
+          uiStore.addNotification('error', 'Delete Failed', 'Failed to delete property. Please try again.');
+        });
+      break;
+    case 'deleteBooking':
+      deleteBooking(data.id as string)
+        .then(() => {
+          uiStore.addNotification('success', 'Booking Deleted', 'Booking has been deleted successfully.');
+          calendarRef.value?.refreshEvents?.();
+        })
+        .catch((error) => {
+          console.error('Failed to delete booking:', error);
+          uiStore.addNotification('error', 'Delete Failed', 'Failed to delete booking. Please try again.');
+        });
+      break;
+    default:
+      console.warn('Unknown confirmation action:', data.action);
+  }
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+const handleConfirmDialogCancel = (): void => {
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+const handleConfirmDialogClose = (): void => {
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+onMounted(async () => {
+  eventLogger.setEnabled(true);
+  eventLogger.logEvent(
+    'System',
+    'Home',
+    'mounted',
+    { timestamp: Date.now() },
+    'receive'
+  );
+  try {
+    uiStore.setLoading('bookings', true);
+    uiStore.setLoading('properties', true);
+    if (authStore.isAuthenticated) {
+      await Promise.all([
+        fetchAllProperties(),
+        fetchAllBookings()
+      ]);
+    }
+    uiStore.setLoading('bookings', false);
+    uiStore.setLoading('properties', false);
+  } catch (error) {
+    console.error('Failed to initialize data:', error);
+    uiStore.addNotification('error', 'Initialization Failed', 'Failed to load data. Please refresh the page.');
+    uiStore.setLoading('bookings', false);
+    uiStore.setLoading('properties', false);
+  }
+});
+watch(() => authStore.isAuthenticated, async (isAuthenticated) => {
+  if (isAuthenticated) {
+    try {
+      uiStore.setLoading('bookings', true);
+      uiStore.setLoading('properties', true);
+      await Promise.all([
+        fetchAllProperties(),
+        fetchAllBookings()
+      ]);
+      uiStore.setLoading('bookings', false);
+      uiStore.setLoading('properties', false);
+    } catch (error) {
+      console.error('Failed to fetch data after authentication:', error);
+      uiStore.addNotification('error', 'Data Fetch Failed', 'Failed to load your data after login. Please refresh the page.');
+      uiStore.setLoading('bookings', false);
+      uiStore.setLoading('properties', false);
+    }
+  } else {
+    propertyStore.clearAll();
+    bookingStore.clearAll();
+    userStore.clearUserPreferences();
+  }
+});
+watch(currentView, (newView) => {
+  setCalendarView(newView);
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.changeView(newView);
+  }
+});
+watch(selectedPropertyFilter, (newPropertyId) => {
+  uiStore.setPropertyFilter(newPropertyId);
+});
+watch(xs, (isExtraSmall) => {
+  sidebarOpen.value = !isExtraSmall;
+});
+onUnmounted(() => {
+});
+</script>
+<style scoped>
+.home-container {
+  height: 100vh;
+  overflow: hidden;
+  background: rgb(var(--v-theme-background));
+  color: rgb(var(--v-theme-on-background));
+}
+.fill-height {
+  height: 100%;
+}
+.sidebar-column {
+  background: rgb(var(--v-theme-surface));
+  border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12);
+  height: 100vh;
+  overflow-y: auto;
+}
+.calendar-column {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: rgb(var(--v-theme-background));
+}
+.calendar-header {
+  padding: 16px;
+  background: rgb(var(--v-theme-surface));
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  color: rgb(var(--v-theme-on-surface));
+}
+.mobile-hidden {
+  display: none;
+}
+@media (min-width: 1264px) {
+  .mobile-hidden {
+    display: block;
+  }
+}
+:deep(.v-card) {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+:deep(.v-card:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--v-theme-on-surface), 0.15);
+  border-color: rgba(var(--v-theme-primary), 0.3) !important;
+}
+:deep(.v-btn) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+:deep(.v-btn--variant-elevated),
+:deep(.v-btn--variant-flat) {
+  background: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
+}
+:deep(.v-btn--variant-outlined) {
+  border-color: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-primary)) !important;
+}
+:deep(.v-btn--variant-text) {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+:deep(.v-btn:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.3);
+}
+:deep(.text-h6),
+:deep(.text-h5),
+:deep(.text-h4) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+:deep(.text-subtitle-1),
+:deep(.text-subtitle-2) {
+  color: rgba(var(--v-theme-on-surface), 0.8) !important;
+}
+:deep(.v-icon) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+:deep(.v-btn .v-icon) {
+  color: inherit !important;
+}
+:deep(.v-badge .v-badge__badge) {
+  background: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
+}
+:deep(.fc-event.highlighted) {
+  animation: highlight-pulse 3s ease-in-out;
+}
+@keyframes highlight-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0.7); }
+  50% { box-shadow: 0 0 0 20px rgba(var(--v-theme-primary), 0); }
+}
+</style>
+````
+
 ## File: src/components/smart/admin/HomeAdmin.vue
 ````vue
 <template>
@@ -32478,767 +33241,45 @@ onUnmounted(() => {
 </style>
 ````
 
-## File: src/components/smart/Home.vue
-````vue
-<template>
-  <div class="home-container">
-    <v-row
-      no-gutters
-      class="fill-height"
-    >
-      <v-col
-        cols="12"
-        lg="3"
-        xl="2"
-        class="sidebar-column"
-        :class="{ 'mobile-hidden': !sidebarOpen }"
-      >
-        <Sidebar
-          :today-turns="todayTurns"
-          :upcoming-cleanings="upcomingCleanings"
-          :properties="propertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        lg="9"
-        xl="10"
-        class="calendar-column"
-      >
-        <div class="calendar-header">
-          <v-btn
-            v-if="$vuetify.display.lgAndDown"
-            icon="mdi-menu"
-            variant="text"
-            class="mr-4"
-            @click="toggleSidebar"
-          />
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn
-              variant="outlined"
-              class="mr-2"
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6">
-              {{ formattedDate }}
-            </div>
-            <v-spacer />
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              class="ml-4"
-            >
-              <v-btn value="dayGridMonth">
-                Month
-              </v-btn>
-              <v-btn value="timeGridWeek">
-                Week
-              </v-btn>
-              <v-btn value="timeGridDay">
-                Day
-              </v-btn>
-            </v-btn-toggle>
-          </div>
-        </div>
-        <FullCalendar
-          ref="calendarRef"
-          :bookings="filteredBookings"
-          :properties="propertiesMap"
-          :loading="loading"
-          :current-view="currentView"
-          :current-date="currentDate"
-          @date-select="handleDateSelect"
-          @event-click="handleEventClick"
-          @event-drop="handleEventDrop"
-          @event-resize="handleEventResize"
-          @view-change="handleCalendarViewChange"
-          @date-change="handleCalendarDateChange"
-          @create-booking="handleCreateBookingFromCalendar"
-          @update-booking="handleUpdateBooking"
-        />
-      </v-col>
-    </v-row>
-    <BookingForm
-      :open="eventModalOpen"
-      :mode="eventModalMode"
-      :booking="eventModalData"
-      @close="handleEventModalClose"
-      @save="handleEventModalSave"
-      @delete="handleEventModalDelete"
-    />
-    <PropertyModal
-      :open="propertyModalOpen"
-      :mode="propertyModalMode"
-      :property="propertyModalData"
-      @close="handlePropertyModalClose"
-      @save="handlePropertyModalSave"
-      @delete="handlePropertyModalDelete"
-    />
-    <ConfirmationDialog
-      :open="confirmDialogOpen"
-      :title="confirmDialogTitle"
-      :message="confirmDialogMessage"
-      :confirm-text="confirmDialogConfirmText"
-      :cancel-text="confirmDialogCancelText"
-      :dangerous="confirmDialogDangerous"
-      @confirm="handleConfirmDialogConfirm"
-      @cancel="handleConfirmDialogCancel"
-      @close="handleConfirmDialogClose"
-    />
-  </div>
-</template>
+## File: src/stores/ui.ts
+````typescript
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import type { ModalState, ConfirmDialogState, Notification, NotificationType, FilterState, ModalData, FilterValue } from '@/types';
 ⋮----
-{{ formattedDate }}
+function openModal(modalId: string, mode: 'create' | 'edit' | 'view' | 'delete' = 'view', data?: ModalData)
+function closeModal(modalId: string)
+function closeAllModals()
+function openConfirmDialog(
+    dialogId: string,
+    options: {
+          title?: string;
+          message?: string;
+          confirmText?: string;
+          cancelText?: string;
+          confirmColor?: string;
+          dangerous?: boolean;
+          data?: ModalData;
+        } = {}
+)
+function closeConfirmDialog(dialogId: string)
+function closeAllConfirmDialogs()
+function toggleSidebar(sidebarId: string)
+function setSidebarState(sidebarId: string, isOpen: boolean)
+function setLoading(operation: string, isLoading: boolean)
+function addNotification(type: NotificationType, title: string, message: string, autoClose: boolean = true)
 ⋮----
-<script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useDisplay } from 'vuetify';
-import Sidebar from './Sidebar.vue';
-import FullCalendar from './FullCalendar.vue';
-import BookingForm from '@/components/dumb/BookingForm.vue';
-import PropertyModal from '@/components/dumb/PropertyModal.vue';
-import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
-import { useUIStore } from '@/stores/ui';
-import { useUserStore } from '@/stores/user';
-import { useAuthStore } from '@/stores/auth';
-import { useBookings } from '@/composables/shared/useBookings';
-import { useProperties } from '@/composables/shared/useProperties';
-import { useCalendarState } from '@/composables/shared/useCalendarState';
-import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
-const uiStore = useUIStore();
-const userStore = useUserStore();
-const authStore = useAuthStore();
-const { xs } = useDisplay();
-const {
-  loading: bookingsLoading,
-  createBooking,
-  updateBooking,
-  deleteBooking,
-  fetchAllBookings
-} = useBookings();
-const {
-  loading: propertiesLoading,
-  createProperty,
-  updateProperty,
-  deleteProperty,
-  fetchAllProperties
-} = useProperties();
-const {
-  currentView,
-  currentDate,
-  filterBookings,
-  setCalendarView,
-  goToDate,
-  goToToday,
-  next,
-  prev,
-  clearPropertyFilters,
-  togglePropertyFilter
-} = useCalendarState();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-const sidebarOpen = ref(!xs.value);
-const selectedPropertyFilter = ref<string | null>(null);
-const loading = computed(() =>
-  bookingsLoading.value ||
-  propertiesLoading.value ||
-  uiStore.isLoading('bookings') ||
-  uiStore.isLoading('properties')
-);
-const formattedDate = computed(() => {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  };
-  return currentDate.value.toLocaleDateString('en-US', options);
-});
-const propertiesMap = computed(() => {
-  const map = new Map<string, Property>();
-  if (propertyStore.properties instanceof Map) {
-    return propertyStore.properties;
-  }
-  propertyStore.propertiesArray.forEach(property => {
-    if (property && property.id) {
-      map.set(property.id, property);
-    }
-  });
-  return map;
-});
-const todayTurns = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const turns = new Map<string, Booking>();
-  bookingStore.bookingsArray.forEach(booking => {
-    if (
-      booking.booking_type === 'turn' &&
-      new Date(booking.checkout_date) >= today &&
-      new Date(booking.checkout_date) < tomorrow
-    ) {
-      turns.set(booking.id, booking);
-    }
-  });
-  return turns;
-});
-const upcomingCleanings = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const inOneWeek = new Date(today);
-  inOneWeek.setDate(inOneWeek.getDate() + 7);
-  const cleanings = new Map<string, Booking>();
-  bookingStore.bookingsArray.forEach(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
-    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
-      cleanings.set(booking.id, booking);
-    }
-  });
-  return cleanings;
-});
-const filteredBookings = computed(() => {
-  let bookings = Array.from(bookingStore.bookings.values());
-  if (selectedPropertyFilter.value) {
-    bookings = bookings.filter(booking => booking.property_id === selectedPropertyFilter.value);
-  }
-  bookings = filterBookings(bookings);
-  const map = new Map<string, Booking>();
-  bookings.forEach(booking => {
-    map.set(booking.id, booking);
-  });
-  return map;
-});
-const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
-const eventModalMode = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const eventModalData = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return modal?.data as Booking | undefined;
-});
-const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
-const propertyModalMode = computed(() => {
-  const modal = uiStore.getModalState('propertyModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const propertyModalData = computed(() => {
-  const modal = uiStore.getModalState('propertyModal');
-  return modal?.data as Property | undefined;
-});
-const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirmDialog'));
-const confirmDialogTitle = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.title || 'Confirm';
-});
-const confirmDialogMessage = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.message || 'Are you sure you want to proceed?';
-});
-const confirmDialogConfirmText = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.confirmText || 'Confirm';
-});
-const confirmDialogCancelText = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.cancelText || 'Cancel';
-});
-const confirmDialogDangerous = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.dangerous || false;
-});
-const confirmDialogData = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.data || null;
-});
-const handleNavigateToBooking = (bookingId: string): void => {
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    'navigateToBooking',
-    bookingId,
-    'receive'
-  );
-  const booking = bookingStore.getBookingById(bookingId);
-  if (booking) {
-    const bookingDate = new Date(booking.checkout_date);
-    handleNavigateToDate(bookingDate);
-    setTimeout(() => {
-      const calendarApi = calendarRef.value?.getApi?.();
-      if (calendarApi) {
-        const event = calendarApi.getEventById(bookingId);
-        if (event) {
-          event.setProp('classNames', [...event.classNames, 'highlighted']);
-          setTimeout(() => {
-            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
-          }, 3000);
-        }
-      }
-    }, 100);
-  }
-};
-const handleNavigateToDate = (date: Date): void => {
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    'navigateToDate',
-    date,
-    'receive'
-  );
-  goToDate(date);
-  eventLogger.logEvent(
-    'Home',
-    'FullCalendar',
-    'goToDate',
-    date,
-    'emit'
-  );
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(date);
-  }
-};
-const handleFilterByProperty = (propertyId: string | null): void => {
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    'filterByProperty',
-    propertyId,
-    'receive'
-  );
-  selectedPropertyFilter.value = propertyId;
-  if (propertyId) {
-    togglePropertyFilter(propertyId);
-  } else {
-    clearPropertyFilters();
-  }
-  uiStore.setPropertyFilter(propertyId);
-  eventLogger.logEvent(
-    'Home',
-    'FullCalendar',
-    'filteredBookingsUpdate',
-    { propertyId, count: filteredBookings.value.size },
-    'emit'
-  );
-};
-const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    'createBooking',
-    data,
-    'receive'
-  );
-  uiStore.openModal('eventModal', 'create', data);
-};
-const handleCreateProperty = (): void => {
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    'createProperty',
-    null,
-    'receive'
-  );
-  uiStore.openModal('propertyModal', 'create');
-};
-const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'receive'
-  );
-  const bookingData: Partial<BookingFormData> = {
-    checkout_date: selectInfo.startStr,
-    checkin_date: selectInfo.endStr,
-  };
-  uiStore.openModal('eventModal', 'create', bookingData);
-};
-const handleEventClick = (clickInfo: EventClickArg): void => {
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'receive'
-  );
-  const booking = bookingStore.getBookingById(clickInfo.event.id);
-  if (booking) {
-    uiStore.openModal('eventModal', 'edit', { booking });
-  }
-};
-const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  try {
-    await updateBooking(booking.id, {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-    });
-    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
-  } catch (error) {
-    console.error('Failed to update booking:', error);
-    dropInfo.revert();
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking dates. Please try again.');
-  }
-};
-const handleEventResize = async (resizeInfo: any): Promise<void> => {
-  const booking = resizeInfo.event.extendedProps.booking as Booking;
-  try {
-    await updateBooking(booking.id, {
-      checkout_date: resizeInfo.event.startStr,
-      checkin_date: resizeInfo.event.endStr
-    });
-    uiStore.addNotification('success', 'Booking Updated', 'Booking duration has been updated successfully.');
-  } catch (error) {
-    console.error('Failed to resize booking:', error);
-    resizeInfo.revert();
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking duration. Please try again.');
-  }
-};
-const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
-  const bookingData: Partial<BookingFormData> = {
-    checkout_date: data.start,
-    checkin_date: data.end,
-    property_id: data.propertyId,
-    booking_type: 'standard'
-  };
-  handleCreateBooking(bookingData);
-};
-const handleUpdateBooking = async (data: { id: string; start: string; end: string }): Promise<void> => {
-  try {
-    await updateBooking(data.id, {
-      checkout_date: data.start,
-      checkin_date: data.end
-    });
-    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
-  } catch (error) {
-    console.error('Failed to update booking:', error);
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking. Please try again.');
-    calendarRef.value?.refreshEvents?.();
-  }
-};
-const handleCalendarViewChange = (view: string): void => {
-  currentView.value = view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
-  setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
-};
-const handleCalendarDateChange = (date: Date): void => {
-  currentDate.value = date;
-};
-const handleGoToday = (): void => {
-  goToToday();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
-  }
-};
-const handlePrevious = (): void => {
-  prev();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
-  }
-};
-const handleNext = (): void => {
-  next();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
-  }
-};
-const toggleSidebar = (): void => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
-const handleEventModalClose = (): void => {
-  uiStore.closeModal('eventModal');
-};
-const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
-  try {
-    if (eventModalMode.value === 'create') {
-      await createBooking(data);
-      uiStore.addNotification('success', 'Booking Created', 'New booking has been created successfully.');
-    } else {
-      const booking = eventModalData.value as Booking;
-      await updateBooking(booking.id, data);
-      uiStore.addNotification('success', 'Booking Updated', 'Booking has been updated successfully.');
-    }
-    uiStore.closeModal('eventModal');
-    calendarRef.value?.refreshEvents?.();
-  } catch (error) {
-    console.error('Failed to save booking:', error);
-    uiStore.addNotification('error', 'Save Failed', 'Failed to save booking. Please try again.');
-  }
-};
-const handleEventModalDelete = async (bookingId: string): Promise<void> => {
-  uiStore.openConfirmDialog(
-    'confirmDialog',
-    {
-      title: 'Delete Booking',
-      message: 'Are you sure you want to delete this booking? This action cannot be undone.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      dangerous: true,
-      data: { action: 'deleteBooking', id: bookingId }
-    }
-  );
-  uiStore.closeModal('eventModal');
-};
-const handlePropertyModalClose = (): void => {
-  uiStore.closeModal('propertyModal');
-};
-const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
-  try {
-    if (propertyModalMode.value === 'create') {
-      await createProperty(data);
-      uiStore.addNotification('success', 'Property Created', 'New property has been created successfully.');
-    } else {
-      const property = propertyModalData.value as Property;
-      await updateProperty(property.id, data);
-      uiStore.addNotification('success', 'Property Updated', 'Property has been updated successfully.');
-    }
-    uiStore.closeModal('propertyModal');
-  } catch (error) {
-    console.error('Failed to save property:', error);
-    uiStore.addNotification('error', 'Save Failed', 'Failed to save property. Please try again.');
-  }
-};
-const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
-  uiStore.openConfirmDialog(
-    'confirmDialog',
-    {
-      title: 'Delete Property',
-      message: 'Are you sure you want to delete this property? This action cannot be undone.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      dangerous: true,
-      data: { action: 'deleteProperty', id: propertyId }
-    }
-  );
-};
-const handleConfirmDialogConfirm = (): void => {
-  const data = confirmDialogData.value;
-  if (!data) return;
-  switch (data.action) {
-    case 'deleteProperty':
-      deleteProperty(data.id as string)
-        .then(() => {
-          uiStore.addNotification('success', 'Property Deleted', 'Property has been deleted successfully.');
-        })
-        .catch((error) => {
-          console.error('Failed to delete property:', error);
-          uiStore.addNotification('error', 'Delete Failed', 'Failed to delete property. Please try again.');
-        });
-      break;
-    case 'deleteBooking':
-      deleteBooking(data.id as string)
-        .then(() => {
-          uiStore.addNotification('success', 'Booking Deleted', 'Booking has been deleted successfully.');
-          calendarRef.value?.refreshEvents?.();
-        })
-        .catch((error) => {
-          console.error('Failed to delete booking:', error);
-          uiStore.addNotification('error', 'Delete Failed', 'Failed to delete booking. Please try again.');
-        });
-      break;
-    default:
-      console.warn('Unknown confirmation action:', data.action);
-  }
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-const handleConfirmDialogCancel = (): void => {
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-const handleConfirmDialogClose = (): void => {
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-onMounted(async () => {
-  eventLogger.setEnabled(true);
-  eventLogger.logEvent(
-    'System',
-    'Home',
-    'mounted',
-    { timestamp: Date.now() },
-    'receive'
-  );
-  try {
-    uiStore.setLoading('bookings', true);
-    uiStore.setLoading('properties', true);
-    if (authStore.isAuthenticated) {
-      await Promise.all([
-        fetchAllProperties(),
-        fetchAllBookings()
-      ]);
-    }
-    uiStore.setLoading('bookings', false);
-    uiStore.setLoading('properties', false);
-  } catch (error) {
-    console.error('Failed to initialize data:', error);
-    uiStore.addNotification('error', 'Initialization Failed', 'Failed to load data. Please refresh the page.');
-    uiStore.setLoading('bookings', false);
-    uiStore.setLoading('properties', false);
-  }
-});
-watch(() => authStore.isAuthenticated, async (isAuthenticated) => {
-  if (isAuthenticated) {
-    try {
-      uiStore.setLoading('bookings', true);
-      uiStore.setLoading('properties', true);
-      await Promise.all([
-        fetchAllProperties(),
-        fetchAllBookings()
-      ]);
-      uiStore.setLoading('bookings', false);
-      uiStore.setLoading('properties', false);
-    } catch (error) {
-      console.error('Failed to fetch data after authentication:', error);
-      uiStore.addNotification('error', 'Data Fetch Failed', 'Failed to load your data after login. Please refresh the page.');
-      uiStore.setLoading('bookings', false);
-      uiStore.setLoading('properties', false);
-    }
-  } else {
-    propertyStore.clearAll();
-    bookingStore.clearAll();
-    userStore.clearUserPreferences();
-  }
-});
-watch(currentView, (newView) => {
-  setCalendarView(newView);
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.changeView(newView);
-  }
-});
-watch(selectedPropertyFilter, (newPropertyId) => {
-  uiStore.setPropertyFilter(newPropertyId);
-});
-watch(xs, (isExtraSmall) => {
-  sidebarOpen.value = !isExtraSmall;
-});
-onUnmounted(() => {
-});
-</script>
-<style scoped>
-.home-container {
-  height: 100vh;
-  overflow: hidden;
-  background: rgb(var(--v-theme-background));
-  color: rgb(var(--v-theme-on-background));
-}
-.fill-height {
-  height: 100%;
-}
-.sidebar-column {
-  background: rgb(var(--v-theme-surface));
-  border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-  height: 100vh;
-  overflow-y: auto;
-}
-.calendar-column {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: rgb(var(--v-theme-background));
-}
-.calendar-header {
-  padding: 16px;
-  background: rgb(var(--v-theme-surface));
-  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-  display: flex;
-  align-items: center;
-  min-height: 64px;
-  color: rgb(var(--v-theme-on-surface));
-}
-.mobile-hidden {
-  display: none;
-}
-@media (min-width: 1264px) {
-  .mobile-hidden {
-    display: block;
-  }
-}
-:deep(.v-card) {
-  background: rgb(var(--v-theme-surface)) !important;
-  color: rgb(var(--v-theme-on-surface)) !important;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-:deep(.v-card:hover) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--v-theme-on-surface), 0.15);
-  border-color: rgba(var(--v-theme-primary), 0.3) !important;
-}
-:deep(.v-btn) {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-:deep(.v-btn--variant-elevated),
-:deep(.v-btn--variant-flat) {
-  background: rgb(var(--v-theme-primary)) !important;
-  color: rgb(var(--v-theme-on-primary)) !important;
-}
-:deep(.v-btn--variant-outlined) {
-  border-color: rgb(var(--v-theme-primary)) !important;
-  color: rgb(var(--v-theme-primary)) !important;
-}
-:deep(.v-btn--variant-text) {
-  color: rgb(var(--v-theme-primary)) !important;
-}
-:deep(.v-btn:hover) {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.3);
-}
-:deep(.text-h6),
-:deep(.text-h5),
-:deep(.text-h4) {
-  color: rgb(var(--v-theme-on-surface)) !important;
-}
-:deep(.text-subtitle-1),
-:deep(.text-subtitle-2) {
-  color: rgba(var(--v-theme-on-surface), 0.8) !important;
-}
-:deep(.v-icon) {
-  color: rgb(var(--v-theme-on-surface)) !important;
-}
-:deep(.v-btn .v-icon) {
-  color: inherit !important;
-}
-:deep(.v-badge .v-badge__badge) {
-  background: rgb(var(--v-theme-primary)) !important;
-  color: rgb(var(--v-theme-on-primary)) !important;
-}
-:deep(.fc-event.highlighted) {
-  animation: highlight-pulse 3s ease-in-out;
-}
-@keyframes highlight-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0.7); }
-  50% { box-shadow: 0 0 0 20px rgba(var(--v-theme-primary), 0); }
-}
-</style>
+// Keep only last 10 notifications to prevent memory bloat
+⋮----
+function removeNotification(id: string)
+function clearNotifications()
+function setError(errorMessage: string | null)
+function updateFilter(filter: Partial<FilterState>)
+function resetFilters()
+function setCalendarView(view: string)
+function setPropertyFilter(propertyId: string | null)
+function setFilter(key: string, value: FilterValue)
+function getFilter(key: string): FilterValue
 ````
 
 ## File: src/components/smart/admin/AdminSidebar.vue
@@ -34741,47 +34782,6 @@ onMounted(() => {
   background: rgba(0, 0, 0, 0.3);
 }
 </style>
-````
-
-## File: src/stores/ui.ts
-````typescript
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { ModalState, ConfirmDialogState, Notification, NotificationType, FilterState, ModalData, FilterValue } from '@/types';
-⋮----
-function openModal(modalId: string, mode: 'create' | 'edit' | 'view' | 'delete' = 'view', data?: ModalData)
-function closeModal(modalId: string)
-function closeAllModals()
-function openConfirmDialog(
-    dialogId: string,
-    options: {
-          title?: string;
-          message?: string;
-          confirmText?: string;
-          cancelText?: string;
-          confirmColor?: string;
-          dangerous?: boolean;
-          data?: ModalData;
-        } = {}
-)
-function closeConfirmDialog(dialogId: string)
-function closeAllConfirmDialogs()
-function toggleSidebar(sidebarId: string)
-function setSidebarState(sidebarId: string, isOpen: boolean)
-function setLoading(operation: string, isLoading: boolean)
-function addNotification(type: NotificationType, title: string, message: string, autoClose: boolean = true)
-⋮----
-// Keep only last 10 notifications to prevent memory bloat
-⋮----
-function removeNotification(id: string)
-function clearNotifications()
-function setError(errorMessage: string | null)
-function updateFilter(filter: Partial<FilterState>)
-function resetFilters()
-function setCalendarView(view: string)
-function setPropertyFilter(propertyId: string | null)
-function setFilter(key: string, value: FilterValue)
-function getFilter(key: string): FilterValue
 ````
 
 ## File: src/components/smart/Sidebar.vue
