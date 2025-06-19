@@ -37,8 +37,12 @@ Break down these specific requirements:
 ### **Context Research Phase**
 ```bash
 # Get FullCalendar and Vue documentation for calendar integration
-get-library-docs /fullcalendar/fullcalendar --topic="vue-integration events drag-drop"
+project_knowledge_search "calendar vuetify layout examples responsive"
+project_knowledge_search "owner calendar controls date picker"
+
+get-library-docs /fullcalendar/fullcalendar --topic="vue-integration events"
 get-library-docs /vuejs/docs --topic="composition-api computed reactive"
+get-library-docs /fullcalendar/fullcalendar --topic="vue-integration events drag-drop"
 get-library-docs /vuetifyjs/vuetify --topic="components theming"
 ```
 
@@ -70,7 +74,10 @@ Break down these specific requirements:
 ### **Context Research Phase**
 ```bash
 # Get Vuetify and Vue documentation for comprehensive admin navigation
-get-library-docs /vuetifyjs/vuetify --topic="navigation-drawer expansion-panels badges"
+project_knowledge_search "admin dashboard navigation vuetify complex layout"
+project_knowledge_search "expansion panels badges sidebar examples"
+
+get-library-docs /vuetifyjs/vuetify --topic="navigation-drawer "
 get-library-docs /vuejs/docs --topic="composition-api computed dynamic-components"
 ```
 
@@ -100,11 +107,11 @@ Break down these specific requirements:
 ## 📋 **TASK-063: Fix TypeScript Errors in Admin Components**
 
 ### **Context Research Phase**
-```bash
-# Get TypeScript documentation for error resolution
 get-library-docs /microsoft/typescript --topic="interfaces type-guards error-handling"
 get-library-docs /vuejs/docs --topic="typescript composition-api"
-```
+
+# Your project context for existing patterns
+project_knowledge_search "typescript interfaces admin components"
 
 ### **Sequential Thinking Focus**
 Break down these specific requirements:
@@ -133,11 +140,13 @@ Break down these specific requirements:
 ### **Context Research Phase**
 ```bash
 # Get FullCalendar and TypeScript documentation for admin calendar
+project_knowledge_search "calendar admin interface data table complex vuetify"
+project_knowledge_search "drag drop calendar vuetify examples"
+
+# Official docs for technical details
 get-library-docs /fullcalendar/fullcalendar --topic="vue-integration drag-drop resources"
 get-library-docs /microsoft/typescript --topic="interfaces generics"
-get-library-docs /vuejs/docs --topic="composition-api reactive"
 ```
-
 ### **Sequential Thinking Focus**
 Break down these specific requirements:
 - Fix existing TypeScript errors in AdminCalendar.vue
@@ -161,12 +170,13 @@ Break down these specific requirements:
 ---
 
 ## 📋 **TASK-065: Integrate Owner Components in HomeOwner.vue**
-
+```
 ### **Context Research Phase**
-```bash
-# Get Vue documentation for component integration and orchestration
+project_knowledge_search "layout responsive dashboard owner interface"
+project_knowledge_search "component integration homeowner patterns"
+
+# Official docs for orchestration patterns
 get-library-docs /vuejs/docs --topic="composition-api components props-emit"
-get-library-docs /vuetifyjs/vuetify --topic="layout grid responsive"
 ```
 
 ### **Sequential Thinking Focus**
@@ -195,9 +205,12 @@ Break down these specific requirements:
 
 ### **Context Research Phase**
 ```bash
-# Get Vue documentation for complex admin interface orchestration
-get-library-docs /vuejs/docs --topic="composition-api dynamic-components provide-inject"
-get-library-docs /vuetifyjs/vuetify --topic="layout complex-ui admin-panels"
+# Your custom RAG for complex admin layouts
+project_knowledge_search "admin dashboard complex layout integration vuetify"
+project_knowledge_search "homeadmin component orchestration patterns"
+
+# Official docs for advanced integration
+get-library-docs /vuejs/docs --topic="composition-api provide-inject dynamic-components"
 ```
 
 ### **Sequential Thinking Focus**

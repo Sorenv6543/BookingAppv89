@@ -1,0 +1,22 @@
+{
+  "tools": [
+    {
+      "name": "vuetify_rag",
+      "description": "Query Vuettify documentation using RAG API",
+      "command": "curl",
+      "args": [
+        "-X", "POST",
+        "http://localhost:8000/ask",
+        "-H", "Content-Type: application/json",
+        "-d", "{\"query\": \"$1\", \"context\": \"$2\", \"type\": \"coding\"}"
+      ],
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "description": "Vuettify question"},
+          "context": {"type": "string", "description": "Current code context"}
+        }
+      }
+    }
+  ]
+}
