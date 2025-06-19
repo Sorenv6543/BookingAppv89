@@ -11,19 +11,19 @@
   <div class="home-admin-container">
     <v-row
       no-gutters
-      class="fill-height flex-nowrap"
-      style="height: 100vh;"
+      class="fill-height flex-nowrap admin-layout"
     >
       <!-- Sidebar Column -->
       <v-col 
         cols="12" 
+        md="4" 
         lg="4" 
         xl="3" 
-        class="sidebar-column"
+        class="sidebar-column pa-0"
       >
         <!-- Mobile Menu Toggle -->
         <v-app-bar
-          v-if="$vuetify.display.mdAndDown"
+          v-if="$vuetify.display.smAndDown"
           flat
           color="transparent"
           height="48"
@@ -56,9 +56,10 @@
       <!-- Main Calendar Column -->
       <v-col 
         cols="12" 
+        md="8" 
         lg="8" 
         xl="9" 
-        class="calendar-column"
+        class="calendar-column pa-0"
       >
         <div class="calendar-header">
           <!-- Admin-focused Calendar Controls -->
@@ -1035,17 +1036,31 @@ onUnmounted(() => {
 
 <style scoped>
 .home-admin-container {
-  height: 100vh;
+  /* Let v-main handle the height calculation */
+  height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
+.admin-layout {
+  /* Use Vuetify's fill-height for proper v-main integration */
+  height: 100%;
+  min-height: 100%;
+  /* Ensure columns are truly adjacent with no gaps */
+  gap: 0 !important;
+}
+
 .sidebar-column {
   position: relative;
   background-color: rgb(var(--v-theme-surface));
-  padding-right: 0 !important;
-  height: 100vh;
+  /* Remove all padding and margins for adjacent positioning */
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 100%;
+  max-height: 100%;
+  /* Ensure clean edge against calendar */
+  border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12);
 }
 
 .sidebar-container {
@@ -1054,7 +1069,8 @@ onUnmounted(() => {
 }
 
 .sidebar-desktop {
-  height: calc(100vh - 64px);
+  /* Account for app-bar automatically via v-main */
+  height: 100%;
   overflow-y: auto;
 }
 
@@ -1070,11 +1086,15 @@ onUnmounted(() => {
 }
 
 .calendar-column {
-  height: 100vh;
+  /* Remove fixed 100vh - work within v-main boundaries */
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding-left: 0 !important;
+  /* Remove all padding for adjacent positioning */
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: rgb(var(--v-theme-background));
 }
 
 .calendar-header {
@@ -1108,26 +1128,52 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
-/* Responsive design optimized for Vuetify grid system */
+/* Mobile-First Responsive Design */
 @media (max-width: 959px) { /* md and down */
   .home-admin-container {
     position: relative;
+    height: auto;
+    min-height: 100%;
+  }
+  
+  .admin-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100%;
+  }
+  
+  .sidebar-column {
+    height: auto;
+    max-height: 50vh;
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
+    z-index: 1000;
   }
   
   .calendar-column {
+    flex: 1;
+    min-height: 50vh;
+    height: auto;
     transition: transform 0.3s ease;
   }
   
   .calendar-column.drawer-open {
     transform: translateX(0);
   }
-  
-  .sidebar-column {
-    z-index: 1000;
-  }
 }
 
 @media (min-width: 960px) { /* lg and up */
+  .admin-layout {
+    height: 100%;
+  }
+  
+  .sidebar-column {
+    height: 100%;
+  }
+  
+  .calendar-column {
+    height: 100%;
+  }
+  
   .sidebar-container {
     transform: none !important;
     position: static !important;
@@ -1136,6 +1182,7 @@ onUnmounted(() => {
   }
 }
 
+/* Mobile UI Optimizations */
 @media (max-width: 600px) {
   .calendar-header {
     padding: 8px;
@@ -1149,6 +1196,12 @@ onUnmounted(() => {
   .calendar-header .v-btn-toggle {
     margin-left: 0 !important;
     margin-top: 8px;
+  }
+  
+  /* Mobile viewport fixes */
+  .home-admin-container {
+    min-height: 100dvh; /* Dynamic viewport height */
+    min-height: 100vh;  /* Fallback */
   }
 }
 

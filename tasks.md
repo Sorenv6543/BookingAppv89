@@ -1264,18 +1264,46 @@
 - [ ] **TASK-061**: Create OwnerCalendar.vue component
   - Status: Not Started
   - Requirements:
-    - Create `src/components/smart/owner/OwnerCalendar.vue`
+    - Create `src/components/smart/owner/OwnerCalendar.vue` owner-specific features
     - Filter calendar events to owner's properties only
-    - Implement owner-specific calendar controls (OwnerCalendarControls)
+    -  Extract calendar business logic to `useOwnerCalendarState.ts` 
+    - Implement owner-specific calendar controls (OwnerCalendarControls) 
     - Add owner-specific event creation workflows
     - Remove admin-only features (cleaner assignment, system-wide view)
-    - Add owner-specific calendar views (My Properties, My Bookings)
+    - Make OwnerCalendar.vue a thin presentation layer (~150 lines max)
+    -  Component should delegate all business logic to composable
     - Implement owner-specific event styling and indicators
   - Notes: Replace generic FullCalendar.vue for owner role
   - Files: src/components/smart/owner/OwnerCalendar.vue
   - Dependencies: OwnerCalendarControls.vue component
-  - Verification: Owner sees only their property events and bookings
+  -  Component should delegate all business logic to composables
+  - ### **Verification Checklist** (Updated):
+  - [ ] OwnerCalendar.vue is thin presentation layer (~150 lines)
+  - [ ] All business logic extracted to useOwnerCalendarState composable
+  - [ ] Owner sees only their property events and bookings
+  - [ ] Calendar logic reusable and testable in isolation
+  - [ ] Component focuses only on UI rendering and event delegation
   - Assigned to: Cursor
+
+### **TASK-061B: 
+- **Status**: Not Started  
+- **Priority**: 🚨 CRITICAL - Required before TASK-066
+- **Complexity Rating**: 9/10 - Very high complexity due to system-wide logic
+- **Requirements**:
+  - Create `src/composables/admin/useAdminDashboard.ts`
+  - Extract ALL business logic from HomeAdmin.vue (currently 1020+ lines)
+  - Implement system-wide data access and operations
+  - Create clean interface for HomeAdmin.vue orchestration
+  - Include admin-specific error handling and business impact warnings
+  - Implement system calendar state management
+  - Add cleaner assignment and system management operations
+  - Include business analytics and reporting functionality
+- **Expected Outcome**: HomeAdmin.vue reduces from 1020+ lines to ~200 lines
+- **Files**: `src/composables/admin/useAdminDashboard.ts`
+- **Dependencies**: Existing admin composables (useAdminBookings, useAdminProperties, useCleanerManagement)
+- **Verification**: HomeAdmin.vue becomes thin orchestrator with minimal business logic
+- **Assigned to**: Cursor
+
 
 - [ ] **TASK-062**: Create AdminSidebar.vue component
   - Status: Not Started
@@ -1290,20 +1318,78 @@
   - Notes: Comprehensive admin navigation interface
   - Files: src/components/smart/admin/AdminSidebar.vue
   - Verification: Admin sees full system navigation and controls
+  - Sidebar should delegate all business logic to composables
+  - Make AdminSidebar.vue a thin presentation layer (~150 lines max)
+  
+  - ### **Verification Checklist** (Updated):
+  - [ ] AdminSidebar.vue is thin presentation layer (~150 lines)
+  - [ ] All navigation logic extracted to useAdminNavigation composable  
+  - [ ] System metrics calculation handled in composables
+  - [ ] Component focuses only on UI rendering and event delegation
+  
+  - ### **Implementation Specifics**:
+   ```typescript
+   // AdminSidebar.vue should look like this:
+   const {
+     navigationState,
+     systemMetrics,
+     navigationActions
+   } = useAdminNavigation();
+   
+   // NOT like this (business logic in component):
+  const urgentTurns = computed(() => /* complex system calculations */);
+  ```
+  ### **Verification Checklist** (Updated):
+  - [ ] All dashboard composables properly typed
+  - [ ] Thin orchestrator components have proper type safety
+  - [ ] New architectural patterns supported by TypeScript
+  - [ ] `npm run type-check` passes without errors
   - Assigned to: Cursor
 
-- [ ] **TASK-063**: Fix TypeScript errors in existing components
+- [ ] **📋 UPDATED TASK-063: Fix TypeScript Errors + Add Dashboard Composable Types**
   - Status: Not Started
   - Requirements:
     - Fix all TypeScript compilation errors in role-based components
+    -  **🚨 NEW CRITICAL**: Add TypeScript interfaces for dashboard composables
+    -  **🚨 NEW CRITICAL**: Create type definitions for thin orchestrator pattern
+    - **Enhanced Focus**: Support new architectural patterns with proper typing
     - Add proper type definitions for component props and events
     - Update existing components to use strict TypeScript compliance
     - Add type guards for role-based data validation
     - Fix any eslint errors related to TypeScript usage
-    - Add comprehensive type documentation
+    - Add comprehensive type documentation`
   - Notes: Essential for code quality and maintainability
   - Files: All TypeScript files with compilation errors
   - Verification: TypeScript compiles without errors
+  - ### **New Type Definitions Required**:
+   ```typescript
+   // types/dashboard.ts (NEW FILE)
+   export interface OwnerDashboardData {
+     properties: Property[];
+     bookings: Booking[];
+     todayTurns: Booking[];
+     calendarEvents: CalendarEvent[];
+   }
+   
+   export interface OwnerDashboardActions {
+     createBooking: (data: BookingFormData) => Promise<Booking>;
+     updateBooking: (id: string, data: Partial<Booking>) => Promise<void>;
+     navigateToBooking: (id: string) => void;
+   }
+   
+   export interface AdminDashboardData {
+     allProperties: Property[];
+     allBookings: Booking[];
+     systemMetrics: SystemMetrics;
+     cleanerQueue: CleanerAssignment[];
+   }
+   
+   export interface AdminDashboardActions {
+     assignCleaner: (bookingId: string, cleanerId: string) => Promise<void>;
+     generateReport: (type: ReportType) => Promise<Report>;
+     manageSystem: () => void;
+   }
+   ```
   - Assigned to: Cursor
 
 - [ ] **TASK-064**: Fix AdminCalendar.vue implementation issues
@@ -1315,16 +1401,47 @@
     - Fix calendar event filtering for admin view
     - Add admin-specific event management features
     - Implement cleaner assignment integration
+    -   **Original**:Fix DOM mounting issues and admin calendar features
+    - **🚨 NEW CRITICAL**: Extract admin calendar logic to `useAdminCalendarStat.ts`composable
+    - **🚨 NEW CRITICAL**: Make AdminCalendar.vue a thin presentation layer (~150 lines max)
+    - **Enhanced Focus**: Resolve technical issues while implementing proper architecture
   - Notes: Complete admin calendar functionality
   - Files: src/components/smart/admin/AdminCalendar.vue
   - Dependencies: AdminCalendarControls component
-  - Verification: Admin calendar works with full functionality
-  - Assigned to: Cursor
 
-### **Integration and Testing**
-- [ ] **TASK-065**: Integrate new owner components into HomeOwner.vue
-  - Status: Not Started
-  - Requirements:
+  ### **Implementation Specifics**:
+  ```typescript
+  // AdminCalendar.vue should look like this:
+  const {
+    adminCalendarState,
+    systemCalendarEvents,
+    calendarActions
+  } = useAdminCalendarState();
+  
+  // Business logic extraction includes:
+  // - Cleaner assignment logic
+  // - System-wide event filtering  
+  // - Calendar state management
+  // - DOM mounting safety checks
+  ```
+  ### **Verification Checklist** (Updated):
+- [ ] DOM mounting errors resolved
+- [ ] AdminCalendar.vue is thin presentation layer (~150 lines)
+- [ ] All calendar logic extracted to useAdminCalendarState composable
+- [ ] Admin calendar route loads without errors
+- [ ] Complex admin workflows function correctly
+---
+  ## **📋 UPDATED TASK-065: Transform HomeOwner.vue into Thin Orchestrator**
+  ### **🚨 CRITICAL ARCHITECTURAL FOCUS** (Primary Objective):
+  ### **Enhanced Requirements** (Completely Refocused):
+  - **🚨 PRIMARY**: Refactor HomeOwner.vue to use useOwnerDashboard() composable
+  - **🚨 PRIMARY**: Reduce component size from ~900 lines to ~200 lines maximum
+  - **🚨 PRIMARY**: Remove ALL business logic from component
+  - **Secondary**: Integrate OwnerSidebar and OwnerCalendar components
+  - **Secondary**: Update component imports and references
+  - [ ] **TASK-065**: Integrate new owner components into HomeOwner.vue
+    - Status: Not Started
+    - Requirements:
     - Update HomeOwner.vue to use OwnerSidebar component
     - Integrate OwnerCalendar into owner home page
     - Test owner component integration thoroughly
@@ -1336,23 +1453,136 @@
   - Dependencies: TASK-060, TASK-061
   - Verification: Owner interface uses all role-specific components
   - Assigned to: Cursor
+  - 
+   ### **Implementation Pattern** (REQUIRED):
+```vue
+<!-- HomeOwner.vue - Target: ~200 lines total -->
+<template>
+  <div class="home-owner-container">
+    <v-row no-gutters class="fill-height">
+      <v-col cols="12" lg="3" xl="2">
+        <OwnerSidebar
+          :today-turns="ownerData.todayTurns"
+          :upcoming-cleanings="ownerData.upcomingCleanings"
+          :properties="ownerData.properties"
+          @navigate-to-booking="ownerActions.navigateToBooking"
+          @create-booking="ownerActions.createBooking"
+        />
+      </v-col>
+      <v-col cols="12" lg="9" xl="10">
+        <OwnerCalendar
+          :events="ownerData.calendarEvents"
+          :current-view="calendarState.currentView"
+          @event-click="ownerActions.handleEventClick"
+          @date-select="ownerActions.handleDateSelect"
+        />
+      </v-col>
+    </v-row>
+  </div>
+</template>
 
-- [ ] **TASK-066**: Integrate new admin components into HomeAdmin.vue
-  - Status: Not Started
-  - Requirements:
-    - Update HomeAdmin.vue to use AdminSidebar component
-    - Integrate fixed AdminCalendar into admin home page
-    - Test admin component integration thoroughly
-    - Verify admin access to all system features
-    - Test admin-specific workflows end-to-end
-    - Update admin page routing and navigation
-  - Notes: Complete admin interface with all role-based components
-  - Files: src/components/smart/admin/HomeAdmin.vue
-  - Dependencies: TASK-062, TASK-064
-  - Verification: Admin interface uses all role-specific components
-  - Assigned to: Cursor
+<script setup lang="ts">
+// ✅ GOOD: Thin orchestration layer
+const { 
+  ownerData, 
+  ownerActions, 
+  calendarState 
+} = useOwnerDashboard();
+
+// ✅ Minimal component-specific logic only
+const sidebarOpen = ref(false);
+const toggleSidebar = () => sidebarOpen.value = !sidebarOpen.value;
+</script>
+```
+
+## **📋 UPDATED TASK-066: Transform HomeAdmin.vue into Thin Orchestrator**
+**Transform HomeAdmin.vue from 1020+ line business logic component into ~200 line thin orchestrator using useAdminDashboard composable**
+   - [ ] **TASK-066**: Integrate new admin components into HomeAdmin.vue
+     - Status: Not Started
+     - Requirements:
+       - HomeAdmin.vue to use AdminSidebar component
+       - Integrate fixed AdminCalendar into admin home page
+
+           - ### **Enhanced Requirements** (Completely Refocused):
+      - **🚨 PRIMARY**: Refactor HomeAdmin.vue to use useAdminDashboard() composable
+      - **🚨 PRIMARY**: Reduce component size from 1020+ lines to ~200 lines maximum
+      - **🚨 PRIMARY**: Remove ALL business logic from component
+      - **Secondary**: Integrate AdminSidebar and AdminCalendar components
+      - **Secondary**: Update component imports and references
+           - Verify admin access to all system features
+     - Test admin-specific workflows end-to-end
+     - admin page routing and navigation
+     - Notes: Complete admin interface with all role-based components
+     - Files: src/components/smart/admin/HomeAdmin.vue
+     - Dependencies: TASK-062, TASK-064
+     - Verification: Admin interface uses all role-specific components
+     - Assigned to: Cursor
+---
+
+### **Implementation Pattern** (REQUIRED):
+```vue
+<!-- HomeAdmin.vue - Target: ~200 lines total -->
+<template>
+  <div class="home-admin-container">
+    <v-row no-gutters class="fill-height">
+      <v-col cols="12" lg="3" xl="2">
+        <AdminSidebar
+          :system-metrics="adminData.systemMetrics"
+          :urgent-turns="adminData.urgentTurns"
+          :cleaner-queue="adminData.cleanerQueue"
+          @assign-cleaner="adminActions.assignCleaner"
+          @generate-report="adminActions.generateReport"
+        />
+      </v-col>
+      <v-col cols="12" lg="9" xl="10">
+        <AdminCalendar
+          :events="adminData.allCalendarEvents"
+          :cleaners="adminData.cleaners"
+          @assign-cleaner="adminActions.assignCleaner"
+          @update-booking-status="adminActions.updateStatus"
+        />
+      </v-col>
+    </v-row>
+  </div>
+</template>
+
+<script setup lang="ts">
+// ✅ GOOD: Thin orchestration layer  
+const { 
+  adminData, 
+  adminActions, 
+  systemState 
+} = useAdminDashboard();
+
+// ✅ Minimal component-specific logic only
+const sidebarOpen = ref(false);
+const toggleSidebar = () => sidebarOpen.value = !sidebarOpen.value;
+</script>
+```
+### **Before/After Metrics**:
+- **Before**: 1020+ lines with complex business logic
+- **After**: ~200 lines, pure orchestration
+- **Business Logic**: Moved to useAdminDashboard composable
+- **Maintainability**: Single source of truth achieved
+
+### **Verification Checklist** (Architectural Focus):
+- [ ] **🚨 CRITICAL**: HomeAdmin.vue is ~200 lines or less
+- [ ] **🚨 CRITICAL**: Uses useAdminDashboard() for all business logic
+- [ ] **🚨 CRITICAL**: No business logic remains in component
+- [ ] Admin interface shows system-wide data
+- [ ] Role switching functionality works through composables
+- [ ] All admin-specific features accessible
+- [ ] Complex admin workflows function correctly
+
+### **Dependencies**:
+- **CRITICAL**: TASK-060B (useAdminDashboard) must be complete first
+- **Standard**: TASK-062 (AdminSidebar), TASK-064 (AdminCalendar)
 
 ---
+
+
+
+
 
 ## **Phase 1G: Code Cleanup & Organization** 
 **(HIGH PRIORITY - Remove Technical Debt)**
@@ -1367,15 +1597,28 @@
     - Configure build to exclude `src/dev/` from production bundle
     - Update .gitignore to handle development artifacts appropriately
     - Create README.md in dev folder explaining purpose
-  - Files to Move:
+     ### **Enhanced File Organization**:
     ```
-    src/components/demos/ → src/dev/demos/
-    src/pages/demos/ → src/dev/pages/
-    src/components/dumb/PropertyCardDemo.vue → src/dev/demos/
+    src/dev/
+    ├── demos/
+    │   ├── components/           # Component demos
+    │   ├── composables/         # Composable demos  
+    │   ├── dashboard/           # Dashboard composable demos
+    │   └── integration/         # Integration test demos
+    ├── testing/
+    │   ├── fixtures/           # Test data
+    │   ├── mocks/              # Mock implementations
+    │   └── utilities/          # Test utilities
+    └── README.md               # Development environment docs
     ```
-  - Notes: Clean separation of dev vs production code
-  - Verification: Production build excludes demo components, dev server still includes them
-  - Assigned to: Cursor
+    
+    ### **Verification Checklist** (Updated):
+    - [ ] Production build excludes src/dev/ completely
+    - [ ] Development server includes demo components
+    - [ ] Clean separation of dev vs production code
+    - [ ] Dashboard composables have demo components
+
+---
 
 - [ ] **TASK-068**: Remove redundant generic components after migration
   - Status: Not Started

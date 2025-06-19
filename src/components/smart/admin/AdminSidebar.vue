@@ -1,7 +1,7 @@
 <template>
   <!-- Mobile/Tablet: Compact horizontal sidebar for small screens -->
   <v-card
-    v-if="!mdAndUp"
+    v-if="!$vuetify.display.lgAndUp"
     class="admin-sidebar-mobile mb-4"
     :elevation="1"
     color="surface"
@@ -61,7 +61,7 @@
     </v-card-text>
   </v-card>
 
-  <!-- Desktop: Grid-integrated sidebar (mdAndUp instead of lgAndUp) -->
+  <!-- Desktop: Grid-integrated sidebar (lgAndUp for consistency) -->
   <v-card
     v-else
     class="admin-sidebar-desktop"
@@ -1438,6 +1438,8 @@ onMounted(() => {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  /* Ensure no margins for adjacent positioning */
+  margin: 0 !important;
 }
 
 .admin-sidebar-desktop .v-container {
@@ -1453,6 +1455,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   z-index: 1001 !important;
+  /* Ensure no margins for adjacent positioning */
+  margin: 0 !important;
 }
 
 .admin-sidebar-mobile .v-container {
