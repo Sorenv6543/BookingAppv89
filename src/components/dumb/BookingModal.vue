@@ -146,7 +146,7 @@
             </v-row>
             
             <!-- Status (Edit mode only) -->
-            <v-row v-if="mode === 'edit'">
+            <v-row v-if="mode === 'edit' || mode === 'admin-edit'">
               <v-col cols="12">
                 <v-select
                   v-model="form.status"
@@ -156,6 +156,117 @@
                   :disabled="loading"
                   :error-messages="errors.get('status')"
                 />
+              </v-col>
+            </v-row>
+            
+            <!-- Cleaner Assignment (Admin mode only) -->
+            <v-row v-if="mode === 'admin-edit'">
+              <v-col cols="12">
+                <v-card variant="outlined" class="mb-4">
+                  <v-card-title class="text-subtitle-1">
+                    <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
+                    Cleaner Assignment
+                  </v-card-title>
+                  <v-divider />
+                  <v-card-text>
+                    <v-select
+                      v-model="form.assigned_cleaner_id"
+                      :items="availableCleaners"
+                      item-title="name"
+                      item-value="id"
+                      label="Assigned Cleaner"
+                      variant="outlined"
+                      :disabled="loading"
+                      clearable
+                      :error-messages="errors.get('assigned_cleaner_id')"
+                    >
+                      <template #item="{ props, item }">
+                        <v-list-item v-bind="props">
+                          <template #prepend>
+                            <v-avatar size="32" color="primary">
+                              <v-icon>mdi-account</v-icon>
+                            </v-avatar>
+                          </template>
+                          <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                          <v-list-item-subtitle>
+                            Skills: {{ item.raw.skills.join(', ') }}
+                          </v-list-item-subtitle>
+                        </v-list-item>
+                      </template>
+                    </v-select>
+                    
+                    <v-btn
+                      v-if="form.assigned_cleaner_id"
+                      color="success"
+                      variant="tonal"
+                      size="small"
+                      class="mt-2"
+                      @click="handleAssignCleaner"
+                    >
+                      <v-icon start>mdi-check</v-icon>
+                      Confirm Assignment
+                    </v-btn>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            
+            <!-- Admin Quick Actions -->
+            <v-row v-if="mode === 'admin-edit' && booking">
+              <v-col cols="12">
+                <v-card variant="outlined" color="info">
+                  <v-card-title class="text-subtitle-1">
+                    <v-icon class="mr-2">mdi-lightning-bolt</v-icon>
+                    Quick Actions
+                  </v-card-title>
+                  <v-card-text>
+                    <div class="d-flex flex-wrap gap-2">
+                      <v-btn
+                        v-if="form.status === 'pending'"
+                        color="primary"
+                        size="small"
+                        variant="tonal"
+                        @click="handleQuickSchedule"
+                      >
+                        <v-icon start>mdi-calendar-check</v-icon>
+                        Schedule Now
+                      </v-btn>
+                      
+                      <v-btn
+                        v-if="form.booking_type === 'turn'"
+                        color="error"
+                        size="small"
+                        variant="tonal"
+                        @click="handleUrgentAssign"
+                      >
+                        <v-icon start>mdi-alert</v-icon>
+                        Urgent Assign
+                      </v-btn>
+                      
+                      <v-btn
+                        v-if="form.status === 'scheduled'"
+                        color="purple"
+                        size="small"
+                        variant="tonal"
+                        @click="handleStartCleaning"
+                      >
+                        <v-icon start>mdi-play</v-icon>
+                        Start Cleaning
+                      </v-btn>
+                      
+                      <v-btn
+                        v-if="form.status === 'in_progress'"
+                        color="green"
+                        size="small"
+                        variant="tonal"
+                        @click="handleCompleteCleaning"
+                      >
+                        <v-icon start>mdi-check</v-icon>
+                        Mark Complete
+                      </v-btn>
+                    </div>
+                  </v-card-text>
+                </v-card>
               </v-col>
             </v-row>
             
@@ -236,7 +347,7 @@ import type { VForm } from 'vuetify/components';
 // PROPS & EMITS
 interface Props {
   open?: boolean;
-  mode?: 'create' | 'edit';
+  mode?: 'create' | 'edit' | 'admin-edit';
   booking?: Booking;
 }
 
@@ -244,6 +355,8 @@ interface Emits {
   (e: 'close'): void;
   (e: 'save', booking: BookingFormData): void;
   (e: 'delete', id: string): void;
+  (e: 'assign-cleaner', data: { bookingId: string; cleanerId: string }): void;
+  (e: 'status-change', data: { bookingId: string; status: BookingStatus }): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -264,6 +377,15 @@ const loading = ref<boolean>(false);
 const errors = ref<Map<string, string>>(new Map());
 const autoDetectType = ref<boolean>(true);
 
+// Admin-specific state
+const showCleanerAssignment = ref<boolean>(false);
+const selectedCleaner = ref<string>('');
+const availableCleaners = ref([
+  { id: 'cleaner-1', name: 'John Smith', skills: ['Standard', 'Deep Clean'] },
+  { id: 'cleaner-2', name: 'Sarah Johnson', skills: ['Turn', 'Standard'] },
+  { id: 'cleaner-3', name: 'Mike Wilson', skills: ['Deep Clean', 'Move-out'] }
+]);
+
 // FORM DATA
 const form = reactive<Partial<BookingFormData>>({
   property_id: '',
@@ -274,6 +396,7 @@ const form = reactive<Partial<BookingFormData>>({
   notes: '',
   status: 'pending',
   owner_id: '', // Will be set by the parent component
+  assigned_cleaner_id: '', // Admin-specific field
 });
 
 // COMPUTED PROPERTIES
@@ -285,11 +408,11 @@ const isOpen = computed({
 });
 
 const formTitle = computed((): string => {
-  return props.mode === 'create' ? 'Create Booking' : 'Edit Booking';
+  return props.mode === 'create' ? 'Create Booking' : props.mode === 'edit' ? 'Edit Booking' : 'Admin Edit Booking';
 });
 
 const submitButtonText = computed((): string => {
-  return props.mode === 'create' ? 'Create' : 'Save';
+  return props.mode === 'create' ? 'Create' : props.mode === 'edit' ? 'Save' : 'Assign Cleaner';
 });
 
 const propertiesArray = computed((): Property[] => {
@@ -387,7 +510,8 @@ function resetForm(): void {
       guest_count: props.booking.guest_count,
       notes: props.booking.notes,
       status: props.booking.status,
-      owner_id: props.booking.owner_id
+      owner_id: props.booking.owner_id,
+      assigned_cleaner_id: props.booking.assigned_cleaner_id
     });
   } else {
     // Reset to defaults for create mode
@@ -399,7 +523,8 @@ function resetForm(): void {
       guest_count: undefined,
       notes: '',
       status: 'pending',
-      owner_id: ''
+      owner_id: '',
+      assigned_cleaner_id: ''
     });
   }
 }
@@ -467,7 +592,8 @@ async function handleSubmit(): Promise<void> {
       status: (form.status as BookingStatus) || 'pending',
       owner_id: form.owner_id as string,
       guest_count: form.guest_count,
-      notes: form.notes
+      notes: form.notes,
+      assigned_cleaner_id: form.assigned_cleaner_id
     };
     
     // Emit save event with booking data
@@ -500,6 +626,60 @@ function handleDelete(): void {
 function handleClose(): void {
   resetForm();
   emit('close');
+}
+
+// Admin-specific handlers
+function handleAssignCleaner(): void {
+  if (props.booking && form.assigned_cleaner_id) {
+    emit('assign-cleaner', {
+      bookingId: props.booking.id,
+      cleanerId: form.assigned_cleaner_id
+    });
+  }
+}
+
+function handleQuickSchedule(): void {
+  if (props.booking) {
+    form.status = 'scheduled';
+    emit('status-change', {
+      bookingId: props.booking.id,
+      status: 'scheduled'
+    });
+  }
+}
+
+function handleUrgentAssign(): void {
+  if (props.booking && form.booking_type === 'turn') {
+    // Find first available cleaner for turn bookings
+    const turnCleaner = availableCleaners.value.find(cleaner => 
+      cleaner.skills.includes('Turn')
+    );
+    
+    if (turnCleaner) {
+      form.assigned_cleaner_id = turnCleaner.id;
+      handleAssignCleaner();
+    }
+  }
+}
+
+function handleStartCleaning(): void {
+  if (props.booking) {
+    form.status = 'in_progress';
+    emit('status-change', {
+      bookingId: props.booking.id,
+      status: 'in_progress'
+    });
+  }
+}
+
+function handleCompleteCleaning(): void {
+  if (props.booking) {
+    form.status = 'completed';
+    emit('status-change', {
+      bookingId: props.booking.id,
+      status: 'completed'
+    });
+  }
 }
 
 // LIFECYCLE HOOKS

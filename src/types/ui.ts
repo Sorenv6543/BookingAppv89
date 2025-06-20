@@ -19,7 +19,7 @@ export type FilterValue = string | number | boolean | Date | string[] | null | u
  */
 export interface ModalState {
   open: boolean;
-  mode: 'create' | 'edit' | 'view' | 'delete';
+  mode: 'create' | 'edit' | 'view' | 'admin-edit' | 'delete';
   data?: ModalData;
 }
 

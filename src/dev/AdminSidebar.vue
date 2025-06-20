@@ -44,6 +44,7 @@
               hide-details
               @update:model-value="handlePropertyFilterChange"
             />
+            
             <v-select
               v-model="selectedStatus"
               :items="statusSelectItems"
@@ -55,6 +56,7 @@
               hide-details
               @update:model-value="handleStatusFilterChange"
             />
+            <h2></h2>AdminSidebar.vue line 58
           </div>
         </v-col>
       </v-row>
@@ -74,7 +76,7 @@
       <v-row class="mb-4">
         <v-col cols="12">
           <h2 class="text-h6 font-weight-bold">
-            Business Management
+            components/smart/admin/AdminSidebar.vue
           </h2>
           <div class="text-subtitle-2 text-medium-emphasis">
             {{ formattedDate }}
@@ -534,7 +536,7 @@
       <v-row class="mb-4">
         <v-col cols="12">
           <h2 class="text-h6 font-weight-bold">
-            Business Management
+            AdminSidebar.vue line 537
           </h2>
           <div class="text-subtitle-2 text-medium-emphasis">
             {{ formattedDate }}
@@ -766,10 +768,12 @@
                   </div>
                 </v-col>
                 <v-col cols="6">
+                  <h2>AdminSidebar.vue line 771</h2>
                   <div class="text-center">
                     <div class="text-h4 font-weight-bold text-warning">
                       {{ urgentTurnsCount }}
                     </div>
+                    <h2>AdminSidebar.vue line 775</h2>
                     <div class="text-caption text-medium-emphasis">
                       Urgent Turns
                     </div>

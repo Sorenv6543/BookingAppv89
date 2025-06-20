@@ -51,9 +51,21 @@ export interface BookingWithMetadata extends Booking {
 }
 
 /**
- * Form data for creating/editing bookings
+ * Booking form data interface
+ * Used for creating/updating bookings
  */
-export type BookingFormData = Omit<Booking, 'id' | 'created_at' | 'updated_at'>;
+export interface BookingFormData {
+  property_id: string;
+  checkout_date: string;
+  checkin_date: string;
+  booking_type: BookingType;
+  status?: BookingStatus;
+  guest_count?: number;
+  notes?: string;
+  owner_id?: string;
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
+  assigned_cleaner_id?: string; // Admin-specific field for cleaner assignment
+}
 
 /**
  * Map type for booking collections

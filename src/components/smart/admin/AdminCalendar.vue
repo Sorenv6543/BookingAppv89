@@ -17,6 +17,7 @@
             md="3"
             class="mb-2 mb-md-0"
           >
+          AdminCalendar.vue line 20
             <v-btn-toggle
               v-model="currentView"
               mandatory

@@ -5,7 +5,7 @@
       <v-container fluid>
         <v-row align="center">
           <v-col>
-            <h1 class="text-h4 font-weight-bold">Cleaner Management</h1>
+            <h1 class="text-h4 font-weight-bold">Cleaner Management</h1><h2>admin/cleaners/index.vue line 8</h2>
             <p class="text-subtitle-1 text-medium-emphasis">
               Manage cleaner profiles, availability, and performance
             </p>

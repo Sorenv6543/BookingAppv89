@@ -33,11 +33,11 @@
             @click="sidebarOpen = !sidebarOpen"
           />
           <v-app-bar-title class="text-h6">
-            Business Management
+            pages/admin/index.vue
           </v-app-bar-title>
         </v-app-bar>
 
-        <!-- Proper Navigation Drawer Implementation -->
+        <!-- Proper Navigation Drawer Implementation
         <AdminSidebar
           v-model="sidebarOpen"
           :rail="railMode"
@@ -51,124 +51,127 @@
           @create-booking="handleCreateBooking"
           @create-property="handleCreateProperty"
         />
-      </v-col>
+      </v-col> -->
 
-      <!-- Main Calendar Column -->
-      <v-col 
-        cols="12" 
-        md="8" 
-        lg="8" 
-        xl="9" 
-        class="calendar-column pa-0"
-      >
-        <div class="calendar-header">
-          <!-- Admin-focused Calendar Controls -->
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn 
-              variant="outlined" 
-              class="mr-2" 
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6">
-              {{ formattedDate }}
+        <!-- Main Calendar Column -->
+        <v-col 
+          cols="12" 
+          md="8" 
+          lg="8" 
+          xl="9" 
+          class="calendar-column pa-0"
+        >
+          <div class="calendar-header">
+            <h2>HomeAdmin.vue line 65</h2>
+            <div class="d-flex align-center">
+              <v-btn
+                icon="mdi-arrow-left"
+                variant="text"
+                class="mr-2"
+                @click="handlePrevious"
+              />
+              <v-btn 
+                variant="outlined" 
+                class="mr-2" 
+                @click="handleGoToday"
+              >
+                Today
+              </v-btn>
+              <v-btn
+                icon="mdi-arrow-right"
+                variant="text"
+                class="mr-4"
+                @click="handleNext"
+              />
+              <div class="text-h6">
+                {{ formattedDate }}
+              </div>
+            
+              <!-- System-wide Metrics -->
+              <div class="ml-4 text-caption text-medium-emphasis">
+                {{ systemMetricsText }}
+              </div>
+            
+              <v-spacer />
+            
+              <!-- Admin Quick Actions -->
+              <v-btn
+                color="warning"
+                variant="outlined"
+                prepend-icon="mdi-account-hard-hat"
+                class="mr-2"
+                @click="handleAssignCleaners"
+              >
+                Assign Cleaners
+              </v-btn>
+              <v-btn
+                color="info"
+                variant="outlined"
+                prepend-icon="mdi-chart-line"
+                class="mr-2"
+                @click="handleGenerateReports"
+              >
+                Reports
+              </v-btn>
+              <v-btn
+                color="primary"
+                prepend-icon="mdi-cog"
+                class="mr-4"
+                @click="handleManageSystem"
+              >
+                Manage System
+              </v-btn>
+            
+              <v-btn-toggle
+                v-model="currentView"
+                mandatory
+                class="ml-4"
+              >
+                <v-btn value="dayGridMonth">
+                  Month
+                </v-btn>
+                <v-btn value="timeGridWeek">
+                  Week
+                </v-btn>
+                <v-btn value="timeGridDay">
+                  Day
+                </v-btn>
+              </v-btn-toggle>
             </div>
-            
-            <!-- System-wide Metrics -->
-            <div class="ml-4 text-caption text-medium-emphasis">
-              {{ systemMetricsText }}
-            </div>
-            
-            <v-spacer />
-            
-            <!-- Admin Quick Actions -->
-            <v-btn
-              color="warning"
-              variant="outlined"
-              prepend-icon="mdi-account-hard-hat"
-              class="mr-2"
-              @click="handleAssignCleaners"
-            >
-              Assign Cleaners
-            </v-btn>
-            <v-btn
-              color="info"
-              variant="outlined"
-              prepend-icon="mdi-chart-line"
-              class="mr-2"
-              @click="handleGenerateReports"
-            >
-              Reports
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-cog"
-              class="mr-4"
-              @click="handleManageSystem"
-            >
-              Manage System
-            </v-btn>
-            
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              class="ml-4"
-            >
-              <v-btn value="dayGridMonth">
-                Month
-              </v-btn>
-              <v-btn value="timeGridWeek">
-                Week
-              </v-btn>
-              <v-btn value="timeGridDay">
-                Day
-              </v-btn>
-            </v-btn-toggle>
           </div>
-        </div>
 
-        <!-- TODO: Replace with AdminCalendar.vue when TASK-039H is complete -->
-        <AdminCalendar 
-          ref="calendarRef"
-          :bookings="adminFilteredBookings"
-          :loading="loading"
-          :current-view="currentView"
-          :current-date="currentDate"
-          :properties="allPropertiesMap"
-          :users="allUsersMap"
-          @date-select="handleDateSelect"
-          @event-click="handleEventClick"
-          @event-drop="handleEventDrop"
-          @event-resize="handleEventResize"
-          @view-change="handleCalendarViewChange"
-          @date-change="handleCalendarDateChange"
-          @create-booking="handleCreateBookingFromCalendar"
-          @update-booking="handleUpdateBooking"
-        />
+          <!-- TODO: Replace with AdminCalendar.vue when TASK-039H is complete -->
+          <AdminCalendar 
+            ref="calendarRef"
+            :bookings="adminFilteredBookings"
+            :loading="loading"
+            :current-view="currentView"
+            :current-date="currentDate"
+            :properties="allPropertiesMap"
+            :users="allUsersMap"
+            @date-select="handleDateSelect"
+            @event-click="handleEventClick"
+            @event-drop="handleEventDrop"
+            @event-resize="handleEventResize"
+            @view-change="handleCalendarViewChange"
+            @date-change="handleCalendarDateChange"
+            @create-booking="handleCreateBookingFromCalendar"
+            @update-booking="handleUpdateBooking"
+          />
+        </v-col>
       </v-col>
     </v-row>
 
     <!-- Admin-focused Modals -->
-    <BookingForm
+    <BookingModal
       :open="eventModalOpen"
       :mode="eventModalMode"
       :booking="eventModalData"
       @close="handleEventModalClose"
       @save="handleEventModalSave"
       @delete="handleEventModalDelete"
+      @assign-cleaner="handleCleanerAssign"
+      @status-change="handleStatusChange"
     />
 
     <PropertyModal
@@ -205,9 +208,9 @@ import { useDisplay } from 'vuetify';
 
 // Admin components (using generic components for now)
 
-import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
+
 import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
-import BookingForm from '@/components/dumb/BookingModal.vue';
+import BookingModal from '@/components/dumb/BookingModal.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
 import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
 
@@ -224,7 +227,7 @@ import { useProperties } from '@/composables/shared/useProperties';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 // Types
-import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
+import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView, BookingStatus } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Import event logger for component communication
@@ -279,15 +282,7 @@ const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
 const sidebarOpen = ref(!xs.value);
 const selectedPropertyFilter = ref<string | null>(null);
 
-// Navigation drawer responsive behavior
-const railMode = computed(() => {
-  // Use rail mode on desktop when there's limited space
-  return !xs.value && !sidebarOpen.value;
-});
 
-// ============================================================================
-// ADMIN-SPECIFIC DATA ACCESS
-// ============================================================================
 
 // Check if user is authenticated and is an admin
 const isAdminAuthenticated = computed(() => {
@@ -460,10 +455,10 @@ const systemMetricsText = computed(() => {
 
 // Event Modal State
 const eventModalOpen = computed(() => uiStore.isModalOpen('event'));
-const eventModalMode = computed((): 'create' | 'edit' | undefined => {
+const eventModalMode = computed((): 'create' | 'admin-edit' | undefined => {
   const modalState = uiStore.getModalState('event');
   const mode = modalState?.mode;
-  return (mode === 'create' || mode === 'edit') ? mode : undefined;
+  return (mode === 'create' || mode === 'admin-edit') ? mode : undefined;
 });
 const eventModalData = computed((): Booking | undefined => {
   const modalData = uiStore.getModalData('event') as any;
@@ -509,48 +504,7 @@ const confirmDialogDangerous = computed((): boolean => {
 // EVENT HANDLERS - NAVIGATION
 // ============================================================================
 
-const handleNavigateToBooking = (bookingId: string): void => {
-  try {
-    // Log receiving event from AdminSidebar (or generic Sidebar)
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'navigateToBooking',
-      bookingId,
-      'receive'
-    );
 
-    // Open booking modal for editing
-    const booking = allBookingsMap.value.get(bookingId);
-    if (booking) {
-      uiStore.openModal('event', 'edit', {
-        booking: booking
-      });
-    } else {
-      console.warn(`Booking with ID ${bookingId} not found`);
-    }
-  } catch (error) {
-    console.error('Error navigating to booking:', error);
-    // TODO: Show admin-specific error notification
-  }
-};
-
-const handleNavigateToDate = (date: Date): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'navigateToDate',
-      date,
-      'receive'
-    );
-
-    goToDate(date);
-  } catch (error) {
-    console.error('Error navigating to date:', error);
-    // TODO: Show admin-specific error notification
-  }
-};
 
 const handleFilterByProperty = (propertyId: string | null): void => {
   try {
@@ -958,6 +912,44 @@ const handlePropertyModalDelete = (propertyId: string): void => {
     });
   } catch (error) {
     console.error('Error deleting property:', error);
+  }
+};
+
+// New admin-specific handlers for enhanced BookingModal
+const handleCleanerAssign = async (data: { bookingId: string; cleanerId: string }): Promise<void> => {
+  try {
+    // This would typically use useCleanerManagement composable
+    console.log('Assigning cleaner:', data);
+    
+    // Update the booking in the store
+    const booking = allBookingsMap.value.get(data.bookingId);
+    if (booking) {
+      const updatedBooking = { ...booking, assigned_cleaner_id: data.cleanerId, status: 'scheduled' as const };
+      allBookingsMap.value.set(data.bookingId, updatedBooking);
+      
+      // Show success notification
+      uiStore.addNotification('success', 'Cleaner Assigned', 'Cleaner has been successfully assigned to the booking.');
+    }
+  } catch (error) {
+    console.error('Error assigning cleaner:', error);
+    uiStore.addNotification('error', 'Assignment Failed', 'Failed to assign cleaner to booking.');
+  }
+};
+
+const handleStatusChange = async (data: { bookingId: string; status: BookingStatus }): Promise<void> => {
+  try {
+    // Update the booking status in the store
+    const booking = allBookingsMap.value.get(data.bookingId);
+    if (booking) {
+      const updatedBooking = { ...booking, status: data.status };
+      allBookingsMap.value.set(data.bookingId, updatedBooking);
+      
+      // Show success notification
+      uiStore.addNotification('success', 'Status Updated', `Booking status changed to ${data.status}.`);
+    }
+  } catch (error) {
+    console.error('Error updating status:', error);
+    uiStore.addNotification('error', 'Status Update Failed', 'Failed to update booking status.');
   }
 };
 

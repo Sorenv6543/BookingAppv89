@@ -73,7 +73,7 @@ export const useUIStore = defineStore('ui', () => {
   });
   
   // Actions
-  function openModal(modalId: string, mode: 'create' | 'edit' | 'view' | 'delete' = 'view', data?: ModalData) {
+  function openModal(modalId: string, mode: 'create' | 'admin-edit' | 'edit' | 'view' | 'delete' = 'view', data?: ModalData) {
     modals.value.set(modalId, {
       open: true,
       mode,

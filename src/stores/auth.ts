@@ -28,7 +28,7 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(null);
   const loading = ref<boolean>(false);
   const error = ref<string | null>(null);
-  const tempViewMode = ref<{ role: UserRole; ownerId?: string } | null>(null);
+  const tempViewMode = ref<{ role: UserRole; adminId?: string; ownerId?: string } | null>(null);
   
   // Initialize auth composable
   const authComposable = useAuth();

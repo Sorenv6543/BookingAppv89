@@ -25,7 +25,7 @@
         </v-avatar>
         <div>
           <div class="text-h6 font-weight-bold">
-            Property Scheduler
+            Admin Layout
           </div>
           <div class="admin-badge">
             Admin Dashboard
@@ -139,7 +139,7 @@
           </v-avatar>
         </template>
         <v-list-item-title class="text-h6 font-weight-bold">
-          Admin Panel
+          Admin Layout
         </v-list-item-title>
         <v-list-item-subtitle>
           Business Management

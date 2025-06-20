@@ -5,7 +5,7 @@
       <v-container fluid>
         <v-row align="center">
           <v-col>
-            <h1 class="text-h4 font-weight-bold">All Properties</h1>
+            <h1 class="text-h4 font-weight-bold">All Properties</h1><h2>admin/properties/index.vue line 8</h2>
             <p class="text-subtitle-1 text-medium-emphasis">
               Manage all properties across all clients
             </p>

@@ -5,6 +5,7 @@ import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
 import { useUIStore } from '@/stores/ui';
 import type { Booking, BookingStatus, BookingType } from '@/types';
+import type { EventClickArg } from '@fullcalendar/core';
 
 /**
  * Admin-specific calendar state composable
@@ -224,7 +225,7 @@ export function useAdminCalendarState() {
   /**
    * Handle admin event click - admin booking management interface
    */
-  function handleAdminEventClick(eventInfo: any) {
+  function handleAdminEventClick(eventInfo: EventClickArg) {
     const booking = allBookings.value.find(b => b.id === eventInfo.event.id);
     if (!booking) {
       error.value = 'Booking not found';
@@ -232,9 +233,8 @@ export function useAdminCalendarState() {
     }
     
     // Open admin booking management modal with enhanced options
-    uiStore.openModal('adminBookingModal', {
+    uiStore.openModal('adminBookingModal', 'admin-edit', {
       booking,
-      mode: 'admin-edit',
       availableActions: [
         'edit-details',
         'assign-cleaner',

@@ -5,7 +5,7 @@
       <v-container fluid>
         <v-row align="center">
           <v-col>
-            <h1 class="text-h4 font-weight-bold">Business Reports</h1>
+            <h1 class="text-h4 font-weight-bold">Business Reports</h1><h2>admin/reports/index.vue line 8</h2>
             <p class="text-subtitle-1 text-medium-emphasis">
               Analytics and performance metrics across all operations
             </p>

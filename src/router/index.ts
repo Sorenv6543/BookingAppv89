@@ -9,7 +9,7 @@ const router = createRouter({
     // Root route - role-based redirect
     {
       path: '/',
-      name: 'home',
+      name: 'root',
       component: () => import('@/pages/index.vue'), // Role-based routing component
       meta: {
         layout: 'default'
@@ -59,7 +59,7 @@ const router = createRouter({
       name: 'admin',
       component: () => import('@/pages/admin/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'admin',
         requiresAuth: true,
         role: 'admin'
       }
@@ -69,7 +69,7 @@ const router = createRouter({
       name: 'admin-schedule',
       component: () => import('@/pages/admin/schedule/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'admin',
         requiresAuth: true,
         role: 'admin'
       }
@@ -79,7 +79,7 @@ const router = createRouter({
       name: 'admin-properties',
       component: () => import('@/pages/admin/properties/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'admin',
         requiresAuth: true,
         role: 'admin'
       }
@@ -89,7 +89,7 @@ const router = createRouter({
       name: 'admin-bookings',
       component: () => import('@/pages/admin/bookings/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'admin',
         requiresAuth: true,
         role: 'admin'
       }
@@ -99,7 +99,7 @@ const router = createRouter({
       name: 'admin-cleaners',
       component: () => import('@/pages/admin/cleaners/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'admin',
         requiresAuth: true,
         role: 'admin'
       }
@@ -109,7 +109,7 @@ const router = createRouter({
       name: 'admin-reports',
       component: () => import('@/pages/admin/reports/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'admin',
         requiresAuth: true,
         role: 'admin'
       }
@@ -139,19 +139,7 @@ const router = createRouter({
 
     // ===========================================
     // LEGACY REDIRECTS
-    // ===========================================
-    {
-      path: '/properties',
-      name: 'properties-legacy',
-      redirect: '/owner/properties'
-    },
-
-    {
-      path: '/bookings',
-      name: 'bookings-legacy',
-      redirect: '/owner/bookings'
-    },
-
+ 
     // ===========================================
     // DEVELOPMENT/TESTING ROUTES
     // ===========================================

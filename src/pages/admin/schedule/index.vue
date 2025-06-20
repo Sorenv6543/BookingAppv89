@@ -6,9 +6,10 @@
       <v-container fluid>
         <v-row align="center">
           <v-col>
-            <h1 class="text-h4 font-weight-bold">
-              Master Schedule
-            </h1>
+            <h2 class="text-h4 font-weight-bold">
+              Master Schedule - 
+            </h2>
+            <h2>admin/schedule/index.vue line 12</h2>
             <p class="text-subtitle-1 text-medium-emphasis">
               System-wide calendar and cleaner assignment management
             </p>

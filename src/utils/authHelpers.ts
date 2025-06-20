@@ -11,11 +11,11 @@ import type { UserRole } from '@/types'
 export function getDefaultRouteForRole(userRole: UserRole | undefined): string {
   switch (userRole) {
     case 'owner':
-      return '/owner/dashboard'
+      return '/owner'
     case 'admin':
       return '/admin'
     case 'cleaner':
-      return '/cleaner/dashboard' // Future implementation
+      return '/cleaner' // Future implementation
     default:
       return '/auth/login'
   }
@@ -163,7 +163,7 @@ export function validateRoleNavigation(userRole: UserRole | undefined, targetPat
   if (userRole === 'owner' && targetPath.startsWith('/admin')) {
     return {
       allowed: false,
-      redirectTo: '/owner/dashboard',
+      redirectTo: '/owner',
       message: 'Access denied. Admin privileges required.'
     }
   }
@@ -172,7 +172,7 @@ export function validateRoleNavigation(userRole: UserRole | undefined, targetPat
   if (userRole === 'cleaner' && (targetPath.startsWith('/admin') || targetPath.startsWith('/owner'))) {
     return {
       allowed: false,
-      redirectTo: '/cleaner/dashboard',
+      redirectTo: '/cleaner',
       message: 'Access denied. Insufficient privileges.'
     }
   }
