@@ -6,12 +6,11 @@ This document provides detailed prompting instructions for the enhanced task seq
 ## 🚨 CRITICAL ARCHITECTURAL CONTEXT
 **Major Issue Identified**: Current codebase has 2940+ lines of duplicated business logic across Home.vue (1020+ lines), HomeOwner.vue (~900 lines), and HomeAdmin.vue (1020+ lines). This violates the single source of truth principle and creates massive maintenance overhead.
 
-**Solution**: Extract all business logic to dashboard composables and transform components into thin orchestrators (~200 lines each).
+**Solution**: Extract all business logic to dashboard composables and transform components into thin orchestrators (~300 lines each).
 
 ---
-
+## ---------------------------------------------------------------------------------------------------------------------------------
 ## 🚨 **CRITICAL ARCHITECTURAL TASKS (MUST COMPLETE FIRST)**
-
 ### **TASK-060A: Create useOwnerDashboard Composable**
 **Complexity Rating: 8/10** - High complexity due to massive business logic extraction
 
@@ -123,7 +122,7 @@ export function useOwnerDashboard() {
 ### **Verification**: Creates foundation for thin HomeOwner.vue orchestrator
 
 ---
-
+## ---------------------------------------------------------------------------------------------------------------------------------
 ### **TASK-060B: Create useAdminDashboard Composable**
 **Complexity Rating: 9/10** - Very high complexity due to system-wide business logic
 
@@ -225,7 +224,7 @@ export function useAdminDashboard() {
   };
 }
 ```
-
+      <--------------------------------------------------------------------------------------------------------------------------------wwwwwwwwwwwwwwww>
 ### **Expected Impact**: Enable HomeAdmin.vue reduction from 1020+ to ~200 lines
 ### **Verification**: Creates foundation for thin HomeAdmin.vue orchestrator
 **Complexity Rating: 8/10** - High complexity due to role-based data filtering and calendar integration
@@ -296,7 +295,7 @@ get-library-docs /fullcalendar/fullcalendar --topic="vue-integration event-filte
 ### **Verification**: Owner sees only their property events and bookings
 
 ---
-
+## ---------------------------------------------------------------------------------------------------------------------------------
 ## 🔧 **TASK-062: Create AdminSidebar.vue Component**
 **Complexity Rating: 6/10** - Medium-high complexity due to comprehensive admin navigation
 
@@ -355,7 +354,7 @@ get-library-docs /microsoft/typescript --topic="interfaces enums type-safety"
 ### **Verification**: Admin sees full system navigation and controls
 
 ---
-
+## ---------------------------------------------------------------------------------------------------------------------------------
 ## 🔍 **TASK-063: Fix TypeScript Errors in Admin Components**
 **Complexity Rating: 6/10** - Medium-high due to cross-component error resolution
 
@@ -412,7 +411,7 @@ get-library-docs /vuejs/pinia --topic="typescript-support state-typing"
 ### **Verification**: `npm run type-check` passes without errors
 
 ---
-
+## ---------------------------------------------------------------------------------------------------------------------------------
 ## 🔧 **TASK-064: Fix AdminCalendar.vue Implementation Issues**
 **Complexity Rating: 8/10** - High complexity due to DOM mounting and component lifecycle issues
 
@@ -471,7 +470,7 @@ get-library-docs /fullcalendar/fullcalendar --topic="vue-integration dom-mountin
 ### **Verification**: Admin calendar route loads without errors
 
 ---
-
+## ---------------------------------------------------------------------------------------------------------------------------------
 ## 🔗 **TASK-065: Transform HomeOwner.vue into Thin Orchestrator**
 **Complexity Rating: 9/10** - CRITICAL architectural transformation
 
@@ -625,7 +624,7 @@ watch(xs, (newValue) => {
 - **Standard**: TASK-060 (OwnerSidebar), TASK-061 (OwnerCalendar)
 
 ---
-
+## ---------------------------------------------------------------------------------------------------------------------------------
 ## 🔗 **TASK-066: Transform HomeAdmin.vue into Thin Orchestrator**
 **Complexity Rating: 9/10** - CRITICAL architectural transformation
 
@@ -772,12 +771,12 @@ watch(xs, (newValue) => {
 - [ ] Complex admin workflows function through composables
 - [ ] Cleaner assignment works through composable actions
 - [ ] Business reporting accessible through composable actions
-
 ### **Dependencies**:
 - **CRITICAL**: TASK-060B (useAdminDashboard) must be complete
 - **Standard**: TASK-062 (AdminSidebar), TASK-064 (AdminCalendar)
 
 ---
+## ---------------------------------------------------------------------------------------------------------------------------------
 
 ## 📁 **TASK-067: Move Demo Components to Development Folder**
 **Complexity Rating: 3/10** - Low complexity file organization task
@@ -829,7 +828,7 @@ get-library-docs /vitejs/vite --topic="config-conditional-builds exclude-pattern
 ### **Verification**: Production build excludes demo components, dev server includes them
 
 ---
-
+## ---------------------------------------------------------------------------------------------------------------------------------
 ## 🗑️ **TASK-068: Remove Generic Components + Eliminate Home.vue**
 **Complexity Rating: 6/10** - Increased complexity due to Home.vue elimination
 
@@ -991,7 +990,7 @@ get-library-docs /vuejs/docs --topic="component-dependencies refactoring-pattern
 ### **Verification**: tasks.md is organized and current
 
 ---
-
+## ---------------------------------------------------------------------------------------------------------------------------------
 ## ⚙️ **TASK-070: Optimize Build Configuration for Role-Based Architecture**
 **Complexity Rating: 6/10** - Medium-high complexity build optimization
 
