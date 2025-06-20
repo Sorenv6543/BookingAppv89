@@ -43,8 +43,8 @@ src/pages/bookings/
 src/pages/settings/
 .cursor/rules/askvuetifyexpert.mdc
 .cursor/rules/criticalprojectconcepts.mdc
-.cursor/rules/settings.json
-.cursor/rules/taskexecutor.mdc
+.cursor/settings.json
+.cursor/taskexecutor.mdc
 .cursor/vuetify_component_help.md
 .cursor/vuetify_context_call_.md
 .cursor/vuetify_troubleshooting.md
@@ -97,7 +97,6 @@ src/components/smart/admin/UseAdminPropertiesDemo.vue
 src/components/smart/FullCalendar.vue
 src/components/smart/Home.vue
 src/components/smart/owner/HomeOwner.vue
-src/components/smart/owner/OwnerCalendar.vue
 src/components/smart/owner/OwnerCalendarDemo.vue
 src/components/smart/owner/OwnerSidebar.vue
 src/components/smart/owner/OwnerSidebarDemo.vue
@@ -118,7 +117,6 @@ src/composables/owner/useOwnerBookings.ts
 src/composables/owner/useOwnerCalendarState.ts
 src/composables/owner/useOwnerErrorHandler.ts
 src/composables/owner/useOwnerProperties.ts
-src/composables/owner/useOwnersDashboard.ts
 src/composables/shared/useAuth.ts
 src/composables/shared/useBookings.ts
 src/composables/shared/useCalendarState.ts
@@ -178,13 +176,13 @@ src/types/user.ts
 src/utils/authHelpers.ts
 src/utils/businessLogic.ts
 src/utils/errorMessages.ts
-task_documentation.md
-task_specific_prompts.md
+task_61_70prompts.md
 tasks.md
 tsconfig.json
 tsconfig.node.json
 vite.config.ts
 vitest.config.ts
+vuetify-rag-servicew.bin
 ```
 
 # Files
@@ -342,7 +340,7 @@ Every layout recommendation must include:
 Always prioritize user experience while maintaining technical excellence.
 ````
 
-## File: .cursor/rules/settings.json
+## File: .cursor/settings.json
 ````json
 {
   "tools": [
@@ -368,7 +366,7 @@ Always prioritize user experience while maintaining technical excellence.
 }
 ````
 
-## File: .cursor/rules/taskexecutor.mdc
+## File: .cursor/taskexecutor.mdc
 ````
 ---
 description: 
@@ -10266,33 +10264,6 @@ function showHelpfulTip(
 function clearOwnerErrors(): void
 ````
 
-## File: src/composables/owner/useOwnersDashboard.ts
-````typescript
-import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useOwnerBookings } from './useOwnerBookings';
-import { useOwnerProperties } from './useOwnerProperties';
-import { useOwnerCalendarState } from './useOwnerCalendarState';
-import { useOwnerErrorHandler } from './useOwnerErrorHandler';
-import { useAuth } from '@/composables/shared/useAuth';
-import { useUIStore } from '@/stores/ui';
-import type {
-  Booking,
-  Property,
-  BookingFormData,
-  PropertyFormData,
-  CalendarView
-} from '@/types';
-import type {
-  DateSelectArg,
-  EventClickArg,
-  EventDropArg
-} from '@fullcalendar/core';
-export function useOwnerDashboard()
-⋮----
-const initializeDashboard = async () =>
-````
-
 ## File: src/composables/shared/useBookings.ts
 ````typescript
 import { ref, computed } from 'vue';
@@ -14994,1653 +14965,1177 @@ export function extractErrorCode(error: any): string | undefined
 export function getErrorTitle(category: ErrorCategory, role: UserRole = 'owner'): string
 ````
 
-## File: task_documentation.md
+## File: task_61_70prompts.md
 ````markdown
-# 🚀 Critical Task Implementation Guide
-## Property Cleaning Scheduler - Role-Based Architecture
+# Comprehensive Prompting Instructions: Tasks 060A-070 (Architecture-Enhanced)
 
-This guide provides comprehensive documentation and examples for implementing the critical tasks in your role-based architecture migration. All examples follow your existing Vue 3 + Pinia + Vuetify + TypeScript patterns.
+## Overview
+This document provides detailed prompting instructions for the enhanced task sequence, integrating critical architectural improvements with the original tasks 061-070. The focus is on eliminating code duplication, establishing HomeOwner and HomeAdmin as true single sources of truth, and creating thin orchestrator components with business logic properly abstracted to composables.
 
----
+## 🚨 CRITICAL ARCHITECTURAL CONTEXT
+**Major Issue Identified**: Current codebase has 2940+ lines of duplicated business logic across Home.vue (1020+ lines), HomeOwner.vue (~900 lines), and HomeAdmin.vue (1020+ lines). This violates the single source of truth principle and creates massive maintenance overhead.
 
-## 📝 **TASK-060: Create OwnerSidebar.vue Component**
-
-### **Overview**
-Create a role-specific sidebar that shows only owner-relevant navigation and filters data appropriately.
-
-### **Implementation Pattern**
-
-```vue
-<!-- src/components/smart/owner/OwnerSidebar.vue -->
-<template>
-  <v-navigation-drawer
-    v-model="isOpen"
-    :rail="isRail"
-    :permanent="!isMobile"
-    :temporary="isMobile"
-    app
-    class="owner-sidebar"
-  >
-    <!-- User Profile Section -->
-    <v-list-item
-      :prepend-avatar="authStore.user?.avatar || undefined"
-      :title="authStore.user?.name || 'Property Owner'"
-      :subtitle="authStore.user?.email"
-      class="owner-profile"
-    >
-      <template #append>
-        <v-btn
-          variant="text"
-          icon="mdi-chevron-left"
-          size="small"
-          @click="toggleRail"
-        />
-      </template>
-    </v-list-item>
-
-    <v-divider />
-
-    <!-- Owner Quick Stats -->
-    <v-list-item v-if="!isRail" class="owner-stats">
-      <v-list-item-title class="text-caption text-medium-emphasis">
-        Quick Stats
-      </v-list-item-title>
-      <div class="d-flex justify-space-between text-body-2 mt-2">
-        <div class="text-center">
-          <div class="text-h6 text-primary">{{ ownerProperties.length }}</div>
-          <div class="text-caption">Properties</div>
-        </div>
-        <div class="text-center">
-          <div class="text-h6 text-success">{{ upcomingBookings.length }}</div>
-          <div class="text-caption">Upcoming</div>
-        </div>
-        <div class="text-center">
-          <div class="text-h6 text-warning">{{ urgentTurns.length }}</div>
-          <div class="text-caption">Urgent Turns</div>
-        </div>
-      </div>
-    </v-list-item>
-
-    <v-divider />
-
-    <!-- Owner Navigation -->
-    <v-list density="compact" nav>
-      <!-- Dashboard -->
-      <v-list-item
-        prepend-icon="mdi-view-dashboard"
-        title="Dashboard"
-        :active="currentRoute === 'owner-dashboard'"
-        @click="navigateTo('/owner/dashboard')"
-      />
-
-      <!-- My Properties -->
-      <v-list-group value="properties">
-        <template #activator="{ props }">
-          <v-list-item
-            v-bind="props"
-            prepend-icon="mdi-home-group"
-            title="My Properties"
-          />
-        </template>
-
-        <v-list-item
-          prepend-icon="mdi-plus-circle"
-          title="Add Property"
-          @click="showAddPropertyDialog = true"
-        />
-        
-        <v-list-item
-          v-for="property in ownerProperties"
-          :key="property.id"
-          :prepend-icon="property.active ? 'mdi-home' : 'mdi-home-off'"
-          :title="property.name"
-          :subtitle="`${property.address?.city} • ${property.pricing_tier}`"
-          @click="filterByProperty(property.id)"
-        >
-          <template #append>
-            <v-chip
-              v-if="getPropertyBookingsCount(property.id) > 0"
-              size="x-small"
-              color="primary"
-            >
-              {{ getPropertyBookingsCount(property.id) }}
-            </v-chip>
-          </template>
-        </v-list-item>
-      </v-list-group>
-
-      <!-- My Bookings -->
-      <v-list-item
-        prepend-icon="mdi-calendar-check"
-        title="My Bookings"
-        :active="currentRoute === 'owner-bookings'"
-        @click="navigateTo('/owner/bookings')"
-      >
-        <template #append>
-          <v-chip
-            v-if="ownerBookings.length > 0"
-            size="x-small"
-            color="primary"
-          >
-            {{ ownerBookings.length }}
-          </v-chip>
-        </template>
-      </v-list-item>
-
-      <!-- Calendar View -->
-      <v-list-item
-        prepend-icon="mdi-calendar"
-        title="Calendar"
-        :active="currentRoute === 'owner-calendar'"
-        @click="navigateTo('/owner/calendar')"
-      />
-
-      <v-divider class="my-2" />
-
-      <!-- Turn Alerts (Owner-specific) -->
-      <v-list-item
-        prepend-icon="mdi-alert-circle"
-        :title="`Turn Alerts (${urgentTurns.length})`"
-        :class="{ 'text-warning': urgentTurns.length > 0 }"
-        @click="showTurnAlerts = true"
-      />
-
-      <!-- Settings -->
-      <v-list-item
-        prepend-icon="mdi-cog"
-        title="Settings"
-        @click="navigateTo('/owner/settings')"
-      />
-    </v-list>
-
-    <!-- Owner Quick Actions -->
-    <template #append>
-      <div class="pa-2">
-        <v-btn
-          block
-          color="primary"
-          prepend-icon="mdi-plus"
-          text="Add Booking"
-          variant="elevated"
-          @click="showAddBookingDialog = true"
-        />
-      </div>
-    </template>
-  </v-navigation-drawer>
-
-  <!-- Add Property Dialog -->
-  <v-dialog v-model="showAddPropertyDialog" max-width="600">
-    <OwnerPropertyForm
-      mode="create"
-      @save="handlePropertySave"
-      @cancel="showAddPropertyDialog = false"
-    />
-  </v-dialog>
-
-  <!-- Add Booking Dialog -->
-  <v-dialog v-model="showAddBookingDialog" max-width="800">
-    <OwnerBookingForm
-      :properties="ownerProperties"
-      mode="create"
-      @save="handleBookingSave"
-      @cancel="showAddBookingDialog = false"
-    />
-  </v-dialog>
-
-  <!-- Turn Alerts Dialog -->
-  <v-dialog v-model="showTurnAlerts" max-width="500">
-    <TurnAlertsPanel
-      :turns="urgentTurns"
-      role="owner"
-      @close="showTurnAlerts = false"
-    />
-  </v-dialog>
-</template>
-
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useDisplay } from 'vuetify'
-import { useAuthStore } from '@/stores/auth'
-import { usePropertyStore } from '@/stores/property'
-import { useBookingStore } from '@/stores/booking'
-import { useOwnerErrorHandler } from '@/composables/owner/useOwnerErrorHandler'
-import OwnerPropertyForm from '@/components/dumb/owner/OwnerPropertyForm.vue'
-import OwnerBookingForm from '@/components/dumb/owner/OwnerBookingForm.vue'
-import TurnAlertsPanel from '@/components/dumb/shared/TurnAlertsPanel.vue'
-import type { Property, Booking } from '@/types'
-
-// Props
-interface Props {
-  modelValue?: boolean
-  rail?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: true,
-  rail: false
-})
-
-// Emits
-interface Emits {
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'update:rail', value: boolean): void
-  (e: 'property-selected', propertyId: string): void
-}
-
-const emit = defineEmits<Emits>()
-
-// Composables
-const route = useRoute()
-const router = useRouter()
-const { mobile: isMobile } = useDisplay()
-const authStore = useAuthStore()
-const propertyStore = usePropertyStore()
-const bookingStore = useBookingStore()
-const { handleError, showSuccess } = useOwnerErrorHandler()
-
-// Local state
-const showAddPropertyDialog = ref(false)
-const showAddBookingDialog = ref(false)
-const showTurnAlerts = ref(false)
-
-// Computed
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-
-const isRail = computed({
-  get: () => props.rail,
-  set: (value) => emit('update:rail', value)
-})
-
-const currentRoute = computed(() => route.name as string)
-
-// ROLE-BASED DATA FILTERING - Owner sees only their data
-const ownerProperties = computed((): Property[] => {
-  if (!authStore.user?.id) return []
-  return propertyStore.propertiesByOwner(authStore.user.id)
-})
-
-const ownerBookings = computed((): Booking[] => {
-  if (!authStore.user?.id) return []
-  return bookingStore.bookingsByOwner(authStore.user.id)
-})
-
-const upcomingBookings = computed((): Booking[] => {
-  const now = new Date()
-  return ownerBookings.value.filter(booking => 
-    new Date(booking.checkin_date) > now &&
-    booking.status === 'confirmed'
-  )
-})
-
-const urgentTurns = computed((): Booking[] => {
-  return ownerBookings.value.filter(booking =>
-    booking.booking_type === 'turn' &&
-    booking.status === 'pending' &&
-    new Date(booking.checkout_date) <= new Date(Date.now() + 24 * 60 * 60 * 1000) // Within 24 hours
-  )
-})
-
-// Methods
-const toggleRail = (): void => {
-  isRail.value = !isRail.value
-}
-
-const navigateTo = (path: string): void => {
-  router.push(path)
-}
-
-const filterByProperty = (propertyId: string): void => {
-  emit('property-selected', propertyId)
-  navigateTo('/owner/calendar')
-}
-
-const getPropertyBookingsCount = (propertyId: string): number => {
-  return ownerBookings.value.filter(booking => 
-    booking.property_id === propertyId &&
-    ['confirmed', 'pending'].includes(booking.status)
-  ).length
-}
-
-const handlePropertySave = async (propertyData: any): Promise<void> => {
-  try {
-    await propertyStore.createProperty({
-      ...propertyData,
-      owner_id: authStore.user?.id
-    })
-    showAddPropertyDialog.value = false
-    showSuccess('Property added successfully!')
-  } catch (error) {
-    handleError(error, 'Failed to add property')
-  }
-}
-
-const handleBookingSave = async (bookingData: any): Promise<void> => {
-  try {
-    await bookingStore.createBooking({
-      ...bookingData,
-      owner_id: authStore.user?.id
-    })
-    showAddBookingDialog.value = false
-    showSuccess('Booking added successfully!')
-  } catch (error) {
-    handleError(error, 'Failed to add booking')
-  }
-}
-</script>
-
-<style scoped>
-.owner-sidebar {
-  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-}
-
-.owner-profile {
-  background: rgba(var(--v-theme-primary), 0.05);
-  margin: 4px;
-  border-radius: 8px;
-}
-
-.owner-stats {
-  background: rgba(var(--v-theme-surface-variant), 0.3);
-  margin: 4px;
-  border-radius: 8px;
-}
-
-.v-list-item--active {
-  background: rgba(var(--v-theme-primary), 0.12) !important;
-}
-
-.text-warning .v-list-item__prepend .v-icon {
-  color: rgb(var(--v-theme-warning)) !important;
-}
-</style>
-```
-
-### **Key Implementation Points**
-
-1. **Role-Based Data Filtering**: Uses computed properties to filter data by `owner_id`
-2. **Integration with Existing Stores**: Uses your existing Pinia stores
-3. **Vuetify Patterns**: Follows your established Vuetify component usage
-4. **TypeScript Safety**: Proper typing for all props, emits, and data
-5. **Error Handling**: Uses role-specific error handler for owner-friendly messages
+**Solution**: Extract all business logic to dashboard composables and transform components into thin orchestrators (~200 lines each).
 
 ---
 
-## 📝 **TASK-072: Store-Level Role Filtering Architecture**
+## 🚨 **CRITICAL ARCHITECTURAL TASKS (MUST COMPLETE FIRST)**
+## ---------------------------------------------------------------------------------------------------------------------------------
+### **TASK-060A: Create useOwnerDashboard Composable**
+**Complexity Rating: 8/10** - High complexity due to massive business logic extraction
 
-### **Overview**
-Move role-based filtering from components to Pinia stores for better performance and consistency.
 
-### **Implementation Pattern**
+### **Sequential Thinking Approach**
+```
+1. **Analysis Phase**: Examine HomeOwner.vue business logic
+   - Identify all business logic currently in HomeOwner.vue (~900 lines)
+   - Map data access patterns and state management
+   - Catalog all owner-specific operations and workflows
 
-```typescript
-// src/stores/ownerData.ts - Owner-specific data store
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { useAuthStore } from './auth'
-import { usePropertyStore } from './property'
-import { useBookingStore } from './booking'
-import type { Property, Booking, User } from '@/types'
+2. **Extraction Design Phase**: Plan composable architecture
+   - Design clean interface for HomeOwner.vue orchestration
+   - Plan role-specific data filtering and access patterns
+   - Design owner-specific error handling and validation
 
-export const useOwnerDataStore = defineStore('ownerData', () => {
-  // Dependencies
-  const authStore = useAuthStore()
-  const propertyStore = usePropertyStore()
-  const bookingStore = useBookingStore()
+3. **Implementation Phase**: Create comprehensive composable
+   - Extract owner data access (properties, bookings, calendar)
+   - Extract owner actions (create, update, delete operations)
+   - Extract owner-specific business rules and validation
+   - Implement proper error handling and state management
 
-  // Cache for performance
-  const lastOwnerId = ref<string | null>(null)
-  const cachedProperties = ref<Property[]>([])
-  const cachedBookings = ref<Booking[]>([])
-  const cacheTimestamp = ref<number>(0)
-  const CACHE_TTL = 30000 // 30 seconds
+4. **Integration Design Phase**: Plan HomeOwner.vue integration
+   - Design minimal component interface
+   - Plan prop passing and event handling through composables
+   - Ensure clean separation of concerns
 
-  // Cache management
-  const isCacheValid = computed(() => {
-    const now = Date.now()
-    return (
-      lastOwnerId.value === authStore.user?.id &&
-      (now - cacheTimestamp.value) < CACHE_TTL
-    )
-  })
-
-  const invalidateCache = (): void => {
-    lastOwnerId.value = null
-    cachedProperties.value = []
-    cachedBookings.value = []
-    cacheTimestamp.value = 0
-  }
-
-  // Core owner data getters with caching
-  const ownerProperties = computed((): Property[] => {
-    if (!authStore.user?.id) return []
-
-    // Return cached data if valid
-    if (isCacheValid.value) {
-      return cachedProperties.value
-    }
-
-    // Filter and cache new data
-    const filtered = propertyStore.propertiesArray.filter(
-      property => property.owner_id === authStore.user?.id
-    )
-
-    cachedProperties.value = filtered
-    lastOwnerId.value = authStore.user.id
-    cacheTimestamp.value = Date.now()
-
-    return filtered
-  })
-
-  const ownerBookings = computed((): Booking[] => {
-    if (!authStore.user?.id) return []
-
-    // Return cached data if valid for bookings
-    if (isCacheValid.value && cachedBookings.value.length > 0) {
-      return cachedBookings.value
-    }
-
-    // Filter and cache new data
-    const filtered = bookingStore.bookingsArray.filter(
-      booking => booking.owner_id === authStore.user?.id
-    )
-
-    cachedBookings.value = filtered
-    return filtered
-  })
-
-  // Derived owner data
-  const activeProperties = computed((): Property[] => {
-    return ownerProperties.value.filter(property => property.active)
-  })
-
-  const upcomingBookings = computed((): Booking[] => {
-    const now = new Date()
-    return ownerBookings.value.filter(booking =>
-      new Date(booking.checkin_date) > now &&
-      ['confirmed', 'pending'].includes(booking.status)
-    )
-  })
-
-  const recentBookings = computed((): Booking[] => {
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-    return ownerBookings.value.filter(booking =>
-      new Date(booking.checkout_date) >= thirtyDaysAgo
-    ).sort((a, b) => 
-      new Date(b.checkout_date).getTime() - new Date(a.checkout_date).getTime()
-    )
-  })
-
-  const urgentTurns = computed((): Booking[] => {
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
-    return ownerBookings.value.filter(booking =>
-      booking.booking_type === 'turn' &&
-      booking.status === 'pending' &&
-      new Date(booking.checkout_date) <= tomorrow
-    )
-  })
-
-  // Property-specific helpers
-  const getPropertyBookings = (propertyId: string): Booking[] => {
-    return ownerBookings.value.filter(booking => 
-      booking.property_id === propertyId
-    )
-  }
-
-  const getPropertyStats = (propertyId: string) => {
-    const bookings = getPropertyBookings(propertyId)
-    const thisMonth = new Date()
-    thisMonth.setDate(1)
-    
-    const thisMonthBookings = bookings.filter(booking =>
-      new Date(booking.checkin_date) >= thisMonth
-    )
-
-    return {
-      totalBookings: bookings.length,
-      thisMonthBookings: thisMonthBookings.length,
-      avgNightly: bookings.length > 0 
-        ? bookings.reduce((sum, b) => sum + (b.nightly_rate || 0), 0) / bookings.length
-        : 0,
-      occupancyRate: calculateOccupancyRate(propertyId)
-    }
-  }
-
-  const calculateOccupancyRate = (propertyId: string): number => {
-    const bookings = getPropertyBookings(propertyId)
-    if (bookings.length === 0) return 0
-
-    const now = new Date()
-    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    
-    const bookedDays = bookings
-      .filter(booking => 
-        new Date(booking.checkin_date) >= lastMonth &&
-        new Date(booking.checkout_date) <= thisMonth
-      )
-      .reduce((total, booking) => {
-        const checkin = new Date(booking.checkin_date)
-        const checkout = new Date(booking.checkout_date)
-        return total + Math.ceil((checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60 * 24))
-      }, 0)
-
-    const totalDays = Math.ceil((thisMonth.getTime() - lastMonth.getTime()) / (1000 * 60 * 60 * 24))
-    return Math.round((bookedDays / totalDays) * 100)
-  }
-
-  // Actions
-  const refreshOwnerData = async (): Promise<void> => {
-    invalidateCache()
-    await Promise.all([
-      propertyStore.fetchProperties(),
-      bookingStore.fetchBookings()
-    ])
-  }
-
-  // Watch for auth changes to invalidate cache
-  authStore.$subscribe((mutation, state) => {
-    if (mutation.storeId === 'auth' && state.user?.id !== lastOwnerId.value) {
-      invalidateCache()
-    }
-  })
-
-  return {
-    // Core data
-    ownerProperties,
-    ownerBookings,
-    activeProperties,
-    upcomingBookings,
-    recentBookings,
-    urgentTurns,
-    
-    // Helpers
-    getPropertyBookings,
-    getPropertyStats,
-    
-    // Actions
-    refreshOwnerData,
-    invalidateCache,
-    
-    // Cache info (for debugging)
-    isCacheValid,
-    cacheTimestamp: computed(() => cacheTimestamp.value)
-  }
-})
+5. **Verification Phase**: Validate architecture improvement
+   - Test composable functionality in isolation
+   - Verify clean interface design
+   - Prepare for HomeOwner.vue refactoring
 ```
 
-```typescript
-// src/stores/adminData.ts - Admin-specific data store
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { usePropertyStore } from './property'
-import { useBookingStore } from './booking'
-import type { Property, Booking, SystemMetrics } from '@/types'
+### **Context7 Documentation**
+```bash
+# Vue.js composables and business logic patterns
+get-library-docs /vuejs/docs --topic="composition-api composables business-logic-extraction"
 
-export const useAdminDataStore = defineStore('adminData', () => {
-  // Dependencies
-  const propertyStore = usePropertyStore()
-  const bookingStore = useBookingStore()
+# Advanced state management patterns
+get-library-docs /vuejs/pinia --topic="composables-integration complex-state-patterns"
 
-  // Admin sees ALL data - no filtering
-  const allProperties = computed((): Property[] => {
-    return propertyStore.propertiesArray
-  })
-
-  const allBookings = computed((): Booking[] => {
-    return bookingStore.bookingsArray
-  })
-
-  // System-wide metrics
-  const systemMetrics = computed((): SystemMetrics => {
-    const properties = allProperties.value
-    const bookings = allBookings.value
-    const now = new Date()
-    
-    return {
-      totalProperties: properties.length,
-      activeProperties: properties.filter(p => p.active).length,
-      totalBookings: bookings.length,
-      upcomingBookings: bookings.filter(b => 
-        new Date(b.checkin_date) > now && b.status === 'confirmed'
-      ).length,
-      urgentTurns: bookings.filter(b =>
-        b.booking_type === 'turn' &&
-        b.status === 'pending' &&
-        new Date(b.checkout_date) <= new Date(now.getTime() + 24 * 60 * 60 * 1000)
-      ).length,
-      revenue: bookings
-        .filter(b => b.status === 'completed')
-        .reduce((sum, b) => sum + (b.total_cost || 0), 0)
-    }
-  })
-
-  // Owner performance analytics
-  const ownerAnalytics = computed(() => {
-    const ownerStats = new Map<string, any>()
-    
-    allProperties.value.forEach(property => {
-      const ownerId = property.owner_id
-      if (!ownerStats.has(ownerId)) {
-        ownerStats.set(ownerId, {
-          ownerId,
-          ownerName: property.owner_name || 'Unknown',
-          properties: [],
-          bookings: [],
-          revenue: 0,
-          avgOccupancy: 0
-        })
-      }
-      ownerStats.get(ownerId).properties.push(property)
-    })
-
-    allBookings.value.forEach(booking => {
-      const ownerId = booking.owner_id
-      if (ownerStats.has(ownerId)) {
-        const stats = ownerStats.get(ownerId)
-        stats.bookings.push(booking)
-        if (booking.status === 'completed') {
-          stats.revenue += booking.total_cost || 0
-        }
-      }
-    })
-
-    return Array.from(ownerStats.values())
-  })
-
-  // Critical alerts for admin
-  const criticalAlerts = computed(() => {
-    const alerts = []
-    const now = new Date()
-    const twentyFourHours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-
-    // Unassigned cleanings
-    const unassignedCleanings = allBookings.value.filter(booking =>
-      !booking.assigned_cleaner_id &&
-      booking.cleaning_scheduled &&
-      new Date(booking.checkout_date) <= twentyFourHours
-    )
-
-    if (unassignedCleanings.length > 0) {
-      alerts.push({
-        type: 'warning',
-        title: 'Unassigned Cleanings',
-        message: `${unassignedCleanings.length} cleanings need cleaner assignment`,
-        count: unassignedCleanings.length,
-        action: 'assign-cleaners'
-      })
-    }
-
-    // Overdue turns
-    const overdueTurns = allBookings.value.filter(booking =>
-      booking.booking_type === 'turn' &&
-      booking.status === 'pending' &&
-      new Date(booking.checkout_date) < now
-    )
-
-    if (overdueTurns.length > 0) {
-      alerts.push({
-        type: 'error',
-        title: 'Overdue Turns',
-        message: `${overdueTurns.length} turns are overdue`,
-        count: overdueTurns.length,
-        action: 'urgent-turns'
-      })
-    }
-
-    return alerts
-  })
-
-  return {
-    // System data
-    allProperties,
-    allBookings,
-    systemMetrics,
-    ownerAnalytics,
-    criticalAlerts
-  }
-})
+# TypeScript for composable interfaces
+get-library-docs /microsoft/typescript --topic="interfaces generics composable-typing"
 ```
 
-### **Updated Component Usage Pattern**
+### **Vuetify RAG Server Usage**
+```bash
+# Not heavily needed for this task - focus on business logic extraction
+# May need for UI state management patterns if applicable
+```
 
-```vue
-<!-- src/components/smart/owner/HomeOwner.vue - Updated to use store filtering -->
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useOwnerDataStore } from '@/stores/ownerData'
-import { useOwnerErrorHandler } from '@/composables/owner/useOwnerErrorHandler'
+### **Implementation Requirements**
+- **File Location**: `src/composables/owner/useOwnerDashboard.ts`
+- **Key Extractions**:
+  - All data access logic from HomeOwner.vue
+  - All business operations (CRUD for bookings/properties)
+  - All owner-specific validation and error handling
+  - All calendar state management
+  - All UI state management (modals, loading states)
+- **Interface Design**: Clean, minimal API for component consumption
+- **Expected Impact**: Enable HomeOwner.vue reduction from ~900 to ~200 lines
 
-// Use owner data store instead of component-level filtering
-const ownerData = useOwnerDataStore()
-const { handleError } = useOwnerErrorHandler()
+### **Implementation Pattern** (REQUIRED):
+```typescript
+// useOwnerDashboard.ts
+export function useOwnerDashboard() {
+  // Data (all owner-scoped)
+  const ownerData = reactive({
+    properties: computed(() => /* owner filtering logic */),
+    bookings: computed(() => /* owner filtering logic */),
+    todayTurns: computed(() => /* owner turn logic */),
+    upcomingCleanings: computed(() => /* owner cleaning logic */),
+    calendarEvents: computed(() => /* owner calendar logic */)
+  });
 
-// Data comes pre-filtered from store
-const properties = computed(() => ownerData.ownerProperties)
-const bookings = computed(() => ownerData.ownerBookings)
-const urgentTurns = computed(() => ownerData.urgentTurns)
+  // Actions (all owner-scoped operations)
+  const ownerActions = {
+    createBooking: async (data: BookingFormData) => {
+      // Extract from HomeOwner.vue
+    },
+    updateBooking: async (id: string, data: Partial<Booking>) => {
+      // Extract from HomeOwner.vue  
+    },
+    deleteBooking: async (id: string) => {
+      // Extract from HomeOwner.vue
+    },
+    navigateToBooking: (id: string) => {
+      // Extract from HomeOwner.vue
+    },
+    handleEventClick: (event: EventClickArg) => {
+      // Extract from HomeOwner.vue
+    }
+  };
 
-// Property-specific data
-const getPropertyStats = (propertyId: string) => {
-  return ownerData.getPropertyStats(propertyId)
+  // Calendar state (owner-specific)
+  const calendarState = reactive({
+    currentView: ref('dayGridMonth'),
+    currentDate: ref(new Date()),
+    selectedPropertyIds: ref<string[]>([])
+  });
+
+  return {
+    ownerData,
+    ownerActions, 
+    calendarState
+  };
 }
+```
+
+### **Verification**: Creates foundation for thin HomeOwner.vue orchestrator
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+### **TASK-060B: Create useAdminDashboard Composable**
+**Complexity Rating: 9/10** - Very high complexity due to system-wide business logic
+
+### **Sequential Thinking Approach**
+```
+1. **Analysis Phase**: Examine HomeAdmin.vue business logic
+   - Identify all business logic currently in HomeAdmin.vue (1020+ lines)
+   - Map system-wide data access patterns
+   - Catalog all admin-specific operations and workflows
+   - Analyze cleaner management and system administration logic
+
+2. **Extraction Design Phase**: Plan comprehensive composable architecture
+   - Design clean interface for HomeAdmin.vue orchestration
+   - Plan system-wide data access without filtering
+   - Design admin-specific error handling with business impact
+   - Plan cleaner assignment and system management workflows
+
+3. **Implementation Phase**: Create comprehensive admin composable
+   - Extract admin data access (all properties, all bookings, system metrics)
+   - Extract admin actions (cleaner assignment, system management)
+   - Extract business analytics and reporting functionality
+   - Implement admin-specific error handling and notifications
+
+4. **System Integration Phase**: Handle complex admin workflows
+   - Integrate cleaner management operations
+   - Implement business reporting and analytics
+   - Handle system-wide notifications and alerts
+   - Manage complex admin state
+
+5. **Verification Phase**: Validate comprehensive functionality
+   - Test all admin operations in isolation
+   - Verify system-wide data access
+   - Prepare for HomeAdmin.vue refactoring
+```
+
+### **Context7 Documentation**
+```bash
+# Advanced Vue.js patterns for complex business logic
+get-library-docs /vuejs/docs --topic="composition-api advanced-patterns complex-state"
+
+# Enterprise state management patterns
+get-library-docs /vuejs/pinia --topic="enterprise-patterns complex-operations"
+
+# TypeScript for complex interfaces
+get-library-docs /microsoft/typescript --topic="advanced-types complex-interfaces enterprise-patterns"
+```
+
+### **Implementation Requirements**
+- **File Location**: `src/composables/admin/useAdminDashboard.ts`
+- **Key Extractions**:
+  - All system-wide data access logic from HomeAdmin.vue
+  - All admin business operations (cleaner assignment, system management)
+  - All business analytics and reporting functionality
+  - All admin-specific validation and error handling
+  - All system calendar state management
+  - All admin UI state management
+
+### **Implementation Pattern** (REQUIRED):
+```typescript
+// useAdminDashboard.ts
+export function useAdminDashboard() {
+  // Data (system-wide, no filtering)
+  const adminData = reactive({
+    allProperties: computed(() => /* no filtering - all data */),
+    allBookings: computed(() => /* no filtering - all data */),
+    systemMetrics: computed(() => /* business calculations */),
+    urgentTurns: computed(() => /* system-wide urgent turns */),
+    cleanerQueue: computed(() => /* cleaner assignments */),
+    allCalendarEvents: computed(() => /* system calendar */)
+  });
+
+  // Actions (admin-specific operations)  
+  const adminActions = {
+    assignCleaner: async (bookingId: string, cleanerId: string) => {
+      // Extract from HomeAdmin.vue
+    },
+    generateReport: async (type: ReportType) => {
+      // Extract from HomeAdmin.vue
+    },
+    manageSystem: () => {
+      // Extract from HomeAdmin.vue
+    },
+    updateBookingStatus: async (id: string, status: BookingStatus) => {
+      // Extract from HomeAdmin.vue
+    }
+  };
+
+  // System state (admin-specific)
+  const systemState = reactive({
+    currentView: ref('dayGridMonth'),
+    selectedCleaners: ref<string[]>([]),
+    systemAlerts: ref<SystemAlert[]>([])
+  });
+
+  return {
+    adminData,
+    adminActions,
+    systemState
+  };
+}
+```
+## ---------------------------------------------------------------------------------------------------------------------------------
+### **TASK-061
+### **Expected Impact**: Enable HomeAdmin.vue reduction from 1020+ to ~200 lines
+### **Verification**: Creates foundation for thin HomeAdmin.vue orchestrator
+**Complexity Rating: 8/10** - High complexity due to role-based data filtering and calendar integration
+
+### **Sequential Thinking Approach**
+Use this structured thinking process:
+
+```
+1. **Research Phase**: Understand existing calendar patterns
+   - Analyze current FullCalendar.vue implementation
+   - Identify owner-specific requirements vs admin features
+   - Research role-based data filtering patterns
+
+2. **Design Phase**: Plan component architecture
+   - Define component interface (props, emits, slots)
+   - Plan data filtering logic for owner properties only
+   - Design owner-specific calendar controls
+
+3. **Implementation Phase**: Build the component
+   - Create base calendar structure
+   - Implement role-based event filtering
+   - Add owner-specific controls and workflows
+
+4. **Integration Phase**: Connect to existing systems
+   - Integrate with stores (auth, properties, bookings)
+   - Ensure proper data isolation
+   - Test calendar event creation/editing workflows
+
+5. **Verification Phase**: Comprehensive testing
+   - Verify only owner's properties appear
+   - Test all owner-specific calendar features
+   - Ensure no admin-only features are accessible
+```
+
+### **Context7 Documentation**
+```bash
+# Essential Vue.js patterns for complex components
+resolve-library-id "vue"
+get-library-docs /vuejs/docs --topic="composition-api reactive-data calendar-components"
+
+# TypeScript interfaces for calendar events
+resolve-library-id "typescript"
+get-library-docs /microsoft/typescript --topic="interfaces generics type-guards"
+
+# FullCalendar integration patterns
+resolve-library-id "fullcalendar"
+get-library-docs /fullcalendar/fullcalendar --topic="vue-integration event-filtering"
+```
+
+### **Vuetify RAG Server Usage**
+```bash
+# Use Vuetify RAG for calendar styling and layout
+# Focus on: v-calendar, v-date-picker, v-card layouts
+# Key components: v-toolbar, v-btn, v-menu for calendar controls
+```
+
+### **Implementation Requirements**
+- **File Location**: `src/components/smart/owner/OwnerCalendar.vue`
+- **Key Features**: 
+  - Filter calendar events to owner's properties only
+  - Owner-specific calendar controls (OwnerCalendarControls)
+  - Owner-specific event creation workflows
+  - Remove admin-only features (cleaner assignment, system-wide view)
+  - Owner-specific calendar views (My Properties, My Bookings)
+  - Owner-specific event styling and indicators
+
+### **Dependencies**: OwnerCalendarControls.vue component
+### **Verification**: Owner sees only their property events and bookings
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+## 🔧 **TASK-062: Create AdminSidebar.vue Component**
+**Complexity Rating: 6/10** - Medium-high complexity due to comprehensive admin navigation
+
+### **Sequential Thinking Approach**
+```
+1. **Analysis Phase**: Map admin navigation requirements
+   - Inventory all admin features and sections
+   - Analyze current generic sidebar patterns
+   - Identify admin-specific navigation needs
+
+2. **Architecture Phase**: Design comprehensive admin nav
+   - Plan hierarchical navigation structure
+   - Design system status indicators
+   - Plan role switcher integration
+
+3. **Implementation Phase**: Build admin navigation
+   - Create main navigation sections
+   - Add system status indicators and alerts
+   - Implement business metrics display
+   - Add role switcher functionality
+
+4. **Styling Phase**: Apply admin-focused design
+   - Use admin-appropriate colors and iconography
+   - Ensure professional admin interface feel
+   - Optimize for admin workflow efficiency
+
+5. **Integration Phase**: Connect to admin systems
+   - Link to all admin routes and features
+   - Connect business metrics data
+   - Test role switching functionality
+```
+
+### **Context7 Documentation**
+```bash
+# Vue.js navigation patterns
+get-library-docs /vuejs/docs --topic="router-navigation component-communication"
+
+# TypeScript for navigation interfaces
+get-library-docs /microsoft/typescript --topic="interfaces enums type-safety"
+```
+
+### **Vuetify RAG Server Usage**
+```bash
+# Essential for comprehensive admin sidebar
+# Focus on: v-navigation-drawer, v-list, v-list-item-group
+# Key components: v-badge, v-chip (for status), v-divider, v-expansion-panels
+# Icons: mdi-icons for admin-specific actions
+```
+
+### **Implementation Requirements**
+- **File Location**: `src/components/smart/admin/AdminSidebar.vue`
+- **Full Feature Set**: Cleaners, Properties, Bookings, Reports, System Settings
+- **System Controls**: Status indicators, role switcher, business metrics
+- **Admin Styling**: Professional admin-focused UI with comprehensive navigation
+
+### **Verification**: Admin sees full system navigation and controls
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+## 🔍 **TASK-063: Fix TypeScript Errors in Admin Components**
+**Complexity Rating: 6/10** - Medium-high due to cross-component error resolution
+
+### **Sequential Thinking Approach**
+```
+1. **Discovery Phase**: Identify all TypeScript errors
+   - Run `npm run type-check` to get complete error list
+   - Categorize errors by type (missing types, incorrect interfaces, etc.)
+   - Prioritize critical errors vs warnings
+
+2. **Analysis Phase**: Understand error patterns
+   - Identify common error patterns across components
+   - Analyze missing type definitions
+   - Review existing type patterns in codebase
+
+3. **Resolution Phase**: Fix errors systematically
+   - Start with interface and type definition errors
+   - Fix prop and emit type errors
+   - Resolve store integration typing issues
+   - Update import/export statements
+
+4. **Validation Phase**: Ensure comprehensive type coverage
+   - Re-run type checking after each fix batch
+   - Verify IntelliSense works correctly
+   - Test component interfaces in development
+
+5. **Documentation Phase**: Update type documentation
+   - Add JSDoc comments for complex types
+   - Document type patterns for future development
+```
+
+### **Context7 Documentation**
+```bash
+# TypeScript best practices for Vue.js
+get-library-docs /microsoft/typescript --topic="interfaces type-guards error-handling strict-mode"
+get-library-docs /vuejs/docs --topic="typescript composition-api props-typing"
+
+# Pinia store typing patterns
+resolve-library-id "pinia"
+get-library-docs /vuejs/pinia --topic="typescript-support state-typing"
+```
+
+### **Vuetify RAG Server Usage**
+```bash
+# Use for Vuetify component type definitions
+# Focus on: component prop types, event types, theme typing
+```
+
+### **Implementation Requirements**
+- **Scope**: All files in `src/components/smart/admin/` and `src/components/dumb/admin/`
+- **Common Issues**: Missing type definitions, incorrect prop types, store typing
+- **Tools**: Use `npm run type-check` to identify specific errors
+
+### **Verification**: `npm run type-check` passes without errors
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+## 🔧 **TASK-064: Fix AdminCalendar.vue Implementation Issues**
+**Complexity Rating: 8/10** - High complexity due to DOM mounting and component lifecycle issues
+
+### **Sequential Thinking Approach**
+```
+1. **Problem Analysis Phase**: Understand current issues
+   - Reproduce "Cannot read properties of null (reading 'parentNode')" error
+   - Analyze component lifecycle and DOM mounting patterns
+   - Identify specific failure points in calendar initialization
+
+2. **Root Cause Investigation**: Deep dive into issues
+   - Examine FullCalendar DOM mounting requirements
+   - Review Vue.js component lifecycle vs calendar needs
+   - Analyze timing issues between Vue mounting and calendar init
+
+3. **Solution Design Phase**: Plan comprehensive fixes
+   - Design DOM mounting safety checks
+   - Plan component lifecycle management improvements
+   - Design error boundaries and retry mechanisms
+
+4. **Implementation Phase**: Apply systematic fixes
+   - Add DOM element existence checks
+   - Implement proper component lifecycle management
+   - Add error boundaries for calendar failures
+   - Implement retry mechanisms for initialization
+
+5. **Testing Phase**: Comprehensive validation
+   - Test calendar mounting in various scenarios
+   - Verify admin calendar features work correctly
+   - Test error recovery and retry mechanisms
+```
+
+### **Context7 Documentation**
+```bash
+# Vue.js lifecycle and DOM interaction
+get-library-docs /vuejs/docs --topic="lifecycle-hooks dom-manipulation component-mounting"
+
+# FullCalendar Vue integration
+resolve-library-id "fullcalendar"
+get-library-docs /fullcalendar/fullcalendar --topic="vue-integration dom-mounting error-handling"
+```
+
+### **Vuetify RAG Server Usage**
+```bash
+# Calendar layout and container components
+# Focus on: v-container, v-row, v-col for calendar layouts
+# Error display: v-alert, v-snackbar for error handling
+```
+
+### **Implementation Requirements**
+- **File Location**: `src/components/smart/admin/AdminCalendar.vue`
+- **Critical Fixes**: Resolve DOM mounting null pointer errors
+- **Error Handling**: Add comprehensive error boundaries
+- **Admin Features**: Ensure all admin calendar functionality works
+
+### **Verification**: Admin calendar route loads without errors
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+## 🔗 **TASK-065: Transform HomeOwner.vue into Thin Orchestrator**
+**Complexity Rating: 9/10** - CRITICAL architectural transformation
+
+### **🚨 PRIMARY OBJECTIVE**
+**Transform HomeOwner.vue from 900+ line business logic component into ~200 line thin orchestrator using useOwnerDashboard composable**
+
+### **Sequential Thinking Approach**
+```
+1. **Current State Analysis Phase**: Assess existing HomeOwner.vue
+   - Measure current component size (~900 lines)
+   - Identify all business logic that should be extracted
+   - Map current component dependencies and data flow
+   - Document current architectural violations
+
+2. **Refactoring Design Phase**: Plan thin orchestrator transformation
+   - Design minimal component interface using useOwnerDashboard
+   - Plan removal of all business logic from component
+   - Design clean prop passing and event delegation
+   - Plan component size reduction strategy
+
+3. **Implementation Phase**: Execute orchestrator transformation
+   - Replace all business logic with useOwnerDashboard calls
+   - Integrate OwnerSidebar and OwnerCalendar components
+   - Remove all computed properties with business logic
+   - Remove all methods with business operations
+   - Keep only UI-specific logic (sidebar toggle, responsive behavior)
+
+4. **Integration Testing Phase**: Verify functionality preservation
+   - Test that all owner functionality still works
+   - Verify role-based data filtering through composables
+   - Test component communication through composable actions
+   - Ensure no regression in user experience
+
+5. **Architecture Validation Phase**: Confirm transformation success
+   - Measure final component size (~200 lines target)
+   - Verify no business logic remains in component
+   - Confirm single source of truth established
+   - Validate clean separation of concerns
+```
+
+### **Context7 Documentation**
+```bash
+# Thin component patterns and orchestration
+get-library-docs /vuejs/docs --topic="component-orchestration thin-components presentation-logic"
+
+# Advanced composable integration
+get-library-docs /vuejs/docs --topic="composables-integration component-composition"
+
+# Clean architecture patterns
+get-library-docs /vuejs/docs --topic="clean-architecture separation-of-concerns"
+```
+
+### **Vuetify RAG Server Usage**
+```bash
+# Layout orchestration for thin components
+# Focus on: clean component structure, minimal templates
+# Key components: v-row, v-col for simple orchestration layouts
+```
+
+### **Implementation Requirements**
+
+#### **BEFORE (Current - WRONG)**:
+```vue
+<!-- HomeOwner.vue - ~900 lines with business logic -->
+<script setup>
+// ❌ BAD: Business logic in component
+const ownerBookings = computed(() => 
+  Array.from(bookingStore.bookings.values())
+    .filter(b => b.owner_id === user.id)
+);
+
+const createBooking = async (data) => {
+  // ❌ 50+ lines of business logic here
+};
+
+const handleCalendarEvents = () => {
+  // ❌ 100+ lines of calendar logic here
+};
+
+// ❌ 800+ more lines of business logic...
 </script>
 ```
 
----
-
-## 📝 **TASK-079: Role-Based Testing Utilities**
-
-### **Overview**
-Create comprehensive testing utilities that support role-based component testing.
-
-### **Implementation Pattern**
-
-```typescript
-// src/test/utils/roleBasedMounting.ts
-import { mount, VueWrapper } from '@vue/test-utils'
-import { createPinia, setActivePinia } from 'pinia'
-import { createVuetify } from 'vuetify'
-import { createRouter, createWebHistory } from 'vue-router'
-import type { ComponentMountingOptions } from '@vue/test-utils'
-import type { User, Property, Booking } from '@/types'
-import { useAuthStore } from '@/stores/auth'
-import { usePropertyStore } from '@/stores/property'
-import { useBookingStore } from '@/stores/booking'
-
-// Mock data factories
-export const createMockOwner = (overrides?: Partial<User>): User => ({
-  id: 'owner-123',
-  name: 'Test Owner',
-  email: 'owner@test.com',
-  role: 'owner',
-  created_at: new Date().toISOString(),
-  ...overrides
-})
-
-export const createMockAdmin = (overrides?: Partial<User>): User => ({
-  id: 'admin-456',
-  name: 'Test Admin',
-  email: 'admin@test.com',
-  role: 'admin',
-  created_at: new Date().toISOString(),
-  ...overrides
-})
-
-export const createMockProperty = (ownerId: string, overrides?: Partial<Property>): Property => ({
-  id: `prop-${Math.random().toString(36).substr(2, 9)}`,
-  name: 'Test Property',
-  owner_id: ownerId,
-  owner_name: 'Test Owner',
-  address: {
-    street: '123 Test St',
-    city: 'Test City',
-    state: 'TS',
-    zip: '12345'
-  },
-  pricing_tier: 'premium',
-  nightly_rate: 150,
-  cleaning_fee: 75,
-  active: true,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  ...overrides
-})
-
-export const createMockBooking = (ownerId: string, propertyId: string, overrides?: Partial<Booking>): Booking => ({
-  id: `booking-${Math.random().toString(36).substr(2, 9)}`,
-  property_id: propertyId,
-  owner_id: ownerId,
-  checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-  checkout_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-  booking_type: 'standard',
-  guest_count: 2,
-  status: 'confirmed',
-  cleaning_scheduled: true,
-  total_cost: 450,
-  nightly_rate: 150,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  ...overrides
-})
-
-// Role-based mounting utilities
-interface OwnerMountOptions extends ComponentMountingOptions<any> {
-  ownerData?: {
-    user?: Partial<User>
-    properties?: Partial<Property>[]
-    bookings?: Partial<Booking>[]
-  }
-}
-
-interface AdminMountOptions extends ComponentMountingOptions<any> {
-  adminData?: {
-    user?: Partial<User>
-    allProperties?: Partial<Property>[]
-    allBookings?: Partial<Booking>[]
-  }
-}
-
-export const mountOwnerComponent = async (
-  component: any,
-  options: OwnerMountOptions = {}
-): Promise<VueWrapper<any>> => {
-  // Setup testing environment
-  const pinia = createPinia()
-  setActivePinia(pinia)
-  
-  const vuetify = createVuetify({
-    theme: { defaultTheme: 'light' }
-  })
-  
-  const router = createRouter({
-    history: createWebHistory(),
-    routes: [
-      { path: '/', component: { template: '<div>Home</div>' } },
-      { path: '/owner/dashboard', component: { template: '<div>Dashboard</div>' } }
-    ]
-  })
-
-  // Setup stores with owner data
-  const authStore = useAuthStore()
-  const propertyStore = usePropertyStore()
-  const bookingStore = useBookingStore()
-
-  // Create mock owner
-  const mockOwner = createMockOwner(options.ownerData?.user)
-  authStore.user = mockOwner
-
-  // Setup owner properties
-  if (options.ownerData?.properties) {
-    options.ownerData.properties.forEach(propertyData => {
-      const property = createMockProperty(mockOwner.id, propertyData)
-      propertyStore.properties.set(property.id, property)
-    })
-  }
-
-  // Setup owner bookings
-  if (options.ownerData?.bookings) {
-    options.ownerData.bookings.forEach(bookingData => {
-      const booking = createMockBooking(
-        mockOwner.id,
-        Array.from(propertyStore.properties.keys())[0] || 'default-property',
-        bookingData
-      )
-      bookingStore.bookings.set(booking.id, booking)
-    })
-  }
-
-  // Mount component
-  return mount(component, {
-    global: {
-      plugins: [pinia, vuetify, router],
-      stubs: {
-        'router-link': true,
-        'router-view': true
-      }
-    },
-    ...options
-  })
-}
-
-export const mountAdminComponent = async (
-  component: any,
-  options: AdminMountOptions = {}
-): Promise<VueWrapper<any>> => {
-  // Setup testing environment
-  const pinia = createPinia()
-  setActivePinia(pinia)
-  
-  const vuetify = createVuetify({
-    theme: { defaultTheme: 'light' }
-  })
-  
-  const router = createRouter({
-    history: createWebHistory(),
-    routes: [
-      { path: '/', component: { template: '<div>Home</div>' } },
-      { path: '/admin/dashboard', component: { template: '<div>Admin Dashboard</div>' } }
-    ]
-  })
-
-  // Setup stores with admin data
-  const authStore = useAuthStore()
-  const propertyStore = usePropertyStore()
-  const bookingStore = useBookingStore()
-
-  // Create mock admin
-  const mockAdmin = createMockAdmin(options.adminData?.user)
-  authStore.user = mockAdmin
-
-  // Setup all properties (admin sees everything)
-  if (options.adminData?.allProperties) {
-    options.adminData.allProperties.forEach(propertyData => {
-      const property = createMockProperty('various-owners', propertyData)
-      propertyStore.properties.set(property.id, property)
-    })
-  }
-
-  // Setup all bookings (admin sees everything)
-  if (options.adminData?.allBookings) {
-    options.adminData.allBookings.forEach(bookingData => {
-      const booking = createMockBooking(
-        'various-owners',
-        Array.from(propertyStore.properties.keys())[0] || 'default-property',
-        bookingData
-      )
-      bookingStore.bookings.set(booking.id, booking)
-    })
-  }
-
-  // Mount component
-  return mount(component, {
-    global: {
-      plugins: [pinia, vuetify, router],
-      stubs: {
-        'router-link': true,
-        'router-view': true
-      }
-    },
-    ...options
-  })
-}
-
-// Role-based assertion helpers
-export const expectOwnerDataScoping = (wrapper: VueWrapper<any>, ownerId: string) => {
-  // Find all property elements and verify they belong to owner
-  const propertyElements = wrapper.findAll('[data-testid*="property-"]')
-  propertyElements.forEach(element => {
-    expect(element.attributes('data-owner-id')).toBe(ownerId)
-  })
-
-  // Find all booking elements and verify they belong to owner
-  const bookingElements = wrapper.findAll('[data-testid*="booking-"]')
-  bookingElements.forEach(element => {
-    expect(element.attributes('data-owner-id')).toBe(ownerId)
-  })
-}
-
-export const expectAdminDataAccess = (wrapper: VueWrapper<any>) => {
-  // Admin should see system-wide stats
-  expect(wrapper.find('[data-testid="total-properties"]').exists()).toBe(true)
-  expect(wrapper.find('[data-testid="total-bookings"]').exists()).toBe(true)
-  expect(wrapper.find('[data-testid="system-metrics"]').exists()).toBe(true)
-}
-```
-
-### **Example Test Implementation**
-
-```typescript
-// src/components/smart/owner/__tests__/OwnerSidebar.test.ts
-import { describe, it, expect, beforeEach } from 'vitest'
-import { nextTick } from 'vue'
-import OwnerSidebar from '../OwnerSidebar.vue'
-import { mountOwnerComponent, expectOwnerDataScoping, createMockProperty, createMockBooking } from '@/test/utils/roleBasedMounting'
-
-describe('OwnerSidebar.vue', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('should display only owner properties', async () => {
-    const wrapper = await mountOwnerComponent(OwnerSidebar, {
-      ownerData: {
-        user: { name: 'John Owner' },
-        properties: [
-          { name: 'Beach House', active: true },
-          { name: 'Mountain Cabin', active: false }
-        ]
-      }
-    })
-
-    await nextTick()
-
-    // Should show owner's properties
-    expect(wrapper.text()).toContain('Beach House')
-    expect(wrapper.text()).toContain('Mountain Cabin')
-    
-    // Verify data scoping
-    expectOwnerDataScoping(wrapper, 'owner-123')
-  })
-
-  it('should show correct booking counts', async () => {
-    const wrapper = await mountOwnerComponent(OwnerSidebar, {
-      ownerData: {
-        properties: [
-          { name: 'Test Property' }
-        ],
-        bookings: [
-          { status: 'confirmed' },
-          { status: 'pending' },
-          { status: 'completed' }
-        ]
-      }
-    })
-
-    await nextTick()
-
-    // Should show booking count in nav
-    const bookingNavItem = wrapper.find('[data-testid="owner-bookings-nav"]')
-    expect(bookingNavItem.text()).toContain('3') // Total bookings
-  })
-
-  it('should handle turn alerts correctly', async () => {
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-    
-    const wrapper = await mountOwnerComponent(OwnerSidebar, {
-      ownerData: {
-        bookings: [
-          {
-            booking_type: 'turn',
-            status: 'pending',
-            checkout_date: tomorrow
-          }
-        ]
-      }
-    })
-
-    await nextTick()
-
-    // Should show turn alert
-    const turnAlert = wrapper.find('[data-testid="turn-alerts"]')
-    expect(turnAlert.text()).toContain('Turn Alerts (1)')
-  })
-
-  it('should not show admin-only features', async () => {
-    const wrapper = await mountOwnerComponent(OwnerSidebar, {
-      ownerData: {
-        user: { role: 'owner' }
-      }
-    })
-
-    await nextTick()
-
-    // Should not show admin features
-    expect(wrapper.find('[data-testid="admin-reports"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="cleaner-management"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="system-settings"]').exists()).toBe(false)
-  })
-})
-```
-
----
-
-## 📝 **TASK-070: Import Path Optimization Guide**
-
-### **Overview**
-Standardize import paths and fix any remaining inconsistencies after the composables reorganization.
-
-### **Current Import Patterns**
-
-```typescript
-// ✅ CORRECT - Shared composables
-import { useAuth } from '@/composables/shared/useAuth'
-import { useBookings } from '@/composables/shared/useBookings'
-import { useProperties } from '@/composables/shared/useProperties'
-
-// ✅ CORRECT - Role-specific composables (future)
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings'
-import { useAdminReports } from '@/composables/admin/useAdminReports'
-
-// ✅ CORRECT - Components
-import OwnerSidebar from '@/components/smart/owner/OwnerSidebar.vue'
-import PropertyCard from '@/components/dumb/shared/PropertyCard.vue'
-
-// ✅ CORRECT - Stores
-import { useAuthStore } from '@/stores/auth'
-import { usePropertyStore } from '@/stores/property'
-
-// ❌ INCORRECT - Old patterns to fix
-import { useAuth } from '@/composables/useAuth' // Missing /shared/
-import { useBookings } from '../composables/useBookings' // Relative path
-```
-
-### **Automated Import Path Audit Script**
-
-```typescript
-// scripts/audit-imports.ts
-import { readdir, readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
-
-interface ImportIssue {
-  file: string
-  line: number
-  issue: string
-  suggestion: string
-}
-
-const CORRECT_PATTERNS = {
-  // Shared composables
-  'useAuth': '@/composables/shared/useAuth',
-  'useBookings': '@/composables/shared/useBookings',
-  'useProperties': '@/composables/shared/useProperties',
-  'useCalendarState': '@/composables/shared/useCalendarState',
-  'useErrorHandler': '@/composables/shared/useErrorHandler',
-  'useLoadingState': '@/composables/shared/useLoadingState',
-  
-  // Stores
-  'useAuthStore': '@/stores/auth',
-  'usePropertyStore': '@/stores/property',
-  'useBookingStore': '@/stores/booking',
-  'useUIStore': '@/stores/ui',
-  
-  // Types
-  'types': '@/types'
-}
-
-const auditImports = async (dirPath: string): Promise<ImportIssue[]> => {
-  const issues: ImportIssue[] = []
-  
-  const files = await readdir(dirPath, { recursive: true })
-  
-  for (const file of files) {
-    if (!(file.endsWith('.vue') || file.endsWith('.ts'))) continue
-    
-    const filePath = join(dirPath, file)
-    const content = await readFile(filePath, 'utf-8')
-    const lines = content.split('\n')
-    
-    lines.forEach((line, index) => {
-      // Check for import statements
-      const importMatch = line.match(/import\s+.*from\s+['"]([^'"]+)['"]/)
-      if (!importMatch) return
-      
-      const importPath = importMatch[1]
-      
-      // Check for incorrect patterns
-      for (const [composable, correctPath] of Object.entries(CORRECT_PATTERNS)) {
-        if (importPath.includes(composable) && importPath !== correctPath) {
-          // Skip relative imports from within same directory
-          if (importPath.startsWith('./') || importPath.startsWith('../')) {
-            const isSharedToShared = filePath.includes('/shared/') && importPath.includes('/shared/')
-            if (isSharedToShared) continue
-          }
-          
-          issues.push({
-            file: filePath,
-            line: index + 1,
-            issue: `Incorrect import path: ${importPath}`,
-            suggestion: `Should be: ${correctPath}`
-          })
-        }
-      }
-      
-      // Check for old composable patterns
-      if (importPath.match(/@\/composables\/use[A-Z]/) && !importPath.includes('/shared/')) {
-        issues.push({
-          file: filePath,
-          line: index + 1,
-          issue: `Missing /shared/ in composable import: ${importPath}`,
-          suggestion: `Should be: ${importPath.replace('/composables/', '/composables/shared/')}`
-        })
-      }
-    })
-  }
-  
-  return issues
-}
-
-// Run audit
-const runAudit = async () => {
-  console.log('🔍 Auditing import paths...')
-  
-  const issues = await auditImports('./src')
-  
-  if (issues.length === 0) {
-    console.log('✅ All import paths are correct!')
-    return
-  }
-  
-  console.log(`❌ Found ${issues.length} import path issues:`)
-  
-  issues.forEach(issue => {
-    console.log(`\n📁 ${issue.file}:${issue.line}`)
-    console.log(`   Issue: ${issue.issue}`)
-    console.log(`   Fix:   ${issue.suggestion}`)
-  })
-  
-  // Generate fix script
-  await generateFixScript(issues)
-}
-
-const generateFixScript = async (issues: ImportIssue[]) => {
-  const fixScript = `#!/bin/bash
-# Auto-generated import path fix script
-
-echo "🔧 Fixing import paths..."
-
-${issues.map(issue => {
-  const oldPath = issue.issue.match(/: (.+)$/)?.[1] || ''
-  const newPath = issue.suggestion.match(/: (.+)$/)?.[1] || ''
-  
-  if (oldPath && newPath) {
-    return `sed -i 's|${oldPath.replace(/[/.*+?^${}()|[\\]\\]/g, '\\\\$&')}|${newPath}|g' "${issue.file}"`
-  }
-  return `# TODO: Manually fix ${issue.file}:${issue.line}`
-}).join('\n')}
-
-echo "✅ Import paths fixed!"
-`
-  
-  await writeFile('./scripts/fix-imports.sh', fixScript, 'utf-8')
-  console.log('\n📝 Generated fix script: ./scripts/fix-imports.sh')
-  console.log('Run: chmod +x ./scripts/fix-imports.sh && ./scripts/fix-imports.sh')
-}
-
-runAudit().catch(console.error)
-```
-
-### **ESLint Rules for Import Consistency**
-
-```javascript
-// .eslintrc.js - Add these rules
-module.exports = {
-  // ... existing config
-  rules: {
-    // ... existing rules
-    
-    // Import path consistency
-    'import/no-relative-parent-imports': 'error',
-    'import/order': [
-      'error',
-      {
-        'groups': [
-          'builtin',
-          'external',
-          'internal',
-          'parent',
-          'sibling',
-          'index'
-        ],
-        'pathGroups': [
-          {
-            'pattern': '@/composables/shared/**',
-            'group': 'internal',
-            'position': 'before'
-          },
-          {
-            'pattern': '@/composables/owner/**',
-            'group': 'internal',
-            'position': 'before'
-          },
-          {
-            'pattern': '@/composables/admin/**',
-            'group': 'internal',
-            'position': 'before'
-          },
-          {
-            'pattern': '@/stores/**',
-            'group': 'internal',
-            'position': 'before'
-          },
-          {
-            'pattern': '@/components/**',
-            'group': 'internal',
-            'position': 'after'
-          },
-          {
-            'pattern': '@/types/**',
-            'group': 'internal',
-            'position': 'after'
-          }
-        ],
-        'pathGroupsExcludedImportTypes': ['builtin']
-      }
-    ]
-  }
-}
-```
-
----
-
-## 📝 **TASK-063: TypeScript Integration Patterns**
-
-### **Overview**
-Fix TypeScript issues in role-based components and establish consistent typing patterns.
-
-### **Common TypeScript Patterns**
-
-```typescript
-// src/types/roleBasedComponents.ts
-import type { Component } from 'vue'
-import type { User, Property, Booking } from '@/types'
-
-// Role-based component props
-export interface OwnerComponentProps {
-  user: User & { role: 'owner' }
-  properties: Property[]
-  bookings: Booking[]
-}
-
-export interface AdminComponentProps {
-  user: User & { role: 'admin' }
-  allProperties: Property[]
-  allBookings: Booking[]
-  systemMetrics: SystemMetrics
-}
-
-// Generic role-based component
-export interface RoleBasedComponent<TRole extends 'owner' | 'admin'> {
-  role: TRole
-  user: User & { role: TRole }
-  data: TRole extends 'owner' ? OwnerComponentProps : AdminComponentProps
-}
-
-// Component event types
-export interface OwnerComponentEvents {
-  'property-selected': [propertyId: string]
-  'booking-created': [booking: Booking]
-  'error-occurred': [error: Error]
-}
-
-export interface AdminComponentEvents {
-  'cleaner-assigned': [bookingId: string, cleanerId: string]
-  'bulk-action': [action: string, items: string[]]
-  'system-alert': [alert: SystemAlert]
-}
-
-// Store typing helpers
-export type FilteredStore<T, TRole> = TRole extends 'owner' 
-  ? T & { data: T[] }
-  : T & { allData: T[] }
-```
-
-### **TypeScript Component Template**
-
+#### **AFTER (Target - CORRECT)**:
 ```vue
-<!-- Template for role-based components -->
+<!-- HomeOwner.vue - ~200 lines, thin orchestrator -->
 <template>
-  <div :class="componentClasses">
-    <!-- Component content -->
+  <div class="home-owner-container">
+    <v-row no-gutters class="fill-height">
+      <v-col cols="12" lg="3" xl="2">
+        <OwnerSidebar
+          :today-turns="ownerData.todayTurns"
+          :upcoming-cleanings="ownerData.upcomingCleanings"
+          :properties="ownerData.properties"
+          @navigate-to-booking="ownerActions.navigateToBooking"
+          @create-booking="ownerActions.createBooking"
+        />
+      </v-col>
+      <v-col cols="12" lg="9" xl="10">
+        <OwnerCalendar
+          :events="ownerData.calendarEvents"
+          :current-view="calendarState.currentView"
+          @event-click="ownerActions.handleEventClick"
+          @date-select="ownerActions.handleDateSelect"
+        />
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, type Ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import type { RouteLocationNormalized, Router } from 'vue-router'
+// ✅ GOOD: Thin orchestration layer
+const { 
+  ownerData, 
+  ownerActions, 
+  calendarState 
+} = useOwnerDashboard();
 
-// Store imports with proper typing
-import { useAuthStore } from '@/stores/auth'
-import type { AuthStore } from '@/types/stores'
+// ✅ Minimal component-specific logic only (UI concerns)
+const sidebarOpen = ref(false);
+const toggleSidebar = () => sidebarOpen.value = !sidebarOpen.value;
 
-// Component-specific types
-interface Props {
-  modelValue?: boolean
-  variant?: 'default' | 'compact' | 'expanded'
-  disabled?: boolean
-}
-
-interface Emits {
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'action', action: string, payload?: any): void
-  (e: 'error', error: Error): void
-}
-
-// Props with defaults
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: false,
-  variant: 'default',
-  disabled: false
-})
-
-// Emits definition
-const emit = defineEmits<Emits>()
-
-// Composables with explicit typing
-const route: RouteLocationNormalized = useRoute()
-const router: Router = useRouter()
-const authStore = useAuthStore()
-
-// Reactive state with proper typing
-const loading: Ref<boolean> = ref(false)
-const error: Ref<Error | null> = ref(null)
-const selectedItems: Ref<string[]> = ref([])
-
-// Computed properties with explicit return types
-const isOwner = computed((): boolean => {
-  return authStore.user?.role === 'owner'
-})
-
-const componentClasses = computed((): string[] => {
-  return [
-    'role-based-component',
-    `role-based-component--${props.variant}`,
-    {
-      'role-based-component--disabled': props.disabled,
-      'role-based-component--loading': loading.value
-    }
-  ]
-})
-
-// Methods with proper typing
-const handleAction = async (action: string, payload?: any): Promise<void> => {
-  try {
-    loading.value = true
-    error.value = null
-    
-    // Process action
-    await processAction(action, payload)
-    
-    emit('action', action, payload)
-  } catch (err) {
-    const errorObj = err instanceof Error ? err : new Error(String(err))
-    error.value = errorObj
-    emit('error', errorObj)
-  } finally {
-    loading.value = false
-  }
-}
-
-const processAction = async (action: string, payload?: any): Promise<void> => {
-  // Implementation
-}
-
-// Expose for template ref access
-defineExpose({
-  handleAction,
-  loading: computed(() => loading.value),
-  error: computed(() => error.value)
-})
+// ✅ Simple responsive behavior only
+const { xs } = useDisplay();
+watch(xs, (newValue) => {
+  if (newValue) sidebarOpen.value = false;
+});
 </script>
 ```
 
-### **Store TypeScript Patterns**
+### **Critical Transformation Metrics**:
+- **Before**: ~900 lines with business logic
+- **After**: ~200 lines, pure orchestration  
+- **Business Logic**: 0 lines (moved to useOwnerDashboard)
+- **Component Responsibility**: Pure UI orchestration only
 
+### **Verification Checklist**:
+- [ ] **🚨 CRITICAL**: HomeOwner.vue is ~200 lines or less
+- [ ] **🚨 CRITICAL**: Uses useOwnerDashboard() for ALL business logic
+- [ ] **🚨 CRITICAL**: NO business logic remains in component
+- [ ] **🚨 CRITICAL**: All computed properties with business logic removed
+- [ ] **🚨 CRITICAL**: All methods with business operations removed
+- [ ] Owner interface shows only owner-scoped data
+- [ ] Component communication works through composable actions
+- [ ] Role-based data isolation maintained through composables
+- [ ] UI store integration works through composables
+- [ ] Responsive behavior maintained (minimal UI logic only)
+
+### **Dependencies**:
+- **CRITICAL**: TASK-060A (useOwnerDashboard) must be complete
+- **Standard**: TASK-060 (OwnerSidebar), TASK-061 (OwnerCalendar)
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+## 🔗 **TASK-066: Transform HomeAdmin.vue into Thin Orchestrator**
+**Complexity Rating: 9/10** - CRITICAL architectural transformation
+
+### **🚨 PRIMARY OBJECTIVE**
+**Transform HomeAdmin.vue from 1020+ line business logic component into ~200 line thin orchestrator using useAdminDashboard composable**
+
+### **Sequential Thinking Approach**
+```
+1. **Current State Analysis Phase**: Assess existing HomeAdmin.vue
+   - Measure current component size (1020+ lines)
+   - Identify all system-wide business logic to extract
+   - Map current admin-specific workflows and operations
+   - Document current architectural violations
+
+2. **Refactoring Design Phase**: Plan admin orchestrator transformation
+   - Design minimal component interface using useAdminDashboard
+   - Plan removal of all business logic from component
+   - Design admin-specific prop passing and event delegation
+   - Plan component size reduction strategy for complex admin operations
+
+3. **Implementation Phase**: Execute admin orchestrator transformation
+   - Replace all business logic with useAdminDashboard calls
+   - Integrate AdminSidebar and AdminCalendar components
+   - Remove all computed properties with system calculations
+   - Remove all methods with admin operations (cleaner assignment, etc.)
+   - Keep only UI-specific logic (sidebar toggle, responsive behavior)
+
+4. **Admin Integration Testing Phase**: Verify complex admin functionality
+   - Test that all admin functionality still works
+   - Verify system-wide data access through composables
+   - Test admin-specific workflows (cleaner assignment, reporting)
+   - Test role switching functionality
+   - Ensure no regression in admin experience
+
+5. **Architecture Validation Phase**: Confirm admin transformation success
+   - Measure final component size (~200 lines target)
+   - Verify no business logic remains in component
+   - Confirm admin single source of truth established
+   - Validate clean separation of admin concerns
+```
+
+### **Context7 Documentation**
+```bash
+# Complex component orchestration patterns
+get-library-docs /vuejs/docs --topic="complex-orchestration admin-patterns enterprise-composition"
+
+# Advanced admin interface patterns
+get-library-docs /vuejs/docs --topic="admin-interfaces system-management dashboard-patterns"
+```
+
+### **Vuetify RAG Server Usage**
+```bash
+# Complex admin layouts and orchestration
+# Focus on: admin dashboard layouts, complex component coordination
+# Key components: v-app, v-navigation-drawer, v-main for admin orchestration
+```
+
+### **Implementation Requirements**
+
+#### **BEFORE (Current - WRONG)**:
+```vue
+<!-- HomeAdmin.vue - 1020+ lines with complex business logic -->
+<script setup>
+// ❌ BAD: Complex system-wide business logic in component
+const systemMetrics = computed(() => {
+  // 100+ lines of complex business calculations
+});
+
+const assignCleaner = async (bookingId, cleanerId) => {
+  // ❌ 150+ lines of cleaner assignment logic
+};
+
+const generateReports = async () => {
+  // ❌ 200+ lines of reporting logic
+};
+
+// ❌ 570+ more lines of admin business logic...
+</script>
+```
+
+#### **AFTER (Target - CORRECT)**:
+```vue
+<!-- HomeAdmin.vue - ~200 lines, thin orchestrator -->
+<template>
+  <div class="home-admin-container">
+    <v-row no-gutters class="fill-height">
+      <v-col cols="12" lg="3" xl="2">
+        <AdminSidebar
+          :system-metrics="adminData.systemMetrics"
+          :urgent-turns="adminData.urgentTurns"
+          :cleaner-queue="adminData.cleanerQueue"
+          @assign-cleaner="adminActions.assignCleaner"
+          @generate-report="adminActions.generateReport"
+        />
+      </v-col>
+      <v-col cols="12" lg="9" xl="10">
+        <AdminCalendar
+          :events="adminData.allCalendarEvents"
+          :cleaners="adminData.cleaners"
+          @assign-cleaner="adminActions.assignCleaner"
+          @update-booking-status="adminActions.updateStatus"
+        />
+      </v-col>
+    </v-row>
+  </div>
+</template>
+
+<script setup lang="ts">
+// ✅ GOOD: Thin orchestration layer for complex admin operations
+const { 
+  adminData, 
+  adminActions, 
+  systemState 
+} = useAdminDashboard();
+
+// ✅ Minimal component-specific logic only (UI concerns)
+const sidebarOpen = ref(false);
+const toggleSidebar = () => sidebarOpen.value = !sidebarOpen.value;
+
+// ✅ Simple responsive behavior only
+const { xs } = useDisplay();
+watch(xs, (newValue) => {
+  if (newValue) sidebarOpen.value = false;
+});
+</script>
+```
+
+### **Critical Transformation Metrics**:
+- **Before**: 1020+ lines with complex business logic
+- **After**: ~200 lines, pure orchestration
+- **Business Logic**: 0 lines (moved to useAdminDashboard)
+- **Admin Operations**: All delegated to composables
+- **Component Responsibility**: Pure UI orchestration only
+
+### **Verification Checklist**:
+- [ ] **🚨 CRITICAL**: HomeAdmin.vue is ~200 lines or less
+- [ ] **🚨 CRITICAL**: Uses useAdminDashboard() for ALL business logic
+- [ ] **🚨 CRITICAL**: NO business logic remains in component
+- [ ] **🚨 CRITICAL**: All system calculations moved to composables
+- [ ] **🚨 CRITICAL**: All admin operations delegated to composables
+- [ ] Admin interface shows system-wide data through composables
+- [ ] Role switching functionality works through composables
+- [ ] All admin-specific features accessible through composable actions
+- [ ] Complex admin workflows function through composables
+- [ ] Cleaner assignment works through composable actions
+- [ ] Business reporting accessible through composable actions
+
+### **Dependencies**:
+- **CRITICAL**: TASK-060B (useAdminDashboard) must be complete
+- **Standard**: TASK-062 (AdminSidebar), TASK-064 (AdminCalendar)
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+## 📁 **TASK-067: Move Demo Components to Development Folder**
+**Complexity Rating: 3/10** - Low complexity file organization task
+
+### **Sequential Thinking Approach**
+```
+1. **Inventory Phase**: Catalog all demo components
+   - Identify all files in src/components/demos/
+   - Find demo pages in src/pages/demos/
+   - Locate demo-related files throughout codebase
+
+2. **Planning Phase**: Design development folder structure
+   - Create logical src/dev/ folder structure
+   - Plan import path update strategy
+   - Design build exclusion configuration
+
+3. **Implementation Phase**: Execute file moves
+   - Create src/dev/ folder structure
+   - Move demo components systematically
+   - Update import paths where necessary
+
+4. **Build Configuration**: Configure development exclusion
+   - Update Vite config to exclude src/dev/ from production
+   - Test that demo components still work in development
+   - Verify production build excludes demo code
+
+5. **Documentation**: Create dev folder documentation
+   - Create README.md explaining dev folder purpose
+   - Document available demo components
+```
+
+### **Context7 Documentation**
+```bash
+# Vite configuration for conditional builds
+resolve-library-id "vite"
+get-library-docs /vitejs/vite --topic="config-conditional-builds exclude-patterns"
+```
+
+### **Vuetify RAG Server Usage**: Not needed for this task
+
+### **Implementation Requirements**
+- **Create**: `src/dev/` folder for development-only components
+- **Move Files**: 
+  - `src/components/demos/` → `src/dev/demos/`
+  - `src/pages/demos/` → `src/dev/pages/`
+  - `src/components/dumb/PropertyCardDemo.vue` → `src/dev/demos/`
+- **Build Config**: Exclude `src/dev/` from production bundle
+
+### **Verification**: Production build excludes demo components, dev server includes them
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+## 🗑️ **TASK-068: Remove Generic Components + Eliminate Home.vue**
+**Complexity Rating: 6/10** - Increased complexity due to Home.vue elimination
+
+### **🚨 PRIMARY OBJECTIVE**
+**Remove Home.vue completely to establish HomeOwner and HomeAdmin as true single sources of truth**
+
+### **Sequential Thinking Approach**
+```
+1. **Pre-Removal Validation Phase**: Ensure prerequisites complete
+   - Verify TASK-065 (HomeOwner) is stable as thin orchestrator
+   - Verify TASK-066 (HomeAdmin) is stable as thin orchestrator  
+   - Confirm both components work independently of Home.vue
+   - Test all functionality works through new orchestrators
+
+2. **Home.vue Elimination Planning**: Plan complete removal strategy
+   - Identify all references to Home.vue throughout codebase
+   - Plan routing updates to bypass Home.vue completely
+   - Design direct role-based routing strategy
+   - Plan rollback strategy in case of issues
+
+3. **Critical Removal Phase**: Eliminate Home.vue completely
+   - Remove Home.vue file (1020+ lines of duplicated logic)
+   - Update routing to go directly to HomeOwner/HomeAdmin
+   - Remove all imports and references to Home.vue
+   - Update navigation patterns to use role-specific routes
+
+4. **Generic Component Cleanup**: Remove redundant components
+   - Remove generic Sidebar.vue (replaced by OwnerSidebar/AdminSidebar)
+   - Remove generic FullCalendar.vue (replaced by role-specific versions)
+   - Update any remaining references to removed components
+   - Verify no broken imports remain
+
+5. **Architecture Validation Phase**: Confirm single source of truth
+   - Test that only HomeOwner and HomeAdmin serve as orchestrators
+   - Verify no generic fallback components exist
+   - Confirm true role-based architecture achieved
+   - Test all functionality works without generic components
+```
+
+### **Context7 Documentation**
+```bash
+# Vue Router configuration for role-based routing
+get-library-docs /vuejs/vue-router --topic="routing-configuration role-based-navigation"
+
+# Component removal and dependency management
+get-library-docs /vuejs/docs --topic="component-dependencies refactoring-patterns"
+```
+
+### **Vuetify RAG Server Usage**: Not needed for this cleanup task
+
+### **Implementation Requirements**
+
+#### **🚨 CRITICAL: Home.vue Removal (Priority #1)**
 ```typescript
-// src/stores/typedStore.ts - Enhanced store typing
-import { defineStore } from 'pinia'
-import { ref, computed, type Ref, type ComputedRef } from 'vue'
-import type { User, Property, Booking } from '@/types'
-
-// Store state interface
-interface StoreState {
-  data: Map<string, any>
-  loading: boolean
-  error: Error | null
-  lastUpdated: number | null
+// BEFORE (WRONG): Generic routing through Home.vue
+{
+  path: '/',
+  name: 'Home', 
+  component: () => import('@/components/smart/Home.vue') // ❌ REMOVE THIS
 }
 
-// Store getters interface
-interface StoreGetters {
-  hasData: ComputedRef<boolean>
-  dataArray: ComputedRef<any[]>
-  isLoading: ComputedRef<boolean>
-  lastError: ComputedRef<Error | null>
+// AFTER (CORRECT): Direct role-based routing
+{
+  path: '/owner',
+  name: 'Owner',
+  component: () => import('@/components/smart/owner/HomeOwner.vue')
+},
+{
+  path: '/admin', 
+  name: 'Admin',
+  component: () => import('@/components/smart/admin/HomeAdmin.vue')
+},
+{
+  path: '/',
+  redirect: '/owner' // or '/admin' based on auth
 }
+```
 
-// Store actions interface
-interface StoreActions {
-  fetchData(): Promise<void>
-  createItem(item: any): Promise<any>
-  updateItem(id: string, updates: Partial<any>): Promise<void>
-  deleteItem(id: string): Promise<void>
-  clearError(): void
-}
+#### **Generic Component Removal Priority**:
+1. **Home.vue** - CRITICAL (eliminates 1020+ lines of duplication)
+2. **Sidebar.vue** - HIGH (replaced by OwnerSidebar/AdminSidebar)  
+3. **FullCalendar.vue** - MEDIUM (replaced by role-specific calendars)
 
-// Complete store interface
-export interface TypedStore extends StoreState, StoreGetters, StoreActions {}
+#### **Files to Remove**:
+- ❌ `src/components/smart/Home.vue` (CRITICAL - most important)
+- ❌ `src/components/smart/Sidebar.vue` 
+- ❌ `src/components/smart/FullCalendar.vue` (if replaced)
 
-export const useTypedStore = defineStore('typed', (): TypedStore => {
-  // State with explicit types
-  const data: Ref<Map<string, any>> = ref(new Map())
-  const loading: Ref<boolean> = ref(false)
-  const error: Ref<Error | null> = ref(null)
-  const lastUpdated: Ref<number | null> = ref(null)
+### **Before/After Architecture Impact**:
+- **Before**: 3 orchestrators (Home.vue, HomeOwner.vue, HomeAdmin.vue) = confusion
+- **After**: 2 orchestrators (HomeOwner.vue, HomeAdmin.vue) = true single sources of truth
+- **Code Reduction**: Eliminates 1020+ lines of duplicated business logic
+- **Maintenance**: Changes only need to happen in role-specific orchestrators
 
-  // Getters with explicit return types
-  const hasData: ComputedRef<boolean> = computed(() => data.value.size > 0)
-  const dataArray: ComputedRef<any[]> = computed(() => Array.from(data.value.values()))
-  const isLoading: ComputedRef<boolean> = computed(() => loading.value)
-  const lastError: ComputedRef<Error | null> = computed(() => error.value)
+### **Verification Checklist**:
+- [ ] **🚨 CRITICAL**: Home.vue file completely removed
+- [ ] **🚨 CRITICAL**: All routing bypasses Home.vue completely  
+- [ ] **🚨 CRITICAL**: Only HomeOwner and HomeAdmin exist as orchestrators
+- [ ] **🚨 CRITICAL**: No generic fallback components remain
+- [ ] Application works without old generic components
+- [ ] No broken imports or references remain
+- [ ] Role-based routing works correctly
+- [ ] Both owner and admin interfaces function independently
 
-  // Actions with proper typing
-  const fetchData = async (): Promise<void> => {
-    try {
-      loading.value = true
-      error.value = null
-      
-      // Fetch implementation
-      
-      lastUpdated.value = Date.now()
-    } catch (err) {
-      error.value = err instanceof Error ? err : new Error(String(err))
-      throw err
-    } finally {
-      loading.value = false
+### **Dependencies**:
+- **CRITICAL**: TASK-065 (HomeOwner thin orchestrator) must be stable
+- **CRITICAL**: TASK-066 (HomeAdmin thin orchestrator) must be stable  
+- **WARNING**: Do not proceed until both role-specific orchestrators work independently
+
+### **Rollback Strategy**:
+- Keep backup of Home.vue until verification complete
+- Test thoroughly before permanent removal
+- Ensure both role-specific interfaces work before removing generic components
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+## 📝 **TASK-069: Clean Up tasks.md File**
+**Complexity Rating: 3/10** - Low complexity documentation organization
+
+### **Sequential Thinking Approach**
+```
+1. **Analysis Phase**: Review current tasks.md state
+   - Identify completed tasks that can be archived
+   - Find obsolete or superseded tasks
+   - Assess current organization and numbering
+
+2. **Organization Design**: Plan improved structure
+   - Design logical task grouping by phase/priority
+   - Plan consistent numbering system
+   - Design cross-reference system for related tasks
+
+3. **Archival Phase**: Move completed tasks
+   - Create docs/completed-tasks.md structure
+   - Move completed tasks with their history
+   - Preserve task completion information
+
+4. **Reorganization Phase**: Restructure remaining tasks
+   - Group tasks by phase and priority
+   - Update task numbering for consistency
+   - Add cross-references between related tasks
+
+5. **Status Update**: Refresh task statuses
+   - Update partially completed task statuses
+   - Add current progress notes
+   - Verify task assignments and dependencies
+```
+
+### **Context7 Documentation**: Not needed for this task
+
+### **Vuetify RAG Server Usage**: Not needed for this task
+
+### **Implementation Requirements**
+- **Archive**: Completed tasks to `docs/completed-tasks.md`
+- **Remove**: Obsolete or superseded tasks
+- **Reorganize**: Remaining tasks by current priority
+- **Update**: Task numbering for consistency
+- **Add**: Cross-references between related tasks
+
+### **Verification**: tasks.md is organized and current
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+## ⚙️ **TASK-070: Optimize Build Configuration for Role-Based Architecture**
+**Complexity Rating: 6/10** - Medium-high complexity build optimization
+
+### **Sequential Thinking Approach**
+```
+1. **Current State Analysis**: Assess build performance
+   - Analyze current Vite configuration
+   - Measure current build times and bundle sizes
+   - Identify role-based architecture impact on builds
+
+2. **Optimization Planning**: Design build improvements
+   - Plan role-based component bundling strategy
+   - Design build-time feature flags for roles
+   - Plan development vs production optimization differences
+
+3. **Configuration Implementation**: Apply optimizations
+   - Configure Vite for optimal role-based bundling
+   - Implement build-time type checking
+   - Add build performance monitoring
+   - Configure source maps for debugging
+
+4. **Feature Flag Implementation**: Add role-based flags
+   - Implement build-time role-based feature flags
+   - Configure conditional compilation for roles
+   - Optimize bundle sizes for production
+
+5. **Validation Phase**: Test build optimizations
+   - Measure improvement in build times
+   - Verify bundle size optimizations
+   - Test development debugging capabilities
+```
+
+### **Context7 Documentation**
+```bash
+# Vite advanced configuration
+resolve-library-id "vite"
+get-library-docs /vitejs/vite --topic="advanced-config bundle-optimization build-performance"
+
+# TypeScript build integration
+get-library-docs /microsoft/typescript --topic="build-integration performance-optimization"
+
+# Vue.js build optimization patterns
+get-library-docs /vuejs/docs --topic="build-optimization production-builds"
+```
+
+### **Vuetify RAG Server Usage**
+```bash
+# Build optimization for Vuetify components
+# Focus on: tree-shaking, component importing, theme optimization
+```
+
+### **Implementation Requirements**
+- **File**: `vite.config.ts`, build scripts, optimization configs
+- **Features**: 
+  - Vite optimization for role-based bundling
+  - Build-time role-based feature flags
+  - Bundle size optimization for production
+  - Build-time type checking
+  - Source maps for development debugging
+  - Build performance monitoring
+
+### **Verification**: Optimized production builds with role-based features
+
+---
+
+## 🚨 **CRITICAL ARCHITECTURAL SUCCESS METRICS**
+
+### **Before Architectural Improvements**:
+- ❌ 3 orchestrator components (Home.vue, HomeOwner.vue, HomeAdmin.vue)
+- ❌ 2940+ lines of duplicated business logic
+- ❌ Business logic scattered across components
+- ❌ Inconsistent single source of truth
+- ❌ HomeOwner.vue: ~900 lines with business logic
+- ❌ HomeAdmin.vue: 1020+ lines with business logic
+- ❌ Home.vue: 1020+ lines of duplicated logic
+
+### **After Architectural Improvements**:
+- ✅ 2 thin orchestrator components (HomeOwner.vue, HomeAdmin.vue)
+- ✅ Business logic centralized in dashboard composables
+- ✅ True single sources of truth established
+- ✅ HomeOwner.vue: ~200 lines, pure orchestration
+- ✅ HomeAdmin.vue: ~200 lines, pure orchestration
+- ✅ Home.vue: Eliminated completely
+- ✅ 2740+ lines of business logic properly abstracted
+
+### **Quality Improvements**:
+- **Maintainability**: Business logic changes in composables, not components
+- **Testability**: Pure composables easy to unit test in isolation
+- **Performance**: Optimized reactivity through proper separation of concerns
+- **Developer Experience**: Clear architectural patterns and component responsibilities
+- **Type Safety**: Comprehensive TypeScript support for new dashboard patterns
+- **Code Reuse**: Business logic reusable across different UI contexts
+
+---
+
+## ⚠️ **CRITICAL IMPLEMENTATION WARNINGS**
+
+### **MANDATORY DEPENDENCIES**:
+1. **TASK-060A (useOwnerDashboard) MUST be completed before TASK-065**
+2. **TASK-060B (useAdminDashboard) MUST be completed before TASK-066**  
+3. **TASK-065 and TASK-066 MUST be stable before TASK-068 (Home.vue removal)**
+4. **All role-specific components MUST work independently before removing generic ones**
+
+### **VALIDATION CHECKPOINTS**:
+- **After TASK-060A**: Verify useOwnerDashboard composable works in isolation
+- **After TASK-060B**: Verify useAdminDashboard composable works in isolation
+- **After TASK-065**: Measure HomeOwner.vue line count (target: ~200 lines)
+- **After TASK-066**: Measure HomeAdmin.vue line count (target: ~200 lines)
+- **Before TASK-068**: Verify both orchestrators work independently of Home.vue
+
+### **ROLLBACK STRATEGY**:
+```
+1. Keep Home.vue until TASK-065 and TASK-066 are verified stable
+2. Maintain generic components until role-specific versions are proven
+3. Test each transformation thoroughly before proceeding to next task
+4. Have backup plan to restore previous architecture if issues arise
+```
+
+### **COMPONENT SIZE ENFORCEMENT**:
+```typescript
+// Build-time validation (implement in TASK-070)
+const MAX_ORCHESTRATOR_LINES = 250; // Allow some buffer over 200
+const validateComponentSize = (filePath: string) => {
+  if (filePath.includes('HomeOwner.vue') || filePath.includes('HomeAdmin.vue')) {
+    const lineCount = countLines(filePath);
+    if (lineCount > MAX_ORCHESTRATOR_LINES) {
+      throw new Error(`${filePath} has ${lineCount} lines, exceeds ${MAX_ORCHESTRATOR_LINES} limit`);
     }
   }
-
-  const createItem = async (item: any): Promise<any> => {
-    try {
-      loading.value = true
-      
-      // Create implementation
-      const created = { ...item, id: generateId() }
-      data.value.set(created.id, created)
-      
-      return created
-    } catch (err) {
-      error.value = err instanceof Error ? err : new Error(String(err))
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const updateItem = async (id: string, updates: Partial<any>): Promise<void> => {
-    const existing = data.value.get(id)
-    if (!existing) {
-      throw new Error(`Item with id ${id} not found`)
-    }
-
-    try {
-      loading.value = true
-      
-      const updated = { ...existing, ...updates, updated_at: new Date().toISOString() }
-      data.value.set(id, updated)
-    } catch (err) {
-      error.value = err instanceof Error ? err : new Error(String(err))
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const deleteItem = async (id: string): Promise<void> => {
-    try {
-      loading.value = true
-      
-      if (!data.value.has(id)) {
-        throw new Error(`Item with id ${id} not found`)
-      }
-      
-      data.value.delete(id)
-    } catch (err) {
-      error.value = err instanceof Error ? err : new Error(String(err))
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const clearError = (): void => {
-    error.value = null
-  }
-
-  return {
-    // State
-    data,
-    loading,
-    error,
-    lastUpdated,
-    
-    // Getters
-    hasData,
-    dataArray,
-    isLoading,
-    lastError,
-    
-    // Actions
-    fetchData,
-    createItem,
-    updateItem,
-    deleteItem,
-    clearError
-  }
-})
-
-// Helper to generate IDs
-const generateId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-}
+};
 ```
 
 ---
 
-## 🚀 **Getting Started**
+## 📋 **UPDATED TASK EXECUTION ORDER**
 
-### **Implementation Order**
+### **Phase 1: Foundation (Week 1)**
+1. **TASK-060A**: Create useOwnerDashboard composable
+2. **TASK-060B**: Create useAdminDashboard composable
+3. **TASK-061**: Create OwnerCalendar.vue (enhanced with logic extraction)
+4. **TASK-062**: Create AdminSidebar.vue (enhanced with logic extraction)
+5. **TASK-063**: Fix TypeScript + add dashboard types
+6. **TASK-064**: Fix AdminCalendar.vue (enhanced with logic extraction)
 
-1. **Start with TASK-060** (OwnerSidebar) using the provided template
-2. **Apply the patterns** from the store filtering guide (TASK-072)
-3. **Set up testing utilities** (TASK-079) for your new components
-4. **Run the import audit** (TASK-070) to clean up any inconsistencies
-5. **Fix TypeScript issues** (TASK-063) using the typing patterns
+### **Phase 2: Orchestrator Transformation (Week 1-2)**
+7. **TASK-065**: Transform HomeOwner.vue into thin orchestrator
+8. **TASK-066**: Transform HomeAdmin.vue into thin orchestrator
 
-### **Quick Start Commands**
+### **Phase 3: Cleanup & Validation (Week 2)**
+9. **TASK-067**: Move demo components to development folder
+10. **TASK-068**: Remove generic components + eliminate Home.vue
+11. **TASK-069**: Clean up tasks.md + add architecture documentation
+12. **TASK-070**: Optimize build + add architecture validation
 
-```bash
-# 1. Create the component
-cp docs/examples/OwnerSidebar.vue src/components/smart/owner/OwnerSidebar.vue
+---
 
-# 2. Run import audit
-npm run audit:imports
+## 🎯 **PROJECT TRANSFORMATION IMPACT**
 
-# 3. Fix any import issues
-chmod +x scripts/fix-imports.sh && ./scripts/fix-imports.sh
+This enhanced task sequence will transform your codebase from:
 
-# 4. Run tests
-npm run test src/components/smart/owner/
+**Current Architecture (Problematic)**:
+- Multiple competing "single sources of truth"
+- 2940+ lines of duplicated business logic
+- Business logic scattered across UI components
+- Maintenance nightmare for business rule changes
 
-# 5. Type check
-npm run type-check
-```
+**Target Architecture (Clean)**:
+- True single sources of truth (HomeOwner, HomeAdmin)
+- Business logic centralized in testable composables
+- Thin orchestrator components (~200 lines each)
+- Clean separation of concerns and maintainable codebase
 
-### **Verification Checklist**
-
-- [ ] Component follows your existing Vue 3 + TypeScript patterns
-- [ ] Uses proper Pinia store integration
-- [ ] Implements role-based data filtering
-- [ ] Includes comprehensive TypeScript typing
-- [ ] Has corresponding unit tests
-- [ ] Follows your Vuetify theming conventions
-- [ ] Uses correct import paths
-
-This documentation provides the foundation for implementing your critical role-based architecture tasks while maintaining consistency with your existing codebase patterns.
+The architectural improvements integrated into these tasks will eliminate the fundamental issues identified in the codebase analysis and establish a truly maintainable, role-based architecture.
 ````
 
 ## File: tsconfig.node.json
@@ -16655,6 +16150,17 @@ This documentation provides the foundation for implementing your critical role-b
   },
   "include": ["vite.config.ts"]
 }
+````
+
+## File: vuetify-rag-servicew.bin
+````
+# Simple uptime script (run locally or in GitHub Actions)
+#!/bin/bash
+while true; do
+  curl -s "https://vuetify-rag-api.onrender.com" > /dev/null
+  echo "Pinged at $(date)"
+  sleep 300  # Every 5 minutes
+done
 ````
 
 ## File: .gitignore
@@ -21448,597 +20954,6 @@ onMounted(async () => {
 </style>
 ````
 
-## File: src/components/smart/owner/OwnerCalendar.vue
-````vue
-<template>
-  <div class="owner-calendar-container">
-    <OwnerCalendarControls
-      :current-date="currentDate"
-      :view="currentView"
-      :properties="myPropertyOptions"
-      :loading="loading"
-      class="mb-4"
-      @navigation="handleCalendarNavigation"
-      @view-change="handleViewChange"
-      @property-filter="handlePropertyFilter"
-      @booking-type-filter="handleBookingTypeFilter"
-      @quick-action="handleQuickAction"
-    />
-    <v-card
-      elevation="2"
-      class="owner-calendar-card"
-      :style="{
-        height: calendarCardHeight,
-        minHeight: mobile ? '400px' : '600px',
-        maxHeight: mobile ? '70vh' : '80vh'
-      }"
-    >
-      <div
-        v-if="!isMounted || loading"
-        class="calendar-loading d-flex flex-column align-center justify-center"
-        :style="{ height: '400px' }"
-      >
-        <v-progress-circular
-          indeterminate
-          color="primary"
-          size="64"
-        />
-        <p class="text-center mt-4">
-          Loading your calendar...
-        </p>
-      </div>
-      <FullCalendar
-        v-else
-        ref="calendarRef"
-        :options="ownerCalendarOptions"
-        class="owner-calendar"
-        :style="{
-          height: fullCalendarHeight,
-          minHeight: mobile ? '350px' : '550px'
-        }"
-      />
-    </v-card>
-    <v-card
-      v-if="myTurnAlerts.length > 0"
-      class="mt-4"
-      color="error"
-      variant="tonal"
-    >
-      <v-card-title class="d-flex align-center">
-        <v-icon class="mr-2">mdi-alert</v-icon>
-        Urgent Turn Cleanings Today
-      </v-card-title>
-      <v-card-text>
-        <div
-          v-for="alert in myTurnAlerts"
-          :key="alert.id"
-          class="mb-2 d-flex align-center justify-space-between"
-        >
-          <div>
-            <strong>{{ getPropertyName(alert.property_id) }}</strong>
-            <br>
-            <small>{{ alert.timeUntilCheckout }}</small>
-          </div>
-          <v-btn
-            color="error"
-            variant="elevated"
-            size="small"
-            @click="handleTurnAlertClick(alert)"
-          >
-            View Details
-          </v-btn>
-        </div>
-      </v-card-text>
-    </v-card>
-  </div>
-</template>
-⋮----
-<strong>{{ getPropertyName(alert.property_id) }}</strong>
-⋮----
-<small>{{ alert.timeUntilCheckout }}</small>
-⋮----
-<script setup lang="ts">
-import FullCalendar from '@fullcalendar/vue3';
-import type { CalendarOptions, DateSelectArg, EventClickArg } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import { computed, ref, watch, nextTick, onMounted } from 'vue';
-import { useTheme, useDisplay } from 'vuetify';
-import OwnerCalendarControls from '@/components/dumb/owner/OwnerCalendarControls.vue';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
-import { useOwnerCalendarState } from '@/composables/owner/useOwnerCalendarState';
-import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
-import { useUIStore } from '@/stores/ui';
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-interface Emits {
-  (e: 'dateSelect', selectInfo: DateSelectArg): void;
-  (e: 'eventClick', clickInfo: EventClickArg): void;
-  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
-  (e: 'viewChange', view: string): void;
-  (e: 'dateChange', date: Date): void;
-  (e: 'bookingUpdate', data: { id: string; updates: any }): void;
-}
-const emit = defineEmits<Emits>();
-const theme = useTheme();
-const { mobile } = useDisplay();
-const uiStore = useUIStore();
-const ownerBookings = useOwnerBookings();
-const ownerCalendarState = useOwnerCalendarState();
-const ownerProperties = useOwnerProperties();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-const isMounted = ref(false);
-const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'>('dayGridMonth');
-const currentDate = ref(new Date());
-const selectedPropertyId = ref<string | null>(null);
-const selectedBookingType = ref<'all' | 'standard' | 'turn'>('all');
-const loading = computed(() => {
-  return ownerBookings.loading.value || ownerProperties.loading.value;
-});
-const calendarCardHeight = computed(() => {
-  return mobile.value ? '70vh' : '80vh';
-});
-const fullCalendarHeight = computed(() => {
-  return mobile.value ? 'calc(70vh - 48px)' : 'calc(80vh - 48px)';
-});
-const myPropertyOptions = computed(() => {
-  return ownerProperties.myProperties.value.map(property => ({
-    id: property.id,
-    name: property.name
-  }));
-});
-const filteredOwnerBookings = computed(() => {
-  let bookings = ownerBookings.myBookings.value;
-  if (selectedPropertyId.value) {
-    bookings = bookings.filter(booking => booking.property_id === selectedPropertyId.value);
-  }
-  if (selectedBookingType.value !== 'all') {
-    bookings = bookings.filter(booking => booking.booking_type === selectedBookingType.value);
-  }
-  return bookings;
-});
-const ownerCalendarEvents = computed(() => {
-  return filteredOwnerBookings.value.map(booking => {
-    const property = ownerProperties.myProperties.value.find(p => p.id === booking.property_id);
-    const isTurn = booking.booking_type === 'turn';
-    return {
-      id: booking.id,
-      title: `${property?.name || 'My Property'}${isTurn ? ' 🔥 TURN' : ''}`,
-      start: booking.checkout_date,
-      end: booking.checkin_date,
-      backgroundColor: getOwnerEventColor(booking),
-      borderColor: getOwnerEventBorderColor(booking),
-      textColor: getOwnerEventTextColor(booking),
-      extendedProps: {
-        booking,
-        property,
-        bookingType: booking.booking_type,
-        status: booking.status,
-        priority: booking.priority,
-        guestCount: booking.guest_count,
-        notes: booking.notes,
-        isOwnerBooking: true,
-        canEdit: true,
-        canDelete: true
-      },
-      classNames: [
-        `owner-booking-${booking.booking_type}`,
-        `owner-status-${booking.status}`,
-        `owner-priority-${booking.priority}`,
-        isTurn ? 'owner-turn-event' : 'owner-standard-event'
-      ].filter(Boolean)
-    };
-  });
-});
-const myTurnAlerts = computed(() => {
-  return ownerCalendarState.myTurnAlerts.value;
-});
-const getOwnerEventColor = (booking: any): string => {
-  const isDark = theme.global.current.value.dark;
-  if (booking.booking_type === 'turn') {
-    switch (booking.priority) {
-      case 'urgent':
-        return isDark ? '#FF1744' : '#D32F2F';
-      case 'high':
-        return isDark ? '#FF6D00' : '#F57C00';
-      case 'normal':
-        return isDark ? '#FF9800' : '#FF6F00';
-      case 'low':
-        return isDark ? '#FFC107' : '#FFA000';
-      default:
-        return isDark ? '#FF5252' : '#F44336';
-    }
-  } else {
-    switch (booking.priority) {
-      case 'urgent':
-        return isDark ? '#FF9800' : '#FF6F00';
-      case 'high':
-        return isDark ? '#2196F3' : '#1976D2';
-      case 'normal':
-        return isDark ? '#00BCD4' : '#0097A7';
-      case 'low':
-        return isDark ? '#4CAF50' : '#388E3C';
-      default:
-        return isDark ? '#2196F3' : '#1976D2';
-    }
-  }
-};
-const getOwnerEventBorderColor = (booking: any): string => {
-  if (booking.booking_type === 'turn') {
-    return '#B71C1C';
-  }
-  return '#1976D2';
-};
-const getOwnerEventTextColor = (booking: any): string => {
-  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
-};
-const ownerCalendarOptions = computed<CalendarOptions>(() => ({
-  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-  initialView: currentView.value,
-  headerToolbar: false,
-  events: ownerCalendarEvents.value,
-  eventDisplay: 'block',
-  eventOverlap: false,
-  eventResizableFromStart: false,
-  selectable: true,
-  selectMirror: true,
-  editable: false,
-  droppable: false,
-  locale: 'en',
-  timeZone: 'local',
-  slotMinTime: '06:00:00',
-  slotMaxTime: '22:00:00',
-  slotDuration: '01:00:00',
-  snapDuration: '00:30:00',
-  height: 'auto',
-  aspectRatio: mobile.value ? 1.2 : 1.8,
-  themeSystem: 'standard',
-  select: handleOwnerDateSelect,
-  eventClick: handleOwnerEventClick,
-  datesSet: handleDatesSet,
-  eventContent: renderOwnerEventContent,
-  dayCellContent: renderOwnerDayCell,
-  businessHours: {
-    daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
-    startTime: '08:00',
-    endTime: '18:00'
-  },
-  dayMaxEvents: 3,
-  moreLinkClick: 'popover',
-  allDaySlot: false,
-  nowIndicator: true,
-  scrollTime: '08:00:00'
-}));
-const handleOwnerDateSelect = (selectInfo: DateSelectArg): void => {
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'emit'
-  );
-  emit('dateSelect', selectInfo);
-  emit('createBooking', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr,
-    propertyId: selectedPropertyId.value || undefined
-  });
-  selectInfo.view.calendar.unselect();
-};
-const handleOwnerEventClick = (clickInfo: EventClickArg): void => {
-  const booking = clickInfo.event.extendedProps.booking;
-  if (!ownerCalendarState.validateOwnerBookingAccess(booking.id)) {
-    uiStore.showError('You can only edit your own bookings');
-    return;
-  }
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'emit'
-  );
-  emit('eventClick', clickInfo);
-};
-const handleCalendarNavigation = (direction: 'prev' | 'next' | 'today'): void => {
-  if (!calendarRef.value) return;
-  const api = calendarRef.value.getApi();
-  switch (direction) {
-    case 'prev':
-      api.prev();
-      break;
-    case 'next':
-      api.next();
-      break;
-    case 'today':
-      api.today();
-      break;
-  }
-  currentDate.value = api.getDate();
-  emit('dateChange', currentDate.value);
-};
-const handleViewChange = (view: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'): void => {
-  currentView.value = view;
-  if (calendarRef.value) {
-    calendarRef.value.getApi().changeView(view);
-  }
-  emit('viewChange', view);
-};
-const handlePropertyFilter = (propertyId: string | null): void => {
-  selectedPropertyId.value = propertyId;
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'OwnerCalendar',
-    'propertyFilter',
-    { propertyId },
-    'emit'
-  );
-};
-const handleBookingTypeFilter = (bookingType: 'all' | 'standard' | 'turn'): void => {
-  selectedBookingType.value = bookingType;
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'OwnerCalendar',
-    'bookingTypeFilter',
-    { bookingType },
-    'internal'
-  );
-};
-const handleQuickAction = (action: 'add-booking'): void => {
-  if (action === 'add-booking') {
-    if (ownerProperties.myProperties.value.length === 0) {
-      uiStore.showError('You need to add a property before creating bookings');
-      return;
-    }
-    emit('createBooking', {
-      start: new Date().toISOString(),
-      end: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-    });
-  }
-};
-const handleDatesSet = (dateInfo: any): void => {
-  currentDate.value = new Date(dateInfo.start);
-  emit('dateChange', currentDate.value);
-};
-const handleTurnAlertClick = (alert: any): void => {
-  const event = ownerCalendarEvents.value.find(e => e.id === alert.id);
-  if (event && calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    const fcEvent = api.getEventById(alert.id);
-    if (fcEvent) {
-      emit('eventClick', {
-        event: fcEvent,
-        el: null,
-        jsEvent: new MouseEvent('click'),
-        view: api.view
-      } as EventClickArg);
-    }
-  }
-};
-const renderOwnerEventContent = (eventInfo: any) => {
-  const booking = eventInfo.event.extendedProps.booking;
-  const property = eventInfo.event.extendedProps.property;
-  const isTurn = booking.booking_type === 'turn';
-  return {
-    html: `
-      <div class="owner-event-content">
-        <div class="owner-event-title">
-          ${isTurn ? '🔥 ' : '🏠 '}${property?.name || 'My Property'}
-        </div>
-        <div class="owner-event-details">
-          ${booking.status.toUpperCase()}
-          ${booking.guest_count ? ` • ${booking.guest_count} guests` : ''}
-        </div>
-        ${isTurn && booking.priority === 'urgent' ? '<div class="owner-turn-badge">URGENT</div>' : ''}
-      </div>
-    `
-  };
-};
-const renderOwnerDayCell = (dayInfo: any) => {
-  const dayBookings = filteredOwnerBookings.value.filter(booking => {
-    const checkoutDate = new Date(booking.checkout_date).toDateString();
-    const dayDate = dayInfo.date.toDateString();
-    return checkoutDate === dayDate;
-  });
-  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
-  const bookingCount = dayBookings.length;
-  return {
-    html: `
-      <div class="owner-day-number">
-        ${dayInfo.dayNumberText}
-        ${turnCount > 0 ? `<span class="owner-turn-indicator">${turnCount}</span>` : ''}
-        ${bookingCount > 0 && turnCount === 0 ? `<span class="owner-booking-indicator">${bookingCount}</span>` : ''}
-      </div>
-    `
-  };
-};
-const getPropertyName = (propertyId: string): string => {
-  const property = ownerProperties.myProperties.value.find(p => p.id === propertyId);
-  return property?.name || 'Unknown Property';
-};
-const goToDate = (date: string | Date): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(date);
-    currentDate.value = new Date(date);
-  }
-};
-const changeView = (viewName: string): void => {
-  handleViewChange(viewName as any);
-};
-const refreshEvents = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().refetchEvents();
-  }
-};
-onMounted(async () => {
-  await Promise.all([
-    ownerBookings.fetchMyBookings(),
-    ownerProperties.fetchMyProperties()
-  ]);
-  isMounted.value = true;
-  await nextTick();
-  refreshEvents();
-});
-watch(() => theme.global.current.value.dark, () => {
-  nextTick(() => refreshEvents());
-});
-watch(() => ownerBookings.myBookings.value, () => {
-  nextTick(() => refreshEvents());
-}, { deep: true });
-defineExpose({
-  goToDate,
-  changeView,
-  refreshEvents,
-  getApi: () => calendarRef.value?.getApi()
-});
-</script>
-<style scoped>
-.owner-calendar-container {
-  height: 100%;
-  width: 100%;
-}
-.owner-calendar-card {
-  overflow: hidden;
-}
-.calendar-loading {
-  height: 100%;
-  min-height: 400px;
-}
-.owner-calendar {
-  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
-  --fc-button-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-border-color: rgb(var(--v-theme-primary));
-  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
-  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
-  --fc-page-bg-color: rgb(var(--v-theme-surface));
-  --fc-neutral-bg-color: rgb(var(--v-theme-surface-variant), 0.3);
-  --fc-neutral-text-color: rgb(var(--v-theme-on-surface));
-  --fc-list-event-hover-bg-color: rgb(var(--v-theme-surface-variant), 0.5);
-}
-.fc-event.owner-turn-event {
-  font-weight: bold;
-  border-width: 2px !important;
-  position: relative;
-}
-.fc-event.owner-turn-event.owner-priority-urgent {
-  animation: owner-pulse 2s infinite;
-}
-@keyframes owner-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
-  70% { box-shadow: 0 0 0 8px rgba(var(--v-theme-error), 0); }
-  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
-}
-.fc-event.owner-status-pending {
-  opacity: 0.9;
-}
-.fc-event.owner-status-completed {
-  opacity: 0.6;
-}
-.fc-event.owner-status-completed .fc-event-title {
-  text-decoration: line-through;
-}
-.fc-event.owner-priority-urgent {
-  border-left: 4px solid rgb(var(--v-theme-error)) !important;
-}
-.fc-event.owner-priority-high {
-  border-left: 3px solid rgb(var(--v-theme-warning)) !important;
-}
-.owner-turn-indicator {
-  background: rgb(var(--v-theme-error));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 10px;
-  margin-left: 4px;
-  font-weight: bold;
-  animation: owner-pulse 2s infinite;
-}
-.owner-booking-indicator {
-  background: rgb(var(--v-theme-primary));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 10px;
-  margin-left: 4px;
-  font-weight: bold;
-}
-.owner-event-content {
-  padding: 2px;
-  font-size: 0.9em;
-}
-.owner-event-title {
-  font-weight: 600;
-  font-size: 0.85em;
-  line-height: 1.2;
-}
-.owner-event-details {
-  font-size: 0.75em;
-  opacity: 0.9;
-  margin-top: 1px;
-}
-.owner-turn-badge {
-  background: rgba(var(--v-theme-error), 0.2);
-  color: rgb(var(--v-theme-error));
-  font-size: 0.7em;
-  padding: 1px 4px;
-  border-radius: 4px;
-  margin-top: 2px;
-  font-weight: bold;
-  text-align: center;
-}
-.owner-day-number {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-@media (max-width: 768px) {
-  .owner-calendar {
-    --fc-daygrid-event-dot-width: 6px;
-  }
-  .owner-event-content {
-    font-size: 0.8em;
-  }
-  .owner-event-title {
-    font-size: 0.8em;
-  }
-  .owner-event-details {
-    font-size: 0.7em;
-  }
-  .owner-turn-badge {
-    font-size: 0.65em;
-  }
-  .owner-turn-indicator,
-  .owner-booking-indicator {
-    font-size: 9px;
-    padding: 1px 3px;
-  }
-}
-@media (max-width: 600px) {
-  .owner-calendar {
-    --fc-daygrid-event-dot-width: 5px;
-  }
-  .owner-event-content {
-    font-size: 0.75em;
-  }
-  .owner-event-title {
-    font-size: 0.75em;
-  }
-  .owner-event-details {
-    font-size: 0.65em;
-  }
-}
-.v-theme--dark .owner-calendar {
-  --fc-page-bg-color: rgb(var(--v-theme-surface));
-  --fc-neutral-bg-color: rgb(var(--v-theme-surface-bright));
-  --fc-neutral-text-color: rgb(var(--v-theme-on-surface));
-  --fc-list-event-hover-bg-color: rgb(var(--v-theme-surface-variant));
-}
-</style>
-````
-
 ## File: src/components/smart/owner/OwnerCalendarDemo.vue
 ````vue
 <template>
@@ -24423,271 +23338,6 @@ export function getRoleSpecificErrorMessage(error: string, userRole?: UserRole):
 export function clearAllRoleSpecificState()
 export function validateRoleNavigation(userRole: UserRole | undefined, targetPath: string):
 export function getRoleSpecificSuccessMessage(action: 'login' | 'logout' | 'register', userRole?: UserRole): string
-````
-
-## File: task_specific_prompts.md
-````markdown
-# 🎯 TASK-SPECIFIC PROMPTS - Phase 1F Priority Tasks
-
-## 📋 **TASK-060: Create OwnerSidebar.vue Component**
-
-### **Context Research Phase**
-```bash
-# Get Vue 3 and Vuetify documentation for sidebar components
-get-library-docs /vuejs/docs --topic="composition-api components props"
-get-library-docs /vuetifyjs/vuetify --topic="navigation-drawer list-item theming"
-```
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Owner-only navigation items (no cleaner management, no system reports)
-- Integration with OwnerQuickActions component
-- Owner-specific color scheme and styling
-- Filter navigation to owner-specific features only
-- Add owner-specific quick actions (Add Property, View My Bookings)
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/owner/OwnerSidebar.vue`
-- **Base Pattern**: Study existing `src/components/smart/Sidebar.vue` for structure
-- **Key Integrations**: OwnerQuickActions component, auth store for owner data
-- **Navigation Items**: Properties, My Bookings, Calendar, Settings (NO admin items)
-
-### **Verification Checklist**
-- [ ] Owner sees only relevant navigation (Properties, Bookings, Calendar)
-- [ ] No admin features visible (Cleaner Management, System Reports)
-- [ ] OwnerQuickActions properly integrated
-- [ ] Owner-specific styling applied
-- [ ] Navigation state syncs with current route
-
----
-
-## 📋 **TASK-061: Create OwnerCalendar.vue Component**
-
-### **Context Research Phase**
-```bash
-# Get FullCalendar and Vue documentation for calendar integration
-project_knowledge_search "calendar vuetify layout examples responsive"
-project_knowledge_search "owner calendar controls date picker"
-
-get-library-docs /fullcalendar/fullcalendar --topic="vue-integration events"
-get-library-docs /vuejs/docs --topic="composition-api computed reactive"
-get-library-docs /fullcalendar/fullcalendar --topic="vue-integration events drag-drop"
-get-library-docs /vuetifyjs/vuetify --topic="components theming"
-```
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Filter calendar events to owner's properties only
-- Implement OwnerCalendarControls integration
-- Add owner-specific event creation workflows
-- Remove admin-only features (cleaner assignment, system-wide view)
-- Owner-specific calendar views and styling
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/owner/OwnerCalendar.vue`
-- **Base Pattern**: Study existing `src/components/smart/FullCalendar.vue`
-- **Data Filtering**: Only show events for authenticated owner's properties
-- **Dependencies**: OwnerCalendarControls.vue component (create if missing)
-
-### **Verification Checklist**
-- [ ] Owner sees only their property events and bookings
-- [ ] OwnerCalendarControls properly integrated
-- [ ] No admin-only features (cleaner assignment views)
-- [ ] Owner-specific event styling and indicators work
-- [ ] Event creation workflow is owner-optimized
-
----
-
-## 📋 **TASK-062: Create AdminSidebar.vue Component**
-
-### **Context Research Phase**
-```bash
-# Get Vuetify and Vue documentation for comprehensive admin navigation
-project_knowledge_search "admin dashboard navigation vuetify complex layout"
-project_knowledge_search "expansion panels badges sidebar examples"
-
-get-library-docs /vuetifyjs/vuetify --topic="navigation-drawer "
-get-library-docs /vuejs/docs --topic="composition-api computed dynamic-components"
-```
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Full admin navigation (cleaners, reports, system management)
-- Admin-specific quick actions and system controls
-- System status indicators and alerts
-- Business metrics in sidebar summary
-- Role switcher component integration
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/admin/AdminSidebar.vue`
-- **Full Feature Set**: Cleaners, Properties, Bookings, Reports, System Settings
-- **System Controls**: Status indicators, role switcher, business metrics
-- **Admin Styling**: Professional admin-focused UI with comprehensive navigation
-
-### **Verification Checklist**
-- [ ] Admin sees full system navigation and controls
-- [ ] System status indicators functional
-- [ ] Business metrics displayed in sidebar
-- [ ] Role switcher integration works
-- [ ] All admin features accessible from navigation
-
----
-
-## 📋 **TASK-063: Fix TypeScript Errors in Admin Components**
-
-### **Context Research Phase**
-get-library-docs /microsoft/typescript --topic="interfaces type-guards error-handling"
-get-library-docs /vuejs/docs --topic="typescript composition-api"
-
-# Your project context for existing patterns
-project_knowledge_search "typescript interfaces admin components"
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Identify all TypeScript errors in admin components
-- Fix type definitions and interfaces
-- Ensure proper typing for admin-specific data
-- Update import paths and type exports
-- Verify compilation with strict mode
-
-### **Implementation Specifics**
-- **Scope**: All files in `src/components/smart/admin/` and `src/components/dumb/admin/`
-- **Common Issues**: Missing type definitions, incorrect prop types, store typing
-- **Tools**: Use `npm run type-check` to identify specific errors
-
-### **Verification Checklist**
-- [ ] `npm run type-check` passes without errors
-- [ ] All admin components have proper TypeScript interfaces
-- [ ] Props and emits are correctly typed
-- [ ] Store integrations are properly typed
-- [ ] Import/export statements are correct
-
----
-
-## 📋 **TASK-064: Fix AdminCalendar.vue Component**
-
-### **Context Research Phase**
-```bash
-# Get FullCalendar and TypeScript documentation for admin calendar
-project_knowledge_search "calendar admin interface data table complex vuetify"
-project_knowledge_search "drag drop calendar vuetify examples"
-
-# Official docs for technical details
-get-library-docs /fullcalendar/fullcalendar --topic="vue-integration drag-drop resources"
-get-library-docs /microsoft/typescript --topic="interfaces generics"
-```
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Fix existing TypeScript errors in AdminCalendar.vue
-- Ensure admin-specific features work (cleaner assignment, system-wide view)
-- Fix integration with admin stores and composables
-- Verify all calendar functionality for admin role
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/admin/AdminCalendar.vue`
-- **Admin Features**: System-wide calendar view, cleaner assignment, drag-drop
-- **Data Scope**: All properties and bookings across all owners
-- **Integration**: Admin stores, cleaner management, booking assignment
-
-### **Verification Checklist**
-- [ ] TypeScript compilation passes for AdminCalendar
-- [ ] Admin sees all properties and bookings on calendar
-- [ ] Cleaner assignment functionality works
-- [ ] Drag-drop operations function correctly
-- [ ] System-wide calendar view displays properly
-
----
-
-## 📋 **TASK-065: Integrate Owner Components in HomeOwner.vue**
-```
-### **Context Research Phase**
-project_knowledge_search "layout responsive dashboard owner interface"
-project_knowledge_search "component integration homeowner patterns"
-
-# Official docs for orchestration patterns
-get-library-docs /vuejs/docs --topic="composition-api components props-emit"
-```
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Integrate OwnerSidebar and OwnerCalendar into HomeOwner.vue
-- Ensure proper data flow between owner components
-- Maintain existing HomeOwner orchestrator pattern
-- Test role-based data filtering works end-to-end
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/owner/HomeOwner.vue`
-- **Dependencies**: TASK-060 (OwnerSidebar), TASK-061 (OwnerCalendar)
-- **Integration Pattern**: Central orchestrator with role-specific components
-- **Data Flow**: Auth store → HomeOwner → child components
-
-### **Verification Checklist**
-- [ ] OwnerSidebar and OwnerCalendar properly integrated
-- [ ] Owner interface shows only owner-scoped data
-- [ ] Component communication works correctly
-- [ ] Role-based data isolation maintained
-- [ ] UI store integration for modals/sidebars works
-
----
-
-## 📋 **TASK-066: Integrate Admin Components in HomeAdmin.vue**
-
-### **Context Research Phase**
-```bash
-# Your custom RAG for complex admin layouts
-project_knowledge_search "admin dashboard complex layout integration vuetify"
-project_knowledge_search "homeadmin component orchestration patterns"
-
-# Official docs for advanced integration
-get-library-docs /vuejs/docs --topic="composition-api provide-inject dynamic-components"
-```
-
-### **Sequential Thinking Focus**
-Break down these specific requirements:
-- Integrate AdminSidebar and AdminCalendar into HomeAdmin.vue
-- Ensure admin interface uses all role-specific components
-- Maintain comprehensive admin functionality
-- Test system-wide data access and role switching
-
-### **Implementation Specifics**
-- **File Location**: `src/components/smart/admin/HomeAdmin.vue`
-- **Dependencies**: TASK-062 (AdminSidebar), TASK-064 (AdminCalendar)
-- **Full Admin Features**: System management, cleaner assignment, all-owner data
-- **Role Switching**: Support admin viewing as owner mode
-
-### **Verification Checklist**
-- [ ] AdminSidebar and AdminCalendar properly integrated
-- [ ] Admin interface shows system-wide data
-- [ ] Role switching functionality works (admin can view as owner)
-- [ ] All admin-specific features accessible
-- [ ] Complex admin workflows function correctly
-
----
-
-## 🔄 **TASK DEPENDENCY EXECUTION ORDER**
-
-### **Parallel Track A: Owner Components**
-1. **TASK-060** (OwnerSidebar) → 
-2. **TASK-061** (OwnerCalendar) → 
-3. **TASK-065** (HomeOwner Integration)
-
-### **Parallel Track B: Admin Components**  
-1. **TASK-062** (AdminSidebar) + **TASK-063** (TypeScript fixes) →
-2. **TASK-064** (AdminCalendar fixes) →
-3. **TASK-066** (HomeAdmin Integration)
-
-### **Critical Success Path**
-- Complete both tracks before moving to Phase 1G cleanup
-- Test role switching after TASK-065 and TASK-066 completion
-- Verify data isolation after each integration task
-
-## ⚠️ **SHARED CRITICAL NOTES FOR ALL TASKS**
-
-1. **Role-Based Data Filtering**: Always implement at component level first, document need for backend RLS
-2. **Existing Pattern Preservation**: Don't break current demo functionality during development
-3. **TypeScript Strict Mode**: All new components must compile without errors
-4. **Component Naming**: Follow `Role + ComponentType.vue` convention
-5. **Testing Strategy**: Test each component individually before integration tasks
 ````
 
 ## File: tsconfig.json
@@ -35250,1444 +33900,555 @@ import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from 
 ````markdown
 # 📋 TASK.md - Property Cleaning Scheduler
 
-## **Project Setup & Foundation**
 
-### **Environment Setup**
-- [x] **TASK-001**: Set up Context7 MCP in Cursor
-  - Status: Complete
-  - Notes: Configured Context7 MCP for Vue 3, Vuetify, FullCalendar.io, and Supabase documentation access
-  - Assigned to: Human + Cursor
 
-- [x] **TASK-002**: Create project folder structure
-  - Status: Complete
-  - Notes: Created directory structure according to project architecture in /property-cleaning-scheduler
-  - Assigned to: Cursor
+# Integrated Task Updates: Architecture Improvements + Tasks 060-070
 
-- [x] **TASK-003**: Initialize Vite + Vue 3 + TypeScript project
-  - Status: Complete
-  - Notes: Created a Vue 3 project with TypeScript, Vite, Vue Router, and Pinia
-  - Dependencies: npm create vue@latest property-cleaning-scheduler
-  - Assigned to: Cursor
+## **🚨 CRITICAL ARCHITECTURAL TASKS 
+## ---------------------------------------------------------------------------------------------------------------------------------
 
-- [x] **TASK-004**: Install and configure dependencies
-  - Status: Complete
-  - Notes: Installed and configured Vuetify, Supabase, FullCalendar, and other required dependencies
-  - Dependencies: vuetify, pinia, vue-router, @supabase/supabase-js, @fullcalendar/vue3
-  - Assigned to: Cursor
+### **TASK-060A: Create useOwnerDashboard Composable**
+- **Status**: Not Started
+- **Priority**: 🚨 CRITICAL - Required before TASK-065
+- **Complexity Rating**: 8/10 - High complexity due to business logic extraction
+- **Requirements**:
+  - Create `src/composables/owner/useOwnerDashboard.ts`
+  - Extract ALL business logic from HomeOwner.vue (currently ~900 lines)
+  - Implement owner-scoped data access and operations
+  - Create clean interface for HomeOwner.vue orchestration
+  - Include owner-specific error handling and validation
+  - Implement owner calendar state management
+  - Add owner-specific booking and property operations
+- **Expected Outcome**: HomeOwner.vue reduces from ~900 lines to ~200 lines
+- **Files**: `src/composables/owner/useOwnerDashboard.ts`
+- **Dependencies**: Existing owner composables (useOwnerBookings, useOwnerProperties)
+- **Verification**: HomeOwner.vue becomes thin orchestrator with minimal business logic
+- **Assigned to**: Cursor
+## ---------------------------------------------------------------------------------------------------------------------------------
 
-- [x] **TASK-005**: Configure tsconfig.json with path aliases
-  - Status: Complete
-  - Notes: Updated tsconfig.json and vite.config.ts with path aliases for all project directories
-  - Requirements: @/ alias, strict TypeScript settings
-  - Assigned to: Cursor
+### **TASK-060B: Create useAdminDashboard Composable**
+- **Status**: Not Started  
+- **Priority**: 🚨 CRITICAL - Required before TASK-066
+- **Complexity Rating**: 9/10 - Very high complexity due to system-wide logic
+- **Requirements**:
+  - Create `src/composables/admin/useAdminDashboard.ts`
+  - Extract ALL business logic from HomeAdmin.vue (currently 1020+ lines)
+  - Implement system-wide data access and operations
+  - Create clean interface for HomeAdmin.vue orchestration
+  - Include admin-specific error handling and business impact warnings
+  - Implement system calendar state management
+  - Add cleaner assignment and system management operations
+  - Include business analytics and reporting functionality
+- **Expected Outcome**: HomeAdmin.vue reduces from 1020+ lines to ~200 lines
+- **Files**: `src/composables/admin/useAdminDashboard.ts`
+- **Dependencies**: Existing admin composables (useAdminBookings, useAdminProperties, useCleanerManagement)
+- **Verification**: HomeAdmin.vue becomes thin orchestrator with minimal business logic
+- **Assigned to**: Cursor
 
-### **Documentation Setup**
-- [ ] **TASK-006**: Create docs/ folder and save essential references
-  - Status: Not Started
-  - Notes: 
-  - Files: summary.md, vue-patterns.md, architecture-patterns.md, business-logic.md
-  - Assigned to: Human
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
 
-- [x] **TASK-007**: Test basic project setup with Hello World
-  - Status: Complete
-  - Notes: Created a HelloWorld component and verified that the application runs successfully with Vite
-  - Verification: npm run dev works, TypeScript compiles
-  - Assigned to: Cursor
+## **📋 UPDATED TASK-061: Create OwnerCalendar.vue Component + Extract Calendar Logic**
+**Complexity Rating: 9/10** - Increased complexity due to architectural improvements
+
+### **Enhanced Requirements** (Original + Architectural):
+- **Original**: Create `src/components/smart/owner/OwnerCalendar.vue` with owner-specific features
+- **🚨 NEW CRITICAL**: Extract calendar business logic to `useOwnerCalendarState.ts` composable
+- **🚨 NEW CRITICAL**: Make OwnerCalendar.vue a thin presentation layer (~150 lines max)
+- **Enhanced Focus**: Component should delegate all business logic to composables
+
+### **Implementation Specifics**:
+```typescript
+// OwnerCalendar.vue should look like this:
+const {
+  calendarState,
+  calendarEvents, 
+  calendarActions
+} = useOwnerCalendarState();
+
+// NOT like this (business logic in component):
+const events = computed(() => /* complex filtering logic */);
+```
+
+### **Verification Checklist** (Updated):
+- [ ] OwnerCalendar.vue is thin presentation layer (~150 lines)
+- [ ] All business logic extracted to useOwnerCalendarState composable
+- [ ] Owner sees only their property events and bookings
+- [ ] Calendar logic reusable and testable in isolation
+- [ ] Component focuses only on UI rendering and event delegation
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+
+## **📋 UPDATED TASK-062: Create AdminSidebar.vue Component + Extract Navigation Logic**
+**Complexity Rating: 7/10** - Increased complexity due to logic extraction
+
+### **Enhanced Requirements** (Original + Architectural):
+- **Original**: Create comprehensive admin navigation interface
+- **🚨 NEW CRITICAL**: Extract navigation business logic to `useAdminNavigation.ts` composable
+- **🚨 NEW CRITICAL**: Make AdminSidebar.vue a thin presentation layer (~150 lines max)
+- **Enhanced Focus**: Sidebar should delegate all business logic to composables
+
+### **Implementation Specifics**:
+```typescript
+// AdminSidebar.vue should look like this:
+const {
+  navigationState,
+  systemMetrics,
+  navigationActions
+} = useAdminNavigation();
+
+// NOT like this (business logic in component):
+const urgentTurns = computed(() => /* complex system calculations */);
+```
+
+### **Verification Checklist** (Updated):
+- [ ] AdminSidebar.vue is thin presentation layer (~150 lines)
+- [ ] All navigation logic extracted to useAdminNavigation composable  
+- [ ] System metrics calculation handled in composables
+- [ ] Component focuses only on UI rendering and event delegation
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+
+## **📋 UPDATED TASK-063: Fix TypeScript Errors + Add Dashboard Composable Types**
+**Complexity Rating: 7/10** - Enhanced scope for new interfaces
+
+### **Enhanced Requirements** (Original + Architectural):
+- **Original**: Fix TypeScript compilation errors in role-based components
+- **🚨 NEW CRITICAL**: Add TypeScript interfaces for dashboard composables
+- **🚨 NEW CRITICAL**: Create type definitions for thin orchestrator pattern
+- **Enhanced Focus**: Support new architectural patterns with proper typing
+
+### **New Type Definitions Required**:
+```typescript
+// types/dashboard.ts (NEW FILE)
+export interface OwnerDashboardData {
+  properties: Property[];
+  bookings: Booking[];
+  todayTurns: Booking[];
+  calendarEvents: CalendarEvent[];
+}
+
+export interface OwnerDashboardActions {
+  createBooking: (data: BookingFormData) => Promise<Booking>;
+  updateBooking: (id: string, data: Partial<Booking>) => Promise<void>;
+  navigateToBooking: (id: string) => void;
+}
+
+export interface AdminDashboardData {
+  allProperties: Property[];
+  allBookings: Booking[];
+  systemMetrics: SystemMetrics;
+  cleanerQueue: CleanerAssignment[];
+}
+
+export interface AdminDashboardActions {
+  assignCleaner: (bookingId: string, cleanerId: string) => Promise<void>;
+  generateReport: (type: ReportType) => Promise<Report>;
+  manageSystem: () => void;
+}
+```
+
+### **Verification Checklist** (Updated):
+- [ ] All dashboard composables properly typed
+- [ ] Thin orchestrator components have proper type safety
+- [ ] New architectural patterns supported by TypeScript
+- [ ] `npm run type-check` passes without errors
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+
+## **📋 UPDATED TASK-064: Fix AdminCalendar.vue + Extract Calendar Logic**
+**Complexity Rating: 9/10** - Increased complexity due to logic extraction
+
+### **Enhanced Requirements** (Original + Architectural):
+- **Original**: Fix DOM mounting issues and admin calendar features
+- **🚨 NEW CRITICAL**: Extract admin calendar logic to `useAdminCalendarState.ts` composable
+- **🚨 NEW CRITICAL**: Make AdminCalendar.vue a thin presentation layer (~150 lines max)
+- **Enhanced Focus**: Resolve technical issues while implementing proper architecture
+
+### **Implementation Specifics**:
+```typescript
+// AdminCalendar.vue should look like this:
+const {
+  adminCalendarState,
+  systemCalendarEvents,
+  calendarActions
+} = useAdminCalendarState();
+
+// Business logic extraction includes:
+// - Cleaner assignment logic
+// - System-wide event filtering  
+// - Calendar state management
+// - DOM mounting safety checks
+```
+
+### **Verification Checklist** (Updated):
+- [ ] DOM mounting errors resolved
+- [ ] AdminCalendar.vue is thin presentation layer (~150 lines)
+- [ ] All calendar logic extracted to useAdminCalendarState composable
+- [ ] Admin calendar route loads without errors
+- [ ] Complex admin workflows function correctly
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+
+## **📋 UPDATED TASK-065: Transform HomeOwner.vue into Thin Orchestrator**
+**Complexity Rating: 9/10** - CRITICAL architectural transformation
+
+### **🚨 CRITICAL ARCHITECTURAL FOCUS** (Primary Objective):
+**Transform HomeOwner.vue from 900+ line business logic component into ~200 line thin orchestrator using useOwnerDashboard composable**
+
+### **Enhanced Requirements** (Completely Refocused):
+- **🚨 PRIMARY**: Refactor HomeOwner.vue to use useOwnerDashboard() composable
+- **🚨 PRIMARY**: Reduce component size from ~900 lines to ~200 lines maximum
+- **🚨 PRIMARY**: Remove ALL business logic from component
+- **Secondary**: Integrate OwnerSidebar and OwnerCalendar components
+- **Secondary**: Update component imports and references
+
+### **Implementation Pattern** (REQUIRED):
+```vue
+<!-- HomeOwner.vue - Target: ~200 lines total -->
+<template>
+  <div class="home-owner-container">
+    <v-row no-gutters class="fill-height">
+      <v-col cols="12" lg="3" xl="2">
+        <OwnerSidebar
+          :today-turns="ownerData.todayTurns"
+          :upcoming-cleanings="ownerData.upcomingCleanings"
+          :properties="ownerData.properties"
+          @navigate-to-booking="ownerActions.navigateToBooking"
+          @create-booking="ownerActions.createBooking"
+        />
+      </v-col>
+      <v-col cols="12" lg="9" xl="10">
+        <OwnerCalendar
+          :events="ownerData.calendarEvents"
+          :current-view="calendarState.currentView"
+          @event-click="ownerActions.handleEventClick"
+          @date-select="ownerActions.handleDateSelect"
+        />
+      </v-col>
+    </v-row>
+  </div>
+</template>
+
+<script setup lang="ts">
+// ✅ GOOD: Thin orchestration layer
+const { 
+  ownerData, 
+  ownerActions, 
+  calendarState 
+} = useOwnerDashboard();
+
+// ✅ Minimal component-specific logic only
+const sidebarOpen = ref(false);
+const toggleSidebar = () => sidebarOpen.value = !sidebarOpen.value;
+</script>
+```
+
+### **Before/After Metrics**:
+- **Before**: 900+ lines with business logic
+- **After**: ~200 lines, pure orchestration
+- **Business Logic**: Moved to useOwnerDashboard composable
+- **Maintainability**: Single source of truth achieved
+
+### **Verification Checklist** (Architectural Focus):
+- [ ] **🚨 CRITICAL**: HomeOwner.vue is ~200 lines or less
+- [ ] **🚨 CRITICAL**: Uses useOwnerDashboard() for all business logic
+- [ ] **🚨 CRITICAL**: No business logic remains in component
+- [ ] Owner interface shows only owner-scoped data
+- [ ] Component communication works correctly through composables
+- [ ] Role-based data isolation maintained
+
+### **Dependencies**:
+- **CRITICAL**: TASK-060A (useOwnerDashboard) must be complete first
+- **Standard**: TASK-060 (OwnerSidebar), TASK-061 (OwnerCalendar)
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+
+## **📋 UPDATED TASK-066: Transform HomeAdmin.vue into Thin Orchestrator**
+**Complexity Rating: 9/10** - CRITICAL architectural transformation
+
+### **🚨 CRITICAL ARCHITECTURAL FOCUS** (Primary Objective):
+**Transform HomeAdmin.vue from 1020+ line business logic component into ~200 line thin orchestrator using useAdminDashboard composable**
+
+### **Enhanced Requirements** (Completely Refocused):
+- **🚨 PRIMARY**: Refactor HomeAdmin.vue to use useAdminDashboard() composable
+- **🚨 PRIMARY**: Reduce component size from 1020+ lines to ~200 lines maximum
+- **🚨 PRIMARY**: Remove ALL business logic from component
+- **Secondary**: Integrate AdminSidebar and AdminCalendar components
+- **Secondary**: Update component imports and references
+
+### **Implementation Pattern** (REQUIRED):
+```vue
+<!-- HomeAdmin.vue - Target: ~200 lines total -->
+<template>
+  <div class="home-admin-container">
+    <v-row no-gutters class="fill-height">
+      <v-col cols="12" lg="3" xl="2">
+        <AdminSidebar
+          :system-metrics="adminData.systemMetrics"
+          :urgent-turns="adminData.urgentTurns"
+          :cleaner-queue="adminData.cleanerQueue"
+          @assign-cleaner="adminActions.assignCleaner"
+          @generate-report="adminActions.generateReport"
+        />
+      </v-col>
+      <v-col cols="12" lg="9" xl="10">
+        <AdminCalendar
+          :events="adminData.allCalendarEvents"
+          :cleaners="adminData.cleaners"
+          @assign-cleaner="adminActions.assignCleaner"
+          @update-booking-status="adminActions.updateStatus"
+        />
+      </v-col>
+    </v-row>
+  </div>
+</template>
+
+<script setup lang="ts">
+// ✅ GOOD: Thin orchestration layer  
+const { 
+  adminData, 
+  adminActions, 
+  systemState 
+} = useAdminDashboard();
+
+// ✅ Minimal component-specific logic only
+const sidebarOpen = ref(false);
+const toggleSidebar = () => sidebarOpen.value = !sidebarOpen.value;
+</script>
+```
+
+### **Before/After Metrics**:
+- **Before**: 1020+ lines with complex business logic
+- **After**: ~200 lines, pure orchestration
+- **Business Logic**: Moved to useAdminDashboard composable
+- **Maintainability**: Single source of truth achieved
+
+### **Verification Checklist** (Architectural Focus):
+- [ ] **🚨 CRITICAL**: HomeAdmin.vue is ~200 lines or less
+- [ ] **🚨 CRITICAL**: Uses useAdminDashboard() for all business logic
+- [ ] **🚨 CRITICAL**: No business logic remains in component
+- [ ] Admin interface shows system-wide data
+- [ ] Role switching functionality works through composables
+- [ ] All admin-specific features accessible
+- [ ] Complex admin workflows function correctly
+
+### **Dependencies**:
+- **CRITICAL**: TASK-060B (useAdminDashboard) must be complete first
+- **Standard**: TASK-062 (AdminSidebar), TASK-064 (AdminCalendar)
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+
+## **📋 UPDATED TASK-067: Move Demo Components + Create Dev Folder Structure**
+**Complexity Rating: 3/10** - Low complexity file organization
+
+### **Enhanced Requirements** (Original + Demo Organization):
+- **Original**: Move demo components to development folder
+- **🚨 NEW**: Create proper development environment structure
+- **Enhanced Focus**: Clean separation of production vs development code
+
+### **Enhanced File Organization**:
+```
+src/dev/
+├── demos/
+│   ├── components/           # Component demos
+│   ├── composables/         # Composable demos  
+│   ├── dashboard/           # Dashboard composable demos
+│   └── integration/         # Integration test demos
+├── testing/
+│   ├── fixtures/           # Test data
+│   ├── mocks/              # Mock implementations
+│   └── utilities/          # Test utilities
+└── README.md               # Development environment docs
+```
+
+### **Verification Checklist** (Updated):
+- [ ] Production build excludes src/dev/ completely
+- [ ] Development server includes demo components
+- [ ] Clean separation of dev vs production code
+- [ ] Dashboard composables have demo components
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+
+## **📋 UPDATED TASK-068: Remove Generic Components + Home.vue**
+**Complexity Rating: 5/10** - Increased complexity due to Home.vue removal
+
+### **🚨 CRITICAL ARCHITECTURAL FOCUS**:
+**Remove Home.vue completely to establish HomeOwner and HomeAdmin as true single sources of truth**
+
+### **Enhanced Requirements** (Original + Home.vue Removal):
+- **🚨 PRIMARY**: Remove Home.vue completely (1020+ lines of duplicated logic)
+- **🚨 PRIMARY**: Update routing to bypass Home.vue entirely
+- **Standard**: Remove generic Sidebar.vue and FullCalendar.vue
+- **Standard**: Update all remaining references
+
+### **Removal Priority Order**:
+1. **Home.vue** (CRITICAL - most important)
+2. **Sidebar.vue** (HIGH - replaced by role-specific versions)
+3. **FullCalendar.vue** (MEDIUM - replaced by role-specific versions)
+
+### **Routing Updates Required**:
+```typescript
+// Before (WRONG): Generic routing through Home.vue
+{ path: '/', component: () => import('@/components/smart/Home.vue') }
+
+// After (CORRECT): Direct role-based routing
+{ path: '/owner', component: () => import('@/components/smart/owner/HomeOwner.vue') }
+{ path: '/admin', component: () => import('@/components/smart/admin/HomeAdmin.vue') }
+{ path: '/', redirect: '/owner' } // or '/admin' based on auth
+```
+
+### **Verification Checklist** (Enhanced):
+- [ ] **🚨 CRITICAL**: Home.vue completely removed
+- [ ] **🚨 CRITICAL**: Routing bypasses Home.vue completely
+- [ ] Application works without old generic components
+- [ ] No broken imports or references remain
+- [ ] HomeOwner and HomeAdmin established as only orchestrators
+
+### **Dependencies**:
+- **CRITICAL**: TASK-065 and TASK-066 must be complete first
+- **CRITICAL**: HomeOwner and HomeAdmin must be stable thin orchestrators
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+
+## **📋 UPDATED TASK-069: Clean Up tasks.md + Add Architecture Documentation**
+**Complexity Rating: 4/10** - Enhanced documentation scope
+
+### **Enhanced Requirements** (Original + Architecture Docs):
+- **Original**: Archive completed tasks and reorganize
+- **🚨 NEW**: Document new architectural patterns established
+- **🚨 NEW**: Create migration guide for future developers
+- **Enhanced Focus**: Capture architectural improvements in documentation
+
+### **New Documentation Required**:
+```markdown
+docs/
+├── architecture/
+│   ├── thin-orchestrator-pattern.md
+│   ├── dashboard-composables.md
+│   ├── role-based-data-access.md
+│   └── migration-from-home-vue.md
+└── development/
+    ├── component-size-guidelines.md
+    └── business-logic-extraction.md
+```
+
+### **Verification Checklist** (Enhanced):
+- [ ] tasks.md is organized and current
+- [ ] Architectural improvements documented
+- [ ] Migration patterns recorded for future reference
+- [ ] Component size guidelines established
+
+---
+## ---------------------------------------------------------------------------------------------------------------------------------
+## **📋 UPDATED TASK-070: Optimize Build + Add Architecture Validation**
+**Complexity Rating: 7/10** - Enhanced with architecture validation
+
+### **Enhanced Requirements** (Original + Architecture Validation):
+- **Original**: Optimize Vite configuration for role-based architecture
+- **🚨 NEW**: Add build-time validation for architectural patterns
+- **🚨 NEW**: Prevent regression to old patterns
+- **Enhanced Focus**: Enforce architectural standards through build process
+
+### **New Build Validations**:
+```typescript
+// vite.config.ts additions
+export default defineConfig({
+  plugins: [
+    // Architecture validation plugin
+    {
+      name: 'architecture-validator',
+      buildStart() {
+        // Validate component sizes
+        // Ensure Home.vue doesn't exist
+        // Check for business logic in components
+      }
+    }
+  ]
+});
+```
+
+### **Architecture Metrics to Track**:
+- HomeOwner.vue line count (target: ~200)
+- HomeAdmin.vue line count (target: ~200)  
+- Business logic in components (target: minimal)
+- Component coupling (target: loose through composables)
+
+### **Verification Checklist** (Enhanced):
+- [ ] Build enforces architectural standards
+- [ ] Component size limits validated
+- [ ] Business logic extraction verified
+- [ ] Optimized production builds with role-based features
 
 ---
 
-## **Phase 1A: Core Types & Store Foundation**
+## **🔄 UPDATED TASK DEPENDENCY MAP**
 
-### **TypeScript Interfaces**
-- [x] **TASK-008**: Create core types in src/types/
-  - Status: Complete
-  - Notes: Created all core type files with comprehensive interfaces and type guards
-  - Files: user.ts, property.ts, booking.ts, ui.ts, api.ts, index.ts
-  - Assigned to: Cursor
+```
+TASK-060A (useOwnerDashboard) → TASK-065 (HomeOwner Integration)
+TASK-060B (useAdminDashboard) → TASK-066 (HomeAdmin Integration)
 
-- [x] **TASK-009**: Create User interface with role-based typing
-  - Status: Complete
-  - Notes: Implemented User interface with role-based typing and type guards for different roles
-  - Requirements: 'owner' | 'admin' | 'cleaner' roles, settings object
-  - Assigned to: Cursor
+TASK-060 (OwnerSidebar) → TASK-065 (Integration)
+TASK-061 (OwnerCalendar + Logic) → TASK-065 (Integration)
+TASK-062 (AdminSidebar + Logic) → TASK-066 (Integration)
+TASK-063 (TypeScript + New Types) → TASK-074 (Strict mode)
+TASK-064 (AdminCalendar + Logic) → TASK-066 (Integration)
 
-- [x] **TASK-010**: Create Property interface with business logic types
-  - Status: Complete
-  - Notes: Created Property interface with pricing tiers, cleaning duration, and business metrics
-  - Requirements: pricing_tier, cleaning_duration, special_instructions
-  - Assigned to: Cursor
-
-- [x] **TASK-011**: Create Booking interface with turn/standard distinction
-  - Status: Complete
-  - Notes: Created Booking interface with turn/standard distinction, status workflow, and priority system
-  - Requirements: booking_type ('standard' | 'turn'), status workflow
-  - Assigned to: Cursor
-
-### **Pinia Stores**
-- [x] **TASK-012**: Create user store with Map collections
-  - Status: Complete
-  - Notes: Created user store with Map collections for houses and events, with computed getters and full CRUD operations
-  - Requirements: houses Map, events Map, computed getters
-  - Reference: docs/vue-patterns.md
-  - Assigned to: Cursor
-
-- [x] **TASK-013**: Create property store with Map collections
-  - Status: Complete
-  - Notes: Created property store with Map collections, comprehensive computed getters for filtering, and full CRUD operations
-  - Requirements: properties Map, computed getters, filtering by active/owner/pricing tier
-  - Reference: docs/vue-patterns.md
-  - Assigned to: Cursor
-
-- [x] **TASK-014**: Create booking store with Map collections
-  - Status: Complete
-  - Notes: Created booking store with Map collections, specialized getters for filtering by status/type/property/date range
-  - Requirements: bookings Map, status management, cleaner assignment
-  - Reference: docs/vue-patterns.md
-  - Assigned to: Cursor
-
-- [x] **TASK-015**: Create UI store for modal and sidebar management
-  - Status: Complete
-  - Notes: Created UI store with Map collections for modals, sidebars, loading states, notifications, and filtering
-  - Requirements: modals Map, sidebars Map, loading states, error handling, filter management
-  - Verification: Modal, sidebar, and notification systems working correctly
-  - Assigned to: Cursor
+TASK-065, TASK-066 → TASK-068 (Remove Home.vue + old components)
+TASK-067 (Move demos) → TASK-078 (Build optimization)
+TASK-068 (Remove Home.vue) → TASK-070 (Architecture validation)
+```
 
 ---
 
-## **Phase 1B: Core Composables & Business Logic**
+## **🚨 CRITICAL SUCCESS METRICS**
 
-### **Composables**
-- [x] **TASK-016**: Create useBookings composable
-  - Status: Complete
-  - Notes: Implemented CRUD operations, validation, error handling, and business logic for calculating cleaning windows and priorities
-  - Requirements: CRUD operations, error handling, store integration
-  - Reference: docs/business-logic.md
-  - Assigned to: Cursor
+### **Before Architectural Improvements**:
+- ❌ 3 orchestrator components (Home.vue, HomeOwner.vue, HomeAdmin.vue)
+- ❌ 2940+ lines of duplicated business logic
+- ❌ Business logic scattered across components
+- ❌ Inconsistent data access patterns
 
-- [x] **TASK-017**: Create useProperties composable
-  - Status: Complete
-  - Notes: Created composable for property management with validation, metrics calculation, and store integration
-  - Requirements: property management, validation
-  - Assigned to: Cursor
+### **After Architectural Improvements**:
+- ✅ 2 thin orchestrator components (~200 lines each)
+- ✅ Business logic centralized in dashboard composables
+- ✅ Consistent role-based data access patterns
+- ✅ True single sources of truth established
 
-- [x] **TASK-018**: Create useAuth composable (mock for now)
-  - Status: Complete
-  - Notes: Implemented mock authentication with login/logout, user registration, and settings management
-  - Requirements: login/logout, user management
-  - Assigned to: Cursor
-
-- [x] **TASK-019**: Create useCalendarState composable
-  - Status: Complete
-  - Notes: Implemented calendar view state management with date range handling, navigation, filtering, and event formatting
-  - Requirements: calendar view management, date handling
-  - Assigned to: Cursor
-
-### **Business Logic Utils**
-- [x] **TASK-020**: Implement turn vs standard booking logic
-  - Status: Complete
-  - Notes: Implemented comprehensive business logic utilities in src/utils/businessLogic.ts including priority calculation (calculateBookingPriority), cleaning window calculation (getCleaningWindow), and scheduling validation (canScheduleCleaning). These functions handle the distinct requirements for turn vs standard bookings, with appropriate timing buffers and constraints.
-  - Requirements: priority calculation, cleaning window calculation
-  - Reference: docs/business-logic.md
-  - Assigned to: Cursor
-
-- [x] **TASK-021**: Create booking validation functions
-  - Status: Complete
-  - Notes: Added validation functions to src/utils/businessLogic.ts including time conflict detection (detectBookingConflicts), turn booking validation (validateTurnBooking), and general booking validation (validateBooking). Implemented comprehensive error message generation and warning system. Also added workflow status management functions (getAvailableStatusTransitions, canTransitionBookingStatus).
-  - Requirements: time conflict detection, turn booking validation
-  - Assigned to: Cursor
+### **Quality Improvements**:
+- **Maintainability**: Business logic changes in composables, not components
+- **Testability**: Pure composables easy to unit test
+- **Performance**: Optimized reactivity through proper separation
+- **Developer Experience**: Clear architectural patterns
+- **Type Safety**: Comprehensive TypeScript support for new patterns
 
 ---
 
-## **Phase 1C: Basic Component Structure**
-
-### **Layout Components**
-- [X] **TASK-022**: Create basic layout structure
-  - Status: Not Started
-  - Notes:  Complete
-  - Files: layouts/default.vue, layouts/admin.vue
-  - Assigned to: Cursor
-
-- [x] **TASK-023**: Set up Vue Router with file-based structure
-  - Status: Complete
-  - Notes: Implemented file-based routing with layout switching for all required routes (/, /properties, /calendar, /admin) and auth routes. Created necessary page components and updated App.vue to support multiple layouts.
-  - Routes: /, /properties, /calendar, /admin
-  - Assigned to: Cursor
-
-### **Dumb Components (Pure UI)**
-- [x] **TASK-024**: Create PropertyCard component
-  - Status: Complete
-  - Notes: Created a reusable PropertyCard dumb component using Vuetify's v-card that displays property information (name, address, cleaning duration, pricing tier, active status, special instructions) and provides edit/delete actions through emitted events. Implemented proper TypeScript typing, color-coded property status indicators, truncation for long text with tooltips, and hover effects for better UX. Also created a demo component and route (/demos/property-card) to showcase the component with sample properties.
-  - Requirements: display property info, edit/delete actions
-  - Reference: docs/vue-patterns.md
-  - Assigned to: Cursor
-
-- [x] **TASK-025**: Create BookingForm/EventModal component
-  - Status: Complete
-  - Notes: Created a comprehensive BookingForm component using Vuetify's dialog, form, and validation components. Implemented dynamic form fields, proper validation, and special handling for turn vs standard bookings. The form includes auto-detection of booking type based on dates, alerts for inconsistent booking types, and proper TypeScript type safety. Created a demo component and route (/demos/booking-form) to showcase both create and edit functionality.
-  - Requirements: create/edit bookings, validation, turn vs standard
-  - Assigned to: Cursor
-
-- [x] **TASK-026**: Create TurnAlerts component
-  - Status: Complete
-  - Notes: Created a reusable TurnAlerts dumb component that displays turn bookings (same-day checkout/checkin) with priority indicators. Implemented color-coded alerts with "urgent" (red) and "high" (orange) priority levels, expandable interface with booking details, and action buttons for viewing and assigning cleaners. Added demo component with sample data generation to showcase the component's functionality.
-  - Requirements: urgent turn notifications, navigation
-  - Assigned to: Cursor
-
-- [x] **TASK-027**: Create UpcomingCleanings component
-  - Status: Complete
-  - Notes: Created a comprehensive UpcomingCleanings component that displays cleanings grouped by date (today, tomorrow, upcoming). Implemented time management features including cleaning windows, checkout/checkin times, and color-coded indicators for booking types and priorities. Added a demo component for testing. Component supports filtering by date range and shows "View all" options for each section when there are more cleanings than the configured limit.
-  - Requirements: cleaning schedule display, time management
-  - Assigned to: Cursor
-
-### **Smart Components (Business Logic)**
-- [x] **TASK-028**: Create Sidebar component (smart)
-  - Status: Complete
-  - Notes: Created a smart Sidebar component that integrates TurnAlerts and UpcomingCleanings, implements PropertyFilter functionality, and includes QuickActions. The component follows the Map collections pattern, connects to the UI store, and uses proper TypeScript typing with comprehensive error handling. Added a SidebarDemo component and demo page for testing.
-  - Requirements: turn alerts, property filter, quick actions
-  - Reference: docs/architecture-patterns.md
-  - Assigned to: Cursor
-
-- [x] **TASK-029**: Create FullCalendar component integration
-  - Status: Complete
-  - Notes: Implemented a comprehensive FullCalendar integration as a smart component that follows the project's Map collection pattern. Created a reusable FullCalendar.vue component that displays bookings with proper type distinction (turn vs standard), supports drag-and-drop for scheduling, provides date selection for new bookings, and integrates with the UI store for modal management. Turn bookings are visually highlighted with distinct colors and animations to indicate priority. Added custom event rendering to show property information and booking status. Created a FullCalendarDemo.vue component for testing and a demo page. Updated the calendar page to use the FullCalendar component with proper store integration.
-  - Requirements: booking display, drag/drop, turn highlighting
-  - Dependencies: @fullcalendar/vue3 setup
-  - Assigned to: Cursor
-
-### **Central Orchestrator**
-- [x] **TASK-030**: Create Home.vue as central orchestrator
-  - Status: Complete
-  - Notes: Created Home.vue component that acts as a central orchestrator coordinating between Sidebar and FullCalendar components. Implemented proper data flow from stores to components, event handling between components, and modal management. Used Map collections for state and implemented responsive design.
-  - Requirements: coordinate Sidebar ↔ Calendar, manage modal states
-  - Reference: docs/architecture-patterns.md
-  - Assigned to: Cursor
-
----
-
-## **Phase 1D: Integration & Testing**
-
-### **Component Integration**
-- [x] **TASK-031**: Integrate all components in Home.vue
-  - Status: Complete
-  - Notes: Updated Home.vue to properly integrate all components following the central orchestrator pattern. Added proper event handling for all components, implemented Map collections for state management, and prepared placeholders for future PropertyModal and NotificationSystem components. Created a minimal auth.ts store to support authentication functionality.
-  - Requirements: proper data flow, event handling, state management
-  - Assigned to: Cursor
-
-- [x] **TASK-032**: Implement modal management system
-  - Status: Complete
-  - Notes: Implemented a comprehensive modal management system with event modal, property modal, and confirmation dialogs. Added UI store support for confirmation dialogs with a Map collection pattern. Created PropertyModal and ConfirmationDialog components and integrated them with Home.vue. Updated event deletion to use confirmation dialogs for better UX.
-  - Requirements: event modal, property modal, confirmation dialogs
-  - Assigned to: Cursor
-
-- [x] **TASK-033**: Test component communication
-  - Status: Complete
-  - Notes: Implemented a comprehensive component communication testing system with event logging. Created a debug panel (DebugPanel.vue) that displays all component communication events in real-time. Added event logging to Sidebar, Home, and FullCalendar components to track data flow. Created documentation (component-communication-testing.md) with detailed testing procedures for all communication paths.
-  - Verification: Sidebar → Home → Calendar data flow works, visually verified through debug panel
-  - Assigned to: Cursor
-
-### **Basic Functionality Testing**
-- [x] **TASK-034**: Test property CRUD operations
-  - Status: Complete
-  - Notes: Created comprehensive testing page at /testing/crud with UI for all property CRUD operations. Implemented individual test functions for each operation with proper error handling and status reporting. Tests include property creation, reading properties from store, updating properties, and deleting properties with validation for associated bookings.
-  - Verification: create, edit, delete properties work
-  - Assigned to: Cursor
-
-- [x] **TASK-035**: Test booking CRUD operations
-  - Status: Complete
-  - Notes: Implemented booking CRUD testing in the /testing/crud page with comprehensive test cases. Created test functions for creating, reading, updating and deleting bookings with proper store integration. Implemented tests for both turn and standard booking types with appropriate validation.
-  - Verification: create, edit, delete bookings work, turn vs standard
-  - Assigned to: Cursor
-
-- [x] **TASK-036**: Test calendar integration
-  - Status: Complete
-  - Notes: Implemented calendar integration testing in the /testing/crud page with a live FullCalendar instance. Created tests for event display, turn booking highlighting, and drag-and-drop functionality. Test cases verify that bookings appear correctly on the calendar with appropriate styling for turn vs standard bookings.
-  - Verification: events display, drag/drop works, turn highlighting
-  - Assigned to: Cursor
-
-### **UI/UX Polish**
-- [x] **TASK-037**: Style components with Vuetify theme
-  - Status: Complete
-  - Notes: Implemented comprehensive styling with consistent theme, improved responsiveness, and better visual hierarchy. Updated color palette for clearer turn vs standard booking distinction, added theme toggle, and enhanced component styling for better user experience.
-  - Requirements: consistent styling, responsive design
-  - Assigned to: Cursor
-
-- [x] **TASK-037b**: Implement multiple themes with theme picker
-  - Status: Complete
-  - Notes: Created 8 distinct themes (light, dark, green, purple, orange, teal, red, brown) with both light and dark variants. Implemented a ThemePicker component in the app-bar that displays a grid of theme options. Added theme persistence using localStorage and smooth transition animations between themes. All components properly apply the selected theme.
-  - Requirements: multiple themes, theme picker in app-bar, theme persistence
-  - Assigned to: Cursor
-
-- [x] **TASK-037c**: Create a project_summaryV2.md that is updated with the current codebase
-  - Status: Complete
-  - Notes: Created comprehensive project_summaryV2.md that reflects the current state of the MVP implementation. Documented all implemented features, architectural patterns, component communication system, testing setup, and development guidelines. The document serves as both a status update and developer reference for the fully functional Property Cleaning Scheduler application.
-  - Requirements: Updated project summary reflecting current implementation status
-  - Assigned to: Cursor
-## **Phase 1D.5: Role-Based Architecture Split** 
-**(NEW - Insert Before Current Phase 1E)**
-
-### **Folder Structure & Organization**
-- [x] **TASK-039A**: Create role-based folder structure
-  - Status: Complete
-  - Requirements:
-    - ✅ Create `components/smart/owner/` folder
-    - ✅ Create `components/smart/admin/` folder
-    - ✅ Create `components/smart/shared/` folder
-    - ✅ Create `composables/owner/` folder  
-    - ✅ Create `composables/admin/` folder
-    - ✅ Create `composables/shared/` folder
-    - ✅ Move existing composables to `shared/` as base implementations
-  - Notes: Successfully reorganized code into role-based folder structure. All existing composables moved to shared/ folder and import paths updated throughout the application. Created comprehensive README files for each new folder documenting purpose, architecture patterns, and future development guidelines. Folder structure now supports multi-tenant role-based development.
-  - Implementation Details:
-    - Created role-based folder structure for components/smart/ (owner/, admin/, shared/)
-    - Created role-based folder structure for composables/ (owner/, admin/, shared/)  
-    - Moved all existing composables (useAuth, useBookings, useProperties, useCalendarState, useComponentEventLogger) to shared/ folder
-    - Updated import paths in all consuming components (Home.vue, Home2.vue, Sidebar.vue, FullCalendar.vue, auth pages, admin layout, calendar pages, crud-testing page)
-    - Added comprehensive README documentation for each new folder explaining role-based architecture patterns
-    - Verified dev server starts successfully with new folder structure
-  - Verification: ✅ Existing app still works after folder reorganization (dev server runs successfully)
-  - Assigned to: Cursor
-
-- [x] **TASK-039B**: Move existing composables to shared folder
-  - Status: Complete
-  - Requirements:
-    - ✅ Move `useBookings.ts` → `composables/shared/useBookings.ts`
-    - ✅ Move `useProperties.ts` → `composables/shared/useProperties.ts`
-    - ✅ Move `useCalendarState.ts` → `composables/shared/useCalendarState.ts`
-    - ✅ Move `useAuth.ts` → `composables/shared/useAuth.ts`
-    - ✅ Update all import paths in existing components
-  - Notes: Completed as part of TASK-039A implementation. All existing composables (useAuth, useBookings, useProperties, useCalendarState, useComponentEventLogger) have been successfully moved to the shared/ folder and import paths updated throughout the application.
-  - Implementation Details:
-    - All 5 composables successfully moved to `src/composables/shared/` folder
-    - Import paths updated in all consuming components including: Home.vue, Sidebar.vue, FullCalendar.vue, auth pages, admin layout, calendar pages, and crud-testing page
-    - Verified correct import pattern: `from '@/composables/shared/useXxx'`
-    - No old import paths remaining (verified via grep search)
-    - Dev server runs successfully with new import structure
-  - Verification: ✅ All existing components import correctly from shared folder, dev server starts successfully
-  - Assigned to: Cursor
-
-### **Owner-Specific Smart Components**
-- [x] **TASK-039C**: Create HomeOwner.vue component
-  - Status: Complete
-  - Requirements:
-    - ✅ Copy existing `Home.vue` as starting point
-    - ✅ Filter data to show only current user's properties and bookings
-    - ✅ Use `OwnerSidebar.vue` and `OwnerCalendar.vue` (to be created) - prepared with TODO comments
-    - ✅ Add role-specific quick actions (Add Property, Add Booking)
-    - ✅ Remove admin-only features (cleaner assignment, system-wide reporting)
-    - ✅ Implement owner-specific error handling
-  - Data Scope: `bookings.filter(b => b.owner_id === currentUser.id)` ✅
-  - Navigation: Simple property filter, basic calendar views ✅
-  - Implementation Details:
-    - Created `src/components/smart/owner/HomeOwner.vue` with role-based data filtering
-    - All computed properties filter by `owner_id === currentUser.id`
-    - Added owner-specific quick actions in calendar header
-    - Implemented owner-friendly error messages
-    - Prepared for future OwnerSidebar and OwnerCalendar integration
-    - Uses existing Sidebar and FullCalendar components with filtered data
-    - Added owner-specific styling and animations
-  - Notes: Component implements core role-based filtering functionality. Some TypeScript type issues remain that need resolution in follow-up tasks. Component is ready for integration with future owner-specific child components.
-  - Assigned to: Cursor
-
-- [x] **TASK-039D**: Create OwnerSidebar.vue component
-  - Status: Complete
-  - Requirements:
-    - ✅ Show only owner's properties in property filter
-    - ✅ Display turn alerts for owner's properties only
-    - ✅ Display upcoming cleanings for owner's properties only
-    - ✅ Add "Add Property" and "Add Booking" quick action buttons
-    - ✅ Remove admin-only sections (cleaner management, system reports)
-    - ✅ Show owner-specific metrics (their properties count, their bookings)
-  - Features:
-    - ✅ Property filter dropdown (owner's properties only)
-    - ✅ Today's turns section (owner's turns only)
-    - ✅ Upcoming cleanings (next 7 days, owner only)
-    - ✅ Quick actions: "Add Property", "Add Booking", "View Calendar"
-  - Implementation Details:
-    - Created OwnerSidebar.vue component with role-based data filtering
-    - All data filtered by `owner_id === currentUser.id`
-    - Added owner-specific metrics display (property count, booking count)
-    - Replaced "Assign" buttons with "View" buttons (no cleaner assignment for owners)
-    - Added "View My Calendar" quick action button
-    - Integrated with existing TurnAlerts and UpcomingCleanings dumb components
-    - Updated HomeOwner.vue to use OwnerSidebar instead of generic Sidebar
-    - Created OwnerSidebarDemo.vue and demo page for testing
-    - Follows established Map collection patterns and event logging
-  - Notes: Component successfully filters all data to show only current owner's properties and bookings. Removes admin-only features while maintaining the same UI structure and event communication patterns. Ready for integration with future owner-specific composables.
-  - Assigned to: Cursor
-
-- [x] **TASK-039E**: Create OwnerCalendar.vue component
-  - Status: Complete
-  - Requirements:
-    - Filter calendar events to show only owner's bookings
-    - Simpler calendar controls (basic views: month, week, day)
-    - Remove admin features (cleaner assignment, drag-to-assign)
-    - Keep basic booking editing (click to edit owner's bookings)
-    - Highlight turn bookings with owner-focused messaging
-    - Add owner-specific context menu items
-  - Features:
-    - Basic FullCalendar integration with owner data filter
-    - Event click → open booking modal for editing
-    - Date click → create new booking modal
-    - Turn booking highlighting (owner's turns only)
-    - No cleaner assignment interface
-  - Notes: Successfully implemented OwnerCalendar.vue component with role-based data filtering, simplified UI optimized for property owners, owner-specific color scheme and messaging, demo component with sample data, and proper integration with existing Map collection patterns. Component removes admin features while maintaining core calendar functionality for owner use cases.
-  - Assigned to: Cursor
-
-### **Admin-Specific Smart Components**
-- [x] **TASK-039F**: Create HomeAdmin.vue component  
-  - Status: Complete
-  - Requirements:
-    - ✅ Copy existing `Home.vue` as starting point
-    - ✅ Show ALL properties and bookings (no filtering)
-    - ✅ Use `AdminSidebar.vue` and `AdminCalendar.vue` (using generic components with TODO comments)
-    - ✅ Add admin-specific quick actions (Assign Cleaners, Generate Reports, Manage System)
-    - ✅ Add system-wide turn management
-    - ✅ Implement admin-specific error handling and notifications
-  - Data Scope: All bookings, all properties (no filtering) ✅
-  - Navigation: Advanced filters, multiple calendar views, cleaner management ✅
-  - Implementation Notes:
-    - Created comprehensive HomeAdmin.vue component (1020 lines) with full admin functionality
-    - Shows ALL data across ALL property owners (no owner filtering)
-    - Implements system-wide metrics display: properties, bookings, urgent turns, upcoming cleanings
-    - Admin-specific quick actions: "Assign Cleaners", "Reports", "Manage System"
-    - Uses generic Sidebar and FullCalendar components with TODO comments for future AdminSidebar/AdminCalendar
-    - Admin-specific error handling with business impact warnings
-    - Created HomeAdminDemo.vue with comprehensive testing data across multiple owners
-    - Added demo route: `/demos/home-admin` for testing
-    - Component follows role-based architecture: admin sees ALL data, owner sees only their data
-  - Files Created:
-    - `src/components/smart/admin/HomeAdmin.vue` - Main admin interface component
-    - `src/components/smart/admin/HomeAdminDemo.vue` - Demo component with sample data
-    - `src/components/smart/admin/README.md` - Documentation
-  - Demo Route: `/demos/home-admin`
-  - Assigned to: Cursor
-
-- [x] **TASK-039G**: Create AdminSidebar.vue component
-  - Status: Complete
-  - Requirements:
-    - Show ALL properties in advanced property filter
-    - Display system-wide turn alerts (all urgent turns)
-    - Display system-wide cleaning metrics
-    - Add admin quick actions (Assign Cleaners, View Reports, Manage Cleaners)
-    - Add business analytics section (total properties, active cleanings)
-    - Include cleaner availability section
-  - Features:
-    - Advanced property filter (all properties, by owner, by status)
-    - System-wide urgent turns (all properties)
-    - Cleaner assignment queue
-    - Quick actions: "Assign Cleaners", "Generate Report", "Manage Schedule"
-    - Business metrics dashboard
-  - Implementation Notes:
-    - Created AdminSidebar.vue with role-based architecture following multi-tenant patterns
-    - Shows ALL system data (no owner filtering) for admin interface
-    - Includes system-wide turn alerts, business analytics, and cleaner management
-    - Created AdminSidebarDemo.vue with comprehensive test data
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Ready for integration with HomeAdmin.vue component
-  - Files Created:
-    - `src/components/smart/admin/AdminSidebar.vue` - Main admin sidebar component
-    - `src/components/smart/admin/AdminSidebarDemo.vue` - Demo component with test data
-  - Assigned to: Cursor
-
-- [x] **TASK-039H**: Create AdminCalendar.vue component
-  - Status: Complete
-  - Requirements:
-    - Show ALL bookings across all properties ✓
-    - Advanced calendar controls (multiple views, advanced filters) ✓
-    - Cleaner assignment interface (drag-to-assign, right-click assign) ✓
-    - Booking status management (pending → scheduled → completed) ✓
-    - Advanced context menus with admin actions ✓
-    - Color coding by cleaner assignment status ✓
-  - Features:
-    - FullCalendar with all bookings data ✓
-    - Cleaner assignment drag-and-drop ✓
-    - Advanced filtering (by status, by cleaner, by property owner) ✓
-    - Booking status workflow management ✓
-    - System-wide turn prioritization view ✓
-  - Implementation Notes:
-    - Created comprehensive AdminCalendar.vue with advanced admin features
-    - Implemented role-based multi-tenant architecture (admin sees ALL data)
-    - Added cleaner assignment modal with drag-and-drop support
-    - Implemented context menus with status management actions
-    - Added advanced filtering by cleaner, status, and booking type
-    - Created AdminCalendarDemo.vue with comprehensive test data
-    - Fixed Property interface to include bedrooms, bathrooms, square_feet, property_type
-    - Updated PricingTier to include 'standard' option
-    - Resolved TypeScript errors with proper null/undefined handling
-  - Files Created:
-    - src/components/smart/admin/AdminCalendar.vue (1049 lines)
-    - src/components/smart/admin/AdminCalendarDemo.vue (687 lines)
-  - Assigned to: Cursor
-
-### **Owner-Specific Composables**
-- [x] **TASK-039I**: Create useOwnerBookings.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useBookings.ts` functionality
-    - ✅ Filter all operations to current owner's bookings only
-    - ✅ Implement owner-specific validation rules
-    - ✅ Add owner-specific error messages
-    - ✅ Remove admin-only functions (cleaner assignment)
-  - Functions:
-    - ✅ `fetchMyBookings()` - get current user's bookings only
-    - ✅ `createMyBooking(data)` - create booking with current user as owner
-    - ✅ `updateMyBooking(id, data)` - update only if user owns the booking
-    - ✅ `deleteMyBooking(id)` - delete only if user owns the booking
-    - ✅ `getMyTodayTurns()` - today's turns for current user only
-    - ✅ `getMyUpcomingCleanings()` - upcoming cleanings for current user
-  - Implementation Details:
-    - Created `src/composables/owner/useOwnerBookings.ts` with role-based data filtering
-    - All computed properties filter by `owner_id === currentUser.id`
-    - Added owner-specific CRUD operations with ownership validation
-    - Implemented owner-friendly error messages and validation
-    - Created comprehensive demo component `UseOwnerBookingsDemo.vue`
-    - Added demo route `/demos/use-owner-bookings` for testing
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared `useBookings` composable using composition pattern
-    - Removes admin-only functions (cleaner assignment, system-wide operations)
-  - Notes: Successfully implemented owner-specific booking composable that filters all data to current user's bookings only. Provides owner-friendly interface with proper validation and error handling. Ready for integration with owner-specific components like HomeOwner.vue and OwnerSidebar.vue.
-  - Assigned to: Cursor
-
-- [x] **TASK-039J**: Create useOwnerProperties.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useProperties.ts` functionality
-    - ✅ Filter all operations to current owner's properties only
-    - ✅ Implement owner-specific property validation
-    - ✅ Add owner-specific metrics calculation
-    - ✅ Remove admin-only property management functions
-  - Functions:
-    - ✅ `fetchMyProperties()` - get current user's properties only
-    - ✅ `createMyProperty(data)` - create property with current user as owner
-    - ✅ `updateMyProperty(id, data)` - update only if user owns the property
-    - ✅ `deleteMyProperty(id)` - delete only if user owns (check for bookings)
-    - ✅ `getMyPropertyMetrics()` - metrics for current user's properties
-    - ✅ `toggleMyPropertyStatus()` - toggle active status for owner's properties
-    - ✅ `getMyPropertyRecommendations()` - owner-specific recommendations
-  - Implementation Details:
-    - Created `src/composables/owner/useOwnerProperties.ts` with role-based data filtering
-    - All computed properties filter by `owner_id === currentUser.id`
-    - Added ownership validation for all CRUD operations
-    - Implemented owner-friendly error messages and validation
-    - Created comprehensive demo component `UseOwnerPropertiesDemo.vue`
-    - Added demo route `/demos/use-owner-properties` for testing
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared `useProperties` composable using composition pattern
-    - Includes aggregated metrics calculation for owner's property portfolio
-    - Added property recommendations based on utilization and performance
-    - Removes admin-only functions while maintaining core property management
-  - Notes: Successfully implemented owner-specific property composable that filters all data to current user's properties only. Provides owner-friendly interface with proper validation, error handling, and business insights. Ready for integration with owner-specific components like HomeOwner.vue and OwnerSidebar.vue.
-  - Assigned to: Cursor
-
-- [x] **TASK-039K**: Create useOwnerCalendarState.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useCalendarState.ts` functionality
-    - ✅ Filter calendar data to current owner's events only
-    - ✅ Implement owner-specific calendar views and navigation
-    - ✅ Add owner-specific date/time utilities
-    - ✅ Remove admin calendar features
-  - Functions:
-    - ✅ `getOwnerCalendarEvents()` - format owner's bookings for calendar
-    - ✅ `handleOwnerDateSelect()` - create booking for owner's property
-    - ✅ `handleOwnerEventClick()` - edit owner's booking
-    - ✅ `getOwnerTurnAlerts()` - owner's urgent turns only
-    - ✅ `filterByOwnerProperty(propertyId)` - filter owner's calendar
-  - Implementation Details:
-    - Created comprehensive owner-specific calendar state composable extending shared useCalendarState
-    - All computed properties filter data by `owner_id === currentUser.id`
-    - Added owner-specific event handling with ownership validation
-    - Implemented owner-friendly error messages and validation
-    - Created demo component `UseOwnerCalendarStateDemo.vue` with comprehensive testing
-    - Added demo route `/demos/use-owner-calendar-state` for testing
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared composable using composition pattern
-    - Removes admin-only functions while maintaining core calendar functionality
-  - Notes: Successfully implemented owner-specific calendar state management that filters all data to current user's bookings only. Provides owner-friendly interface with proper validation, error handling, and business insights. Ready for integration with owner-specific components like HomeOwner.vue and OwnerCalendar.vue.
-  - Assigned to: Cursor
-
-### **Admin-Specific Composables**
-- [x] **TASK-039L**: Create useAdminBookings.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useBookings.ts` functionality
-    - ✅ No filtering - access ALL bookings across all owners
-    - ✅ Add admin-specific functions (cleaner assignment, status management)
-    - ✅ Implement system-wide analytics and reporting
-    - ✅ Add bulk operations for managing multiple bookings
-  - Functions:
-    - ✅ `fetchAllBookings()` - get ALL bookings (no owner filter)
-    - ✅ `assignCleaner(bookingId, cleanerId)` - assign cleaner to booking
-    - ✅ `updateBookingStatus(bookingId, status)` - manage booking workflow
-    - ✅ `getSystemTurns()` - all urgent turns across all properties
-    - ✅ `getUnassignedBookings()` - bookings without assigned cleaners
-    - ✅ `bulkAssignCleaner(bookingIds, cleanerId)` - bulk cleaner assignment
-  - Implementation Details:
-    - Created comprehensive admin-specific booking composable extending shared useBookings
-    - NO filtering - accesses ALL bookings across all owners (key difference from owner version)
-    - Added admin-specific computed properties: allBookings, systemTurns, systemTodayTurns, unassignedBookings, bookingsByStatus, bookingsByOwner, bookingsByCleaner, systemMetrics
-    - Implemented admin CRUD operations: fetchAllBookings(), assignCleaner(), updateBookingStatus(), bulkAssignCleaner(), bulkUpdateStatus()
-    - Added system-wide analytics: getSystemTurnAlerts(), getCleanerWorkloadAnalysis(), getPropertyUtilizationReport()
-    - Implemented advanced filtering with multiple criteria: filterBookings()
-    - Created demo component `UseAdminBookingsDemo.vue` with comprehensive testing interface
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared composable using composition pattern
-    - Includes admin-specific error messaging with business impact context
-    - All functions work with system-wide data scope for business admin interface
-  - Notes: Successfully implemented admin-specific booking management that provides access to ALL data across all clients. Includes comprehensive analytics, bulk operations, and business insights for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminCalendar.vue.
-  - Assigned to: Cursor
-
-- [x] **TASK-039M**: Create useAdminProperties.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useProperties.ts` functionality  
-    - ✅ No filtering - access ALL properties across all owners
-    - ✅ Add admin analytics and reporting functions
-    - ✅ Implement system-wide property management
-    - ✅ Add bulk operations and advanced filtering
-  - Functions:
-    - ✅ `fetchAllProperties()` - get ALL properties (no owner filter)
-    - ✅ `getPropertyAnalytics()` - system-wide property metrics
-    - ✅ `getPropertiesByOwner(ownerId)` - filter properties by specific owner
-    - ✅ `getPropertyUtilization()` - booking frequency per property
-    - ✅ `bulkUpdateProperties(propertyIds, updates)` - bulk property updates
-  - Implementation Details:
-    - Created comprehensive admin-specific property composable extending shared useProperties
-    - NO filtering - accesses ALL properties across all owners (key difference from owner version)
-    - Added admin-specific computed properties: allProperties, allActiveProperties, propertiesByOwner, propertiesByPricingTier, systemPropertyMetrics, propertyUtilizationData
-    - Implemented admin CRUD operations: fetchAllProperties(), getPropertiesByOwner(), bulkUpdateProperties(), bulkTogglePropertyStatus()
-    - Added system-wide analytics: getPropertyAnalytics(), getPropertyUtilization(), getOwnerPerformanceReport()
-    - Implemented advanced filtering with multiple criteria: filterProperties()
-    - Created demo component `UseAdminPropertiesDemo.vue` with comprehensive testing interface
-    - Added demo route `/demos/use-admin-properties` for testing
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared composable using composition pattern
-    - Includes admin-specific error messaging with business impact context
-    - All functions work with system-wide data scope for business admin interface
-  - Notes: Successfully implemented admin-specific property management that provides access to ALL data across all clients. Includes comprehensive analytics, bulk operations, and business insights for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminSidebar.vue.
-  - Assigned to: Cursor
-
-- [x] **TASK-039N**: Create useAdminCalendarState.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useCalendarState.ts` functionality
-    - ✅ No filtering - access ALL calendar events across all owners
-    - ✅ Add admin-specific calendar features (cleaner views, advanced filters)
-    - ✅ Implement system-wide calendar management
-    - ✅ Add cleaner assignment calendar logic
-  - Functions:
-    - ✅ `getAdminCalendarEvents()` - format ALL bookings for calendar
-    - ✅ `handleAdminEventClick()` - admin booking management interface
-    - ✅ `getCleanerSchedule(cleanerId)` - view specific cleaner's schedule
-    - ✅ `getSystemTurnAlerts()` - all urgent turns across all properties
-    - ✅ `filterByMultipleCriteria()` - advanced admin filtering
-  - Implementation Details:
-    - Created comprehensive admin-specific calendar state composable extending shared useCalendarState
-    - NO filtering - accesses ALL calendar events across all owners (key difference from owner version)
-    - Added admin-specific computed properties: allBookings, allProperties, systemTurnAlerts, cleanerSchedules
-    - Implemented admin calendar functions: getAdminCalendarEvents(), handleAdminEventClick(), getCleanerSchedule(), filterByMultipleCriteria()
-    - Added admin-specific event formatting with enhanced color coding and titles
-    - Implemented system-wide turn alerts with priority calculation and property details
-    - Added cleaner schedule management with metrics calculation
-    - Created comprehensive demo component `UseAdminCalendarStateDemo.vue`
-    - Added demo route `/demos/use-admin-calendar-state` for testing
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared composable using composition pattern
-    - All functions work with system-wide data scope for business admin interface
-  - Files Created:
-    - `src/composables/admin/useAdminCalendarState.ts` - Main admin calendar state composable
-    - `src/components/smart/admin/UseAdminCalendarStateDemo.vue` - Demo component with testing interface
-  - Demo Route: `/demos/use-admin-calendar-state`
-  - Notes: Successfully implemented admin-specific calendar state management that provides access to ALL data across all clients. Includes comprehensive calendar event formatting, system-wide turn alerts, cleaner schedule management, and advanced filtering capabilities for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminCalendar.vue.
-  - Assigned to: Cursor
-
-- [x] **TASK-039O**: Create useCleanerManagement.ts composable (Admin-only)
-  - Status: Complete
-  - Requirements:
-    - New admin-only composable for cleaner operations
-    - Manage cleaner profiles, availability, and assignments
-    - Implement cleaner scheduling logic
-    - Add cleaner performance tracking
-  - Functions:
-    - `fetchCleaners()` - get all cleaner profiles ✅
-    - `createCleaner(data)` - add new cleaner ✅
-    - `updateCleaner(id, data)` - update cleaner profile ✅
-    - `assignCleanerToBooking(cleanerId, bookingId)` - make assignment ✅
-    - `getCleanerAvailability(cleanerId, date)` - check availability ✅
-    - `getCleanerPerformance(cleanerId)` - performance metrics ✅
-  - Implementation Notes:
-    - Created comprehensive admin-only composable with 935 lines of code
-    - Includes all required functions plus additional admin features:
-      - `deleteCleaner()` - remove cleaner profiles
-      - `unassignCleanerFromBooking()` - remove cleaner assignments
-      - `bulkAssignCleaner()` - bulk assignment operations
-      - `getCleanerSchedule()` - detailed schedule management
-      - `findAvailableCleaners()` - availability search with skill filtering
-      - `getSystemCleanerAnalytics()` - comprehensive business analytics
-      - `getCleanerUtilization()` - utilization reports and recommendations
-    - Follows role-based architecture patterns:
-      - Admin-only access with authentication validation
-      - System-wide data access (no owner filtering)
-      - Integration with existing stores (user, booking, property)
-      - Business impact error messaging
-      - Mock cleaner data for development (5 cleaners with different skills)
-    - TypeScript interfaces for all data structures:
-      - `CleanerFormData` - form input validation
-      - `CleanerAvailability` - availability checking
-      - `CleanerPerformance` - performance metrics
-      - `CleanerWorkload` - workload analysis
-    - Advanced features:
-      - Skill-based cleaner grouping and filtering
-      - Workload analysis with utilization tracking
-      - Performance analytics with monthly trends
-      - System-wide cleaner metrics and recommendations
-      - Conflict detection and availability management
-    - Ready for integration with admin components and pages
-  - Assigned to: Cursor
-
-### **Dumb Component Updates**
-- [x] **TASK-039P**: Create owner-specific dumb components
-  - Status: Complete
-  - Requirements:
-    - ✅ Create `components/dumb/owner/OwnerBookingForm.vue` - simplified booking form
-    - ✅ Create `components/dumb/owner/OwnerPropertyForm.vue` - simplified property form
-    - ✅ Create `components/dumb/owner/OwnerQuickActions.vue` - owner action buttons
-    - ✅ Create `components/dumb/owner/OwnerCalendarControls.vue` - basic calendar controls
-  - Implementation Details:
-    - **OwnerBookingForm.vue**: Simplified booking form with owner-friendly language, auto-detection of turn bookings, mobile-optimized layout, removed admin features (cleaner assignment, advanced status management)
-    - **OwnerPropertyForm.vue**: Streamlined property form with basic property details (bedrooms, bathrooms, property type), simplified service level selection, owner-friendly validation messages
-    - **OwnerQuickActions.vue**: Mobile-first quick action buttons with primary actions (Schedule Cleaning, Add Property) and secondary actions (View Calendar, My Properties), collapsible additional actions
-    - **OwnerCalendarControls.vue**: Basic calendar navigation and view controls (month/week/day), property filtering, booking type filtering, mobile-responsive design with collapsible secondary controls
-  - Technical Features:
-    - All components use Vue 3 Composition API with TypeScript
-    - Vuetify 3 components with Material Design icons
-    - Mobile-first responsive design with breakpoint optimizations
-    - Consistent prop/emit patterns following project conventions
-    - Owner-specific language and simplified UX (no technical jargon)
-    - Error handling with user-friendly messages
-    - Form validation with appropriate rules for property owners
-  - Notes: Successfully created simplified versions focused on owner needs, removing all admin features while maintaining core functionality. Components are ready for integration with owner-specific smart components and composables.
-  - Assigned to: Cursor
-
-- [x] **TASK-039Q**: Create admin-specific dumb components
-  - Status: Complete
-  - Requirements:
-    - ✅ Create `components/dumb/admin/AdminBookingForm.vue` - advanced booking form with cleaner assignment
-    - ✅ Create `components/dumb/admin/CleanerAssignmentModal.vue` - cleaner selection interface
-    - ✅ Create `components/dumb/admin/AdminCalendarControls.vue` - advanced calendar controls
-    - ✅ Create `components/dumb/admin/TurnPriorityPanel.vue` - system-wide turn management
-    - ✅ Create `components/dumb/admin/AdminQuickActions.vue` - admin action buttons
-  - Notes: All admin-specific dumb components implemented with advanced features:
-    - AdminBookingForm: Advanced booking form with cleaner assignment, status management, business impact alerts
-    - CleanerAssignmentModal: Comprehensive cleaner selection with availability, skills, conflict detection
-    - AdminCalendarControls: Advanced calendar controls with filtering, bulk operations, export functionality
-    - TurnPriorityPanel: System-wide turn management with priority queue and business impact indicators
-    - AdminQuickActions: Admin action buttons with critical actions, bulk operations, management tools, and quick stats
-    - Created AdminQuickActionsDemo.vue for testing and demonstration
-    - All components follow role-based architecture patterns with admin-specific language and functionality
-  - Assigned to: Cursor
-
-### **Page Structure Updates**
-- [x] **TASK-039R**: Implement role-based routing in pages/index.vue
-  - Status: Complete
-  - Requirements:
-    - ✅ Check user role in `setup()` function
-    - ✅ Route to `HomeOwner.vue` if user role is 'owner'
-    - ✅ Route to `HomeAdmin.vue` if user role is 'admin' 
-    - ✅ Add fallback routing for unauthenticated users
-    - ✅ Implement proper loading state during role check
-  - Implementation Details:
-    - Updated auth store with role-specific computed properties (isOwner, isAdmin, isCleaner)
-    - Implemented dynamic component rendering using computed property
-    - Added loading state with progress spinner during authentication check
-    - Created inline AuthPrompt component for unauthenticated users with mock login buttons
-    - Added proper TypeScript typing and error handling for edge cases
-    - Implemented smooth transitions between role-based components
-    - Added comprehensive documentation about frontend filtering vs backend security
-  - Code Pattern:
-    ```vue
-    <template>
-      <div v-if="authStore.loading" class="loading-container">
-        <!-- Loading spinner -->
-      </div>
-      <component v-else :is="homeComponent" />
-    </template>
-    <script setup>
-    const homeComponent = computed(() => {
-      if (!authStore.isAuthenticated) return AuthPrompt;
-      if (authStore.isAdmin) return HomeAdmin;
-      if (authStore.isOwner) return HomeOwner;
-      return AuthPrompt; // fallback
-    });
-    </script>
-    ```
-  - Security Notes: Frontend filtering for UX only - backend RLS required for real security
-  - Testing: Mock login buttons allow testing both admin and owner interfaces
-  - Files Modified:
-    - `src/pages/index.vue` - Main role-based routing implementation
-    - `src/stores/auth.ts` - Added role-specific computed properties
-    - `src/composables/owner/useOwnerProperties.ts` - Fixed TypeScript errors
-  - Assigned to: Cursor
-
-- [x] **TASK-039S**: Create owner-specific pages structure
-  - Status: Complete
-  - Requirements:
-    - ✅ Create `pages/owner/` folder
-    - ✅ Move `pages/properties/index.vue` → `pages/owner/properties/index.vue`
-    - ✅ Move `pages/calendar/index.vue` → `pages/owner/calendar.vue`
-    - ✅ Create `pages/owner/dashboard.vue` (using HomeOwner.vue)
-    - ✅ Create `pages/owner/bookings/index.vue` - owner's booking list
-    - ✅ Update all routing in router config
-  - Implementation Details:
-    - Created comprehensive owner-specific page structure with role-based data filtering
-    - **Dashboard Page**: Simple wrapper around HomeOwner.vue component for main owner interface
-    - **Properties Page**: Full property management with stats, CRUD operations, and empty states using owner-specific composables
-    - **Calendar Page**: Owner calendar with booking stats, OwnerCalendar component integration, and owner-specific event handling
-    - **Bookings Page**: Comprehensive booking list with data table, filtering, stats, and CRUD operations
-    - **Router Updates**: Added new owner routes with proper meta fields (requiresAuth: true, role: 'owner') and legacy route redirects
-    - All pages use owner-specific composables (useOwnerBookings, useOwnerProperties) for proper data filtering
-    - Consistent UI patterns with Vuetify components, responsive design, and owner-friendly language
-    - Proper error handling and loading states throughout
-  - Files Created:
-    - `src/pages/owner/dashboard.vue` - Main owner interface wrapper
-    - `src/pages/owner/properties/index.vue` - Owner property management page
-    - `src/pages/owner/calendar.vue` - Owner calendar interface
-    - `src/pages/owner/bookings/index.vue` - Owner booking list and management
-  - Router Changes:
-    - Added `/owner/dashboard`, `/owner/properties`, `/owner/calendar`, `/owner/bookings` routes
-    - Legacy routes `/properties` and `/calendar` now redirect to owner-specific versions
-    - All owner routes include proper meta fields for role-based access control
-  - Notes: Successfully implemented owner-focused page structure with simplified navigation and role-based data filtering. Some minor TypeScript type issues remain but core functionality is complete. Pages are ready for integration with role-based route guards.
-  - Assigned to: Cursor
-
-- [x] **TASK-039T**: Expand admin-specific pages structure  
-  - Status: Complete
-  - Requirements:
-    - Expand existing `pages/admin/` folder
-    - Create `pages/admin/schedule/index.vue` - master calendar (using HomeAdmin.vue)
-    - Create `pages/admin/cleaners/index.vue` - cleaner management
-    - Create `pages/admin/properties/index.vue` - all properties view
-    - Create `pages/admin/bookings/index.vue` - all bookings view  
-    - Create `pages/admin/reports/index.vue` - business analytics
-    - Update router config with admin routes
-  - Notes: Successfully implemented comprehensive admin interface with full business management capabilities. Created all required admin pages:
-    - Updated admin/index.vue to use HomeAdmin component as main dashboard
-    - Created admin/schedule/index.vue with master calendar functionality
-    - Created admin/cleaners/index.vue with cleaner management (has some TypeScript issues to resolve)
-    - Created admin/properties/index.vue with comprehensive property management and filtering
-    - Created admin/bookings/index.vue with system-wide booking management and cleaner assignment
-    - Created admin/reports/index.vue with business analytics and metrics dashboard
-    - Updated router configuration with all admin routes and proper authentication guards
-    All pages follow role-based architecture patterns with admin seeing ALL data across ALL clients, proper TypeScript typing, and integration with existing admin-specific composables.
-  - Assigned to: Cursor
-
-### **Authentication & Route Guards**
-- [x] **TASK-039U**: Implement role-based route guards
-  - Status: Complete
-  - Requirements:
-    - ✅ Create route guards that check user roles
-    - ✅ Redirect owners trying to access admin pages
-    - ✅ Redirect admins to admin interface by default
-    - ✅ Add proper error messages for unauthorized access
-    - ✅ Implement loading states during authentication check
-  - Route Protection:
-    - ✅ `/owner/*` - requires 'owner' role
-    - ✅ `/admin/*` - requires 'admin' role
-    - ✅ `/` - routes based on role
-  - Implementation Details:
-    - Created TypeScript route meta extensions in `src/types/router.ts`
-    - Implemented comprehensive route guards in `src/router/guards.ts`
-    - Added role-based authentication and authorization logic
-    - Business rule: Admin can access owner routes for support, but owners cannot access admin routes
-    - Integrated with existing UI store notification system for error messages
-    - Added loading states and proper error handling
-    - Created demo page at `/demos/route-guards` for testing different role scenarios
-    - Moved shared dumb components to `components/dumb/shared/` folder structure
-    - Guards include: authGuard, loadingGuard, afterNavigationGuard, developmentGuard
-  - Files Created/Modified:
-    - `src/types/router.ts` - TypeScript route meta extensions
-    - `src/router/guards.ts` - Route guard implementations
-    - `src/router/index.ts` - Applied guards to router
-    - `src/pages/demos/route-guards.vue` - Demo page for testing
-    - Reorganized shared components folder structure
-  - Testing: Demo page allows testing different user roles and route access scenarios
-  - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2
-  - Assigned to: Cursor
-
-- [x] **TASK-039V**: Update authentication flow for role-based routing
-  - Status: Complete
-  - Requirements:
-    - ✅ Update login success to route based on user role
-    - ✅ Update logout to clear role-specific state
-    - ✅ Add role selection during user registration
-    - ✅ Implement role switching for admin users (if needed)
-    - ✅ Update auth composable to handle role-based navigation
-  - Implementation Details:
-    - **Enhanced Auth Store**: Updated `src/stores/auth.ts` with comprehensive role-based authentication
-      - Role-based computed properties with temp view mode support for admin switching
-      - Async login/logout/register functions returning success booleans for component navigation
-      - Admin role switching functionality (`switchToOwnerView`, `switchToAdminView`)
-      - Proper TypeScript typing with PropertyOwner, Admin, Cleaner interfaces
-      - Mock user data with correct type assertions for development
-      - Role-specific user creation from registration data
-    - **Enhanced Login Page**: Updated `src/pages/auth/login.vue` with role-based navigation
-      - Modern Vuetify UI with gradient background and glassmorphism effects
-      - Form validation with email/password rules
-      - Role-based navigation after successful login using `getDefaultRouteForRole`
-      - Demo account buttons for quick testing (owner/admin)
-      - Error and success alert handling with proper integration
-      - Navigation to registration page
-    - **Enhanced Registration Page**: Updated `src/pages/auth/signup.vue` with comprehensive role selection
-      - Role selection radio group with descriptions for owner/admin/cleaner
-      - Personal information fields with validation
-      - Conditional company name field for property owners
-      - Password strength validation and confirmation
-      - Terms and conditions checkbox with modal dialogs
-      - Role-based navigation after successful registration
-      - Responsive design with proper validation
-    - **Admin Role Switching**: Enhanced `src/components/dumb/admin/AdminRoleSwitcher.vue`
-      - Dropdown menu for view switching between admin and owner perspectives
-      - Visual indicators for current view mode
-      - Support action buttons for owner view
-      - Admin support mode information and utilities
-      - Proper event emission for parent components
-      - Styled with Vuetify theming and smooth transitions
-    - **Auth Helpers**: Enhanced `src/utils/authHelpers.ts` with comprehensive utilities
-      - `getDefaultRouteForRole()` for role-based routing
-      - `getRoleSpecificSuccessMessage()` for role-aware messaging
-      - `clearAllRoleSpecificState()` for localStorage cleanup
-      - `canSwitchToRole()` for role switching validation
-      - `validateRoleNavigation()` for navigation validation
-      - Role display names and available roles for UI
-    - **Main Page Integration**: Updated `src/pages/index.vue` with better auth store integration
-      - Enhanced AuthPrompt component with navigation to login page
-      - Support for admin temp view mode in component selection
-      - Improved mock login functions with success notifications
-      - Removed unused store imports and functions
-    - **Demo Component**: Created `src/pages/demos/auth-flow.vue` for testing
-      - Comprehensive testing interface for all auth functionality
-      - Authentication state display and role switching testing
-      - Navigation testing and auth helpers demonstration
-      - Admin role switching component integration
-      - Success/error message handling
-  - Root Cause Analysis: The auth system was partially implemented but lacked proper integration between the auth store and composable, and needed enhanced role-based navigation
-  - Solution: Created a comprehensive role-based authentication system with proper store integration, role switching for admins, and enhanced UI components
-  - Files Modified:
-    - `src/stores/auth.ts` - Major enhancement with role-based features
-    - `src/pages/auth/login.vue` - Enhanced with role-based navigation
-    - `src/pages/auth/signup.vue` - Enhanced with role selection
-    - `src/components/dumb/admin/AdminRoleSwitcher.vue` - Fixed emit types
-    - `src/utils/authHelpers.ts` - Enhanced with comprehensive utilities
-    - `src/pages/index.vue` - Better auth store integration
-    - `src/pages/demos/auth-flow.vue` - New demo component for testing
-  - Testing: Demo component allows testing all auth functionality including role switching, navigation, and state management
-  - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2. All role-based patterns follow established multi-tenant architecture.
-  - Assigned to: Cursor
-
-### **Bug Fixes & Layout Issues**
-- [x] **TASK-039W**: Fix Vuetify layout injection error in admin interface
-  - Status: Complete
-  - Requirements:
-    - ✅ Fix "injection 'Symbol(vuetify:layout)' not found" error when accessing /admin/
-    - ✅ Update admin layout to use Vuetify's layout system (v-app, v-app-bar, v-main)
-    - ✅ Maintain admin-specific styling and navigation
-    - ✅ Ensure VNavigationDrawer works properly within layout context
-    - ✅ Update HomeAdmin component styling to work with new layout
-    - ✅ Fix DOM parentNode error in AdminCalendar component
-  - Implementation Details:
-    - Updated `src/layouts/admin.vue` to use v-app, v-app-bar, and v-main instead of custom HTML/CSS layout
-    - Added admin-specific app bar with proper navigation and user menu
-    - Updated HomeAdmin component styling to account for app bar height (64px)
-    - Fixed responsive design to work with new layout system
-    - Maintained admin-specific branding and color scheme
-    - **DOM Error Fix**: Added proper lifecycle management to AdminCalendar component:
-      - Added `isMounted` and `isCalendarReady` reactive state
-      - Implemented `onMounted` and `onBeforeUnmount` lifecycle hooks
-      - Added conditional rendering with loading state to prevent premature DOM access
-      - Used `nextTick` and setTimeout to ensure proper DOM mounting order
-      - Added calendar cleanup on component unmount
-      - Fixed FullCalendar options to return safe defaults until component is ready
-  - Root Cause: VNavigationDrawer component requires Vuetify layout context (v-app) to function properly, and FullCalendar was trying to access DOM elements before they were mounted
-  - Solution: Replaced custom HTML layout with proper Vuetify layout components and added DOM mounting guards
-  - Files Modified:
-    - `src/layouts/admin.vue` - Complete rewrite using Vuetify layout system
-    - `src/pages/admin/index.vue` - Removed height constraints
-    - `src/components/smart/admin/HomeAdmin.vue` - Updated styling for new layout
-    - `src/components/smart/admin/AdminCalendar.vue` - Added DOM mounting safety checks
-    - `src/pages/admin/schedule/index.vue` - Updated to pass required props to AdminCalendar
-  - Notes: This fix ensures all Vuetify components work properly in admin interface, maintains consistency with default layout patterns, and resolves the "Cannot read properties of null (reading 'parentNode')" error when accessing `/admin/schedule`
-  - Assigned to: Cursor
-
----
-- [x] **TASK-038**: Implement loading states and error handling
-  - Status: Complete
-  - Notes: Implemented comprehensive role-based error handling and loading state system including:
-    - Enhanced TypeScript types for error handling and loading states (src/types/ui.ts)
-    - Error message mapping utilities with role-specific templates (src/utils/errorMessages.ts)
-    - Shared error handler composable with role-aware messaging (src/composables/shared/useErrorHandler.ts)
-    - Shared loading state composable with centralized management (src/composables/shared/useLoadingState.ts)
-    - Owner-specific error handler with simple, encouraging messages (src/composables/owner/useOwnerErrorHandler.ts)
-    - Admin-specific error handler with technical details and business impact (src/composables/admin/useAdminErrorHandler.ts)
-    - UI components: LoadingSpinner, SkeletonLoader, ErrorAlert with role-aware display
-    - Comprehensive demo component for testing all error handling and loading scenarios
-    - Role-based error messaging: Owner (simple, user-friendly) vs Admin (technical, business-focused)
-    - Business impact assessment and escalation for admin errors
-    - Loading state hierarchy: global, page, component, action levels
-    - Integration with existing Map collection patterns and UI store
-  - Requirements: loading spinners, error messages, user feedback ✓
-  - Assigned to: Cursor
-
-
-<!-- - [] **TASK-UI-FIX_ADMIN-SIDEBAR**: Fix AdminSidebar width responsiveness
-  - Status: Complete
-  - Requirements: 
-    - ✅ Desktop: Standard sidebar width controlled by parent column
-    - ✅ Mobile: Hidden sidebar (not visible)
-    - ✅ Responsive: Proper transitions between breakpoints
-  - Implementation Details:
-    - **Root Cause**: AdminSidebar.vue was forcing `width="100%"` on v-navigation-drawer, overriding parent HomeAdmin.vue column constraints (`lg="3" xl="2"`)
-    - **Solution**: Removed `width="100%"` prop and added `permanent` prop for embedded behavior within parent column
-    - **CSS Updates**: Updated styling to use `width: 100% !important` to fill parent column container (not viewport), removed redundant responsive width rules
-    - **Testing**: Created demo page at `/demos/admin-sidebar-width-test` for verification
-    - **Files Modified**: 
-      - `src/components/smart/admin/AdminSidebar.vue` - Updated v-navigation-drawer props and CSS
-      - `src/pages/demos/admin-sidebar-width-test.vue` - Created test page
-      - `src/router/index.ts` - Added demo route
-  - Results:
-    - **Desktop (lg)**: Sidebar respects parent column sizing = 25% width
-    - **Large Desktop (xl)**: Sidebar respects parent column sizing = 16.7% width  
-    - **Mobile**: Sidebar hidden using existing `mobile-hidden` class logic
-    - **Functionality**: All admin-specific features and data access preserved
-  - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2. Fix maintains role-based architecture patterns and multi-tenant data access.
-  - Assigned to: Cursor
-
-- [ ] **TASK-039**: Add turn booking visual indicators
-  - Status: Not Started
-  - Notes: 
-  - Requirements: urgent styling, priority colors, alerts
-  - Assigned to: Cursor
-
----
-
-## **Phase 1E: MVP Completion** 
-**(UPDATED - Now Role-Aware)**
-
-### **Error Handling Implementation**
-- [ ] **TASK-040**: Create global error handling system with role-specific messaging
-  - Status: Not Started
-  - Requirements:
-    - Role-specific error messages (owner vs admin language)
-    - Different error escalation paths for each role
-    - Owner errors: focus on booking/property issues
-    - Admin errors: include system-wide impact messaging
-  - Notes: Build on existing error foundations, add role context
-  - Reference: docs/error-handling-patterns.md
-  - Assigned to: Cursor
-
-- [ ] **TASK-041**: Implement form validation with role-specific error display
-  - Status: Not Started
-  - Requirements:
-    - Owner forms: simple validation messages
-    - Admin forms: advanced validation with business impact warnings
-    - Role-specific field requirements (admin sees more fields)
-    - Different validation rules based on user role
-  - Notes: Real-time validation, error states, user feedback per role
-  - Assigned to: Cursor
-
-- [ ] **TASK-042**: Add API error handling and retry logic with role-specific strategies
-  - Status: Not Started
-  - Requirements:
-    - Owner API errors: focus on user-friendly messaging
-    - Admin API errors: include technical details and system impact
-    - Different retry strategies (owners = simple, admins = advanced)
-    - Role-specific fallback behaviors
-  - Notes: Network errors, timeout handling, retry strategies per role
-  - Assigned to: Cursor
-
-- [ ] **TASK-043**: Implement user notification system with role-specific notifications
-  - Status: Not Started
-  - Requirements:
-    - Owner notifications: personal booking updates, cleaning schedules
-    - Admin notifications: system alerts, cleaner updates, business metrics
-    - Different notification channels per role
-    - Role-specific notification preferences
-  - Notes: Success/error toasts, action confirmations per role
-  - Assigned to: Cursor
-
-### **Unit Testing Setup**
-- [ ] **TASK-044**: Set up Vitest testing environment for role-based components
-  - Status: Complete (needs expansion for role-based)
-  - Requirements:
-    - Add test utilities for role-based component mounting
-    - Add mock factories for owner vs admin data
-    - Create role-specific test helpers
-    - Update existing test setup for role compatibility
-  - Notes: Expand existing Vitest setup for role-based testing
-  - Assigned to: Cursor
-
-- [x] **TASK-045**: Create testing utilities and helpers
-  - Status: Complete
-  - Notes: Existing test utilities work for both roles
-  - Requirements: mock factories, testing pinia, component wrappers
-  - Reference: docs/testing-patterns.md
-  - Assigned to: Cursor
-
-- [ ] **TASK-046**: Write unit tests for business logic utils (role-aware)
-  - Status: Not Started
-  - Requirements:
-    - Test priority calculation with role context
-    - Test booking validation for both owner and admin cases
-    - Test cleaning window calculation for different user types
-    - Verify role-specific business rules
-  - Notes: Test priority calculation, booking validation, cleaning windows per role
-  - Files: businessLogic.test.ts
-  - Assigned to: Cursor
-
-- [ ] **TASK-047**: Write unit tests for role-specific composables
-  - Status: Not Started
-  - Requirements:
-    - Test `useOwnerBookings.ts` - owner data filtering, owner operations
-    - Test `useAdminBookings.ts` - all data access, admin operations
-    - Test role-specific calendar state composables
-    - Test cleaner management composable (admin-only)
-  - Notes: Test role-specific business logic and data filtering
-  - Files: useOwnerBookings.test.ts, useAdminBookings.test.ts, etc.
-  - Assigned to: Cursor
-
-- [x] **TASK-048**: Write unit tests for Pinia stores
-  - Status: Complete
-  - Notes: Existing store tests work for both roles
-  - Requirements: test store actions, getters, Map operations
-  - Files: user.spec.ts, property.spec.ts, booking.spec.ts, ui.spec.ts
-  - Assigned to: Cursor
-
-- [ ] **TASK-049**: Write component tests for role-specific smart components
-  - Status: Not Started
-  - Requirements:
-    - Test `HomeOwner.vue` - owner data filtering, owner interactions
-    - Test `HomeAdmin.vue` - all data access, admin interactions  
-    - Test `OwnerSidebar.vue` vs `AdminSidebar.vue` functionality
-    - Test `OwnerCalendar.vue` vs `AdminCalendar.vue` features
-  - Notes: Test component communication, data flow per role
-  - Focus: Role-specific props, emits, user interactions
-  - Assigned to: Cursor
-
-- [ ] **TASK-050**: Write integration tests for role-based workflows
-  - Status: Not Started
-  - Requirements:
-    - Test complete owner workflow: login → add property → create booking → view calendar
-    - Test complete admin workflow: login → view all data → assign cleaner → update status
-    - Test role-based data isolation (owners can't see other owners' data)
-    - Test role-based permission enforcement
-  - Notes: End-to-end workflow testing per role
-  - Focus: User journeys, cross-component communication per role
-  - Assigned to: Cursor
-
-### **Final Integration & Testing**
-- [ ] **TASK-051**: End-to-end testing of role-based booking workflows
-  - Status: Not Started
-  - Requirements:
-    - Test owner booking workflow: create → edit → view on calendar
-    - Test admin booking workflow: view all → assign cleaner → update status
-    - Test cross-role data updates (owner creates, admin sees)
-    - Verify role-based data filtering throughout
-  - Verification: Complete booking workflows for both roles
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-052**: Test role-based turn booking priority system
-  - Status: Not Started
-  - Requirements:
-    - Test owner turn alerts (only their properties)
-    - Test admin turn alerts (all properties, system-wide)
-    - Test role-specific turn booking creation and management
-    - Verify proper priority indicators for each role
-  - Verification: Turn priority system works correctly for both roles
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-053**: Test role-based error handling scenarios
-  - Status: Not Started
-  - Requirements:
-    - Test role-specific error messages and handling
-    - Test permission denied scenarios (owner accessing admin features)
-    - Test role-based fallback behaviors
-    - Verify role-specific user feedback systems
-  - Verification: Error handling appropriate for each role
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-054**: Responsive design testing for role-based interfaces
-  - Status: Not Started
-  - Requirements:
-    - Test owner interface on desktop, tablet, mobile
-    - Test admin interface on desktop, tablet, mobile
-    - Verify role-specific mobile optimizations
-    - Test role-based navigation on different screen sizes
-  - Verification: Both interfaces work across all device sizes
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-055**: Run full test suite and achieve 80%+ coverage for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Run tests for both owner and admin code paths
-    - Achieve 80%+ coverage on role-specific business logic
-    - Verify critical role-based workflows are tested
-    - Test role-based security and data isolation
-  - Verification: npm run test:coverage passes for both roles
-  - Assigned to: Human + Cursor
-
-### **Documentation & Cleanup**
-- [] **TASK-055A**: Create UML diagrams to visualize codebase architecture
-  - Status: Complete (needs update for role-based)
-  - Requirements:
-    - Update existing UML diagrams for role-based architecture
-    - Add role-specific component interaction diagrams
-    - Document role-based data flow patterns
-    - Add role-based security/permission diagrams
-  - Notes: Update existing comprehensive UML diagrams for role-based system
-  - Assigned to: Cursor
-
-- [ ] **TASK-056**: Document component APIs and usage for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Document owner-specific component APIs
-    - Document admin-specific component APIs  
-    - Document shared component usage patterns
-    - Document role-based prop interfaces and emit patterns
-  - Notes: Role-specific component documentation
-  - Files: component documentation, prop interfaces per role
-  - Assigned to: Cursor
-
-- [ ] **TASK-057**: Code cleanup and optimization for role-based architecture
-  - Status: Not Started
-  - Requirements:
-    - Remove unused generic components (old Home.vue, Sidebar.vue, etc.)
-    - Optimize role-specific data filtering
-    - Clean up import paths for new folder structure
-    - Remove duplicate code between role-specific components
-  - Notes: Clean up after role-based refactoring
-  - Assigned to: Cursor
-
-- [ ] **TASK-058**: Update documentation with role-based testing and error handling
-  - Status: Not Started
-  - Requirements:
-    - Update README.md with role-based architecture explanation
-    - Document role-based testing strategies
-    - Document role-based error handling patterns
-    - Add role-based deployment instructions
-  - Notes: Complete documentation update for role-based system
-  - Files: README.md, testing guide, error handling guide per role
-  - Assigned to: Cursor
-
-- [ ] **TASK-059**: MVP deployment preparation for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Build optimization for role-based components
-    - Environment setup for role-based authentication
-    - Deployment config for role-based routing
-    - Performance optimization for role-specific data loading
-  - Notes: Deployment preparation with role-based considerations
-  - Assigned to: Cursor
-
----## **Phase 1F: Critical Architecture Completion** 
-**(URGENT - Complete Role-Based Migration)** -->
-
-# 📋 Additional Tasks for tasks.md - Critical Issues & Improvements
-
-## **Phase 1F: Critical Architecture Completion** 
-**(URGENT - Complete Role-Based Migration)**
-
-### **Complete Missing Role-Based Components**
-- [x] **TASK-060**: Create OwnerSidebar.vue component
-  - Status: Complete ✅
-  - Requirements:
-    - ✅ Create `src/components/smart/owner/OwnerSidebar.vue`
-    - ✅ Filter navigation to owner-specific features only
-    - ✅ Remove admin-only navigation items (cleaner management, system reports)
-    - ✅ Add owner-specific quick actions (Add Property, View My Bookings)
-    - ✅ Implement owner-friendly navigation labels and icons
-    - ✅ Use owner-specific color scheme and styling
-    - ✅ Integrate with existing OwnerQuickActions component
-  - Notes: ✅ Complete implementation with owner-specific navigation menu, data filtering, OwnerQuickActions integration, and owner-only features
-  - Files: src/components/smart/owner/OwnerSidebar.vue
-  - Verification: ✅ Owner sees only relevant navigation, no admin features, all data properly filtered by owner_id
-  - Assigned to: Cursor
-
-- [ ] **TASK-061**: Create OwnerCalendar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/owner/OwnerCalendar.vue`
-    - Filter calendar events to owner's properties only
-    - Implement owner-specific calendar controls (OwnerCalendarControls)
-    - Add owner-specific event creation workflows
-    - Remove admin-only features (cleaner assignment, system-wide view)
-    - Add owner-specific calendar views (My Properties, My Bookings)
-    - Implement owner-specific event styling and indicators
-  - Notes: Replace generic FullCalendar.vue for owner role
-  - Files: src/components/smart/owner/OwnerCalendar.vue
-  - Dependencies: OwnerCalendarControls.vue component
-  - Verification: Owner sees only their property events and bookings
-  - Assigned to: Cursor
-
-- [ ] **TASK-062**: Create AdminSidebar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/admin/AdminSidebar.vue`
-    - Include full admin navigation (cleaners, reports, system management)
-    - Add admin-specific quick actions and system controls
-    - Implement admin-focused styling and iconography
-    - Add system status indicators and alerts
-    - Include business metrics in sidebar summary
-    - Add role switcher component integration
-  - Notes: Comprehensive admin navigation interface
-  - Files: src/components/smart/admin/AdminSidebar.vue
-  - Verification: Admin sees full system navigation and controls
-  - Assigned to: Cursor
-
-- [ ] **TASK-063**: Fix TypeScript errors in existing components
-  - Status: Not Started
-  - Requirements:
-    - Fix all TypeScript compilation errors in role-based components
-    - Add proper type definitions for component props and events
-    - Update existing components to use strict TypeScript compliance
-    - Add type guards for role-based data validation
-    - Fix any eslint errors related to TypeScript usage
-    - Add comprehensive type documentation
-  - Notes: Essential for code quality and maintainability
-  - Files: All TypeScript files with compilation errors
-  - Verification: TypeScript compiles without errors
-  - Assigned to: Cursor
-
-- [ ] **TASK-064**: Fix AdminCalendar.vue implementation issues
-  - Status: Not Started
-  - Requirements:
-    - Fix existing bugs in AdminCalendar.vue component
-    - Implement proper admin-specific calendar features
-    - Add admin calendar controls (AdminCalendarControls)
-    - Fix calendar event filtering for admin view
-    - Add admin-specific event management features
-    - Implement cleaner assignment integration
-  - Notes: Complete admin calendar functionality
-  - Files: src/components/smart/admin/AdminCalendar.vue
-  - Dependencies: AdminCalendarControls component
-  - Verification: Admin calendar works with full functionality
-  - Assigned to: Cursor
-
-### **Integration and Testing**
-- [ ] **TASK-065**: Integrate new owner components into HomeOwner.vue
-  - Status: Not Started
-  - Requirements:
-    - Update HomeOwner.vue to use OwnerSidebar component
-    - Integrate OwnerCalendar into owner home page
-    - Test owner component integration thoroughly
-    - Verify role-based data filtering works correctly
-    - Test owner-specific workflows end-to-end
-    - Update owner page routing and navigation
-  - Notes: Complete owner interface with all role-based components
-  - Files: src/components/smart/owner/HomeOwner.vue
-  - Dependencies: TASK-060, TASK-061
-  - Verification: Owner interface uses all role-specific components
-  - Assigned to: Cursor
-
-- [ ] **TASK-066**: Integrate new admin components into HomeAdmin.vue
-  - Status: Not Started
-  - Requirements:
-    - Update HomeAdmin.vue to use AdminSidebar component
-    - Integrate fixed AdminCalendar into admin home page
-    - Test admin component integration thoroughly
-    - Verify admin access to all system features
-    - Test admin-specific workflows end-to-end
-    - Update admin page routing and navigation
-  - Notes: Complete admin interface with all role-based components
-  - Files: src/components/smart/admin/HomeAdmin.vue
-  - Dependencies: TASK-062, TASK-064
-  - Verification: Admin interface uses all role-specific components
-  - Assigned to: Cursor
-
----
-
-## **Phase 1G: Code Cleanup & Organization** 
-**(HIGH PRIORITY - Remove Technical Debt)**
-
-### **Remove Development Artifacts**
-- [ ] **TASK-067**: Move demo components to development folder
-  - Status: Not Started
-  - Requirements:
-    - Create `src/dev/` folder for development-only components
-    - Move all demo components to `src/dev/demos/`
-    - Update import paths for any remaining demo references
-    - Configure build to exclude `src/dev/` from production bundle
-    - Update .gitignore to handle development artifacts appropriately
-    - Create README.md in dev folder explaining purpose
-  - Files to Move:
-    ```
-    src/components/demos/ → src/dev/demos/
-    src/pages/demos/ → src/dev/pages/
-    src/components/dumb/PropertyCardDemo.vue → src/dev/demos/
-    ```
-  - Notes: Clean separation of dev vs production code
-  - Verification: Production build excludes demo components, dev server still includes them
-  - Assigned to: Cursor
-
-- [ ] **TASK-068**: Remove redundant generic components after migration
-  - Status: Not Started
-  - Requirements:
-    - ⚠️ ONLY after TASK-060, TASK-061, TASK-062 are complete
-    - Remove `src/components/smart/Home.vue` (replaced by HomeOwner/HomeAdmin)
-    - Remove `src/components/smart/Sidebar.vue` (replaced by role-specific versions)
-    - Remove `src/components/smart/FullCalendar.vue` (if replaced by role-specific)
-    - Update any remaining references to removed components
-    - Verify no broken imports or references remain
-    - Archive removed components in git history
-  - Notes: Final cleanup after successful migration
-  - Files: List of generic components to remove
-  - Dependencies: Complete role-based component migration
-  - Verification: Application works without old generic components
-  - Assigned to: Cursor
-
-- [ ] **TASK-069**: Clean up tasks.md file
-  - Status: Not Started
-  - Requirements:
-    - Archive completed tasks to `docs/completed-tasks.md`
-    - Remove obsolete or superseded tasks
-    - Reorganize remaining tasks by current priority
-    - Update task numbering for consistency
-    - Add cross-references between related tasks
-    - Update status for partially completed items
-  - Notes: Improve project management clarity
-  - Files: tasks.md, docs/completed-tasks.md
-  - Verification: tasks.md is organized and current
-  - Assigned to: Human + Cursor
-
-### **Build and Deployment Optimization**
-- [ ] **TASK-070**: Optimize build configuration for role-based architecture
-  - Status: Not Started
-  - Requirements:
-    - Configure Vite for optimal role-based component bundling
-    - Add build-time role-based feature flags
-    - Optimize bundle sizes for production deployment
-    - Add build-time type checking for role-based components
-    - Configure source maps for development debugging
-    - Add build performance monitoring and optimization
-  - Notes: Ensure efficient production builds
-  - Files: vite.config.ts, build scripts, optimization configs
-  - Verification: Optimized production builds with role-based features
-  - Assigned to: Cursor
-
-- [ ] **TASK-071**: Update deployment documentation for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Update deployment guides for role-based architecture
-    - Add environment configuration for role-based features
-    - Document role-based testing procedures for deployment
-    - Add rollback procedures for role-based deployments
-    - Create production checklist for role-based features
-    - Update CI/CD pipeline documentation
-  - Notes: Ensure smooth deployments with role-based changes
-  - Files: Deployment docs, CI/CD configs, operations guides
-  - Verification: Clear deployment procedures for role-based system
-  - Assigned to: Human + Cursor
-
----
-
+## **⚠️ IMPLEMENTATION WARNINGS**
+
+### **CRITICAL DEPENDENCIES**:
+1. **TASK-060A and TASK-060B MUST be completed before TASK-065 and TASK-066**
+2. **HomeOwner and HomeAdmin MUST be stable before removing Home.vue**
+3. **All role-specific components MUST work before removing generic ones**
+
+### **ROLLBACK STRATEGY**:
+- Keep Home.vue until TASK-065 and TASK-066 are verified working
+- Maintain generic components until role-specific versions are stable
+- Test thoroughly before each removal step
+
+### **SUCCESS VALIDATION**:
+- Measure component line counts after each task
+- Verify business logic extraction is complete
+- Test that role-based functionality still works
+- Confirm no regression in user experience
 ## **Phase 1H: Architecture Improvements** 
 **(HIGH PRIORITY - System Optimization)**
 

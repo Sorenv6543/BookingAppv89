@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import HomeOwner from '@/components/smart/owner/HomeOwner.vue';
+import HomeOwner from '@/pages/owner/index.vue';
 
 // Meta information for this page
 defineOptions({

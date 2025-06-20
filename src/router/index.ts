@@ -1,11 +1,4 @@
-// 🛣️ ROUTING & GUARDS LAYER
-
-// src/router/index.ts - 🗺️ ROUTE DEFINITIONS
-
-// ✅ Maps URLs to components
-// ✅ Declares auth requirements via meta.requiresAuth
-// ✅ Declares role requirements via meta.role
-// ✅ Applies navigation guards
+// src/router/index.ts - Curated Route Definitions
 
 import { createRouter, createWebHistory } from 'vue-router'
 import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from './guards'
@@ -13,19 +6,23 @@ import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // Root route - role-based redirect
     {
       path: '/',
       name: 'home',
-      component: () => import('@/pages/index.vue'),
+      component: () => import('@/pages/index.vue'), // Role-based routing component
       meta: {
         layout: 'default'
       }
     },
-    // Owner-specific routes
+
+    // ===========================================
+    // OWNER ROUTES
+    // ===========================================
     {
-      path: '/owner/dashboard',
-      name: 'owner-dashboard',
-      component: () => import('@/pages/owner/dashboard.vue'),
+      path: '/owner',
+      name: 'owner',
+      component: () => import('@/pages/owner/index.vue'),
       meta: {
         layout: 'default',
         requiresAuth: true,
@@ -43,42 +40,28 @@ const router = createRouter({
       }
     },
     {
-      path: '/owner/calendar',
-      name: 'owner-calendar',
-      component: () => import('@/pages/owner/calendar.vue'),
-      meta: {
-        layout: 'default',
-        requiresAuth: true,
-        role: 'owner'
-      }
-    },
-    {
       path: '/owner/bookings',
       name: 'owner-bookings',
-      component: () => import('@/pages/owner/bookings/index.vue'),
+      component: () => import('@/components/dumb/owner/OwnerBookings.vue'),
       meta: {
         layout: 'default',
         requiresAuth: true,
         role: 'owner'
       }
     },
-    // Legacy routes (redirect to owner-specific routes)
-    {
-      path: '/properties',
-      name: 'properties',
-      redirect: '/owner/properties'
-    },
-    {
-      path: '/calendar',
-      name: 'calendar',
-      redirect: '/owner/calendar'
-    },
+
+
+    // ===========================================
+    // ADMIN ROUTES
+    // ===========================================
     {
       path: '/admin',
       name: 'admin',
       component: () => import('@/pages/admin/index.vue'),
       meta: {
-        layout: 'admin'
+        layout: 'default',
+        requiresAuth: true,
+        role: 'admin'
       }
     },
     {
@@ -86,17 +69,7 @@ const router = createRouter({
       name: 'admin-schedule',
       component: () => import('@/pages/admin/schedule/index.vue'),
       meta: {
-        layout: 'admin',
-        requiresAuth: true,
-        role: 'admin'
-      }
-    },
-    {
-      path: '/admin/cleaners',
-      name: 'admin-cleaners',
-      component: () => import('@/pages/admin/cleaners/index.vue'),
-      meta: {
-        layout: 'admin',
+        layout: 'default',
         requiresAuth: true,
         role: 'admin'
       }
@@ -106,7 +79,7 @@ const router = createRouter({
       name: 'admin-properties',
       component: () => import('@/pages/admin/properties/index.vue'),
       meta: {
-        layout: 'admin',
+        layout: 'default',
         requiresAuth: true,
         role: 'admin'
       }
@@ -116,7 +89,17 @@ const router = createRouter({
       name: 'admin-bookings',
       component: () => import('@/pages/admin/bookings/index.vue'),
       meta: {
-        layout: 'admin',
+        layout: 'default',
+        requiresAuth: true,
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/cleaners',
+      name: 'admin-cleaners',
+      component: () => import('@/pages/admin/cleaners/index.vue'),
+      meta: {
+        layout: 'default',
         requiresAuth: true,
         role: 'admin'
       }
@@ -126,152 +109,22 @@ const router = createRouter({
       name: 'admin-reports',
       component: () => import('@/pages/admin/reports/index.vue'),
       meta: {
-        layout: 'admin',
+        layout: 'default',
         requiresAuth: true,
         role: 'admin'
       }
     },
-    // Testing routes
-    {
-      path: '/testing/crud',
-      name: 'crud-testing',
-      component: () => import('@/pages/crud-testing.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    // Demo routes
-    {
-      path: '/demos/home-admin',
-      name: 'home-admin-demo',
-      component: () => import('@/components/smart/admin/HomeAdminDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
 
-    {
-      path: '/demos/turn-alerts',
-      name: 'turn-alerts-demo',
-      component: () => import('@/components/dumb/TurnAlertsDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-
-    {
-      path: '/demos/property-card',
-      name: 'property-card-demo',
-      component: () => import('@/components/dumb/PropertyCardDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/components/smart/admin/use-admin-bookings',
-      name: 'use-admin-bookings-demo',
-      component: () => import('@/components/smart/admin/UseAdminBookingsDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-
-    {
-      path: '/components/smart/admin/admin-calendar',
-      name: 'admin-calendar-demo',
-      component: () => import('@/components/smart/admin/AdminCalendarDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/components/smart/owner/owner-calendar',
-      name: 'owner-calendar-demo',
-      component: () => import('@/components/smart/owner/OwnerCalendarDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/use-owner-bookings',
-      name: 'use-owner-bookings-demo',
-      component: () => import('@/components/smart/owner/UseOwnerBookingsDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/use-owner-properties',
-      name: 'use-owner-properties-demo',
-      component: () => import('@/components/demos/UseOwnerPropertiesDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/use-owner-calendar-state',
-      name: 'use-owner-calendar-state-demo',
-      component: () => import('@/components/smart/owner/UseOwnerCalendarStateDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/use-admin-properties',
-      name: 'use-admin-properties-demo',
-      component: () => import('@/components/smart/admin/UseAdminPropertiesDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/use-admin-calendar-state',
-      name: 'use-admin-calendar-state-demo',
-      component: () => import('@/components/smart/admin/UseAdminCalendarStateDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/route-guards',
-      name: 'route-guards-demo',
-      component: () => import('@/pages/demos/route-guards.vue'),
-      meta: {
-        layout: 'default',
-        public: true,
-        demo: true,
-        title: 'Route Guards Demo'
-      }
-    },
-    // {
-    //   path: '/demos/admin-sidebar-width-test',
-    //   name: 'admin-sidebar-width-test',
-    //   component: () => import('@/pages/demos/admin-sidebar-width-test.vue'),
-    //   meta: {
-    //     layout: 'default',
-    //     public: true,
-    //     demo: true,
-    //     title: 'Admin Sidebar Width Test'
-    //   }
-    // },
-
-
-    // {
-    //   path: '/testing/turn-alerts',
-    //   name: 'turn-alerts-demo',
-    //   component: () => import('@/components/dumb/TurnAlertsDemo.vue'),
-    //   meta: {
-    //     layout: 'default'
-    //   }
-    // },
-
-    // Auth routes
+    // ===========================================
+    // AUTH ROUTES
+    // ===========================================
     {
       path: '/auth/login',
       name: 'login',
       component: () => import('@/pages/auth/login.vue'),
       meta: {
-        layout: 'auth'
+        layout: 'auth',
+        public: true
       }
     },
     {
@@ -279,25 +132,65 @@ const router = createRouter({
       name: 'register',
       component: () => import('@/pages/auth/register.vue'),
       meta: {
-        layout: 'auth'
+        layout: 'auth',
+        public: true
       }
     },
-    // Catch-all route for 404
+
+    // ===========================================
+    // LEGACY REDIRECTS
+    // ===========================================
     {
-      path: '/:pathMatch(.*)*',
+      path: '/properties',
+      name: 'properties-legacy',
+      redirect: '/owner/properties'
+    },
+
+    {
+      path: '/bookings',
+      name: 'bookings-legacy',
+      redirect: '/owner/bookings'
+    },
+
+    // ===========================================
+    // DEVELOPMENT/TESTING ROUTES
+    // ===========================================
+    {
+      path: '/testing/crud',
+      name: 'crud-testing',
+      component: () => import('@/pages/crud-testing.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+
+
+
+    // ===========================================
+    // ERROR ROUTES
+    // ===========================================
+    {
+      path: '/404',
       name: 'not-found',
       component: () => import('@/pages/404.vue'),
       meta: {
-        layout: 'default'
+        layout: 'default',
+        public: true
       }
+    },
+    // Catch-all route - must be last
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/404'
     }
   ]
 })
 
-// Apply navigation guards
+// Apply navigation guards in order
 router.beforeEach(developmentGuard)
 router.beforeEach(loadingGuard)
 router.beforeEach(authGuard)
 router.afterEach(afterNavigationGuard)
 
-export default router 
+export default router

@@ -117,7 +117,7 @@ src/components/smart/owner/HomeOwner.vue -
         </div>
 
         <!-- TODO: Replace with OwnerCalendar.vue when TASK-039E is complete -->
-        <OwnerCalendar
+        <!-- <OwnerCalendar
           ref="calendarRef"
           :bookings="ownerFilteredBookings"
           :properties="ownerPropertiesMap"
@@ -132,12 +132,12 @@ src/components/smart/owner/HomeOwner.vue -
           @date-change="handleCalendarDateChange"
           @create-booking="handleCreateBookingFromCalendar"
           @update-booking="handleUpdateBooking"
-        />
+        /> -->
       </v-col>
     </v-row>
 
     <!-- Owner-focused Modals -->
-    <BookingForm
+    <BookingModal
       :open="eventModalOpen"
       :mode="eventModalMode"
       :booking="eventModalData"
@@ -174,9 +174,9 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDisplay } from 'vuetify';
 
 // Owner-specific components
-import OwnerSidebar from './OwnerSidebar.vue';
+import OwnerSidebar from '../../components/smart/owner/OwnerSidebar.vue';
 import FullCalendar from '../FullCalendar.vue';
-import BookingForm from '@/components/dumb/BookingForm.vue';
+import BookingModal from '@/components/dumb/BookingModal.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
 import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
 

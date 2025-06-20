@@ -46,8 +46,8 @@ import { useAuthStore } from '@/stores/auth'
 import { useUIStore } from '@/stores/ui'
 
 // Role-based component imports
-import HomeOwner from '@/components/smart/owner/HomeOwner.vue'
-import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
+import HomeOwner from '@/pages/owner/index.vue'
+import HomeAdmin from '@/pages/admin/index.vue'
 
 // Stores
 const authStore = useAuthStore()
