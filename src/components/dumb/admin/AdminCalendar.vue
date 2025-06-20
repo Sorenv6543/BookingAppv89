@@ -277,7 +277,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-import AdminCalendar from '../components/smart/admin/AdminCalendar.vue';
+import AdminCalendar from '../../smart/admin/AdminCalendar.vue';
 import type { Booking, Property, User, Cleaner } from '@/types';
 
 // Demo state
