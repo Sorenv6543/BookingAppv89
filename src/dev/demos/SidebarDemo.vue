@@ -77,7 +77,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import Sidebar from './Sidebar.vue';
+import Sidebar from '../components/Sidebar.vue';
 import type { Booking, Property } from '@/types';
 
 // Demo data

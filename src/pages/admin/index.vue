@@ -20,7 +20,7 @@
             {{ formattedDate }}
           </div>
         </div>
-        
+
         <!-- System-wide Metrics -->
         <div class="admin-metrics d-flex align-center flex-wrap ga-4">
           <v-chip
@@ -53,10 +53,25 @@
           </v-chip>
         </div>
       </div>
-      
     </div>
 
-
+    <AdminVbar
+      :loading="loading"
+      @toggle-drawer="toggleDrawer"
+      @logout="logout"
+      @create-booking="createBooking"
+      @create-property="createProperty"
+    />
+    <!-- OwnerSidebar: Shows only current owner's data -->
+    <AdminSidebar
+      :today-turns="systemTodayTurns"
+      :upcoming-cleanings="systemUpcomingCleanings"
+      :properties="allPropertiesMap"
+      :loading="loading"
+      @navigate-to-booking="handleNavigateToBooking"
+      @navigate-to-date="handleNavigateToDate"
+      @filter-by-property="handleFilterByProperty" 
+    />
     <!-- Admin Calendar - Full Width -->
     <div class="admin-calendar-wrapper">
       <AdminCalendar 
@@ -81,7 +96,7 @@
     </div>
 
     <!-- Admin-focused Modals -->
-    <BookingModal
+    <AdminBookingModal
       :open="eventModalOpen"
       :mode="eventModalMode"
       :booking="eventModalData"
@@ -92,7 +107,7 @@
       @status-change="handleStatusChange"
     />
 
-    <PropertyModal
+    <AdminPropertyModal
       :open="propertyModalOpen"
       :mode="propertyModalMode"
       :property="propertyModalData"
@@ -119,11 +134,12 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 // Admin components (using generic components for now)
-
+import AdminVbar from '@/components/smart/admin/AdminVbar.vue';
+import AdminSidebar from '@/components/dumb/admin/AdminSidebar.vue';
 
 import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
-import BookingModal from '@/components/dumb/BookingModal.vue';
-import PropertyModal from '@/components/dumb/PropertyModal.vue';
+import AdminBookingModal from '@/components/dumb/admin/AdminBookingModal.vue';
+
 import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
 
 // State management

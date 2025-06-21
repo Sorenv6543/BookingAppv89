@@ -175,7 +175,7 @@ import { useAdminProperties } from '@/composables/admin/useAdminProperties';
 import { useCleanerManagement } from '@/composables/admin/useCleanerManagement';
 import { useUIStore } from '@/stores/ui';
 import AdminBookingForm from '@/components/dumb/admin/AdminBookingForm.vue';
-import CleanerAssignmentPanel from '@/components/dumb/admin/CleanerAssignmentPanel.vue';
+
 import StatusManagementPanel from '@/components/dumb/admin/StatusManagementPanel.vue';
 import BookingHistoryPanel from '@/components/dumb/admin/BookingHistoryPanel.vue';
 import BookingReportsPanel from '@/components/dumb/admin/BookingReportsPanel.vue';

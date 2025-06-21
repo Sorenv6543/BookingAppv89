@@ -8,7 +8,7 @@ src/components/smart/owner/HomeOwner.vue -
 ✅ Filters bookings by owner_id
 ✅ Prevents access to other owners' data
  -->
-``
+```
 <template>
   <div class="home-owner-container">
     <v-row
@@ -23,98 +23,84 @@ src/components/smart/owner/HomeOwner.vue -
         class="sidebar-column"
         :class="{ 'mobile-hidden': !sidebarOpen }"
       >
-        <!-- OwnerSidebar: Shows only current owner's data -->
-        <OwnerSidebar
-          :today-turns="ownerTodayTurns"
-          :upcoming-cleanings="ownerUpcomingCleanings"
-          :properties="ownerPropertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col>
-
-      <!-- Main Calendar Column -->
-      <v-col 
-        cols="12" 
-        lg="9" 
-        xl="10" 
-        class="calendar-column"
-      >
-        <div class="calendar-header">
-          <v-btn
-            v-if="$vuetify.display.lgAndDown"
-            icon="mdi-menu"
-            variant="text"
-            class="mr-4"
-            @click="toggleSidebar"
-          />
+        <!-- Main Calendar Column -->
+        <v-col 
+          cols="12" 
+          lg="9" 
+          xl="10" 
+          class="calendar-column"
+        >
+          <div class="calendar-header">
+            <v-btn
+              v-if="$vuetify.display.lgAndDown"
+              icon="mdi-menu"
+              variant="text"
+              class="mr-4"
+              @click="toggleSidebar"
+            />
           
-          <!-- Owner-focused Calendar Controls -->
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn 
-              variant="outlined" 
-              class="mr-2" 
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6">
-              {{ formattedDate }}
+            <!-- Owner-focused Calendar Controls -->
+            <div class="d-flex align-center">
+              <v-btn
+                icon="mdi-arrow-left"
+                variant="text"
+                class="mr-2"
+                @click="handlePrevious"
+              />
+              <v-btn 
+                variant="outlined" 
+                class="mr-2" 
+                @click="handleGoToday"
+              >
+                Today
+              </v-btn>
+              <v-btn
+                icon="mdi-arrow-right"
+                variant="text"
+                class="mr-4"
+                @click="handleNext"
+              />
+              <div class="text-h6">
+                {{ formattedDate }}
+              </div>
+              <v-spacer />
+            
+              <!-- Owner Quick Actions -->
+              <v-btn
+                color="primary"
+                variant="outlined"
+                prepend-icon="mdi-plus"
+                class="mr-2"
+                @click="handleCreateProperty"
+              >
+                Add Property
+              </v-btn>
+              <v-btn
+                color="primary"
+                prepend-icon="mdi-calendar-plus"
+                class="mr-4"
+                @click="handleCreateBooking"
+              >
+                Add Booking
+              </v-btn>
+            
+              <v-btn-toggle
+                v-model="currentView"
+                mandatory
+                class="ml-4"
+              >
+                <v-btn value="dayGridMonth">
+                  Month
+                </v-btn>
+                <v-btn value="timeGridWeek">
+                  Week
+                </v-btn>
+                <v-btn value="timeGridDay">
+                  Day
+                </v-btn>
+              </v-btn-toggle>
             </div>
-            <v-spacer />
-            
-            <!-- Owner Quick Actions -->
-            <v-btn
-              color="primary"
-              variant="outlined"
-              prepend-icon="mdi-plus"
-              class="mr-2"
-              @click="handleCreateProperty"
-            >
-              Add Property
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-calendar-plus"
-              class="mr-4"
-              @click="handleCreateBooking"
-            >
-              Add Booking
-            </v-btn>
-            
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              class="ml-4"
-            >
-              <v-btn value="dayGridMonth">
-                Month
-              </v-btn>
-              <v-btn value="timeGridWeek">
-                Week
-              </v-btn>
-              <v-btn value="timeGridDay">
-                Day
-              </v-btn>
-            </v-btn-toggle>
           </div>
-        </div>
 
         <!-- TODO: Replace with OwnerCalendar.vue when TASK-039E is complete -->
         <!-- <OwnerCalendar
@@ -133,6 +119,7 @@ src/components/smart/owner/HomeOwner.vue -
           @create-booking="handleCreateBookingFromCalendar"
           @update-booking="handleUpdateBooking"
         /> -->
+        </v-col>
       </v-col>
     </v-row>
 
@@ -174,7 +161,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDisplay } from 'vuetify';
 
 // Owner-specific components
-import OwnerSidebar from '../../components/smart/owner/OwnerSidebar.vue';
+import OwnerSidebar from '../../components/dumb/owner/OwnerSidebar.vue';
 import FullCalendar from '../FullCalendar.vue';
 import BookingModal from '@/components/dumb/BookingModal.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
