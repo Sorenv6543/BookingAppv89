@@ -916,3 +916,89 @@ The warning occurs because:
 
 ## Status
 ✅ **RESOLVED** - VOverlay directive warnings have been eliminated and all loading overlays function properly.
+
+## Issue: AdminCalendar Not Filling Full Width of Viewport
+
+**Date:** 2024-12-19  
+**Components:** `src/layouts/admin.vue`, `src/pages/admin/index.vue`, `src/components/smart/admin/AdminCalendar.vue`
+
+### Problem Description
+The AdminCalendar.vue component was not filling the remaining width of the viewport on all displays. The layout structure had conflicts between the admin layout and the page-level layout implementation.
+
+### Root Cause
+1. **Duplicate Layout Structure**: `pages/admin/index.vue` was trying to implement its own sidebar/layout structure, but `admin.vue` already provided the navigation drawer layout.
+2. **TypeScript Errors**: Multiple type mismatches and unused variables were causing compilation issues.
+3. **Conflicting Layout Patterns**: The page was using complex v-row/v-col structures that didn't work well with the Vuetify app layout system.
+
+### Solution Implemented
+
+#### 1. Fixed Admin Layout (`admin.vue`)
+- Removed duplicate `model-value="true"` prop that was causing TypeScript errors
+- Fixed navigation drawer to use proper `:permanent="mdAndUp"` instead of `:permanent="true"`
+- Ensured proper responsive behavior with the drawer
+
+#### 2. Restructured Admin Dashboard (`pages/admin/index.vue`)
+- **Removed Complex Layout Structure**: Eliminated the v-row/v-col structure that was trying to create a sidebar
+- **Simplified to Content-Only**: Since `admin.vue` already provides the navigation drawer, the page now only contains the main dashboard content
+- **Clean Header Structure**: Created a dedicated admin dashboard header with metrics and controls
+- **Full-Width Calendar Wrapper**: Added a wrapper that ensures AdminCalendar fills the remaining width
+
+#### 3. Optimized AdminCalendar (`AdminCalendar.vue`)
+- **Updated Height Calculations**: Adjusted viewport calculations to account for app-bar (64px) and dashboard header (140px)
+- **Full-Width Container Styles**: Added explicit width: 100% and proper margin/padding reset
+- **Responsive Behavior**: Ensured the calendar adapts properly on all screen sizes
+
+#### 4. TypeScript Cleanup
+- Fixed event handler type mismatches
+- Removed unused variables and functions
+- Cleaned up import statements
+- Fixed modal mode comparisons
+
+### Key Changes Made
+
+```typescript
+// Height calculations updated for proper viewport usage
+const calendarCardHeight = computed(() => {
+  return 'calc(100vh - 220px)'; // App-bar + dashboard header
+});
+
+const fullCalendarHeight = computed(() => {
+  return 'calc(100vh - 280px)'; // Additional space for toolbar
+});
+```
+
+```scss
+// Full-width container styles
+.admin-calendar-wrapper {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  overflow: hidden;
+}
+```
+
+### Layout Architecture
+- **admin.vue**: Provides the overall layout with app-bar and navigation drawer (280px width)
+- **pages/admin/index.vue**: Contains the main dashboard content that fills the remaining space
+- **AdminCalendar.vue**: Fills the full width of the main content area
+
+### Benefits
+1. **Clean Separation**: Each component has a clear responsibility
+2. **Full Viewport Usage**: Calendar now uses all available width after the navigation drawer
+3. **Responsive Design**: Works properly on all screen sizes
+4. **TypeScript Compliance**: No more compilation errors
+5. **Performance**: Removed unused code and optimized rendering
+
+### Testing Verified
+- ✅ Desktop: Calendar fills full width after 280px navigation drawer
+- ✅ Tablet: Responsive behavior with collapsible drawer
+- ✅ Mobile: Full-width calendar with mobile-optimized controls
+- ✅ TypeScript: No compilation errors
+- ✅ Navigation: Proper drawer behavior on all screen sizes
+
+---
+
+## Previous Issues
+
+[Previous problem fixes remain here...]

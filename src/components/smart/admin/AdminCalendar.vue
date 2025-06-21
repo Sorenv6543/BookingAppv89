@@ -409,13 +409,13 @@ const bookingTypeOptions = [
 
 // Height calculations for responsive full-viewport calendar
 const calendarCardHeight = computed(() => {
-  // Calculate available height: viewport minus toolbar height (approx 120px)
-  return 'calc(100vh - 180px)';
+  // Calculate available height: viewport minus app-bar (64px) and dashboard header (approx 140px)
+  return 'calc(100vh - 220px)';
 });
 
 const fullCalendarHeight = computed(() => {
-  // FullCalendar height should fill the card minus padding
-  return 'calc(100vh - 200px)';
+  // FullCalendar height should fill the card minus padding and toolbar
+  return 'calc(100vh - 280px)';
 });
 
 // Admin sees ALL bookings (no owner filtering)
@@ -1051,6 +1051,8 @@ onBeforeUnmount(() => {
   width: 100%;
   display: flex;
   flex-direction: column;
+  padding: 0;
+  margin: 0;
 }
 
 .calendar-loading {
@@ -1059,12 +1061,14 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   height: 100%;
+  width: 100%;
 }
 
 .admin-calendar-toolbar {
   background: rgb(var(--v-theme-surface));
   border: 1px solid rgb(var(--v-theme-outline), 0.12);
   flex-shrink: 0;
+  width: 100%;
 }
 
 .admin-view-toggle {
@@ -1082,6 +1086,8 @@ onBeforeUnmount(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  margin: 0;
 }
 
 .admin-calendar {
@@ -1093,6 +1099,7 @@ onBeforeUnmount(() => {
   --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
   --fc-event-border-radius: 4px;
   flex: 1;
+  width: 100%;
 }
 
 /* Admin-specific turn booking highlighting */

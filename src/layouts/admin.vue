@@ -125,7 +125,7 @@
     <v-navigation-drawer
       v-model="drawer"
       :temporary="!mdAndUp"
-      :permanent="false"
+      :permanent="mdAndUp"
       app
       color="surface"
       width="280"
@@ -332,7 +332,7 @@ const addCleaner = () => {
 }
 
 /* Responsive app bar */
-@media (max-width: 959px) {
+@media (max-width: 800px) {
   .admin-app-bar .v-toolbar__content {
     padding-left: 8px;
     padding-right: 8px;

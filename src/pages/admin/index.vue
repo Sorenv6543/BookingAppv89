@@ -1,6 +1,6 @@
 <!-- 
 👑 ADMIN INTERFACE
- src/components/smart/admin/HomeAdmin.vue - 
+ src/pages/admin/index.vue - Admin Dashboard
 
 ✅ UNFILTERED VIEW - Admin sees all data
 ✅ Access to all properties across all owners
@@ -8,159 +8,153 @@
 ✅ Can manage any owner's data 
 -->
 <template>
-  <div class="home-admin-container">
-    <v-row
-      no-gutters
-      class="fill-height flex-nowrap admin-layout"
-    >
-      <!-- Sidebar Column -->
-      <v-col 
-        cols="12" 
-        md="4" 
-        lg="4" 
-        xl="3" 
-        class="sidebar-column pa-0"
-      >
-        <!-- Mobile Menu Toggle -->
-        <v-app-bar
-          v-if="$vuetify.display.smAndDown"
-          flat
-          color="transparent"
-          height="48"
-          class="px-0"
-        >
-          <v-app-bar-nav-icon
-            @click="sidebarOpen = !sidebarOpen"
-          />
-          <v-app-bar-title class="text-h6">
-            pages/admin/index.vue
-          </v-app-bar-title>
-        </v-app-bar>
-
-        <!-- Proper Navigation Drawer Implementation
-        <AdminSidebar
-          v-model="sidebarOpen"
-          :rail="railMode"
-          :today-turns="systemTodayTurns"
-          :upcoming-cleanings="systemUpcomingCleanings"
-          :properties="allPropertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col> -->
-
-        <!-- Main Calendar Column -->
-        <v-col 
-          cols="12" 
-          md="8" 
-          lg="8" 
-          xl="9" 
-          class="calendar-column pa-0"
-        >
-          <div class="calendar-header">
-            <h2>HomeAdmin.vue line 65</h2>
-            <div class="d-flex align-center">
-              <v-btn
-                icon="mdi-arrow-left"
-                variant="text"
-                class="mr-2"
-                @click="handlePrevious"
-              />
-              <v-btn 
-                variant="outlined" 
-                class="mr-2" 
-                @click="handleGoToday"
-              >
-                Today
-              </v-btn>
-              <v-btn
-                icon="mdi-arrow-right"
-                variant="text"
-                class="mr-4"
-                @click="handleNext"
-              />
-              <div class="text-h6">
-                {{ formattedDate }}
-              </div>
-            
-              <!-- System-wide Metrics -->
-              <div class="ml-4 text-caption text-medium-emphasis">
-                {{ systemMetricsText }}
-              </div>
-            
-              <v-spacer />
-            
-              <!-- Admin Quick Actions -->
-              <v-btn
-                color="warning"
-                variant="outlined"
-                prepend-icon="mdi-account-hard-hat"
-                class="mr-2"
-                @click="handleAssignCleaners"
-              >
-                Assign Cleaners
-              </v-btn>
-              <v-btn
-                color="info"
-                variant="outlined"
-                prepend-icon="mdi-chart-line"
-                class="mr-2"
-                @click="handleGenerateReports"
-              >
-                Reports
-              </v-btn>
-              <v-btn
-                color="primary"
-                prepend-icon="mdi-cog"
-                class="mr-4"
-                @click="handleManageSystem"
-              >
-                Manage System
-              </v-btn>
-            
-              <v-btn-toggle
-                v-model="currentView"
-                mandatory
-                class="ml-4"
-              >
-                <v-btn value="dayGridMonth">
-                  Month
-                </v-btn>
-                <v-btn value="timeGridWeek">
-                  Week
-                </v-btn>
-                <v-btn value="timeGridDay">
-                  Day
-                </v-btn>
-              </v-btn-toggle>
+  <div class="admin-dashboard-container">
+    <!-- Admin Dashboard Header -->
+    <div class="admin-dashboard-header">
+      <div class="d-flex align-center justify-space-between flex-wrap">
+        <div>
+          <h1 class="text-h4 font-weight-bold mb-1">
+            Admin Dashboard
+          </h1>
+          <div class="text-subtitle-1 text-medium-emphasis">
+            {{ formattedDate }}
+          </div>
+        </div>
+        
+        <!-- System-wide Metrics -->
+        <div class="admin-metrics d-flex align-center flex-wrap ga-4">
+          <v-chip
+            color="primary"
+            variant="outlined"
+            prepend-icon="mdi-home-group"
+          >
+            {{ allPropertiesMap.size }} Properties
+          </v-chip>
+          <v-chip
+            color="info"
+            variant="outlined"
+            prepend-icon="mdi-calendar-edit"
+          >
+            {{ allBookingsMap.size }} Bookings
+          </v-chip>
+          <v-chip
+            color="warning"
+            variant="outlined"
+            prepend-icon="mdi-fire"
+          >
+            {{ systemTodayTurns.size }} Urgent Turns
+          </v-chip>
+          <v-chip
+            color="success"
+            variant="outlined"
+            prepend-icon="mdi-calendar-clock"
+          >
+            {{ systemUpcomingCleanings.size }} Upcoming
+          </v-chip>
+        </div>
+      </div>
+      
+      <!-- Calendar Controls -->
+      <div class="calendar-controls mt-4">
+        <div class="d-flex align-center justify-space-between flex-wrap ga-2">
+          <!-- Date Navigation -->
+          <div class="d-flex align-center">
+            <v-btn
+              icon="mdi-arrow-left"
+              variant="text"
+              class="mr-2"
+              @click="handlePrevious"
+            />
+            <v-btn 
+              variant="outlined" 
+              class="mr-2" 
+              @click="handleGoToday"
+            >
+              Today
+            </v-btn>
+            <v-btn
+              icon="mdi-arrow-right"
+              variant="text"
+              class="mr-4"
+              @click="handleNext"
+            />
+            <div class="text-h6">
+              {{ formattedDate }}
             </div>
           </div>
+          
+          <!-- Admin Quick Actions -->
+          <div class="d-flex align-center flex-wrap ga-2">
+            <v-btn
+              color="warning"
+              variant="outlined"
+              prepend-icon="mdi-account-hard-hat"
+              size="small"
+              @click="handleAssignCleaners"
+            >
+              Assign Cleaners
+            </v-btn>
+            <v-btn
+              color="info"
+              variant="outlined"
+              prepend-icon="mdi-chart-line"
+              size="small"
+              @click="handleGenerateReports"
+            >
+              Reports
+            </v-btn>
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-cog"
+              size="small"
+              @click="handleManageSystem"
+            >
+              Manage System
+            </v-btn>
+          </div>
+          
+          <!-- View Toggle -->
+          <v-btn-toggle
+            v-model="currentView"
+            mandatory
+            density="compact"
+          >
+            <v-btn value="dayGridMonth" size="small">
+              Month
+            </v-btn>
+            <v-btn value="timeGridWeek" size="small">
+              Week
+            </v-btn>
+            <v-btn value="timeGridDay" size="small">
+              Day
+            </v-btn>
+          </v-btn-toggle>
+        </div>
+      </div>
+    </div>
 
-          <!-- TODO: Replace with AdminCalendar.vue when TASK-039H is complete -->
-          <AdminCalendar 
-            ref="calendarRef"
-            :bookings="adminFilteredBookings"
-            :loading="loading"
-            :current-view="currentView"
-            :current-date="currentDate"
-            :properties="allPropertiesMap"
-            :users="allUsersMap"
-            @date-select="handleDateSelect"
-            @event-click="handleEventClick"
-            @event-drop="handleEventDrop"
-            @event-resize="handleEventResize"
-            @view-change="handleCalendarViewChange"
-            @date-change="handleCalendarDateChange"
-            @create-booking="handleCreateBookingFromCalendar"
-            @update-booking="handleUpdateBooking"
-          />
-        </v-col>
-      </v-col>
-    </v-row>
+    <!-- Admin Calendar - Full Width -->
+    <div class="admin-calendar-wrapper">
+      <AdminCalendar 
+        ref="calendarRef"
+        :bookings="adminFilteredBookings"
+        :loading="loading"
+        :current-view="currentView"
+        :current-date="currentDate"
+        :properties="allPropertiesMap"
+        :users="allUsersMap"
+        @date-select="handleDateSelect"
+        @event-click="handleEventClick"
+        @event-drop="handleEventDrop"
+        @event-resize="handleEventResize"
+        @view-change="handleCalendarViewChange"
+        @date-change="handleCalendarDateChange"
+        @create-booking="handleCreateBookingFromCalendar"
+        @update-booking="handleUpdateBooking"
+        @assign-cleaner="handleCleanerAssign"
+        @update-booking-status="handleStatusChange"
+      />
+    </div>
 
     <!-- Admin-focused Modals -->
     <BookingModal
@@ -194,17 +188,11 @@
       @cancel="handleConfirmDialogCancel"
       @close="handleConfirmDialogClose"
     />
-
-    <!-- TODO: Add admin-specific modals -->
-    <!-- CleanerAssignmentModal -->
-    <!-- ReportsModal -->
-    <!-- SystemManagementModal -->
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useDisplay } from 'vuetify';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 // Admin components (using generic components for now)
 
@@ -227,7 +215,7 @@ import { useProperties } from '@/composables/shared/useProperties';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 // Types
-import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView, BookingStatus } from '@/types';
+import type { Booking, Property, BookingFormData, PropertyFormData, BookingStatus, User } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Import event logger for component communication
@@ -241,7 +229,6 @@ const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
-const { xs } = useDisplay();
 
 // ============================================================================
 // COMPOSABLES - BUSINESS LOGIC
@@ -270,19 +257,13 @@ const {
   goToDate,
   goToToday,
   next,
-  prev,
-  clearPropertyFilters,
-  togglePropertyFilter
+  prev
 } = useCalendarState();
 
 // ============================================================================
 // LOCAL STATE
 // ============================================================================
 const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
-const sidebarOpen = ref(!xs.value);
-const selectedPropertyFilter = ref<string | null>(null);
-
-
 
 // Check if user is authenticated and is an admin
 const isAdminAuthenticated = computed(() => {
@@ -333,7 +314,7 @@ const allPropertiesMap = computed(() => {
 
 // ALL users (no filtering for admin)
 const allUsersMap = computed(() => {
-  const map = new Map<string, any>();
+  const map = new Map<string, User>();
   
   if (!isAdminAuthenticated.value) {
     return map;
@@ -420,13 +401,6 @@ const systemUpcomingCleanings = computed(() => {
 const adminFilteredBookings = computed(() => {
   let bookings = Array.from(allBookingsMap.value.values());
   
-  // Apply property filter if selected (can be any property)
-  if (selectedPropertyFilter.value) {
-    bookings = bookings.filter(booking => 
-      booking.property_id === selectedPropertyFilter.value
-    );
-  }
-  
   // Apply calendar state filters
   bookings = filterBookings(bookings);
   
@@ -439,15 +413,7 @@ const adminFilteredBookings = computed(() => {
   return map;
 });
 
-// System-wide metrics for admin header
-const systemMetricsText = computed(() => {
-  const totalProperties = allPropertiesMap.value.size;
-  const totalBookings = allBookingsMap.value.size;
-  const urgentTurns = systemTodayTurns.value.size;
-  const upcomingCleanings = systemUpcomingCleanings.value.size;
-  
-  return `${totalProperties} properties • ${totalBookings} bookings • ${urgentTurns} urgent turns • ${upcomingCleanings} upcoming`;
-});
+
 
 // ============================================================================
 // UI STATE - MODAL MANAGEMENT
@@ -461,7 +427,7 @@ const eventModalMode = computed((): 'create' | 'admin-edit' | undefined => {
   return (mode === 'create' || mode === 'admin-edit') ? mode : undefined;
 });
 const eventModalData = computed((): Booking | undefined => {
-  const modalData = uiStore.getModalData('event') as any;
+  const modalData = uiStore.getModalData('event') as { booking?: Booking };
   return modalData?.booking || undefined;
 });
 
@@ -473,7 +439,7 @@ const propertyModalMode = computed((): 'create' | 'edit' | undefined => {
   return (mode === 'create' || mode === 'edit') ? mode : undefined;
 });
 const propertyModalData = computed((): Property | undefined => {
-  const modalData = uiStore.getModalData('property') as any;
+  const modalData = uiStore.getModalData('property') as { property?: Property };
   return modalData?.property || undefined;
 });
 
@@ -501,52 +467,21 @@ const confirmDialogDangerous = computed((): boolean => {
 });
 
 // ============================================================================
-// EVENT HANDLERS - NAVIGATION
-// ============================================================================
-
-
-
-const handleFilterByProperty = (propertyId: string | null): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'filterByProperty',
-      propertyId,
-      'receive'
-    );
-
-    selectedPropertyFilter.value = propertyId;
-    
-    // Admin can filter by any property (not just their own)
-    if (propertyId) {
-      togglePropertyFilter(propertyId);
-    } else {
-      clearPropertyFilters();
-    }
-  } catch (error) {
-    console.error('Error filtering by property:', error);
-    // TODO: Show admin-specific error notification
-  }
-};
-
-// ============================================================================
 // EVENT HANDLERS - ADMIN-SPECIFIC ACTIONS
 // ============================================================================
 
 const handleAssignCleaners = (): void => {
   try {
     eventLogger.logEvent(
-      'HomeAdmin',
-      'HomeAdmin',
+      'AdminDashboard',
+      'AdminDashboard',
       'assignCleaners',
       null,
       'emit'
     );
 
-    // TODO: Open cleaner assignment modal when TASK-039Q is complete
+    // TODO: Open cleaner assignment modal when implemented
     console.log('Admin: Assign Cleaners clicked');
-    // uiStore.openModal('cleanerAssignment', { bookings: unassignedBookings });
   } catch (error) {
     console.error('Error opening cleaner assignment:', error);
   }
@@ -555,8 +490,8 @@ const handleAssignCleaners = (): void => {
 const handleGenerateReports = (): void => {
   try {
     eventLogger.logEvent(
-      'HomeAdmin',
-      'HomeAdmin',
+      'AdminDashboard',
+      'AdminDashboard',
       'generateReports',
       null,
       'emit'
@@ -564,7 +499,6 @@ const handleGenerateReports = (): void => {
 
     // TODO: Open reports modal or navigate to reports page
     console.log('Admin: Generate Reports clicked');
-    // uiStore.openModal('reports', { dateRange: currentWeek });
   } catch (error) {
     console.error('Error opening reports:', error);
   }
@@ -573,8 +507,8 @@ const handleGenerateReports = (): void => {
 const handleManageSystem = (): void => {
   try {
     eventLogger.logEvent(
-      'HomeAdmin',
-      'HomeAdmin',
+      'AdminDashboard',
+      'AdminDashboard',
       'manageSystem',
       null,
       'emit'
@@ -582,59 +516,16 @@ const handleManageSystem = (): void => {
 
     // TODO: Open system management modal or navigate to admin settings
     console.log('Admin: Manage System clicked');
-    // uiStore.openModal('systemManagement', {});
   } catch (error) {
     console.error('Error opening system management:', error);
-  }
-};
-
-// ============================================================================
-// EVENT HANDLERS - CRUD OPERATIONS
-// ============================================================================
-
-const handleCreateBooking = (): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'createBooking',
-      null,
-      'receive'
-    );
-
-    // Admin can create bookings for any property
-    uiStore.openModal('event', 'create', {
-      booking: null
-    });
-  } catch (error) {
-    console.error('Error creating booking:', error);
-  }
-};
-
-const handleCreateProperty = (): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'createProperty',
-      null,
-      'receive'
-    );
-
-    // Admin can create properties for any owner
-    uiStore.openModal('property', 'create', {
-      property: null
-    });
-  } catch (error) {
-    console.error('Error creating property:', error);
   }
 };
 
 const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
   try {
     eventLogger.logEvent(
-      'FullCalendar',
-      'HomeAdmin',
+      'AdminCalendar',
+      'AdminDashboard',
       'createBooking',
       data,
       'receive'
@@ -680,7 +571,7 @@ const handleEventClick = (clickInfo: EventClickArg): void => {
     const booking = allBookingsMap.value.get(bookingId);
     
     if (booking) {
-      uiStore.openModal('event', 'edit', {
+      uiStore.openModal('event', 'admin-edit', {
         booking: booking
       });
     }
@@ -710,7 +601,7 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
   }
 };
 
-const handleEventResize = (resizeInfo: any): void => {
+const handleEventResize = (resizeInfo: { event: { id: string; startStr: string; endStr?: string; end?: Date }; revert: () => void }): void => {
   try {
     const bookingId = resizeInfo.event.id;
     const booking = allBookingsMap.value.get(bookingId);
@@ -731,18 +622,9 @@ const handleEventResize = (resizeInfo: any): void => {
   }
 };
 
-const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+const handleUpdateBooking = (data: { id: string; updates: Partial<Booking> }): void => {
   try {
-    // Convert FullCalendar data format to BookingFormData format
-    const booking = allBookingsMap.value.get(data.id);
-    if (booking) {
-      const bookingData: Partial<BookingFormData> = {
-        ...booking,
-        checkout_date: data.start,
-        checkin_date: data.end
-      };
-      updateBooking(data.id, bookingData);
-    }
+    updateBooking(data.id, data.updates);
   } catch (error) {
     console.error('Error updating booking:', error);
   }
@@ -752,24 +634,9 @@ const handleUpdateBooking = (data: { id: string; start: string; end: string }): 
 // EVENT HANDLERS - CALENDAR CONTROLS
 // ============================================================================
 
-const handleCalendarViewChange = (view: CalendarView): void => {
+const handleCalendarViewChange = (view: string): void => {
   try {
-    // Convert generic CalendarView to FullCalendar-specific view names
-    let fullCalendarView: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
-    switch (view) {
-      case 'month':
-        fullCalendarView = 'dayGridMonth';
-        break;
-      case 'week':
-        fullCalendarView = 'timeGridWeek';
-        break;
-      case 'day':
-        fullCalendarView = 'timeGridDay';
-        break;
-      default:
-        fullCalendarView = 'timeGridWeek';
-    }
-    setCalendarView(fullCalendarView);
+    setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
   } catch (error) {
     console.error('Error changing calendar view:', error);
   }
@@ -823,9 +690,9 @@ const handleEventModalSave = async (bookingData: BookingFormData): Promise<void>
   try {
     if (eventModalMode.value === 'create') {
       await createBooking(bookingData);
-    } else if (eventModalMode.value === 'edit') {
+    } else if (eventModalMode.value === 'admin-edit') {
       // Get the booking ID from modal data since BookingFormData doesn't include id
-      const modalData = uiStore.getModalData('event') as any;
+      const modalData = uiStore.getModalData('event') as { booking?: Booking };
       const bookingId = modalData?.booking?.id;
       if (bookingId) {
         await updateBooking(bookingId, bookingData);
@@ -875,7 +742,7 @@ const handlePropertyModalSave = async (propertyData: PropertyFormData): Promise<
       await createProperty(propertyData);
     } else if (propertyModalMode.value === 'edit') {
       // Get the property ID from modal data since PropertyFormData doesn't include id
-      const modalData = uiStore.getModalData('property') as any;
+      const modalData = uiStore.getModalData('property') as { property?: Property };
       const propertyId = modalData?.property?.id;
       if (propertyId) {
         await updateProperty(propertyId, propertyData);
@@ -991,14 +858,6 @@ const handleConfirmDialogClose = (): void => {
 };
 
 // ============================================================================
-// UI HELPERS
-// ============================================================================
-
-const toggleSidebar = (): void => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
-
-// ============================================================================
 // LIFECYCLE HOOKS
 // ============================================================================
 
@@ -1009,14 +868,8 @@ onMounted(async () => {
       fetchAllBookings(),
       fetchAllProperties()
     ]);
-    
-    // Set up responsive sidebar
-    watch(xs, (newVal) => {
-      sidebarOpen.value = !newVal;
-    }, { immediate: true });
-    
   } catch (error) {
-    console.error('Error initializing HomeAdmin:', error);
+    console.error('Error initializing AdminDashboard:', error);
     // TODO: Show admin-specific error notification
   }
 });
@@ -1027,181 +880,71 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.home-admin-container {
-  /* Let v-main handle the height calculation */
+.admin-dashboard-container {
   height: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.admin-layout {
-  /* Use Vuetify's fill-height for proper v-main integration */
-  height: 100%;
-  min-height: 100%;
-  /* Ensure columns are truly adjacent with no gaps */
-  gap: 0 !important;
-}
-
-.sidebar-column {
-  position: relative;
-  background-color: rgb(var(--v-theme-surface));
-  /* Remove all padding and margins for adjacent positioning */
-  padding: 0 !important;
-  margin: 0 !important;
-  height: 100%;
-  max-height: 100%;
-  /* Ensure clean edge against calendar */
-  border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-}
-
-.sidebar-container {
-  height: 100%;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.6, 1);
-}
-
-.sidebar-desktop {
-  /* Account for app-bar automatically via v-main */
-  height: 100%;
-  overflow-y: auto;
-}
-
-.sidebar-mobile-hidden {
-  transform: translateX(-100%);
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1000;
   width: 100%;
-  background: rgb(var(--v-theme-surface));
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.calendar-column {
-  /* Remove fixed 100vh - work within v-main boundaries */
-  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  /* Remove all padding for adjacent positioning */
-  padding: 0 !important;
-  margin: 0 !important;
-  background-color: rgb(var(--v-theme-background));
+  padding: 0;
+  margin: 0;
 }
 
-.calendar-header {
-  padding: 16px;
-  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  background-color: rgb(var(--v-theme-surface));
+.admin-dashboard-header {
+  background: rgb(var(--v-theme-surface));
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
+  padding: 24px;
   flex-shrink: 0;
-  height: 80px;
 }
 
-/* Admin-specific styling */
-.home-admin-container .calendar-header {
-  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
-  color: rgb(var(--v-theme-on-primary));
+.admin-metrics {
+  gap: 8px;
 }
 
-.home-admin-container .calendar-header .v-btn {
-  color: rgb(var(--v-theme-on-primary));
+.calendar-controls {
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.06);
+  padding-top: 16px;
 }
 
-.home-admin-container .calendar-header .text-h6 {
-  color: rgb(var(--v-theme-on-primary));
-  font-weight: 600;
+.admin-calendar-wrapper {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  overflow: hidden;
 }
 
-/* System metrics styling */
-.home-admin-container .text-caption {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-/* Mobile-First Responsive Design */
-@media (max-width: 959px) { /* md and down */
-  .home-admin-container {
-    position: relative;
-    height: auto;
-    min-height: 100%;
+/* Mobile responsive adjustments */
+@media (max-width: 960px) {
+  .admin-dashboard-header {
+    padding: 16px;
   }
   
-  .admin-layout {
+  .admin-metrics {
+    margin-top: 16px;
+  }
+  
+  .calendar-controls .d-flex {
     flex-direction: column;
-    height: auto;
-    min-height: 100%;
+    gap: 12px;
   }
   
-  .sidebar-column {
-    height: auto;
-    max-height: 50vh;
-    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-    z-index: 1000;
-  }
-  
-  .calendar-column {
-    flex: 1;
-    min-height: 50vh;
-    height: auto;
-    transition: transform 0.3s ease;
-  }
-  
-  .calendar-column.drawer-open {
-    transform: translateX(0);
-  }
-}
-
-@media (min-width: 960px) { /* lg and up */
-  .admin-layout {
-    height: 100%;
-  }
-  
-  .sidebar-column {
-    height: 100%;
-  }
-  
-  .calendar-column {
-    height: 100%;
-  }
-  
-  .sidebar-container {
-    transform: none !important;
-    position: static !important;
-    z-index: auto !important;
-    box-shadow: none !important;
-  }
-}
-
-/* Mobile UI Optimizations */
-@media (max-width: 600px) {
-  .calendar-header {
+  .admin-calendar-wrapper {
     padding: 8px;
   }
-  
-  .calendar-header .d-flex {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  
-  .calendar-header .v-btn-toggle {
-    margin-left: 0 !important;
-    margin-top: 8px;
-  }
-  
-  /* Mobile viewport fixes */
-  .home-admin-container {
-    min-height: 100dvh; /* Dynamic viewport height */
-    min-height: 100vh;  /* Fallback */
-  }
 }
 
-/* Admin color scheme */
-.home-admin-container {
-  --admin-primary: rgb(var(--v-theme-primary));
-  --admin-secondary: rgb(var(--v-theme-secondary));
-  --admin-warning: rgb(var(--v-theme-warning));
-  --admin-info: rgb(var(--v-theme-info));
+@media (max-width: 600px) {
+  .admin-dashboard-header {
+    padding: 12px;
+  }
+  
+  .admin-calendar-wrapper {
+    padding: 4px;
+  }
+  
+  .calendar-controls .d-flex > div {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style> 

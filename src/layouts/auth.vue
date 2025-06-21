@@ -33,21 +33,21 @@
       <v-container 
         fluid 
         fill-height
-        class="pa-0"
+        class="pa-4"
       >
         <v-row 
           align="center" 
-          justify="center"
+          justify="space-around"
           no-gutters
           class="fill-height"
         >
           <v-col 
             cols="12" 
-            sm="8" 
-            md="6" 
+            sm="12" 
+            md="12" 
             lg="4" 
             xl="3"
-            class="pa-4"
+            class="pa-0"
           >
             <!-- Auth forms will be rendered here -->
             <router-view />
