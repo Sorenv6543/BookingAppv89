@@ -4,7 +4,7 @@ import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
 import { useProperties } from '@/composables/shared/useProperties';
 import { useBookings } from '@/composables/shared/useBookings';
-import FullCalendar from '@/components/smart/FullCalendar.vue';
+import FullCalendar from '@/dev/FullCalendar.vue';
 import type { PropertyFormData, BookingFormData } from '@/types';
 
 // Stores and composables

@@ -13,9 +13,9 @@
     <div class="admin-dashboard-header">
       <div class="d-flex align-center justify-space-between flex-wrap">
         <div>
-          <h1 class="text-h4 font-weight-bold mb-1">
+          <h2 class="text-h4 font-weight-bold mb-1">
             Admin Dashboard
-          </h1>
+          </h2>
           <div class="text-subtitle-1 text-medium-emphasis">
             {{ formattedDate }}
           </div>
@@ -54,84 +54,8 @@
         </div>
       </div>
       
-      <!-- Calendar Controls -->
-      <div class="calendar-controls mt-4">
-        <div class="d-flex align-center justify-space-between flex-wrap ga-2">
-          <!-- Date Navigation -->
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn 
-              variant="outlined" 
-              class="mr-2" 
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6">
-              {{ formattedDate }}
-            </div>
-          </div>
-          
-          <!-- Admin Quick Actions -->
-          <div class="d-flex align-center flex-wrap ga-2">
-            <v-btn
-              color="warning"
-              variant="outlined"
-              prepend-icon="mdi-account-hard-hat"
-              size="small"
-              @click="handleAssignCleaners"
-            >
-              Assign Cleaners
-            </v-btn>
-            <v-btn
-              color="info"
-              variant="outlined"
-              prepend-icon="mdi-chart-line"
-              size="small"
-              @click="handleGenerateReports"
-            >
-              Reports
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-cog"
-              size="small"
-              @click="handleManageSystem"
-            >
-              Manage System
-            </v-btn>
-          </div>
-          
-          <!-- View Toggle -->
-          <v-btn-toggle
-            v-model="currentView"
-            mandatory
-            density="compact"
-          >
-            <v-btn value="dayGridMonth" size="small">
-              Month
-            </v-btn>
-            <v-btn value="timeGridWeek" size="small">
-              Week
-            </v-btn>
-            <v-btn value="timeGridDay" size="small">
-              Day
-            </v-btn>
-          </v-btn-toggle>
-        </div>
-      </div>
     </div>
+
 
     <!-- Admin Calendar - Full Width -->
     <div class="admin-calendar-wrapper">

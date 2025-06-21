@@ -119,7 +119,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useDisplay } from 'vuetify';
-import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
+import AdminSidebar from '@/components/dumb/admin/AdminSidebar.vue';
 
 const { xs } = useDisplay();
 const sidebarOpen = ref(!xs.value);

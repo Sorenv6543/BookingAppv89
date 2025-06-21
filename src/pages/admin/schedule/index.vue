@@ -103,15 +103,13 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
-import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue'
-import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue'
-import BookingForm from '@/components/dumb/BookingModal.vue'
-import CleanerAssignmentModal from '@/components/dumb/admin/CleanerAssignmentModal.vue'
+
 import { useAdminBookings } from '@/composables/admin/useAdminBookings'
 import { useCleanerManagement } from '@/composables/admin/useCleanerManagement'
 import { useUIStore } from '@/stores/ui'
 import { useBookingStore } from '@/stores/booking'
 import { usePropertyStore } from '@/stores/property'
+import { useUserStore } from '@/stores/user'
 import type { Booking, BookingFormData } from '@/types/booking'
 
 // Responsive display

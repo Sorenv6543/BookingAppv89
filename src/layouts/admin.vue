@@ -32,7 +32,53 @@
 
       <v-spacer />
 
-      <!-- Desktop Navigation - Removed since drawer is always visible -->
+      <!-- Desktop Navigation - Hidden on mobile -->
+      <div
+        v-if="mdAndUp"
+        class="d-flex align-center mr-4"
+      >
+        <v-btn
+          to="/admin"
+          variant="text"
+          prepend-icon="mdi-view-dashboard"
+          class="mr-2"
+        >
+          Dashboard
+        </v-btn>
+        <v-btn
+          to="/admin/schedule"
+          variant="text"
+          prepend-icon="mdi-calendar-clock"
+          class="mr-2"
+        >
+          Schedule
+        </v-btn>
+        <v-btn
+          to="/admin/cleaners"
+          variant="text"
+          prepend-icon="mdi-account-hard-hat"
+          class="mr-2"
+        >
+          Cleaners
+        </v-btn>
+        <v-btn
+          to="/admin/properties"
+          variant="text"
+          prepend-icon="mdi-home-group"
+          class="mr-2"
+        >
+          Properties
+        </v-btn>
+        <v-btn
+          to="/admin/reports"
+          variant="text"
+          prepend-icon="mdi-chart-line"
+          class="mr-4"
+        >
+          Reports
+        </v-btn>
+      </div>
+    
 
       <!-- User Menu -->
       <v-menu
@@ -78,9 +124,9 @@
 
     <!-- Admin Navigation Drawer - Always Visible -->
     <v-navigation-drawer
-
-      
-  
+      v-model="drawer"
+      permanent
+      app
       color="surface"
       width="280"
       class="admin-nav-drawer"
@@ -197,11 +243,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useDisplay } from 'vuetify'
 import { useAuth } from '@/composables/shared/useAuth'
 import { useRouter } from 'vue-router'
 
-// Navigation state
-const drawer = ref(false)
+// Responsive display composable
+const { mdAndUp } = useDisplay()
+
+
+// Navigation state (drawer is permanently visible)
+const drawer = ref(true)
 
 // Auth and routing
 const { logout: authLogout } = useAuth()
