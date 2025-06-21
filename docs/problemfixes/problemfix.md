@@ -1002,3 +1002,74 @@ const fullCalendarHeight = computed(() => {
 ## Previous Issues
 
 [Previous problem fixes remain here...]
+
+## Admin Navigation Drawer Always Visible
+
+**Date:** 2024-06-21  
+**File:** `src/layouts/admin.vue`  
+**Problem:** The admin navigation drawer was only visible on desktop and hidden on mobile with a toggle button.  
+**Solution:** Modified the drawer to be permanently visible on all screen sizes.
+
+### Changes Made:
+
+1. **Removed Mobile Menu Button**
+   - Removed the `v-app-bar-nav-icon` that was used to toggle the drawer on mobile
+   - This eliminates the need for manual drawer control
+
+2. **Made Drawer Always Permanent**
+   - Changed from conditional `temporary` and `permanent` props based on screen size
+   - Now uses `permanent` prop only, making the drawer always visible
+
+3. **Removed Desktop Navigation Duplication**
+   - Removed the duplicate navigation buttons in the app bar since the drawer is always visible
+   - This prevents redundant navigation options
+
+4. **Cleaned Up Event Handlers**
+   - Removed `closeMobileDrawer()` function and all references to it
+   - Simplified quick action handlers by removing drawer closing logic
+   - Removed unused `useDisplay` import and `mdAndUp` reactive variable
+
+5. **Updated Responsive Styles**
+   - Added responsive width adjustments for smaller screens
+   - Drawer width: 280px (default) → 240px (tablet) → 200px (mobile)
+   - Added smaller font size for list items on mobile
+
+### Key Code Changes:
+
+**Before:**
+```vue
+<v-navigation-drawer
+  v-model="drawer"
+  :temporary="!mdAndUp"
+  :permanent="mdAndUp"
+  app
+  color="surface"
+  width="280"
+  class="admin-nav-drawer"
+>
+```
+
+**After:**
+```vue
+<v-navigation-drawer
+  v-model="drawer"
+  permanent
+  app
+  color="surface"
+  width="280"
+  class="admin-nav-drawer"
+>
+```
+
+### Benefits:
+- Consistent admin experience across all devices
+- No need to toggle drawer on mobile - always accessible
+- Simplified code with fewer conditional states
+- Better admin workflow with persistent navigation
+
+### Impact:
+- Admin users now have consistent navigation access regardless of screen size
+- Mobile admin experience improved with always-visible navigation
+- Code is cleaner with fewer responsive conditions to maintain
+
+**Status:** ✅ Complete - Admin drawer is now always visible on all screen sizes

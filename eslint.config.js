@@ -1,3 +1,6 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+import storybook from "eslint-plugin-storybook";
+
 // @ts-check
 import js from '@eslint/js';
 import globals from 'globals';
@@ -6,69 +9,63 @@ import typescriptParser from '@typescript-eslint/parser';
 import vue from 'eslint-plugin-vue';
 import vueParser from 'vue-eslint-parser';
 
-export default [
-  js.configs.recommended,
-  ...vue.configs['flat/recommended'],
-  {
-    files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
-    languageOptions: {
+export default [js.configs.recommended, ...vue.configs['flat/recommended'], {
+  files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
+  languageOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    globals: {
+      ...globals.browser,
+      ...globals.node,
+    },
+  },
+}, {
+  files: ['**/*.ts', '**/*.tsx'],
+  languageOptions: {
+    parser: typescriptParser,
+    parserOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
+    },
+    globals: {
+      ...globals.browser,
+      ...globals.node,
     },
   },
-  {
-    files: ['**/*.ts', '**/*.tsx'],
-    languageOptions: {
+  plugins: {
+    '@typescript-eslint': typescript,
+  },
+  rules: {
+    ...typescript.configs.recommended.rules,
+  },
+}, {
+  files: ['**/*.vue'],
+  languageOptions: {
+    parser: vueParser,
+    parserOptions: {
       parser: typescriptParser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
+      ecmaVersion: 'latest',
+      sourceType: 'module',
     },
-    plugins: {
-      '@typescript-eslint': typescript,
-    },
-    rules: {
-      ...typescript.configs.recommended.rules,
+    globals: {
+      ...globals.browser,
+      ...globals.node,
     },
   },
-  {
-    files: ['**/*.vue'],
-    languageOptions: {
-      parser: vueParser,
-      parserOptions: {
-        parser: typescriptParser,
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
-    plugins: {
-      vue,
-      '@typescript-eslint': typescript,
-    },
-    rules: {
-      ...vue.configs.recommended.rules,
-      ...typescript.configs.recommended.rules,
-      'vue/multi-word-component-names': 'off',
-      'vue/no-unused-vars': 'error',
-      'vue/component-definition-name-casing': ['error', 'PascalCase'],
-      'vue/component-name-in-template-casing': ['error', 'PascalCase'],
-      'vue/define-props-declaration': ['error', 'type-based'],
-      'vue/define-emits-declaration': ['error', 'type-based'],
-      'vue/prefer-define-options': 'error',
-      'vue/no-v-html': 'warn',
-    },
+  plugins: {
+    vue,
+    '@typescript-eslint': typescript,
   },
-]; 
+  rules: {
+    ...vue.configs.recommended.rules,
+    ...typescript.configs.recommended.rules,
+    'vue/multi-word-component-names': 'off',
+    'vue/no-unused-vars': 'error',
+    'vue/component-definition-name-casing': ['error', 'PascalCase'],
+    'vue/component-name-in-template-casing': ['error', 'PascalCase'],
+    'vue/define-props-declaration': ['error', 'type-based'],
+    'vue/define-emits-declaration': ['error', 'type-based'],
+    'vue/prefer-define-options': 'error',
+    'vue/no-v-html': 'warn',
+  },
+}, ...storybook.configs["flat/recommended"]]; 

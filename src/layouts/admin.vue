@@ -7,12 +7,7 @@
       elevation="2"
       class="admin-app-bar"
     >
-      <!-- Mobile Menu Button -->
-      <v-app-bar-nav-icon
-        v-if="!mdAndUp"
-        @click="drawer = !drawer"
-        class="mr-2"
-      />
+      <!-- Mobile Menu Button - Removed since drawer is always visible -->
 
       <!-- Logo and Title -->
       <div class="d-flex align-center">
@@ -21,7 +16,9 @@
           size="36"
           class="mr-3"
         >
-          <v-icon color="white">mdi-shield-crown</v-icon>
+          <v-icon color="white">
+            mdi-shield-crown
+          </v-icon>
         </v-avatar>
         <div>
           <div class="text-h6 font-weight-bold">
@@ -35,49 +32,7 @@
 
       <v-spacer />
 
-      <!-- Desktop Navigation - Hidden on mobile -->
-      <div v-if="mdAndUp" class="d-flex align-center mr-4">
-        <v-btn
-          to="/admin"
-          variant="text"
-          prepend-icon="mdi-view-dashboard"
-          class="mr-2"
-        >
-          Dashboard
-        </v-btn>
-        <v-btn
-          to="/admin/schedule"
-          variant="text"
-          prepend-icon="mdi-calendar-clock"
-          class="mr-2"
-        >
-          Schedule
-        </v-btn>
-        <v-btn
-          to="/admin/cleaners"
-          variant="text"
-          prepend-icon="mdi-account-hard-hat"
-          class="mr-2"
-        >
-          Cleaners
-        </v-btn>
-        <v-btn
-          to="/admin/properties"
-          variant="text"
-          prepend-icon="mdi-home-group"
-          class="mr-2"
-        >
-          Properties
-        </v-btn>
-        <v-btn
-          to="/admin/reports"
-          variant="text"
-          prepend-icon="mdi-chart-line"
-          class="mr-4"
-        >
-          Reports
-        </v-btn>
-      </div>
+      <!-- Desktop Navigation - Removed since drawer is always visible -->
 
       <!-- User Menu -->
       <v-menu
@@ -121,12 +76,11 @@
       </v-menu>
     </v-app-bar>
 
-    <!-- Mobile Navigation Drawer -->
+    <!-- Admin Navigation Drawer - Always Visible -->
     <v-navigation-drawer
-      v-model="drawer"
-      :temporary="!mdAndUp"
-      :permanent="mdAndUp"
-      app
+
+      
+  
       color="surface"
       width="280"
       class="admin-nav-drawer"
@@ -134,8 +88,13 @@
       <!-- Drawer Header -->
       <v-list-item class="px-4 py-4">
         <template #prepend>
-          <v-avatar color="primary" size="40">
-            <v-icon color="white">mdi-shield-crown</v-icon>
+          <v-avatar
+            color="primary"
+            size="40"
+          >
+            <v-icon color="white">
+              mdi-shield-crown
+            </v-icon>
           </v-avatar>
         </template>
         <v-list-item-title class="text-h6 font-weight-bold">
@@ -148,43 +107,37 @@
 
       <v-divider />
 
-      <!-- Mobile Navigation Items -->
+      <!-- Admin Navigation Items -->
       <v-list nav>
         <v-list-item
           to="/admin"
           prepend-icon="mdi-view-dashboard"
           title="Dashboard"
-          @click="closeMobileDrawer"
         />
         <v-list-item
           to="/admin/schedule"
           prepend-icon="mdi-calendar-clock"
           title="Master Schedule"
-          @click="closeMobileDrawer"
         />
         <v-list-item
           to="/admin/cleaners"
           prepend-icon="mdi-account-hard-hat"
           title="Cleaner Management"
-          @click="closeMobileDrawer"
         />
         <v-list-item
           to="/admin/properties"
           prepend-icon="mdi-home-group"
           title="All Properties"
-          @click="closeMobileDrawer"
         />
         <v-list-item
           to="/admin/bookings"
           prepend-icon="mdi-calendar-edit"
           title="All Bookings"
-          @click="closeMobileDrawer"
         />
         <v-list-item
           to="/admin/reports"
           prepend-icon="mdi-chart-line"
           title="Business Reports"
-          @click="closeMobileDrawer"
         />
       </v-list>
 
@@ -210,7 +163,7 @@
         />
       </v-list>
 
-      <!-- Mobile Footer -->
+      <!-- Admin Footer -->
       <template #append>
         <div class="pa-4">
           <v-btn
@@ -244,12 +197,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useDisplay } from 'vuetify'
 import { useAuth } from '@/composables/shared/useAuth'
 import { useRouter } from 'vue-router'
-
-// Responsive display composable
-const { mdAndUp } = useDisplay()
 
 // Navigation state
 const drawer = ref(false)
@@ -264,25 +213,16 @@ const logout = async () => {
   router.push('/auth/login')
 }
 
-const closeMobileDrawer = () => {
-  if (!mdAndUp.value) {
-    drawer.value = false
-  }
-}
-
 const createBooking = () => {
   router.push('/admin/schedule')
-  closeMobileDrawer()
 }
 
 const createProperty = () => {
   router.push('/admin/properties')
-  closeMobileDrawer()
 }
 
 const addCleaner = () => {
   router.push('/admin/cleaners')
-  closeMobileDrawer()
 }
 </script>
 
@@ -331,11 +271,25 @@ const addCleaner = () => {
   color: rgb(var(--v-theme-primary)) !important;
 }
 
-/* Responsive app bar */
+/* Responsive adjustments for always-visible drawer */
 @media (max-width: 800px) {
   .admin-app-bar .v-toolbar__content {
     padding-left: 8px;
     padding-right: 8px;
+  }
+  
+  .admin-nav-drawer {
+    width: 240px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-nav-drawer {
+    width: 200px !important;
+  }
+  
+  .admin-nav-drawer .v-list-item-title {
+    font-size: 0.875rem;
   }
 }
 </style> 
