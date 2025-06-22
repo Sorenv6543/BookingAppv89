@@ -683,4 +683,3 @@ watch(isOpen, (newValue) => {
   border-left: 4px solid rgb(var(--v-theme-primary));
 }
 </style>
-</rewritten_file>
