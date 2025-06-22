@@ -84,16 +84,18 @@
   
   <style scoped>
   .auth-main {
-    background: linear-gradient(135deg, 
-      rgb(var(--v-theme-primary)) 0%, 
-      rgb(var(--v-theme-primary-darken-2)) 100%
-    );
+    background: linear-gradient(135deg, rgba(96, 121, 230, 0.1) 0%, rgba(117, 53, 182, 0.1) 100%);
+   
     min-height: 100vh;
   }
   
   /* Center the auth content */
   .v-container {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(168, 49, 49, 0.1);
+  
+      background: linear-gradient(135deg, rgba(96, 121, 230, 0.8) 0%, rgba(117, 53, 182, 0.1) 100%);
+  
+
     backdrop-filter: blur(10px);
     border-radius: 0;
   }
