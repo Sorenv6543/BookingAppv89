@@ -9,7 +9,7 @@
     >
       <!-- Mobile Menu Button -->
       <v-app-bar-nav-icon
-        v-if="!mdAndUp"
+       
         @click="drawer = !drawer"
         class="mr-2"
       />
@@ -36,7 +36,7 @@
       <v-spacer />
 
       <!-- Desktop Navigation - Hidden on mobile -->
-      <div v-if="mdAndUp" class="d-flex align-center mr-4">
+      <div class="d-flex align-center mr-4">
         <v-btn
           to="/admin"
           variant="text"
@@ -124,8 +124,8 @@
     <!-- Mobile Navigation Drawer -->
     <v-navigation-drawer
       v-model="drawer"
-      :temporary="!mdAndUp"
-      :permanent="false"
+        
+      permanent
       app
       color="surface"
       width="280"

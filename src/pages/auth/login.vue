@@ -1,11 +1,27 @@
 <template>
   <v-container class="fill-height">
-    <v-row justify="center" align="center">
-      <v-col cols="12" sm="8" md="6" lg="4" xl="3">
-        <v-card elevation="8" class="pa-6">
+    <v-row
+      justify="center"
+      align="center"
+    >
+      <v-col
+        cols="12"
+        sm="8"
+        md="6"
+        lg="4"
+        xl="3"
+      >
+        <v-card
+          elevation="8"
+          class="pa-6"
+        >
           <!-- Header -->
           <v-card-title class="text-h4 text-center mb-2">
-            <v-icon class="mr-3" color="primary" size="large">
+            <v-icon
+              class="mr-3"
+              color="primary"
+              size="large"
+            >
               mdi-login
             </v-icon>
             Welcome Back
@@ -52,7 +68,10 @@
           </v-alert>
           
           <!-- Login Form -->
-          <v-form @submit.prevent="handleLogin" ref="loginForm">
+          <v-form
+            ref="loginForm"
+            @submit.prevent="handleLogin"
+          >
             <v-text-field
               v-model="email"
               label="Email"
@@ -71,12 +90,12 @@
               :type="showPassword ? 'text' : 'password'"
               prepend-inner-icon="mdi-lock"
               :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append-inner="showPassword = !showPassword"
               variant="outlined"
               :rules="passwordRules"
               :disabled="authStore.loading"
               class="mb-4"
               required
+              @click:append-inner="showPassword = !showPassword"
             />
             
             <v-btn
@@ -87,7 +106,9 @@
               :loading="authStore.loading"
               class="mb-4"
             >
-              <v-icon class="mr-2">mdi-login</v-icon>
+              <v-icon class="mr-2">
+                mdi-login
+              </v-icon>
               Sign In
             </v-btn>
           </v-form>
@@ -96,7 +117,11 @@
           <v-divider class="my-4" />
           
           <div class="text-center mb-3">
-            <v-chip color="info" variant="tonal" size="small">
+            <v-chip
+              color="info"
+              variant="tonal"
+              size="small"
+            >
               Demo Accounts
             </v-chip>
           </div>
@@ -108,10 +133,15 @@
                 variant="outlined"
                 size="small"
                 block
-                @click="loginAsOwner"
                 :loading="authStore.loading"
+                @click="loginAsOwner"
               >
-                <v-icon class="mr-1" size="small">mdi-home-account</v-icon>
+                <v-icon
+                  class="mr-1"
+                  size="small"
+                >
+                  mdi-home-account
+                </v-icon>
                 Owner Demo
               </v-btn>
             </v-col>
@@ -121,10 +151,15 @@
                 variant="outlined"
                 size="small"
                 block
-                @click="loginAsAdmin"
                 :loading="authStore.loading"
+                @click="loginAsAdmin"
               >
-                <v-icon class="mr-1" size="small">mdi-shield-account</v-icon>
+                <v-icon
+                  class="mr-1"
+                  size="small"
+                >
+                  mdi-shield-account
+                </v-icon>
                 Admin Demo
               </v-btn>
             </v-col>
@@ -140,8 +175,8 @@
             <v-btn
               color="primary"
               variant="text"
-              @click="goToRegister"
               :disabled="authStore.loading"
+              @click="goToRegister"
             >
               Create Account
             </v-btn>

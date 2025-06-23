@@ -13,133 +13,14 @@
       no-gutters
       class="fill-height flex-nowrap admin-layout"
     >
-      <!-- Sidebar Column -->
+    <!--main calendar column-->
       <v-col 
         cols="12" 
-        md="4" 
-        lg="4" 
-        xl="3" 
-        class="sidebar-column pa-0"
-      >
-        <!-- Mobile Menu Toggle -->
-        <v-app-bar
-          v-if="$vuetify.display.smAndDown"
-          flat
-          color="transparent"
-          height="48"
-          class="px-0"
-        >
-          <v-app-bar-nav-icon
-            @click="sidebarOpen = !sidebarOpen"
-          />
-          <v-app-bar-title class="text-h6">
-            Business Management
-          </v-app-bar-title>
-        </v-app-bar>
-
-        <!-- Proper Navigation Drawer Implementation -->
-        <AdminSidebar
-          v-model="sidebarOpen"
-          :rail="railMode"
-          :today-turns="systemTodayTurns"
-          :upcoming-cleanings="systemUpcomingCleanings"
-          :properties="allPropertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col>
-
-      <!-- Main Calendar Column -->
-      <v-col 
-        cols="12" 
-        md="8" 
-        lg="8" 
-        xl="9" 
+        md="12" 
+        lg="12" 
+        xl="12" 
         class="calendar-column pa-0"
       >
-        <div class="calendar-header">
-          <!-- Admin-focused Calendar Controls -->
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn 
-              variant="outlined" 
-              class="mr-2" 
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6">
-              {{ formattedDate }}
-            </div>
-            
-            <!-- System-wide Metrics -->
-            <div class="ml-4 text-caption text-medium-emphasis">
-              {{ systemMetricsText }}
-            </div>
-            
-            <v-spacer />
-            
-            <!-- Admin Quick Actions -->
-            <v-btn
-              color="warning"
-              variant="outlined"
-              prepend-icon="mdi-account-hard-hat"
-              class="mr-2"
-              @click="handleAssignCleaners"
-            >
-              Assign Cleaners
-            </v-btn>
-            <v-btn
-              color="info"
-              variant="outlined"
-              prepend-icon="mdi-chart-line"
-              class="mr-2"
-              @click="handleGenerateReports"
-            >
-              Reports
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-cog"
-              class="mr-4"
-              @click="handleManageSystem"
-            >
-              Manage System
-            </v-btn>
-            
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              class="ml-4"
-            >
-              <v-btn value="dayGridMonth">
-                Month
-              </v-btn>
-              <v-btn value="timeGridWeek">
-                Week
-              </v-btn>
-              <v-btn value="timeGridDay">
-                Day
-              </v-btn>
-            </v-btn-toggle>
-          </div>
-        </div>
-
         <!-- TODO: Replace with AdminCalendar.vue when TASK-039H is complete -->
         <AdminCalendar 
           ref="calendarRef"
@@ -205,7 +86,7 @@ import { useDisplay } from 'vuetify';
 
 // Admin components (using generic components for now)
 
-import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
+
 import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
 import BookingForm from '@/components/dumb/BookingModal.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
@@ -279,11 +160,7 @@ const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
 const sidebarOpen = ref(!xs.value);
 const selectedPropertyFilter = ref<string | null>(null);
 
-// Navigation drawer responsive behavior
-const railMode = computed(() => {
-  // Use rail mode on desktop when there's limited space
-  return !xs.value && !sidebarOpen.value;
-});
+
 
 // ============================================================================
 // ADMIN-SPECIFIC DATA ACCESS
@@ -1051,51 +928,9 @@ onUnmounted(() => {
   gap: 0 !important;
 }
 
-.sidebar-column {
-  position: relative;
-  background-color: rgb(var(--v-theme-surface));
-  /* Remove all padding and margins for adjacent positioning */
-  padding: 0 !important;
-  margin: 0 !important;
-  height: 100%;
-  max-height: 100%;
-  /* Ensure clean edge against calendar */
-  border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-}
 
-.sidebar-container {
-  height: 100%;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.6, 1);
-}
 
-.sidebar-desktop {
-  /* Account for app-bar automatically via v-main */
-  height: 100%;
-  overflow-y: auto;
-}
 
-.sidebar-mobile-hidden {
-  transform: translateX(-100%);
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  width: 100%;
-  background: rgb(var(--v-theme-surface));
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.calendar-column {
-  /* Remove fixed 100vh - work within v-main boundaries */
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  /* Remove all padding for adjacent positioning */
-  padding: 0 !important;
-  margin: 0 !important;
-  background-color: rgb(var(--v-theme-background));
-}
 
 .calendar-header {
   padding: 16px;
