@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Sidebar from '@/dev/Sidebar.vue'
+import ErrorHandlingDemo from '@/dev/ErrorHandlingDemo.vue'
 </script>
 
 <template>
-  <Sidebar />
+  <ErrorHandlingDemo />
 </template>
 
 <style scoped>

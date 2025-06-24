@@ -178,7 +178,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import AdminSidebar from '../components/smart/admin/AdminSidebar.vue';
+import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue'
 import type { Booking, Property, User, Cleaner } from '@/types';
 
 // Demo state

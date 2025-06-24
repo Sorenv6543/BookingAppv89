@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Sidebar from '@/dev/Sidebar.vue'
+import PropertyCardDemo from '@/dev/PropertyCardDemo.vue'
 </script>
 
 <template>
-  <Sidebar />
+  <PropertyCardDemo />
 </template>
 
 <style scoped>

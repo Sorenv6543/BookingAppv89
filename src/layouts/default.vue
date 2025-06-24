@@ -80,7 +80,7 @@
   <script setup lang="ts">
   import { ref } from 'vue';
   import { useDisplay } from 'vuetify';
-  import ThemePicker from '@/components/dumb/shared/ThemePicker.vue';
+
 
   // Reactive state for the navigation drawer
   const drawer = ref(true);

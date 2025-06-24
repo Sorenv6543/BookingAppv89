@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Sidebar from '@/dev/Sidebar.vue'
+import AdminCalendarDemo from '@/dev/AdminCalendarDemo.vue'
 </script>
 
 <template>
-  <Sidebar />
+  <AdminCalendarDemo />
 </template>
 
 <style scoped>

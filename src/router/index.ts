@@ -24,7 +24,7 @@ const router = createRouter({
       name: 'owner',
       component: () => import('@/pages/owner/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'owner',
         requiresAuth: true,
         role: 'owner'
       }
@@ -34,7 +34,7 @@ const router = createRouter({
       name: 'owner-properties',
       component: () => import('@/pages/owner/properties/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'owner',
         requiresAuth: true,
         role: 'owner'
       }
@@ -44,7 +44,7 @@ const router = createRouter({
       name: 'owner-bookings',
       component: () => import('@/components/dumb/owner/OwnerBookings.vue'),
       meta: {
-        layout: 'default',
+        layout: 'owner',
         requiresAuth: true,
         role: 'owner'
       }
@@ -57,7 +57,7 @@ const router = createRouter({
     {
       path: '/admin',
       name: 'admin',
-      component: () => import('@/pages/admin/index.vue'),
+      component: () => import('@/components/smart/admin/AdminHome.vue'),
       meta: {
         layout: 'admin',
         requiresAuth: true,
@@ -137,20 +137,6 @@ const router = createRouter({
       }
     },
 
-    // ===========================================
-    // LEGACY REDIRECTS
-    // ===========================================
-    {
-      path: '/properties',
-      name: 'properties-legacy',
-      redirect: '/owner/properties'
-    },
-
-    {
-      path: '/bookings',
-      name: 'bookings-legacy',
-      redirect: '/owner/bookings'
-    },
 
     // ===========================================
     // DEVELOPMENT/TESTING ROUTES
@@ -159,6 +145,202 @@ const router = createRouter({
       path: '/testing/crud',
       name: 'crud-testing',
       component: () => import('@/pages/crud-testing.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+
+    // ===========================================
+    // DEMO ROUTES
+    // ===========================================
+    {
+      path: '/demos',
+      name: 'demos',
+      component: () => import('@/pages/demos/index.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/admin-calendar-demo',
+      name: 'admin-calendar-demo',
+      component: () => import('@/pages/demos/admin-calendar-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/admin-quick-actions-demo',
+      name: 'admin-quick-actions-demo',
+      component: () => import('@/pages/demos/admin-quick-actions-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/admin-sidebar',
+      name: 'admin-sidebar',
+      component: () => import('@/pages/demos/admin-sidebar.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+
+    {
+      path: '/demos/auth-flow',
+      name: 'auth-flow',
+      component: () => import('@/pages/demos/auth-flow.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/calendar-header-blue-gradient',
+      name: 'calendar-header-blue-gradient',
+      component: () => import('@/pages/demos/calendar-header-blue-gradient.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+
+
+    {
+      path: '/demos/home-admin-demo',
+      name: 'home-admin-demo',
+      component: () => import('@/pages/demos/home-admin-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/owner-sidebar-demo',
+      name: 'owner-sidebar-demo',
+      component: () => import('@/pages/demos/owner-sidebar-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/property-card-demo',
+      name: 'property-card-demo',
+      component: () => import('@/pages/demos/property-card-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/role-routing',
+      name: 'role-routing',
+      component: () => import('@/pages/demos/role-routing.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/route-guards',
+      name: 'route-guards',
+      component: () => import('@/pages/demos/route-guards.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/sidebar',
+      name: 'sidebar',
+      component: () => import('@/pages/demos/sidebar.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/sidebar-demo',
+      name: 'sidebar-demo',
+      component: () => import('@/pages/demos/sidebar-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/turn-alerts-demo',
+      name: 'turn-alerts-demo',
+      component: () => import('@/pages/demos/turn-alerts-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/turn-visual-indicators',
+      name: 'turn-visual-indicators',
+      component: () => import('@/pages/demos/turn-visual-indicators.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/use-admin-bookings-demo',
+      name: 'use-admin-bookings-demo',
+      component: () => import('@/pages/demos/use-admin-bookings-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/use-admin-calendar-state-demo',
+      name: 'use-admin-calendar-state-demo',
+      component: () => import('@/pages/demos/use-admin-calendar-state-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/use-admin-properties-demo',
+      name: 'use-admin-properties-demo',
+      component: () => import('@/pages/demos/use-admin-properties-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/use-owner-calendar-state-demo',
+      name: 'use-owner-calendar-state-demo',
+      component: () => import('@/pages/demos/use-owner-calendar-state-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/use-owner-bookings-demo',
+      name: 'use-owner-bookings-demo',
+      component: () => import('@/pages/demos/use-owner-bookings-demo.vue'),
+      meta: {
+        layout: 'default',
+        development: true
+      }
+    },
+    {
+      path: '/demos/dev-index',
+      name: 'dev-index',
+      component: () => import('@/pages/demos/dev-index.vue'),
       meta: {
         layout: 'default',
         development: true

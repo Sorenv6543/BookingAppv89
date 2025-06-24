@@ -211,7 +211,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import HomeAdmin from '../../../pages/admin/index.vue';
+import HomeAdmin from '../components/smart/admin/AdminHome.vue';
 import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
 import { useAuthStore } from '@/stores/auth';

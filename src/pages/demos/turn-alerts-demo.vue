@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Sidebar from '@/dev/Sidebar.vue'
+import TurnAlertsDemo from '@/dev/TurnAlertsDemo.vue'
 </script>
 
 <template>
-  <Sidebar />
+  <TurnAlertsDemo />
 </template>
 
 <style scoped>

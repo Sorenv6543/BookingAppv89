@@ -291,7 +291,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useAdminCalendarState } from '@/composables/admin/useAdminCalendarState';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
@@ -303,8 +303,6 @@ const {
   loading,
   error,
   success,
-  selectedCleanerIds,
-  selectedOwnerIds,
   showUnassignedOnly,
   showOverdueOnly,
   calendarViewMode,

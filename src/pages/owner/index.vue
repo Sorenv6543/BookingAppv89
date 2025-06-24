@@ -174,7 +174,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDisplay } from 'vuetify';
 
 // Owner-specific components
-import OwnerSidebar from '../../components/smart/owner/OwnerSidebar.vue';
+import OwnerSidebar from '../../dev/OwnerSidebar.vue';
 import FullCalendar from '../FullCalendar.vue';
 import BookingModal from '@/components/dumb/BookingModal.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';

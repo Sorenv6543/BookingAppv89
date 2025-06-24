@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Sidebar from '@/dev/Sidebar.vue'
+import OwnerSidebarDemo from '@/dev/OwnerSidebarDemo.vue'
 </script>
 
 <template>
-  <Sidebar />
+  <OwnerSidebarDemo />
 </template>
 
 <style scoped>

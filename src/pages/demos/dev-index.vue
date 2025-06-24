@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Sidebar from '@/dev/Sidebar.vue'
+import DevIndex from '@/dev/index.vue'
 </script>
 
 <template>
-  <Sidebar />
+  <DevIndex />
 </template>
 
 <style scoped>
