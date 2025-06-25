@@ -10,27 +10,163 @@ src/components/smart/owner/HomeOwner.vue -
  -->
 
 <template>
-  <!-- MINIMAL TEMPLATE FOR DEBUGGING - Let's see if this can mount -->
-  <div class="home-owner-minimal pa-4">
-    <v-card class="pa-4">
-      <v-card-title>🏠 HomeOwner Component - Debug Mode</v-card-title>
-      <v-card-text>
-        <div class="debug-info">
-          <p><strong>✅ Script Setup:</strong> Running</p>
-          <p><strong>✅ Auth Status:</strong> {{ authStore.isAuthenticated ? 'Authenticated' : 'Not Authenticated' }}</p>
-          <p><strong>✅ User:</strong> {{ authStore.user?.name || 'None' }} ({{ authStore.user?.role || 'No Role' }})</p>
-          <p><strong>✅ User ID:</strong> {{ currentOwnerId || 'undefined' }}</p>
-          <p><strong>✅ Is Owner Auth:</strong> {{ isOwnerAuthenticated ? 'Yes' : 'No' }}</p>
-          <p><strong>🎨 Template:</strong> Rendering Successfully</p>
-          <p><strong>⏰ Mount Status:</strong> <span id="mount-status">Waiting for onMounted...</span></p>
-        </div>
-        
-        <v-alert type="info" class="mt-4">
-          <strong>Debug Test:</strong> If you see "Component Mounted!" below, the basic component works.
-          Then we can gradually add back the complex template parts.
-        </v-alert>
-      </v-card-text>
-    </v-card>
+  <div class="home-owner-container">
+    <!-- Owner Sidebar - Fixed to left edge -->
+    <div 
+      class="sidebar-column"
+      :class="{ 
+        'sidebar-hidden': !sidebarOpen && $vuetify.display.mdAndDown,
+        'sidebar-visible': sidebarOpen || $vuetify.display.lgAndUp 
+      }"
+    >
+      <OwnerSidebar
+        :today-turns="ownerTodayTurns"
+        :upcoming-cleanings="ownerUpcomingCleanings"
+        :properties="ownerPropertiesMap"
+        :loading="loading"
+        @navigate-to-booking="handleNavigateToBooking"
+        @navigate-to-date="handleNavigateToDate"
+        @filter-by-property="handleFilterByProperty"
+        @create-booking="handleCreateBooking"
+        @create-property="handleCreateProperty"
+      />
+    </div>
+
+    <!-- Main Calendar Area - Fills remaining space -->
+    <div class="calendar-column">
+         <!-- Owner Calendar Header - Fixed to top of calendar area -->
+         <v-card flat class="calendar-header-card">
+           <v-card-text class="pa-3">
+             <div class="d-flex align-center">
+               <!-- Mobile menu button -->
+               <v-btn
+                 v-if="$vuetify.display.mdAndDown"
+                 icon="mdi-menu"
+                 variant="text"
+                 class="mr-4"
+                 @click="toggleSidebar"
+               />
+               
+               <!-- Calendar Navigation -->
+               <v-btn
+                 icon="mdi-arrow-left"
+                 variant="text"
+                 class="mr-2"
+                 @click="handlePrevious"
+               />
+               <v-btn 
+                 variant="outlined" 
+                 class="mr-2" 
+                 @click="handleGoToday"
+               >
+                 Today
+               </v-btn>
+               <v-btn
+                 icon="mdi-arrow-right"
+                 variant="text"
+                 class="mr-4"
+                 @click="handleNext"
+               />
+               <div class="text-h6 mr-4">
+                 {{ formattedDate }}
+               </div>
+               
+               <v-spacer />
+               
+               <!-- Owner Quick Actions -->
+               <v-btn
+                 v-if="$vuetify.display.smAndUp"
+                 color="primary"
+                 variant="outlined"
+                 prepend-icon="mdi-plus"
+                 class="mr-2"
+                 @click="handleCreateProperty"
+               >
+                 Add Property
+               </v-btn>
+               <v-btn
+                 color="primary"
+                 prepend-icon="mdi-calendar-plus"
+                 class="mr-4"
+                 @click="handleCreateBooking"
+               >
+                 Add Booking
+               </v-btn>
+               
+               <!-- Calendar View Toggle -->
+               <v-btn-toggle
+                 v-model="currentView"
+                 mandatory
+                 density="compact"
+                 class="ml-2"
+               >
+                 <v-btn value="dayGridMonth" size="small">
+                   Month
+                 </v-btn>
+                 <v-btn value="timeGridWeek" size="small">
+                   Week
+                 </v-btn>
+                 <v-btn value="timeGridDay" size="small">
+                   Day
+                 </v-btn>
+               </v-btn-toggle>
+             </div>
+           </v-card-text>
+         </v-card>
+
+         <!-- Owner Calendar - Fixed height below header -->
+         <div class="calendar-content">
+           <OwnerCalendar
+             ref="calendarRef"
+             :bookings="ownerFilteredBookings"
+             :properties="ownerPropertiesMap"
+             :loading="loading"
+             :current-view="currentView"
+             :current-date="currentDate"
+             @date-select="handleDateSelect"
+             @event-click="handleEventClick"
+             @event-drop="handleEventDrop"
+             @event-resize="handleEventResize"
+             @view-change="handleCalendarViewChange"
+             @date-change="handleCalendarDateChange"
+             @create-booking="handleCreateBookingFromCalendar"
+             @update-booking="handleUpdateBooking"
+           />
+         </div>
+     </div>
+
+    <!-- Owner-focused Modals (always available) - Ensure they appear above fixed container -->
+    <div style="position: relative; z-index: 1000;">
+      <BookingForm
+        :open="eventModalOpen"
+        :mode="eventModalMode"
+        :booking="eventModalData"
+        @close="handleEventModalClose"
+        @save="handleEventModalSave"
+        @delete="handleEventModalDelete"
+      />
+
+      <PropertyModal
+        :open="propertyModalOpen"
+        :mode="propertyModalMode"
+        :property="propertyModalData"
+        @close="handlePropertyModalClose"
+        @save="handlePropertyModalSave"
+        @delete="handlePropertyModalDelete"
+      />
+
+      <ConfirmationDialog
+        :open="confirmDialogOpen"
+        :title="confirmDialogTitle"
+        :message="confirmDialogMessage"
+        :confirm-text="confirmDialogConfirmText"
+        :cancel-text="confirmDialogCancelText"
+        :dangerous="confirmDialogDangerous"
+        @confirm="handleConfirmDialogConfirm"
+        @cancel="handleConfirmDialogCancel"
+        @close="handleConfirmDialogClose"
+      />
+    </div>
   </div>
 </template>
 
@@ -405,7 +541,7 @@ const confirmDialogDangerous = computed(() => {
 });
 const confirmDialogData = computed(() => {
   const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.data || null;
+  return dialog?.data;
 });
 
 // ============================================================================
@@ -834,19 +970,40 @@ watch(isOwnerAuthenticated, (newValue) => {
 onMounted(async () => {
   console.log('🚀 [HomeOwner] Component mounted successfully!');
   
-  // Update the UI to show successful mount
-  const mountStatusElement = document.getElementById('mount-status');
-  if (mountStatusElement) {
-    mountStatusElement.innerHTML = '✅ Component Mounted Successfully!';
-    mountStatusElement.style.color = 'green';
-    mountStatusElement.style.fontWeight = 'bold';
+  // Wait for auth to be properly initialized
+  if (authStore.loading) {
+    console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
+    // Wait for auth loading to complete
+    const maxWait = 5000; // 5 seconds max
+    const startTime = Date.now();
+    
+    while (authStore.loading && (Date.now() - startTime) < maxWait) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
   }
   
-  console.log('🔍 [HomeOwner] Basic mount test - simplified template worked!');
+  console.log('🔍 [HomeOwner] Auth state after waiting:', {
+    isAuthenticated: authStore.isAuthenticated,
+    user: authStore.user,
+    loading: authStore.loading,
+    isOwnerAuthenticated: isOwnerAuthenticated.value
+  });
   
-  // For now, skip the complex data loading while we debug
-  // TODO: Re-enable data loading once we identify the template issue
-  console.log('⏭️ [HomeOwner] Skipping data loading in debug mode');
+  // Load owner's data only if properly authenticated
+  if (isOwnerAuthenticated.value) {
+    console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
+    try {
+      await Promise.all([
+        fetchAllProperties(),
+        fetchAllBookings()
+      ]);
+      console.log('✅ [HomeOwner] Owner data loaded successfully');
+    } catch (error) {
+      console.error('❌ [HomeOwner] Failed to load your data:', error);
+    }
+  } else {
+    console.warn('⚠️ [HomeOwner] User is not authenticated as owner, skipping data load');
+  }
 });
 
 onUnmounted(() => {
@@ -891,51 +1048,200 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 </script>
 
 <style scoped>
+/* =================================================================== */
+/* OWNER LAYOUT - EDGE-TO-EDGE FIXED POSITIONING */
+/* =================================================================== */
+
+/*
+ * IMPORTANT: Fixed positioning breaks out of Vuetify's v-main padding
+ * This ensures the sidebar reaches the true left edge of the viewport
+ * and the calendar stretches to the true right edge.
+ */
 .home-owner-container {
-  height: 100vh;
+  position: fixed;
+  top: 64px; /* Below app-bar */
+  left: 0; /* True left edge of viewport */
+  right: 0; /* True right edge of viewport */
+  bottom: 0;
+  height: calc(100vh - 64px); /* Account for app-bar height */
+  width: 100vw; /* Full viewport width */
   overflow: hidden;
+  display: flex; /* Flexbox for sidebar + calendar layout */
+  z-index: 1; /* Above v-main, below modals */
 }
+
+/* No longer needed - using direct flexbox on container */
+
+/* =================================================================== */
+/* SIDEBAR COLUMN - FIXED TO LEFT EDGE */
+/* =================================================================== */
 
 .sidebar-column {
-  height: 100vh;
+  width: 320px; /* Fixed width sidebar */
+  min-width: 320px; /* Prevent shrinking */
+  height: 100%;
   overflow-y: auto;
   border-right: 1px solid rgb(var(--v-theme-on-surface), 0.12);
-}
-
-.calendar-column {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.calendar-header {
-  padding: 16px;
-  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
   background: rgb(var(--v-theme-surface));
+  transition: all 0.3s ease;
   flex-shrink: 0;
+  position: relative; /* Desktop: always visible, positioned normally */
 }
 
-.mobile-hidden {
-  display: none;
-}
-
-@media (min-width: 1024px) {
-  .mobile-hidden {
-    display: block;
+/* Mobile: Sidebar overlay */
+@media (max-width: 959px) {
+  .sidebar-column {
+    position: absolute; /* Absolute to the fixed parent container */
+    top: 0; /* Relative to parent container */
+    left: 0;
+    z-index: 1005;
+    width: 300px;
+    min-width: 300px;
+    height: 100%; /* Full height of parent container */
+    transform: translateX(-100%);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .sidebar-column.sidebar-visible {
+    transform: translateX(0);
+  }
+  
+  .sidebar-column.sidebar-hidden {
+    transform: translateX(-100%);
+  }
+  
+  /* On mobile, calendar takes full width when sidebar is hidden */
+  .calendar-column {
+    flex: 1;
+    margin-left: 0;
   }
 }
 
-/* Owner-specific styling */
+/* Desktop: Sidebar always visible, attached to left edge */
+@media (min-width: 960px) {
+  .sidebar-column {
+    position: relative;
+    transform: translateX(0) !important;
+  }
+  
+  .sidebar-column.sidebar-hidden,
+  .sidebar-column.sidebar-visible {
+    transform: translateX(0) !important;
+  }
+  
+  /* On desktop, calendar fills remaining space after fixed sidebar */
+  .calendar-column {
+    flex: 1;
+    margin-left: 0;
+    width: calc(100vw - 320px); /* Explicit width calculation */
+  }
+}
+
+/* =================================================================== */
+/* CALENDAR COLUMN - FILLS REMAINING SPACE */
+/* =================================================================== */
+
+.calendar-column {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevent flex item overflow */
+  position: relative;
+  flex: 1; /* Take remaining space after sidebar */
+}
+
+/* Calendar Header - Fixed height */
+.calendar-header-card {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
+  background: rgb(var(--v-theme-surface));
+  z-index: 1;
+}
+
+/* Calendar Content - Flexible height */
+.calendar-content {
+  flex: 1;
+  min-height: 0; /* Allow shrinking */
+  position: relative;
+  overflow: hidden;
+}
+
+/* =================================================================== */
+/* RESPONSIVE BREAKPOINT FIXES */
+/* =================================================================== */
+
+/* Small screens (mobile) */
+@media (max-width: 599px) {
+  .home-owner-container {
+    top: 56px; /* Smaller mobile app-bar */
+    height: calc(100vh - 56px);
+  }
+  
+  .sidebar-column {
+    top: 0; /* Relative to parent container */
+    height: 100%; /* Full height of parent container */
+  }
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 600px) and (max-width: 959px) {
+  .calendar-column {
+    margin-left: 0;
+  }
+}
+
+/* Large screens (desktop) - Edge-to-edge layout */
+@media (min-width: 960px) {
+  .home-owner-container {
+    top: 64px; /* Standard app-bar height */
+    height: calc(100vh - 64px);
+  }
+  
+  .calendar-column {
+    margin-left: 0;
+  }
+}
+
+/* Extra large screens - Prevent calendar disappearing */
+@media (min-width: 1280px) {
+  .calendar-column {
+    min-width: 600px; /* Ensure calendar never disappears */
+  }
+}
+
+/* =================================================================== */
+/* OWNER-SPECIFIC THEME VARIABLES */
+/* =================================================================== */
+
 .home-owner-container {
   --owner-primary: rgb(var(--v-theme-primary));
   --owner-accent: rgb(var(--v-theme-secondary));
+  --owner-surface: rgb(var(--v-theme-surface));
+  --owner-border: rgb(var(--v-theme-on-surface), 0.12);
 }
 
-/* Highlighted booking animation for owner */
+/* =================================================================== */
+/* ENHANCED CALENDAR STYLING FOR OWNERS */
+/* =================================================================== */
+
+/* Owner booking highlights */
 :deep(.fc-event.highlighted) {
   animation: owner-highlight 3s ease-in-out;
   box-shadow: 0 0 0 3px var(--owner-primary);
 }
+
+:deep(.fc-event.booking-turn) {
+  font-weight: 600;
+  border-width: 2px !important;
+}
+
+:deep(.fc-event.priority-urgent) {
+  animation: pulse-urgent 2s infinite;
+}
+
+/* =================================================================== */
+/* ANIMATIONS */
+/* =================================================================== */
 
 @keyframes owner-highlight {
   0% { 
@@ -943,12 +1249,57 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
     box-shadow: 0 0 0 0 var(--owner-primary);
   }
   50% { 
-    transform: scale(1.05);
+    transform: scale(1.02);
     box-shadow: 0 0 0 6px rgba(var(--v-theme-primary), 0.3);
   }
   100% { 
     transform: scale(1);
     box-shadow: 0 0 0 3px var(--owner-primary);
+  }
+}
+
+@keyframes pulse-urgent {
+  0% { 
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7);
+  }
+  70% { 
+    box-shadow: 0 0 0 8px rgba(244, 67, 54, 0);
+  }
+  100% { 
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
+  }
+}
+
+/* =================================================================== */
+/* MOBILE OVERLAY BACKDROP & INTERACTION */
+/* =================================================================== */
+
+@media (max-width: 959px) {
+  /* Backdrop overlay when sidebar is open */
+  .home-owner-container::before {
+    content: '';
+    position: absolute; /* Use absolute since parent is now fixed */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .home-owner-container:has(.sidebar-visible)::before {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  
+  /* Allow clicking backdrop to close sidebar */
+  .home-owner-container:has(.sidebar-visible)::before {
+    cursor: pointer;
   }
 }
 </style> 
