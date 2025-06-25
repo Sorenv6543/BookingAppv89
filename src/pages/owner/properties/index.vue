@@ -128,16 +128,21 @@ const handleAddProperty = (): void => {
   uiStore.openModal('propertyModal', 'create');
 };
 
-const handleEditProperty = (property: Property): void => {
-  uiStore.openModal('propertyModal', 'edit', property);
+const handleEditProperty = (propertyId: string): void => {
+  const property = ownerProperties.value.find(p => p.id === propertyId);
+  if (property) {
+    uiStore.openModal('propertyModal', 'edit', property);
+  }
 };
 
-const handleDeleteProperty = async (property: Property): Promise<void> => {
+const handleDeleteProperty = async (propertyId: string): Promise<void> => {
+  const property = ownerProperties.value.find(p => p.id === propertyId);
+  if (!property) return;
+
   const confirmed = await uiStore.showConfirmation(
     'Delete Property',
     `Are you sure you want to delete "${property.name}"? This action cannot be undone.`,
-    'Delete',
-    'error'
+    { dangerous: true }
   );
 
   if (confirmed) {

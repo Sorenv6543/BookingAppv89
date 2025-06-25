@@ -701,7 +701,7 @@ const handleGoToday = (): void => {
     calendarApi.today();
   }
 };
-const handleCalendarViewChange = (view: CalendarView): void => {
+const handleCalendarViewChange = (view: string): void => {
   // Map CalendarView to FullCalendar view type
   const calendarView = view === 'week' ? 'timeGridWeek' : 
                       view === 'day' ? 'timeGridDay' : 

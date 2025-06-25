@@ -29,8 +29,8 @@ declare module 'vue-router' {
   }
 }
 
-// Export user role type for consistency
-export type UserRole = 'owner' | 'admin' | 'cleaner'
+// User role type available from ./user.ts
+// export type UserRole = 'owner' | 'admin' | 'cleaner' // Removed duplicate export
 
 // Route guard result types
 export interface RouteGuardResult {

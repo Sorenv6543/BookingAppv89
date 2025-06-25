@@ -511,7 +511,7 @@ function generateSampleData() {
       status: 'scheduled' as const,
       guest_count: 2,
       notes: 'Standard cleaning between guests',
-      priority: 'standard' as const,
+              priority: 'normal' as const,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }

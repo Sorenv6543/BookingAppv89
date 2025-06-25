@@ -351,7 +351,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useTheme } from 'vuetify';
 import TurnPriorityBadge from '@/components/dumb/shared/TurnPriorityBadge.vue';
 import UrgentTurnIndicator from '@/components/dumb/shared/UrgentTurnIndicator.vue';

@@ -128,33 +128,7 @@ export const BUSINESS_IMPACT_MESSAGES = {
   critical: "Critical business impact. System-wide outage or data loss risk."
 } as const;
 
-/**
- * Get role-appropriate error message
- */
-export function getErrorMessage(
-  category: ErrorCategory,
-  errorType: string,
-  role: UserRole,
-  context: Record<string, any> = {}
-): string {
-  const categoryMessages = ERROR_MESSAGES[category];
-  if (!categoryMessages) {
-    return getGenericErrorMessage(role);
-  }
-
-  const roleMessages = categoryMessages[role as keyof typeof categoryMessages];
-  if (!roleMessages) {
-    return getGenericErrorMessage(role);
-  }
-
-  const message = roleMessages[errorType as keyof typeof roleMessages];
-  if (!message) {
-    return getGenericErrorMessage(role);
-  }
-
-  // Replace placeholders with context values
-  return replacePlaceholders(message, context);
-}
+// Removed duplicate getErrorMessage function - using the one below
 
 /**
  * Get generic error message for role
@@ -206,72 +180,9 @@ export function getRetryMessage(role: UserRole, attempt: number, maxAttempts: nu
   }
 }
 
-/**
- * Get loading message based on role and operation
- */
-export function getLoadingMessage(role: UserRole, operation: string): string {
-  const operationMessages = {
-    owner: {
-      'save_booking': "Saving your booking...",
-      'load_properties': "Loading your properties...",
-      'delete_booking': "Removing booking...",
-      'update_property': "Updating property...",
-      'login': "Signing you in...",
-      'logout': "Signing you out..."
-    },
-    admin: {
-      'save_booking': "Processing booking update...",
-      'load_properties': "Syncing property database...",
-      'delete_booking': "Removing booking and updating schedules...",
-      'update_property': "Updating property and notifying cleaners...",
-      'login': "Authenticating admin session...",
-      'logout': "Clearing admin session..."
-    },
-    cleaner: {
-      'save_booking': "Updating schedule...",
-      'load_properties': "Loading assigned properties...",
-      'delete_booking': "Updating assignment...",
-      'update_property': "Updating property notes...",
-      'login': "Connecting to schedule...",
-      'logout': "Disconnecting..."
-    }
-  };
+// Removed duplicate getLoadingMessage function - using the one below
 
-  const roleMessages = operationMessages[role];
-  return roleMessages?.[operation as keyof typeof roleMessages] || `Processing ${operation}...`;
-}
-
-/**
- * Get success message based on role and operation
- */
-export function getSuccessMessage(role: UserRole, operation: string, context: Record<string, any> = {}): string {
-  const operationMessages = {
-    owner: {
-      'save_booking': "Booking saved successfully!",
-      'delete_booking': "Booking removed.",
-      'update_property': "Property updated.",
-      'login': "Welcome back!",
-      'logout': "You've been signed out."
-    },
-    admin: {
-      'save_booking': `Booking saved. ${context.cleanersNotified || 0} cleaners notified.`,
-      'delete_booking': `Booking removed. ${context.affectedSchedules || 0} schedules updated.`,
-      'update_property': `Property updated. ${context.bookingsAffected || 0} bookings affected.`,
-      'login': "Admin session established.",
-      'logout': "Admin session terminated."
-    },
-    cleaner: {
-      'save_booking': "Schedule updated.",
-      'delete_booking': "Assignment removed.",
-      'update_property': "Notes saved.",
-      'login': "Connected to schedule.",
-      'logout': "Disconnected."
-    }
-  };
-
-  const roleMessages = operationMessages[role];
-  return roleMessages?.[operation as keyof typeof roleMessages] || `${operation} completed successfully.`;
-}
+// Removed duplicate getSuccessMessage function - using the one below
 
 /**
  * Error code to category mapping

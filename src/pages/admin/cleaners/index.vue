@@ -294,7 +294,7 @@ import type { Cleaner } from '@/types/user'
 
 // Router and composables
 const router = useRouter()
-const { allCleaners, loading, fetchCleaners, createCleaner, updateCleaner, deleteCleaner } = useCleanerManagement()
+const { allCleaners, loading: _loading, fetchCleaners, createCleaner, updateCleaner, deleteCleaner } = useCleanerManagement()
 
 // Reactive state
 const searchQuery = ref('')

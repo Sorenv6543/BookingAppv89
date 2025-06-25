@@ -776,18 +776,10 @@ const handleEventResize = (resizeInfo: any): void => {
   }
 };
 
-const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+const handleUpdateBooking = (data: { id: string; updates: Partial<Booking> }): void => {
   try {
-    // Convert FullCalendar data format to BookingFormData format
-    const booking = allBookingsMap.value.get(data.id);
-    if (booking) {
-      const bookingData: Partial<BookingFormData> = {
-        ...booking,
-        checkout_date: data.start,
-        checkin_date: data.end
-      };
-      updateBooking(data.id, bookingData);
-    }
+    // Use the updates directly from the event
+    updateBooking(data.id, data.updates);
   } catch (error) {
     console.error('Error updating booking:', error);
   }
@@ -797,18 +789,21 @@ const handleUpdateBooking = (data: { id: string; start: string; end: string }): 
 // EVENT HANDLERS - CALENDAR CONTROLS
 // ============================================================================
 
-const handleCalendarViewChange = (view: CalendarView): void => {
+const handleCalendarViewChange = (view: string): void => {
   try {
-    // Convert generic CalendarView to FullCalendar-specific view names
+    // Convert string view to FullCalendar-specific view names
     let fullCalendarView: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
     switch (view) {
       case 'month':
+      case 'dayGridMonth':
         fullCalendarView = 'dayGridMonth';
         break;
       case 'week':
+      case 'timeGridWeek':
         fullCalendarView = 'timeGridWeek';
         break;
       case 'day':
+      case 'timeGridDay':
         fullCalendarView = 'timeGridDay';
         break;
       default:

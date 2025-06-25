@@ -38,6 +38,8 @@ export const useUserStore = defineStore('user', () => {
 
   // Getters - User-specific filtered views
   const isAuthenticated = computed(() => !!user.value);
+  const currentUser = computed(() => user.value);
+  const sessionId = computed(() => user.value ? `session-${user.value.id}` : undefined);
   
   /**
    * User's properties (filtered by ownership or admin access)
@@ -205,6 +207,8 @@ export const useUserStore = defineStore('user', () => {
     
     // Getters - User-filtered views
     isAuthenticated,
+    currentUser,
+    sessionId,
     userProperties,
     userActiveProperties,
     userBookings,

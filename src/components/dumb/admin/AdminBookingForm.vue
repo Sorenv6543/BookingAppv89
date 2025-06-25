@@ -16,7 +16,9 @@
           class="ml-2"
           variant="elevated"
         >
-          <v-icon start>mdi-clock-alert</v-icon>
+          <v-icon start>
+            mdi-clock-alert
+          </v-icon>
           URGENT TURN
         </v-chip>
         <v-chip
@@ -48,7 +50,10 @@
           <v-container>
             <!-- Property and Owner Information -->
             <v-row>
-              <v-col cols="12" md="8">
+              <v-col
+                cols="12"
+                md="8"
+              >
                 <v-select
                   v-model="form.property_id"
                   :items="propertiesArray"
@@ -65,7 +70,10 @@
                   <template #item="{ props, item }">
                     <v-list-item v-bind="props">
                       <template #prepend>
-                        <v-avatar color="primary" size="small">
+                        <v-avatar
+                          color="primary"
+                          size="small"
+                        >
                           <v-icon>mdi-home</v-icon>
                         </v-avatar>
                       </template>
@@ -77,7 +85,10 @@
                 </v-select>
               </v-col>
               
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-select
                   v-model="form.status"
                   :items="statusOptions"
@@ -93,7 +104,7 @@
                         <v-chip
                           :color="getStatusColor(item.value)"
                           size="x-small"
-                          variant="dot"
+                          variant="tonal"
                         />
                       </template>
                     </v-list-item>
@@ -104,7 +115,10 @@
             
             <!-- Dates and Times -->
             <v-row>
-              <v-col cols="12" sm="6">
+              <v-col
+                cols="12"
+                sm="6"
+              >
                 <v-text-field
                   v-model="form.checkout_date"
                   label="Checkout Date & Time"
@@ -121,7 +135,10 @@
                 />
               </v-col>
               
-              <v-col cols="12" sm="6">
+              <v-col
+                cols="12"
+                sm="6"
+              >
                 <v-text-field
                   v-model="form.checkin_date"
                   label="Checkin Date & Time"
@@ -142,15 +159,23 @@
             <!-- Cleaner Assignment Section -->
             <v-row>
               <v-col cols="12">
-                <v-card variant="outlined" class="mb-4">
+                <v-card
+                  variant="outlined"
+                  class="mb-4"
+                >
                   <v-card-title class="text-subtitle-1 py-2">
-                    <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-account-hard-hat
+                    </v-icon>
                     Cleaner Assignment
                   </v-card-title>
                   <v-divider />
                   <v-card-text>
                     <v-row>
-                      <v-col cols="12" md="6">
+                      <v-col
+                        cols="12"
+                        md="6"
+                      >
                         <v-select
                           v-model="form.assigned_cleaner_id"
                           :items="availableCleaners"
@@ -166,7 +191,10 @@
                           <template #item="{ props, item }">
                             <v-list-item v-bind="props">
                               <template #prepend>
-                                <v-avatar :color="getCleanerAvailabilityColor(item.raw)" size="small">
+                                <v-avatar
+                                  :color="getCleanerAvailabilityColor(item.raw)"
+                                  size="small"
+                                >
                                   <v-icon>mdi-account</v-icon>
                                 </v-avatar>
                               </template>
@@ -177,7 +205,7 @@
                                 <v-chip
                                   :color="getCleanerAvailabilityColor(item.raw)"
                                   size="x-small"
-                                  variant="dot"
+                                  variant="tonal"
                                 >
                                   {{ getCleanerAvailabilityText(item.raw) }}
                                 </v-chip>
@@ -187,14 +215,19 @@
                         </v-select>
                       </v-col>
                       
-                      <v-col cols="12" md="6">
+                      <v-col
+                        cols="12"
+                        md="6"
+                      >
                         <v-btn
                           variant="outlined"
                           color="primary"
                           :disabled="!form.property_id || !form.checkout_date"
                           @click="openCleanerAssignmentModal"
                         >
-                          <v-icon start>mdi-magnify</v-icon>
+                          <v-icon start>
+                            mdi-magnify
+                          </v-icon>
                           Find Best Cleaner
                         </v-btn>
                       </v-col>
@@ -237,7 +270,10 @@
             
             <!-- Booking Details -->
             <v-row>
-              <v-col cols="12" sm="6">
+              <v-col
+                cols="12"
+                sm="6"
+              >
                 <v-text-field
                   v-model.number="form.guest_count"
                   label="Guest Count"
@@ -253,7 +289,10 @@
                 />
               </v-col>
               
-              <v-col cols="12" sm="6">
+              <v-col
+                cols="12"
+                sm="6"
+              >
                 <v-select
                   v-model="form.priority"
                   :items="priorityOptions"
@@ -303,7 +342,11 @@
                   :title="businessImpactAlert.title"
                   class="mb-0"
                 >
-                  <p v-for="message in businessImpactAlert.messages" :key="message" class="mb-1">
+                  <p
+                    v-for="message in businessImpactAlert.messages"
+                    :key="message"
+                    class="mb-1"
+                  >
                     {{ message }}
                   </p>
                 </v-alert>
@@ -345,7 +388,9 @@
           :disabled="loading"
           @click="handleDelete"
         >
-          <v-icon start>mdi-delete</v-icon>
+          <v-icon start>
+            mdi-delete
+          </v-icon>
           Delete
         </v-btn>
         
@@ -358,7 +403,9 @@
           :disabled="loading || !form.assigned_cleaner_id"
           @click="handleMarkComplete"
         >
-          <v-icon start>mdi-check</v-icon>
+          <v-icon start>
+            mdi-check
+          </v-icon>
           Mark Complete
         </v-btn>
         
@@ -369,7 +416,9 @@
           :disabled="!formValid"
           @click="handleSubmit"
         >
-          <v-icon start>{{ mode === 'create' ? 'mdi-plus' : 'mdi-content-save' }}</v-icon>
+          <v-icon start>
+            {{ mode === 'create' ? 'mdi-plus' : 'mdi-content-save' }}
+          </v-icon>
           {{ submitButtonText }}
         </v-btn>
       </v-card-actions>
@@ -417,6 +466,7 @@ const formValid = ref(false)
 
 // Default form data
 const defaultForm: BookingFormData = {
+  owner_id: '', // Required field for admin forms
   property_id: '',
   checkout_date: '',
   checkin_date: '',
@@ -425,7 +475,7 @@ const defaultForm: BookingFormData = {
   notes: '',
   status: 'pending',
   assigned_cleaner_id: '',
-  priority: 'standard'
+  priority: 'normal'
 }
 
 const form = ref<BookingFormData>({ ...defaultForm })
@@ -455,7 +505,7 @@ const propertiesArray = computed(() => {
 })
 
 const availableCleaners = computed(() => {
-  return props.cleaners.filter(cleaner => {
+  return props.cleaners.filter(() => {
     // Filter based on availability and skills if needed
     return true // Simplified for now
   })
@@ -475,17 +525,19 @@ const statusOptions = [
 ]
 
 const priorityOptions = [
-  { title: 'Standard', value: 'standard' },
+  { title: 'Low', value: 'low' },
+  { title: 'Normal', value: 'normal' },
   { title: 'High', value: 'high' },
   { title: 'Urgent', value: 'urgent' }
 ]
 
-const showSameDayAlert = computed(() => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return false
-  const checkoutDate = new Date(form.value.checkout_date).toDateString()
-  const checkinDate = new Date(form.value.checkin_date).toDateString()
-  return checkoutDate === checkinDate
-})
+// Commented out unused computed - was causing TS warning
+// const showSameDayAlert = computed(() => {
+//   if (!form.value.checkout_date || !form.value.checkin_date) return false
+//   const checkoutDate = new Date(form.value.checkout_date).toDateString()
+//   const checkinDate = new Date(form.value.checkin_date).toDateString()
+//   return checkoutDate === checkinDate
+// })
 
 const showDateError = computed(() => {
   if (!form.value.checkout_date || !form.value.checkin_date) return false
@@ -547,7 +599,7 @@ const updateBookingType = () => {
   } else {
     form.value.booking_type = 'standard'
     if (form.value.priority === 'urgent') {
-      form.value.priority = 'standard'
+      form.value.priority = 'normal'
     }
   }
 }
@@ -605,12 +657,12 @@ const getCleanerSubtitle = (cleaner: Cleaner) => {
   return `${cleaner.skills.slice(0, 2).join(', ')} • ${getCleanerTodayBookings(cleaner.id)}/${cleaner.max_daily_bookings} bookings`
 }
 
-const getCleanerTodayBookings = (cleanerId: string) => {
+const getCleanerTodayBookings = (_: string) => {
   // This would typically come from bookings store
   return Math.floor(Math.random() * 5) // Mock data
 }
 
-const getCleanerRating = (cleanerId: string) => {
+const getCleanerRating = (_: string) => {
   // This would typically come from performance data
   return 4 + Math.random() // Mock rating between 4-5
 }
@@ -648,6 +700,7 @@ const handleMarkComplete = () => {
 watch(() => props.booking, (newBooking) => {
   if (newBooking) {
     form.value = {
+      owner_id: newBooking.owner_id,
       property_id: newBooking.property_id,
       checkout_date: newBooking.checkout_date,
       checkin_date: newBooking.checkin_date,
@@ -656,7 +709,7 @@ watch(() => props.booking, (newBooking) => {
       notes: newBooking.notes || '',
       status: newBooking.status,
       assigned_cleaner_id: newBooking.assigned_cleaner_id || '',
-      priority: newBooking.priority || 'standard'
+      priority: newBooking.priority || 'normal'
     }
   } else {
     form.value = { ...defaultForm }
@@ -683,4 +736,3 @@ watch(isOpen, (newValue) => {
   border-left: 4px solid rgb(var(--v-theme-primary));
 }
 </style>
-</rewritten_file>

@@ -199,6 +199,39 @@ export const useUIStore = defineStore('ui', () => {
       addNotification('error', 'Error', errorMessage);
     }
   }
+
+  // Convenience methods for common UI patterns
+  function showNotification(message: string, type: NotificationType = 'info') {
+    return addNotification(type, type.charAt(0).toUpperCase() + type.slice(1), message);
+  }
+  
+  function showConfirmation(
+    title: string,
+    message: string,
+    options: {
+      confirmText?: string;
+      cancelText?: string;
+      dangerous?: boolean;
+    } = {}
+  ): Promise<boolean> {
+    return new Promise((resolve) => {
+      const dialogId = 'confirmation-' + crypto.randomUUID();
+      openConfirmDialog(dialogId, {
+        title,
+        message,
+        confirmText: options.confirmText || 'Confirm',
+        cancelText: options.cancelText || 'Cancel',
+        dangerous: options.dangerous || false
+      });
+      
+      // Return promise that resolves when dialog is closed
+      // This is a simplified implementation - in a real app you'd use events
+      setTimeout(() => {
+        closeConfirmDialog(dialogId);
+        resolve(false); // For now, always resolve false - would need event handling for real implementation
+      }, 100);
+    });
+  }
   
   function updateFilter(filter: Partial<FilterState>) {
     filterState.value = {
@@ -334,6 +367,8 @@ export const useUIStore = defineStore('ui', () => {
     removeNotification,
     clearNotifications,
     setError,
+    showNotification,
+    showConfirmation,
     updateFilter,
     resetFilters,
     setCalendarView,

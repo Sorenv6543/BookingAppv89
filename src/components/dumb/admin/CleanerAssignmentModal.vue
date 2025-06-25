@@ -8,7 +8,9 @@
   >
     <v-card>
       <v-card-title class="text-h5 pb-2 d-flex align-center">
-        <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
+        <v-icon class="mr-2">
+          mdi-account-hard-hat
+        </v-icon>
         Assign Cleaner
         <v-spacer />
         <v-chip
@@ -17,7 +19,9 @@
           size="small"
           variant="elevated"
         >
-          <v-icon start>mdi-clock-alert</v-icon>
+          <v-icon start>
+            mdi-clock-alert
+          </v-icon>
           URGENT
         </v-chip>
       </v-card-title>
@@ -29,39 +33,82 @@
         <v-container>
           <v-row v-if="booking">
             <v-col cols="12">
-              <v-card variant="outlined" class="mb-4">
+              <v-card
+                variant="outlined"
+                class="mb-4"
+              >
                 <v-card-title class="text-subtitle-1 py-2">
-                  <v-icon class="mr-2">mdi-information</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-information
+                  </v-icon>
                   Booking Details
                 </v-card-title>
                 <v-divider />
                 <v-card-text>
                   <v-row>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Property</div>
-                      <div class="text-body-1 font-weight-medium">{{ selectedProperty?.name }}</div>
-                      <div class="text-body-2 text-medium-emphasis">{{ selectedProperty?.address }}</div>
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Property
+                      </div>
+                      <div class="text-body-1 font-weight-medium">
+                        {{ selectedProperty?.name }}
+                      </div>
+                      <div class="text-body-2 text-medium-emphasis">
+                        {{ selectedProperty?.address }}
+                      </div>
                     </v-col>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Schedule</div>
-                      <div class="text-body-1">
-                        <v-icon size="small" class="mr-1">mdi-calendar-export</v-icon>
-                        {{ formatDateTime(booking.checkout_date) }}
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Schedule
                       </div>
                       <div class="text-body-1">
-                        <v-icon size="small" class="mr-1">mdi-calendar-import</v-icon>
-                        {{ formatDateTime(booking.checkin_date) }}
+                        <v-icon
+                          size="small"
+                          class="mr-1"
+                        >
+                          mdi-calendar-export
+                        </v-icon>
+                        {{ booking.checkout_date ? formatDateTime(booking.checkout_date) : 'Not set' }}
+                      </div>
+                      <div class="text-body-1">
+                        <v-icon
+                          size="small"
+                          class="mr-1"
+                        >
+                          mdi-calendar-import
+                        </v-icon>
+                        {{ booking.checkin_date ? formatDateTime(booking.checkin_date) : 'Not set' }}
                       </div>
                     </v-col>
                   </v-row>
                   <v-row>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Cleaning Window</div>
-                      <div class="text-body-1">{{ getCleaningWindow() }}</div>
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Cleaning Window
+                      </div>
+                      <div class="text-body-1">
+                        {{ getCleaningWindow() }}
+                      </div>
                     </v-col>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Estimated Duration</div>
-                      <div class="text-body-1">{{ selectedProperty?.cleaning_duration || 120 }} minutes</div>
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Estimated Duration
+                      </div>
+                      <div class="text-body-1">
+                        {{ selectedProperty?.cleaning_duration || 120 }} minutes
+                      </div>
                     </v-col>
                   </v-row>
                 </v-card-text>
@@ -71,7 +118,10 @@
           
           <!-- Filters and Search -->
           <v-row>
-            <v-col cols="12" md="6">
+            <v-col
+              cols="12"
+              md="6"
+            >
               <v-text-field
                 v-model="searchQuery"
                 label="Search Cleaners"
@@ -82,7 +132,10 @@
                 persistent-hint
               />
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col
+              cols="12"
+              md="3"
+            >
               <v-select
                 v-model="availabilityFilter"
                 :items="availabilityFilterOptions"
@@ -91,7 +144,10 @@
                 clearable
               />
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col
+              cols="12"
+              md="3"
+            >
               <v-select
                 v-model="skillFilter"
                 :items="skillFilterOptions"
@@ -107,23 +163,38 @@
             <v-col cols="12">
               <v-card variant="outlined">
                 <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
-                  <v-icon class="mr-2">mdi-account-group</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-account-group
+                  </v-icon>
                   Available Cleaners
                   <v-spacer />
-                  <v-chip size="small" variant="tonal">
+                  <v-chip
+                    size="small"
+                    variant="tonal"
+                  >
                     {{ filteredCleaners.length }} available
                   </v-chip>
                 </v-card-title>
                 <v-divider />
                 
-                <v-list class="pa-0" max-height="400" style="overflow-y: auto;">
-                  <template v-for="(cleaner, index) in filteredCleaners" :key="cleaner.id">
+                <v-list
+                  class="pa-0"
+                  max-height="400"
+                  style="overflow-y: auto;"
+                >
+                  <template
+                    v-for="(cleaner, index) in filteredCleaners"
+                    :key="cleaner.id"
+                  >
                     <v-list-item
                       :class="{ 'bg-primary-lighten-5': selectedCleanerId === cleaner.id }"
                       @click="selectCleaner(cleaner.id)"
                     >
                       <template #prepend>
-                        <v-avatar :color="getAvailabilityColor(cleaner)" size="40">
+                        <v-avatar
+                          :color="getAvailabilityColor(cleaner)"
+                          size="40"
+                        >
                           <v-icon>mdi-account</v-icon>
                         </v-avatar>
                       </template>
@@ -187,9 +258,13 @@
                   <!-- No cleaners available -->
                   <v-list-item v-if="filteredCleaners.length === 0">
                     <v-list-item-title class="text-center text-medium-emphasis">
-                      <v-icon class="mb-2">mdi-account-off</v-icon>
+                      <v-icon class="mb-2">
+                        mdi-account-off
+                      </v-icon>
                       <div>No cleaners match your criteria</div>
-                      <div class="text-caption">Try adjusting your filters</div>
+                      <div class="text-caption">
+                        Try adjusting your filters
+                      </div>
                     </v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -200,20 +275,36 @@
           <!-- Selected Cleaner Details -->
           <v-row v-if="selectedCleanerDetails">
             <v-col cols="12">
-              <v-card variant="outlined" color="primary">
+              <v-card
+                variant="outlined"
+                color="primary"
+              >
                 <v-card-title class="text-subtitle-1 py-2">
-                  <v-icon class="mr-2">mdi-account-check</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-account-check
+                  </v-icon>
                   Selected Cleaner Details
                 </v-card-title>
                 <v-divider />
                 <v-card-text>
                   <v-row>
-                    <v-col cols="12" md="4">
+                    <v-col
+                      cols="12"
+                      md="4"
+                    >
                       <div class="text-center">
-                        <v-avatar :color="getAvailabilityColor(selectedCleanerDetails)" size="80" class="mb-2">
-                          <v-icon size="40">mdi-account</v-icon>
+                        <v-avatar
+                          :color="getAvailabilityColor(selectedCleanerDetails)"
+                          size="80"
+                          class="mb-2"
+                        >
+                          <v-icon size="40">
+                            mdi-account
+                          </v-icon>
                         </v-avatar>
-                        <div class="text-h6 font-weight-medium">{{ selectedCleanerDetails.name }}</div>
+                        <div class="text-h6 font-weight-medium">
+                          {{ selectedCleanerDetails.name }}
+                        </div>
                         <v-rating
                           :model-value="getCleanerRating(selectedCleanerDetails.id)"
                           readonly
@@ -224,8 +315,13 @@
                       </div>
                     </v-col>
                     
-                    <v-col cols="12" md="4">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Skills & Specializations</div>
+                    <v-col
+                      cols="12"
+                      md="4"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Skills & Specializations
+                      </div>
                       <div class="d-flex flex-wrap gap-1 mb-3">
                         <v-chip
                           v-for="skill in selectedCleanerDetails.skills"
@@ -238,27 +334,44 @@
                         </v-chip>
                       </div>
                       
-                      <div class="text-body-2 text-medium-emphasis mb-1">Availability Status</div>
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Availability Status
+                      </div>
                       <v-chip
                         :color="getAvailabilityColor(selectedCleanerDetails)"
                         variant="elevated"
                       >
-                        <v-icon start>{{ getAvailabilityIcon(selectedCleanerDetails) }}</v-icon>
+                        <v-icon start>
+                          {{ getAvailabilityIcon(selectedCleanerDetails) }}
+                        </v-icon>
                         {{ getAvailabilityText(selectedCleanerDetails) }}
                       </v-chip>
                     </v-col>
                     
-                    <v-col cols="12" md="4">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Today's Schedule</div>
+                    <v-col
+                      cols="12"
+                      md="4"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Today's Schedule
+                      </div>
                       <div class="text-body-1 mb-2">
                         {{ getCleanerTodayBookings(selectedCleanerDetails.id) }}/{{ selectedCleanerDetails.max_daily_bookings }} bookings
                       </div>
                       
-                      <div class="text-body-2 text-medium-emphasis mb-1">Distance from Property</div>
-                      <div class="text-body-1 mb-2">{{ getDistanceText(selectedCleanerDetails) }}</div>
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Distance from Property
+                      </div>
+                      <div class="text-body-1 mb-2">
+                        {{ getDistanceText(selectedCleanerDetails) }}
+                      </div>
                       
-                      <div class="text-body-2 text-medium-emphasis mb-1">Estimated Travel Time</div>
-                      <div class="text-body-1">{{ getTravelTime(selectedCleanerDetails) }}</div>
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Estimated Travel Time
+                      </div>
+                      <div class="text-body-1">
+                        {{ getTravelTime(selectedCleanerDetails) }}
+                      </div>
                     </v-col>
                   </v-row>
                   
@@ -300,7 +413,9 @@
           :disabled="loading"
           @click="handleAutoAssign"
         >
-          <v-icon start>mdi-auto-fix</v-icon>
+          <v-icon start>
+            mdi-auto-fix
+          </v-icon>
           Auto-Assign Best Match
         </v-btn>
         
@@ -313,7 +428,9 @@
           :disabled="!selectedCleanerId"
           @click="handleAssign"
         >
-          <v-icon start>mdi-account-check</v-icon>
+          <v-icon start>
+            mdi-account-check
+          </v-icon>
           Assign Cleaner
         </v-btn>
       </v-card-actions>
@@ -439,57 +556,57 @@ const getAvailabilityStatus = (cleaner: Cleaner): string => {
 
 const getAvailabilityColor = (cleaner: Cleaner) => {
   const status = getAvailabilityStatus(cleaner)
-  const colors = {
+  const colors: Record<string, string> = {
     available: 'green',
     limited: 'orange',
     booked: 'red'
   }
-  return colors[status]
+  return colors[status] || 'grey'
 }
 
 const getAvailabilityText = (cleaner: Cleaner) => {
   const status = getAvailabilityStatus(cleaner)
-  const texts = {
+  const texts: Record<string, string> = {
     available: 'Available',
     limited: 'Limited',
     booked: 'Fully Booked'
   }
-  return texts[status]
+  return texts[status] || 'Unknown'
 }
 
 const getAvailabilityIcon = (cleaner: Cleaner) => {
   const status = getAvailabilityStatus(cleaner)
-  const icons = {
+  const icons: Record<string, string> = {
     available: 'mdi-check-circle',
     limited: 'mdi-clock',
     booked: 'mdi-close-circle'
   }
-  return icons[status]
+  return icons[status] || 'mdi-help-circle'
 }
 
-const getCleanerTodayBookings = (cleanerId: string) => {
+const getCleanerTodayBookings = (_cleanerId: string) => {
   // Mock data - would come from bookings store
   return Math.floor(Math.random() * 6)
 }
 
-const getCleanerRating = (cleanerId: string) => {
+const getCleanerRating = (_cleanerId: string) => {
   // Mock data - would come from performance data
   return 3.5 + Math.random() * 1.5
 }
 
-const getDistanceText = (cleaner: Cleaner) => {
+const getDistanceText = (_cleaner: Cleaner) => {
   // Mock data - would calculate from cleaner location and property
   const distance = Math.floor(Math.random() * 20) + 1
   return `${distance} km away`
 }
 
-const getTravelTime = (cleaner: Cleaner) => {
+const getTravelTime = (_cleaner: Cleaner) => {
   // Mock data - would calculate based on distance and traffic
   const time = Math.floor(Math.random() * 30) + 10
   return `${time} minutes`
 }
 
-const hasScheduleConflict = (cleaner: Cleaner) => {
+const hasScheduleConflict = (_cleaner: Cleaner) => {
   // Mock conflict detection - would check against existing bookings
   return Math.random() < 0.2 // 20% chance of conflict
 }
