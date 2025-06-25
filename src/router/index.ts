@@ -8,7 +8,7 @@
 // ✅ Applies navigation guards
 
 import { createRouter, createWebHistory } from 'vue-router'
-import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from './guards'
+import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from '@/router/guards'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -132,7 +132,31 @@ const router = createRouter({
       }
     },
 
-    // // Demo routes - now in src/dev/demos/
+    // Demo routes - now in src/dev/demos/
+    {
+      path: '/demos',
+      name: 'demos-index',
+      component: () => import('@/dev/demos/index.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
+      path: '/demos/pwa',
+      name: 'pwa-demo',
+      component: () => import('@/dev/demos/PWADemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
+      path: '/demos/owner-data-store',
+      name: 'owner-data-store-demo',
+      component: () => import('@/dev/demos/OwnerDataStoreDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
     // {
     //   path: '/demos/home-admin',
     //   name: 'home-admin-demo',

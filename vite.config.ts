@@ -3,7 +3,10 @@ import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import path from 'path'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import { VitePluginInspector } from 'vite-plugin-vue-inspector'
+import { VitePWA } from 'vite-plugin-pwa'
+
+
+
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -25,6 +28,57 @@ export default defineConfig({
       componentInspector: {
         enabled: true,
         launchEditor: 'code',
+      }
+    }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'supabase-api',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 // 24 hours
+              }
+            }
+          }
+        ]
+      },
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      manifest: {
+        name: 'Property Cleaning Scheduler',
+        short_name: 'CleanSync',
+        description: 'Professional property cleaning management for owners and administrators',
+        theme_color: '#1976d2',
+        background_color: '#ffffff',
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
+        icons: [
+          {
+            src: 'pwa-icon.svg',
+            sizes: '192x192',
+            type: 'image/svg+xml'
+          },
+          {
+            src: 'pwa-icon.svg', 
+            sizes: '512x512',
+            type: 'image/svg+xml'
+          },
+          {
+            src: 'pwa-icon.svg',
+            sizes: '512x512', 
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
+          }
+        ]
+      },
+      devOptions: {
+        enabled: true
       }
     })
 
@@ -72,7 +126,9 @@ export default defineConfig({
         }
       }
     },
+    // access from local network
   server: {
+    host: '192.168.1.100',
     port: 3000,
     open: true,
     sourcemapIgnoreList: false,

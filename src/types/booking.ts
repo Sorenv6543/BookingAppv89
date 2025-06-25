@@ -63,10 +63,13 @@ export type BookingMap = Map<string, Booking>;
 /**
  * Type guard for Booking objects
  */
-export function isBooking(obj: any): obj is Booking {
-  return obj && 
-    typeof obj.id === 'string' &&
-    typeof obj.property_id === 'string' &&
-    typeof obj.checkout_date === 'string' &&
-    typeof obj.checkin_date === 'string';
+export function isBooking(obj: unknown): obj is Booking {
+  if (typeof obj !== 'object' || obj === null) return false;
+  const b = obj as Partial<Booking>;
+  return (
+    typeof b.id === 'string' &&
+    typeof b.property_id === 'string' &&
+    typeof b.checkout_date === 'string' &&
+    typeof b.checkin_date === 'string'
+  );
 }

@@ -246,8 +246,6 @@ const isOpen = computed({
   set: (value) => emit('update:modelValue', value)
 })
 
-
-
 const currentRoute = computed(() => route.name as string)
 
 // ROLE-BASED DATA FILTERING - Owner sees only their data
@@ -1309,7 +1307,6 @@ export interface AdminComponentProps {
   user: User & { role: 'admin' }
   allProperties: Property[]
   allBookings: Booking[]
-  systemMetrics: SystemMetrics
 }
 
 // Generic role-based component

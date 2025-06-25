@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { User } from '@/types';
-import { usePropertyStore } from './property';
-import { useBookingStore } from './booking';
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
 
 /**
  * User store for the Property Cleaning Scheduler

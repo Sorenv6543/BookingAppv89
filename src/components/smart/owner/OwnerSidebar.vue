@@ -5,178 +5,414 @@
     :elevation="0"
     color="tertiary"
   >                                   
-    <v-container class="py-2">
-      <!-- Header with Owner-specific info -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <h2 class="text-h6 font-weight-bold">
-            My Properties
-          </h2>
-          <div class="text-subtitle-2 text-medium-emphasis">
-            {{ formattedDate }}
-          </div>
-          <!-- Owner-specific metrics -->
-          <div class="text-caption text-medium-emphasis mt-1">
-            {{ ownerPropertiesCount }} properties • {{ ownerBookingsCount }} bookings
-          </div>
-        </v-col>
-      </v-row>
-
-      <!-- Turn Alerts (owner's turns only) -->
-      <v-row v-if="ownerTodayTurnsArray.length > 0">
-        <v-col cols="12">
-          <TurnAlerts 
-            :bookings="ownerTodayBookingsWithMetadata" 
-            :properties="ownerPropertiesMap"
-            @view="$emit('navigateToBooking', $event)"
-            @assign="handleViewBooking"
-            @view-all="handleViewAll('turns')"
-          />
-        </v-col>
-      </v-row>
-
-      <!-- Upcoming Cleanings (owner's cleanings only) -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <UpcomingCleanings 
-            :bookings="ownerUpcomingBookingsWithMetadata"
-            :properties="ownerPropertiesMap"
-            @view="$emit('navigateToBooking', $event)"
-            @assign="handleViewBooking"
-            @view-all="handleViewAll($event)"
-            @toggle-expanded="toggleUpcomingExpanded"
-          />
-        </v-col>
-      </v-row>
-
-      <!-- Property Filter (owner's properties only) -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <v-card
-            class="property-filter"
-            variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-filter-variant"
-                class="mr-2"
-              />
-              Filter My Properties
-            </v-card-title>
-            <v-card-text>
-              <v-select
-                v-model="selectedProperty"
-                :items="ownerPropertySelectItems"
-                label="Select Property"
-                clearable
-                @update:model-value="handlePropertyFilterChange"
-              >
-                <template #prepend-item>
-                  <v-list-item
-                    title="All My Properties"
-                    value=""
-                    @click="selectedProperty = null"
-                  />
-                  <v-divider class="mt-2" />
-                </template>
-              </v-select>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Quick Actions (owner-specific) -->
-      <v-row>
-        <v-col cols="12">
-          <v-card
-            class="quick-actions"
-            variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-lightning-bolt"
-                class="mr-2"
-              />
-              Quick Actions
-            </v-card-title>
-            <v-card-text class="d-flex gap-2">
-              <v-btn
-                prepend-icon="mdi-calendar-plus"
-                color="primary"
-                variant="tonal"
-                block
-                @click="$emit('createBooking')"
-              >
-                Add Booking
-              </v-btn>
-              <v-btn
-                prepend-icon="mdi-home-plus"
-                color="secondary"
-                variant="tonal"
-                block
-                @click="$emit('createProperty')"
-              >
-                Add Property
-              </v-btn>
-            </v-card-text>
-            <v-card-text class="pt-0">
-              <v-btn
-                prepend-icon="mdi-calendar-month"
-                color="info"
-                variant="outlined"
-                block
-                @click="handleViewCalendar"
-              >
-                View My Calendar
-              </v-btn>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Loading Overlay -->
-      <v-overlay 
-        :model-value="loading"
-        :contained="true"
-        :persistent="true"
-        class="align-center justify-center"
-      >
-        <v-progress-circular
-          indeterminate
-          color="primary"
+    <!-- User Profile Section -->
+    <v-list-item
+      :prepend-avatar="`https://ui-avatars.com/api/?name=${encodeURIComponent(authStore.user?.name || 'Owner')}&background=6366f1&color=fff`"
+      :title="authStore.user?.name || 'Property Owner'"
+      :subtitle="authStore.user?.email"
+      class="owner-profile ma-2"
+      rounded="lg"
+      color="primary"
+      variant="tonal"
+    >
+      <template #append>
+        <v-btn
+          variant="text"
+          :icon="isRail ? 'mdi-chevron-right' : 'mdi-chevron-left'"
+          size="small"
+          @click="toggleRail"
         />
-      </v-overlay>
-    </v-container>
+      </template>
+    </v-list-item>
+
+    <v-divider class="mx-4" />
+
+    <!-- Owner Quick Stats -->
+    <v-expand-transition>
+      <v-card
+        v-if="!isRail"
+        variant="flat"
+        class="mx-2 my-3"
+        color="surface-bright"
+      >
+        <v-card-subtitle class="text-caption text-medium-emphasis pb-2">
+          Quick Stats
+        </v-card-subtitle>
+        <v-card-text class="pt-0">
+          <v-row dense>
+            <v-col
+              cols="4"
+              class="text-center"
+            >
+              <v-avatar
+                color="primary"
+                size="40"
+              >
+                <span class="text-h6">{{ ownerData.stats.propertiesCount }}</span>
+              </v-avatar>
+              <div class="text-caption mt-1">
+                Properties
+              </div>
+            </v-col>
+            <v-col
+              cols="4"
+              class="text-center"
+            >
+              <v-avatar
+                color="success"
+                size="40"
+              >
+                <span class="text-h6">{{ ownerData.stats.upcomingBookingsCount }}</span>
+              </v-avatar>
+              <div class="text-caption mt-1">
+                Upcoming
+              </div>
+            </v-col>
+            <v-col
+              cols="4"
+              class="text-center"
+            >
+              <v-avatar 
+                :color="ownerData.stats.urgentTurnsCount > 0 ? 'warning' : 'surface'" 
+                size="40"
+              >
+                <span class="text-h6">{{ ownerData.stats.urgentTurnsCount }}</span>
+              </v-avatar>
+              <div class="text-caption mt-1">
+                Urgent
+              </div>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-expand-transition>
+
+    <v-divider class="mx-4" />
+
+    <!-- Owner Navigation -->
+    <v-list
+      density="compact"
+      nav
+      class="px-2"
+    >
+      <!-- Dashboard -->
+      <v-list-item
+        prepend-icon="mdi-view-dashboard"
+        title="Dashboard"
+        :active="currentRoute === 'owner-dashboard'"
+        rounded="lg"
+        class="mb-1"
+        @click="navigateTo('/owner/dashboard')"
+      />
+
+      <!-- My Properties -->
+      <v-list-group
+        value="properties"
+        class="mb-1"
+      >
+        <template #activator="{ props: activatorProps }">
+          <v-list-item
+            v-bind="activatorProps"
+            prepend-icon="mdi-home-group"
+            title="My Properties"
+            rounded="lg"
+          >
+            <template #append="{ isActive }">
+              <v-icon :icon="isActive ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+            </template>
+          </v-list-item>
+        </template>
+
+        <v-list-item
+          prepend-icon="mdi-plus-circle"
+          title="Add Property"
+          class="ml-4"
+          rounded="lg"
+          @click="showAddPropertyDialog = true"
+        />
+        
+        <v-list-item
+          v-for="property in ownerData.ownerProperties"
+          :key="property.id"
+          :prepend-icon="property.active ? 'mdi-home' : 'mdi-home-off'"
+          :title="property.name"
+          :subtitle="getPropertySubtitle(property)"
+          class="ml-4"
+          rounded="lg"
+          @click="filterByProperty(property.id)"
+        >
+          <template #append>
+            <v-chip
+              v-if="getPropertyBookingsCount(property.id) > 0"
+              size="x-small"
+              color="primary"
+              variant="tonal"
+            >
+              {{ getPropertyBookingsCount(property.id) }}
+            </v-chip>
+          </template>
+        </v-list-item>
+      </v-list-group>
+
+      <!-- My Bookings -->
+      <v-list-item
+        prepend-icon="mdi-calendar-check"
+        title="My Bookings"
+        :active="currentRoute === 'owner-bookings'"
+        rounded="lg"
+        class="mb-1"
+        @click="navigateTo('/owner/bookings')"
+      >
+        <template #append>
+          <v-chip
+            v-if="ownerData.ownerBookings.length > 0"
+            size="x-small"
+            color="primary"
+            variant="tonal"
+          >
+            {{ ownerData.ownerBookings.length }}
+          </v-chip>
+        </template>
+      </v-list-item>
+
+      <!-- Calendar View -->
+      <v-list-item
+        prepend-icon="mdi-calendar"
+        title="Calendar"
+        :active="currentRoute === 'owner-calendar'"
+        rounded="lg"
+        class="mb-1"
+        @click="navigateTo('/owner/calendar')"
+      />
+
+      <v-divider class="my-3" />
+
+      <!-- Turn Alerts (Owner-specific) -->
+      <v-list-item
+        :prepend-icon="ownerData.urgentTurns.length > 0 ? 'mdi-alert-circle' : 'mdi-check-circle'"
+        :title="`Turn Alerts (${ownerData.urgentTurns.length})`"
+        :class="{ 'text-warning': ownerData.urgentTurns.length > 0, 'text-success': ownerData.urgentTurns.length === 0 }"
+        rounded="lg"
+        class="mb-1"
+        @click="showTurnAlerts = true"
+      >
+        <template #append>
+          <v-badge
+            v-if="ownerData.urgentTurns.length > 0"
+            :content="ownerData.urgentTurns.length"
+            color="warning"
+          />
+        </template>
+      </v-list-item>
+
+      <!-- Settings -->
+      <v-list-item
+        prepend-icon="mdi-cog"
+        title="Settings"
+        rounded="lg"
+        @click="navigateTo('/owner/settings')"
+      />
+    </v-list>
+
+    <!-- Owner Quick Actions -->
+    <template #append>
+      <v-expand-transition>
+        <div
+          v-if="!isRail"
+          class="pa-3"
+        >
+          <v-btn
+            block
+            color="primary"
+            prepend-icon="mdi-plus"
+            text="Add Booking"
+            variant="elevated"
+            class="mb-2"
+            @click="showAddBookingDialog = true"
+          />
+          <v-btn
+            block
+            color="secondary"
+            prepend-icon="mdi-home-plus"
+            text="Add Property"
+            variant="outlined"
+            @click="showAddPropertyDialog = true"
+          />
+        </div>
+      </v-expand-transition>
+      
+      <!-- Rail mode quick actions -->
+      <div
+        v-if="isRail"
+        class="d-flex flex-column pa-2"
+      >
+        <v-btn
+          icon="mdi-plus"
+          color="primary"
+          variant="elevated"
+          class="mb-2"
+          @click="showAddBookingDialog = true"
+        />
+        <v-btn
+          icon="mdi-home-plus"
+          color="secondary"
+          variant="outlined"
+          @click="showAddPropertyDialog = true"
+        />
+      </div>
+    </template>
   </v-navigation-drawer>
+
+  <!-- Enhanced Property Dialog -->
+  <v-dialog 
+    v-model="showAddPropertyDialog" 
+    max-width="600"
+    persistent
+    :fullscreen="isMobile"
+  >
+    <v-card>
+      <v-card-title class="d-flex align-center">
+        <v-icon
+          icon="mdi-home-plus"
+          class="mr-3"
+        />
+        Add New Property
+        <v-spacer />
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          @click="showAddPropertyDialog = false"
+        />
+      </v-card-title>
+      <v-card-text>
+        <!-- Simple form for now - will be replaced with OwnerPropertyForm -->
+        <v-alert
+          type="info"
+          variant="tonal"
+          class="mb-4"
+        >
+          Property creation form will be implemented here
+        </v-alert>
+        <v-btn
+          color="primary"
+          @click="createSampleProperty"
+        >
+          Create Sample Property
+        </v-btn>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <!-- Enhanced Booking Dialog -->
+  <v-dialog 
+    v-model="showAddBookingDialog" 
+    max-width="800"
+    persistent
+    :fullscreen="isMobile"
+  >
+    <v-card>
+      <v-card-title class="d-flex align-center">
+        <v-icon
+          icon="mdi-calendar-plus"
+          class="mr-3"
+        />
+        Schedule New Cleaning
+        <v-spacer />
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          @click="showAddBookingDialog = false"
+        />
+      </v-card-title>
+      <v-card-text>
+        <!-- Simple form for now - will be replaced with OwnerBookingForm -->
+        <v-alert
+          type="info"
+          variant="tonal"
+          class="mb-4"
+        >
+          Booking creation form will be implemented here
+        </v-alert>
+        <v-btn 
+          color="primary" 
+          :disabled="ownerData.ownerProperties.length === 0"
+          @click="createSampleBooking"
+        >
+          Create Sample Booking
+        </v-btn>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <!-- Enhanced Turn Alerts Dialog -->
+  <v-dialog 
+    v-model="showTurnAlerts" 
+    max-width="500"
+    :fullscreen="isMobile"
+  >
+    <v-card>
+      <v-card-title class="d-flex align-center">
+        <v-icon 
+          :icon="ownerData.urgentTurns.length > 0 ? 'mdi-alert-circle' : 'mdi-check-circle'"
+          :color="ownerData.urgentTurns.length > 0 ? 'warning' : 'success'"
+          class="mr-3"
+        />
+        Turn Alerts
+        <v-spacer />
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          @click="showTurnAlerts = false"
+        />
+      </v-card-title>
+      <v-card-text>
+        <div v-if="ownerData.urgentTurns.length > 0">
+          <v-list>
+            <v-list-item
+              v-for="turn in ownerData.urgentTurns"
+              :key="turn.id"
+            >
+              <template #prepend>
+                <v-avatar
+                  color="warning"
+                  size="40"
+                >
+                  <v-icon>mdi-alert</v-icon>
+                </v-avatar>
+              </template>
+              <v-list-item-title>
+                {{ getPropertyName(turn.property_id) }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                Checkout: {{ new Date(turn.checkout_date).toLocaleDateString() }}
+              </v-list-item-subtitle>
+            </v-list-item>
+          </v-list>
+        </div>
+        <v-alert
+          v-else
+          type="success"
+          variant="tonal"
+        >
+          <v-icon
+            icon="mdi-check-circle"
+            class="mr-2"
+          />
+          No urgent turns! All your properties are under control.
+        </v-alert>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useDisplay } from 'vuetify';
+import { useRouter, useRoute } from 'vue-router';
 import { useUIStore } from '@/stores/ui';
 import { useAuthStore } from '@/stores/auth';
-import TurnAlerts from '@/components/dumb/shared/TurnAlerts.vue';
-import UpcomingCleanings from '@/components/dumb/shared/UpcomingCleanings.vue';
-
-// Import types
-import type { Booking, Property, BookingWithMetadata } from '@/types';
-
-// Import event logger
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-
-// Define props with default values
-interface Props {
-  todayTurns?: Map<string, Booking> | Booking[];
-  upcomingCleanings?: Map<string, Booking> | Booking[];
-  properties?: Map<string, Property> | Property[];
-  loading?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  todayTurns: () => [],
-  upcomingCleanings: () => [],
-  properties: () => [],
-  loading: false
-});
+import { useOwnerDataStore } from '@/stores/ownerData';
+import type { Property } from '@/types';
 
 // Define emits
 interface Emits {
@@ -189,309 +425,118 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
+// Composables
+const router = useRouter();
+const route = useRoute();
+const { mobile } = useDisplay();
+
 // Store connections
 const uiStore = useUIStore();
 const authStore = useAuthStore();
+const ownerDataStore = useOwnerDataStore();
 
-// Local state - initialize from UI store
-const selectedProperty = ref<string | null>(uiStore.selectedPropertyFilter || null);
+// Enhanced state
+const isRail = ref(false);
+const showAddPropertyDialog = ref(false);
+const showAddBookingDialog = ref(false);
+const showTurnAlerts = ref(false);
 
-// Computed properties
-const formattedDate = computed(() => {
+// Get owner data from store
+const ownerData = computed(() => ownerDataStore);
+
+// Responsive design
+const isMobile = computed(() => mobile.value);
+
+// Current route detection
+const currentRoute = computed(() => route.name as string);
+
+// Navigation methods
+const navigateTo = (path: string) => {
   try {
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    };
-    return new Date().toLocaleDateString('en-US', options);
+    router.push(path);
   } catch (error) {
-    console.error('Error formatting date:', error);
-    return new Date().toISOString().split('T')[0]; // Fallback format
+    console.error('Navigation error:', error);
   }
-});
+};
 
-// Get current user ID for filtering
-const currentUserId = computed(() => authStore.user?.id || '1');
+const toggleRail = () => {
+  isRail.value = !isRail.value;
+};
 
-// Convert inputs to proper Maps if they're not already
-const todayTurnsMap = computed(() => {
+// Property and booking methods
+const filterByProperty = (propertyId: string) => {
   try {
-    if (props.todayTurns instanceof Map) return props.todayTurns;
-    
-    const map = new Map<string, Booking>();
-    if (Array.isArray(props.todayTurns)) {
-      props.todayTurns.forEach(booking => {
-        if (booking && booking.id) {
-          map.set(booking.id, booking);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing today\'s turns:', error);
-    return new Map<string, Booking>();
-  }
-});
-
-const upcomingCleaningsMap = computed(() => {
-  try {
-    if (props.upcomingCleanings instanceof Map) return props.upcomingCleanings;
-    
-    const map = new Map<string, Booking>();
-    if (Array.isArray(props.upcomingCleanings)) {
-      props.upcomingCleanings.forEach(booking => {
-        if (booking && booking.id) {
-          map.set(booking.id, booking);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing upcoming cleanings:', error);
-    return new Map<string, Booking>();
-  }
-});
-
-const propertiesMap = computed(() => {
-  try {
-    if (props.properties instanceof Map) return props.properties;
-    
-    const map = new Map<string, Property>();
-    if (Array.isArray(props.properties)) {
-      props.properties.forEach(property => {
-        if (property && property.id) {
-          map.set(property.id, property);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing properties:', error);
-    return new Map<string, Property>();
-  }
-});
-
-// OWNER-SPECIFIC FILTERING: Filter all data to show only current owner's data
-const ownerPropertiesMap = computed(() => {
-  const ownerMap = new Map<string, Property>();
-  propertiesMap.value.forEach((property, id) => {
-    if (property.owner_id === currentUserId.value) {
-      ownerMap.set(id, property);
-    }
-  });
-  return ownerMap;
-});
-
-const ownerTodayTurnsMap = computed(() => {
-  const ownerMap = new Map<string, Booking>();
-  todayTurnsMap.value.forEach((booking, id) => {
-    if (booking.owner_id === currentUserId.value) {
-      ownerMap.set(id, booking);
-    }
-  });
-  return ownerMap;
-});
-
-const ownerUpcomingCleaningsMap = computed(() => {
-  const ownerMap = new Map<string, Booking>();
-  upcomingCleaningsMap.value.forEach((booking, id) => {
-    if (booking.owner_id === currentUserId.value) {
-      ownerMap.set(id, booking);
-    }
-  });
-  return ownerMap;
-});
-
-// Convert owner Maps to arrays for components that expect arrays
-const ownerTodayTurnsArray = computed(() => 
-  Array.from(ownerTodayTurnsMap.value.values())
-);
-
-const ownerUpcomingCleaningsArray = computed(() => 
-  Array.from(ownerUpcomingCleaningsMap.value.values())
-);
-
-// Owner-specific metrics
-const ownerPropertiesCount = computed(() => ownerPropertiesMap.value.size);
-const ownerBookingsCount = computed(() => 
-  ownerTodayTurnsArray.value.length + ownerUpcomingCleaningsArray.value.length
-);
-
-// Add metadata (priority) to owner's bookings for the components
-const ownerTodayBookingsWithMetadata = computed(() => {
-  return ownerTodayTurnsArray.value.map(booking => {
-    // Owner's turns are typically high priority
-    const priority: 'low' | 'normal' | 'high' | 'urgent' = 'high';
-    
-    return {
-      ...booking,
-      priority,
-      property_name: ownerPropertiesMap.value.get(booking.property_id)?.name || `Property ${booking.property_id.substring(0, 8)}`,
-      cleaning_window: {
-        start: booking.checkout_date,
-        end: booking.checkin_date,
-        duration: ownerPropertiesMap.value.get(booking.property_id)?.cleaning_duration || 120
-      }
-    } as BookingWithMetadata;
-  });
-});
-
-const ownerUpcomingBookingsWithMetadata = computed(() => {
-  return ownerUpcomingCleaningsArray.value.map(booking => {
-    // Priority based on booking type
-    const priority: 'low' | 'normal' | 'high' | 'urgent' = 
-      booking.booking_type === 'turn' ? 'high' : 'normal';
-    
-    return {
-      ...booking,
-      priority,
-      property_name: ownerPropertiesMap.value.get(booking.property_id)?.name || `Property ${booking.property_id.substring(0, 8)}`,
-      cleaning_window: {
-        start: booking.checkout_date,
-        end: booking.checkin_date,
-        duration: ownerPropertiesMap.value.get(booking.property_id)?.cleaning_duration || 120
-      }
-    } as BookingWithMetadata;
-  });
-});
-
-// Format owner's properties for v-select (only their properties)
-const ownerPropertySelectItems = computed(() => {
-  try {
-    return Array.from(ownerPropertiesMap.value.values())
-      .filter(property => property && property.id && property.name)
-      .map(property => ({
-        title: property.name,
-        value: property.id,
-      }));
-  } catch (error) {
-    console.error('Error creating owner property select items:', error);
-    return [];
-  }
-});
-
-// Methods
-const handlePropertyFilterChange = (propertyId: string | null): void => {
-  try {
-    // Update UI store
     uiStore.setPropertyFilter(propertyId);
-    
-    // Log event
-    eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'filterByProperty',
-      propertyId,
-      'emit'
-    );
-    
-    // Emit to parent
     emit('filterByProperty', propertyId);
   } catch (error) {
-    console.error('Error changing property filter:', error);
-    // Could add UI notification here using the UI store
+    console.error('Error filtering by property:', error);
   }
 };
 
-// Owner-specific: View booking instead of assign cleaner
-const handleViewBooking = (bookingId: string): void => {
+const getPropertySubtitle = (property: Property): string => {
+  return property.address || 'No address';
+};
+
+const getPropertyBookingsCount = (propertyId: string): number => {
+  return ownerData.value.ownerBookings.filter(b => b.property_id === propertyId).length;
+};
+
+const getPropertyName = (propertyId: string): string => {
+  const property = ownerData.value.ownerProperties.find(p => p.id === propertyId);
+  return property?.name || 'Unknown Property';
+};
+
+// Sample data creation methods
+const createSampleProperty = async () => {
   try {
-    // Log event
-    eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'navigateToBooking',
-      bookingId,
-      'emit'
-    );
+    const sampleProperty = {
+      name: `Sample Property ${Date.now()}`,
+      address: '123 Sample Street',
+      property_type: 'house' as const,
+      bedrooms: 2,
+      bathrooms: 2,
+      cleaning_duration: 120,
+      pricing_tier: 'standard' as const,
+      active: true
+    };
     
-    // Navigate to booking for viewing/editing
-    emit('navigateToBooking', bookingId);
+    await ownerDataStore.createOwnerProperty(sampleProperty);
+    showAddPropertyDialog.value = false;
   } catch (error) {
-    console.error('Error handling view booking:', error);
+    console.error('Error creating sample property:', error);
   }
 };
 
-const handleViewAll = (period: string): void => {
+const createSampleBooking = async () => {
   try {
-    // Navigate to filtered view of owner's bookings
-    const today = new Date();
-    let targetDate = today;
-    
-    if (period === 'turns') {
-      // Navigate to owner's turn bookings
-      // Keep targetDate as today
-    } else if (period === 'today') {
-      // Navigate to today's bookings
-      // Keep targetDate as today
-    } else if (period === 'tomorrow') {
-      // Navigate to tomorrow's bookings
-      targetDate = new Date();
-      targetDate.setDate(targetDate.getDate() + 1);
-    } else {
-      // Period could be a date string
-      try {
-        targetDate = new Date(period);
-      } catch {
-        // If not a valid date, just navigate to today
-        targetDate = today;
-      }
+    if (ownerData.value.ownerProperties.length === 0) {
+      console.error('No properties available for booking');
+      return;
     }
+
+    const property = ownerData.value.ownerProperties[0];
+    const sampleBooking = {
+      property_id: property.id,
+      booking_type: 'standard' as const,
+      checkout_date: new Date().toISOString().split('T')[0],
+      cleaner_id: null,
+      status: 'scheduled' as const,
+      special_instructions: 'Sample booking created from sidebar'
+    };
     
-    // Log event
-    eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'navigateToDate',
-      targetDate,
-      'emit'
-    );
-    
-    emit('navigateToDate', targetDate);
+    await ownerDataStore.createOwnerBooking(sampleBooking);
+    showAddBookingDialog.value = false;
   } catch (error) {
-    console.error('Error handling view all:', error);
+    console.error('Error creating sample booking:', error);
   }
 };
 
-const handleViewCalendar = (): void => {
+// Initialize owner data on mount
+onMounted(async () => {
   try {
-    // Navigate to owner's calendar view
-    const today = new Date();
-    
-    // Log event
-    eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'navigateToDate',
-      today,
-      'emit'
-    );
-    
-    emit('navigateToDate', today);
+    await ownerDataStore.refreshOwnerData();
   } catch (error) {
-    console.error('Error handling view calendar:', error);
-  }
-};
-
-const toggleUpcomingExpanded = (expanded: boolean): void => {
-  // This method can be used if needed
-  console.log('Owner upcoming cleanings expanded:', expanded);
-};
-
-// Watch for changes in the UI store's property filter
-watch(() => uiStore.selectedPropertyFilter, (newPropertyId) => {
-  selectedProperty.value = newPropertyId;
-});
-
-// Initialize from UI store on mount
-onMounted(() => {
-  try {
-    selectedProperty.value = uiStore.selectedPropertyFilter;
-  } catch (error) {
-    console.error('Error initializing selected property:', error);
-    selectedProperty.value = null;
+    console.error('Error initializing owner data:', error);
   }
 });
 </script>

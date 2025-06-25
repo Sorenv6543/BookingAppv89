@@ -4,10 +4,20 @@ import { useAdminBookings } from '@/composables/admin/useAdminBookings';
 import { useBookingStore } from '@/stores/booking';
 import { useAuthStore } from '@/stores/auth';
 import type { User, Booking } from '@/types';
+import { setAdminUser, addAdminBookings } from '../utils/test-utils';
 
 describe('useAdminBookings (Role-Based)', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+  });
+
+  it('should show all bookings for admin', () => {
+    const bookingStore = useBookingStore();
+    const authStore = useAuthStore();
+    setAdminUser(authStore, 'admin1');
+    addAdminBookings(bookingStore, 3);
+    const { allBookings } = useAdminBookings();
+    expect(allBookings.value).toHaveLength(3);
   });
 
   it('should provide access to ALL bookings across all owners', () => {

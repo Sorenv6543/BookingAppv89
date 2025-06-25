@@ -4,6 +4,7 @@ import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useBookingStore } from '@/stores/booking';
 import { useAuthStore } from '@/stores/auth';
 import type { User, Booking } from '@/types';
+import { setOwnerUser, addOwnerBookings } from '../utils/test-utils';
 
 describe('useOwnerBookings (Role-Based)', () => {
   beforeEach(() => {
@@ -13,52 +14,13 @@ describe('useOwnerBookings (Role-Based)', () => {
   it('should filter bookings to only show owner data', () => {
     const bookingStore = useBookingStore();
     const authStore = useAuthStore();
-    
-    // Set up owner user
-    const ownerUser: User = {
-      id: 'owner1',
-      email: 'owner@example.com',
-      name: 'Property Owner',
-      role: 'owner',
-      settings: {
-        notifications: true,
-        timezone: 'America/New_York',
-        theme: 'light',
-        language: 'en'
-      }
-    };
-    authStore.user = ownerUser;
-
-    // Add bookings for different owners
-    const ownerBooking: Booking = {
-      id: 'booking1',
-      property_id: 'prop1',
-      owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
-      booking_type: 'standard',
-      status: 'pending'
-    };
-
-    const otherOwnerBooking: Booking = {
-      id: 'booking2',
-      property_id: 'prop2',
-      owner_id: 'owner2',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-01T15:00:00Z',
-      booking_type: 'turn',
-      status: 'scheduled'
-    };
-
-    bookingStore.addBooking(ownerBooking);
-    bookingStore.addBooking(otherOwnerBooking);
-
+    setOwnerUser(authStore, 'owner1');
+    addOwnerBookings(bookingStore, 'owner1', 1);
+    // Add a booking for another owner
+    addOwnerBookings(bookingStore, 'owner2', 1);
     const { myBookings } = useOwnerBookings();
-
-    // Owner should only see their own bookings
     expect(myBookings.value).toHaveLength(1);
     expect(myBookings.value[0].owner_id).toBe('owner1');
-    expect(myBookings.value[0].id).toBe('booking1');
   });
 
   it('should identify turn bookings for urgent alerts', () => {
