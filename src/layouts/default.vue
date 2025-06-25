@@ -1,8 +1,6 @@
 <!-- layouts/default.vue -->
 <template>
   <v-app>
-    <!-- Navigation Drawer -->
-
     <!-- App Bar -->
     <v-app-bar
       app
@@ -61,7 +59,7 @@
     </v-app-bar>
   
     <!-- Main Content Area -->
-    <v-main class="bg-background bg-gradient">
+    <v-main class="owner-main">
       <router-view />
     </v-main>
   
@@ -78,31 +76,19 @@
 </template>
   
   <script setup lang="ts">
-  import { ref } from 'vue';
-  import { useDisplay } from 'vuetify';
-  import ThemePicker from '@/components/dumb/shared/ThemePicker.vue';
-
-  // Reactive state for the navigation drawer
-  const drawer = ref(true);
-  const rail = ref(false);
+  import { ref } from 'vue'
+  import ThemePicker from '@/components/dumb/shared/ThemePicker.vue'
   
+  // Sidebar state (for future implementation)
+  const sidebarOpen = ref(false)
   
-  // Store connections
-  const { mobile} = useDisplay();
-  
-  // Methods
-  const toggleSidebar = (): void => {
-    if (mobile.value) {
-      // On mobile, toggle the drawer visibility
-      drawer.value = !drawer.value;
-    } else {
-      // On desktop, toggle the rail mode
-      rail.value = !rail.value;
-    }
-  };
-
-
-  
+  // Toggle sidebar function
+  const toggleSidebar = () => {
+    sidebarOpen.value = !sidebarOpen.value
+    // Note: This layout doesn't currently have a sidebar,
+    // but the toggle function is needed for the nav icon
+    console.log('Sidebar toggle clicked')
+  }
   </script>
   
   <style>
@@ -126,7 +112,7 @@
   }
   
   /* Main content area */
-  .v-main {
+  .owner-main {
     background: rgb(var(--v-theme-background)) !important;
     color: rgb(var(--v-theme-on-background)) !important;
   }

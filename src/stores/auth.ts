@@ -81,12 +81,33 @@ export const useAuthStore = defineStore('auth', () => {
       
       // Get user data directly
       const userData = getUserFromEmail(email);
+      console.log('🔍 [AuthStore] Login attempt:', { 
+        email, 
+        userData: userData ? { id: userData.id, role: userData.role, name: userData.name } : null 
+      });
+      
       if (userData) {
         user.value = userData;
         token.value = 'mock-jwt-token'; // Mock token for development
         
+        console.log('✅ [AuthStore] User authenticated:', { 
+          id: user.value.id, 
+          role: user.value.role, 
+          name: user.value.name,
+          isAuthenticated: isAuthenticated.value
+        });
+        
         // Clear any previous temp view mode
         tempViewMode.value = null;
+        
+        // Small delay to ensure reactivity propagates
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        console.log('✅ [AuthStore] Auth state after delay:', {
+          isAuthenticated: isAuthenticated.value,
+          userId: user.value?.id,
+          userRole: user.value?.role
+        });
         
         loading.value = false;
         return true;

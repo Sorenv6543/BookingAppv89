@@ -8,164 +8,29 @@ src/components/smart/owner/HomeOwner.vue -
 ✅ Filters bookings by owner_id
 ✅ Prevents access to other owners' data
  -->
-``
+
 <template>
-  <div class="home-owner-container">
-    <v-row
-      no-gutters
-      class="fill-height"
-    >
-      <!-- Sidebar Column -->
-      <v-col 
-        cols="12" 
-        lg="3" 
-        xl="2" 
-        class="sidebar-column"
-        :class="{ 'mobile-hidden': !sidebarOpen }"
-      >
-        <!-- OwnerSidebar: Shows only current owner's data -->
-        <OwnerSidebar
-          :today-turns="ownerTodayTurns"
-          :upcoming-cleanings="ownerUpcomingCleanings"
-          :properties="ownerPropertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col>
-
-      <!-- Main Calendar Column -->
-      <v-col 
-        cols="12" 
-        lg="9" 
-        xl="10" 
-        class="calendar-column"
-      >
-        <div class="calendar-header">
-          <v-btn
-            v-if="$vuetify.display.lgAndDown"
-            icon="mdi-menu"
-            variant="text"
-            class="mr-4"
-            @click="toggleSidebar"
-          />
-          
-          <!-- Owner-focused Calendar Controls -->
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn 
-              variant="outlined" 
-              class="mr-2" 
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6">
-              {{ formattedDate }}
-            </div>
-            <v-spacer />
-            
-            <!-- Owner Quick Actions -->
-            <v-btn
-              color="primary"
-              variant="outlined"
-              prepend-icon="mdi-plus"
-              class="mr-2"
-              @click="handleCreateProperty"
-            >
-              Add Property
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-calendar-plus"
-              class="mr-4"
-              @click="handleCreateBooking"
-            >
-              Add Booking
-            </v-btn>
-            
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              class="ml-4"
-            >
-              <v-btn value="dayGridMonth">
-                Month
-              </v-btn>
-              <v-btn value="timeGridWeek">
-                Week
-              </v-btn>
-              <v-btn value="timeGridDay">
-                Day
-              </v-btn>
-            </v-btn-toggle>
-          </div>
+  <!-- MINIMAL TEMPLATE FOR DEBUGGING - Let's see if this can mount -->
+  <div class="home-owner-minimal pa-4">
+    <v-card class="pa-4">
+      <v-card-title>🏠 HomeOwner Component - Debug Mode</v-card-title>
+      <v-card-text>
+        <div class="debug-info">
+          <p><strong>✅ Script Setup:</strong> Running</p>
+          <p><strong>✅ Auth Status:</strong> {{ authStore.isAuthenticated ? 'Authenticated' : 'Not Authenticated' }}</p>
+          <p><strong>✅ User:</strong> {{ authStore.user?.name || 'None' }} ({{ authStore.user?.role || 'No Role' }})</p>
+          <p><strong>✅ User ID:</strong> {{ currentOwnerId || 'undefined' }}</p>
+          <p><strong>✅ Is Owner Auth:</strong> {{ isOwnerAuthenticated ? 'Yes' : 'No' }}</p>
+          <p><strong>🎨 Template:</strong> Rendering Successfully</p>
+          <p><strong>⏰ Mount Status:</strong> <span id="mount-status">Waiting for onMounted...</span></p>
         </div>
-
-        <!-- TODO: Replace with OwnerCalendar.vue when TASK-039E is complete -->
-        <OwnerCalendar
-          ref="calendarRef"
-          :bookings="ownerFilteredBookings"
-          :properties="ownerPropertiesMap"
-          :loading="loading"
-          :current-view="currentView"
-          :current-date="currentDate"
-          @date-select="handleDateSelect"
-          @event-click="handleEventClick"
-          @event-drop="handleEventDrop"
-          @event-resize="handleEventResize"
-          @view-change="handleCalendarViewChange"
-          @date-change="handleCalendarDateChange"
-          @create-booking="handleCreateBookingFromCalendar"
-          @update-booking="handleUpdateBooking"
-        />
-      </v-col>
-    </v-row>
-
-    <!-- Owner-focused Modals -->
-    <BookingForm
-      :open="eventModalOpen"
-      :mode="eventModalMode"
-      :booking="eventModalData"
-      @close="handleEventModalClose"
-      @save="handleEventModalSave"
-      @delete="handleEventModalDelete"
-    />
-
-    <PropertyModal
-      :open="propertyModalOpen"
-      :mode="propertyModalMode"
-      :property="propertyModalData"
-      @close="handlePropertyModalClose"
-      @save="handlePropertyModalSave"
-      @delete="handlePropertyModalDelete"
-    />
-
-    <ConfirmationDialog
-      :open="confirmDialogOpen"
-      :title="confirmDialogTitle"
-      :message="confirmDialogMessage"
-      :confirm-text="confirmDialogConfirmText"
-      :cancel-text="confirmDialogCancelText"
-      :dangerous="confirmDialogDangerous"
-      @confirm="handleConfirmDialogConfirm"
-      @cancel="handleConfirmDialogCancel"
-      @close="handleConfirmDialogClose"
-    />
+        
+        <v-alert type="info" class="mt-4">
+          <strong>Debug Test:</strong> If you see "Component Mounted!" below, the basic component works.
+          Then we can gradually add back the complex template parts.
+        </v-alert>
+      </v-card-text>
+    </v-card>
   </div>
 </template>
 
@@ -174,7 +39,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDisplay } from 'vuetify';
 
 // Owner-specific components
-import OwnerSidebar from './OwnerSidebar.vue';
+import OwnerSidebar from '@/components/smart/owner/OwnerSidebar.vue';
 import OwnerCalendar from '@/components/smart/owner/OwnerCalendar.vue';
 import BookingForm from '@/components/dumb/BookingForm.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
@@ -193,7 +58,7 @@ import { useProperties } from '@/composables/shared/useProperties';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 // Types
-import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
+import type { Booking, Property, BookingFormData, PropertyFormData,  } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Import event logger for component communication
@@ -252,28 +117,65 @@ const selectedPropertyFilter = ref<string | null>(null);
 // OWNER-SPECIFIC DATA ACCESS
 // ============================================================================
 
-// Get current owner's user ID
+// Get current owner's user ID with debugging
+let currentOwnerIdCallCount = 0;
 const currentOwnerId = computed(() => {
-  return authStore.user?.id;
+  currentOwnerIdCallCount++;
+  const userId = authStore.user?.id;
+  console.log(`🔍 [HomeOwner] currentOwnerId computed (call #${currentOwnerIdCallCount}):`, {
+    user: authStore.user,
+    userId,
+    isAuthenticated: authStore.isAuthenticated,
+    userRole: authStore.user?.role
+  });
+  
+  if (currentOwnerIdCallCount > 10) {
+    console.error('❌ [HomeOwner] Infinite loop detected in currentOwnerId computed!');
+  }
+  
+  return userId;
 });
 
 // Check if user is authenticated and is an owner
+let isOwnerAuthenticatedCallCount = 0;
 const isOwnerAuthenticated = computed(() => {
-  return authStore.isAuthenticated && 
+  isOwnerAuthenticatedCallCount++;
+  const authenticated = !!(authStore.isAuthenticated && 
          authStore.user?.role === 'owner' && 
-         currentOwnerId.value;
+         currentOwnerId.value);
+  
+  console.log(`🔍 [HomeOwner] isOwnerAuthenticated computed (call #${isOwnerAuthenticatedCallCount}):`, {
+    isAuthenticated: authStore.isAuthenticated,
+    userRole: authStore.user?.role,
+    currentOwnerId: currentOwnerId.value,
+    result: authenticated
+  });
+  
+  if (isOwnerAuthenticatedCallCount > 10) {
+    console.error('❌ [HomeOwner] Infinite loop detected in isOwnerAuthenticated computed!');
+  }
+  
+  return authenticated;
 });
 
 // ============================================================================
 // COMPUTED STATE - OWNER-FILTERED DATA
 // ============================================================================
 
-const loading = computed(() => 
-  bookingsLoading.value || 
-  propertiesLoading.value || 
-  uiStore.isLoading('bookings') || 
-  uiStore.isLoading('properties')
-);
+let loadingCallCount = 0;
+const loading = computed(() => {
+  loadingCallCount++;
+  const result = bookingsLoading.value || 
+    propertiesLoading.value || 
+    uiStore.isLoading('bookings') || 
+    uiStore.isLoading('properties');
+  
+  if (loadingCallCount > 20) {
+    console.error(`❌ [HomeOwner] Infinite loop detected in loading computed! (call #${loadingCallCount})`);
+  }
+  
+  return result;
+});
 
 const formattedDate = computed(() => {
   const options: Intl.DateTimeFormatOptions = { 
@@ -286,8 +188,14 @@ const formattedDate = computed(() => {
 });
 
 // Owner's properties only
+let ownerPropertiesMapCallCount = 0;
 const ownerPropertiesMap = computed(() => {
+  ownerPropertiesMapCallCount++;
   const map = new Map<string, Property>();
+  
+  if (ownerPropertiesMapCallCount > 20) {
+    console.error(`❌ [HomeOwner] Infinite loop detected in ownerPropertiesMap computed! (call #${ownerPropertiesMapCallCount})`);
+  }
   
   if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
     return map;
@@ -313,8 +221,18 @@ const ownerPropertiesMap = computed(() => {
   return map;
 });
 
-// Owner's bookings only
+// ADDING BACK COMPLEX COMPUTED PROPERTIES ONE BY ONE TO FIND THE CULPRIT
+
+// Owner's bookings only - TESTING THIS FIRST
+let ownerBookingsMapCallCount = 0;
 const ownerBookingsMap = computed(() => {
+  ownerBookingsMapCallCount++;
+  console.log(`🔍 [HomeOwner] ownerBookingsMap computed (call #${ownerBookingsMapCallCount})`);
+  
+  if (ownerBookingsMapCallCount > 20) {
+    console.error('❌ [HomeOwner] Infinite loop detected in ownerBookingsMap computed!');
+    return new Map<string, Booking>();
+  }
   const map = new Map<string, Booking>();
   
   if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
@@ -333,8 +251,19 @@ const ownerBookingsMap = computed(() => {
   return map;
 });
 
-// Owner's today's turn bookings
+// ADDING BACK DEPENDENT COMPUTED PROPERTIES WITH DEBUGGING
+
+// Owner's today's turn bookings - TESTING THIS NEXT
+let ownerTodayTurnsCallCount = 0;
 const ownerTodayTurns = computed(() => {
+  ownerTodayTurnsCallCount++;
+  console.log(`🔍 [HomeOwner] ownerTodayTurns computed (call #${ownerTodayTurnsCallCount})`);
+  
+  if (ownerTodayTurnsCallCount > 20) {
+    console.error('❌ [HomeOwner] Infinite loop detected in ownerTodayTurns computed!');
+    return new Map<string, Booking>();
+  }
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
@@ -360,8 +289,17 @@ const ownerTodayTurns = computed(() => {
   return turns;
 });
 
-// Owner's upcoming cleanings
+// Owner's upcoming cleanings - TESTING THIS NEXT
+let ownerUpcomingCleaningsCallCount = 0;
 const ownerUpcomingCleanings = computed(() => {
+  ownerUpcomingCleaningsCallCount++;
+  console.log(`🔍 [HomeOwner] ownerUpcomingCleanings computed (call #${ownerUpcomingCleaningsCallCount})`);
+  
+  if (ownerUpcomingCleaningsCallCount > 20) {
+    console.error('❌ [HomeOwner] Infinite loop detected in ownerUpcomingCleanings computed!');
+    return new Map<string, Booking>();
+  }
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const inOneWeek = new Date(today);
@@ -384,8 +322,17 @@ const ownerUpcomingCleanings = computed(() => {
   return cleanings;
 });
 
-// Owner's filtered bookings based on current filters
+// Owner's filtered bookings - TESTING THE MOST COMPLEX ONE
+let ownerFilteredBookingsCallCount = 0;
 const ownerFilteredBookings = computed(() => {
+  ownerFilteredBookingsCallCount++;
+  console.log(`🔍 [HomeOwner] ownerFilteredBookings computed (call #${ownerFilteredBookingsCallCount})`);
+  
+  if (ownerFilteredBookingsCallCount > 20) {
+    console.error('❌ [HomeOwner] Infinite loop detected in ownerFilteredBookings computed!');
+    return new Map<string, Booking>();
+  }
+
   let bookings = Array.from(ownerBookingsMap.value.values());
   
   // Apply property filter if selected (within owner's properties)
@@ -653,7 +600,7 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   }
 };
 
-const handleEventResize = async (resizeInfo: any): Promise<void> => {
+const handleEventResize = async (resizeInfo: { event: any; revert: () => void }): Promise<void> => {
   const booking = resizeInfo.event.extendedProps.booking as Booking;
   
   // Verify owner can modify this booking
@@ -877,18 +824,29 @@ const toggleSidebar = (): void => {
 // LIFECYCLE HOOKS
 // ============================================================================
 
+console.log('🔄 [HomeOwner] Script setup running...');
+
+// Watch for template rendering (proper debugging)
+watch(isOwnerAuthenticated, (newValue) => {
+  console.log('🎨 [HomeOwner] Template will render, isOwnerAuthenticated:', newValue);
+}, { immediate: true });
+
 onMounted(async () => {
-  // Load owner's data
-  if (isOwnerAuthenticated.value) {
-    try {
-      await Promise.all([
-        fetchAllProperties(),
-        fetchAllBookings()
-      ]);
-    } catch (error) {
-      console.error('Failed to load your data:', error);
-    }
+  console.log('🚀 [HomeOwner] Component mounted successfully!');
+  
+  // Update the UI to show successful mount
+  const mountStatusElement = document.getElementById('mount-status');
+  if (mountStatusElement) {
+    mountStatusElement.innerHTML = '✅ Component Mounted Successfully!';
+    mountStatusElement.style.color = 'green';
+    mountStatusElement.style.fontWeight = 'bold';
   }
+  
+  console.log('🔍 [HomeOwner] Basic mount test - simplified template worked!');
+  
+  // For now, skip the complex data loading while we debug
+  // TODO: Re-enable data loading once we identify the template issue
+  console.log('⏭️ [HomeOwner] Skipping data loading in debug mode');
 });
 
 onUnmounted(() => {
@@ -906,11 +864,28 @@ watch(xs, (newValue) => {
 });
 
 // Watch for authentication changes
-watch(isOwnerAuthenticated, (newValue) => {
-  if (newValue) {
-    // Reload data when user becomes authenticated
-    fetchAllProperties();
-    fetchAllBookings();
+watch(isOwnerAuthenticated, async (newValue, oldValue) => {
+  console.log('🔄 [HomeOwner] isOwnerAuthenticated changed:', { 
+    from: oldValue, 
+    to: newValue,
+    user: authStore.user
+  });
+  
+  if (newValue && !oldValue) {
+    // User became authenticated - load data
+    console.log('✅ [HomeOwner] User became authenticated, loading data...');
+    try {
+      await Promise.all([
+        fetchAllProperties(),
+        fetchAllBookings()
+      ]);
+      console.log('✅ [HomeOwner] Data loaded after auth change');
+    } catch (error) {
+      console.error('❌ [HomeOwner] Failed to load data after auth change:', error);
+    }
+  } else if (!newValue && oldValue) {
+    // User became unauthenticated - could clear data if needed
+    console.log('⚠️ [HomeOwner] User became unauthenticated');
   }
 });
 </script>

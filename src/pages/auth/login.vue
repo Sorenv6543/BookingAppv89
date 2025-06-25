@@ -198,10 +198,16 @@ async function handleLogin() {
       // Navigate to role-appropriate dashboard
       const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
       
-      // Small delay to show success message
+      // Small delay to show success message, then navigate
       setTimeout(async () => {
-        await router.push(defaultRoute)
-      }, 1000)
+        try {
+          await router.push(defaultRoute)
+        } catch (error) {
+          console.error('Navigation after login failed:', error)
+          // Fallback navigation
+          window.location.href = defaultRoute
+        }
+      }, 800)
     }
   } catch (error) {
     console.error('Login error:', error)
@@ -213,18 +219,26 @@ async function handleLogin() {
  * Quick login as owner demo
  */
 async function loginAsOwner() {
-  email.value = 'owner@example.com'
-  password.value = 'password'
-  await handleLogin()
+  try {
+    email.value = 'owner@example.com'
+    password.value = 'password'
+    await handleLogin()
+  } catch (error) {
+    console.error('Owner demo login failed:', error)
+  }
 }
 
 /**
  * Quick login as admin demo
  */
 async function loginAsAdmin() {
-  email.value = 'admin@example.com'
-  password.value = 'password'
-  await handleLogin()
+  try {
+    email.value = 'admin@example.com'
+    password.value = 'password'
+    await handleLogin()
+  } catch (error) {
+    console.error('Admin demo login failed:', error)
+  }
 }
 
 /**

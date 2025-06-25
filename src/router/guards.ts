@@ -11,7 +11,8 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUIStore } from '@/stores/ui'
-import type { UserRole, NavigationError } from '@/types/router'
+import type { UserRole } from '@/types/user'
+import type { NavigationError } from '@/types/router'
 
 /**
  * Role-based route guards for multi-tenant architecture
@@ -179,8 +180,7 @@ export function loadingGuard(
  * After navigation guard - cleanup loading states
  */
 export function afterNavigationGuard(
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized
+  to: RouteLocationNormalized
 ) {
   const uiStore = useUIStore()
   
@@ -203,15 +203,16 @@ export function developmentGuard(
   from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) {
-  if (import.meta.env.DEV) {
-    console.log('🚦 Navigation:', {
-      from: from.path,
-      to: to.path,
-      meta: to.meta,
-      requiresAuth: to.meta.requiresAuth,
-      role: to.meta.role
-    })
-  }
+  // Temporarily disable verbose navigation logging to reduce console noise
+  // if (import.meta.env.DEV) {
+  //   console.log('🚦 Navigation:', {
+  //     from: from.path,
+  //     to: to.path,
+  //     meta: to.meta,
+  //     requiresAuth: to.meta.requiresAuth,
+  //     role: to.meta.role
+  //   })
+  // }
   
   next()
 } 

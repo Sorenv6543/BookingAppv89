@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import path from 'path'
-import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -19,8 +18,9 @@ export default defineConfig({
           styles: {
             configFile: 'src/styles/variables.scss'
           }
-    }),
-    vueDevTools()
+    })
+    // Temporarily disable Vue DevTools to resolve login hang issues
+    // vueDevTools()
   ],
   resolve: {
     alias: {
@@ -56,14 +56,26 @@ export default defineConfig({
         scss: {
           sourceMap: true, // Enable SCSS sourcemaps
           sourceMapContents: true,
-          sourceMapEmbed: false
+          sourceMapEmbed: false,
+          // Fix Sass legacy API deprecation warnings
+          api: 'modern-compiler',
+          silenceDeprecations: ['legacy-js-api']
         }
       }
     },
   server: {
     port: 3000,
     open: true,
-    sourcemapIgnoreList: false
+    sourcemapIgnoreList: false,
+    // Fix for requests stalling forever (common Vite issue)
+    hmr: {
+      overlay: false  // Disable HMR overlay which can cause hangs
+    },
+    // Use native file watching instead of aggressive polling
+    watch: {
+      usePolling: false,  // Disable polling to prevent performance issues
+      // interval: 1000   // If polling needed, use 1000ms not 100ms
+    }
   },
   build: {
     target: 'esnext',
@@ -134,7 +146,8 @@ export default defineConfig({
       '@fullcalendar/timegrid',
       '@fullcalendar/interaction'
     ],
-    force: true
+    // Remove force: true to prevent forced re-optimization that can cause hangs
+    // force: true
   },
   // Preview configuration for testing builds
   preview: {

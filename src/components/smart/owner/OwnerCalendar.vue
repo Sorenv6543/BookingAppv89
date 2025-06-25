@@ -1,16 +1,21 @@
 <template>
   <div class="owner-calendar-container">
-    <FullCalendar
-      ref="calendarRef"
-      :options="ownerCalendarOptions"
-      class="owner-calendar"
-    />
+    <v-card
+      :style="{ height: calendarCardHeight }"
+    >
+      <FullCalendar
+        ref="calendarRef"
+        :options="ownerCalendarOptions"
+        class="owner-calendar"
+        :style="{ height: fullCalendarHeight }"
+      />
+    </v-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import FullCalendar from '@fullcalendar/vue3';
-import type { CalendarOptions, DateSelectArg, EventClickArg } from '@fullcalendar/core';
+import type { CalendarOptions, DateSelectArg, EventClickArg, EventApi, ViewApi, Duration } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -286,7 +291,16 @@ const renderOwnerDayCell = (dayInfo: any) => {
     `
   };
 };
+// Height calculations for responsive full-viewport calendar
+const calendarCardHeight = computed(() => {
+  // Calculate available height: viewport minus toolbar height (approx 120px)
+  return 'calc(100vh - 180px)';
+});
 
+const fullCalendarHeight = computed(() => {
+  // FullCalendar height should fill the card minus padding
+  return 'calc(100vh - 200px)';
+});
 // Programmatic calendar methods for owner
 const goToDate = (date: string | Date): void => {
   if (calendarRef.value) {

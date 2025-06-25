@@ -24,7 +24,8 @@ export interface EventFilter {
 export function useComponentEventLogger() {
   // State
   const events = reactive<Map<string, ComponentEvent>>(new Map());
-  const enabled = ref(localStorage.getItem('debug_event_logger') === 'true');
+  // Disable event logging by default to prevent console spam and potential performance issues
+  const enabled = ref(false);
   const autoScroll = ref(true);
   const filter = ref<EventFilter>({});
 

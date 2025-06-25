@@ -1,11 +1,10 @@
 <!--
- 🎭 COMPONENT SELECTION LAYER
- src/pages/index.vue - 🎬 ROLE-BASED COMPONENT DIRECTOR
+ 🎭 ROOT LANDING PAGE
+ src/pages/index.vue - 🏠 HOME PAGE ROUTER
  
-✅ ROOT DECISION MAKER - chooses which UI to show
-✅ Renders different components based on role
-✅ Handles admin view-switching
-✅ Shows auth prompt for unauthenticated users
+✅ Redirects authenticated users to role-specific dashboards
+✅ Shows landing page for unauthenticated users
+✅ Lets route guards handle navigation
  -->
 
 <template>
@@ -33,23 +32,35 @@
     </v-container>
   </div>
 
-  <!-- Role-based component rendering -->
-  <component
-    :is="homeComponent"
-    v-else
-  />
+  <!-- Landing page for unauthenticated users -->
+  <div v-else-if="!authStore.isAuthenticated">
+    <AuthPrompt />
+  </div>
+
+  <!-- Authenticated users get redirected by route guards -->
+  <div v-else class="redirect-container">
+    <v-container class="fill-height">
+      <v-row justify="center" align="center">
+        <v-col cols="auto">
+          <v-progress-circular indeterminate size="48" color="primary" />
+          <div class="text-body-1 mt-4 text-center">
+            Redirecting to your dashboard...
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUIStore } from '@/stores/ui'
-
-// Role-based component imports
-import HomeOwner from '@/components/smart/owner/HomeOwner.vue'
-import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
+import { getDefaultRouteForRole } from '@/utils/authHelpers'
 
 // Stores
+const router = useRouter()
 const authStore = useAuthStore()
 const uiStore = useUIStore()
 
@@ -62,12 +73,12 @@ const AuthPrompt = {
           <v-card elevation="8" class="pa-4">
             <v-card-title class="text-h5 text-center mb-4">
               <v-icon class="mr-2" color="primary">mdi-login</v-icon>
-              Authentication Required
+              Welcome to Property Cleaning Scheduler
             </v-card-title>
             
             <v-card-text class="text-center">
               <p class="text-body-1 mb-4">
-                Please log in to access the Property Cleaning Scheduler.
+                Please log in to access your dashboard.
               </p>
               
               <v-alert
@@ -76,8 +87,7 @@ const AuthPrompt = {
                 class="mb-4"
               >
                 <strong>Development Mode:</strong><br>
-                Authentication is currently mocked for development.
-                Click "Mock Login" to continue.
+                Quick login options for testing.
               </v-alert>
               
               <v-btn
@@ -89,7 +99,7 @@ const AuthPrompt = {
                 class="mb-2"
               >
                 <v-icon class="mr-2">mdi-shield-account</v-icon>
-                Mock Login (Admin)
+                Demo Login (Admin)
               </v-btn>
               
               <v-btn
@@ -102,7 +112,7 @@ const AuthPrompt = {
                 class="mb-4"
               >
                 <v-icon class="mr-2">mdi-home-account</v-icon>
-                Mock Login (Owner)
+                Demo Login (Owner)
               </v-btn>
               
               <v-divider class="my-4" />
@@ -128,29 +138,40 @@ const AuthPrompt = {
   `,
   setup() {
     const handleMockLogin = async () => {
-      const success = await authStore.login('admin@example.com', 'password')
-      if (success) {
-        // Show success notification
-        uiStore.addNotification('success', 'Welcome!', authStore.getSuccessMessage('login'))
+      try {
+        const success = await authStore.login('admin@example.com', 'password')
+        if (success) {
+          // Let route guards handle navigation
+          const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+          await router.push(defaultRoute)
+        }
+      } catch (error) {
+        console.error('Mock login failed:', error)
       }
     }
     
     const handleMockOwnerLogin = async () => {
-      const success = await authStore.login('owner@example.com', 'password')
-      if (success) {
-        // Show success notification
-        uiStore.addNotification('success', 'Welcome!', authStore.getSuccessMessage('login'))
+      try {
+        const success = await authStore.login('owner@example.com', 'password')
+        if (success) {
+          // Let route guards handle navigation
+          const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+          await router.push(defaultRoute)
+        }
+      } catch (error) {
+        console.error('Mock owner login failed:', error)
       }
     }
     
     const goToLogin = () => {
-      // This would use router.push in a real component
-      window.location.href = '/auth/login'
+      router.push('/auth/login')
     }
     
     return {
       authStore,
       uiStore,
+      router,
+      getDefaultRouteForRole,
       handleMockLogin,
       handleMockOwnerLogin,
       goToLogin
@@ -158,55 +179,25 @@ const AuthPrompt = {
   }
 }
 
-/**
- * Role-based component selection
- * This implements the multi-tenant architecture pattern where:
- * - Property owners see HomeOwner.vue (filtered to their data only)
- * - Business admins see HomeAdmin.vue (access to all data)
- * - Unauthenticated users see AuthPrompt
- * 
- * Note: This is frontend filtering for UX only, not security.
- * Real security will be implemented with backend RLS in Phase 2.
- */
-const homeComponent = computed(() => {
-  // Show auth prompt for unauthenticated users
-  if (!authStore.isAuthenticated) {
-    return AuthPrompt
-  }
-  
-  // Show admin interface for admin users (considering temp view mode)
-  if (authStore.isAdmin) {
-    // If admin is in owner view mode, show owner interface
-    if (authStore.tempViewMode?.role === 'owner') {
-      return HomeOwner
-    }
-    return HomeAdmin
-  }
-  
-  // Show owner interface for property owners
-  if (authStore.isOwner) {
-    return HomeOwner
-  }
-  
-  // Fallback for unknown roles or edge cases
-  console.warn('Unknown user role:', authStore.user?.role)
-  return AuthPrompt
-})
-
-// Note: Logout functionality is handled by individual components using the auth store
-// The auth store's logout method automatically clears auth state and cached data
-
-// Check authentication status on mount
+// Check authentication status on mount and redirect if needed
 onMounted(async () => {
   try {
-    await authStore.checkAuth()
+    // Let the auth store initialize
+    if (!authStore.isAuthenticated) {
+      await authStore.checkAuth()
+    }
+    
+    // If user is authenticated, redirect to their dashboard
+    if (authStore.isAuthenticated) {
+      const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+      if (defaultRoute !== '/' && router.currentRoute.value.path === '/') {
+        await router.push(defaultRoute)
+      }
+    }
   } catch (error) {
     console.error('Auth check failed:', error)
   }
 })
-
-// Note: In a real app, the logout function would be provided through a global composable
-// or context provider rather than exposing it globally
 </script>
 
 <style scoped>

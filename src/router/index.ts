@@ -32,47 +32,38 @@ const router = createRouter({
         role: 'owner'
       }
     },
-    {
-      path: '/owner/properties',
-      name: 'owner-properties',
-      component: () => import('@/pages/owner/properties/index.vue'),
-      meta: {
-        layout: 'default',
-        requiresAuth: true,
-        role: 'owner'
-      }
-    },
-    {
-      path: '/owner/calendar',
-      name: 'owner-calendar',
-      component: () => import('@/pages/owner/calendar.vue'),
-      meta: {
-        layout: 'default',
-        requiresAuth: true,
-        role: 'owner'
-      }
-    },
-    {
-      path: '/owner/bookings',
-      name: 'owner-bookings',
-      component: () => import('@/pages/owner/bookings/index.vue'),
-      meta: {
-        layout: 'default',
-        requiresAuth: true,
-        role: 'owner'
-      }
-    },
+    // {
+    //   path: '/owner/properties',
+    //   name: 'owner-properties',
+    //   component: () => import('@/pages/owner/properties/index.vue'),
+    //   meta: {
+    //     layout: 'default',
+    //     requiresAuth: true,
+    //     role: 'owner'
+    //   }
+    // },
+    // {
+    //   path: '/owner/calendar',
+    //   name: 'owner-calendar',
+    //   component: () => import('@/pages/owner/calendar.vue'),
+    //   meta: {
+    //     layout: 'default',
+    //     requiresAuth: true,
+    //     role: 'owner'
+    //   }
+    // },
+    // {
+    //   path: '/owner/bookings',
+    //   name: 'owner-bookings',
+    //   component: () => import('@/pages/owner/bookings/index.vue'),
+    //   meta: {
+    //     layout: 'default',
+    //     requiresAuth: true,
+    //     role: 'owner'
+    //   }
+    // },
     // Legacy routes (redirect to owner-specific routes)
-    {
-      path: '/properties',
-      name: 'properties',
-      redirect: '/owner/properties'
-    },
-    {
-      path: '/calendar',
-      name: 'calendar',
-      redirect: '/owner/calendar'
-    },
+
     {
       path: '/admin',
       name: 'admin',
@@ -141,98 +132,98 @@ const router = createRouter({
       }
     },
 
-    // Demo routes - now in src/dev/demos/
-    {
-      path: '/demos/home-admin',
-      name: 'home-admin-demo',
-      component: () => import('@/dev/demos/HomeAdminDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
+    // // Demo routes - now in src/dev/demos/
+    // {
+    //   path: '/demos/home-admin',
+    //   name: 'home-admin-demo',
+    //   component: () => import('@/dev/demos/HomeAdminDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
 
-    {
-      path: '/demos/turn-alerts',
-      name: 'turn-alerts-demo',
-      component: () => import('@/dev/demos/TurnAlertsDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
+    // {
+    //   path: '/demos/turn-alerts',
+    //   name: 'turn-alerts-demo',
+    //   component: () => import('@/dev/demos/TurnAlertsDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
 
-    {
-      path: '/demos/property-card',
-      name: 'property-card-demo',
-      component: () => import('@/dev/demos/PropertyCardDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/components/smart/admin/use-admin-bookings',
-      name: 'use-admin-bookings-demo',
-      component: () => import('@/dev/demos/UseAdminBookingsDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
+    // {
+    //   path: '/demos/property-card',
+    //   name: 'property-card-demo',
+    //   component: () => import('@/dev/demos/PropertyCardDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
+    // {
+    //   path: '/components/smart/admin/use-admin-bookings',
+    //   name: 'use-admin-bookings-demo',
+    //   component: () => import('@/dev/demos/UseAdminBookingsDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
 
-    {
-      path: '/components/smart/admin/admin-calendar',
-      name: 'admin-calendar-demo',
-      component: () => import('@/dev/demos/AdminCalendarDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/components/smart/owner/owner-calendar',
-      name: 'owner-calendar-demo',
-      component: () => import('@/dev/demos/OwnerCalendarDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/use-owner-bookings',
-      name: 'use-owner-bookings-demo',
-      component: () => import('@/dev/demos/UseOwnerBookingsDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/use-owner-properties',
-      name: 'use-owner-properties-demo',
-      component: () => import('@/dev/demos/UseOwnerPropertiesDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/use-owner-calendar-state',
-      name: 'use-owner-calendar-state-demo',
-      component: () => import('@/dev/demos/UseOwnerCalendarStateDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/use-admin-properties',
-      name: 'use-admin-properties-demo',
-      component: () => import('@/dev/demos/UseAdminPropertiesDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/demos/use-admin-calendar-state',
-      name: 'use-admin-calendar-state-demo',
-      component: () => import('@/dev/demos/UseAdminCalendarStateDemo.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
+    // {
+    //   path: '/components/smart/admin/admin-calendar',
+    //   name: 'admin-calendar-demo',
+    //   component: () => import('@/dev/demos/AdminCalendarDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
+    // {
+    //   path: '/components/smart/owner/owner-calendar',
+    //   name: 'owner-calendar-demo',
+    //   component: () => import('@/dev/demos/OwnerCalendarDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
+    // {
+    //   path: '/demos/use-owner-bookings',
+    //   name: 'use-owner-bookings-demo',
+    //   component: () => import('@/dev/demos/UseOwnerBookingsDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
+    // {
+    //   path: '/demos/use-owner-properties',
+    //   name: 'use-owner-properties-demo',
+    //   component: () => import('@/dev/demos/UseOwnerPropertiesDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
+    // {
+    //   path: '/demos/use-owner-calendar-state',
+    //   name: 'use-owner-calendar-state-demo',
+    //   component: () => import('@/dev/demos/UseOwnerCalendarStateDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
+    // {
+    //   path: '/demos/use-admin-properties',
+    //   name: 'use-admin-properties-demo',
+    //   component: () => import('@/dev/demos/UseAdminPropertiesDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
+    // {
+    //   path: '/demos/use-admin-calendar-state',
+    //   name: 'use-admin-calendar-state-demo',
+    //   component: () => import('@/dev/demos/UseAdminCalendarStateDemo.vue'),
+    //   meta: {
+    //     layout: 'default'
+    //   }
+    // },
     // {
     //   path: '/demos/route-guards',
     //   name: 'route-guards-demo',
