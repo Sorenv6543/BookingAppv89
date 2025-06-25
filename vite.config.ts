@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import path from 'path'
+import vueDevTools from 'vite-plugin-vue-devtools'
+import { VitePluginInspector } from 'vite-plugin-vue-inspector'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -18,10 +20,17 @@ export default defineConfig({
           styles: {
             configFile: 'src/styles/variables.scss'
           }
+    }),   
+    vueDevTools({
+      componentInspector: {
+        enabled: true,
+        launchEditor: 'code',
+      }
     })
-    // Temporarily disable Vue DevTools to resolve login hang issues
-    // vueDevTools()
-  ],
+
+  ],    
+
+    // Temporarily disable Vue DevTools to resolve login ha
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
