@@ -140,11 +140,11 @@ const router = createRouter({
         layout: 'default'
       }
     },
-    // Demo routes
+    // Demo routes - now in src/dev/demos/
     {
       path: '/demos/home-admin',
       name: 'home-admin-demo',
-      component: () => import('@/components/smart/admin/HomeAdminDemo.vue'),
+      component: () => import('@/dev/demos/HomeAdminDemo.vue'),
       meta: {
         layout: 'default'
       }
@@ -153,7 +153,7 @@ const router = createRouter({
     {
       path: '/demos/turn-alerts',
       name: 'turn-alerts-demo',
-      component: () => import('@/components/dumb/TurnAlertsDemo.vue'),
+      component: () => import('@/dev/demos/TurnAlertsDemo.vue'),
       meta: {
         layout: 'default'
       }
@@ -162,7 +162,7 @@ const router = createRouter({
     {
       path: '/demos/property-card',
       name: 'property-card-demo',
-      component: () => import('@/components/dumb/PropertyCardDemo.vue'),
+      component: () => import('@/dev/demos/PropertyCardDemo.vue'),
       meta: {
         layout: 'default'
       }
@@ -170,7 +170,7 @@ const router = createRouter({
     {
       path: '/components/smart/admin/use-admin-bookings',
       name: 'use-admin-bookings-demo',
-      component: () => import('@/components/smart/admin/UseAdminBookingsDemo.vue'),
+      component: () => import('@/dev/demos/UseAdminBookingsDemo.vue'),
       meta: {
         layout: 'default'
       }
@@ -179,7 +179,7 @@ const router = createRouter({
     {
       path: '/components/smart/admin/admin-calendar',
       name: 'admin-calendar-demo',
-      component: () => import('@/components/smart/admin/AdminCalendarDemo.vue'),
+      component: () => import('@/dev/demos/AdminCalendarDemo.vue'),
       meta: {
         layout: 'default'
       }
@@ -187,7 +187,7 @@ const router = createRouter({
     {
       path: '/components/smart/owner/owner-calendar',
       name: 'owner-calendar-demo',
-      component: () => import('@/components/smart/owner/OwnerCalendarDemo.vue'),
+      component: () => import('@/dev/demos/OwnerCalendarDemo.vue'),
       meta: {
         layout: 'default'
       }
@@ -195,7 +195,7 @@ const router = createRouter({
     {
       path: '/demos/use-owner-bookings',
       name: 'use-owner-bookings-demo',
-      component: () => import('@/components/smart/owner/UseOwnerBookingsDemo.vue'),
+      component: () => import('@/dev/demos/UseOwnerBookingsDemo.vue'),
       meta: {
         layout: 'default'
       }
@@ -203,7 +203,7 @@ const router = createRouter({
     {
       path: '/demos/use-owner-properties',
       name: 'use-owner-properties-demo',
-      component: () => import('@/components/demos/UseOwnerPropertiesDemo.vue'),
+      component: () => import('@/dev/demos/UseOwnerPropertiesDemo.vue'),
       meta: {
         layout: 'default'
       }
@@ -211,7 +211,7 @@ const router = createRouter({
     {
       path: '/demos/use-owner-calendar-state',
       name: 'use-owner-calendar-state-demo',
-      component: () => import('@/components/smart/owner/UseOwnerCalendarStateDemo.vue'),
+      component: () => import('@/dev/demos/UseOwnerCalendarStateDemo.vue'),
       meta: {
         layout: 'default'
       }
@@ -219,7 +219,7 @@ const router = createRouter({
     {
       path: '/demos/use-admin-properties',
       name: 'use-admin-properties-demo',
-      component: () => import('@/components/smart/admin/UseAdminPropertiesDemo.vue'),
+      component: () => import('@/dev/demos/UseAdminPropertiesDemo.vue'),
       meta: {
         layout: 'default'
       }
@@ -227,22 +227,22 @@ const router = createRouter({
     {
       path: '/demos/use-admin-calendar-state',
       name: 'use-admin-calendar-state-demo',
-      component: () => import('@/components/smart/admin/UseAdminCalendarStateDemo.vue'),
+      component: () => import('@/dev/demos/UseAdminCalendarStateDemo.vue'),
       meta: {
         layout: 'default'
       }
     },
-    {
-      path: '/demos/route-guards',
-      name: 'route-guards-demo',
-      component: () => import('@/pages/demos/route-guards.vue'),
-      meta: {
-        layout: 'default',
-        public: true,
-        demo: true,
-        title: 'Route Guards Demo'
-      }
-    },
+    // {
+    //   path: '/demos/route-guards',
+    //   name: 'route-guards-demo',
+    //   component: () => import('@/pages/demos/route-guards.vue'),
+    //   meta: {
+    //     layout: 'default',
+    //     public: true,
+    //     demo: true,
+    //     title: 'Route Guards Demo'
+    //   }
+    // },
     // {
     //   path: '/demos/admin-sidebar-width-test',
     //   name: 'admin-sidebar-width-test',

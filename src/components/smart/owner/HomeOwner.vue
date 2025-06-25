@@ -175,7 +175,7 @@ import { useDisplay } from 'vuetify';
 
 // Owner-specific components
 import OwnerSidebar from './OwnerSidebar.vue';
-import FullCalendar from '../FullCalendar.vue';
+import OwnerCalendar from '@/components/smart/owner/OwnerCalendar.vue';
 import BookingForm from '@/components/dumb/BookingForm.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
 import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
@@ -198,7 +198,7 @@ import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/c
 
 // Import event logger for component communication
 import eventLogger from '@/composables/shared/useComponentEventLogger';
-import OwnerCalendar from '@/pages/demos/owner-calendar.vue';
+
 
 // ============================================================================
 // STORE CONNECTIONS & STATE
@@ -244,7 +244,7 @@ const {
 // ============================================================================
 // LOCAL STATE
 // ============================================================================
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const calendarRef = ref<InstanceType<typeof OwnerCalendar> | null>(null);
 const sidebarOpen = ref(!xs.value);
 const selectedPropertyFilter = ref<string | null>(null);
 

@@ -58,6 +58,10 @@ export default defineConfig({
     target: 'esnext',
     sourcemap: process.env.NODE_ENV === 'development' ? true : 'hidden',
     rollupOptions: {
+      // Exclude dev folder from production builds
+      external: (id) => {
+        return id.includes('/src/dev/') || id.includes('\\src\\dev\\')
+      },
       output: {
         manualChunks: {
           vendor: ['vue', 'vue-router', 'pinia'],
