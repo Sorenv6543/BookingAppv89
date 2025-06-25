@@ -1,13 +1,24 @@
 <template>
-  <v-container fluid class="pa-4">
+  <v-container
+    fluid
+    class="pa-4"
+  >
     <v-row>
       <v-col cols="12">
         <v-card class="mb-4">
           <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2" color="primary">mdi-calendar-account</v-icon>
+            <v-icon
+              class="mr-2"
+              color="primary"
+            >
+              mdi-calendar-account
+            </v-icon>
             useOwnerCalendarState Demo
             <v-spacer />
-            <v-chip color="success" variant="outlined">
+            <v-chip
+              color="success"
+              variant="outlined"
+            >
               Owner Role
             </v-chip>
           </v-card-title>
@@ -20,36 +31,81 @@
 
     <!-- Owner Calendar Stats -->
     <v-row>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-card class="mb-4">
           <v-card-title>
-            <v-icon class="mr-2">mdi-chart-box</v-icon>
+            <v-icon class="mr-2">
+              mdi-chart-box
+            </v-icon>
             {{ ownerCalendarTitle }}
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-primary">{{ calendarStats.totalProperties }}</div>
-                  <div class="text-caption">Properties</div>
+              <v-col
+                cols="6"
+                sm="3"
+              >
+                <v-card
+                  variant="outlined"
+                  class="text-center pa-2"
+                >
+                  <div class="text-h4 text-primary">
+                    {{ calendarStats.totalProperties }}
+                  </div>
+                  <div class="text-caption">
+                    Properties
+                  </div>
                 </v-card>
               </v-col>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-info">{{ calendarStats.totalBookings }}</div>
-                  <div class="text-caption">Bookings</div>
+              <v-col
+                cols="6"
+                sm="3"
+              >
+                <v-card
+                  variant="outlined"
+                  class="text-center pa-2"
+                >
+                  <div class="text-h4 text-info">
+                    {{ calendarStats.totalBookings }}
+                  </div>
+                  <div class="text-caption">
+                    Bookings
+                  </div>
                 </v-card>
               </v-col>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-error">{{ calendarStats.urgentTurns }}</div>
-                  <div class="text-caption">Urgent Turns</div>
+              <v-col
+                cols="6"
+                sm="3"
+              >
+                <v-card
+                  variant="outlined"
+                  class="text-center pa-2"
+                >
+                  <div class="text-h4 text-error">
+                    {{ calendarStats.urgentTurns }}
+                  </div>
+                  <div class="text-caption">
+                    Urgent Turns
+                  </div>
                 </v-card>
               </v-col>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-warning">{{ calendarStats.upcomingCleanings }}</div>
-                  <div class="text-caption">Upcoming</div>
+              <v-col
+                cols="6"
+                sm="3"
+              >
+                <v-card
+                  variant="outlined"
+                  class="text-center pa-2"
+                >
+                  <div class="text-h4 text-warning">
+                    {{ calendarStats.upcomingCleanings }}
+                  </div>
+                  <div class="text-caption">
+                    Upcoming
+                  </div>
                 </v-card>
               </v-col>
             </v-row>
@@ -58,35 +114,68 @@
       </v-col>
 
       <!-- Owner Turn Alerts -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-card class="mb-4">
           <v-card-title>
-            <v-icon class="mr-2" color="error">mdi-fire</v-icon>
+            <v-icon
+              class="mr-2"
+              color="error"
+            >
+              mdi-fire
+            </v-icon>
             My Turn Alerts
-            <v-chip class="ml-2" color="error" size="small">
+            <v-chip
+              class="ml-2"
+              color="error"
+              size="small"
+            >
               {{ myTurnAlerts.length }}
             </v-chip>
           </v-card-title>
           <v-card-text>
-            <div v-if="myTurnAlerts.length === 0" class="text-center text-medium-emphasis py-4">
-              <v-icon size="48" color="success">mdi-check-circle</v-icon>
-              <div class="mt-2">No urgent turns today!</div>
+            <div
+              v-if="myTurnAlerts.length === 0"
+              class="text-center text-medium-emphasis py-4"
+            >
+              <v-icon
+                size="48"
+                color="success"
+              >
+                mdi-check-circle
+              </v-icon>
+              <div class="mt-2">
+                No urgent turns today!
+              </div>
             </div>
-            <v-list v-else density="compact">
+            <v-list
+              v-else
+              density="compact"
+            >
               <v-list-item
                 v-for="alert in myTurnAlerts"
                 :key="alert.id"
                 class="mb-2"
               >
                 <template #prepend>
-                  <v-avatar :color="getUrgencyColor(alert.urgencyLevel)" size="small">
-                    <v-icon color="white">mdi-fire</v-icon>
+                  <v-avatar
+                    :color="getUrgencyColor(alert.urgencyLevel)"
+                    size="small"
+                  >
+                    <v-icon color="white">
+                      mdi-fire
+                    </v-icon>
                   </v-avatar>
                 </template>
                 <v-list-item-title>{{ alert.alertMessage }}</v-list-item-title>
                 <v-list-item-subtitle>{{ alert.timeUntilCheckout }}</v-list-item-subtitle>
                 <template #append>
-                  <v-chip :color="getUrgencyColor(alert.urgencyLevel)" size="small">
+                  <v-chip
+                    :color="getUrgencyColor(alert.urgencyLevel)"
+                    size="small"
+                  >
                     {{ alert.urgencyLevel }}
                   </v-chip>
                 </template>
@@ -102,12 +191,17 @@
       <v-col cols="12">
         <v-card class="mb-4">
           <v-card-title>
-            <v-icon class="mr-2">mdi-filter</v-icon>
+            <v-icon class="mr-2">
+              mdi-filter
+            </v-icon>
             Property Filters
           </v-card-title>
           <v-card-text>
             <v-row align="center">
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="selectedPropertyFilter"
                   :items="propertyFilterOptions"
@@ -131,14 +225,19 @@
                   </template>
                 </v-select>
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-btn
                   color="primary"
                   variant="outlined"
-                  @click="clearOwnerPropertyFilters"
                   :disabled="!selectedPropertyFilter"
+                  @click="clearOwnerPropertyFilters"
                 >
-                  <v-icon class="mr-2">mdi-filter-off</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-filter-off
+                  </v-icon>
                   Clear Filters
                 </v-btn>
               </v-col>
@@ -153,17 +252,35 @@
       <v-col cols="12">
         <v-card class="mb-4">
           <v-card-title>
-            <v-icon class="mr-2">mdi-calendar-month</v-icon>
+            <v-icon class="mr-2">
+              mdi-calendar-month
+            </v-icon>
             My Calendar Events
-            <v-chip class="ml-2" color="info" size="small">
+            <v-chip
+              class="ml-2"
+              color="info"
+              size="small"
+            >
               {{ myCalendarEvents.length }}
             </v-chip>
           </v-card-title>
           <v-card-text>
-            <div v-if="myCalendarEvents.length === 0" class="text-center text-medium-emphasis py-8">
-              <v-icon size="64" color="info">mdi-calendar-blank</v-icon>
-              <div class="mt-4 text-h6">No bookings found</div>
-              <div class="text-body-2">Add some properties and bookings to see them here</div>
+            <div
+              v-if="myCalendarEvents.length === 0"
+              class="text-center text-medium-emphasis py-8"
+            >
+              <v-icon
+                size="64"
+                color="info"
+              >
+                mdi-calendar-blank
+              </v-icon>
+              <div class="mt-4 text-h6">
+                No bookings found
+              </div>
+              <div class="text-body-2">
+                Add some properties and bookings to see them here
+              </div>
             </div>
             <v-row v-else>
               <v-col
@@ -181,21 +298,39 @@
                 >
                   <v-card-text class="pa-3">
                     <div class="d-flex align-center mb-2">
-                      <v-icon class="mr-2" color="white">
+                      <v-icon
+                        class="mr-2"
+                        color="white"
+                      >
                         {{ event.extendedProps.booking_type === 'turn' ? 'mdi-fire' : 'mdi-home-clean' }}
                       </v-icon>
                       <span class="text-white font-weight-bold">{{ event.title }}</span>
                     </div>
                     <div class="text-white text-caption mb-1">
-                      <v-icon size="small" class="mr-1">mdi-home</v-icon>
+                      <v-icon
+                        size="small"
+                        class="mr-1"
+                      >
+                        mdi-home
+                      </v-icon>
                       {{ event.extendedProps.propertyName }}
                     </div>
                     <div class="text-white text-caption mb-1">
-                      <v-icon size="small" class="mr-1">mdi-calendar</v-icon>
+                      <v-icon
+                        size="small"
+                        class="mr-1"
+                      >
+                        mdi-calendar
+                      </v-icon>
                       {{ formatEventDate(event.start) }}
                     </div>
                     <div class="text-white text-caption">
-                      <v-icon size="small" class="mr-1">mdi-information</v-icon>
+                      <v-icon
+                        size="small"
+                        class="mr-1"
+                      >
+                        mdi-information
+                      </v-icon>
                       {{ event.extendedProps.status }}
                     </div>
                   </v-card-text>
@@ -218,10 +353,15 @@
 
     <!-- Function Testing -->
     <v-row>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-card class="mb-4">
           <v-card-title>
-            <v-icon class="mr-2">mdi-function</v-icon>
+            <v-icon class="mr-2">
+              mdi-function
+            </v-icon>
             Function Testing
           </v-card-title>
           <v-card-text>
@@ -231,7 +371,9 @@
               class="mb-2 mr-2"
               @click="testDateSelect"
             >
-              <v-icon class="mr-2">mdi-calendar-plus</v-icon>
+              <v-icon class="mr-2">
+                mdi-calendar-plus
+              </v-icon>
               Test Date Select
             </v-btn>
             <v-btn
@@ -240,7 +382,9 @@
               class="mb-2 mr-2"
               @click="testEventClick"
             >
-              <v-icon class="mr-2">mdi-calendar-edit</v-icon>
+              <v-icon class="mr-2">
+                mdi-calendar-edit
+              </v-icon>
               Test Event Click
             </v-btn>
             <v-btn
@@ -249,7 +393,9 @@
               class="mb-2 mr-2"
               @click="testValidateAccess"
             >
-              <v-icon class="mr-2">mdi-shield-check</v-icon>
+              <v-icon class="mr-2">
+                mdi-shield-check
+              </v-icon>
               Test Access Validation
             </v-btn>
             <v-btn
@@ -258,7 +404,9 @@
               class="mb-2"
               @click="generateSampleData"
             >
-              <v-icon class="mr-2">mdi-database-plus</v-icon>
+              <v-icon class="mr-2">
+                mdi-database-plus
+              </v-icon>
               Generate Sample Data
             </v-btn>
           </v-card-text>
@@ -266,10 +414,15 @@
       </v-col>
 
       <!-- Status Messages -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-card class="mb-4">
           <v-card-title>
-            <v-icon class="mr-2">mdi-message</v-icon>
+            <v-icon class="mr-2">
+              mdi-message
+            </v-icon>
             Status Messages
           </v-card-title>
           <v-card-text>
@@ -311,16 +464,24 @@
         <v-expansion-panels>
           <v-expansion-panel>
             <v-expansion-panel-title>
-              <v-icon class="mr-2">mdi-bug</v-icon>
+              <v-icon class="mr-2">
+                mdi-bug
+              </v-icon>
               Debug Information
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <v-row>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <h4>Current User</h4>
                   <pre class="text-caption">{{ JSON.stringify(currentUser, null, 2) }}</pre>
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <h4>Calendar State</h4>
                   <pre class="text-caption">{{ JSON.stringify({
                     currentView,

@@ -277,3 +277,13 @@ This project is proprietary software for property cleaning business management.
 **Last Updated**: December 2024  
 **Build System**: Vite 5.x + Vue 3 + TypeScript  
 **Architecture**: Role-Based Multi-Tenant
+
+
+
+
+
+
+
+
+
+

@@ -4,7 +4,9 @@
       <v-row>
         <v-col cols="12">
           <div class="d-flex justify-space-between align-center mb-4">
-            <h1 class="text-h4">My Properties</h1>
+            <h1 class="text-h4">
+              My Properties
+            </h1>
             <v-btn
               color="primary"
               prepend-icon="mdi-plus"
@@ -18,35 +20,67 @@
 
       <!-- Property Stats -->
       <v-row class="mb-4">
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
-              <div class="text-h6">{{ ownerProperties.length }}</div>
-              <div class="text-caption text-medium-emphasis">Total Properties</div>
+              <div class="text-h6">
+                {{ ownerProperties.length }}
+              </div>
+              <div class="text-caption text-medium-emphasis">
+                Total Properties
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
-              <div class="text-h6">{{ activeProperties.length }}</div>
-              <div class="text-caption text-medium-emphasis">Active Properties</div>
+              <div class="text-h6">
+                {{ activeProperties.length }}
+              </div>
+              <div class="text-caption text-medium-emphasis">
+                Active Properties
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
-              <div class="text-h6">{{ ownerBookings.length }}</div>
-              <div class="text-caption text-medium-emphasis">Total Bookings</div>
+              <div class="text-h6">
+                {{ ownerBookings.length }}
+              </div>
+              <div class="text-caption text-medium-emphasis">
+                Total Bookings
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
-              <div class="text-h6">{{ todayTurns.length }}</div>
-              <div class="text-caption text-medium-emphasis">Today's Turns</div>
+              <div class="text-h6">
+                {{ todayTurns.length }}
+              </div>
+              <div class="text-caption text-medium-emphasis">
+                Today's Turns
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -72,11 +106,20 @@
 
       <!-- Empty State -->
       <v-row v-if="ownerProperties.length === 0">
-        <v-col cols="12" class="text-center py-8">
-          <v-icon size="64" color="grey-lighten-1" class="mb-4">
+        <v-col
+          cols="12"
+          class="text-center py-8"
+        >
+          <v-icon
+            size="64"
+            color="grey-lighten-1"
+            class="mb-4"
+          >
             mdi-home-outline
           </v-icon>
-          <h3 class="text-h6 mb-2">No Properties Yet</h3>
+          <h3 class="text-h6 mb-2">
+            No Properties Yet
+          </h3>
           <p class="text-body-2 text-medium-emphasis mb-4">
             Add your first property to start managing bookings and cleanings.
           </p>

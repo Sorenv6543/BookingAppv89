@@ -5,7 +5,9 @@
       <v-container fluid>
         <v-row align="center">
           <v-col>
-            <h1 class="text-h4 font-weight-bold">All Properties</h1>
+            <h1 class="text-h4 font-weight-bold">
+              All Properties
+            </h1>
             <p class="text-subtitle-1 text-medium-emphasis">
               Manage all properties across all clients
             </p>
@@ -27,7 +29,10 @@
     <div class="filters-section">
       <v-container fluid>
         <v-row align="center">
-          <v-col cols="12" md="3">
+          <v-col
+            cols="12"
+            md="3"
+          >
             <v-text-field
               v-model="searchQuery"
               prepend-inner-icon="mdi-magnify"
@@ -37,7 +42,10 @@
               clearable
             />
           </v-col>
-          <v-col cols="12" md="2">
+          <v-col
+            cols="12"
+            md="2"
+          >
             <v-select
               v-model="statusFilter"
               :items="statusOptions"
@@ -47,7 +55,10 @@
               clearable
             />
           </v-col>
-          <v-col cols="12" md="2">
+          <v-col
+            cols="12"
+            md="2"
+          >
             <v-select
               v-model="tierFilter"
               :items="tierOptions"
@@ -57,7 +68,10 @@
               clearable
             />
           </v-col>
-          <v-col cols="12" md="2">
+          <v-col
+            cols="12"
+            md="2"
+          >
             <v-select
               v-model="ownerFilter"
               :items="ownerOptions"
@@ -67,7 +81,10 @@
               clearable
             />
           </v-col>
-          <v-col cols="12" md="3">
+          <v-col
+            cols="12"
+            md="3"
+          >
             <div class="d-flex gap-2">
               <v-text-field
                 v-model="minDuration"
@@ -95,9 +112,19 @@
     <div class="page-content">
       <v-container fluid>
         <!-- Properties Grid -->
-        <div v-if="filteredProperties.length === 0" class="text-center py-8">
-          <v-icon size="64" color="grey-lighten-1">mdi-home-search</v-icon>
-          <p class="text-h6 text-medium-emphasis mt-4">No properties found</p>
+        <div
+          v-if="filteredProperties.length === 0"
+          class="text-center py-8"
+        >
+          <v-icon
+            size="64"
+            color="grey-lighten-1"
+          >
+            mdi-home-search
+          </v-icon>
+          <p class="text-h6 text-medium-emphasis mt-4">
+            No properties found
+          </p>
           <p class="text-body-2 text-medium-emphasis">
             Try adjusting your filters or add a new property
           </p>
@@ -112,7 +139,10 @@
             md="4"
             lg="3"
           >
-            <v-card class="property-card" @click="openPropertyDetails(property)">
+            <v-card
+              class="property-card"
+              @click="openPropertyDetails(property)"
+            >
               <v-card-text>
                 <!-- Status and Tier -->
                 <div class="d-flex justify-space-between align-center mb-2">
@@ -139,7 +169,12 @@
                 
                 <!-- Address -->
                 <div class="text-body-2 text-medium-emphasis mb-2">
-                  <v-icon size="16" class="mr-1">mdi-map-marker</v-icon>
+                  <v-icon
+                    size="16"
+                    class="mr-1"
+                  >
+                    mdi-map-marker
+                  </v-icon>
                   {{ property.address }}
                 </div>
                 
@@ -147,21 +182,33 @@
                 <div class="property-details mb-3">
                   <div class="d-flex justify-space-between text-body-2">
                     <span>
-                      <v-icon size="16" class="mr-1">mdi-bed</v-icon>
+                      <v-icon
+                        size="16"
+                        class="mr-1"
+                      >mdi-bed</v-icon>
                       {{ property.bedrooms || 'N/A' }} bed
                     </span>
                     <span>
-                      <v-icon size="16" class="mr-1">mdi-shower</v-icon>
+                      <v-icon
+                        size="16"
+                        class="mr-1"
+                      >mdi-shower</v-icon>
                       {{ property.bathrooms || 'N/A' }} bath
                     </span>
                   </div>
                   <div class="d-flex justify-space-between text-body-2 mt-1">
                     <span>
-                      <v-icon size="16" class="mr-1">mdi-clock</v-icon>
+                      <v-icon
+                        size="16"
+                        class="mr-1"
+                      >mdi-clock</v-icon>
                       {{ property.cleaning_duration }}min
                     </span>
                     <span>
-                      <v-icon size="16" class="mr-1">mdi-resize</v-icon>
+                      <v-icon
+                        size="16"
+                        class="mr-1"
+                      >mdi-resize</v-icon>
                       {{ property.square_feet || 'N/A' }} sqft
                     </span>
                   </div>
@@ -220,7 +267,10 @@
                     <v-list-item @click="duplicateProperty(property)">
                       <v-list-item-title>Duplicate</v-list-item-title>
                     </v-list-item>
-                    <v-list-item @click="deleteProperty(property)" class="text-error">
+                    <v-list-item
+                      class="text-error"
+                      @click="deleteProperty(property)"
+                    >
                       <v-list-item-title>Delete</v-list-item-title>
                     </v-list-item>
                   </v-list>
@@ -233,7 +283,10 @@
     </div>
 
     <!-- Create/Edit Property Dialog -->
-    <v-dialog v-model="showPropertyDialog" max-width="800px">
+    <v-dialog
+      v-model="showPropertyDialog"
+      max-width="800px"
+    >
       <v-card>
         <v-card-title>
           {{ editingProperty ? 'Edit Property' : 'Add New Property' }}
@@ -243,7 +296,12 @@
             Admin property form would be implemented here with owner selection and full property details
           </p>
           <div class="text-center py-4">
-            <v-icon size="48" color="grey-lighten-1">mdi-form-select</v-icon>
+            <v-icon
+              size="48"
+              color="grey-lighten-1"
+            >
+              mdi-form-select
+            </v-icon>
             <p class="text-caption text-medium-emphasis mt-2">
               Integration with AdminPropertyForm component needed
             </p>
@@ -251,8 +309,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="closePropertyDialog">Cancel</v-btn>
-          <v-btn color="primary" @click="saveProperty">
+          <v-btn @click="closePropertyDialog">
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="saveProperty"
+          >
             {{ editingProperty ? 'Update' : 'Create' }}
           </v-btn>
         </v-card-actions>

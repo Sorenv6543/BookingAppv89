@@ -1,14 +1,27 @@
 <template>
-  <v-container fluid class="pa-6">
+  <v-container
+    fluid
+    class="pa-6"
+  >
     <v-row>
       <v-col cols="12">
         <v-card class="mb-6">
           <v-card-title class="d-flex align-center">
-            <v-icon class="mr-3" color="primary">mdi-office-building-cog</v-icon>
+            <v-icon
+              class="mr-3"
+              color="primary"
+            >
+              mdi-office-building-cog
+            </v-icon>
             <span>useAdminProperties Composable Demo</span>
             <v-spacer />
-            <v-chip color="success" variant="outlined">
-              <v-icon start>mdi-shield-check</v-icon>
+            <v-chip
+              color="success"
+              variant="outlined"
+            >
+              <v-icon start>
+                mdi-shield-check
+              </v-icon>
               Admin System-Wide Access
             </v-chip>
           </v-card-title>
@@ -24,41 +37,85 @@
       <v-col cols="12">
         <v-card class="mb-6">
           <v-card-title>
-            <v-icon class="mr-2">mdi-chart-line</v-icon>
+            <v-icon class="mr-2">
+              mdi-chart-line
+            </v-icon>
             System Property Metrics
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="12" md="3">
-                <v-card variant="outlined" color="primary">
+              <v-col
+                cols="12"
+                md="3"
+              >
+                <v-card
+                  variant="outlined"
+                  color="primary"
+                >
                   <v-card-text class="text-center">
-                    <div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.total }}</div>
-                    <div class="text-subtitle-1">Total Properties</div>
+                    <div class="text-h4 font-weight-bold">
+                      {{ systemPropertyMetrics.total }}
+                    </div>
+                    <div class="text-subtitle-1">
+                      Total Properties
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
-              <v-col cols="12" md="3">
-                <v-card variant="outlined" color="success">
+              <v-col
+                cols="12"
+                md="3"
+              >
+                <v-card
+                  variant="outlined"
+                  color="success"
+                >
                   <v-card-text class="text-center">
-                    <div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.active }}</div>
-                    <div class="text-subtitle-1">Active Properties</div>
-                    <div class="text-caption">({{ systemPropertyMetrics.activePercentage }}%)</div>
+                    <div class="text-h4 font-weight-bold">
+                      {{ systemPropertyMetrics.active }}
+                    </div>
+                    <div class="text-subtitle-1">
+                      Active Properties
+                    </div>
+                    <div class="text-caption">
+                      ({{ systemPropertyMetrics.activePercentage }}%)
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
-              <v-col cols="12" md="3">
-                <v-card variant="outlined" color="warning">
+              <v-col
+                cols="12"
+                md="3"
+              >
+                <v-card
+                  variant="outlined"
+                  color="warning"
+                >
                   <v-card-text class="text-center">
-                    <div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.ownerCount }}</div>
-                    <div class="text-subtitle-1">Property Owners</div>
+                    <div class="text-h4 font-weight-bold">
+                      {{ systemPropertyMetrics.ownerCount }}
+                    </div>
+                    <div class="text-subtitle-1">
+                      Property Owners
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
-              <v-col cols="12" md="3">
-                <v-card variant="outlined" color="info">
+              <v-col
+                cols="12"
+                md="3"
+              >
+                <v-card
+                  variant="outlined"
+                  color="info"
+                >
                   <v-card-text class="text-center">
-                    <div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.averageCleaningDuration }}</div>
-                    <div class="text-subtitle-1">Avg Duration (min)</div>
+                    <div class="text-h4 font-weight-bold">
+                      {{ systemPropertyMetrics.averageCleaningDuration }}
+                    </div>
+                    <div class="text-subtitle-1">
+                      Avg Duration (min)
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -70,10 +127,15 @@
 
     <!-- Properties by Owner -->
     <v-row>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-card class="mb-6">
           <v-card-title>
-            <v-icon class="mr-2">mdi-account-group</v-icon>
+            <v-icon class="mr-2">
+              mdi-account-group
+            </v-icon>
             Properties by Owner
           </v-card-title>
           <v-card-text>
@@ -84,14 +146,22 @@
                 class="mb-2"
               >
                 <template #prepend>
-                  <v-avatar color="primary" size="small">
+                  <v-avatar
+                    color="primary"
+                    size="small"
+                  >
                     <v-icon>mdi-account</v-icon>
                   </v-avatar>
                 </template>
                 <v-list-item-title>Owner: {{ ownerId.substring(0, 8) }}...</v-list-item-title>
                 <v-list-item-subtitle>{{ properties.length }} properties</v-list-item-subtitle>
                 <template #append>
-                  <v-chip size="small" color="primary">{{ properties.length }}</v-chip>
+                  <v-chip
+                    size="small"
+                    color="primary"
+                  >
+                    {{ properties.length }}
+                  </v-chip>
                 </template>
               </v-list-item>
             </v-list>
@@ -100,10 +170,15 @@
       </v-col>
 
       <!-- Properties by Pricing Tier -->
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-card class="mb-6">
           <v-card-title>
-            <v-icon class="mr-2">mdi-currency-usd</v-icon>
+            <v-icon class="mr-2">
+              mdi-currency-usd
+            </v-icon>
             Properties by Pricing Tier
           </v-card-title>
           <v-card-text>
@@ -114,14 +189,24 @@
                 class="mb-2"
               >
                 <template #prepend>
-                  <v-avatar :color="getTierColor(tier)" size="small">
+                  <v-avatar
+                    :color="getTierColor(tier)"
+                    size="small"
+                  >
                     <v-icon>{{ getTierIcon(tier) }}</v-icon>
                   </v-avatar>
                 </template>
-                <v-list-item-title class="text-capitalize">{{ tier }}</v-list-item-title>
+                <v-list-item-title class="text-capitalize">
+                  {{ tier }}
+                </v-list-item-title>
                 <v-list-item-subtitle>{{ properties.length }} properties</v-list-item-subtitle>
                 <template #append>
-                  <v-chip size="small" :color="getTierColor(tier)">{{ properties.length }}</v-chip>
+                  <v-chip
+                    size="small"
+                    :color="getTierColor(tier)"
+                  >
+                    {{ properties.length }}
+                  </v-chip>
                 </template>
               </v-list-item>
             </v-list>
@@ -135,46 +220,63 @@
       <v-col cols="12">
         <v-card class="mb-6">
           <v-card-title>
-            <v-icon class="mr-2">mdi-cog</v-icon>
+            <v-icon class="mr-2">
+              mdi-cog
+            </v-icon>
             Admin Operations
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-btn
-                  @click="testFetchAllProperties"
                   :loading="loading"
                   color="primary"
                   variant="outlined"
                   block
                   class="mb-3"
+                  @click="testFetchAllProperties"
                 >
-                  <v-icon start>mdi-download</v-icon>
+                  <v-icon start>
+                    mdi-download
+                  </v-icon>
                   Fetch All Properties
                 </v-btn>
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-btn
-                  @click="testBulkUpdate"
                   :loading="loading"
                   color="warning"
                   variant="outlined"
                   block
                   class="mb-3"
+                  @click="testBulkUpdate"
                 >
-                  <v-icon start>mdi-pencil-box-multiple</v-icon>
+                  <v-icon start>
+                    mdi-pencil-box-multiple
+                  </v-icon>
                   Test Bulk Update
                 </v-btn>
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-btn
-                  @click="testAnalytics"
                   color="info"
                   variant="outlined"
                   block
                   class="mb-3"
+                  @click="testAnalytics"
                 >
-                  <v-icon start>mdi-chart-bar</v-icon>
+                  <v-icon start>
+                    mdi-chart-bar
+                  </v-icon>
                   Generate Analytics
                 </v-btn>
               </v-col>
@@ -189,16 +291,29 @@
       <v-col cols="12">
         <v-card class="mb-6">
           <v-card-title>
-            <v-icon class="mr-2">mdi-chart-pie</v-icon>
+            <v-icon class="mr-2">
+              mdi-chart-pie
+            </v-icon>
             Property Analytics Report
           </v-card-title>
           <v-card-text>
             <v-row>
               <!-- Top Performers -->
-              <v-col cols="12" md="6">
-                <v-card variant="outlined" class="mb-4">
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-card
+                  variant="outlined"
+                  class="mb-4"
+                >
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="success">mdi-trophy</v-icon>
+                    <v-icon
+                      class="mr-2"
+                      color="success"
+                    >
+                      mdi-trophy
+                    </v-icon>
                     Top Performing Properties
                   </v-card-title>
                   <v-card-text>
@@ -209,7 +324,10 @@
                         class="mb-1"
                       >
                         <template #prepend>
-                          <v-chip size="small" :color="index === 0 ? 'success' : 'primary'">
+                          <v-chip
+                            size="small"
+                            :color="index === 0 ? 'success' : 'primary'"
+                          >
                             #{{ index + 1 }}
                           </v-chip>
                         </template>
@@ -225,10 +343,21 @@
               </v-col>
 
               <!-- Under Performers -->
-              <v-col cols="12" md="6">
-                <v-card variant="outlined" class="mb-4">
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-card
+                  variant="outlined"
+                  class="mb-4"
+                >
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="warning">mdi-alert-circle</v-icon>
+                    <v-icon
+                      class="mr-2"
+                      color="warning"
+                    >
+                      mdi-alert-circle
+                    </v-icon>
                     Under Performing Properties
                   </v-card-title>
                   <v-card-text>
@@ -239,7 +368,10 @@
                         class="mb-1"
                       >
                         <template #prepend>
-                          <v-chip size="small" color="warning">
+                          <v-chip
+                            size="small"
+                            color="warning"
+                          >
                             {{ Math.round(performer.utilizationRate * 100) }}%
                           </v-chip>
                         </template>
@@ -260,7 +392,12 @@
               <v-col cols="12">
                 <v-card variant="outlined">
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="success">mdi-currency-usd</v-icon>
+                    <v-icon
+                      class="mr-2"
+                      color="success"
+                    >
+                      mdi-currency-usd
+                    </v-icon>
                     Revenue Projection by Tier
                   </v-card-title>
                   <v-card-text>
@@ -271,10 +408,17 @@
                         cols="12"
                         md="3"
                       >
-                        <v-card variant="outlined" :color="getTierColor(tier as unknown as PricingTier)">
+                        <v-card
+                          variant="outlined"
+                          :color="getTierColor(tier as unknown as PricingTier)"
+                        >
                           <v-card-text class="text-center">
-                            <div class="text-h6 font-weight-bold">${{ revenue }}</div>  
-                            <div class="text-subtitle-2 text-capitalize">{{ tier }}</div>
+                            <div class="text-h6 font-weight-bold">
+                              ${{ revenue }}
+                            </div>  
+                            <div class="text-subtitle-2 text-capitalize">
+                              {{ tier }}
+                            </div>
                           </v-card-text>
                         </v-card>
                       </v-col>
@@ -299,7 +443,9 @@
       <v-col cols="12">
         <v-card class="mb-6">
           <v-card-title>
-            <v-icon class="mr-2">mdi-chart-timeline-variant</v-icon>
+            <v-icon class="mr-2">
+              mdi-chart-timeline-variant
+            </v-icon>
             Property Utilization Data
           </v-card-title>
           <v-card-text>
@@ -310,8 +456,12 @@
               class="elevation-1"
             >
               <template #item.property.name="{ item }">
-                <div class="font-weight-medium">{{ item.property.name }}</div>
-                <div class="text-caption text-medium-emphasis">{{ item.property.address }}</div>
+                <div class="font-weight-medium">
+                  {{ item.property.name }}
+                </div>
+                <div class="text-caption text-medium-emphasis">
+                  {{ item.property.address }}
+                </div>
               </template>
               
               <template #item.utilizationRate="{ item }">
@@ -340,7 +490,9 @@
               </template>
               
               <template #item.revenueProjection="{ item }">
-                <div class="font-weight-medium">${{ item.revenueProjection }}</div>
+                <div class="font-weight-medium">
+                  ${{ item.revenueProjection }}
+                </div>
               </template>
             </v-data-table>
           </v-card-text>
@@ -350,27 +502,51 @@
 
     <!-- Active vs Inactive Properties -->
     <v-row>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2" color="success">mdi-check-circle</v-icon>
+            <v-icon
+              class="mr-2"
+              color="success"
+            >
+              mdi-check-circle
+            </v-icon>
             Active Properties
           </v-card-title>
           <v-card-text>
-            <div class="text-h3 text-success">{{ allActiveProperties.length }}</div>
-            <div class="text-caption">Currently active properties</div>
+            <div class="text-h3 text-success">
+              {{ allActiveProperties.length }}
+            </div>
+            <div class="text-caption">
+              Currently active properties
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2" color="warning">mdi-pause-circle</v-icon>
+            <v-icon
+              class="mr-2"
+              color="warning"
+            >
+              mdi-pause-circle
+            </v-icon>
             Inactive Properties
           </v-card-title>
           <v-card-text>
-            <div class="text-h3 text-warning">{{ allProperties.length - allActiveProperties.length }}</div>
-            <div class="text-caption">Currently inactive properties</div>
+            <div class="text-h3 text-warning">
+              {{ allProperties.length - allActiveProperties.length }}
+            </div>
+            <div class="text-caption">
+              Currently inactive properties
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -381,12 +557,20 @@
       <v-col cols="12">
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2" color="primary">mdi-filter</v-icon>
+            <v-icon
+              class="mr-2"
+              color="primary"
+            >
+              mdi-filter
+            </v-icon>
             Advanced Property Filtering Demo
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-select
                   v-model="filterCriteria.owner_id"
                   :items="ownerOptions"
@@ -396,7 +580,10 @@
                   density="compact"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-select
                   v-model="filterCriteria.pricing_tier"
                   :items="tierOptions"
@@ -406,7 +593,10 @@
                   density="compact"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <v-select
                   v-model="filterCriteria.active"
                   :items="activeOptions"
@@ -420,28 +610,38 @@
             <v-row>
               <v-col cols="12">
                 <v-btn
-                  @click="testFilterProperties"
                   color="primary"
                   variant="outlined"
                   class="mr-2"
+                  @click="testFilterProperties"
                 >
-                  <v-icon start>mdi-filter</v-icon>
+                  <v-icon start>
+                    mdi-filter
+                  </v-icon>
                   Apply Filters
                 </v-btn>
                 <v-btn
-                  @click="clearFilters"
                   color="secondary"
                   variant="outlined"
+                  @click="clearFilters"
                 >
-                  <v-icon start>mdi-filter-off</v-icon>
+                  <v-icon start>
+                    mdi-filter-off
+                  </v-icon>
                   Clear Filters
                 </v-btn>
               </v-col>
             </v-row>
             <v-row v-if="filteredResults.length > 0">
               <v-col cols="12">
-                <v-alert type="info" variant="outlined" class="mt-4">
-                  <v-icon start>mdi-information</v-icon>
+                <v-alert
+                  type="info"
+                  variant="outlined"
+                  class="mt-4"
+                >
+                  <v-icon start>
+                    mdi-information
+                  </v-icon>
                   Found {{ filteredResults.length }} properties matching your criteria
                 </v-alert>
                 <v-list>
@@ -460,7 +660,10 @@
                     </v-list-item-subtitle>
                   </v-list-item>
                 </v-list>
-                <div v-if="filteredResults.length > 5" class="text-caption text-center mt-2">
+                <div
+                  v-if="filteredResults.length > 5"
+                  class="text-caption text-center mt-2"
+                >
                   ... and {{ filteredResults.length - 5 }} more properties
                 </div>
               </v-col>
@@ -478,10 +681,12 @@
           type="success"
           variant="outlined"
           closable
-          @click:close="success = null"
           class="mb-4"
+          @click:close="success = null"
         >
-          <v-icon start>mdi-check-circle</v-icon>
+          <v-icon start>
+            mdi-check-circle
+          </v-icon>
           {{ success || composableSuccess }}
         </v-alert>
         
@@ -490,10 +695,12 @@
           type="error"
           variant="outlined"
           closable
-          @click:close="error = null"
           class="mb-4"
+          @click:close="error = null"
         >
-          <v-icon start>mdi-alert-circle</v-icon>
+          <v-icon start>
+            mdi-alert-circle
+          </v-icon>
           {{ error || composableError }}
         </v-alert>
       </v-col>

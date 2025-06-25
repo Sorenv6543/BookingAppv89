@@ -15,7 +15,10 @@
     </template>
     
     <!-- Alert title -->
-    <template v-if="title" #title>
+    <template
+      v-if="title"
+      #title
+    >
       <span class="error-alert-title">{{ title }}</span>
     </template>
     
@@ -96,7 +99,10 @@
           color="primary"
           @click="handleRetry"
         >
-          <v-icon start icon="mdi-refresh" />
+          <v-icon
+            start
+            icon="mdi-refresh"
+          />
           Try Again
         </v-btn>
         
@@ -127,7 +133,10 @@
           color="warning"
           @click="handleEscalate"
         >
-          <v-icon start icon="mdi-alert-octagon" />
+          <v-icon
+            start
+            icon="mdi-alert-octagon"
+          />
           Escalate
         </v-btn>
       </div>

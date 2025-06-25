@@ -6,7 +6,10 @@
     />
     
     <v-main>
-      <v-container fluid class="pa-0">
+      <v-container
+        fluid
+        class="pa-0"
+      >
         <div class="test-info mb-4 pa-4">
           <h2>AdminSidebar Width Test</h2>
           <p>This page tests the AdminSidebar width behavior:</p>
@@ -48,7 +51,10 @@
         </div>
 
         <!-- Replica of HomeAdmin layout structure -->
-        <v-row no-gutters class="fill-height test-layout">
+        <v-row
+          no-gutters
+          class="fill-height test-layout"
+        >
           <!-- Sidebar Column - Same structure as HomeAdmin -->
           <v-col 
             cols="12" 
@@ -93,7 +99,8 @@
             <div class="test-content pa-4">
               <h3>Main Content Area</h3>
               <p>This area simulates the calendar content.</p>
-              <p><strong>Current breakpoint:</strong> 
+              <p>
+                <strong>Current breakpoint:</strong> 
                 <span v-if="$vuetify.display.xl">XL (≥1904px) - Sidebar should be 2/12 = ~16.7%</span>
                 <span v-else-if="$vuetify.display.lg">LG (≥1264px) - Sidebar should be 3/12 = 25%</span>
                 <span v-else-if="$vuetify.display.md">MD (≥960px) - Mobile layout</span>

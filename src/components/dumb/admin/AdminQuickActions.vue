@@ -5,7 +5,9 @@
     :variant="variant"
   >
     <v-card-title class="text-h6 pb-2 d-flex align-center">
-      <v-icon class="mr-2">mdi-cog</v-icon>
+      <v-icon class="mr-2">
+        mdi-cog
+      </v-icon>
       Admin Actions
       <v-spacer />
       <v-chip
@@ -14,7 +16,12 @@
         size="small"
         variant="elevated"
       >
-        <v-icon start size="small">mdi-alert</v-icon>
+        <v-icon
+          start
+          size="small"
+        >
+          mdi-alert
+        </v-icon>
         {{ urgentCount }} Urgent
       </v-chip>
     </v-card-title>
@@ -22,7 +29,10 @@
     <v-divider />
     
     <v-card-text class="pa-3">
-      <v-container fluid class="pa-0">
+      <v-container
+        fluid
+        class="pa-0"
+      >
         <!-- Critical Actions Row -->
         <v-row class="mb-2">
           <v-col
@@ -40,7 +50,9 @@
               :disabled="disabled"
               @click="handleAction('manage-urgent-turns')"
             >
-              <v-icon class="mr-2">mdi-clock-alert</v-icon>
+              <v-icon class="mr-2">
+                mdi-clock-alert
+              </v-icon>
               <span class="d-none d-sm-inline">Urgent</span>
               Turns
               <v-badge
@@ -69,7 +81,9 @@
               :disabled="disabled"
               @click="handleAction('assign-cleaners')"
             >
-              <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
+              <v-icon class="mr-2">
+                mdi-account-hard-hat
+              </v-icon>
               <span class="d-none d-sm-inline">Assign</span>
               Cleaners
             </v-btn>
@@ -92,7 +106,9 @@
               :disabled="disabled"
               @click="handleAction('master-calendar')"
             >
-              <v-icon class="mr-2">mdi-calendar-multiple</v-icon>
+              <v-icon class="mr-2">
+                mdi-calendar-multiple
+              </v-icon>
               <span class="d-none d-sm-inline">Master</span>
               Calendar
             </v-btn>
@@ -112,7 +128,9 @@
               :disabled="disabled"
               @click="handleAction('create-booking')"
             >
-              <v-icon class="mr-2">mdi-calendar-plus</v-icon>
+              <v-icon class="mr-2">
+                mdi-calendar-plus
+              </v-icon>
               <span class="d-none d-sm-inline">New</span>
               Booking
             </v-btn>
@@ -127,7 +145,12 @@
             <v-row class="mb-2">
               <v-col cols="12">
                 <div class="text-subtitle-2 text-medium-emphasis mb-2">
-                  <v-icon size="small" class="mr-1">mdi-format-list-bulleted-square</v-icon>
+                  <v-icon
+                    size="small"
+                    class="mr-1"
+                  >
+                    mdi-format-list-bulleted-square
+                  </v-icon>
                   Bulk Operations
                 </div>
               </v-col>
@@ -148,7 +171,9 @@
                   :disabled="disabled"
                   @click="handleAction('bulk-assign')"
                 >
-                  <v-icon class="mr-2">mdi-account-multiple</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-account-multiple
+                  </v-icon>
                   <span class="d-none d-sm-inline">Bulk</span>
                   Assign
                 </v-btn>
@@ -168,7 +193,9 @@
                   :disabled="disabled"
                   @click="handleAction('bulk-reschedule')"
                 >
-                  <v-icon class="mr-2">mdi-calendar-sync</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-calendar-sync
+                  </v-icon>
                   <span class="d-none d-sm-inline">Bulk</span>
                   Reschedule
                 </v-btn>
@@ -185,7 +212,12 @@
             <v-row class="mb-2">
               <v-col cols="12">
                 <div class="text-subtitle-2 text-medium-emphasis mb-2">
-                  <v-icon size="small" class="mr-1">mdi-cog-outline</v-icon>
+                  <v-icon
+                    size="small"
+                    class="mr-1"
+                  >
+                    mdi-cog-outline
+                  </v-icon>
                   Business Management
                 </div>
               </v-col>
@@ -206,7 +238,9 @@
                   :disabled="disabled"
                   @click="handleAction('manage-cleaners')"
                 >
-                  <v-icon class="mr-2">mdi-account-group</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-account-group
+                  </v-icon>
                   <span class="d-none d-sm-inline">Manage</span>
                   Cleaners
                 </v-btn>
@@ -226,7 +260,9 @@
                   :disabled="disabled"
                   @click="handleAction('view-reports')"
                 >
-                  <v-icon class="mr-2">mdi-chart-line</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-chart-line
+                  </v-icon>
                   <span class="d-none d-sm-inline">Business</span>
                   Reports
                 </v-btn>
@@ -248,7 +284,9 @@
                   :disabled="disabled"
                   @click="handleAction('manage-properties')"
                 >
-                  <v-icon class="mr-2">mdi-home-group</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-home-group
+                  </v-icon>
                   <span class="d-none d-sm-inline">All</span>
                   Properties
                 </v-btn>
@@ -268,7 +306,9 @@
                   :disabled="disabled"
                   @click="handleAction('system-settings')"
                 >
-                  <v-icon class="mr-2">mdi-cog-box</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-cog-box
+                  </v-icon>
                   <span class="d-none d-sm-inline">System</span>
                   Settings
                 </v-btn>
@@ -316,7 +356,12 @@
             <v-row>
               <v-col cols="12">
                 <div class="text-subtitle-2 text-medium-emphasis mb-2">
-                  <v-icon size="small" class="mr-1">mdi-chart-box</v-icon>
+                  <v-icon
+                    size="small"
+                    class="mr-1"
+                  >
+                    mdi-chart-box
+                  </v-icon>
                   Quick Stats
                 </div>
               </v-col>
@@ -325,22 +370,34 @@
             <v-row>
               <v-col cols="4">
                 <div class="text-center">
-                  <div class="text-h6 text-primary">{{ todayBookings }}</div>
-                  <div class="text-caption text-medium-emphasis">Today</div>
+                  <div class="text-h6 text-primary">
+                    {{ todayBookings }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    Today
+                  </div>
                 </div>
               </v-col>
               
               <v-col cols="4">
                 <div class="text-center">
-                  <div class="text-h6 text-warning">{{ unassignedCount }}</div>
-                  <div class="text-caption text-medium-emphasis">Unassigned</div>
+                  <div class="text-h6 text-warning">
+                    {{ unassignedCount }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    Unassigned
+                  </div>
                 </div>
               </v-col>
               
               <v-col cols="4">
                 <div class="text-center">
-                  <div class="text-h6 text-success">{{ completedToday }}</div>
-                  <div class="text-caption text-medium-emphasis">Completed</div>
+                  <div class="text-h6 text-success">
+                    {{ completedToday }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    Completed
+                  </div>
                 </div>
               </v-col>
             </v-row>
@@ -356,7 +413,10 @@
               block
               @click="showStats = !showStats"
             >
-              <v-icon class="mr-1" size="small">
+              <v-icon
+                class="mr-1"
+                size="small"
+              >
                 {{ showStats ? 'mdi-chevron-up' : 'mdi-chart-box-outline' }}
               </v-icon>
               {{ showStats ? 'Hide Stats' : 'Show Stats' }}

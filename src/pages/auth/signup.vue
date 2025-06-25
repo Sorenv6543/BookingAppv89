@@ -1,11 +1,27 @@
 <template>
   <v-container class="fill-height">
-    <v-row justify="center" align="center">
-      <v-col cols="12" sm="10" md="8" lg="6" xl="4">
-        <v-card elevation="8" class="pa-6">
+    <v-row
+      justify="center"
+      align="center"
+    >
+      <v-col
+        cols="12"
+        sm="10"
+        md="8"
+        lg="6"
+        xl="4"
+      >
+        <v-card
+          elevation="8"
+          class="pa-6"
+        >
           <!-- Header -->
           <v-card-title class="text-h4 text-center mb-2">
-            <v-icon class="mr-3" color="primary" size="large">
+            <v-icon
+              class="mr-3"
+              color="primary"
+              size="large"
+            >
               mdi-account-plus
             </v-icon>
             Create Account
@@ -40,7 +56,10 @@
           </v-alert>
           
           <!-- Registration Form -->
-          <v-form @submit.prevent="handleRegister" ref="registerForm">
+          <v-form
+            ref="registerForm"
+            @submit.prevent="handleRegister"
+          >
             <!-- Account Type Selection -->
             <div class="mb-6">
               <v-label class="text-subtitle-1 font-weight-medium mb-3">
@@ -115,12 +134,12 @@
               :type="showPassword ? 'text' : 'password'"
               prepend-inner-icon="mdi-lock"
               :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append-inner="showPassword = !showPassword"
               variant="outlined"
               :rules="passwordRules"
               :disabled="authStore.loading"
               class="mb-3"
               required
+              @click:append-inner="showPassword = !showPassword"
             />
             
             <v-text-field
@@ -129,12 +148,12 @@
               :type="showConfirmPassword ? 'text' : 'password'"
               prepend-inner-icon="mdi-lock-check"
               :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append-inner="showConfirmPassword = !showConfirmPassword"
               variant="outlined"
               :rules="confirmPasswordRules"
               :disabled="authStore.loading"
               class="mb-4"
               required
+              @click:append-inner="showConfirmPassword = !showConfirmPassword"
             />
             
             <!-- Terms and Conditions -->
@@ -147,11 +166,19 @@
               <template #label>
                 <div class="text-body-2">
                   I agree to the 
-                  <a href="#" @click.prevent="showTerms = true" class="text-primary">
+                  <a
+                    href="#"
+                    class="text-primary"
+                    @click.prevent="showTerms = true"
+                  >
                     Terms of Service
                   </a> 
                   and 
-                  <a href="#" @click.prevent="showPrivacy = true" class="text-primary">
+                  <a
+                    href="#"
+                    class="text-primary"
+                    @click.prevent="showPrivacy = true"
+                  >
                     Privacy Policy
                   </a>
                 </div>
@@ -167,7 +194,9 @@
               :loading="authStore.loading"
               class="mb-4"
             >
-              <v-icon class="mr-2">mdi-account-plus</v-icon>
+              <v-icon class="mr-2">
+                mdi-account-plus
+              </v-icon>
               Create Account
             </v-btn>
           </v-form>
@@ -182,8 +211,8 @@
             <v-btn
               color="primary"
               variant="text"
-              @click="goToLogin"
               :disabled="authStore.loading"
+              @click="goToLogin"
             >
               Sign In
             </v-btn>
@@ -193,7 +222,10 @@
     </v-row>
     
     <!-- Terms Dialog -->
-    <v-dialog v-model="showTerms" max-width="600">
+    <v-dialog
+      v-model="showTerms"
+      max-width="600"
+    >
       <v-card>
         <v-card-title>Terms of Service</v-card-title>
         <v-card-text>
@@ -201,13 +233,18 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="showTerms = false">Close</v-btn>
+          <v-btn @click="showTerms = false">
+            Close
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     
     <!-- Privacy Dialog -->
-    <v-dialog v-model="showPrivacy" max-width="600">
+    <v-dialog
+      v-model="showPrivacy"
+      max-width="600"
+    >
       <v-card>
         <v-card-title>Privacy Policy</v-card-title>
         <v-card-text>
@@ -215,7 +252,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="showPrivacy = false">Close</v-btn>
+          <v-btn @click="showPrivacy = false">
+            Close
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

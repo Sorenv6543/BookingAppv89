@@ -4,22 +4,35 @@
       <v-col cols="12">
         <v-card>
           <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2">mdi-home-group</v-icon>
+            <v-icon class="mr-2">
+              mdi-home-group
+            </v-icon>
             useOwnerProperties Composable Demo
             <v-spacer />
-            <v-chip color="primary" variant="outlined">
+            <v-chip
+              color="primary"
+              variant="outlined"
+            >
               Owner Role Testing
             </v-chip>
           </v-card-title>
           
           <v-card-text>
-            <v-alert type="info" class="mb-4">
+            <v-alert
+              type="info"
+              class="mb-4"
+            >
               This demo tests the owner-specific property composable that filters all operations to the current owner's properties only.
             </v-alert>
 
             <!-- Current User Info -->
-            <v-card class="mb-4" variant="outlined">
-              <v-card-title class="text-h6">Current User Context</v-card-title>
+            <v-card
+              class="mb-4"
+              variant="outlined"
+            >
+              <v-card-title class="text-h6">
+                Current User Context
+              </v-card-title>
               <v-card-text>
                 <v-row>
                   <v-col cols="6">
@@ -33,39 +46,72 @@
             </v-card>
 
             <!-- Owner Property Metrics -->
-            <v-card class="mb-4" variant="outlined">
-              <v-card-title class="text-h6">My Property Metrics</v-card-title>
+            <v-card
+              class="mb-4"
+              variant="outlined"
+            >
+              <v-card-title class="text-h6">
+                My Property Metrics
+              </v-card-title>
               <v-card-text>
                 <v-row>
                   <v-col cols="3">
-                    <v-card color="primary" variant="tonal">
+                    <v-card
+                      color="primary"
+                      variant="tonal"
+                    >
                       <v-card-text class="text-center">
-                        <div class="text-h4">{{ myPropertyMetrics.totalProperties }}</div>
-                        <div class="text-caption">Total Properties</div>
+                        <div class="text-h4">
+                          {{ myPropertyMetrics.totalProperties }}
+                        </div>
+                        <div class="text-caption">
+                          Total Properties
+                        </div>
                       </v-card-text>
                     </v-card>
                   </v-col>
                   <v-col cols="3">
-                    <v-card color="success" variant="tonal">
+                    <v-card
+                      color="success"
+                      variant="tonal"
+                    >
                       <v-card-text class="text-center">
-                        <div class="text-h4">{{ myPropertyMetrics.activeProperties }}</div>
-                        <div class="text-caption">Active Properties</div>
+                        <div class="text-h4">
+                          {{ myPropertyMetrics.activeProperties }}
+                        </div>
+                        <div class="text-caption">
+                          Active Properties
+                        </div>
                       </v-card-text>
                     </v-card>
                   </v-col>
                   <v-col cols="3">
-                    <v-card color="info" variant="tonal">
+                    <v-card
+                      color="info"
+                      variant="tonal"
+                    >
                       <v-card-text class="text-center">
-                        <div class="text-h4">{{ Math.round(myPropertyMetrics.averageUtilization * 100) }}%</div>
-                        <div class="text-caption">Avg Utilization</div>
+                        <div class="text-h4">
+                          {{ Math.round(myPropertyMetrics.averageUtilization * 100) }}%
+                        </div>
+                        <div class="text-caption">
+                          Avg Utilization
+                        </div>
                       </v-card-text>
                     </v-card>
                   </v-col>
                   <v-col cols="3">
-                    <v-card color="warning" variant="tonal">
+                    <v-card
+                      color="warning"
+                      variant="tonal"
+                    >
                       <v-card-text class="text-center">
-                        <div class="text-h4">${{ Math.round(myPropertyMetrics.totalRevenue) }}</div>
-                        <div class="text-caption">Total Revenue</div>
+                        <div class="text-h4">
+                          ${{ Math.round(myPropertyMetrics.totalRevenue) }}
+                        </div>
+                        <div class="text-caption">
+                          Total Revenue
+                        </div>
                       </v-card-text>
                     </v-card>
                   </v-col>
@@ -74,7 +120,10 @@
             </v-card>
 
             <!-- My Properties List -->
-            <v-card class="mb-4" variant="outlined">
+            <v-card
+              class="mb-4"
+              variant="outlined"
+            >
               <v-card-title class="text-h6 d-flex align-center">
                 My Properties ({{ myProperties.length }})
                 <v-spacer />
@@ -82,10 +131,12 @@
                   color="primary" 
                   variant="outlined" 
                   size="small"
-                  @click="fetchMyProperties"
                   :loading="loading"
+                  @click="fetchMyProperties"
                 >
-                  <v-icon start>mdi-refresh</v-icon>
+                  <v-icon start>
+                    mdi-refresh
+                  </v-icon>
                   Refresh
                 </v-btn>
               </v-card-title>
@@ -98,7 +149,10 @@
                     md="6" 
                     lg="4"
                   >
-                    <v-card variant="outlined" :color="property.active ? 'success' : 'warning'">
+                    <v-card
+                      variant="outlined"
+                      :color="property.active ? 'success' : 'warning'"
+                    >
                       <v-card-title class="text-subtitle-1">
                         {{ property.name }}
                         <v-spacer />
@@ -127,8 +181,8 @@
                         <v-btn 
                           size="small" 
                           variant="outlined"
-                          @click="togglePropertyStatus(property.id, !property.active)"
                           :loading="loading"
+                          @click="togglePropertyStatus(property.id, !property.active)"
                         >
                           {{ property.active ? 'Deactivate' : 'Activate' }}
                         </v-btn>
@@ -136,15 +190,24 @@
                     </v-card>
                   </v-col>
                 </v-row>
-                <v-alert v-else type="info">
+                <v-alert
+                  v-else
+                  type="info"
+                >
                   No properties found for the current owner.
                 </v-alert>
               </v-card-text>
             </v-card>
 
             <!-- Property Recommendations -->
-            <v-card class="mb-4" variant="outlined" v-if="recommendations.length > 0">
-              <v-card-title class="text-h6">Property Recommendations</v-card-title>
+            <v-card
+              v-if="recommendations.length > 0"
+              class="mb-4"
+              variant="outlined"
+            >
+              <v-card-title class="text-h6">
+                Property Recommendations
+              </v-card-title>
               <v-card-text>
                 <v-list>
                   <v-list-item 
@@ -152,7 +215,9 @@
                     :key="index"
                   >
                     <template #prepend>
-                      <v-icon color="info">mdi-lightbulb-outline</v-icon>
+                      <v-icon color="info">
+                        mdi-lightbulb-outline
+                      </v-icon>
                     </template>
                     <v-list-item-title>{{ recommendation }}</v-list-item-title>
                   </v-list-item>
@@ -161,12 +226,20 @@
             </v-card>
 
             <!-- Create Property Form -->
-            <v-card class="mb-4" variant="outlined">
-              <v-card-title class="text-h6">Create New Property</v-card-title>
+            <v-card
+              class="mb-4"
+              variant="outlined"
+            >
+              <v-card-title class="text-h6">
+                Create New Property
+              </v-card-title>
               <v-card-text>
                 <v-form @submit.prevent="createProperty">
                   <v-row>
-                    <v-col cols="12" md="6">
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
                       <v-text-field
                         v-model="newProperty.name"
                         label="Property Name"
@@ -174,7 +247,10 @@
                         variant="outlined"
                       />
                     </v-col>
-                    <v-col cols="12" md="6">
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
                       <v-text-field
                         v-model="newProperty.address"
                         label="Address"
@@ -182,7 +258,10 @@
                         variant="outlined"
                       />
                     </v-col>
-                    <v-col cols="12" md="4">
+                    <v-col
+                      cols="12"
+                      md="4"
+                    >
                       <v-select
                         v-model="newProperty.pricing_tier"
                         :items="pricingTiers"
@@ -191,7 +270,10 @@
                         variant="outlined"
                       />
                     </v-col>
-                    <v-col cols="12" md="4">
+                    <v-col
+                      cols="12"
+                      md="4"
+                    >
                       <v-text-field
                         v-model.number="newProperty.cleaning_duration"
                         label="Cleaning Duration (minutes)"
@@ -201,7 +283,10 @@
                         variant="outlined"
                       />
                     </v-col>
-                    <v-col cols="12" md="4">
+                    <v-col
+                      cols="12"
+                      md="4"
+                    >
                       <v-switch
                         v-model="newProperty.active"
                         label="Active"
@@ -230,48 +315,91 @@
             </v-card>
 
             <!-- Status Messages -->
-            <v-alert v-if="error" type="error" class="mb-4" closable @click:close="clearError">
+            <v-alert
+              v-if="error"
+              type="error"
+              class="mb-4"
+              closable
+              @click:close="clearError"
+            >
               {{ error }}
             </v-alert>
-            <v-alert v-if="success" type="success" class="mb-4" closable @click:close="clearSuccess">
+            <v-alert
+              v-if="success"
+              type="success"
+              class="mb-4"
+              closable
+              @click:close="clearSuccess"
+            >
               {{ success }}
             </v-alert>
 
             <!-- Property Metrics Modal -->
-            <v-dialog v-model="metricsDialog" max-width="600">
+            <v-dialog
+              v-model="metricsDialog"
+              max-width="600"
+            >
               <v-card v-if="selectedPropertyMetrics">
                 <v-card-title>Property Metrics</v-card-title>
                 <v-card-text>
                   <v-row>
                     <v-col cols="6">
-                      <v-card variant="tonal" color="info">
+                      <v-card
+                        variant="tonal"
+                        color="info"
+                      >
                         <v-card-text class="text-center">
-                          <div class="text-h5">{{ Math.round(selectedPropertyMetrics.utilizationRate * 100) }}%</div>
-                          <div class="text-caption">Utilization Rate</div>
+                          <div class="text-h5">
+                            {{ Math.round(selectedPropertyMetrics.utilizationRate * 100) }}%
+                          </div>
+                          <div class="text-caption">
+                            Utilization Rate
+                          </div>
                         </v-card-text>
                       </v-card>
                     </v-col>
                     <v-col cols="6">
-                      <v-card variant="tonal" color="success">
+                      <v-card
+                        variant="tonal"
+                        color="success"
+                      >
                         <v-card-text class="text-center">
-                          <div class="text-h5">${{ Math.round(selectedPropertyMetrics.revenueProjection) }}</div>
-                          <div class="text-caption">Revenue Projection</div>
+                          <div class="text-h5">
+                            ${{ Math.round(selectedPropertyMetrics.revenueProjection) }}
+                          </div>
+                          <div class="text-caption">
+                            Revenue Projection
+                          </div>
                         </v-card-text>
                       </v-card>
                     </v-col>
                     <v-col cols="6">
-                      <v-card variant="tonal" color="warning">
+                      <v-card
+                        variant="tonal"
+                        color="warning"
+                      >
                         <v-card-text class="text-center">
-                          <div class="text-h5">{{ Math.round(selectedPropertyMetrics.averageGapBetweenBookings) }}</div>
-                          <div class="text-caption">Avg Gap (days)</div>
+                          <div class="text-h5">
+                            {{ Math.round(selectedPropertyMetrics.averageGapBetweenBookings) }}
+                          </div>
+                          <div class="text-caption">
+                            Avg Gap (days)
+                          </div>
                         </v-card-text>
                       </v-card>
                     </v-col>
                     <v-col cols="6">
-                      <v-card variant="tonal" color="primary">
+                      <v-card
+                        variant="tonal"
+                        color="primary"
+                      >
                         <v-card-text class="text-center">
-                          <div class="text-h5">{{ Math.round(selectedPropertyMetrics.turnPercentage * 100) }}%</div>
-                          <div class="text-caption">Turn Percentage</div>
+                          <div class="text-h5">
+                            {{ Math.round(selectedPropertyMetrics.turnPercentage * 100) }}%
+                          </div>
+                          <div class="text-caption">
+                            Turn Percentage
+                          </div>
                         </v-card-text>
                       </v-card>
                     </v-col>
@@ -285,7 +413,9 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer />
-                  <v-btn @click="metricsDialog = false">Close</v-btn>
+                  <v-btn @click="metricsDialog = false">
+                    Close
+                  </v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>

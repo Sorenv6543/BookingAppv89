@@ -8,17 +8,26 @@
         size="small"
         class="role-switcher-btn"
       >
-        <v-icon class="mr-2" size="small">
+        <v-icon
+          class="mr-2"
+          size="small"
+        >
           {{ currentViewIcon }}
         </v-icon>
         {{ currentViewLabel }}
-        <v-icon class="ml-1" size="small">
+        <v-icon
+          class="ml-1"
+          size="small"
+        >
           mdi-chevron-down
         </v-icon>
       </v-btn>
     </template>
     
-    <v-list density="compact" min-width="280">
+    <v-list
+      density="compact"
+      min-width="280"
+    >
       <!-- Current View Header -->
       <v-list-subheader class="text-uppercase font-weight-bold">
         Current View
@@ -26,18 +35,24 @@
       
       <v-list-item
         :active="!isInOwnerView"
-        @click="switchToAdminView"
         class="current-view-item"
+        @click="switchToAdminView"
       >
         <template #prepend>
-          <v-icon color="primary">mdi-shield-account</v-icon>
+          <v-icon color="primary">
+            mdi-shield-account
+          </v-icon>
         </template>
         <v-list-item-title>Admin Dashboard</v-list-item-title>
         <v-list-item-subtitle>
           Full business management access
         </v-list-item-subtitle>
         <template #append>
-          <v-icon v-if="!isInOwnerView" color="success" size="small">
+          <v-icon
+            v-if="!isInOwnerView"
+            color="success"
+            size="small"
+          >
             mdi-check-circle
           </v-icon>
         </template>
@@ -45,18 +60,24 @@
       
       <v-list-item
         :active="isInOwnerView"
-        @click="switchToOwnerView"
         class="current-view-item"
+        @click="switchToOwnerView"
       >
         <template #prepend>
-          <v-icon color="secondary">mdi-home-account</v-icon>
+          <v-icon color="secondary">
+            mdi-home-account
+          </v-icon>
         </template>
         <v-list-item-title>Owner View</v-list-item-title>
         <v-list-item-subtitle>
           Property owner perspective for support
         </v-list-item-subtitle>
         <template #append>
-          <v-icon v-if="isInOwnerView" color="success" size="small">
+          <v-icon
+            v-if="isInOwnerView"
+            color="success"
+            size="small"
+          >
             mdi-check-circle
           </v-icon>
         </template>
@@ -71,11 +92,13 @@
       
       <v-list-item
         v-if="isInOwnerView"
-        @click="$emit('view-owner-properties')"
         class="support-action-item"
+        @click="$emit('view-owner-properties')"
       >
         <template #prepend>
-          <v-icon color="info">mdi-home-city</v-icon>
+          <v-icon color="info">
+            mdi-home-city
+          </v-icon>
         </template>
         <v-list-item-title>View Owner Properties</v-list-item-title>
         <v-list-item-subtitle>
@@ -85,11 +108,13 @@
       
       <v-list-item
         v-if="isInOwnerView"
-        @click="$emit('view-owner-bookings')"
         class="support-action-item"
+        @click="$emit('view-owner-bookings')"
       >
         <template #prepend>
-          <v-icon color="info">mdi-calendar-check</v-icon>
+          <v-icon color="info">
+            mdi-calendar-check
+          </v-icon>
         </template>
         <v-list-item-title>View Owner Bookings</v-list-item-title>
         <v-list-item-subtitle>
@@ -98,11 +123,13 @@
       </v-list-item>
       
       <v-list-item
-        @click="$emit('open-support-tools')"
         class="support-action-item"
+        @click="$emit('open-support-tools')"
       >
         <template #prepend>
-          <v-icon color="warning">mdi-tools</v-icon>
+          <v-icon color="warning">
+            mdi-tools
+          </v-icon>
         </template>
         <v-list-item-title>Support Tools</v-list-item-title>
         <v-list-item-subtitle>
@@ -113,12 +140,22 @@
       <v-divider class="my-2" />
       
       <!-- Info Section -->
-      <v-list-item class="info-item" disabled>
+      <v-list-item
+        class="info-item"
+        disabled
+      >
         <template #prepend>
-          <v-icon color="info" size="small">mdi-information</v-icon>
+          <v-icon
+            color="info"
+            size="small"
+          >
+            mdi-information
+          </v-icon>
         </template>
         <div class="text-caption text-medium-emphasis">
-          <div class="font-weight-medium mb-1">Admin Support Mode</div>
+          <div class="font-weight-medium mb-1">
+            Admin Support Mode
+          </div>
           <div>
             Switch views to help property owners with their accounts.
             All admin privileges are maintained.

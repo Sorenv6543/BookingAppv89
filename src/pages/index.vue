@@ -38,11 +38,21 @@
   </div>
 
   <!-- Authenticated users get redirected by route guards -->
-  <div v-else class="redirect-container">
+  <div
+    v-else
+    class="redirect-container"
+  >
     <v-container class="fill-height">
-      <v-row justify="center" align="center">
+      <v-row
+        justify="center"
+        align="center"
+      >
         <v-col cols="auto">
-          <v-progress-circular indeterminate size="48" color="primary" />
+          <v-progress-circular
+            indeterminate
+            size="48"
+            color="primary"
+          />
           <div class="text-body-1 mt-4 text-center">
             Redirecting to your dashboard...
           </div>

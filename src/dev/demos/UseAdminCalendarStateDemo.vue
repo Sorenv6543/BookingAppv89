@@ -1,42 +1,99 @@
 <template>
-  <v-container fluid class="pa-4">
+  <v-container
+    fluid
+    class="pa-4"
+  >
     <v-row>
       <v-col cols="12">
         <v-card>
           <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2" color="primary">mdi-calendar-clock</v-icon>
+            <v-icon
+              class="mr-2"
+              color="primary"
+            >
+              mdi-calendar-clock
+            </v-icon>
             useAdminCalendarState Demo
             <v-spacer />
-            <v-chip color="success" variant="outlined">Admin Interface</v-chip>
+            <v-chip
+              color="success"
+              variant="outlined"
+            >
+              Admin Interface
+            </v-chip>
           </v-card-title>
           
           <v-card-text>
-            <v-alert type="info" class="mb-4">
+            <v-alert
+              type="info"
+              class="mb-4"
+            >
               <strong>Admin Calendar State Composable Demo</strong><br>
               This demo showcases the admin-specific calendar state management with system-wide data access,
               advanced filtering, cleaner management, and business analytics.
             </v-alert>
 
             <!-- Status Messages -->
-            <v-alert v-if="error" type="error" class="mb-4" dismissible @click:close="error = null">
+            <v-alert
+              v-if="error"
+              type="error"
+              class="mb-4"
+              dismissible
+              @click:close="error = null"
+            >
               {{ error }}
             </v-alert>
             
-            <v-alert v-if="success" type="success" class="mb-4" dismissible @click:close="success = null">
+            <v-alert
+              v-if="success"
+              type="success"
+              class="mb-4"
+              dismissible
+              @click:close="success = null"
+            >
               {{ success }}
             </v-alert>
 
             <!-- Admin Calendar Controls -->
             <v-row class="mb-4">
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-card variant="outlined">
-                  <v-card-title class="text-h6">Calendar View Mode</v-card-title>
+                  <v-card-title class="text-h6">
+                    Calendar View Mode
+                  </v-card-title>
                   <v-card-text>
-                    <v-btn-toggle v-model="calendarViewMode" mandatory class="mb-3">
-                      <v-btn value="standard" size="small">Standard</v-btn>
-                      <v-btn value="cleaner" size="small">Cleaner</v-btn>
-                      <v-btn value="owner" size="small">Owner</v-btn>
-                      <v-btn value="priority" size="small">Priority</v-btn>
+                    <v-btn-toggle
+                      v-model="calendarViewMode"
+                      mandatory
+                      class="mb-3"
+                    >
+                      <v-btn
+                        value="standard"
+                        size="small"
+                      >
+                        Standard
+                      </v-btn>
+                      <v-btn
+                        value="cleaner"
+                        size="small"
+                      >
+                        Cleaner
+                      </v-btn>
+                      <v-btn
+                        value="owner"
+                        size="small"
+                      >
+                        Owner
+                      </v-btn>
+                      <v-btn
+                        value="priority"
+                        size="small"
+                      >
+                        Priority
+                      </v-btn>
                     </v-btn-toggle>
                     
                     <div class="d-flex flex-wrap gap-2">
@@ -59,28 +116,49 @@
                 </v-card>
               </v-col>
               
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-card variant="outlined">
-                  <v-card-title class="text-h6">System Metrics</v-card-title>
+                  <v-card-title class="text-h6">
+                    System Metrics
+                  </v-card-title>
                   <v-card-text>
                     <v-row dense>
                       <v-col cols="6">
-                        <v-chip color="primary" variant="outlined" class="mb-1">
+                        <v-chip
+                          color="primary"
+                          variant="outlined"
+                          class="mb-1"
+                        >
                           Total Bookings: {{ allBookings.length }}
                         </v-chip>
                       </v-col>
                       <v-col cols="6">
-                        <v-chip color="warning" variant="outlined" class="mb-1">
+                        <v-chip
+                          color="warning"
+                          variant="outlined"
+                          class="mb-1"
+                        >
                           Turn Alerts: {{ systemTurnAlerts.length }}
                         </v-chip>
                       </v-col>
                       <v-col cols="6">
-                        <v-chip color="info" variant="outlined" class="mb-1">
+                        <v-chip
+                          color="info"
+                          variant="outlined"
+                          class="mb-1"
+                        >
                           Properties: {{ allProperties.length }}
                         </v-chip>
                       </v-col>
                       <v-col cols="6">
-                        <v-chip color="success" variant="outlined" class="mb-1">
+                        <v-chip
+                          color="success"
+                          variant="outlined"
+                          class="mb-1"
+                        >
                           Cleaners: {{ Object.keys(cleanerSchedules).length - 1 }}
                         </v-chip>
                       </v-col>
@@ -91,9 +169,18 @@
             </v-row>
 
             <!-- System Turn Alerts -->
-            <v-card variant="outlined" class="mb-4" v-if="systemTurnAlerts.length > 0">
+            <v-card
+              v-if="systemTurnAlerts.length > 0"
+              variant="outlined"
+              class="mb-4"
+            >
               <v-card-title class="text-h6 d-flex align-center">
-                <v-icon class="mr-2" color="error">mdi-fire</v-icon>
+                <v-icon
+                  class="mr-2"
+                  color="error"
+                >
+                  mdi-fire
+                </v-icon>
                 System Turn Alerts ({{ systemTurnAlerts.length }})
               </v-card-title>
               <v-card-text>
@@ -101,7 +188,9 @@
                   <v-col 
                     v-for="alert in systemTurnAlerts.slice(0, 6)" 
                     :key="alert.id"
-                    cols="12" sm="6" md="4"
+                    cols="12"
+                    sm="6"
+                    md="4"
                   >
                     <v-card 
                       :color="alert.priority === 'urgent' ? 'error' : 'warning'"
@@ -112,7 +201,9 @@
                         <div class="text-subtitle2 font-weight-bold">
                           {{ alert.property_name }}
                         </div>
-                        <div class="text-caption">{{ alert.property_address }}</div>
+                        <div class="text-caption">
+                          {{ alert.property_address }}
+                        </div>
                         <v-chip 
                           :color="alert.priority === 'urgent' ? 'error' : 'warning'"
                           size="small"
@@ -128,21 +219,33 @@
             </v-card>
 
             <!-- Cleaner Schedules -->
-            <v-card variant="outlined" class="mb-4">
-              <v-card-title class="text-h6">Cleaner Schedules</v-card-title>
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
+              <v-card-title class="text-h6">
+                Cleaner Schedules
+              </v-card-title>
               <v-card-text>
                 <v-row dense>
                   <v-col 
                     v-for="(bookings, cleanerId) in cleanerSchedules" 
                     :key="cleanerId"
-                    cols="12" sm="6" md="4"
+                    cols="12"
+                    sm="6"
+                    md="4"
                   >
-                    <v-card variant="outlined" class="mb-2">
+                    <v-card
+                      variant="outlined"
+                      class="mb-2"
+                    >
                       <v-card-text class="pa-3">
                         <div class="text-subtitle2 font-weight-bold">
                           {{ cleanerId === 'unassigned' ? 'Unassigned' : `Cleaner ${cleanerId.slice(0, 8)}` }}
                         </div>
-                        <div class="text-caption">{{ bookings.length }} bookings</div>
+                        <div class="text-caption">
+                          {{ bookings.length }} bookings
+                        </div>
                         <v-btn 
                           size="small" 
                           variant="outlined" 
@@ -159,14 +262,21 @@
             </v-card>
 
             <!-- Calendar Events Preview -->
-            <v-card variant="outlined" class="mb-4">
-              <v-card-title class="text-h6">Admin Calendar Events ({{ adminCalendarEvents.length }})</v-card-title>
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
+              <v-card-title class="text-h6">
+                Admin Calendar Events ({{ adminCalendarEvents.length }})
+              </v-card-title>
               <v-card-text>
                 <v-row dense>
                   <v-col 
                     v-for="event in adminCalendarEvents.slice(0, 8)" 
                     :key="event.id"
-                    cols="12" sm="6" md="3"
+                    cols="12"
+                    sm="6"
+                    md="3"
                   >
                     <v-card 
                       :style="{ borderLeft: `4px solid ${event.backgroundColor}` }"
@@ -174,7 +284,9 @@
                       class="mb-2"
                     >
                       <v-card-text class="pa-3">
-                        <div class="text-subtitle2 font-weight-bold">{{ event.title }}</div>
+                        <div class="text-subtitle2 font-weight-bold">
+                          {{ event.title }}
+                        </div>
                         <div class="text-caption">
                           {{ formatDate(event.start) }} - {{ formatDate(event.end) }}
                         </div>
@@ -197,11 +309,19 @@
             </v-card>
 
             <!-- Advanced Filtering Test -->
-            <v-card variant="outlined" class="mb-4">
-              <v-card-title class="text-h6">Advanced Filtering Test</v-card-title>
+            <v-card
+              variant="outlined"
+              class="mb-4"
+            >
+              <v-card-title class="text-h6">
+                Advanced Filtering Test
+              </v-card-title>
               <v-card-text>
                 <v-row dense>
-                  <v-col cols="12" md="4">
+                  <v-col
+                    cols="12"
+                    md="4"
+                  >
                     <v-select
                       v-model="filterCriteria.status"
                       :items="statusOptions"
@@ -212,7 +332,10 @@
                       density="compact"
                     />
                   </v-col>
-                  <v-col cols="12" md="4">
+                  <v-col
+                    cols="12"
+                    md="4"
+                  >
                     <v-select
                       v-model="filterCriteria.bookingType"
                       :items="typeOptions"
@@ -223,18 +346,25 @@
                       density="compact"
                     />
                   </v-col>
-                  <v-col cols="12" md="4">
+                  <v-col
+                    cols="12"
+                    md="4"
+                  >
                     <v-btn 
                       color="primary" 
-                      @click="testAdvancedFiltering"
                       :loading="loading"
+                      @click="testAdvancedFiltering"
                     >
                       Apply Filters
                     </v-btn>
                   </v-col>
                 </v-row>
                 
-                <v-alert v-if="filteredResults.length > 0" type="success" class="mt-3">
+                <v-alert
+                  v-if="filteredResults.length > 0"
+                  type="success"
+                  class="mt-3"
+                >
                   Found {{ filteredResults.length }} bookings matching criteria
                 </v-alert>
               </v-card-text>
@@ -242,14 +372,16 @@
 
             <!-- Function Testing -->
             <v-card variant="outlined">
-              <v-card-title class="text-h6">Function Testing</v-card-title>
+              <v-card-title class="text-h6">
+                Function Testing
+              </v-card-title>
               <v-card-text>
                 <div class="d-flex flex-wrap gap-2">
                   <v-btn 
                     color="primary" 
                     variant="outlined"
-                    @click="testGetAdminCalendarEvents"
                     :loading="loading"
+                    @click="testGetAdminCalendarEvents"
                   >
                     Test Calendar Events
                   </v-btn>
@@ -257,8 +389,8 @@
                   <v-btn 
                     color="secondary" 
                     variant="outlined"
-                    @click="testSystemTurnAlerts"
                     :loading="loading"
+                    @click="testSystemTurnAlerts"
                   >
                     Test Turn Alerts
                   </v-btn>
@@ -266,8 +398,8 @@
                   <v-btn 
                     color="info" 
                     variant="outlined"
-                    @click="testCleanerSchedules"
                     :loading="loading"
+                    @click="testCleanerSchedules"
                   >
                     Test Cleaner Schedules
                   </v-btn>
@@ -275,8 +407,8 @@
                   <v-btn 
                     color="warning" 
                     variant="outlined"
-                    @click="testFilterByMultipleCriteria"
                     :loading="loading"
+                    @click="testFilterByMultipleCriteria"
                   >
                     Test Multi-Criteria Filter
                   </v-btn>

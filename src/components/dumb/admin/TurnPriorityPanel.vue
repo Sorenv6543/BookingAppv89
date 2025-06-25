@@ -1,7 +1,15 @@
 <template>
-  <v-card variant="outlined" class="turn-priority-panel">
+  <v-card
+    variant="outlined"
+    class="turn-priority-panel"
+  >
     <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
-      <v-icon class="mr-2" color="error">mdi-clock-alert</v-icon>
+      <v-icon
+        class="mr-2"
+        color="error"
+      >
+        mdi-clock-alert
+      </v-icon>
       System Turn Priority Queue
       <v-spacer />
       <v-chip
@@ -22,39 +30,82 @@
     <v-divider />
     
     <v-expand-transition>
-      <v-card-text v-show="expanded" class="pa-0">
+      <v-card-text
+        v-show="expanded"
+        class="pa-0"
+      >
         <!-- Summary Stats -->
         <v-container>
           <v-row>
-            <v-col cols="12" md="3">
-              <v-card variant="tonal" color="error">
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-card
+                variant="tonal"
+                color="error"
+              >
                 <v-card-text class="text-center py-3">
-                  <div class="text-h4 font-weight-bold">{{ criticalTurns.length }}</div>
-                  <div class="text-body-2">Critical (< 2 hrs)</div>
+                  <div class="text-h4 font-weight-bold">
+                    {{ criticalTurns.length }}
+                  </div>
+                  <div class="text-body-2">
+                    Critical (&lt; 2 hrs)
+                  </div>
                 </v-card-text>
               </v-card>
             </v-col>
-            <v-col cols="12" md="3">
-              <v-card variant="tonal" color="warning">
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-card
+                variant="tonal"
+                color="warning"
+              >
                 <v-card-text class="text-center py-3">
-                  <div class="text-h4 font-weight-bold">{{ urgentTurns.length }}</div>
-                  <div class="text-body-2">Urgent (< 6 hrs)</div>
+                  <div class="text-h4 font-weight-bold">
+                    {{ urgentTurns.length }}
+                  </div>
+                  <div class="text-body-2">
+                    Urgent (&lt; 6 hrs)
+                  </div>
                 </v-card-text>
               </v-card>
             </v-col>
-            <v-col cols="12" md="3">
-              <v-card variant="tonal" color="info">
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-card
+                variant="tonal"
+                color="info"
+              >
                 <v-card-text class="text-center py-3">
-                  <div class="text-h4 font-weight-bold">{{ unassignedTurns.length }}</div>
-                  <div class="text-body-2">Unassigned</div>
+                  <div class="text-h4 font-weight-bold">
+                    {{ unassignedTurns.length }}
+                  </div>
+                  <div class="text-body-2">
+                    Unassigned
+                  </div>
                 </v-card-text>
               </v-card>
             </v-col>
-            <v-col cols="12" md="3">
-              <v-card variant="tonal" color="success">
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-card
+                variant="tonal"
+                color="success"
+              >
                 <v-card-text class="text-center py-3">
-                  <div class="text-h4 font-weight-bold">${{ estimatedRevenue.toLocaleString() }}</div>
-                  <div class="text-body-2">Revenue at Risk</div>
+                  <div class="text-h4 font-weight-bold">
+                    ${{ estimatedRevenue.toLocaleString() }}
+                  </div>
+                  <div class="text-body-2">
+                    Revenue at Risk
+                  </div>
                 </v-card-text>
               </v-card>
             </v-col>
@@ -66,7 +117,10 @@
         <!-- Filters and Controls -->
         <v-container>
           <v-row>
-            <v-col cols="12" md="6">
+            <v-col
+              cols="12"
+              md="6"
+            >
               <v-select
                 v-model="selectedUrgencyFilter"
                 :items="urgencyFilterOptions"
@@ -77,7 +131,10 @@
                 @update:model-value="handleFilterChange"
               />
             </v-col>
-            <v-col cols="12" md="6">
+            <v-col
+              cols="12"
+              md="6"
+            >
               <v-select
                 v-model="selectedStatusFilter"
                 :items="statusFilterOptions"
@@ -99,7 +156,9 @@
                   color="primary"
                   @click="handleRefresh"
                 >
-                  <v-icon start>mdi-refresh</v-icon>
+                  <v-icon start>
+                    mdi-refresh
+                  </v-icon>
                   Refresh
                 </v-btn>
                 
@@ -110,7 +169,9 @@
                   :disabled="selectedTurns.length === 0"
                   @click="handleBulkAssign"
                 >
-                  <v-icon start>mdi-account-multiple</v-icon>
+                  <v-icon start>
+                    mdi-account-multiple
+                  </v-icon>
                   Bulk Assign ({{ selectedTurns.length }})
                 </v-btn>
                 
@@ -121,7 +182,9 @@
                   :disabled="criticalTurns.length === 0"
                   @click="handleEscalateAll"
                 >
-                  <v-icon start>mdi-alert-octagon</v-icon>
+                  <v-icon start>
+                    mdi-alert-octagon
+                  </v-icon>
                   Escalate Critical
                 </v-btn>
                 
@@ -144,8 +207,15 @@
         
         <!-- Turn List -->
         <div class="turn-list">
-          <v-list class="pa-0" max-height="500" style="overflow-y: auto;">
-            <template v-for="(turn, index) in filteredTurns" :key="turn.id">
+          <v-list
+            class="pa-0"
+            max-height="500"
+            style="overflow-y: auto;"
+          >
+            <template
+              v-for="(turn, index) in filteredTurns"
+              :key="turn.id"
+            >
               <v-list-item
                 :class="getTurnItemClass(turn)"
                 @click="toggleTurnSelection(turn.id)"
@@ -180,15 +250,35 @@
                 
                 <v-list-item-subtitle>
                   <div class="d-flex align-center mb-1">
-                    <v-icon size="small" class="mr-1">mdi-account</v-icon>
+                    <v-icon
+                      size="small"
+                      class="mr-1"
+                    >
+                      mdi-account
+                    </v-icon>
                     {{ getPropertyOwnerName(turn.owner_id) }}
-                    <v-icon size="small" class="mx-2">mdi-map-marker</v-icon>
+                    <v-icon
+                      size="small"
+                      class="mx-2"
+                    >
+                      mdi-map-marker
+                    </v-icon>
                     {{ getPropertyAddress(turn.property_id) }}
                   </div>
                   <div class="d-flex align-center">
-                    <v-icon size="small" class="mr-1">mdi-calendar-export</v-icon>
+                    <v-icon
+                      size="small"
+                      class="mr-1"
+                    >
+                      mdi-calendar-export
+                    </v-icon>
                     {{ formatDateTime(turn.checkout_date) }}
-                    <v-icon size="small" class="mx-2">mdi-calendar-import</v-icon>
+                    <v-icon
+                      size="small"
+                      class="mx-2"
+                    >
+                      mdi-calendar-import
+                    </v-icon>
                     {{ formatDateTime(turn.checkin_date) }}
                   </div>
                 </v-list-item-subtitle>
@@ -203,7 +293,9 @@
                         size="small"
                         variant="tonal"
                       >
-                        <v-icon start>mdi-account-check</v-icon>
+                        <v-icon start>
+                          mdi-account-check
+                        </v-icon>
                         {{ getCleanerName(turn.assigned_cleaner_id) }}
                       </v-chip>
                       <v-chip
@@ -212,7 +304,9 @@
                         size="small"
                         variant="tonal"
                       >
-                        <v-icon start>mdi-account-alert</v-icon>
+                        <v-icon start>
+                          mdi-account-alert
+                        </v-icon>
                         Unassigned
                       </v-chip>
                     </div>
@@ -258,9 +352,18 @@
             <!-- Empty State -->
             <v-list-item v-if="filteredTurns.length === 0">
               <v-list-item-title class="text-center text-medium-emphasis py-8">
-                <v-icon size="64" class="mb-4">mdi-check-circle</v-icon>
-                <div class="text-h6">No Urgent Turns</div>
-                <div class="text-body-2">All turn bookings are under control</div>
+                <v-icon
+                  size="64"
+                  class="mb-4"
+                >
+                  mdi-check-circle
+                </v-icon>
+                <div class="text-h6">
+                  No Urgent Turns
+                </div>
+                <div class="text-body-2">
+                  All turn bookings are under control
+                </div>
               </v-list-item-title>
             </v-list-item>
           </v-list>
@@ -274,7 +377,11 @@
             :title="businessImpactAlert.title"
             class="mb-0"
           >
-            <p v-for="message in businessImpactAlert.messages" :key="message" class="mb-1">
+            <p
+              v-for="message in businessImpactAlert.messages"
+              :key="message"
+              class="mb-1"
+            >
               {{ message }}
             </p>
           </v-alert>
@@ -321,7 +428,7 @@ const selectedTurns = ref<string[]>([])
 const selectedUrgencyFilter = ref<string>('')
 const selectedStatusFilter = ref<string>('')
 const autoRefresh = ref(true)
-const refreshInterval = ref<NodeJS.Timeout | null>(null)
+const refreshInterval = ref<ReturnType<typeof setInterval> | null>(null)
 
 // Computed properties
 const urgentTurns = computed(() => {

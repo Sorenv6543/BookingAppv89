@@ -136,7 +136,9 @@
                   class="mb-0"
                 >
                   <p>Your guests are checking out and new guests are checking in on the same day.</p>
-                  <p class="mb-0">This requires priority same-day cleaning service.</p>
+                  <p class="mb-0">
+                    This requires priority same-day cleaning service.
+                  </p>
                 </v-alert>
               </v-col>
             </v-row>

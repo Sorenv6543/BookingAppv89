@@ -1,7 +1,12 @@
 <template>
-  <v-card variant="outlined" class="admin-calendar-controls">
+  <v-card
+    variant="outlined"
+    class="admin-calendar-controls"
+  >
     <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
-      <v-icon class="mr-2">mdi-calendar-clock</v-icon>
+      <v-icon class="mr-2">
+        mdi-calendar-clock
+      </v-icon>
       Calendar Controls
       <v-spacer />
       <v-btn
@@ -15,12 +20,20 @@
     <v-divider />
     
     <v-expand-transition>
-      <v-card-text v-show="expanded" class="pa-0">
+      <v-card-text
+        v-show="expanded"
+        class="pa-0"
+      >
         <v-container>
           <!-- View Controls -->
           <v-row>
-            <v-col cols="12" md="6">
-              <div class="text-body-2 text-medium-emphasis mb-2">Calendar View</div>
+            <v-col
+              cols="12"
+              md="6"
+            >
+              <div class="text-body-2 text-medium-emphasis mb-2">
+                Calendar View
+              </div>
               <v-btn-toggle
                 v-model="selectedView"
                 variant="outlined"
@@ -28,27 +41,52 @@
                 mandatory
                 @update:model-value="handleViewChange"
               >
-                <v-btn value="dayGridMonth" size="small">
-                  <v-icon start>mdi-calendar-month</v-icon>
+                <v-btn
+                  value="dayGridMonth"
+                  size="small"
+                >
+                  <v-icon start>
+                    mdi-calendar-month
+                  </v-icon>
                   Month
                 </v-btn>
-                <v-btn value="timeGridWeek" size="small">
-                  <v-icon start>mdi-calendar-week</v-icon>
+                <v-btn
+                  value="timeGridWeek"
+                  size="small"
+                >
+                  <v-icon start>
+                    mdi-calendar-week
+                  </v-icon>
                   Week
                 </v-btn>
-                <v-btn value="timeGridDay" size="small">
-                  <v-icon start>mdi-calendar-today</v-icon>
+                <v-btn
+                  value="timeGridDay"
+                  size="small"
+                >
+                  <v-icon start>
+                    mdi-calendar-today
+                  </v-icon>
                   Day
                 </v-btn>
-                <v-btn value="listWeek" size="small">
-                  <v-icon start>mdi-format-list-bulleted</v-icon>
+                <v-btn
+                  value="listWeek"
+                  size="small"
+                >
+                  <v-icon start>
+                    mdi-format-list-bulleted
+                  </v-icon>
                   Agenda
                 </v-btn>
               </v-btn-toggle>
             </v-col>
             
-            <v-col cols="12" md="6">
-              <div class="text-body-2 text-medium-emphasis mb-2">Date Navigation</div>
+            <v-col
+              cols="12"
+              md="6"
+            >
+              <div class="text-body-2 text-medium-emphasis mb-2">
+                Date Navigation
+              </div>
               <div class="d-flex gap-2 align-center">
                 <v-btn
                   variant="outlined"
@@ -93,7 +131,10 @@
           
           <!-- Filters -->
           <v-row>
-            <v-col cols="12" md="3">
+            <v-col
+              cols="12"
+              md="3"
+            >
               <v-select
                 v-model="filters.status"
                 :items="statusOptions"
@@ -117,7 +158,10 @@
               </v-select>
             </v-col>
             
-            <v-col cols="12" md="3">
+            <v-col
+              cols="12"
+              md="3"
+            >
               <v-select
                 v-model="filters.cleaner"
                 :items="cleanerOptions"
@@ -132,7 +176,10 @@
                 <template #item="{ props, item }">
                   <v-list-item v-bind="props">
                     <template #prepend>
-                      <v-avatar :color="getCleanerColor(item.value)" size="small">
+                      <v-avatar
+                        :color="getCleanerColor(item.value)"
+                        size="small"
+                      >
                         <v-icon>mdi-account</v-icon>
                       </v-avatar>
                     </template>
@@ -141,7 +188,10 @@
               </v-select>
             </v-col>
             
-            <v-col cols="12" md="3">
+            <v-col
+              cols="12"
+              md="3"
+            >
               <v-select
                 v-model="filters.bookingType"
                 :items="bookingTypeOptions"
@@ -165,7 +215,10 @@
               </v-select>
             </v-col>
             
-            <v-col cols="12" md="3">
+            <v-col
+              cols="12"
+              md="3"
+            >
               <v-select
                 v-model="filters.propertyOwner"
                 :items="propertyOwnerOptions"
@@ -182,7 +235,10 @@
           
           <!-- Advanced Filters -->
           <v-row v-if="showAdvancedFilters">
-            <v-col cols="12" md="4">
+            <v-col
+              cols="12"
+              md="4"
+            >
               <v-select
                 v-model="filters.priority"
                 :items="priorityOptions"
@@ -206,7 +262,10 @@
               </v-select>
             </v-col>
             
-            <v-col cols="12" md="4">
+            <v-col
+              cols="12"
+              md="4"
+            >
               <v-text-field
                 v-model="filters.dateRange.start"
                 label="Start Date"
@@ -217,7 +276,10 @@
               />
             </v-col>
             
-            <v-col cols="12" md="4">
+            <v-col
+              cols="12"
+              md="4"
+            >
               <v-text-field
                 v-model="filters.dateRange.end"
                 label="End Date"
@@ -233,8 +295,13 @@
           
           <!-- Action Controls -->
           <v-row>
-            <v-col cols="12" md="6">
-              <div class="text-body-2 text-medium-emphasis mb-2">Quick Actions</div>
+            <v-col
+              cols="12"
+              md="6"
+            >
+              <div class="text-body-2 text-medium-emphasis mb-2">
+                Quick Actions
+              </div>
               <div class="d-flex flex-wrap gap-2">
                 <v-btn
                   variant="outlined"
@@ -242,7 +309,9 @@
                   color="primary"
                   @click="handleRefresh"
                 >
-                  <v-icon start>mdi-refresh</v-icon>
+                  <v-icon start>
+                    mdi-refresh
+                  </v-icon>
                   Refresh
                 </v-btn>
                 
@@ -252,7 +321,9 @@
                   color="success"
                   @click="handleExport"
                 >
-                  <v-icon start>mdi-download</v-icon>
+                  <v-icon start>
+                    mdi-download
+                  </v-icon>
                   Export
                 </v-btn>
                 
@@ -262,7 +333,9 @@
                   color="info"
                   @click="handlePrint"
                 >
-                  <v-icon start>mdi-printer</v-icon>
+                  <v-icon start>
+                    mdi-printer
+                  </v-icon>
                   Print
                 </v-btn>
                 
@@ -271,14 +344,21 @@
                   size="small"
                   @click="showAdvancedFilters = !showAdvancedFilters"
                 >
-                  <v-icon start>{{ showAdvancedFilters ? 'mdi-filter-minus' : 'mdi-filter-plus' }}</v-icon>
+                  <v-icon start>
+                    {{ showAdvancedFilters ? 'mdi-filter-minus' : 'mdi-filter-plus' }}
+                  </v-icon>
                   {{ showAdvancedFilters ? 'Less' : 'More' }} Filters
                 </v-btn>
               </div>
             </v-col>
             
-            <v-col cols="12" md="6">
-              <div class="text-body-2 text-medium-emphasis mb-2">Bulk Operations</div>
+            <v-col
+              cols="12"
+              md="6"
+            >
+              <div class="text-body-2 text-medium-emphasis mb-2">
+                Bulk Operations
+              </div>
               <div class="d-flex flex-wrap gap-2">
                 <v-btn
                   variant="outlined"
@@ -287,7 +367,9 @@
                   :disabled="!hasSelectedBookings"
                   @click="handleBulkAssign"
                 >
-                  <v-icon start>mdi-account-multiple</v-icon>
+                  <v-icon start>
+                    mdi-account-multiple
+                  </v-icon>
                   Bulk Assign
                 </v-btn>
                 
@@ -298,7 +380,9 @@
                   :disabled="!hasSelectedBookings"
                   @click="handleBulkStatusUpdate"
                 >
-                  <v-icon start>mdi-clipboard-list</v-icon>
+                  <v-icon start>
+                    mdi-clipboard-list
+                  </v-icon>
                   Update Status
                 </v-btn>
                 
@@ -309,7 +393,9 @@
                   :disabled="!hasSelectedBookings"
                   @click="handleBulkDelete"
                 >
-                  <v-icon start>mdi-delete-multiple</v-icon>
+                  <v-icon start>
+                    mdi-delete-multiple
+                  </v-icon>
                   Bulk Delete
                 </v-btn>
               </div>
@@ -341,10 +427,15 @@
           <!-- Filter Summary -->
           <v-row v-if="hasActiveFilters">
             <v-col cols="12">
-              <v-card variant="tonal" color="info">
+              <v-card
+                variant="tonal"
+                color="info"
+              >
                 <v-card-text class="py-2">
                   <div class="d-flex align-center">
-                    <v-icon class="mr-2">mdi-filter</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-filter
+                    </v-icon>
                     <span class="text-body-2">Active Filters:</span>
                     <div class="d-flex flex-wrap gap-1 ml-2">
                       <v-chip

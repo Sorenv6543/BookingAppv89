@@ -103,12 +103,12 @@
         v-for="i in count - 1"
         :key="i"
         :type="type === 'property-card' ? 'card-avatar, article, actions' : 
-               type === 'booking-item' ? 'list-item-avatar-three-line' :
-               type === 'list-item' ? 'list-item-avatar-two-line' :
-               type === 'table-row' ? 'table-row' : type"
+          type === 'booking-item' ? 'list-item-avatar-three-line' :
+          type === 'list-item' ? 'list-item-avatar-two-line' :
+          type === 'table-row' ? 'table-row' : type"
         :loading="loading"
         :height="type === 'property-card' ? height || 280 : 
-                 type === 'calendar-event' ? height || 60 : height"
+          type === 'calendar-event' ? height || 60 : height"
         :width="width"
         :class="skeletonClasses"
         class="mt-2"

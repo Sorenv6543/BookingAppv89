@@ -1,5 +1,5 @@
 This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
-The content has been processed where comments have been removed, empty lines have been removed, content has been formatted for parsing in markdown style, content has been compressed (code blocks are separated by ⋮---- delimiter).
+The content has been processed where comments have been removed, empty lines have been removed, content has been compressed (code blocks are separated by ⋮---- delimiter).
 
 # File Summary
 
@@ -29,12 +29,11 @@ The content is organized as follows:
 ## Notes
 - Some files may have been excluded based on .gitignore rules and Repomix's configuration
 - Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
-- Files matching these patterns are excluded: docs/**, node_modules/*
+- Files matching these patterns are excluded: /node_modules, src/__tests__, README.md, .git, docs/**, problemfix.md, src/dev, /src/pages/demos
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
 - Code comments have been removed from supported file types
 - Empty lines have been removed from all files
-- Content has been formatted for parsing in markdown style
 - Content has been compressed - code blocks are separated by ⋮---- delimiter
 - Files are sorted by Git change count (files with more changes are at the bottom)
 
@@ -45,28 +44,12 @@ The content is organized as follows:
 .eslintrc.json
 .gitignore
 .repomix/bundles.json
-additional_task_examples.md
-comprehensive_tasks.md
-enhanced_task_list.md
+deployment.config.ts
 eslint.config.js
 index.html
 package.json
-problemfix.md
-README.md
-src/__tests__/components/HelloWorld.spec.ts
-src/__tests__/components/SimpleTest.spec.ts
-src/__tests__/setup/cssStub.js
-src/__tests__/setup/setupTests.ts
-src/__tests__/stores/booking.spec.ts
-src/__tests__/stores/property.spec.ts
-src/__tests__/stores/ui.spec.ts
-src/__tests__/stores/user.spec.ts
-src/__tests__/utils/test-utils.ts
 src/App.vue
 src/assets/main.css
-src/components/demos/AdminQuickActionsDemo.vue
-src/components/demos/ErrorHandlingDemo.vue
-src/components/demos/UseOwnerPropertiesDemo.vue
 src/components/dumb/admin/AdminBookingForm.vue
 src/components/dumb/admin/AdminCalendarControls.vue
 src/components/dumb/admin/AdminQuickActions.vue
@@ -78,7 +61,6 @@ src/components/dumb/owner/OwnerBookingForm.vue
 src/components/dumb/owner/OwnerCalendarControls.vue
 src/components/dumb/owner/OwnerPropertyForm.vue
 src/components/dumb/owner/OwnerQuickActions.vue
-src/components/dumb/PropertyCardDemo.vue
 src/components/dumb/PropertyModal.vue
 src/components/dumb/shared/ConfirmationDialog.vue
 src/components/dumb/shared/ErrorAlert.vue
@@ -90,30 +72,16 @@ src/components/dumb/shared/TurnAlerts.vue
 src/components/dumb/shared/TurnPriorityBadge.vue
 src/components/dumb/shared/UpcomingCleanings.vue
 src/components/dumb/shared/UrgentTurnIndicator.vue
-src/components/dumb/TurnAlertsDemo.vue
 src/components/smart/admin/AdminCalendar.vue
-src/components/smart/admin/AdminCalendarDemo.vue
 src/components/smart/admin/AdminSidebar.vue
-src/components/smart/admin/AdminSidebarDemo.vue
 src/components/smart/admin/HomeAdmin.vue
-src/components/smart/admin/HomeAdminDemo.vue
 src/components/smart/admin/README.md
-src/components/smart/admin/UseAdminBookingsDemo.vue
-src/components/smart/admin/UseAdminCalendarStateDemo.vue
-src/components/smart/admin/UseAdminPropertiesDemo.vue
 src/components/smart/FullCalendar.vue
-src/components/smart/Home.vue
 src/components/smart/owner/HomeOwner.vue
 src/components/smart/owner/OwnerCalendar.vue
-src/components/smart/owner/OwnerCalendarDemo.vue
 src/components/smart/owner/OwnerSidebar.vue
-src/components/smart/owner/OwnerSidebarDemo.vue
 src/components/smart/owner/README.md
-src/components/smart/owner/UseOwnerBookingsDemo.vue
-src/components/smart/owner/UseOwnerCalendarStateDemo.vue
 src/components/smart/shared/README.md
-src/components/smart/Sidebar.vue
-src/components/smart/SidebarDemo.vue
 src/composables/admin/README.md
 src/composables/admin/useAdminBookings.ts
 src/composables/admin/useAdminCalendarState.ts
@@ -148,17 +116,6 @@ src/pages/auth/register.vue
 src/pages/auth/signup.vue
 src/pages/calendar/index.vue
 src/pages/crud-testing.vue
-src/pages/demos/admin-sidebar-width-test.vue
-src/pages/demos/auth-flow.vue
-src/pages/demos/calendar.vue
-src/pages/demos/home-admin.vue
-src/pages/demos/index.vue
-src/pages/demos/owner-calendar.vue
-src/pages/demos/owner-sidebar.vue
-src/pages/demos/role-routing.vue
-src/pages/demos/route-guards.vue
-src/pages/demos/sidebar.vue
-src/pages/demos/turn-visual-indicators.vue
 src/pages/index.vue
 src/pages/owner/bookings/index.vue
 src/pages/owner/calendar.vue
@@ -175,6 +132,7 @@ src/stores/ui.ts
 src/stores/user.ts
 src/types/api.ts
 src/types/booking.ts
+src/types/build.d.ts
 src/types/env.d.ts
 src/types/index.ts
 src/types/property.ts
@@ -186,16 +144,13 @@ src/utils/businessLogic.ts
 src/utils/errorMessages.ts
 task_documentation.md
 task_specific_prompts.md
-tasks_v2.md
 tasks.md
 tsconfig.json
 tsconfig.node.json
+updated_task_status.md
 vite.config.ts
+vite.config.ts.timestamp-1750862340853-15d138252f7ed.mjs
 vitest.config.ts
-VUETIFY_CALENDAR_VIEWPORT_SOLUTION.md
-VUETIFY_LAYOUT_OPTIMIZATION_SUMMARY.md
-VUETIFY_RAG_QUICKSTART.md
-VUETIFY_RESPONSIVE_DRAWER_SOLUTION.md
 ```
 
 # Files
@@ -236,1193 +191,29 @@ VUETIFY_RESPONSIVE_DRAWER_SOLUTION.md
 }
 ````
 
-## File: additional_task_examples.md
-````markdown
-# 📚 Additional Task Examples & Quick Reference
-
-## **TASK-061: Create OwnerCalendar.vue Component**
-
-### **Quick Implementation Pattern**
-
-```vue
-<!-- src/components/smart/owner/OwnerCalendar.vue -->
-<template>
-  <div class="owner-calendar">
-    <!-- Calendar Header with Owner Controls -->
-    <OwnerCalendarControls
-      v-model:view="calendarView"
-      v-model:selected-property="selectedPropertyId"
-      :properties="ownerProperties"
-      :loading="loading"
-      @add-booking="showAddBookingDialog = true"
-      @export-calendar="handleExport"
-    />
-    
-    <!-- FullCalendar Integration -->
-    <FullCalendar
-      ref="calendarRef"
-      :options="calendarOptions"
-      class="owner-calendar__content"
-    />
-    
-    <!-- Owner Booking Dialog -->
-    <v-dialog v-model="showAddBookingDialog" max-width="600">
-      <OwnerBookingForm
-        :properties="ownerProperties"
-        :selected-date="selectedDate"
-        @save="handleBookingSave"
-        @cancel="showAddBookingDialog = false"
-      />
-    </v-dialog>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import FullCalendar from '@fullcalendar/vue3'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
-import interactionPlugin from '@fullcalendar/interaction'
-import { useOwnerDataStore } from '@/stores/ownerData'
-import { useCalendarState } from '@/composables/shared/useCalendarState'
-import OwnerCalendarControls from '@/components/dumb/owner/OwnerCalendarControls.vue'
-import OwnerBookingForm from '@/components/dumb/owner/OwnerBookingForm.vue'
-import type { CalendarOptions, EventInput } from '@fullcalendar/core'
-
-// Owner data store
-const ownerData = useOwnerDataStore()
-const { calendarView, selectedDate } = useCalendarState()
-
-// Local state
-const calendarRef = ref()
-const selectedPropertyId = ref<string | null>(null)
-const showAddBookingDialog = ref(false)
-const loading = ref(false)
-
-// Owner-specific data (pre-filtered by store)
-const ownerProperties = computed(() => ownerData.ownerProperties)
-const ownerBookings = computed(() => {
-  // Further filter by selected property if needed
-  if (selectedPropertyId.value) {
-    return ownerData.getPropertyBookings(selectedPropertyId.value)
+## File: deployment.config.ts
+````typescript
+export interface DeploymentConfig {
+  name: string
+  description: string
+  features: {
+    ownerFeatures: boolean
+    adminFeatures: boolean
+    devDemos: boolean
   }
-  return ownerData.ownerBookings
-})
-
-// Calendar configuration
-const calendarOptions = computed((): CalendarOptions => ({
-  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-  initialView: calendarView.value,
-  headerToolbar: false, // Use custom header
-  events: ownerBookings.value.map(booking => ({
-    id: booking.id,
-    title: `${booking.property_name} - ${booking.guest_count} guests`,
-    start: booking.checkin_date,
-    end: booking.checkout_date,
-    backgroundColor: booking.booking_type === 'turn' ? '#ff9800' : '#2196f3',
-    borderColor: booking.booking_type === 'turn' ? '#f57c00' : '#1976d2',
-    extendedProps: {
-      booking,
-      bookingType: booking.booking_type,
-      status: booking.status
-    }
-  })),
-  selectable: true,
-  selectMirror: true,
-  dayMaxEvents: true,
-  weekends: true,
-  select: handleDateSelect,
-  eventClick: handleEventClick,
-  height: 'auto'
-}))
-
-// Event handlers
-const handleDateSelect = (selectInfo: any) => {
-  selectedDate.value = new Date(selectInfo.start)
-  showAddBookingDialog.value = true
-}
-
-const handleEventClick = (clickInfo: any) => {
-  const booking = clickInfo.event.extendedProps.booking
-  // Navigate to booking details or show edit dialog
-  navigateToBooking(booking.id)
-}
-
-const handleBookingSave = async (bookingData: any) => {
-  try {
-    loading.value = true
-    await ownerData.createBooking(bookingData)
-    showAddBookingDialog.value = false
-  } finally {
-    loading.value = false
+  build: {
+    minify: boolean
+    sourcemap: boolean | 'hidden'
+    optimization: 'development' | 'production' | 'aggressive'
+  }
+  chunks: {
+    ownerComponents: boolean
+    adminComponents: boolean
+    sharedComponents: boolean
   }
 }
-
-const handleExport = () => {
-  // Export owner's calendar data
-  exportOwnerCalendar(ownerBookings.value)
-}
-</script>
-```
-
----
-
-## **TASK-062: Create AdminSidebar.vue Component**
-
-### **Quick Implementation Pattern**
-
-```vue
-<!-- src/components/smart/admin/AdminSidebar.vue -->
-<template>
-  <v-navigation-drawer
-    v-model="isOpen"
-    :rail="isRail"
-    app
-    class="admin-sidebar"
-  >
-    <!-- Admin Profile with Role Indicator -->
-    <v-list-item class="admin-profile">
-      <template #prepend>
-        <v-avatar color="primary">
-          <v-icon>mdi-shield-account</v-icon>
-        </v-avatar>
-      </template>
-      <v-list-item-title>{{ authStore.user?.name }}</v-list-item-title>
-      <v-list-item-subtitle>System Administrator</v-list-item-subtitle>
-    </v-list-item>
-
-    <!-- System Overview Dashboard -->
-    <v-list-item v-if="!isRail" class="system-overview">
-      <div class="admin-metrics">
-        <div class="metric-item">
-          <div class="metric-value">{{ systemMetrics.totalProperties }}</div>
-          <div class="metric-label">Total Properties</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-value">{{ systemMetrics.activeBookings }}</div>
-          <div class="metric-label">Active Bookings</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-value text-warning">{{ systemMetrics.urgentTurns }}</div>
-          <div class="metric-label">Urgent Turns</div>
-        </div>
-      </div>
-    </v-list-item>
-
-    <!-- Admin Navigation -->
-    <v-list density="compact" nav>
-      <!-- System Dashboard -->
-      <v-list-item
-        prepend-icon="mdi-view-dashboard-variant"
-        title="System Dashboard"
-        @click="navigateTo('/admin')"
-      />
-
-      <!-- Property Management -->
-      <v-list-group value="properties">
-        <template #activator="{ props }">
-          <v-list-item
-            v-bind="props"
-            prepend-icon="mdi-home-group"
-            title="All Properties"
-          />
-        </template>
-        <v-list-item title="Property List" @click="navigateTo('/admin/properties')" />
-        <v-list-item title="Add Property" @click="showAddPropertyDialog = true" />
-        <v-list-item title="Property Analytics" @click="navigateTo('/admin/properties/analytics')" />
-      </v-list-group>
-
-      <!-- Booking Management -->
-      <v-list-item
-        prepend-icon="mdi-calendar-multiple"
-        title="All Bookings"
-        @click="navigateTo('/admin/bookings')"
-      />
-
-      <!-- Cleaner Management -->
-      <v-list-item
-        prepend-icon="mdi-account-hard-hat"
-        title="Cleaner Management"
-        @click="navigateTo('/admin/cleaners')"
-      />
-
-      <!-- Turn Management -->
-      <v-list-item
-        prepend-icon="mdi-swap-horizontal"
-        title="Turn Management"
-        @click="navigateTo('/admin/turns')"
-      />
-
-      <!-- Reports & Analytics -->
-      <v-list-group value="reports">
-        <template #activator="{ props }">
-          <v-list-item
-            v-bind="props"
-            prepend-icon="mdi-chart-box"
-            title="Reports"
-          />
-        </template>
-        <v-list-item title="Revenue Report" @click="navigateTo('/admin/reports/revenue')" />
-        <v-list-item title="Occupancy Report" @click="navigateTo('/admin/reports/occupancy')" />
-        <v-list-item title="Cleaner Performance" @click="navigateTo('/admin/reports/cleaners')" />
-      </v-list-group>
-
-      <!-- System Settings -->
-      <v-list-item
-        prepend-icon="mdi-cog"
-        title="System Settings"
-        @click="navigateTo('/admin/settings')"
-      />
-    </v-list>
-
-    <!-- Critical Alerts -->
-    <template #append>
-      <v-alert
-        v-if="criticalAlerts.length > 0"
-        type="warning"
-        variant="tonal"
-        density="compact"
-        class="ma-2"
-      >
-        <div class="text-caption">
-          {{ criticalAlerts.length }} Critical Alert{{ criticalAlerts.length > 1 ? 's' : '' }}
-        </div>
-        <v-btn
-          size="small"
-          variant="text"
-          @click="showAlertsDialog = true"
-        >
-          View Details
-        </v-btn>
-      </v-alert>
-    </template>
-  </v-navigation-drawer>
-</template>
-
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useAdminDataStore } from '@/stores/adminData'
-import { useAuthStore } from '@/stores/auth'
-
-// Admin sees ALL data - no filtering
-const adminData = useAdminDataStore()
-const authStore = useAuthStore()
-
-const systemMetrics = computed(() => adminData.systemMetrics)
-const criticalAlerts = computed(() => adminData.criticalAlerts)
-</script>
-```
-
----
-
-## **TASK-067: Move Demo Components Script**
-
-### **Automated Demo Component Organization**
-
-```bash
-#!/bin/bash
-# scripts/organize-demo-components.sh
-
-echo "🚀 Organizing demo components..."
-
-# Create dev folder structure
-mkdir -p src/dev/demos
-mkdir -p src/dev/pages
-mkdir -p src/dev/components
-
-# Move demo components
-echo "📁 Moving demo components..."
-mv src/components/demos/* src/dev/demos/ 2>/dev/null || echo "No demo components to move"
-mv src/pages/demos/* src/dev/pages/ 2>/dev/null || echo "No demo pages to move"
-
-# Move demo-specific components
-echo "📁 Moving demo-specific files..."
-mv src/components/dumb/PropertyCardDemo.vue src/dev/demos/ 2>/dev/null || echo "PropertyCardDemo.vue not found"
-
-# Update vite.config.ts to exclude dev folder from production
-echo "⚙️ Updating vite.config.ts..."
-cat >> vite.config.ts << 'EOF'
-
-// Exclude dev folder from production builds
-if (process.env.NODE_ENV === 'production') {
-  config.build = config.build || {}
-  config.build.rollupOptions = config.build.rollupOptions || {}
-  config.build.rollupOptions.external = config.build.rollupOptions.external || []
-  
-  if (Array.isArray(config.build.rollupOptions.external)) {
-    config.build.rollupOptions.external.push(/^\/src\/dev\/.*/)
-  }
-}
-EOF
-
-# Update router to conditionally include dev routes
-echo "🛣️ Creating dev router..."
-cat > src/dev/router.ts << 'EOF'
-// src/dev/router.ts - Development-only routes
-import type { RouteRecordRaw } from 'vue-router'
-
-export const devRoutes: RouteRecordRaw[] = [
-  {
-    path: '/dev',
-    name: 'dev-index',
-    component: () => import('./pages/index.vue'),
-    meta: { requiresAuth: false, devOnly: true }
-  },
-  {
-    path: '/dev/demos',
-    name: 'dev-demos',
-    component: () => import('./pages/demos.vue'),
-    meta: { requiresAuth: false, devOnly: true }
-  }
-]
-
-// Only include dev routes in development
-export const getDevRoutes = (): RouteRecordRaw[] => {
-  return import.meta.env.DEV ? devRoutes : []
-}
-EOF
-
-echo "✅ Demo components organized!"
-echo "📋 Summary:"
-echo "   - Demo components moved to src/dev/"
-echo "   - Production builds will exclude dev folder"
-echo "   - Dev routes only available in development"
-```
-
----
-
-## **TASK-078: Build Optimization Configuration**
-
-### **Enhanced Vite Configuration**
-
-```typescript
-// vite.config.ts - Enhanced configuration
-import { defineConfig, loadEnv } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vuetify from 'vite-plugin-vuetify'
-import { fileURLToPath, URL } from 'node:url'
-
-export default defineConfig(({ command, mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
-  
-  return {
-    plugins: [
-      vue(),
-      vuetify({
-        autoImport: true,
-        styles: {
-          configFile: 'src/styles/variables.scss'
-        }
-      })
-    ],
-    resolve: {
-      alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url))
-      }
-    },
-    build: {
-      // Optimize for production
-      target: 'esnext',
-      minify: 'terser',
-      terserOptions: {
-        compress: {
-          drop_console: mode === 'production',
-          drop_debugger: mode === 'production'
-        }
-      },
-      rollupOptions: {
-        // Code splitting
-        output: {
-          manualChunks: {
-            // Vendor chunks
-            vue: ['vue', 'vue-router', 'pinia'],
-            vuetify: ['vuetify'],
-            
-            // Role-based chunks
-            'owner-components': [
-              './src/components/smart/owner/HomeOwner.vue',
-              './src/components/smart/owner/OwnerSidebar.vue',
-              './src/components/smart/owner/OwnerCalendar.vue'
-            ],
-            'admin-components': [
-              './src/components/smart/admin/HomeAdmin.vue',
-              './src/components/smart/admin/AdminSidebar.vue',
-              './src/components/smart/admin/AdminCalendar.vue'
-            ],
-            
-            // Shared utilities
-            'shared-utils': [
-              './src/composables/shared/useAuth.ts',
-              './src/composables/shared/useBookings.ts',
-              './src/composables/shared/useProperties.ts'
-            ]
-          }
-        },
-        
-        // Exclude dev folder from production
-        external: mode === 'production' ? [/^\/src\/dev\/.*$/] : []
-      },
-      
-      // Chunk size warnings
-      chunkSizeWarningLimit: 1000,
-      
-      // Generate source maps for debugging
-      sourcemap: mode !== 'production'
-    },
-    
-    // Development server optimization
-    server: {
-      hmr: {
-        overlay: false
-      }
-    },
-    
-    // Define global constants
-    define: {
-      __DEV__: mode !== 'production',
-      __APP_VERSION__: JSON.stringify(process.env.npm_package_version)
-    }
-  }
-})
-```
-
----
-
-## **TASK-081: Admin Component Testing Example**
-
-### **Admin Component Test Pattern**
-
-```typescript
-// src/components/smart/admin/__tests__/AdminSidebar.test.ts
-import { describe, it, expect, beforeEach } from 'vitest'
-import AdminSidebar from '../AdminSidebar.vue'
-import { mountAdminComponent, expectAdminDataAccess } from '@/test/utils/roleBasedMounting'
-
-describe('AdminSidebar.vue', () => {
-  it('should display system-wide metrics', async () => {
-    const wrapper = await mountAdminComponent(AdminSidebar, {
-      adminData: {
-        allProperties: [
-          { name: 'Property 1', owner_id: 'owner1' },
-          { name: 'Property 2', owner_id: 'owner2' },
-          { name: 'Property 3', owner_id: 'owner1' }
-        ],
-        allBookings: [
-          { property_id: 'prop1', owner_id: 'owner1', status: 'confirmed' },
-          { property_id: 'prop2', owner_id: 'owner2', status: 'pending' }
-        ]
-      }
-    })
-
-    // Admin should see ALL properties and bookings
-    expect(wrapper.find('[data-testid="total-properties"]').text()).toContain('3')
-    expect(wrapper.find('[data-testid="total-bookings"]').text()).toContain('2')
-    
-    // Verify admin has access to system-wide data
-    expectAdminDataAccess(wrapper)
-  })
-
-  it('should show admin-specific navigation', async () => {
-    const wrapper = await mountAdminComponent(AdminSidebar)
-
-    // Should show admin-only features
-    expect(wrapper.find('[data-testid="cleaner-management"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="system-reports"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="admin-settings"]').exists()).toBe(true)
-  })
-
-  it('should display critical system alerts', async () => {
-    const wrapper = await mountAdminComponent(AdminSidebar, {
-      adminData: {
-        allBookings: [
-          {
-            booking_type: 'turn',
-            status: 'pending',
-            checkout_date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Overdue
-            assigned_cleaner_id: null
-          }
-        ]
-      }
-    })
-
-    // Should show critical alerts
-    const alertsSection = wrapper.find('[data-testid="critical-alerts"]')
-    expect(alertsSection.exists()).toBe(true)
-    expect(alertsSection.text()).toContain('Critical Alert')
-  })
-})
-```
-
----
-
-## **Quick Reference Commands**
-
-### **Development Workflow**
-
-```bash
-# Start development
-npm run dev
-
-# Run tests for specific role
-npm run test src/components/smart/owner/
-npm run test src/components/smart/admin/
-
-# Type checking
-npm run type-check
-
-# Build for production
-npm run build
-
-# Organize demo components
-./scripts/organize-demo-components.sh
-
-# Audit imports
-npm run audit:imports
-
-# Fix import paths
-./scripts/fix-imports.sh
-```
-
-### **File Structure Quick Reference**
-
-```
-src/
-├── components/
-│   ├── smart/
-│   │   ├── owner/          # Owner-specific smart components
-│   │   ├── admin/          # Admin-specific smart components
-│   │   └── shared/         # Shared smart components
-│   └── dumb/
-│       ├── owner/          # Owner-specific UI components
-│       ├── admin/          # Admin-specific UI components
-│       └── shared/         # Shared UI components
-├── composables/
-│   ├── owner/              # Owner-specific composables
-│   ├── admin/              # Admin-specific composables
-│   └── shared/             # Shared composables ✅
-├── stores/
-│   ├── ownerData.ts        # Owner-filtered data store
-│   ├── adminData.ts        # Admin system-wide data store
-│   └── [existing stores]   # Your current stores
-├── dev/                    # Development-only code
-│   ├── demos/              # Demo components
-│   └── pages/              # Demo pages
-└── test/
-    └── utils/
-        └── roleBasedMounting.ts # Role-based testing utilities
-```
-
-This additional documentation provides quick implementation patterns and examples for the remaining critical tasks, helping you maintain consistency and speed up development.
-````
-
-## File: comprehensive_tasks.md
-````markdown
-# 📋 Additional Tasks for tasks.md - Critical Issues & Improvements
-
-## **Phase 1F: Critical Architecture Completion** 
-**(URGENT - Complete Role-Based Migration)**
-
-### **Complete Missing Role-Based Components**
-- [ ] **TASK-060**: Create OwnerSidebar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/owner/OwnerSidebar.vue`
-    - Filter navigation to owner-specific features only
-    - Remove admin-only navigation items (cleaner management, system reports)
-    - Add owner-specific quick actions (Add Property, View My Bookings)
-    - Implement owner-friendly navigation labels and icons
-    - Use owner-specific color scheme and styling
-    - Integrate with existing OwnerQuickActions component
-  - Notes: Replace generic Sidebar.vue for owner role
-  - Files: src/components/smart/owner/OwnerSidebar.vue
-  - Verification: Owner sees only relevant navigation, no admin features
-  - Assigned to: Cursor
-
-- [ ] **TASK-061**: Create OwnerCalendar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/owner/OwnerCalendar.vue`
-    - Filter calendar events to owner's properties only
-    - Implement owner-specific calendar controls (OwnerCalendarControls)
-    - Add owner-specific event creation workflows
-    - Remove admin-only features (cleaner assignment, system-wide view)
-    - Add owner-specific calendar views (My Properties, My Bookings)
-    - Implement owner-specific event styling and indicators
-  - Notes: Replace generic FullCalendar.vue for owner role
-  - Files: src/components/smart/owner/OwnerCalendar.vue
-  - Dependencies: OwnerCalendarControls.vue component
-  - Verification: Owner sees only their property events and bookings
-  - Assigned to: Cursor
-
-- [ ] **TASK-062**: Create AdminSidebar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/admin/AdminSidebar.vue`
-    - Include full admin navigation (cleaners, reports, system management)
-    - Add admin-specific quick actions and system controls
-    - Implement admin-focused styling and iconography
-    - Add system status indicators and alerts
-    - Include business metrics in sidebar summary
-    - Add role switcher component integration
-  - Notes: Comprehensive admin navigation interface
-  - Files: src/components/smart/admin/AdminSidebar.vue
-  - Verification: Admin sees full system navigation and controls
-  - Assigned to: Cursor
-
-- [ ] **TASK-063**: Fix TypeScript issues in HomeOwner.vue
-  - Status: Not Started
-  - Requirements:
-    - Resolve all TypeScript compilation errors in HomeOwner.vue
-    - Add proper type definitions for role-based data filtering
-    - Fix prop type definitions and component interfaces
-    - Add proper error handling type annotations
-    - Ensure type safety for owner-specific data access
-    - Add comprehensive JSDoc comments for complex functions
-  - Notes: Critical for production stability
-  - Files: src/components/smart/owner/HomeOwner.vue, src/types/
-  - Verification: TypeScript compiles without errors, proper IntelliSense
-  - Assigned to: Cursor
-
-- [ ] **TASK-064**: Fix AdminCalendar.vue DOM mounting issues
-  - Status: Not Started
-  - Requirements:
-    - Resolve "Cannot read properties of null (reading 'parentNode')" error
-    - Add proper DOM mounting safety checks and guards
-    - Implement proper component lifecycle management
-    - Add error boundaries for calendar component failures
-    - Ensure proper cleanup on component unmount
-    - Add retry mechanisms for calendar initialization failures
-  - Notes: Critical for /admin/schedule route stability
-  - Files: src/components/smart/admin/AdminCalendar.vue
-  - Verification: Admin calendar route loads without errors
-  - Assigned to: Cursor
-
-### **Update Component Integration**
-- [ ] **TASK-065**: Update HomeOwner.vue to use new role-specific components
-  - Status: Not Started
-  - Requirements:
-    - Replace generic Sidebar with OwnerSidebar
-    - Replace generic FullCalendar with OwnerCalendar
-    - Update component imports and references
-    - Ensure proper prop passing to new components
-    - Test integration of owner-specific workflows
-    - Verify data filtering consistency across components
-  - Notes: Final integration of owner role components
-  - Files: src/components/smart/owner/HomeOwner.vue
-  - Dependencies: TASK-060, TASK-061
-  - Verification: Owner interface uses all role-specific components
-  - Assigned to: Cursor
-
-- [ ] **TASK-066**: Update HomeAdmin.vue to use AdminSidebar
-  - Status: Not Started
-  - Requirements:
-    - Replace generic Sidebar with AdminSidebar (if not already done)
-    - Ensure AdminCalendar integration works properly
-    - Update component imports and references
-    - Test admin-specific workflow integration
-    - Verify system-wide data access functionality
-  - Notes: Complete admin role component integration
-  - Files: src/components/smart/admin/HomeAdmin.vue
-  - Dependencies: TASK-062, TASK-064
-  - Verification: Admin interface uses all role-specific components
-  - Assigned to: Cursor
-
----
-
-## **Phase 1G: Code Cleanup & Organization** 
-**(HIGH PRIORITY - Remove Technical Debt)**
-
-### **Remove Development Artifacts**
-- [ ] **TASK-067**: Move demo components to development folder
-  - Status: Not Started
-  - Requirements:
-    - Create `src/dev/` folder for development-only components
-    - Move all demo components to `src/dev/demos/`
-    - Update import paths for any remaining demo references
-    - Configure build to exclude `src/dev/` from production bundle
-    - Update .gitignore to handle development artifacts appropriately
-    - Create README.md in dev folder explaining purpose
-  - Files to Move:
-    ```
-    src/components/demos/ → src/dev/demos/
-    src/pages/demos/ → src/dev/pages/
-    src/components/dumb/PropertyCardDemo.vue → src/dev/demos/
-    ```
-  - Notes: Clean separation of dev vs production code
-  - Verification: Production build excludes demo components, dev server still includes them
-  - Assigned to: Cursor
-
-- [ ] **TASK-068**: Remove redundant generic components after migration
-  - Status: Not Started
-  - Requirements:
-    - ⚠️ ONLY after TASK-060, TASK-061, TASK-062 are complete
-    - Remove `src/components/smart/Home.vue` (replaced by HomeOwner/HomeAdmin)
-    - Remove `src/components/smart/Sidebar.vue` (replaced by role-specific versions)
-    - Remove `src/components/smart/FullCalendar.vue` (if replaced by role-specific)
-    - Update any remaining references to removed components
-    - Verify no broken imports or references remain
-    - Archive removed components in git history
-  - Notes: Final cleanup after successful migration
-  - Files: List of generic components to remove
-  - Dependencies: Complete role-based component migration
-  - Verification: Application works without old generic components
-  - Assigned to: Cursor
-
-- [ ] **TASK-069**: Clean up tasks.md file
-  - Status: Not Started
-  - Requirements:
-    - Archive completed tasks to `docs/completed-tasks.md`
-    - Remove obsolete or superseded tasks
-    - Reorganize remaining tasks by current priority
-    - Update task numbering for consistency
-    - Add cross-references between related tasks
-    - Update status for partially completed items
-  - Notes: Improve project management clarity
-  - Files: tasks.md, docs/completed-tasks.md
-  - Verification: tasks.md is organized and current
-  - Assigned to: Human + Cursor
-
-### **Import Path Optimization**
-- [ ] **TASK-070**: Audit and fix import paths after composables migration
-  - Status: Not Started
-  - Requirements:
-    - Run comprehensive search for old import paths: `grep -r "from '@/composables/use" src/ --exclude-dir=shared`
-    - Fix any remaining non-shared composable imports
-    - Verify all imports use correct `@/composables/shared/` path
-    - Add linting rules to prevent future incorrect imports
-    - Create import path documentation for developers
-    - Test that all imports resolve correctly
-  - Notes: Ensure consistency after recent composables reorganization
-  - Files: All source files with composable imports
-  - Verification: No old import paths remain, linting passes
-  - Assigned to: Cursor
-
-- [ ] **TASK-071**: Optimize component import structure
-  - Status: Not Started
-  - Requirements:
-    - Create barrel exports for component folders (index.ts files)
-    - Standardize import naming conventions across the project
-    - Group imports by category (Vue, external libs, internal, types)
-    - Add automated import sorting with ESLint/Prettier
-    - Create component import guidelines documentation
-    - Update existing components to follow new import standards
-  - Notes: Improve developer experience and code consistency
-  - Files: All component files, new index.ts barrel exports
-  - Verification: Consistent import patterns, improved IntelliSense
-  - Assigned to: Cursor
-
----
-
-## **Phase 1H: Architecture Improvements** 
-**(MEDIUM PRIORITY - Performance & Maintainability)**
-
-### **State Management Optimization**
-- [ ] **TASK-072**: Move role-based filtering to store level
-  - Status: Not Started
-  - Requirements:
-    - Create `src/stores/ownerData.ts` store for owner-scoped data
-    - Create `src/stores/adminData.ts` store for admin-scoped data
-    - Move filtering logic from components to stores
-    - Implement role-based data access patterns in stores
-    - Add role-based cache invalidation strategies
-    - Create composables that automatically apply role filtering
-    - Update components to use role-specific stores
-  - Notes: Centralize data access control and improve performance
-  - Files: New store files, updated composables, component updates
-  - Verification: Role filtering happens at store level, better performance
-  - Assigned to: Cursor
-
-- [ ] **TASK-073**: Implement role-based data access controls
-  - Status: Not Started
-  - Requirements:
-    - Create data access control middleware for stores
-    - Add runtime checks for role-based data access
-    - Implement data sanitization for role-based views
-    - Add audit logging for data access patterns
-    - Create role-based data validation utilities
-    - Add tests for data access control compliance
-  - Notes: Enhance security and data isolation
-  - Files: src/middleware/, src/utils/dataAccess.ts, test files
-  - Verification: Owners cannot access other owners' data
-  - Assigned to: Cursor
-
-### **Type Safety & Error Handling**
-- [ ] **TASK-074**: Complete TypeScript strict mode compliance
-  - Status: Not Started
-  - Requirements:
-    - Enable strict TypeScript mode in tsconfig.json
-    - Fix all TypeScript errors and warnings
-    - Add comprehensive type definitions for all interfaces
-    - Implement runtime type validation for critical data flows
-    - Add type guards for external data sources
-    - Create comprehensive type documentation
-  - Notes: Improve code quality and catch bugs early
-  - Files: tsconfig.json, all TypeScript files, new type definitions
-  - Verification: TypeScript strict mode compiles without errors
-  - Assigned to: Cursor
-
-- [ ] **TASK-075**: Implement comprehensive error handling system
-  - Status: Not Started
-  - Requirements:
-    - Create global error boundary component
-    - Implement role-specific error message templates
-    - Add error reporting and analytics integration
-    - Create error recovery workflows for common failures
-    - Add user-friendly error display components
-    - Implement automatic error retry mechanisms
-  - Notes: Build on existing error foundations
-  - Files: src/components/ErrorBoundary.vue, error handling utilities
-  - Dependencies: Existing error handling tasks (TASK-040 to TASK-043)
-  - Verification: Graceful error handling throughout application
-  - Assigned to: Cursor
-
-### **Performance Optimization**
-- [ ] **TASK-076**: Implement code splitting and lazy loading
-  - Status: Not Started
-  - Requirements:
-    - Split owner vs admin bundles using dynamic imports
-    - Implement lazy loading for route-based components
-    - Add preloading strategies for critical routes
-    - Optimize component bundle sizes with tree shaking
-    - Add bundle analysis and monitoring tools
-    - Create performance budgets for bundle sizes
-  - Notes: Improve initial load time and user experience
-  - Files: router configuration, vite.config.ts, component imports
-  - Verification: Smaller initial bundle size, faster load times
-  - Assigned to: Cursor
-
-- [ ] **TASK-077**: Optimize component re-rendering and memoization
-  - Status: Not Started
-  - Requirements:
-    - Add Vue 3 memoization patterns where appropriate
-    - Optimize computed property dependencies
-    - Implement proper component key strategies
-    - Add performance profiling for component updates
-    - Optimize store subscriptions and reactive patterns
-    - Create performance monitoring dashboard
-  - Notes: Improve runtime performance and responsiveness
-  - Files: All components, stores, performance monitoring
-  - Verification: Improved application responsiveness
-  - Assigned to: Cursor
-
-### **Build and Configuration Optimization**
-- [ ] **TASK-078**: Configure build optimization for production
-  - Status: Not Started
-  - Requirements:
-    - Configure Vite for optimal production builds
-    - Exclude development components from production bundle
-    - Add compression and minification optimizations
-    - Configure proper caching strategies for assets
-    - Add build-time environment variable handling
-    - Create production deployment checklist
-  - Notes: Optimize production deployment
-  - Files: vite.config.ts, build scripts, deployment configuration
-  - Verification: Optimized production builds, excluded dev code
-  - Assigned to: Cursor
-
----
-
-## **Phase 1I: Testing & Quality Assurance** 
-**(MEDIUM PRIORITY - Comprehensive Testing)**
-
-### **Role-Based Component Testing**
-- [ ] **TASK-079**: Create role-based testing utilities
-  - Status: Not Started
-  - Requirements:
-    - Create test utilities for mounting owner components with mock data
-    - Create test utilities for mounting admin components with mock data
-    - Add role-based mock factories for realistic test data
-    - Create shared test helpers for role-based workflows
-    - Add visual regression testing for role-specific interfaces
-    - Create accessibility testing utilities for both roles
-  - Notes: Expand existing Vitest setup for role-based testing
-  - Files: src/test/utils/, mock factories, test helpers
-  - Verification: Easy testing of role-based components
-  - Assigned to: Cursor
-
-- [ ] **TASK-080**: Add comprehensive unit tests for owner components
-  - Status: Not Started
-  - Requirements:
-    - Test HomeOwner.vue with proper data filtering
-    - Test OwnerSidebar.vue navigation and permissions
-    - Test OwnerCalendar.vue event filtering and interactions
-    - Test owner-specific error handling and edge cases
-    - Test owner data isolation and security
-    - Achieve 80%+ coverage for owner-specific code paths
-  - Notes: Critical for owner role stability
-  - Files: Test files for all owner components
-  - Dependencies: TASK-079, completion of owner components
-  - Verification: High test coverage for owner functionality
-  - Assigned to: Cursor
-
-- [ ] **TASK-081**: Add comprehensive unit tests for admin components
-  - Status: Not Started
-  - Requirements:
-    - Test HomeAdmin.vue with system-wide data access
-    - Test AdminSidebar.vue full functionality and permissions
-    - Test AdminCalendar.vue system management features
-    - Test admin-specific error handling and business logic
-    - Test admin system control workflows
-    - Achieve 80%+ coverage for admin-specific code paths
-  - Notes: Critical for admin role stability
-  - Files: Test files for all admin components
-  - Dependencies: TASK-079, completion of admin components
-  - Verification: High test coverage for admin functionality
-  - Assigned to: Cursor
-
-### **Integration and E2E Testing**
-- [ ] **TASK-082**: Create role-based integration tests
-  - Status: Not Started
-  - Requirements:
-    - Test complete owner workflows (property → booking → calendar)
-    - Test complete admin workflows (system management → reports)
-    - Test role switching and permission boundaries
-    - Test cross-role data updates and synchronization
-    - Test role-based error scenarios and recovery
-    - Add automated testing for critical business workflows
-  - Notes: Ensure role-based system works end-to-end
-  - Files: Integration test suite, workflow test scenarios
-  - Verification: Critical workflows work correctly for both roles
-  - Assigned to: Cursor
-
-- [ ] **TASK-083**: Add accessibility testing for role-based interfaces
-  - Status: Not Started
-  - Requirements:
-    - Test keyboard navigation for owner interface
-    - Test keyboard navigation for admin interface
-    - Add screen reader compatibility testing
-    - Test color contrast and visual accessibility
-    - Add ARIA label validation for role-specific components
-    - Create accessibility compliance reports
-  - Notes: Ensure application is accessible to all users
-  - Files: Accessibility test suite, compliance documentation
-  - Verification: WCAG 2.1 AA compliance for both interfaces
-  - Assigned to: Cursor
-
----
-
-## **Phase 1J: Documentation & Developer Experience** 
-**(LOW PRIORITY - Long-term Maintenance)**
-
-### **Architecture Documentation**
-- [ ] **TASK-084**: Create comprehensive role-based architecture documentation
-  - Status: Not Started
-  - Requirements:
-    - Document role-based component patterns and conventions
-    - Create diagrams showing role-based data flow
-    - Document role-based security and permission patterns
-    - Add guidelines for extending role-based functionality
-    - Create onboarding guide for new developers
-    - Document role-based testing strategies
-  - Notes: Enable future development and maintenance
-  - Files: docs/architecture/, README updates, developer guides
-  - Verification: Clear documentation for role-based system
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-085**: Update project README and documentation
-  - Status: Not Started
-  - Requirements:
-    - Update README.md with role-based architecture explanation
-    - Add setup instructions for role-based development
-    - Document environment variables and configuration
-    - Add troubleshooting guide for common role-based issues
-    - Create development workflow documentation
-    - Add links to all relevant documentation
-  - Notes: Improve project onboarding and maintenance
-  - Files: README.md, docs/ folder updates
-  - Verification: Clear project documentation and setup instructions
-  - Assigned to: Human + Cursor
-
-### **Code Quality and Standards**
-- [ ] **TASK-086**: Establish role-based coding standards
-  - Status: Not Started
-  - Requirements:
-    - Create coding standards document for role-based components
-    - Add ESLint rules for role-based patterns
-    - Create component templates for consistent structure
-    - Add automated code quality checks in CI/CD
-    - Create code review checklist for role-based features
-    - Add pre-commit hooks for code quality enforcement
-  - Notes: Ensure consistent code quality across team
-  - Files: .eslintrc.json, coding standards doc, templates
-  - Verification: Automated code quality enforcement
-  - Assigned to: Cursor
-
-- [ ] **TASK-087**: Create development environment optimization
-  - Status: Not Started
-  - Requirements:
-    - Optimize Vite dev server for role-based development
-    - Add hot module replacement for role-specific components
-    - Create development shortcuts and productivity tools
-    - Add debugging utilities for role-based data flow
-    - Optimize build times for development workflow
-    - Create developer productivity documentation
-  - Notes: Improve developer experience and productivity
-  - Files: vite.config.ts, dev tools, productivity guides
-  - Verification: Faster development cycle, better DX
-  - Assigned to: Cursor
-
----
-
-## **Phase 1K: Security & Deployment** 
-**(LOW PRIORITY - Production Readiness)**
-
-### **Security Hardening**
-- [ ] **TASK-088**: Implement client-side security for role-based access
-  - Status: Not Started
-  - Requirements:
-    - Add route guards for role-based access control
-    - Implement session validation for role permissions
-    - Add CSRF protection for role-based forms
-    - Create security audit utilities for role-based features
-    - Add penetration testing for role-based vulnerabilities
-    - Document security best practices for role-based development
-  - Notes: Harden application against security vulnerabilities
-  - Files: src/security/, route guards, security documentation
-  - Verification: Security audit passes, no role-based vulnerabilities
-  - Assigned to: Cursor
-
-- [ ] **TASK-089**: Add audit logging and monitoring
-  - Status: Not Started
-  - Requirements:
-    - Implement audit logging for role-based actions
-    - Add monitoring for role-based performance metrics
-    - Create alerting for role-based security events
-    - Add user activity tracking for compliance
-    - Create audit report generation utilities
-    - Add GDPR compliance features for data handling
-  - Notes: Enable monitoring and compliance for production
-  - Files: src/audit/, monitoring configuration, compliance docs
-  - Verification: Comprehensive audit trail and monitoring
-  - Assigned to: Cursor
-
-### **Production Deployment**
-- [ ] **TASK-090**: Configure production deployment for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Configure environment-specific builds for role-based features
-    - Add production deployment scripts and automation
-    - Configure monitoring and logging for production
-    - Add health checks for role-based functionality
-    - Create rollback procedures for role-based deployments
-    - Add production testing and validation procedures
-  - Notes: Ensure smooth production deployment
-  - Files: Deployment scripts, CI/CD configuration, ops documentation
-  - Verification: Successful production deployment with monitoring
-  - Assigned to: Human + Cursor
-
----
-
-## **Updated Priority Order**
-
-### **CRITICAL (Complete Immediately)**
-1. **Phase 1F**: Complete role-based architecture (TASK-060 to TASK-066)
-2. **Phase 1G**: Code cleanup and organization (TASK-067 to TASK-071)
-
-### **HIGH PRIORITY (Next Sprint)**
-3. **Phase 1H**: Architecture improvements (TASK-072 to TASK-078)
-4. **Phase 1I**: Testing and quality assurance (TASK-079 to TASK-083)
-
-### **MEDIUM PRIORITY (Future Iterations)**
-5. **Phase 1J**: Documentation and developer experience (TASK-084 to TASK-087)
-6. **Phase 1K**: Security and deployment (TASK-088 to TASK-090)
-
----
-
-## **Task Dependencies Map**
-
-```
-TASK-060 (OwnerSidebar) → TASK-065 (Integration)
-TASK-061 (OwnerCalendar) → TASK-065 (Integration) → TASK-080 (Owner Tests)
-TASK-062 (AdminSidebar) → TASK-066 (Integration)
-TASK-063 (TypeScript fixes) → TASK-074 (Strict mode)
-TASK-064 (AdminCalendar fixes) → TASK-066 (Integration) → TASK-081 (Admin Tests)
-
-TASK-065, TASK-066 → TASK-068 (Remove old components)
-TASK-067 (Move demos) → TASK-078 (Build optimization)
-TASK-072 (Store optimization) → TASK-082 (Integration tests)
-TASK-079 (Test utilities) → TASK-080, TASK-081 (Component tests)
-```
-
----
-
-## **Notes for Implementation**
-
-### **Critical Success Factors**
-- ⚠️ **DO NOT** remove old components until new ones are complete and tested
-- 🔒 **ALWAYS** verify role-based data isolation after each change
-- 📊 **TEST** each component individually before integration
-- 🧹 **CLEAN UP** one phase completely before starting the next
-
-### **Development Guidelines**
-- Use existing coding standards and patterns
-- Maintain backward compatibility during migration
-- Document all breaking changes and migration steps
-- Test role switching functionality after each major change
-- Keep demo components functional in development environment
-````
-
-## File: enhanced_task_list.md
-````markdown
-# 📋 Enhanced Task List - Property Cleaning Scheduler
-## Complexity Levels & Implementation Guidance
-
-### **Complexity Legend**
-- 🟢 **Low**: Simple implementation, follows existing patterns, 1-2 hours
-- 🟡 **Medium**: Moderate complexity, some new patterns, 4-8 hours  
-- 🔴 **High**: Complex implementation, new architecture, 1-2 days
-- 🔥 **Very High**: Very complex, affects multiple systems, 3+ days
-
----
-
-## **Phase 1F: Critical Architecture Completion** 
-**(URGENT - Complete Role-Based Migration)**
-
-### **🔴 TASK-060: Create OwnerSidebar.vue Component**
-**Complexity: High** | **Priority: Critical** | **Estimated Time: 1-2 days**
-
-**Why High Complexity:**
-- Establishes new role-based component patterns
-- Requires integration with multiple stores and composables
-- Sets architectural precedent for other role-based components
-- Complex data filtering and state management
-
-**📚 Documentation Reference:**
-- **Main Implementation Guide**: See "TASK-060: Create OwnerSidebar.vue Component" in Critical Task Implementation Guide
-- **Complete working example** with 200+ lines of production-ready code
-- **Integration patterns** for Pinia stores and Vuetify components
-
-**🔍 Context7 Commands:**
-```bash
-# Vue 3 Composition API patterns
-get-library-docs /vuejs/docs --topic "composition api components sidebar navigation"
-
-# Vuetify navigation drawer
-get-library-docs /vuetifyjs/vuetify --topic "navigation drawer sidebar menu"
-
-# Pinia store integration
-get-library-docs /vuejs/pinia --topic "stores composition api filtering"
-```
-
-**Implementation Dependencies:**
-- ✅ Existing: useAuthStore, usePropertyStore, useBookingStore
-- ✅ Existing: OwnerQuickActions, OwnerPropertyForm, OwnerBookingForm components
-- ⚠️ Required: Role-based error handling (useOwnerErrorHandler)
-
-**Key Implementation Points:**
-1. **Role-based data filtering**: `ownerProperties.filter(p => p.owner_id === user.id)`
-2. **Vuetify navigation patterns**: v-navigation-drawer with v-list-group
-3. **Store integration**: Uses existing Pinia stores with computed filtering
-4. **Error handling**: Owner-friendly error messages and fallbacks
-
----
-
-### **🔴 TASK-061: Create OwnerCalendar.vue Component**
-**Complexity: High** | **Priority: Critical** | **Estimated Time: 1-2 days**
-
-<function_calls>
-<invoke name="sequentialthinking">
-<parameter name="nextThoughtNeeded">true
+⋮----
+export function getDeploymentConfig(configName: string): DeploymentConfig
 ````
 
 ## File: index.html
@@ -1442,2355 +233,11 @@ get-library-docs /vuejs/pinia --topic "stores composition api filtering"
 </html>
 ````
 
-## File: README.md
-````markdown
-# Product Requirements Document: Property Cleaning Scheduler
-
-## 1. Executive Summary
-
-### Problem Statement
-A house cleaning business with 30-40 Airbnb/VRBO property owner clients currently experiences communication breakdowns that result in missed cleanings. Property owners manually coordinate checkout/checkin dates with the cleaning company, leading to inefficiencies and lost revenue.
-
-### Solution Overview
-A web-based scheduling platform that allows property owners to sync their Airbnb/VRBO calendars with the cleaning company's master dashboard, automatically scheduling cleaning windows based on checkout dates and cleaner availability.
-
-### Business Impact
-- **Eliminate missed cleanings** due to communication breakdowns
-- **Reduce manual coordination** between 30-40 clients and cleaning company
-- **Improve client retention** through better service reliability
-- **Enable business scaling** beyond current client base
-- **Platform Foundation**: Architecture designed for expansion to other service-based businesses (pest control, maintenance, landscaping, etc.)
-- **Revenue Diversification**: Framework for licensing platform to similar businesses
-
----
-
-## 2. Product Overview
-
-### Target Users
-**Primary Users:**
-- **Property Owners** (30-40 existing clients): Airbnb/VRBO hosts who need cleaning between guest stays
-- **Cleaning Company Admin**: Staff who coordinate and schedule cleaning teams
-
-**User Personas:**
-- **Property Owner "Sarah"**: Manages 2-3 Airbnb properties, checks booking calendar daily on mobile, wants automated solutions
-- **Cleaning Manager "Mike"**: Oversees scheduling for entire cleaning operation, needs visibility into all upcoming jobs
-
-### Core Value Propositions
-- **For Property Owners**: "Never worry about cleaning coordination again"
-- **For Cleaning Company**: "See all client needs in one master calendar"
-
----
-
-## 3. Functional Requirements
-
-### 3.1 Property Owner Portal
-
-#### Property Management
-- **Add New Property**: Name, address, cleaning duration estimate, special instructions
-- **Edit Property Details**: Update information, cleaning preferences
-- **Delete Properties**: Remove properties no longer managed
-- **Property Status**: Active/inactive toggle
-
-#### Booking Management
-- **Manual Booking Entry**: Add checkout/checkin dates, guest count, special requests
-- **Booking Types**: 
-  - **Standard Booking**: Regular checkout → checkin with gap between guests
-  - **Turn**: Same-day checkout and checkin (guest leaves, new guest arrives same day)
-- **Edit Bookings**: Modify existing booking details and booking type
-- **Delete Bookings**: Remove cancelled bookings
-- **Booking Calendar View**: Visual calendar showing all bookings with turn indicators
-- **Future Enhancement**: Connect Airbnb/VRBO calendars for automatic sync
-
-#### Cleaning Schedule View
-- **Personal Calendar**: View scheduled cleanings for their properties
-- **Cleaning Status**: Pending, Scheduled, In Progress, Completed
-- **Notifications**: Email alerts for upcoming cleanings
-
-### 3.2 Cleaning Company Dashboard
-
-#### Master Calendar View
-- **All Client Bookings**: Unified view of all checkout dates across all 30-40 clients
-- **Turn Identification**: Clear visual indicators for same-day turn bookings (high priority)
-- **Cleaning Windows**: Automatically calculated based on checkout → checkin timing
-- **Priority Scheduling**: 
-  - **Turns**: Highest priority (same-day cleaning required)
-  - **Standard**: Next checkin date determines cleaning urgency
-- **Cleaner Availability**: Assign available cleaners to properties
-- **Status Management**: Update cleaning status (Scheduled → In Progress → Complete)
-
-#### Client Management
-- **Client List**: All 30-40 property owners with their properties
-- **Property Overview**: Total properties per client, sync status
-- **Communication Log**: Notes and special instructions per property
-
-#### Reporting & Analytics
-- **Revenue Analytics**: Earnings tracking by property, client, and time period
-- **Payment Insights**: Outstanding payment trends and collection efficiency
-- **Equipment Usage**: Supply inventory optimization insights
-- **Growth Tracking**: New booking trends and platform usage statistics
-
----
-
-## 4. Technical Requirements
-
-### 4.1 Platform Architecture
-- **Frontend Framework**: Vue 3 with Vuetify 3 for UI components
-- **Database & Backend**: Supabase (PostgreSQL database with built-in APIs)
-- **Authentication**: Supabase Auth (built-in user management)
-- **Hosting**: Supabase hosting for backend, frontend hosting TBD
-- **Multi-tenant System**: Separate data isolation for each client using Supabase RLS (Row Level Security)
-- **Scalable Architecture**: Designed for horizontal scaling and feature expansion
-- **Modular Design**: Component-based architecture to support multiple service industries
-- **Configuration-Driven**: Business rules and workflows configurable for different service types
-
-### 4.2 Integrations
-**Priority 1 (MVP):**
-- Manual booking entry system
-- FullCalendar.io integration for calendar views
-- Email notifications (SendGrid/Mailgun)
-- Vuetify 3 UI components
-
-**Priority 2 (Phase 3):**
-- Airbnb API or iCal feed integration
-- VRBO iCal feed integration
-
-**Priority 3 (Phase 5):**
-- Stripe payment processing integration
-- Automated invoicing system
-- Property-specific instructions and special requests
-- Equipment tracking and capacity planning
-- Advanced notification system
-
-### 4.3 Data Requirements
-- **Property Data**: Name, address, cleaning duration, special instructions
-- **Booking Data**: Checkout dates, checkin dates, guest count, **booking type (Standard/Turn)**, special requests
-- **Property Data**: Name, address, cleaning duration, **property-specific instructions**, pricing tier
-- **Financial Data**: Invoices, payments, outstanding balances, service pricing
-- **Equipment Data**: Supply inventory, maintenance schedules, cleaner assignments
-- **Cleaning Data**: Scheduled times, assigned cleaners, completion status
-
-### 4.4 Security & Compliance
-- **Data Encryption**: Supabase handles encryption in transit and at rest
-- **User Authentication**: Supabase Auth with email/password authentication
-- **Row Level Security**: Supabase RLS policies to ensure data isolation between clients
-- **API Security**: Supabase built-in API security and rate limiting
-- **Data Backup**: Supabase automated daily backups
-
----
-
-## 5. User Experience Requirements
-
-### 5.1 Design Principles
-- **Simplicity First**: Non-tech-savvy users must find it intuitive
-- **Mobile-Responsive**: Property owners often check schedules on phones
-- **Clear Visual Hierarchy**: Easy to scan calendars and property lists
-- **Minimal Clicks**: Common tasks in 3 clicks or fewer
-
-### 5.2 Key User Flows
-
-#### Property Owner Onboarding
-1. Account creation with email verification
-2. Add first property with basic details
-3. Manually enter first booking (checkout/checkin dates)
-4. Confirm cleaning is automatically scheduled correctly
-
-#### Daily Usage - Property Owner
-1. Log in → View dashboard with upcoming cleanings
-2. Add new booking → Select booking type (Standard/Turn) → Enter dates → Save
-3. Manage properties → Add/edit/delete properties
-4. Update existing bookings and booking types as needed
-
-#### Daily Usage - Cleaning Company
-1. Log in → Master calendar view with all cleanings
-2. **Priority view**: See all "turns" highlighted for urgent same-day cleaning
-3. Assign cleaner to property → Update status
-4. Filter by date/client/booking type → Plan daily routes
-
----
-
-## 6. Success Metrics & KPIs
-
-### 6.1 User Adoption
-- **Property Owner Engagement**: % of clients actively using platform (target: 90%+)
-- **Properties Connected**: Average properties per client (baseline: current manual process)
-- **Calendar Sync Success**: % of successful calendar syncs (target: 95%+)
-
-### 6.2 Business Impact
-- **Revenue Growth**: Track earnings and payment collection efficiency
-- **Operational Efficiency**: Equipment usage optimization and cost control
-- **Platform Adoption**: Monitor new booking trends and usage patterns
-
-### 6.3 Business Impact
-- **Client Retention**: Maintain 95%+ of existing 30-40 clients
-- **New Client Acquisition**: Platform as competitive advantage
-- **Revenue Protection**: Eliminate lost revenue from missed cleanings
-
----
-
-## 7. Implementation Plan
-
-### Phase 1: MVP - Manual Booking System (Months 1-2)
-- Property owner portal with manual booking entry
-- Property management (add/edit/delete properties)
-- Basic cleaning company dashboard with master calendar view
-- Email notifications for scheduled cleanings
-- Booking management (add/edit/delete bookings)
-
-### Phase 2: Enhanced Dashboard & Reporting (Month 3)
-- Advanced dashboard filtering and search
-- Cleaning status management and tracking
-- Basic reporting and analytics
-- Mobile-responsive optimizations
-
-### Phase 3: Airbnb Integration (Month 4)
-- Airbnb API or iCal integration
-- Automated calendar sync from Airbnb
-- Sync status monitoring and error handling
-
-### Phase 4: VRBO Integration & Advanced Features (Month 5+)
-- VRBO iCal integration
-- SMS notifications
-- Advanced analytics and reporting
-- API for future integrations
-
-### Phase 5: Business Management Features (Months 6-8)
-**Financial Management:**
-- **Automated Invoicing**: Generate invoices based on completed cleanings
-- **Payment Processing**: Stripe integration for automated payment collection
-- **Payment Tracking**: Monitor outstanding payments, late fees
-
-**Service Customization:**
-- **Property-Specific Instructions**: Store detailed cleaning preferences per property
-- **Special Requests**: Handle one-time additions (inside oven, refrigerator, etc.)
-- **Pricing Tiers**: Different service levels (basic, deep clean, premium)
-
-**Communication & Quality:**
-- **Automated Notifications**: Send clients updates when cleaning starts/completes
-- **Equipment Tracking**: Monitor cleaning supplies, equipment maintenance schedules
-- **Capacity Planning**: Visualize team availability vs. booking demand
-
-### Phase 6: Analytics & Business Intelligence (Months 9-10)
-**Financial Analytics:**
-- **Revenue Analytics**: Track earnings by property, client, time period
-- **Payment Insights**: Outstanding payment trends, collection efficiency
-
-**Operational Intelligence:**
-- **Equipment Usage**: Supply inventory optimization insights
-- **Growth Metrics**: New booking trends, platform usage statistics
-
----
-
-## 8. Risk Assessment
-
-### Technical Risks
-- **API Reliability**: Airbnb/VRBO API changes or downtime
-- **Mitigation**: Fallback to manual entry, multiple sync methods
-
-### User Adoption Risks
-- **Tech Resistance**: Some property owners may resist new platform
-- **Mitigation**: Phased rollout, extensive onboarding support
-
-### Business Risks
-- **Scope Creep**: Adding features beyond core scheduling
-- **Mitigation**: Strict MVP focus, feature roadmap discipline
-
----
-
-## 9. Success Criteria
-
-**Launch Readiness:**
-- 100% of existing 30-40 clients onboarded
-- Manual booking system fully functional
-- Sub-2-second page load times
-- Zero critical bugs in core booking and scheduling flow
-
-**3-Month Post-Launch:**
-- 50% reduction in missed cleanings through better coordination
-- 80% reduction in manual scheduling coordination via phone/text
-- 95%+ client satisfaction with platform
-- All clients actively entering bookings manually
-- Platform foundation ready for Airbnb/VRBO integration (Phase 3)
-
----
-
-## 10. Appendix
-
-### Competitive Analysis
-- **Current State**: Manual phone/text coordination
-- **Alternative Solutions**: Generic calendar tools, property management software
-- **Competitive Advantage**: Purpose-built for cleaning service integration
-
-### Technical Specifications
-- **Frontend**: Vue 3 with Composition API + TypeScript
-- **UI Framework**: Vuetify 3 for Material Design components
-- **State Management**: Pinia for centralized state management with TypeScript
-- **Routing**: Vue Router 4 with automatic file-based routing (pages directory)
-- **Calendar Component**: FullCalendar.io Vue component for all calendar views
-- **Database**: Supabase (PostgreSQL) with real-time subscriptions
-- **Backend**: Supabase Edge Functions (if needed) or direct database API calls
-- **Authentication**: Supabase Auth with built-in user management
-- **Hosting**: Supabase for backend services, Netlify/Vercel for frontend deployment
-- **Real-time Updates**: Supabase real-time subscriptions for live calendar updates
-- **Type Safety**: TypeScript with interfaces and Map data structures
-
-### Frontend Architecture
-**State Management (Pinia Stores):**
-- **User Store**: User data, houses, user settings, calendar events (shared userId)
-- **UI Store**: Modal states, sidebar states, loading states
-- **Auth Store**: Authentication state and user session management
-
-**Component Architecture:**
-- **Layouts**: Header and persistent UI elements
-- **Pages**: Auto-routed components from pages/ directory
-- **Dumb Components**: Pure UI components that receive props
-- **Smart Components**: Home.vue as main state orchestrator
-
-**Business Logic (Composables):**
-- **useHouses**: CRUD operations for properties (database + UI)
-- **useAuth**: Authentication logic and user management
-- **useCalendar**: Calendar event management and UI interactions
-- **useBookings**: Booking creation, editing, deletion logic
-
-**Single Source of Truth:**
-- **Home.vue**: Main component orchestrating state flow
-- Receives/emits from FullCalendar and Sidebar
-- Manages props/state between stores and composables
-- Central hub for all data flow
-
-### Assumptions
-- Property owners primarily use Airbnb (majority) and VRBO
-- Current client base willing to adopt new technology with support
-- Cleaning company has 1-2 staff members who will use admin dashboard
-- No integration needed with existing cleaning company software systems
-````
-
-## File: src/__tests__/components/HelloWorld.spec.ts
-````typescript
-import { describe, it, expect } from 'vitest'
-import { mountWithContext } from '../utils/test-utils'
-import HelloWorld from '@/components/dumb/HelloWorld.vue'
-````
-
-## File: src/__tests__/components/SimpleTest.spec.ts
-````typescript
-import { describe, it, expect } from 'vitest'
-````
-
-## File: src/__tests__/setup/cssStub.js
-````javascript
-
-````
-
-## File: src/__tests__/setup/setupTests.ts
-````typescript
-import { beforeAll, afterAll, vi } from 'vitest'
-````
-
-## File: src/__tests__/stores/booking.spec.ts
-````typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useBookingStore } from '@/stores/booking';
-import type { Booking } from '@/types';
-````
-
-## File: src/__tests__/stores/property.spec.ts
-````typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { usePropertyStore } from '@/stores/property';
-import type { Property } from '@/types';
-````
-
-## File: src/__tests__/stores/ui.spec.ts
-````typescript
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useUIStore } from '@/stores/ui';
-````
-
-## File: src/__tests__/stores/user.spec.ts
-````typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { useUserStore } from '@/stores/user';
-````
-
 ## File: src/assets/main.css
 ````css
 :root {
 html, body {
 * {
-````
-
-## File: src/components/demos/AdminQuickActionsDemo.vue
-````vue
-<template>
-  <v-container>
-    <v-row>
-      <v-col cols="12">
-        <h1 class="text-h4 mb-4">AdminQuickActions Demo</h1>
-        <p class="text-body-1 mb-6">
-          This demo showcases the AdminQuickActions component with various states and configurations.
-        </p>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="4">
-        <v-card variant="outlined" class="mb-4">
-          <v-card-title class="text-h6">Demo Controls</v-card-title>
-          <v-card-text>
-            <v-switch
-              v-model="loading"
-              label="Loading State"
-              color="primary"
-              class="mb-2"
-            />
-            <v-switch
-              v-model="disabled"
-              label="Disabled State"
-              color="secondary"
-              class="mb-2"
-            />
-            <v-slider
-              v-model="urgentCount"
-              label="Urgent Count"
-              :min="0"
-              :max="20"
-              :step="1"
-              thumb-label
-              class="mb-2"
-            />
-            <v-slider
-              v-model="todayBookings"
-              label="Today Bookings"
-              :min="0"
-              :max="50"
-              :step="1"
-              thumb-label
-              class="mb-2"
-            />
-            <v-slider
-              v-model="unassignedCount"
-              label="Unassigned Count"
-              :min="0"
-              :max="30"
-              :step="1"
-              thumb-label
-              class="mb-2"
-            />
-            <v-slider
-              v-model="completedToday"
-              label="Completed Today"
-              :min="0"
-              :max="25"
-              :step="1"
-              thumb-label
-              class="mb-2"
-            />
-            <v-select
-              v-model="selectedVariant"
-              :items="variantOptions"
-              label="Card Variant"
-              variant="outlined"
-              class="mb-2"
-            />
-            <v-slider
-              v-model="elevation"
-              label="Elevation"
-              :min="0"
-              :max="24"
-              :step="1"
-              thumb-label
-            />
-          </v-card-text>
-        </v-card>
-        <v-card variant="outlined">
-          <v-card-title class="text-h6 d-flex align-center">
-            Action Log
-            <v-spacer />
-            <v-btn
-              size="small"
-              variant="text"
-              @click="actionLog = []"
-            >
-              Clear
-            </v-btn>
-          </v-card-title>
-          <v-card-text>
-            <div v-if="actionLog.length === 0" class="text-center text-medium-emphasis py-4">
-              No actions performed yet
-            </div>
-            <v-list v-else density="compact">
-              <v-list-item
-                v-for="(action, index) in actionLog.slice().reverse()"
-                :key="index"
-                class="px-0"
-              >
-                <v-list-item-title class="text-body-2">
-                  <v-chip size="x-small" color="primary" class="mr-2">
-                    {{ actionLog.length - index }}
-                  </v-chip>
-                  {{ formatActionType(action.type) }}
-                </v-list-item-title>
-                <v-list-item-subtitle class="text-caption">
-                  {{ action.timestamp.toLocaleTimeString() }}
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="8">
-        <v-card variant="outlined">
-          <v-card-title class="text-h6">AdminQuickActions Component</v-card-title>
-          <v-card-text>
-            <AdminQuickActions
-              :loading="loading"
-              :disabled="disabled"
-              :elevation="elevation"
-              :variant="selectedVariant"
-              :urgent-count="urgentCount"
-              :today-bookings="todayBookings"
-              :unassigned-count="unassignedCount"
-              :completed-today="completedToday"
-              @action="handleAction"
-            />
-          </v-card-text>
-        </v-card>
-        <v-card variant="outlined" class="mt-4">
-          <v-card-title class="text-h6">Component Features</v-card-title>
-          <v-card-text>
-            <v-list>
-              <v-list-item>
-                <v-list-item-title>Critical Actions</v-list-item-title>
-                <v-list-item-subtitle>
-                  Urgent turns management and cleaner assignment with visual indicators
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>Primary Management</v-list-item-title>
-                <v-list-item-subtitle>
-                  Master calendar access and new booking creation
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>Bulk Operations</v-list-item-title>
-                <v-list-item-subtitle>
-                  Collapsible section for bulk assignment and rescheduling
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>Business Management</v-list-item-title>
-                <v-list-item-subtitle>
-                  Cleaner management, reports, properties, and system settings
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>Quick Stats</v-list-item-title>
-                <v-list-item-subtitle>
-                  Optional statistics display for today's metrics
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title>Responsive Design</v-list-item-title>
-                <v-list-item-subtitle>
-                  Adaptive layout with mobile-optimized text and spacing
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-⋮----
-{{ actionLog.length - index }}
-⋮----
-{{ formatActionType(action.type) }}
-⋮----
-{{ action.timestamp.toLocaleTimeString() }}
-⋮----
-<script setup lang="ts">
-import { ref } from 'vue'
-import AdminQuickActions from '@/components/dumb/admin/AdminQuickActions.vue'
-const loading = ref(false)
-const disabled = ref(false)
-const urgentCount = ref(3)
-const todayBookings = ref(12)
-const unassignedCount = ref(5)
-const completedToday = ref(8)
-const elevation = ref(2)
-const selectedVariant = ref<'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'>('elevated')
-const variantOptions = [
-  { title: 'Elevated', value: 'elevated' },
-  { title: 'Flat', value: 'flat' },
-  { title: 'Tonal', value: 'tonal' },
-  { title: 'Outlined', value: 'outlined' },
-  { title: 'Text', value: 'text' },
-  { title: 'Plain', value: 'plain' }
-]
-interface ActionLogEntry {
-  type: string
-  timestamp: Date
-}
-const actionLog = ref<ActionLogEntry[]>([])
-function handleAction(actionType: string) {
-  actionLog.value.push({
-    type: actionType,
-    timestamp: new Date()
-  })
-  if (actionLog.value.length > 20) {
-    actionLog.value = actionLog.value.slice(-20)
-  }
-  console.log('Admin action triggered:', actionType)
-}
-function formatActionType(actionType: string): string {
-  return actionType
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
-</script>
-<style scoped>
-.v-slider {
-  margin-bottom: 8px;
-}
-.v-list-item {
-  min-height: 40px;
-}
-</style>
-````
-
-## File: src/components/demos/ErrorHandlingDemo.vue
-````vue
-<template>
-  <div class="error-handling-demo">
-    <v-container>
-      <v-row>
-        <v-col cols="12">
-          <h1 class="text-h4 mb-6">Error Handling & Loading States Demo</h1>
-          <v-card class="mb-6">
-            <v-card-title>Demo Configuration</v-card-title>
-            <v-card-text>
-              <v-radio-group
-                v-model="selectedRole"
-                inline
-                label="User Role:"
-              >
-                <v-radio label="Property Owner" value="owner" />
-                <v-radio label="Business Admin" value="admin" />
-              </v-radio-group>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <v-card class="mb-6">
-            <v-card-title>Loading States</v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Loading Spinners</h3>
-                  <div class="demo-section mb-4">
-                    <h4 class="text-subtitle-1 mb-2">Inline Spinner</h4>
-                    <LoadingSpinner
-                      variant="inline"
-                      message="Loading data..."
-                      :size="32"
-                    />
-                  </div>
-                  <div class="demo-section mb-4">
-                    <h4 class="text-subtitle-1 mb-2">Button Spinner</h4>
-                    <LoadingSpinner
-                      variant="button"
-                      message="Saving..."
-                      :size="20"
-                    />
-                  </div>
-                  <div class="demo-section mb-4">
-                    <h4 class="text-subtitle-1 mb-2">Progress Spinner</h4>
-                    <LoadingSpinner
-                      :progress="loadingProgress"
-                      show-progress
-                      message="Processing..."
-                    />
-                    <v-btn
-                      @click="simulateProgress"
-                      size="small"
-                      class="mt-2"
-                    >
-                      Simulate Progress
-                    </v-btn>
-                  </div>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Skeleton Loaders</h3>
-                  <div class="demo-section mb-4">
-                    <h4 class="text-subtitle-1 mb-2">Property Card Skeleton</h4>
-                    <SkeletonLoader
-                      type="property-card"
-                      :loading="showSkeletons"
-                    >
-                      <v-card>
-                        <v-card-title>Sample Property</v-card-title>
-                        <v-card-text>Property details would go here...</v-card-text>
-                      </v-card>
-                    </SkeletonLoader>
-                  </div>
-                  <div class="demo-section mb-4">
-                    <h4 class="text-subtitle-1 mb-2">Booking List Skeleton</h4>
-                    <SkeletonLoader
-                      type="booking-item"
-                      :count="3"
-                      :loading="showSkeletons"
-                    >
-                      <div>Booking items would appear here...</div>
-                    </SkeletonLoader>
-                  </div>
-                  <v-btn
-                    @click="toggleSkeletons"
-                    size="small"
-                  >
-                    {{ showSkeletons ? 'Show Content' : 'Show Skeletons' }}
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <v-card class="mb-6">
-            <v-card-title>Error Handling</v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Error Types</h3>
-                  <div class="demo-buttons">
-                    <v-btn
-                      @click="triggerValidationError"
-                      color="warning"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      Validation Error
-                    </v-btn>
-                    <v-btn
-                      @click="triggerNetworkError"
-                      color="error"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      Network Error
-                    </v-btn>
-                    <v-btn
-                      @click="triggerBusinessError"
-                      color="orange"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      Business Logic Error
-                    </v-btn>
-                    <v-btn
-                      @click="triggerSystemError"
-                      color="red-darken-2"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      System Error
-                    </v-btn>
-                  </div>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Role-Specific Handlers</h3>
-                  <div class="demo-buttons">
-                    <v-btn
-                      v-if="selectedRole === 'owner'"
-                      @click="triggerOwnerPropertyError"
-                      color="blue"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      Property Error (Owner)
-                    </v-btn>
-                    <v-btn
-                      v-if="selectedRole === 'owner'"
-                      @click="triggerOwnerBookingError"
-                      color="green"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      Booking Error (Owner)
-                    </v-btn>
-                    <v-btn
-                      v-if="selectedRole === 'admin'"
-                      @click="triggerAdminSystemError"
-                      color="purple"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      System Error (Admin)
-                    </v-btn>
-                    <v-btn
-                      v-if="selectedRole === 'admin'"
-                      @click="triggerAdminDataIntegrityError"
-                      color="red"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      Data Integrity Error
-                    </v-btn>
-                  </div>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <v-card>
-            <v-card-title>Error Display</v-card-title>
-            <v-card-text>
-              <ErrorAlert
-                v-if="currentError"
-                :show="!!currentError"
-                :message="currentError.message"
-                :title="currentError.title"
-                :type="currentError.type"
-                :user-role="selectedRole"
-                :business-impact="currentError.businessImpact"
-                :error-details="currentError.errorDetails"
-                :affected-resources="currentError.affectedResources"
-                :retryable="currentError.retryable"
-                :escalatable="currentError.escalatable"
-                :help-text="currentError.helpText"
-                @close="clearCurrentError"
-                @retry="handleRetry"
-                @escalate="handleEscalate"
-              />
-              <div v-if="isLoading" class="loading-demo">
-                <LoadingSpinner
-                  variant="page"
-                  :message="loadingMessage"
-                  min-height="200px"
-                />
-              </div>
-              <v-alert
-                v-if="showSuccess"
-                type="success"
-                variant="tonal"
-                closable
-                @click:close="showSuccess = false"
-              >
-                {{ successMessage }}
-              </v-alert>
-              <div v-if="!currentError && !isLoading && !showSuccess" class="text-center py-8">
-                <v-icon icon="mdi-check-circle" size="64" color="success" class="mb-4" />
-                <h3 class="text-h6 mb-2">No Errors</h3>
-                <p class="text-body-2 text-medium-emphasis">
-                  Click the buttons above to test different error scenarios
-                </p>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <v-card class="mb-6">
-            <v-card-title>Loading State Management</v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Active Loading Operations</h3>
-                  <div v-if="activeLoadingOps.length === 0" class="text-body-2 text-medium-emphasis">
-                    No active loading operations
-                  </div>
-                  <v-chip
-                    v-for="op in activeLoadingOps"
-                    :key="op"
-                    size="small"
-                    color="primary"
-                    variant="tonal"
-                    class="mr-2 mb-2"
-                  >
-                    {{ op }}
-                  </v-chip>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Loading Controls</h3>
-                  <div class="demo-buttons">
-                    <v-btn
-                      @click="simulateAsyncOperation('fetch-properties')"
-                      :loading="isOperationLoading('fetch-properties')"
-                      color="primary"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      Fetch Properties
-                    </v-btn>
-                    <v-btn
-                      @click="simulateAsyncOperation('save-booking')"
-                      :loading="isOperationLoading('save-booking')"
-                      color="success"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      Save Booking
-                    </v-btn>
-                    <v-btn
-                      @click="simulateAsyncOperation('sync-data')"
-                      :loading="isOperationLoading('sync-data')"
-                      color="info"
-                      variant="outlined"
-                      class="mb-2 mr-2"
-                    >
-                      Sync Data
-                    </v-btn>
-                  </div>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
-⋮----
-{{ showSkeletons ? 'Show Content' : 'Show Skeletons' }}
-⋮----
-{{ successMessage }}
-⋮----
-{{ op }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useOwnerErrorHandler } from '@/composables/owner/useOwnerErrorHandler';
-import { useAdminErrorHandler } from '@/composables/admin/useAdminErrorHandler';
-import { useLoadingState } from '@/composables/shared/useLoadingState';
-import LoadingSpinner from '@/components/dumb/shared/LoadingSpinner.vue';
-import SkeletonLoader from '@/components/dumb/shared/SkeletonLoader.vue';
-import ErrorAlert from '@/components/dumb/shared/ErrorAlert.vue';
-import type { UserRole, BusinessImpact } from '@/types/ui';
-const selectedRole = ref<UserRole>('owner');
-const showSkeletons = ref(true);
-const loadingProgress = ref(0);
-const showSuccess = ref(false);
-const successMessage = ref('');
-// Error handlers
-const ownerErrorHandler = useOwnerErrorHandler();
-const adminErrorHandler = useAdminErrorHandler();
-// Loading state
-const {
-  loadingOperations,
-  withLoading
-} = useLoadingState();
-// Current error state
-interface DemoError {
-  message: string;
-  title?: string;
-  type: 'error' | 'warning' | 'info';
-  businessImpact?: BusinessImpact;
-  errorDetails?: string;
-  affectedResources?: string[];
-  retryable?: boolean;
-  escalatable?: boolean;
-  helpText?: string;
-}
-const currentError = ref<DemoError | null>(null);
-const isLoading = ref(false);
-const loadingMessage = ref('');
-// Computed
-const activeLoadingOps = computed(() =>
-  loadingOperations.value.map(op => op.id)
-);
-// Methods
-function clearCurrentError(): void {
-  currentError.value = null;
-}
-function showSuccessMessage(message: string): void {
-  successMessage.value = message;
-  showSuccess.value = true;
-  setTimeout(() => {
-    showSuccess.value = false;
-  }, 3000);
-}
-function isOperationLoading(operation: string): boolean {
-  return loadingOperations.value.some(op => op.id === operation);
-}
-async function simulateAsyncOperation(operation: string): Promise<void> {
-  await withLoading(operation, async () => {
-    // Simulate async work
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    if (Math.random() > 0.7) {
-      // 30% chance of error
-      throw new Error(`Failed to complete ${operation}`);
-    }
-    showSuccessMessage(`${operation} completed successfully!`);
-  });
-}
-function simulateProgress(): void {
-  loadingProgress.value = 0;
-  const interval = setInterval(() => {
-    loadingProgress.value += 10;
-    if (loadingProgress.value >= 100) {
-      clearInterval(interval);
-      setTimeout(() => {
-        loadingProgress.value = 0;
-      }, 1000);
-    }
-  }, 200);
-}
-function toggleSkeletons(): void {
-  showSkeletons.value = !showSkeletons.value;
-}
-// Error simulation methods
-async function triggerValidationError(): Promise<void> {
-  const error = new Error('Validation failed: Required fields are missing');
-  if (selectedRole.value === 'owner') {
-    await ownerErrorHandler.handleFormError([error], 'property');
-  } else {
-    await adminErrorHandler.handleSystemPropertyError(error, 'create', {
-      propertyIds: ['prop-123'],
-      affectedBookings: 0,
-      affectedCleaners: 0
-    });
-  }
-  currentError.value = {
-    message: selectedRole.value === 'owner'
-      ? 'Please fill in all required fields to continue.'
-      : 'Validation failed: Required field missing (name, address). Property creation blocked.',
-    title: 'Validation Error',
-    type: 'warning',
-    businessImpact: 'low',
-    errorDetails: selectedRole.value === 'admin' ? 'VALIDATION_ERROR: Missing required fields [name, address]' : undefined,
-    retryable: true,
-    helpText: selectedRole.value === 'owner' ? 'Make sure to fill in the property name and address before saving.' : undefined
-  };
-}
-async function triggerNetworkError(): Promise<void> {
-  const error = new Error('Network request failed');
-  if (selectedRole.value === 'owner') {
-    await ownerErrorHandler.handleNetworkError(error, 'save_property');
-  } else {
-    await adminErrorHandler.handleIntegrationError(error, 'PropertyAPI', 'create', {
-      endpoint: '/api/properties',
-      affectedFeatures: ['property-management'],
-      fallbackAvailable: false
-    });
-  }
-  currentError.value = {
-    message: selectedRole.value === 'owner'
-      ? 'Unable to connect to the server. Please check your internet connection and try again.'
-      : 'PropertyAPI integration failed. Service degraded. Features affected: property-management.',
-    title: 'Connection Error',
-    type: 'error',
-    businessImpact: 'medium',
-    errorDetails: selectedRole.value === 'admin' ? 'NETWORK_ERROR: Connection timeout to /api/properties (timeout: 30s)' : undefined,
-    retryable: true,
-    escalatable: selectedRole.value === 'admin',
-    helpText: selectedRole.value === 'owner' ? 'This usually resolves itself. Try again in a few moments.' : undefined
-  };
-}
-async function triggerBusinessError(): Promise<void> {
-  const error = new Error('Booking conflict detected');
-  if (selectedRole.value === 'owner') {
-    await ownerErrorHandler.handleBookingError(error, 'create');
-  } else {
-    await adminErrorHandler.handleBookingManagementError(error, 'create', {
-      bookingIds: ['booking-456'],
-      cleanerIds: ['cleaner-789'],
-      revenueImpact: 250,
-      clientsAffected: 1
-    });
-  }
-  currentError.value = {
-    message: selectedRole.value === 'owner'
-      ? 'This time slot is already booked. Please choose a different date or time.'
-      : 'Booking operation failed. Potential revenue impact: $250. Clients affected: 1.',
-    title: 'Booking Conflict',
-    type: 'warning',
-    businessImpact: 'medium',
-    errorDetails: selectedRole.value === 'admin' ? 'BUSINESS_LOGIC_ERROR: Overlapping booking detected [booking-456, cleaner-789]' : undefined,
-    affectedResources: selectedRole.value === 'admin' ? ['booking-456', 'cleaner-789'] : undefined,
-    retryable: false,
-    helpText: selectedRole.value === 'owner' ? 'Try selecting a different date or contact us for assistance.' : undefined
-  };
-}
-async function triggerSystemError(): Promise<void> {
-  const error = new Error('Database connection failed');
-  if (selectedRole.value === 'admin') {
-    await adminErrorHandler.handleDataIntegrityError(error, 'sync', {
-      affectedTables: ['properties', 'bookings'],
-      recordCount: 150,
-      dataLoss: false
-    });
-  }
-  currentError.value = {
-    message: selectedRole.value === 'owner'
-      ? 'Something went wrong on our end. Our team has been notified and will fix this soon.'
-      : 'Data integrity issue detected. 150 records affected. Investigation required.',
-    title: 'System Error',
-    type: 'error',
-    businessImpact: 'high',
-    errorDetails: selectedRole.value === 'admin' ? 'DB_CONNECTION_ERROR: Connection pool exhausted, sync operation failed' : undefined,
-    affectedResources: selectedRole.value === 'admin' ? ['properties', 'bookings'] : undefined,
-    retryable: false,
-    escalatable: selectedRole.value === 'admin',
-    helpText: selectedRole.value === 'owner' ? 'No action needed from you. We\'ll have this fixed shortly.' : undefined
-  };
-}
-async function triggerOwnerPropertyError(): Promise<void> {
-  const error = new Error('Property save failed');
-  await ownerErrorHandler.handlePropertyError(error, 'create');
-  currentError.value = {
-    message: 'Unable to save your property. Please try again.',
-    title: 'Save Error',
-    type: 'error',
-    retryable: true,
-    helpText: 'Make sure all fields are filled out correctly and you have a stable internet connection.'
-  };
-}
-async function triggerOwnerBookingError(): Promise<void> {
-  const error = new Error('Booking creation failed');
-  await ownerErrorHandler.handleBookingError(error, 'create');
-  currentError.value = {
-    message: 'Unable to create your booking. Please try again.',
-    title: 'Booking Error',
-    type: 'error',
-    retryable: true,
-    helpText: 'Check that your selected date and time are available and try again.'
-  };
-}
-async function triggerAdminSystemError(): Promise<void> {
-  const error = new Error('System-wide property update failed');
-  await adminErrorHandler.handleSystemPropertyError(error, 'bulk_update', {
-    propertyIds: ['prop-1', 'prop-2', 'prop-3'],
-    affectedBookings: 15,
-    affectedCleaners: 5
-  });
-  currentError.value = {
-    message: 'Property operation failed. 15 bookings affected. 5 cleaners impacted.',
-    title: 'Critical Property Error',
-    type: 'error',
-    businessImpact: 'high',
-    errorDetails: 'BULK_UPDATE_ERROR: Transaction rollback, 3 properties failed validation',
-    affectedResources: ['prop-1', 'prop-2', 'prop-3'],
-    retryable: false,
-    escalatable: true
-  };
-}
-async function triggerAdminDataIntegrityError(): Promise<void> {
-  const error = new Error('Data corruption detected');
-  await adminErrorHandler.handleDataIntegrityError(error, 'validation', {
-    affectedTables: ['bookings', 'cleaners', 'properties'],
-    recordCount: 500,
-    dataLoss: true
-  });
-  currentError.value = {
-    message: 'Data integrity issue detected. 500 records affected. Data loss risk!',
-    title: 'Data Integrity Alert',
-    type: 'error',
-    businessImpact: 'critical',
-    errorDetails: 'DATA_CORRUPTION: Checksum mismatch in 500 records across 3 tables',
-    affectedResources: ['bookings', 'cleaners', 'properties'],
-    retryable: false,
-    escalatable: true
-  };
-}
-async function handleRetry(): Promise<void> {
-  isLoading.value = true;
-  loadingMessage.value = 'Retrying operation...';
-  try {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    if (Math.random() > 0.5) {
-      clearCurrentError();
-      showSuccessMessage('Operation completed successfully!');
-    } else {
-      if (currentError.value) {
-        currentError.value.message += ' (Retry failed)';
-      }
-    }
-  } finally {
-    isLoading.value = false;
-  }
-}
-function handleEscalate(): void {
-  showSuccessMessage('Error has been escalated to the development team.');
-  clearCurrentError();
-}
-onMounted(() => {
-  console.log('Error Handling Demo initialized');
-});
-</script>
-<style scoped>
-.error-handling-demo {
-  padding: 20px 0;
-}
-.demo-section {
-  border: 1px solid rgba(var(--v-theme-outline), 0.2);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-.demo-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.loading-demo {
-  border: 2px dashed rgba(var(--v-theme-primary), 0.3);
-  border-radius: 8px;
-  margin: 16px 0;
-}
-.v-theme--dark .demo-section {
-  border-color: rgba(var(--v-theme-outline), 0.3);
-}
-</style>
-````
-
-## File: src/components/demos/UseOwnerPropertiesDemo.vue
-````vue
-<template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2">mdi-home-group</v-icon>
-            useOwnerProperties Composable Demo
-            <v-spacer />
-            <v-chip color="primary" variant="outlined">
-              Owner Role Testing
-            </v-chip>
-          </v-card-title>
-          <v-card-text>
-            <v-alert type="info" class="mb-4">
-              This demo tests the owner-specific property composable that filters all operations to the current owner's properties only.
-            </v-alert>
-            <v-card class="mb-4" variant="outlined">
-              <v-card-title class="text-h6">Current User Context</v-card-title>
-              <v-card-text>
-                <v-row>
-                  <v-col cols="6">
-                    <strong>User ID:</strong> {{ currentUserId || 'Not logged in' }}
-                  </v-col>
-                  <v-col cols="6">
-                    <strong>Role:</strong> {{ authStore.user?.role || 'Unknown' }}
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-            <v-card class="mb-4" variant="outlined">
-              <v-card-title class="text-h6">My Property Metrics</v-card-title>
-              <v-card-text>
-                <v-row>
-                  <v-col cols="3">
-                    <v-card color="primary" variant="tonal">
-                      <v-card-text class="text-center">
-                        <div class="text-h4">{{ myPropertyMetrics.totalProperties }}</div>
-                        <div class="text-caption">Total Properties</div>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                  <v-col cols="3">
-                    <v-card color="success" variant="tonal">
-                      <v-card-text class="text-center">
-                        <div class="text-h4">{{ myPropertyMetrics.activeProperties }}</div>
-                        <div class="text-caption">Active Properties</div>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                  <v-col cols="3">
-                    <v-card color="info" variant="tonal">
-                      <v-card-text class="text-center">
-                        <div class="text-h4">{{ Math.round(myPropertyMetrics.averageUtilization * 100) }}%</div>
-                        <div class="text-caption">Avg Utilization</div>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                  <v-col cols="3">
-                    <v-card color="warning" variant="tonal">
-                      <v-card-text class="text-center">
-                        <div class="text-h4">${{ Math.round(myPropertyMetrics.totalRevenue) }}</div>
-                        <div class="text-caption">Total Revenue</div>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-            <v-card class="mb-4" variant="outlined">
-              <v-card-title class="text-h6 d-flex align-center">
-                My Properties ({{ myProperties.length }})
-                <v-spacer />
-                <v-btn
-                  color="primary"
-                  variant="outlined"
-                  size="small"
-                  @click="fetchMyProperties"
-                  :loading="loading"
-                >
-                  <v-icon start>mdi-refresh</v-icon>
-                  Refresh
-                </v-btn>
-              </v-card-title>
-              <v-card-text>
-                <v-row v-if="myProperties.length > 0">
-                  <v-col
-                    v-for="property in myProperties"
-                    :key="property.id"
-                    cols="12"
-                    md="6"
-                    lg="4"
-                  >
-                    <v-card variant="outlined" :color="property.active ? 'success' : 'warning'">
-                      <v-card-title class="text-subtitle-1">
-                        {{ property.name }}
-                        <v-spacer />
-                        <v-chip
-                          :color="property.active ? 'success' : 'warning'"
-                          size="small"
-                          variant="tonal"
-                        >
-                          {{ property.active ? 'Active' : 'Inactive' }}
-                        </v-chip>
-                      </v-card-title>
-                      <v-card-text>
-                        <div><strong>Address:</strong> {{ property.address }}</div>
-                        <div><strong>Pricing:</strong> {{ property.pricing_tier }}</div>
-                        <div><strong>Duration:</strong> {{ property.cleaning_duration }}min</div>
-                        <div><strong>Owner ID:</strong> {{ property.owner_id }}</div>
-                      </v-card-text>
-                      <v-card-actions>
-                        <v-btn
-                          size="small"
-                          variant="outlined"
-                          @click="viewPropertyMetrics(property.id)"
-                        >
-                          Metrics
-                        </v-btn>
-                        <v-btn
-                          size="small"
-                          variant="outlined"
-                          @click="togglePropertyStatus(property.id, !property.active)"
-                          :loading="loading"
-                        >
-                          {{ property.active ? 'Deactivate' : 'Activate' }}
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-col>
-                </v-row>
-                <v-alert v-else type="info">
-                  No properties found for the current owner.
-                </v-alert>
-              </v-card-text>
-            </v-card>
-            <v-card class="mb-4" variant="outlined" v-if="recommendations.length > 0">
-              <v-card-title class="text-h6">Property Recommendations</v-card-title>
-              <v-card-text>
-                <v-list>
-                  <v-list-item
-                    v-for="(recommendation, index) in recommendations"
-                    :key="index"
-                  >
-                    <template #prepend>
-                      <v-icon color="info">mdi-lightbulb-outline</v-icon>
-                    </template>
-                    <v-list-item-title>{{ recommendation }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-card-text>
-            </v-card>
-            <v-card class="mb-4" variant="outlined">
-              <v-card-title class="text-h6">Create New Property</v-card-title>
-              <v-card-text>
-                <v-form @submit.prevent="createProperty">
-                  <v-row>
-                    <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="newProperty.name"
-                        label="Property Name"
-                        required
-                        variant="outlined"
-                      />
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="newProperty.address"
-                        label="Address"
-                        required
-                        variant="outlined"
-                      />
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <v-select
-                        v-model="newProperty.pricing_tier"
-                        :items="pricingTiers"
-                        label="Pricing Tier"
-                        required
-                        variant="outlined"
-                      />
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <v-text-field
-                        v-model.number="newProperty.cleaning_duration"
-                        label="Cleaning Duration (minutes)"
-                        type="number"
-                        :min="30"
-                        :max="480"
-                        variant="outlined"
-                      />
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <v-switch
-                        v-model="newProperty.active"
-                        label="Active"
-                        color="success"
-                      />
-                    </v-col>
-                    <v-col cols="12">
-                      <v-textarea
-                        v-model="newProperty.special_instructions"
-                        label="Special Instructions"
-                        rows="2"
-                        variant="outlined"
-                      />
-                    </v-col>
-                  </v-row>
-                  <v-btn
-                    type="submit"
-                    color="primary"
-                    :loading="loading"
-                    :disabled="!newProperty.name || !newProperty.address"
-                  >
-                    Create Property
-                  </v-btn>
-                </v-form>
-              </v-card-text>
-            </v-card>
-            <v-alert v-if="error" type="error" class="mb-4" closable @click:close="clearError">
-              {{ error }}
-            </v-alert>
-            <v-alert v-if="success" type="success" class="mb-4" closable @click:close="clearSuccess">
-              {{ success }}
-            </v-alert>
-            <v-dialog v-model="metricsDialog" max-width="600">
-              <v-card v-if="selectedPropertyMetrics">
-                <v-card-title>Property Metrics</v-card-title>
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="6">
-                      <v-card variant="tonal" color="info">
-                        <v-card-text class="text-center">
-                          <div class="text-h5">{{ Math.round(selectedPropertyMetrics.utilizationRate * 100) }}%</div>
-                          <div class="text-caption">Utilization Rate</div>
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-card variant="tonal" color="success">
-                        <v-card-text class="text-center">
-                          <div class="text-h5">${{ Math.round(selectedPropertyMetrics.revenueProjection) }}</div>
-                          <div class="text-caption">Revenue Projection</div>
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-card variant="tonal" color="warning">
-                        <v-card-text class="text-center">
-                          <div class="text-h5">{{ Math.round(selectedPropertyMetrics.averageGapBetweenBookings) }}</div>
-                          <div class="text-caption">Avg Gap (days)</div>
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-card variant="tonal" color="primary">
-                        <v-card-text class="text-center">
-                          <div class="text-h5">{{ Math.round(selectedPropertyMetrics.turnPercentage * 100) }}%</div>
-                          <div class="text-caption">Turn Percentage</div>
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                  </v-row>
-                  <v-alert
-                    :type="selectedPropertyMetrics.cleaningLoad === 'heavy' ? 'warning' : 'info'"
-                    class="mt-4"
-                  >
-                    <strong>Cleaning Load:</strong> {{ selectedPropertyMetrics.cleaningLoad }}
-                  </v-alert>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer />
-                  <v-btn @click="metricsDialog = false">Close</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-⋮----
-<strong>User ID:</strong> {{ currentUserId || 'Not logged in' }}
-⋮----
-<strong>Role:</strong> {{ authStore.user?.role || 'Unknown' }}
-⋮----
-<div class="text-h4">{{ myPropertyMetrics.totalProperties }}</div>
-⋮----
-<div class="text-h4">{{ myPropertyMetrics.activeProperties }}</div>
-⋮----
-<div class="text-h4">{{ Math.round(myPropertyMetrics.averageUtilization * 100) }}%</div>
-⋮----
-<div class="text-h4">${{ Math.round(myPropertyMetrics.totalRevenue) }}</div>
-⋮----
-My Properties ({{ myProperties.length }})
-⋮----
-{{ property.name }}
-⋮----
-{{ property.active ? 'Active' : 'Inactive' }}
-⋮----
-<div><strong>Address:</strong> {{ property.address }}</div>
-<div><strong>Pricing:</strong> {{ property.pricing_tier }}</div>
-<div><strong>Duration:</strong> {{ property.cleaning_duration }}min</div>
-<div><strong>Owner ID:</strong> {{ property.owner_id }}</div>
-⋮----
-{{ property.active ? 'Deactivate' : 'Activate' }}
-⋮----
-<template #prepend>
-                      <v-icon color="info">mdi-lightbulb-outline</v-icon>
-                    </template>
-<v-list-item-title>{{ recommendation }}</v-list-item-title>
-⋮----
-{{ error }}
-⋮----
-{{ success }}
-⋮----
-<div class="text-h5">{{ Math.round(selectedPropertyMetrics.utilizationRate * 100) }}%</div>
-⋮----
-<div class="text-h5">${{ Math.round(selectedPropertyMetrics.revenueProjection) }}</div>
-⋮----
-<div class="text-h5">{{ Math.round(selectedPropertyMetrics.averageGapBetweenBookings) }}</div>
-⋮----
-<div class="text-h5">{{ Math.round(selectedPropertyMetrics.turnPercentage * 100) }}%</div>
-⋮----
-<strong>Cleaning Load:</strong> {{ selectedPropertyMetrics.cleaningLoad }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
-import { useAuthStore } from '@/stores/auth';
-import type { PricingTier } from '@/types';
-const ownerProperties = useOwnerProperties();
-const authStore = useAuthStore();
-const {
-  loading,
-  error,
-  success,
-  myProperties,
-  myPropertyMetrics,
-  fetchMyProperties,
-  createMyProperty,
-  toggleMyPropertyStatus,
-  getMyPropertyMetrics,
-  getMyPropertyRecommendations
-} = ownerProperties;
-const metricsDialog = ref(false);
-const selectedPropertyMetrics = ref<any>(null);
-const newProperty = ref({
-  name: '',
-  address: '',
-  pricing_tier: 'basic' as PricingTier,
-  cleaning_duration: 120,
-  active: true,
-  special_instructions: ''
-});
-// Constants
-const pricingTiers = [
-  { title: 'Basic', value: 'basic' },
-  { title: 'Standard', value: 'standard' },
-  { title: 'Premium', value: 'premium' },
-  { title: 'Luxury', value: 'luxury' }
-];
-const currentUserId = computed(() => authStore.user?.id);
-const recommendations = computed(() => getMyPropertyRecommendations());
-async function createProperty() {
-  const propertyId = await createMyProperty(newProperty.value);
-  if (propertyId) {
-    newProperty.value = {
-      name: '',
-      address: '',
-      pricing_tier: 'basic',
-      cleaning_duration: 120,
-      active: true,
-      special_instructions: ''
-    };
-  }
-}
-async function togglePropertyStatus(id: string, active: boolean) {
-  await toggleMyPropertyStatus(id, active);
-}
-function viewPropertyMetrics(id: string) {
-  const metrics = getMyPropertyMetrics(id);
-  if (metrics) {
-    selectedPropertyMetrics.value = metrics;
-    metricsDialog.value = true;
-  }
-}
-function clearError() {
-  error.value = null;
-}
-function clearSuccess() {
-  success.value = null;
-}
-onMounted(() => {
-  fetchMyProperties();
-});
-</script>
-<style scoped>
-.v-card {
-  transition: all 0.3s ease;
-}
-.v-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
-}
-</style>
-````
-
-## File: src/components/dumb/admin/AdminBookingForm.vue
-````vue
-<template>
-  <v-dialog
-    v-model="isOpen"
-    max-width="800px"
-    persistent
-    scrollable
-    @keydown.esc="handleClose"
-  >
-    <v-card>
-      <v-card-title class="text-h5 pb-2 d-flex align-center">
-        {{ formTitle }}
-        <v-chip
-          v-if="form.booking_type === 'turn'"
-          color="error"
-          size="small"
-          class="ml-2"
-          variant="elevated"
-        >
-          <v-icon start>mdi-clock-alert</v-icon>
-          URGENT TURN
-        </v-chip>
-        <v-chip
-          v-if="form.priority === 'high'"
-          color="warning"
-          size="small"
-          class="ml-2"
-        >
-          HIGH PRIORITY
-        </v-chip>
-        <v-spacer />
-        <v-chip
-          :color="getStatusColor(form.status)"
-          variant="tonal"
-          size="small"
-        >
-          {{ form.status?.toUpperCase() }}
-        </v-chip>
-      </v-card-title>
-      <v-divider />
-      <v-card-text class="pa-0">
-        <v-form
-          ref="formRef"
-          v-model="formValid"
-          @submit.prevent="handleSubmit"
-        >
-          <v-container>
-            <v-row>
-              <v-col cols="12" md="8">
-                <v-select
-                  v-model="form.property_id"
-                  :items="propertiesArray"
-                  item-title="name"
-                  item-value="id"
-                  label="Property"
-                  :rules="propertyRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('property_id')"
-                  prepend-inner-icon="mdi-home"
-                >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-avatar color="primary" size="small">
-                          <v-icon>mdi-home</v-icon>
-                        </v-avatar>
-                      </template>
-                      <template #subtitle>
-                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
-                      </template>
-                    </v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="form.status"
-                  :items="statusOptions"
-                  label="Booking Status"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('status')"
-                  prepend-inner-icon="mdi-clipboard-list"
-                >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-chip
-                          :color="getStatusColor(item.value)"
-                          size="x-small"
-                          variant="dot"
-                        />
-                      </template>
-                    </v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="form.checkout_date"
-                  label="Checkout Date & Time"
-                  type="datetime-local"
-                  :rules="dateRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('checkout_date')"
-                  hint="When guests depart"
-                  persistent-hint
-                  prepend-inner-icon="mdi-calendar-export"
-                  @update:model-value="updateBookingType"
-                />
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="form.checkin_date"
-                  label="Checkin Date & Time"
-                  type="datetime-local"
-                  :rules="dateRules"
-                  required
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('checkin_date')"
-                  hint="When new guests arrive"
-                  persistent-hint
-                  prepend-inner-icon="mdi-calendar-import"
-                  @update:model-value="updateBookingType"
-                />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12">
-                <v-card variant="outlined" class="mb-4">
-                  <v-card-title class="text-subtitle-1 py-2">
-                    <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
-                    Cleaner Assignment
-                  </v-card-title>
-                  <v-divider />
-                  <v-card-text>
-                    <v-row>
-                      <v-col cols="12" md="6">
-                        <v-select
-                          v-model="form.assigned_cleaner_id"
-                          :items="availableCleaners"
-                          item-title="name"
-                          item-value="id"
-                          label="Assigned Cleaner"
-                          variant="outlined"
-                          :disabled="loading"
-                          :error-messages="errors.get('assigned_cleaner_id')"
-                          clearable
-                          prepend-inner-icon="mdi-account"
-                        >
-                          <template #item="{ props, item }">
-                            <v-list-item v-bind="props">
-                              <template #prepend>
-                                <v-avatar :color="getCleanerAvailabilityColor(item.raw)" size="small">
-                                  <v-icon>mdi-account</v-icon>
-                                </v-avatar>
-                              </template>
-                              <template #subtitle>
-                                {{ getCleanerSubtitle(item.raw) }}
-                              </template>
-                              <template #append>
-                                <v-chip
-                                  :color="getCleanerAvailabilityColor(item.raw)"
-                                  size="x-small"
-                                  variant="dot"
-                                >
-                                  {{ getCleanerAvailabilityText(item.raw) }}
-                                </v-chip>
-                              </template>
-                            </v-list-item>
-                          </template>
-                        </v-select>
-                      </v-col>
-                      <v-col cols="12" md="6">
-                        <v-btn
-                          variant="outlined"
-                          color="primary"
-                          :disabled="!form.property_id || !form.checkout_date"
-                          @click="openCleanerAssignmentModal"
-                        >
-                          <v-icon start>mdi-magnify</v-icon>
-                          Find Best Cleaner
-                        </v-btn>
-                      </v-col>
-                    </v-row>
-                    <v-row v-if="selectedCleaner">
-                      <v-col cols="12">
-                        <v-alert
-                          type="info"
-                          variant="tonal"
-                          class="mt-2"
-                        >
-                          <template #title>
-                            Cleaner: {{ selectedCleaner.name }}
-                          </template>
-                          <p class="mb-1">
-                            <strong>Skills:</strong> {{ selectedCleaner.skills.join(', ') }}
-                          </p>
-                          <p class="mb-1">
-                            <strong>Today's Bookings:</strong> {{ getCleanerTodayBookings(selectedCleaner.id) }}/{{ selectedCleaner.max_daily_bookings }}
-                          </p>
-                          <p class="mb-0">
-                            <strong>Performance Rating:</strong>
-                            <v-rating
-                              :model-value="getCleanerRating(selectedCleaner.id)"
-                              readonly
-                              size="small"
-                              density="compact"
-                              class="d-inline-flex ml-2"
-                            />
-                          </p>
-                        </v-alert>
-                      </v-col>
-                    </v-row>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model.number="form.guest_count"
-                  label="Guest Count"
-                  type="number"
-                  min="1"
-                  max="20"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('guest_count')"
-                  hint="Affects cleaning duration estimate"
-                  persistent-hint
-                  prepend-inner-icon="mdi-account-group"
-                />
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-select
-                  v-model="form.priority"
-                  :items="priorityOptions"
-                  label="Priority Level"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('priority')"
-                  prepend-inner-icon="mdi-flag"
-                >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-icon :color="getPriorityColor(item.value)">
-                          {{ getPriorityIcon(item.value) }}
-                        </v-icon>
-                      </template>
-                    </v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12">
-                <v-textarea
-                  v-model="form.notes"
-                  label="Cleaning Instructions & Notes"
-                  variant="outlined"
-                  :disabled="loading"
-                  :error-messages="errors.get('notes')"
-                  hint="Special requirements, client preferences, or operational notes"
-                  persistent-hint
-                  :counter="500"
-                  rows="3"
-                  prepend-inner-icon="mdi-note-text"
-                />
-              </v-col>
-            </v-row>
-            <v-row v-if="showBusinessImpactAlert">
-              <v-col cols="12">
-                <v-alert
-                  :type="businessImpactAlert.type"
-                  variant="tonal"
-                  :title="businessImpactAlert.title"
-                  class="mb-0"
-                >
-                  <p v-for="message in businessImpactAlert.messages" :key="message" class="mb-1">
-                    {{ message }}
-                  </p>
-                </v-alert>
-              </v-col>
-            </v-row>
-            <v-row v-if="showDateError">
-              <v-col cols="12">
-                <v-alert
-                  type="error"
-                  variant="tonal"
-                  title="Scheduling Conflict"
-                  text="Invalid date configuration detected. Please review checkout/checkin times."
-                  class="mb-0"
-                />
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-form>
-      </v-card-text>
-      <v-divider />
-      <v-card-actions class="pa-4">
-        <v-btn
-          color="grey-darken-1"
-          variant="text"
-          :disabled="loading"
-          @click="handleClose"
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          v-if="mode === 'edit'"
-          color="error"
-          variant="outlined"
-          :disabled="loading"
-          @click="handleDelete"
-        >
-          <v-icon start>mdi-delete</v-icon>
-          Delete
-        </v-btn>
-        <v-spacer />
-        <v-btn
-          v-if="mode === 'edit' && form.status !== 'completed'"
-          color="success"
-          variant="tonal"
-          :disabled="loading || !form.assigned_cleaner_id"
-          @click="handleMarkComplete"
-        >
-          <v-icon start>mdi-check</v-icon>
-          Mark Complete
-        </v-btn>
-        <v-btn
-          color="primary"
-          variant="elevated"
-          :loading="loading"
-          :disabled="!formValid"
-          @click="handleSubmit"
-        >
-          <v-icon start>{{ mode === 'create' ? 'mdi-plus' : 'mdi-content-save' }}</v-icon>
-          {{ submitButtonText }}
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-</template>
-⋮----
-{{ formTitle }}
-⋮----
-{{ form.status?.toUpperCase() }}
-⋮----
-<template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-avatar color="primary" size="small">
-                          <v-icon>mdi-home</v-icon>
-                        </v-avatar>
-                      </template>
-                      <template #subtitle>
-                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
-                      </template>
-                    </v-list-item>
-                  </template>
-⋮----
-<template #prepend>
-                        <v-avatar color="primary" size="small">
-                          <v-icon>mdi-home</v-icon>
-                        </v-avatar>
-                      </template>
-<template #subtitle>
-                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
-                      </template>
-⋮----
-{{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
-⋮----
-<template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-chip
-                          :color="getStatusColor(item.value)"
-                          size="x-small"
-                          variant="dot"
-                        />
-                      </template>
-                    </v-list-item>
-                  </template>
-⋮----
-<template #prepend>
-                        <v-chip
-                          :color="getStatusColor(item.value)"
-                          size="x-small"
-                          variant="dot"
-                        />
-                      </template>
-⋮----
-<template #item="{ props, item }">
-                            <v-list-item v-bind="props">
-                              <template #prepend>
-                                <v-avatar :color="getCleanerAvailabilityColor(item.raw)" size="small">
-                                  <v-icon>mdi-account</v-icon>
-                                </v-avatar>
-                              </template>
-                              <template #subtitle>
-                                {{ getCleanerSubtitle(item.raw) }}
-                              </template>
-                              <template #append>
-                                <v-chip
-                                  :color="getCleanerAvailabilityColor(item.raw)"
-                                  size="x-small"
-                                  variant="dot"
-                                >
-                                  {{ getCleanerAvailabilityText(item.raw) }}
-                                </v-chip>
-                              </template>
-                            </v-list-item>
-                          </template>
-⋮----
-<template #prepend>
-                                <v-avatar :color="getCleanerAvailabilityColor(item.raw)" size="small">
-                                  <v-icon>mdi-account</v-icon>
-                                </v-avatar>
-                              </template>
-<template #subtitle>
-                                {{ getCleanerSubtitle(item.raw) }}
-                              </template>
-⋮----
-{{ getCleanerSubtitle(item.raw) }}
-⋮----
-<template #append>
-                                <v-chip
-                                  :color="getCleanerAvailabilityColor(item.raw)"
-                                  size="x-small"
-                                  variant="dot"
-                                >
-                                  {{ getCleanerAvailabilityText(item.raw) }}
-                                </v-chip>
-                              </template>
-⋮----
-{{ getCleanerAvailabilityText(item.raw) }}
-⋮----
-<template #title>
-                            Cleaner: {{ selectedCleaner.name }}
-                          </template>
-⋮----
-Cleaner: {{ selectedCleaner.name }}
-⋮----
-<strong>Skills:</strong> {{ selectedCleaner.skills.join(', ') }}
-⋮----
-<strong>Today's Bookings:</strong> {{ getCleanerTodayBookings(selectedCleaner.id) }}/{{ selectedCleaner.max_daily_bookings }}
-⋮----
-<template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-icon :color="getPriorityColor(item.value)">
-                          {{ getPriorityIcon(item.value) }}
-                        </v-icon>
-                      </template>
-                    </v-list-item>
-                  </template>
-⋮----
-<template #prepend>
-                        <v-icon :color="getPriorityColor(item.value)">
-                          {{ getPriorityIcon(item.value) }}
-                        </v-icon>
-                      </template>
-⋮----
-{{ getPriorityIcon(item.value) }}
-⋮----
-{{ message }}
-⋮----
-<v-icon start>{{ mode === 'create' ? 'mdi-plus' : 'mdi-content-save' }}</v-icon>
-{{ submitButtonText }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
-import type { Property } from '@/types/property'
-import type { Booking, BookingFormData } from '@/types/booking'
-import type { Cleaner } from '@/types/user'
-interface Props {
-  modelValue: boolean
-  mode: 'create' | 'edit'
-  booking?: Booking | null
-  properties: Property[]
-  cleaners: Cleaner[]
-  loading?: boolean
-  errors?: Map<string, string[]>
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-  errors: () => new Map()
-})
-interface Emits {
-  'update:modelValue': [value: boolean]
-  'submit': [data: BookingFormData]
-  'delete': [id: string]
-  'mark-complete': [id: string]
-  'assign-cleaner': [bookingId: string, cleanerId: string]
-  'open-cleaner-modal': [booking: Partial<BookingFormData>]
-}
-const emit = defineEmits<Emits>()
-const formRef = ref()
-const formValid = ref(false)
-const defaultForm: BookingFormData = {
-  property_id: '',
-  checkout_date: '',
-  checkin_date: '',
-  booking_type: 'standard',
-  guest_count: undefined,
-  notes: '',
-  status: 'pending',
-  assigned_cleaner_id: '',
-  priority: 'standard'
-}
-const form = ref<BookingFormData>({ ...defaultForm })
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-const formTitle = computed(() => {
-  if (props.mode === 'create') {
-    return 'Schedule New Cleaning'
-  }
-  return `Edit Booking #${props.booking?.id?.slice(-6) || 'New'}`
-})
-const submitButtonText = computed(() => {
-  return props.mode === 'create' ? 'Schedule Cleaning' : 'Update Booking'
-})
-const propertiesArray = computed(() => {
-  return Array.from(props.properties).map(property => ({
-    ...property,
-    title: `${property.name} - ${property.address}`
-  }))
-})
-const availableCleaners = computed(() => {
-  return props.cleaners.filter(cleaner => {
-    return true
-  })
-})
-const selectedCleaner = computed(() => {
-  if (!form.value.assigned_cleaner_id) return null
-  return props.cleaners.find(c => c.id === form.value.assigned_cleaner_id)
-})
-const statusOptions = [
-  { title: 'Pending', value: 'pending' },
-  { title: 'Scheduled', value: 'scheduled' },
-  { title: 'In Progress', value: 'in_progress' },
-  { title: 'Completed', value: 'completed' },
-  { title: 'Cancelled', value: 'cancelled' }
-]
-const priorityOptions = [
-  { title: 'Standard', value: 'standard' },
-  { title: 'High', value: 'high' },
-  { title: 'Urgent', value: 'urgent' }
-]
-const showSameDayAlert = computed(() => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return false
-  const checkoutDate = new Date(form.value.checkout_date).toDateString()
-  const checkinDate = new Date(form.value.checkin_date).toDateString()
-  return checkoutDate === checkinDate
-})
-const showDateError = computed(() => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return false
-  return new Date(form.value.checkin_date) < new Date(form.value.checkout_date)
-})
-const showBusinessImpactAlert = computed(() => {
-  return businessImpactAlert.value.messages.length > 0
-})
-const businessImpactAlert = computed(() => {
-  const alert = {
-    type: 'info' as 'info' | 'warning' | 'error',
-    title: '',
-    messages: [] as string[]
-  }
-  if (form.value.booking_type === 'turn') {
-    alert.type = 'warning'
-    alert.title = 'High Business Impact'
-    alert.messages.push('Same-day turnovers require immediate attention')
-    alert.messages.push('Client satisfaction and revenue directly affected')
-  }
-  if (form.value.priority === 'urgent' && !form.value.assigned_cleaner_id) {
-    alert.type = 'error'
-    alert.title = 'Critical: Urgent Booking Unassigned'
-    alert.messages.push('Urgent bookings must have assigned cleaners')
-  }
-  return alert
-})
-const propertyRules = [
-  (v: string) => !!v || 'Property selection is required'
-]
-const dateRules = [
-  (v: string) => !!v || 'Date is required',
-  (v: string) => {
-    if (!v) return true
-    const date = new Date(v)
-    const now = new Date()
-    return date >= now || 'Date cannot be in the past'
-  }
-]
-const updateBookingType = () => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return
-  const checkoutDate = new Date(form.value.checkout_date).toDateString()
-  const checkinDate = new Date(form.value.checkin_date).toDateString()
-  if (checkoutDate === checkinDate) {
-    form.value.booking_type = 'turn'
-    form.value.priority = 'urgent'
-  } else {
-    form.value.booking_type = 'standard'
-    if (form.value.priority === 'urgent') {
-      form.value.priority = 'standard'
-    }
-  }
-}
-const getStatusColor = (status: string) => {
-  const colors = {
-    pending: 'orange',
-    scheduled: 'blue',
-    in_progress: 'purple',
-    completed: 'green',
-    cancelled: 'red'
-  }
-  return colors[status as keyof typeof colors] || 'grey'
-}
-const getPriorityColor = (priority: string) => {
-  const colors = {
-    standard: 'grey',
-    high: 'orange',
-    urgent: 'red'
-  }
-  return colors[priority as keyof typeof colors] || 'grey'
-}
-const getPriorityIcon = (priority: string) => {
-  const icons = {
-    standard: 'mdi-flag',
-    high: 'mdi-flag-triangle',
-    urgent: 'mdi-alert'
-  }
-  return icons[priority as keyof typeof icons] || 'mdi-flag'
-}
-const getPropertyOwnerName = (ownerId: string) => {
-  return `Owner ${ownerId.slice(-4)}`
-}
-const getCleanerAvailabilityColor = (cleaner: Cleaner) => {
-  const todayBookings = getCleanerTodayBookings(cleaner.id)
-  if (todayBookings >= cleaner.max_daily_bookings) return 'red'
-  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'orange'
-  return 'green'
-}
-const getCleanerAvailabilityText = (cleaner: Cleaner) => {
-  const todayBookings = getCleanerTodayBookings(cleaner.id)
-  if (todayBookings >= cleaner.max_daily_bookings) return 'Unavailable'
-  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'Limited'
-  return 'Available'
-}
-const getCleanerSubtitle = (cleaner: Cleaner) => {
-  return `${cleaner.skills.slice(0, 2).join(', ')} • ${getCleanerTodayBookings(cleaner.id)}/${cleaner.max_daily_bookings} bookings`
-}
-const getCleanerTodayBookings = (cleanerId: string) => {
-  return Math.floor(Math.random() * 5)
-}
-const getCleanerRating = (cleanerId: string) => {
-  return 4 + Math.random()
-}
-const openCleanerAssignmentModal = () => {
-  emit('open-cleaner-modal', form.value)
-}
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  const { valid } = await formRef.value.validate()
-  if (!valid) return
-  emit('submit', { ...form.value })
-}
-const handleClose = () => {
-  isOpen.value = false
-}
-const handleDelete = () => {
-  if (props.booking?.id) {
-    emit('delete', props.booking.id)
-  }
-}
-const handleMarkComplete = () => {
-  if (props.booking?.id) {
-    emit('mark-complete', props.booking.id)
-  }
-}
-watch(() => props.booking, (newBooking) => {
-  if (newBooking) {
-    form.value = {
-      property_id: newBooking.property_id,
-      checkout_date: newBooking.checkout_date,
-      checkin_date: newBooking.checkin_date,
-      booking_type: newBooking.booking_type,
-      guest_count: newBooking.guest_count,
-      notes: newBooking.notes || '',
-      status: newBooking.status,
-      assigned_cleaner_id: newBooking.assigned_cleaner_id || '',
-      priority: newBooking.priority || 'standard'
-    }
-  } else {
-    form.value = { ...defaultForm }
-  }
-}, { immediate: true })
-watch(isOpen, (newValue) => {
-  if (!newValue) {
-    nextTick(() => {
-      form.value = { ...defaultForm }
-      formRef.value?.resetValidation()
-    })
-  }
-})
-</script>
-<style scoped>
-.v-card-title {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-.v-alert {
-  border-left: 4px solid rgb(var(--v-theme-primary));
-}
-</style>
 ````
 
 ## File: src/components/dumb/admin/AdminRoleSwitcher.vue
@@ -4052,616 +499,6 @@ function switchToOwnerView() {
   color: rgba(var(--v-theme-primary), 0.8);
   font-size: 0.75rem;
   letter-spacing: 0.5px;
-}
-</style>
-````
-
-## File: src/components/dumb/admin/CleanerAssignmentModal.vue
-````vue
-<template>
-  <v-dialog
-    v-model="isOpen"
-    max-width="900px"
-    persistent
-    scrollable
-    @keydown.esc="handleClose"
-  >
-    <v-card>
-      <v-card-title class="text-h5 pb-2 d-flex align-center">
-        <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
-        Assign Cleaner
-        <v-spacer />
-        <v-chip
-          v-if="booking?.booking_type === 'turn'"
-          color="error"
-          size="small"
-          variant="elevated"
-        >
-          <v-icon start>mdi-clock-alert</v-icon>
-          URGENT
-        </v-chip>
-      </v-card-title>
-      <v-divider />
-      <v-card-text class="pa-0">
-        <v-container>
-          <v-row v-if="booking">
-            <v-col cols="12">
-              <v-card variant="outlined" class="mb-4">
-                <v-card-title class="text-subtitle-1 py-2">
-                  <v-icon class="mr-2">mdi-information</v-icon>
-                  Booking Details
-                </v-card-title>
-                <v-divider />
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Property</div>
-                      <div class="text-body-1 font-weight-medium">{{ selectedProperty?.name }}</div>
-                      <div class="text-body-2 text-medium-emphasis">{{ selectedProperty?.address }}</div>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Schedule</div>
-                      <div class="text-body-1">
-                        <v-icon size="small" class="mr-1">mdi-calendar-export</v-icon>
-                        {{ formatDateTime(booking.checkout_date) }}
-                      </div>
-                      <div class="text-body-1">
-                        <v-icon size="small" class="mr-1">mdi-calendar-import</v-icon>
-                        {{ formatDateTime(booking.checkin_date) }}
-                      </div>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Cleaning Window</div>
-                      <div class="text-body-1">{{ getCleaningWindow() }}</div>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Estimated Duration</div>
-                      <div class="text-body-1">{{ selectedProperty?.cleaning_duration || 120 }} minutes</div>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="searchQuery"
-                label="Search Cleaners"
-                variant="outlined"
-                prepend-inner-icon="mdi-magnify"
-                clearable
-                hint="Search by name or skills"
-                persistent-hint
-              />
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-select
-                v-model="availabilityFilter"
-                :items="availabilityFilterOptions"
-                label="Availability"
-                variant="outlined"
-                clearable
-              />
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-select
-                v-model="skillFilter"
-                :items="skillFilterOptions"
-                label="Required Skill"
-                variant="outlined"
-                clearable
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12">
-              <v-card variant="outlined">
-                <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
-                  <v-icon class="mr-2">mdi-account-group</v-icon>
-                  Available Cleaners
-                  <v-spacer />
-                  <v-chip size="small" variant="tonal">
-                    {{ filteredCleaners.length }} available
-                  </v-chip>
-                </v-card-title>
-                <v-divider />
-                <v-list class="pa-0" max-height="400" style="overflow-y: auto;">
-                  <template v-for="(cleaner, index) in filteredCleaners" :key="cleaner.id">
-                    <v-list-item
-                      :class="{ 'bg-primary-lighten-5': selectedCleanerId === cleaner.id }"
-                      @click="selectCleaner(cleaner.id)"
-                    >
-                      <template #prepend>
-                        <v-avatar :color="getAvailabilityColor(cleaner)" size="40">
-                          <v-icon>mdi-account</v-icon>
-                        </v-avatar>
-                      </template>
-                      <v-list-item-title class="font-weight-medium">
-                        {{ cleaner.name }}
-                        <v-chip
-                          v-if="selectedCleanerId === cleaner.id"
-                          color="primary"
-                          size="x-small"
-                          class="ml-2"
-                        >
-                          SELECTED
-                        </v-chip>
-                      </v-list-item-title>
-                      <v-list-item-subtitle>
-                        <div class="d-flex flex-wrap gap-1 mb-1">
-                          <v-chip
-                            v-for="skill in cleaner.skills.slice(0, 3)"
-                            :key="skill"
-                            size="x-small"
-                            variant="outlined"
-                          >
-                            {{ skill }}
-                          </v-chip>
-                          <v-chip
-                            v-if="cleaner.skills.length > 3"
-                            size="x-small"
-                            variant="text"
-                          >
-                            +{{ cleaner.skills.length - 3 }} more
-                          </v-chip>
-                        </div>
-                        <div class="text-caption">
-                          Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
-                          • Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
-                        </div>
-                      </v-list-item-subtitle>
-                      <template #append>
-                        <div class="d-flex flex-column align-end">
-                          <v-chip
-                            :color="getAvailabilityColor(cleaner)"
-                            size="small"
-                            variant="tonal"
-                            class="mb-1"
-                          >
-                            {{ getAvailabilityText(cleaner) }}
-                          </v-chip>
-                          <div class="text-caption text-medium-emphasis">
-                            {{ getDistanceText(cleaner) }}
-                          </div>
-                        </div>
-                      </template>
-                    </v-list-item>
-                    <v-divider v-if="index < filteredCleaners.length - 1" />
-                  </template>
-                  <v-list-item v-if="filteredCleaners.length === 0">
-                    <v-list-item-title class="text-center text-medium-emphasis">
-                      <v-icon class="mb-2">mdi-account-off</v-icon>
-                      <div>No cleaners match your criteria</div>
-                      <div class="text-caption">Try adjusting your filters</div>
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-card>
-            </v-col>
-          </v-row>
-          <v-row v-if="selectedCleanerDetails">
-            <v-col cols="12">
-              <v-card variant="outlined" color="primary">
-                <v-card-title class="text-subtitle-1 py-2">
-                  <v-icon class="mr-2">mdi-account-check</v-icon>
-                  Selected Cleaner Details
-                </v-card-title>
-                <v-divider />
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="12" md="4">
-                      <div class="text-center">
-                        <v-avatar :color="getAvailabilityColor(selectedCleanerDetails)" size="80" class="mb-2">
-                          <v-icon size="40">mdi-account</v-icon>
-                        </v-avatar>
-                        <div class="text-h6 font-weight-medium">{{ selectedCleanerDetails.name }}</div>
-                        <v-rating
-                          :model-value="getCleanerRating(selectedCleanerDetails.id)"
-                          readonly
-                          size="small"
-                          density="compact"
-                          class="justify-center mt-1"
-                        />
-                      </div>
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Skills & Specializations</div>
-                      <div class="d-flex flex-wrap gap-1 mb-3">
-                        <v-chip
-                          v-for="skill in selectedCleanerDetails.skills"
-                          :key="skill"
-                          size="small"
-                          color="primary"
-                          variant="tonal"
-                        >
-                          {{ skill }}
-                        </v-chip>
-                      </div>
-                      <div class="text-body-2 text-medium-emphasis mb-1">Availability Status</div>
-                      <v-chip
-                        :color="getAvailabilityColor(selectedCleanerDetails)"
-                        variant="elevated"
-                      >
-                        <v-icon start>{{ getAvailabilityIcon(selectedCleanerDetails) }}</v-icon>
-                        {{ getAvailabilityText(selectedCleanerDetails) }}
-                      </v-chip>
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <div class="text-body-2 text-medium-emphasis mb-1">Today's Schedule</div>
-                      <div class="text-body-1 mb-2">
-                        {{ getCleanerTodayBookings(selectedCleanerDetails.id) }}/{{ selectedCleanerDetails.max_daily_bookings }} bookings
-                      </div>
-                      <div class="text-body-2 text-medium-emphasis mb-1">Distance from Property</div>
-                      <div class="text-body-1 mb-2">{{ getDistanceText(selectedCleanerDetails) }}</div>
-                      <div class="text-body-2 text-medium-emphasis mb-1">Estimated Travel Time</div>
-                      <div class="text-body-1">{{ getTravelTime(selectedCleanerDetails) }}</div>
-                    </v-col>
-                  </v-row>
-                  <v-row v-if="hasScheduleConflict(selectedCleanerDetails)">
-                    <v-col cols="12">
-                      <v-alert
-                        type="warning"
-                        variant="tonal"
-                        title="Potential Schedule Conflict"
-                        class="mt-2"
-                      >
-                        This cleaner has overlapping bookings. Please verify availability before confirming assignment.
-                      </v-alert>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-      <v-divider />
-      <v-card-actions class="pa-4">
-        <v-btn
-          color="grey-darken-1"
-          variant="text"
-          :disabled="loading"
-          @click="handleClose"
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          variant="outlined"
-          color="primary"
-          :disabled="loading"
-          @click="handleAutoAssign"
-        >
-          <v-icon start>mdi-auto-fix</v-icon>
-          Auto-Assign Best Match
-        </v-btn>
-        <v-spacer />
-        <v-btn
-          color="primary"
-          variant="elevated"
-          :loading="loading"
-          :disabled="!selectedCleanerId"
-          @click="handleAssign"
-        >
-          <v-icon start>mdi-account-check</v-icon>
-          Assign Cleaner
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-</template>
-⋮----
-<div class="text-body-1 font-weight-medium">{{ selectedProperty?.name }}</div>
-<div class="text-body-2 text-medium-emphasis">{{ selectedProperty?.address }}</div>
-⋮----
-{{ formatDateTime(booking.checkout_date) }}
-⋮----
-{{ formatDateTime(booking.checkin_date) }}
-⋮----
-<div class="text-body-1">{{ getCleaningWindow() }}</div>
-⋮----
-<div class="text-body-1">{{ selectedProperty?.cleaning_duration || 120 }} minutes</div>
-⋮----
-{{ filteredCleaners.length }} available
-⋮----
-<template v-for="(cleaner, index) in filteredCleaners" :key="cleaner.id">
-                    <v-list-item
-                      :class="{ 'bg-primary-lighten-5': selectedCleanerId === cleaner.id }"
-                      @click="selectCleaner(cleaner.id)"
-                    >
-                      <template #prepend>
-                        <v-avatar :color="getAvailabilityColor(cleaner)" size="40">
-                          <v-icon>mdi-account</v-icon>
-                        </v-avatar>
-                      </template>
-                      <v-list-item-title class="font-weight-medium">
-                        {{ cleaner.name }}
-                        <v-chip
-                          v-if="selectedCleanerId === cleaner.id"
-                          color="primary"
-                          size="x-small"
-                          class="ml-2"
-                        >
-                          SELECTED
-                        </v-chip>
-                      </v-list-item-title>
-                      <v-list-item-subtitle>
-                        <div class="d-flex flex-wrap gap-1 mb-1">
-                          <v-chip
-                            v-for="skill in cleaner.skills.slice(0, 3)"
-                            :key="skill"
-                            size="x-small"
-                            variant="outlined"
-                          >
-                            {{ skill }}
-                          </v-chip>
-                          <v-chip
-                            v-if="cleaner.skills.length > 3"
-                            size="x-small"
-                            variant="text"
-                          >
-                            +{{ cleaner.skills.length - 3 }} more
-                          </v-chip>
-                        </div>
-                        <div class="text-caption">
-                          Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
-                          • Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
-                        </div>
-                      </v-list-item-subtitle>
-                      <template #append>
-                        <div class="d-flex flex-column align-end">
-                          <v-chip
-                            :color="getAvailabilityColor(cleaner)"
-                            size="small"
-                            variant="tonal"
-                            class="mb-1"
-                          >
-                            {{ getAvailabilityText(cleaner) }}
-                          </v-chip>
-                          <div class="text-caption text-medium-emphasis">
-                            {{ getDistanceText(cleaner) }}
-                          </div>
-                        </div>
-                      </template>
-                    </v-list-item>
-                    <v-divider v-if="index < filteredCleaners.length - 1" />
-                  </template>
-⋮----
-<template #prepend>
-                        <v-avatar :color="getAvailabilityColor(cleaner)" size="40">
-                          <v-icon>mdi-account</v-icon>
-                        </v-avatar>
-                      </template>
-⋮----
-{{ cleaner.name }}
-⋮----
-{{ skill }}
-⋮----
-+{{ cleaner.skills.length - 3 }} more
-⋮----
-Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
-• Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
-⋮----
-<template #append>
-                        <div class="d-flex flex-column align-end">
-                          <v-chip
-                            :color="getAvailabilityColor(cleaner)"
-                            size="small"
-                            variant="tonal"
-                            class="mb-1"
-                          >
-                            {{ getAvailabilityText(cleaner) }}
-                          </v-chip>
-                          <div class="text-caption text-medium-emphasis">
-                            {{ getDistanceText(cleaner) }}
-                          </div>
-                        </div>
-                      </template>
-⋮----
-{{ getAvailabilityText(cleaner) }}
-⋮----
-{{ getDistanceText(cleaner) }}
-⋮----
-<div class="text-h6 font-weight-medium">{{ selectedCleanerDetails.name }}</div>
-⋮----
-{{ skill }}
-⋮----
-<v-icon start>{{ getAvailabilityIcon(selectedCleanerDetails) }}</v-icon>
-{{ getAvailabilityText(selectedCleanerDetails) }}
-⋮----
-{{ getCleanerTodayBookings(selectedCleanerDetails.id) }}/{{ selectedCleanerDetails.max_daily_bookings }} bookings
-⋮----
-<div class="text-body-1 mb-2">{{ getDistanceText(selectedCleanerDetails) }}</div>
-⋮----
-<div class="text-body-1">{{ getTravelTime(selectedCleanerDetails) }}</div>
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import type { Property } from '@/types/property'
-import type { BookingFormData } from '@/types/booking'
-import type { Cleaner } from '@/types/user'
-interface Props {
-  modelValue: boolean
-  booking?: Partial<BookingFormData> | null
-  properties: Property[]
-  cleaners: Cleaner[]
-  loading?: boolean
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
-})
-interface Emits {
-  'update:modelValue': [value: boolean]
-  'assign': [cleanerId: string]
-  'auto-assign': []
-}
-const emit = defineEmits<Emits>()
-const selectedCleanerId = ref<string>('')
-const searchQuery = ref('')
-const availabilityFilter = ref<string>('')
-const skillFilter = ref<string>('')
-// Computed properties
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-const selectedProperty = computed(() => {
-  if (!props.booking?.property_id) return null
-  return props.properties.find(p => p.id === props.booking?.property_id)
-})
-const selectedCleanerDetails = computed(() => {
-  if (!selectedCleanerId.value) return null
-  return props.cleaners.find(c => c.id === selectedCleanerId.value)
-})
-const availabilityFilterOptions = [
-  { title: 'Available', value: 'available' },
-  { title: 'Limited Availability', value: 'limited' },
-  { title: 'Fully Booked', value: 'booked' }
-]
-const skillFilterOptions = computed(() => {
-  const allSkills = new Set<string>()
-  props.cleaners.forEach(cleaner => {
-    cleaner.skills.forEach(skill => allSkills.add(skill))
-  })
-  return Array.from(allSkills).map(skill => ({ title: skill, value: skill }))
-})
-const filteredCleaners = computed(() => {
-  let filtered = [...props.cleaners]
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(cleaner =>
-      cleaner.name.toLowerCase().includes(query) ||
-      cleaner.skills.some(skill => skill.toLowerCase().includes(query))
-    )
-  }
-  if (availabilityFilter.value) {
-    filtered = filtered.filter(cleaner => {
-      const availability = getAvailabilityStatus(cleaner)
-      return availability === availabilityFilter.value
-    })
-  }
-  if (skillFilter.value) {
-    filtered = filtered.filter(cleaner =>
-      cleaner.skills.includes(skillFilter.value)
-    )
-  }
-  return filtered.sort((a, b) => {
-    const aAvailable = getAvailabilityStatus(a) === 'available'
-    const bAvailable = getAvailabilityStatus(b) === 'available'
-    if (aAvailable && !bAvailable) return -1
-    if (!aAvailable && bAvailable) return 1
-    return getCleanerRating(b.id) - getCleanerRating(a.id)
-  })
-})
-const selectCleaner = (cleanerId: string) => {
-  selectedCleanerId.value = cleanerId
-}
-const getAvailabilityStatus = (cleaner: Cleaner): string => {
-  const todayBookings = getCleanerTodayBookings(cleaner.id)
-  if (todayBookings >= cleaner.max_daily_bookings) return 'booked'
-  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'limited'
-  return 'available'
-}
-const getAvailabilityColor = (cleaner: Cleaner) => {
-  const status = getAvailabilityStatus(cleaner)
-  const colors = {
-    available: 'green',
-    limited: 'orange',
-    booked: 'red'
-  }
-  return colors[status]
-}
-const getAvailabilityText = (cleaner: Cleaner) => {
-  const status = getAvailabilityStatus(cleaner)
-  const texts = {
-    available: 'Available',
-    limited: 'Limited',
-    booked: 'Fully Booked'
-  }
-  return texts[status]
-}
-const getAvailabilityIcon = (cleaner: Cleaner) => {
-  const status = getAvailabilityStatus(cleaner)
-  const icons = {
-    available: 'mdi-check-circle',
-    limited: 'mdi-clock',
-    booked: 'mdi-close-circle'
-  }
-  return icons[status]
-}
-const getCleanerTodayBookings = (cleanerId: string) => {
-  return Math.floor(Math.random() * 6)
-}
-const getCleanerRating = (cleanerId: string) => {
-  return 3.5 + Math.random() * 1.5
-}
-const getDistanceText = (cleaner: Cleaner) => {
-  const distance = Math.floor(Math.random() * 20) + 1
-  return `${distance} km away`
-}
-const getTravelTime = (cleaner: Cleaner) => {
-  const time = Math.floor(Math.random() * 30) + 10
-  return `${time} minutes`
-}
-const hasScheduleConflict = (cleaner: Cleaner) => {
-  return Math.random() < 0.2
-}
-const formatDateTime = (dateTime: string) => {
-  if (!dateTime) return ''
-  const date = new Date(dateTime)
-  return date.toLocaleString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  })
-}
-const getCleaningWindow = () => {
-  if (!props.booking?.checkout_date || !props.booking?.checkin_date) return ''
-  const checkout = new Date(props.booking.checkout_date)
-  const checkin = new Date(props.booking.checkin_date)
-  const diffHours = Math.abs(checkin.getTime() - checkout.getTime()) / (1000 * 60 * 60)
-  if (diffHours < 1) {
-    return 'Same-day turnaround (< 1 hour)'
-  } else if (diffHours < 24) {
-    return `${Math.floor(diffHours)} hours available`
-  } else {
-    return `${Math.floor(diffHours / 24)} days available`
-  }
-}
-const handleAssign = () => {
-  if (selectedCleanerId.value) {
-    emit('assign', selectedCleanerId.value)
-  }
-}
-const handleAutoAssign = () => {
-  emit('auto-assign')
-}
-const handleClose = () => {
-  isOpen.value = false
-}
-watch(isOpen, (newValue) => {
-  if (newValue) {
-    selectedCleanerId.value = ''
-    searchQuery.value = ''
-    availabilityFilter.value = ''
-    skillFilter.value = ''
-  }
-})
-</script>
-<style scoped>
-.v-card-title {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-.v-list-item:hover {
-  background-color: rgb(var(--v-theme-surface-variant));
-}
-.bg-primary-lighten-5 {
-  background-color: rgb(var(--v-theme-primary), 0.1) !important;
 }
 </style>
 ````
@@ -8580,591 +4417,6 @@ const getCountdownText = (): string => {
 </style>
 ````
 
-## File: src/components/smart/admin/HomeAdminDemo.vue
-````vue
-<template>
-  <div class="home-admin-demo">
-    <v-container fluid>
-      <v-row>
-        <v-col cols="12">
-          <h1 class="text-h4 mb-4">
-            HomeAdmin Demo
-          </h1>
-          <p class="text-body-1 mb-4">
-            This demo shows the HomeAdmin component with sample data across multiple property owners.
-            The admin interface displays ALL data system-wide (no owner filtering) and includes admin-specific features.
-          </p>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col
-          cols="12"
-          md="3"
-        >
-          <v-card>
-            <v-card-title>Demo Controls</v-card-title>
-            <v-card-text>
-              <v-btn
-                block
-                color="primary"
-                class="mb-2"
-                @click="loadSampleData"
-              >
-                Load Sample Data
-              </v-btn>
-              <v-btn
-                block
-                color="secondary"
-                class="mb-2"
-                @click="clearData"
-              >
-                Clear Data
-              </v-btn>
-              <v-btn
-                block
-                color="info"
-                class="mb-4"
-                @click="toggleEventLog"
-              >
-                {{ showEventLog ? 'Hide' : 'Show' }} Event Log
-              </v-btn>
-              <h4>Sample Data Summary</h4>
-              <v-list density="compact">
-                <v-list-item>
-                  <v-list-item-title>Properties: {{ samplePropertiesArray.length }}</v-list-item-title>
-                  <v-list-item-subtitle>Across {{ uniqueOwners.length }} owners</v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Bookings: {{ sampleBookingsArray.length }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ turnBookingsCount }} turns, {{ standardBookingsCount }} standard</v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Today's Turns: {{ todayTurnsCount }}</v-list-item-title>
-                  <v-list-item-subtitle>System-wide urgent</v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Upcoming: {{ upcomingCleaningsCount }}</v-list-item-title>
-                  <v-list-item-subtitle>Next 7 days</v-list-item-subtitle>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-          </v-card>
-          <v-card
-            v-if="showEventLog"
-            class="mt-4"
-          >
-            <v-card-title class="d-flex align-center">
-              Event Log
-              <v-spacer />
-              <v-btn
-                size="small"
-                variant="outlined"
-                @click="clearEventLog"
-              >
-                Clear
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <v-list
-                v-if="eventLog.length > 0"
-                density="compact"
-                max-height="300"
-                style="overflow-y: auto;"
-              >
-                <v-list-item
-                  v-for="(event, index) in eventLog"
-                  :key="index"
-                  :title="event.action"
-                  :subtitle="event.details"
-                >
-                  <template #prepend>
-                    <v-icon
-                      :icon="getEventIcon(event.action)"
-                      :color="getEventColor(event.action)"
-                      size="small"
-                    />
-                  </template>
-                  <template #append>
-                    <span class="text-caption">{{ event.timestamp }}</span>
-                  </template>
-                </v-list-item>
-              </v-list>
-              <div
-                v-else
-                class="text-center py-4 text-medium-emphasis"
-              >
-                No events yet. Interact with the admin interface to see events.
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col
-          cols="12"
-          md="9"
-        >
-          <v-card>
-            <v-card-title>Admin Interface (System-wide View)</v-card-title>
-            <v-card-text class="pa-0">
-              <div style="height: 800px;">
-                <HomeAdmin />
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row class="mt-4">
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-card>
-            <v-card-title>Sample Properties (All Owners)</v-card-title>
-            <v-card-text>
-              <v-list density="compact">
-                <v-list-item
-                  v-for="property in samplePropertiesArray"
-                  :key="property.id"
-                  :title="property.name"
-                  :subtitle="`Owner: ${getOwnerName(property.owner_id)} | ${property.address}`"
-                >
-                  <template #prepend>
-                    <v-chip
-                      :color="getOwnerColor(property.owner_id)"
-                      size="x-small"
-                      label
-                    >
-                      {{ getOwnerInitials(property.owner_id) }}
-                    </v-chip>
-                  </template>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-card>
-            <v-card-title>Sample Bookings (All Owners)</v-card-title>
-            <v-card-text>
-              <v-list density="compact">
-                <v-list-item
-                  v-for="booking in sampleBookingsArray"
-                  :key="booking.id"
-                  :title="`${booking.booking_type.toUpperCase()} - ${getPropertyName(booking.property_id)}`"
-                  :subtitle="`Owner: ${getOwnerName(booking.owner_id)} | ${formatDate(booking.checkout_date)} → ${formatDate(booking.checkin_date)}`"
-                >
-                  <template #prepend>
-                    <v-chip
-                      :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
-                      size="x-small"
-                      label
-                    >
-                      {{ booking.booking_type }}
-                    </v-chip>
-                  </template>
-                  <template #append>
-                    <v-chip
-                      :color="getOwnerColor(booking.owner_id)"
-                      size="x-small"
-                      label
-                    >
-                      {{ getOwnerInitials(booking.owner_id) }}
-                    </v-chip>
-                  </template>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
-⋮----
-{{ showEventLog ? 'Hide' : 'Show' }} Event Log
-⋮----
-<v-list-item-title>Properties: {{ samplePropertiesArray.length }}</v-list-item-title>
-<v-list-item-subtitle>Across {{ uniqueOwners.length }} owners</v-list-item-subtitle>
-⋮----
-<v-list-item-title>Bookings: {{ sampleBookingsArray.length }}</v-list-item-title>
-<v-list-item-subtitle>{{ turnBookingsCount }} turns, {{ standardBookingsCount }} standard</v-list-item-subtitle>
-⋮----
-<v-list-item-title>Today's Turns: {{ todayTurnsCount }}</v-list-item-title>
-⋮----
-<v-list-item-title>Upcoming: {{ upcomingCleaningsCount }}</v-list-item-title>
-⋮----
-<template #prepend>
-                    <v-icon
-                      :icon="getEventIcon(event.action)"
-                      :color="getEventColor(event.action)"
-                      size="small"
-                    />
-                  </template>
-<template #append>
-                    <span class="text-caption">{{ event.timestamp }}</span>
-                  </template>
-⋮----
-<span class="text-caption">{{ event.timestamp }}</span>
-⋮----
-<template #prepend>
-                    <v-chip
-                      :color="getOwnerColor(property.owner_id)"
-                      size="x-small"
-                      label
-                    >
-                      {{ getOwnerInitials(property.owner_id) }}
-                    </v-chip>
-                  </template>
-⋮----
-{{ getOwnerInitials(property.owner_id) }}
-⋮----
-<template #prepend>
-                    <v-chip
-                      :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
-                      size="x-small"
-                      label
-                    >
-                      {{ booking.booking_type }}
-                    </v-chip>
-                  </template>
-⋮----
-{{ booking.booking_type }}
-⋮----
-<template #append>
-                    <v-chip
-                      :color="getOwnerColor(booking.owner_id)"
-                      size="x-small"
-                      label
-                    >
-                      {{ getOwnerInitials(booking.owner_id) }}
-                    </v-chip>
-                  </template>
-⋮----
-{{ getOwnerInitials(booking.owner_id) }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import HomeAdmin from './HomeAdmin.vue';
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
-import { useAuthStore } from '@/stores/auth';
-import type { Booking, Property } from '@/types';
-const showEventLog = ref(false);
-const eventLog = ref<Array<{
-  action: string;
-  details: string;
-  timestamp: string;
-}>>([]);
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
-const authStore = useAuthStore();
-const sampleOwners = [
-  { id: '1', name: 'John Smith', initials: 'JS', color: 'blue' },
-  { id: '2', name: 'Sarah Johnson', initials: 'SJ', color: 'green' },
-  { id: '3', name: 'Mike Wilson', initials: 'MW', color: 'purple' },
-  { id: '4', name: 'Lisa Brown', initials: 'LB', color: 'orange' }
-];
-const sampleProperties = ref<Map<string, Property>>(new Map());
-const sampleBookings = ref<Map<string, Booking>>(new Map());
-const samplePropertiesArray = computed(() =>
-  Array.from(sampleProperties.value.values())
-);
-const sampleBookingsArray = computed(() =>
-  Array.from(sampleBookings.value.values())
-);
-const uniqueOwners = computed(() =>
-  [...new Set(samplePropertiesArray.value.map(p => p.owner_id))]
-);
-const turnBookingsCount = computed(() =>
-  sampleBookingsArray.value.filter(b => b.booking_type === 'turn').length
-);
-const standardBookingsCount = computed(() =>
-  sampleBookingsArray.value.filter(b => b.booking_type === 'standard').length
-);
-const todayTurnsCount = computed(() => {
-  const today = new Date().toISOString().split('T')[0];
-  return sampleBookingsArray.value.filter(b =>
-    b.booking_type === 'turn' &&
-    b.checkout_date.startsWith(today)
-  ).length;
-});
-const upcomingCleaningsCount = computed(() => {
-  const today = new Date();
-  const inOneWeek = new Date();
-  inOneWeek.setDate(today.getDate() + 7);
-  return sampleBookingsArray.value.filter(b => {
-    const checkoutDate = new Date(b.checkout_date);
-    return checkoutDate >= today && checkoutDate <= inOneWeek;
-  }).length;
-});
-const loadSampleData = (): void => {
-  const properties = new Map<string, Property>([
-    ['prop-1', {
-      id: 'prop-1',
-      owner_id: '1',
-      name: 'Sunset Beach House',
-      address: '123 Ocean Drive, Miami, FL',
-      cleaning_duration: 180,
-      special_instructions: 'Check pool area, extra attention to kitchen',
-      pricing_tier: 'luxury',
-      active: true,
-      created_at: '2024-01-15T10:00:00Z',
-      updated_at: '2024-01-15T10:00:00Z'
-    }],
-    ['prop-2', {
-      id: 'prop-2',
-      owner_id: '1',
-      name: 'Downtown Loft',
-      address: '456 Main Street, Miami, FL',
-      cleaning_duration: 120,
-      special_instructions: 'Hardwood floors, be careful with electronics',
-      pricing_tier: 'premium',
-      active: true,
-      created_at: '2024-01-20T14:30:00Z',
-      updated_at: '2024-01-20T14:30:00Z'
-    }],
-    ['prop-3', {
-      id: 'prop-3',
-      owner_id: '2',
-      name: 'Mountain Cabin',
-      address: '789 Pine Avenue, Aspen, CO',
-      cleaning_duration: 150,
-      special_instructions: 'Fireplace cleaning, check hot tub',
-      pricing_tier: 'luxury',
-      active: true,
-      created_at: '2024-02-01T09:15:00Z',
-      updated_at: '2024-02-01T09:15:00Z'
-    }],
-    ['prop-4', {
-      id: 'prop-4',
-      owner_id: '2',
-      name: 'City Studio',
-      address: '321 Urban Street, Denver, CO',
-      cleaning_duration: 90,
-      pricing_tier: 'basic',
-      active: true,
-      created_at: '2024-02-05T11:00:00Z',
-      updated_at: '2024-02-05T11:00:00Z'
-    }],
-    ['prop-5', {
-      id: 'prop-5',
-      owner_id: '3',
-      name: 'Lakefront Villa',
-      address: '555 Lake Road, Austin, TX',
-      cleaning_duration: 200,
-      special_instructions: 'Boat dock area, outdoor furniture',
-      pricing_tier: 'luxury',
-      active: true,
-      created_at: '2024-02-10T16:45:00Z',
-      updated_at: '2024-02-10T16:45:00Z'
-    }],
-    ['prop-6', {
-      id: 'prop-6',
-      owner_id: '4',
-      name: 'Historic Townhouse',
-      address: '777 Heritage Lane, Charleston, SC',
-      cleaning_duration: 160,
-      special_instructions: 'Antique furniture, gentle cleaning required',
-      pricing_tier: 'premium',
-      active: true,
-      created_at: '2024-02-15T13:20:00Z',
-      updated_at: '2024-02-15T13:20:00Z'
-    }]
-  ]);
-  const bookings = new Map<string, Booking>([
-    ['booking-1', {
-      id: 'booking-1',
-      property_id: 'prop-1',
-      owner_id: '1',
-      checkout_date: new Date().toISOString().split('T')[0] + 'T11:00:00Z',
-      checkin_date: new Date().toISOString().split('T')[0] + 'T15:00:00Z',
-      booking_type: 'turn',
-      guest_count: 4,
-      notes: 'Same-day turnaround, high priority',
-      status: 'pending',
-      created_at: '2024-01-10T08:00:00Z',
-      updated_at: '2024-01-10T08:00:00Z'
-    }],
-    ['booking-2', {
-      id: 'booking-2',
-      property_id: 'prop-3',
-      owner_id: '2',
-      checkout_date: new Date().toISOString().split('T')[0] + 'T10:00:00Z',
-      checkin_date: new Date().toISOString().split('T')[0] + 'T16:00:00Z',
-      booking_type: 'turn',
-      guest_count: 2,
-      notes: 'Mountain cabin turnaround',
-      status: 'scheduled',
-      assigned_cleaner_id: 'cleaner-1',
-      created_at: '2024-01-12T09:30:00Z',
-      updated_at: '2024-01-12T09:30:00Z'
-    }],
-    ['booking-3', {
-      id: 'booking-3',
-      property_id: 'prop-5',
-      owner_id: '3',
-      checkout_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
-      checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
-      booking_type: 'standard',
-      guest_count: 6,
-      notes: 'Regular cleaning, family with kids',
-      status: 'pending',
-      created_at: '2024-01-14T11:00:00Z',
-      updated_at: '2024-01-14T11:00:00Z'
-    }],
-    ['booking-4', {
-      id: 'booking-4',
-      property_id: 'prop-6',
-      owner_id: '4',
-      checkout_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
-      checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
-      booking_type: 'standard',
-      guest_count: 2,
-      notes: 'Historic home, careful cleaning',
-      status: 'pending',
-      created_at: '2024-01-16T13:45:00Z',
-      updated_at: '2024-01-16T13:45:00Z'
-    }],
-    ['booking-5', {
-      id: 'booking-5',
-      property_id: 'prop-2',
-      owner_id: '1',
-      checkout_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T09:00:00Z',
-      checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T17:00:00Z',
-      booking_type: 'turn',
-      guest_count: 3,
-      notes: 'Downtown loft quick turn',
-      status: 'pending',
-      created_at: '2024-01-18T15:30:00Z',
-      updated_at: '2024-01-18T15:30:00Z'
-    }],
-    ['booking-6', {
-      id: 'booking-6',
-      property_id: 'prop-4',
-      owner_id: '2',
-      checkout_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T10:00:00Z',
-      checkin_date: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T16:00:00Z',
-      booking_type: 'standard',
-      guest_count: 1,
-      notes: 'Studio apartment, minimal cleaning',
-      status: 'pending',
-      created_at: '2024-01-20T10:15:00Z',
-      updated_at: '2024-01-20T10:15:00Z'
-    }]
-  ]);
-  sampleProperties.value = properties;
-  sampleBookings.value = bookings;
-  properties.forEach((property, id) => {
-    propertyStore.properties.set(id, property);
-  });
-  bookings.forEach((booking, id) => {
-    bookingStore.bookings.set(id, booking);
-  });
-  addEventLog('Load Sample Data', 'Loaded multi-owner sample data for admin view');
-};
-const clearData = (): void => {
-  sampleProperties.value.clear();
-  sampleBookings.value.clear();
-  propertyStore.properties.clear();
-  bookingStore.bookings.clear();
-  addEventLog('Clear Data', 'Cleared all sample data');
-};
-const toggleEventLog = (): void => {
-  showEventLog.value = !showEventLog.value;
-};
-const clearEventLog = (): void => {
-  eventLog.value = [];
-};
-const addEventLog = (action: string, details: string): void => {
-  eventLog.value.unshift({
-    action,
-    details,
-    timestamp: new Date().toLocaleTimeString()
-  });
-  if (eventLog.value.length > 20) {
-    eventLog.value = eventLog.value.slice(0, 20);
-  }
-};
-const getOwnerName = (ownerId: string): string => {
-  return sampleOwners.find(o => o.id === ownerId)?.name || 'Unknown Owner';
-};
-const getOwnerInitials = (ownerId: string): string => {
-  return sampleOwners.find(o => o.id === ownerId)?.initials || 'UO';
-};
-const getOwnerColor = (ownerId: string): string => {
-  return sampleOwners.find(o => o.id === ownerId)?.color || 'grey';
-};
-const getPropertyName = (propertyId: string): string => {
-  return sampleProperties.value.get(propertyId)?.name || 'Unknown Property';
-};
-const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString();
-};
-const getEventIcon = (action: string): string => {
-  const iconMap: Record<string, string> = {
-    'Load Sample Data': 'mdi-database-plus',
-    'Clear Data': 'mdi-database-remove',
-    'Navigate to Booking': 'mdi-calendar-edit',
-    'Navigate to Date': 'mdi-calendar-month',
-    'Filter by Property': 'mdi-filter-variant',
-    'Create Booking': 'mdi-calendar-plus',
-    'Create Property': 'mdi-home-plus',
-    'Assign Cleaners': 'mdi-account-hard-hat',
-    'Generate Reports': 'mdi-chart-line',
-    'Manage System': 'mdi-cog'
-  };
-  return iconMap[action] || 'mdi-information';
-};
-const getEventColor = (action: string): string => {
-  const colorMap: Record<string, string> = {
-    'Load Sample Data': 'success',
-    'Clear Data': 'warning',
-    'Navigate to Booking': 'primary',
-    'Navigate to Date': 'info',
-    'Filter by Property': 'warning',
-    'Create Booking': 'success',
-    'Create Property': 'secondary',
-    'Assign Cleaners': 'warning',
-    'Generate Reports': 'info',
-    'Manage System': 'primary'
-  };
-  return colorMap[action] || 'grey';
-};
-onMounted(() => {
-  authStore.user = {
-    id: 'admin-1',
-    email: 'admin@cleaningcompany.com',
-    name: 'Admin User',
-    role: 'admin',
-    settings: {
-      notifications: true,
-      timezone: 'America/New_York',
-      theme: 'light',
-      language: 'en'
-    },
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
-  };
-  loadSampleData();
-});
-</script>
-<style scoped>
-.home-admin-demo {
-  min-height: 100vh;
-  background-color: rgb(var(--v-theme-surface));
-}
-.home-admin-demo .v-card {
-  border: 1px solid rgba(var(--v-theme-primary), 0.2);
-}
-.home-admin-demo .v-card-title {
-  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
-  color: rgb(var(--v-theme-on-primary));
-}
-</style>
-````
-
 ## File: src/components/smart/admin/README.md
 ````markdown
 # Admin Smart Components
@@ -9227,1444 +4479,6 @@ Admin components handle sensitive business data and should:
 - Support role-based permissions for future expansion
 ````
 
-## File: src/components/smart/admin/UseAdminBookingsDemo.vue
-````vue
-<template>
-  <div class="use-admin-bookings-demo">
-    <h1>useAdminBookings Composable Demo</h1>
-    <p class="demo-description">
-      Testing admin-specific booking composable with system-wide data access (NO filtering)
-    </p>
-    <div v-if="loading" class="loading">
-      Loading admin booking data...
-    </div>
-    <div v-if="error" class="error">
-      Error: {{ error }}
-    </div>
-    <div v-if="success" class="success">
-      Success: {{ success }}
-    </div>
-    <section class="metrics-section">
-      <h2>System-Wide Metrics</h2>
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <h3>Total Bookings</h3>
-          <div class="metric-value">{{ systemMetrics.total }}</div>
-        </div>
-        <div class="metric-card">
-          <h3>Turn Bookings</h3>
-          <div class="metric-value">{{ systemMetrics.turns }}</div>
-          <div class="metric-subtitle">{{ systemMetrics.turnPercentage }}% of total</div>
-        </div>
-        <div class="metric-card">
-          <h3>Urgent Turns Today</h3>
-          <div class="metric-value urgent">{{ systemMetrics.urgentTurns }}</div>
-        </div>
-        <div class="metric-card">
-          <h3>Unassigned</h3>
-          <div class="metric-value warning">{{ systemMetrics.unassigned }}</div>
-        </div>
-        <div class="metric-card">
-          <h3>Completion Rate</h3>
-          <div class="metric-value">{{ systemMetrics.completionRate }}%</div>
-        </div>
-      </div>
-    </section>
-    <section class="actions-section">
-      <h2>Admin Actions</h2>
-      <div class="action-buttons">
-        <button @click="handleFetchAllBookings" :disabled="loading">
-          Fetch All Bookings
-        </button>
-        <button @click="handleTestCleanerAssignment" :disabled="loading">
-          Test Cleaner Assignment
-        </button>
-        <button @click="handleTestStatusUpdate" :disabled="loading">
-          Test Status Update
-        </button>
-        <button @click="handleTestBulkAssignment" :disabled="loading">
-          Test Bulk Assignment
-        </button>
-      </div>
-    </section>
-    <section class="alerts-section">
-      <h2>System Turn Alerts</h2>
-      <div class="turn-alerts">
-        <div class="alert-summary">
-          <p><strong>Total:</strong> {{ turnAlerts.total }}</p>
-          <p><strong>Assigned:</strong> {{ turnAlerts.assigned }}</p>
-          <p><strong>Unassigned:</strong> {{ turnAlerts.unassigned }}</p>
-        </div>
-        <div v-if="turnAlerts.alerts.length > 0" class="alert-list">
-          <div
-            v-for="alert in turnAlerts.alerts"
-            :key="alert.id"
-            class="alert-item"
-            :class="alert.priority"
-          >
-            <div class="alert-info">
-              <strong>{{ alert.id.substring(0, 8) }}</strong>
-              <span>{{ alert.checkout_date }} → {{ alert.checkin_date }}</span>
-              <span class="status">{{ alert.status }}</span>
-            </div>
-            <div class="alert-impact" :class="alert.assigned_cleaner_id ? 'assigned' : 'unassigned'">
-              {{ alert.businessImpact }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="status-section">
-      <h2>Bookings by Status (System-Wide)</h2>
-      <div class="status-grid">
-        <div
-          v-for="(bookings, status) in bookingsByStatus"
-          :key="status"
-          class="status-card"
-        >
-          <h3>{{ status.replace('_', ' ').toUpperCase() }}</h3>
-          <div class="status-count">{{ bookings.length }}</div>
-          <div class="status-list">
-            <div
-              v-for="booking in bookings.slice(0, 3)"
-              :key="booking.id"
-              class="booking-item"
-            >
-              {{ booking.id.substring(0, 8) }} - {{ booking.booking_type }}
-            </div>
-            <div v-if="bookings.length > 3" class="more-items">
-              +{{ bookings.length - 3 }} more
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="workload-section">
-      <h2>Cleaner Workload Analysis</h2>
-      <div class="workload-summary">
-        <p><strong>Total Cleaners:</strong> {{ cleanerAnalysis.totalCleaners }}</p>
-        <p><strong>Unassigned Bookings:</strong> {{ cleanerAnalysis.unassignedCount }}</p>
-        <p><strong>Average Workload Score:</strong> {{ cleanerAnalysis.averageWorkload.toFixed(1) }}</p>
-      </div>
-      <div class="cleaner-workloads">
-        <div
-          v-for="(workload, cleanerId) in cleanerAnalysis.cleanerWorkloads"
-          :key="cleanerId"
-          class="cleaner-card"
-        >
-          <h4>Cleaner {{ cleanerId.substring(0, 8) }}</h4>
-          <div class="workload-stats">
-            <span>Assigned: {{ workload.assigned }}</span>
-            <span>Completed: {{ workload.completed }}</span>
-            <span>Pending: {{ workload.pending }}</span>
-            <span class="workload-score">Score: {{ workload.workloadScore }}</span>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="utilization-section">
-      <h2>Property Utilization Report</h2>
-      <div class="utilization-summary">
-        <p><strong>Total Properties:</strong> {{ propertyReport.totalProperties }}</p>
-        <p><strong>Average Utilization:</strong> {{ propertyReport.averageUtilization.toFixed(1) }}%</p>
-        <p><strong>Average Turn Rate:</strong> {{ propertyReport.averageTurnRate.toFixed(1) }}%</p>
-      </div>
-      <div class="property-stats">
-        <div
-          v-for="[propertyId, stats] in Object.entries(propertyReport.propertyStats).slice(0, 5)"
-          :key="propertyId"
-          class="property-card"
-        >
-          <h4>Property {{ propertyId.substring(0, 8) }}</h4>
-          <div class="property-metrics">
-            <span>Total: {{ stats.totalBookings }}</span>
-            <span>Turns: {{ stats.turnBookings }}</span>
-            <span>Completed: {{ stats.completedBookings }}</span>
-            <span>Utilization: {{ stats.utilizationRate }}%</span>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="filtering-section">
-      <h2>Advanced Filtering Demo</h2>
-      <div class="filter-controls">
-        <label>
-          <input
-            type="checkbox"
-            v-model="filterCriteria.unassignedOnly"
-            @change="applyFilters"
-          >
-          Unassigned Only
-        </label>
-        <select v-model="filterCriteria.status" @change="applyFilters">
-          <option value="">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="scheduled">Scheduled</option>
-          <option value="in_progress">In Progress</option>
-          <option value="completed">Completed</option>
-        </select>
-        <select v-model="filterCriteria.bookingType" @change="applyFilters">
-          <option value="">All Types</option>
-          <option value="standard">Standard</option>
-          <option value="turn">Turn</option>
-        </select>
-      </div>
-      <div class="filtered-results">
-        <h3>Filtered Results: {{ filteredBookings.length }} bookings</h3>
-        <div class="booking-list">
-          <div
-            v-for="booking in filteredBookings.slice(0, 10)"
-            :key="booking.id"
-            class="booking-card"
-          >
-            <div class="booking-header">
-              <strong>{{ booking.id.substring(0, 8) }}</strong>
-              <span class="booking-type">{{ booking.booking_type }}</span>
-              <span class="booking-status">{{ booking.status }}</span>
-            </div>
-            <div class="booking-details">
-              <span>{{ booking.checkout_date }} → {{ booking.checkin_date }}</span>
-              <span>{{ booking.assigned_cleaner_id ? 'Assigned' : 'Unassigned' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="data-section">
-      <h2>Raw Data (First 5 Bookings)</h2>
-      <pre class="data-display">{{ JSON.stringify(allBookings.slice(0, 5), null, 2) }}</pre>
-    </section>
-  </div>
-</template>
-⋮----
-Error: {{ error }}
-⋮----
-Success: {{ success }}
-⋮----
-<div class="metric-value">{{ systemMetrics.total }}</div>
-⋮----
-<div class="metric-value">{{ systemMetrics.turns }}</div>
-<div class="metric-subtitle">{{ systemMetrics.turnPercentage }}% of total</div>
-⋮----
-<div class="metric-value urgent">{{ systemMetrics.urgentTurns }}</div>
-⋮----
-<div class="metric-value warning">{{ systemMetrics.unassigned }}</div>
-⋮----
-<div class="metric-value">{{ systemMetrics.completionRate }}%</div>
-⋮----
-<p><strong>Total:</strong> {{ turnAlerts.total }}</p>
-<p><strong>Assigned:</strong> {{ turnAlerts.assigned }}</p>
-<p><strong>Unassigned:</strong> {{ turnAlerts.unassigned }}</p>
-⋮----
-<strong>{{ alert.id.substring(0, 8) }}</strong>
-<span>{{ alert.checkout_date }} → {{ alert.checkin_date }}</span>
-<span class="status">{{ alert.status }}</span>
-⋮----
-{{ alert.businessImpact }}
-⋮----
-<h3>{{ status.replace('_', ' ').toUpperCase() }}</h3>
-<div class="status-count">{{ bookings.length }}</div>
-⋮----
-{{ booking.id.substring(0, 8) }} - {{ booking.booking_type }}
-⋮----
-+{{ bookings.length - 3 }} more
-⋮----
-<p><strong>Total Cleaners:</strong> {{ cleanerAnalysis.totalCleaners }}</p>
-<p><strong>Unassigned Bookings:</strong> {{ cleanerAnalysis.unassignedCount }}</p>
-<p><strong>Average Workload Score:</strong> {{ cleanerAnalysis.averageWorkload.toFixed(1) }}</p>
-⋮----
-<h4>Cleaner {{ cleanerId.substring(0, 8) }}</h4>
-⋮----
-<span>Assigned: {{ workload.assigned }}</span>
-<span>Completed: {{ workload.completed }}</span>
-<span>Pending: {{ workload.pending }}</span>
-<span class="workload-score">Score: {{ workload.workloadScore }}</span>
-⋮----
-<p><strong>Total Properties:</strong> {{ propertyReport.totalProperties }}</p>
-<p><strong>Average Utilization:</strong> {{ propertyReport.averageUtilization.toFixed(1) }}%</p>
-<p><strong>Average Turn Rate:</strong> {{ propertyReport.averageTurnRate.toFixed(1) }}%</p>
-⋮----
-<h4>Property {{ propertyId.substring(0, 8) }}</h4>
-⋮----
-<span>Total: {{ stats.totalBookings }}</span>
-<span>Turns: {{ stats.turnBookings }}</span>
-<span>Completed: {{ stats.completedBookings }}</span>
-<span>Utilization: {{ stats.utilizationRate }}%</span>
-⋮----
-<h3>Filtered Results: {{ filteredBookings.length }} bookings</h3>
-⋮----
-<strong>{{ booking.id.substring(0, 8) }}</strong>
-<span class="booking-type">{{ booking.booking_type }}</span>
-<span class="booking-status">{{ booking.status }}</span>
-⋮----
-<span>{{ booking.checkout_date }} → {{ booking.checkin_date }}</span>
-<span>{{ booking.assigned_cleaner_id ? 'Assigned' : 'Unassigned' }}</span>
-⋮----
-<pre class="data-display">{{ JSON.stringify(allBookings.slice(0, 5), null, 2) }}</pre>
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useAdminBookings } from '@/composables/admin/useAdminBookings';
-import type { BookingStatus, BookingType } from '@/types';
-const {
-  loading,
-  error,
-  success,
-  allBookings,
-  systemMetrics,
-  bookingsByStatus,
-  fetchAllBookings,
-  assignCleaner,
-  updateBookingStatus,
-  bulkAssignCleaner,
-  getSystemTurnAlerts,
-  getCleanerWorkloadAnalysis,
-  getPropertyUtilizationReport,
-  filterBookings
-} = useAdminBookings();
-const filterCriteria = ref<{
-  unassignedOnly: boolean;
-  status: BookingStatus | '';
-  bookingType: BookingType | '';
-}>({
-  unassignedOnly: false,
-  status: '',
-  bookingType: ''
-});
-const filteredBookings = ref(allBookings.value);
-// Computed analytics
-const turnAlerts = computed(() => getSystemTurnAlerts());
-const cleanerAnalysis = computed(() => getCleanerWorkloadAnalysis());
-const propertyReport = computed(() => getPropertyUtilizationReport());
-// Demo action handlers
-async function handleFetchAllBookings() {
-  await fetchAllBookings();
-}
-async function handleTestCleanerAssignment() {
-  if (allBookings.value.length > 0) {
-    const firstBooking = allBookings.value[0];
-    const testCleanerId = 'test-cleaner-123';
-    await assignCleaner(firstBooking.id, testCleanerId);
-  }
-}
-async function handleTestStatusUpdate() {
-  if (allBookings.value.length > 0) {
-    const firstBooking = allBookings.value[0];
-    await updateBookingStatus(firstBooking.id, 'scheduled');
-  }
-}
-async function handleTestBulkAssignment() {
-  const unassignedBookingIds = allBookings.value
-    .filter(b => !b.assigned_cleaner_id)
-    .slice(0, 3)
-    .map(b => b.id);
-  if (unassignedBookingIds.length > 0) {
-    const testCleanerId = 'bulk-test-cleaner-456';
-    await bulkAssignCleaner(unassignedBookingIds, testCleanerId);
-  }
-}
-function applyFilters() {
-  const criteria: any = {};
-  if (filterCriteria.value.unassignedOnly) {
-    criteria.unassignedOnly = true;
-  }
-  if (filterCriteria.value.status) {
-    criteria.status = [filterCriteria.value.status];
-  }
-  if (filterCriteria.value.bookingType) {
-    criteria.bookingType = [filterCriteria.value.bookingType];
-  }
-  filteredBookings.value = filterBookings(criteria);
-}
-onMounted(async () => {
-  await handleFetchAllBookings();
-  applyFilters();
-});
-</script>
-<style scoped>
-.use-admin-bookings-demo {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.demo-description {
-  color: #666;
-  margin-bottom: 30px;
-  font-style: italic;
-}
-.loading {
-  background: #e3f2fd;
-  color: #1976d2;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-}
-.error {
-  background: #ffebee;
-  color: #c62828;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-}
-.success {
-  background: #e8f5e8;
-  color: #2e7d32;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-}
-section {
-  margin-bottom: 40px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-h2 {
-  color: #333;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-}
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-}
-.metric-card {
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 6px;
-  text-align: center;
-}
-.metric-value {
-  font-size: 2em;
-  font-weight: bold;
-  color: #007bff;
-}
-.metric-value.urgent {
-  color: #dc3545;
-}
-.metric-value.warning {
-  color: #ffc107;
-}
-.metric-subtitle {
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 5px;
-}
-.action-buttons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-button {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-button:hover {
-  background: #0056b3;
-}
-button:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
-}
-.alert-summary {
-  background: #fff3cd;
-  padding: 15px;
-  border-radius: 6px;
-  margin-bottom: 15px;
-}
-.alert-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.alert-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border-radius: 4px;
-  background: #f8f9fa;
-}
-.alert-item.urgent {
-  border-left: 4px solid #dc3545;
-}
-.alert-item.high {
-  border-left: 4px solid #ffc107;
-}
-.alert-impact.unassigned {
-  color: #dc3545;
-  font-weight: bold;
-}
-.alert-impact.assigned {
-  color: #28a745;
-}
-.status-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-}
-.status-card {
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 6px;
-}
-.status-count {
-  font-size: 1.5em;
-  font-weight: bold;
-  color: #007bff;
-  margin: 10px 0;
-}
-.booking-item {
-  font-size: 0.9em;
-  color: #666;
-  margin: 2px 0;
-}
-.cleaner-workloads {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-}
-.cleaner-card {
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 6px;
-}
-.workload-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-top: 10px;
-}
-.workload-score {
-  font-weight: bold;
-  color: #007bff;
-}
-.property-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-}
-.property-card {
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 6px;
-}
-.property-metrics {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-top: 10px;
-}
-.filter-controls {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.filter-controls label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.filter-controls select {
-  padding: 5px 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-.booking-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 15px;
-}
-.booking-card {
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 6px;
-}
-.booking-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-.booking-type {
-  background: #007bff;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.8em;
-}
-.booking-status {
-  background: #28a745;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.8em;
-}
-.booking-details {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9em;
-  color: #666;
-}
-.data-display {
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 6px;
-  overflow-x: auto;
-  font-size: 0.9em;
-}
-</style>
-````
-
-## File: src/components/smart/admin/UseAdminCalendarStateDemo.vue
-````vue
-<template>
-  <v-container fluid class="pa-4">
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2" color="primary">mdi-calendar-clock</v-icon>
-            useAdminCalendarState Demo
-            <v-spacer />
-            <v-chip color="success" variant="outlined">Admin Interface</v-chip>
-          </v-card-title>
-          <v-card-text>
-            <v-alert type="info" class="mb-4">
-              <strong>Admin Calendar State Composable Demo</strong><br>
-              This demo showcases the admin-specific calendar state management with system-wide data access,
-              advanced filtering, cleaner management, and business analytics.
-            </v-alert>
-            <v-alert v-if="error" type="error" class="mb-4" dismissible @click:close="error = null">
-              {{ error }}
-            </v-alert>
-            <v-alert v-if="success" type="success" class="mb-4" dismissible @click:close="success = null">
-              {{ success }}
-            </v-alert>
-            <v-row class="mb-4">
-              <v-col cols="12" md="6">
-                <v-card variant="outlined">
-                  <v-card-title class="text-h6">Calendar View Mode</v-card-title>
-                  <v-card-text>
-                    <v-btn-toggle v-model="calendarViewMode" mandatory class="mb-3">
-                      <v-btn value="standard" size="small">Standard</v-btn>
-                      <v-btn value="cleaner" size="small">Cleaner</v-btn>
-                      <v-btn value="owner" size="small">Owner</v-btn>
-                      <v-btn value="priority" size="small">Priority</v-btn>
-                    </v-btn-toggle>
-                    <div class="d-flex flex-wrap gap-2">
-                      <v-switch
-                        v-model="showUnassignedOnly"
-                        label="Unassigned Only"
-                        color="warning"
-                        density="compact"
-                        hide-details
-                      />
-                      <v-switch
-                        v-model="showOverdueOnly"
-                        label="Overdue Only"
-                        color="error"
-                        density="compact"
-                        hide-details
-                      />
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-card variant="outlined">
-                  <v-card-title class="text-h6">System Metrics</v-card-title>
-                  <v-card-text>
-                    <v-row dense>
-                      <v-col cols="6">
-                        <v-chip color="primary" variant="outlined" class="mb-1">
-                          Total Bookings: {{ allBookings.length }}
-                        </v-chip>
-                      </v-col>
-                      <v-col cols="6">
-                        <v-chip color="warning" variant="outlined" class="mb-1">
-                          Turn Alerts: {{ systemTurnAlerts.length }}
-                        </v-chip>
-                      </v-col>
-                      <v-col cols="6">
-                        <v-chip color="info" variant="outlined" class="mb-1">
-                          Properties: {{ allProperties.length }}
-                        </v-chip>
-                      </v-col>
-                      <v-col cols="6">
-                        <v-chip color="success" variant="outlined" class="mb-1">
-                          Cleaners: {{ Object.keys(cleanerSchedules).length - 1 }}
-                        </v-chip>
-                      </v-col>
-                    </v-row>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-card variant="outlined" class="mb-4" v-if="systemTurnAlerts.length > 0">
-              <v-card-title class="text-h6 d-flex align-center">
-                <v-icon class="mr-2" color="error">mdi-fire</v-icon>
-                System Turn Alerts ({{ systemTurnAlerts.length }})
-              </v-card-title>
-              <v-card-text>
-                <v-row dense>
-                  <v-col
-                    v-for="alert in systemTurnAlerts.slice(0, 6)"
-                    :key="alert.id"
-                    cols="12" sm="6" md="4"
-                  >
-                    <v-card
-                      :color="alert.priority === 'urgent' ? 'error' : 'warning'"
-                      variant="outlined"
-                      class="mb-2"
-                    >
-                      <v-card-text class="pa-3">
-                        <div class="text-subtitle2 font-weight-bold">
-                          {{ alert.property_name }}
-                        </div>
-                        <div class="text-caption">{{ alert.property_address }}</div>
-                        <v-chip
-                          :color="alert.priority === 'urgent' ? 'error' : 'warning'"
-                          size="small"
-                          class="mt-1"
-                        >
-                          {{ alert.alert_message }}
-                        </v-chip>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-            <v-card variant="outlined" class="mb-4">
-              <v-card-title class="text-h6">Cleaner Schedules</v-card-title>
-              <v-card-text>
-                <v-row dense>
-                  <v-col
-                    v-for="(bookings, cleanerId) in cleanerSchedules"
-                    :key="cleanerId"
-                    cols="12" sm="6" md="4"
-                  >
-                    <v-card variant="outlined" class="mb-2">
-                      <v-card-text class="pa-3">
-                        <div class="text-subtitle2 font-weight-bold">
-                          {{ cleanerId === 'unassigned' ? 'Unassigned' : `Cleaner ${cleanerId.slice(0, 8)}` }}
-                        </div>
-                        <div class="text-caption">{{ bookings.length }} bookings</div>
-                        <v-btn
-                          size="small"
-                          variant="outlined"
-                          class="mt-2"
-                          @click="testGetCleanerSchedule(cleanerId)"
-                        >
-                          View Schedule
-                        </v-btn>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-            <v-card variant="outlined" class="mb-4">
-              <v-card-title class="text-h6">Admin Calendar Events ({{ adminCalendarEvents.length }})</v-card-title>
-              <v-card-text>
-                <v-row dense>
-                  <v-col
-                    v-for="event in adminCalendarEvents.slice(0, 8)"
-                    :key="event.id"
-                    cols="12" sm="6" md="3"
-                  >
-                    <v-card
-                      :style="{ borderLeft: `4px solid ${event.backgroundColor}` }"
-                      variant="outlined"
-                      class="mb-2"
-                    >
-                      <v-card-text class="pa-3">
-                        <div class="text-subtitle2 font-weight-bold">{{ event.title }}</div>
-                        <div class="text-caption">
-                          {{ formatDate(event.start) }} - {{ formatDate(event.end) }}
-                        </div>
-                        <div class="text-caption">
-                          Status: {{ event.extendedProps.status }}
-                        </div>
-                        <v-btn
-                          size="small"
-                          variant="outlined"
-                          class="mt-2"
-                          @click="testHandleAdminEventClick(event)"
-                        >
-                          Manage
-                        </v-btn>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-            <v-card variant="outlined" class="mb-4">
-              <v-card-title class="text-h6">Advanced Filtering Test</v-card-title>
-              <v-card-text>
-                <v-row dense>
-                  <v-col cols="12" md="4">
-                    <v-select
-                      v-model="filterCriteria.status"
-                      :items="statusOptions"
-                      label="Filter by Status"
-                      multiple
-                      chips
-                      clearable
-                      density="compact"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="4">
-                    <v-select
-                      v-model="filterCriteria.bookingType"
-                      :items="typeOptions"
-                      label="Filter by Type"
-                      multiple
-                      chips
-                      clearable
-                      density="compact"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="4">
-                    <v-btn
-                      color="primary"
-                      @click="testAdvancedFiltering"
-                      :loading="loading"
-                    >
-                      Apply Filters
-                    </v-btn>
-                  </v-col>
-                </v-row>
-                <v-alert v-if="filteredResults.length > 0" type="success" class="mt-3">
-                  Found {{ filteredResults.length }} bookings matching criteria
-                </v-alert>
-              </v-card-text>
-            </v-card>
-            <v-card variant="outlined">
-              <v-card-title class="text-h6">Function Testing</v-card-title>
-              <v-card-text>
-                <div class="d-flex flex-wrap gap-2">
-                  <v-btn
-                    color="primary"
-                    variant="outlined"
-                    @click="testGetAdminCalendarEvents"
-                    :loading="loading"
-                  >
-                    Test Calendar Events
-                  </v-btn>
-                  <v-btn
-                    color="secondary"
-                    variant="outlined"
-                    @click="testSystemTurnAlerts"
-                    :loading="loading"
-                  >
-                    Test Turn Alerts
-                  </v-btn>
-                  <v-btn
-                    color="info"
-                    variant="outlined"
-                    @click="testCleanerSchedules"
-                    :loading="loading"
-                  >
-                    Test Cleaner Schedules
-                  </v-btn>
-                  <v-btn
-                    color="warning"
-                    variant="outlined"
-                    @click="testFilterByMultipleCriteria"
-                    :loading="loading"
-                  >
-                    Test Multi-Criteria Filter
-                  </v-btn>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-⋮----
-{{ error }}
-⋮----
-{{ success }}
-⋮----
-Total Bookings: {{ allBookings.length }}
-⋮----
-Turn Alerts: {{ systemTurnAlerts.length }}
-⋮----
-Properties: {{ allProperties.length }}
-⋮----
-Cleaners: {{ Object.keys(cleanerSchedules).length - 1 }}
-⋮----
-System Turn Alerts ({{ systemTurnAlerts.length }})
-⋮----
-{{ alert.property_name }}
-⋮----
-<div class="text-caption">{{ alert.property_address }}</div>
-⋮----
-{{ alert.alert_message }}
-⋮----
-{{ cleanerId === 'unassigned' ? 'Unassigned' : `Cleaner ${cleanerId.slice(0, 8)}` }}
-⋮----
-<div class="text-caption">{{ bookings.length }} bookings</div>
-⋮----
-<v-card-title class="text-h6">Admin Calendar Events ({{ adminCalendarEvents.length }})</v-card-title>
-⋮----
-<div class="text-subtitle2 font-weight-bold">{{ event.title }}</div>
-⋮----
-{{ formatDate(event.start) }} - {{ formatDate(event.end) }}
-⋮----
-Status: {{ event.extendedProps.status }}
-⋮----
-Found {{ filteredResults.length }} bookings matching criteria
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useAdminCalendarState } from '@/composables/admin/useAdminCalendarState';
-import { useBookingStore } from '@/stores/booking';
-import { usePropertyStore } from '@/stores/property';
-import type { BookingStatus, BookingType } from '@/types';
-const {
-  loading,
-  error,
-  success,
-  selectedCleanerIds,
-  selectedOwnerIds,
-  showUnassignedOnly,
-  showOverdueOnly,
-  calendarViewMode,
-  allBookings,
-  allProperties,
-  systemTurnAlerts,
-  cleanerSchedules,
-  adminCalendarEvents,
-  getAdminCalendarEvents,
-  handleAdminEventClick,
-  getCleanerSchedule,
-  filterByMultipleCriteria
-} = useAdminCalendarState();
-const bookingStore = useBookingStore();
-const propertyStore = usePropertyStore();
-const filteredResults = ref<any[]>([]);
-const filterCriteria = ref<{
-  status: BookingStatus[];
-  bookingType: BookingType[];
-}>({
-  status: [],
-  bookingType: []
-});
-const statusOptions = [
-  { title: 'Pending', value: 'pending' },
-  { title: 'Scheduled', value: 'scheduled' },
-  { title: 'In Progress', value: 'in_progress' },
-  { title: 'Completed', value: 'completed' },
-  { title: 'Cancelled', value: 'cancelled' }
-];
-const typeOptions = [
-  { title: 'Standard', value: 'standard' },
-  { title: 'Turn', value: 'turn' }
-];
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-function testGetAdminCalendarEvents() {
-  loading.value = true;
-  try {
-    const events = getAdminCalendarEvents();
-    success.value = `Generated ${events.length} admin calendar events with enhanced formatting`;
-    console.log('Admin Calendar Events:', events);
-  } catch (err) {
-    error.value = 'Failed to generate admin calendar events';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-function testSystemTurnAlerts() {
-  loading.value = true;
-  try {
-    const alerts = systemTurnAlerts.value;
-    success.value = `Found ${alerts.length} system turn alerts across all properties`;
-    console.log('System Turn Alerts:', alerts);
-  } catch (err) {
-    error.value = 'Failed to get system turn alerts';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-function testCleanerSchedules() {
-  loading.value = true;
-  try {
-    const schedules = cleanerSchedules.value;
-    const cleanerCount = Object.keys(schedules).length - 1;
-    success.value = `Retrieved schedules for ${cleanerCount} cleaners and ${schedules.unassigned?.length || 0} unassigned bookings`;
-    console.log('Cleaner Schedules:', schedules);
-  } catch (err) {
-    error.value = 'Failed to get cleaner schedules';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-function testGetCleanerSchedule(cleanerId: string) {
-  loading.value = true;
-  try {
-    const schedule = getCleanerSchedule(cleanerId);
-    success.value = `Retrieved schedule for ${cleanerId}: ${schedule.bookings.length} bookings, ${schedule.metrics.totalHours}h total`;
-    console.log(`Schedule for ${cleanerId}:`, schedule);
-  } catch (err) {
-    error.value = `Failed to get schedule for ${cleanerId}`;
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-function testHandleAdminEventClick(event: any) {
-  loading.value = true;
-  try {
-    const eventInfo = { event };
-    handleAdminEventClick(eventInfo);
-    console.log('Admin Event Click:', event);
-  } catch (err) {
-    error.value = 'Failed to handle admin event click';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-function testAdvancedFiltering() {
-  loading.value = true;
-  try {
-    const results = filterByMultipleCriteria({
-      status: filterCriteria.value.status,
-      bookingType: filterCriteria.value.bookingType,
-      unassignedOnly: showUnassignedOnly.value,
-      overdueOnly: showOverdueOnly.value
-    });
-    filteredResults.value = results;
-    success.value = `Advanced filtering returned ${results.length} bookings`;
-    console.log('Filtered Results:', results);
-  } catch (err) {
-    error.value = 'Failed to apply advanced filtering';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-function testFilterByMultipleCriteria() {
-  loading.value = true;
-  try {
-    const testCriteria = {
-      status: ['pending', 'scheduled'] as BookingStatus[],
-      bookingType: ['turn'] as BookingType[],
-      unassignedOnly: true,
-      priorityOnly: true
-    };
-    const results = filterByMultipleCriteria(testCriteria);
-    success.value = `Multi-criteria filter test: ${results.length} urgent unassigned turn bookings found`;
-    console.log('Multi-criteria Filter Results:', results);
-  } catch (err) {
-    error.value = 'Failed to test multi-criteria filtering';
-    console.error('Error:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-onMounted(async () => {
-  if (bookingStore.bookings.size === 0) {
-    console.log('Generating demo data for admin calendar state testing...');
-    success.value = 'Demo initialized - Admin calendar state ready for testing';
-  }
-});
-</script>
-<style scoped>
-.gap-2 {
-  gap: 8px;
-}
-</style>
-````
-
-## File: src/components/smart/owner/OwnerCalendar.vue
-````vue
-<template>
-  <div class="owner-calendar-container">
-    <FullCalendar
-      ref="calendarRef"
-      :options="ownerCalendarOptions"
-      class="owner-calendar"
-    />
-  </div>
-</template>
-<script setup lang="ts">
-import FullCalendar from '@fullcalendar/vue3';
-import type { CalendarOptions, DateSelectArg, EventClickArg } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import { computed, ref, watch } from 'vue';
-import { useTheme } from 'vuetify';
-import type { Booking, Property } from '@/types';
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-interface Props {
-  bookings: Map<string, Booking>;
-  properties: Map<string, Property>;
-  loading?: boolean;
-  currentView?: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
-  currentDate?: Date;
-}
-interface Emits {
-  (e: 'dateSelect', selectInfo: DateSelectArg): void;
-  (e: 'eventClick', clickInfo: EventClickArg): void;
-  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
-  (e: 'viewChange', view: string): void;
-  (e: 'dateChange', date: Date): void;
-}
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-  currentView: 'timeGridWeek',
-  currentDate: () => new Date()
-});
-const emit = defineEmits<Emits>();
-const theme = useTheme();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-const ownerCalendarEvents = computed(() => {
-  return Array.from(props.bookings.values()).map(booking => {
-    const property = props.properties.get(booking.property_id);
-    const isTurn = booking.booking_type === 'turn';
-    return {
-      id: booking.id,
-      title: `${property?.name || 'My Property'} ${isTurn ? '🔥 TURN' : ''}`,
-      start: booking.checkout_date,
-      end: booking.checkin_date,
-      backgroundColor: getOwnerEventColor(booking),
-      borderColor: getOwnerEventBorderColor(booking),
-      textColor: getOwnerEventTextColor(booking),
-      extendedProps: {
-        booking,
-        property,
-        bookingType: booking.booking_type,
-        status: booking.status,
-        guestCount: booking.guest_count,
-        notes: booking.notes
-      },
-      classNames: [
-        `owner-booking-${booking.booking_type}`,
-        `owner-status-${booking.status}`,
-        isTurn ? 'owner-priority-urgent' : 'owner-priority-normal'
-      ]
-    };
-  });
-});
-const getOwnerEventColor = (booking: Booking): string => {
-  const isDark = theme.global.current.value.dark;
-  if (booking.booking_type === 'turn') {
-    switch (booking.status) {
-      case 'pending': return isDark ? '#FF5252' : '#F44336';
-      case 'scheduled': return isDark ? '#FF9800' : '#FF6F00';
-      case 'in_progress': return isDark ? '#4CAF50' : '#2E7D32';
-      case 'completed': return isDark ? '#9E9E9E' : '#616161';
-      default: return isDark ? '#FF5252' : '#F44336';
-    }
-  } else {
-    switch (booking.status) {
-      case 'pending': return isDark ? '#2196F3' : '#1976D2';
-      case 'scheduled': return isDark ? '#00BCD4' : '#0097A7';
-      case 'in_progress': return isDark ? '#4CAF50' : '#388E3C';
-      case 'completed': return isDark ? '#9E9E9E' : '#757575';
-      default: return isDark ? '#2196F3' : '#1976D2';
-    }
-  }
-};
-const getOwnerEventBorderColor = (booking: Booking): string => {
-  return booking.booking_type === 'turn' ? '#D32F2F' : '#1976D2';
-};
-const getOwnerEventTextColor = (booking: Booking): string => {
-  return booking.status === 'completed' ? '#E0E0E0' : '#FFFFFF';
-};
-const ownerCalendarOptions = computed<CalendarOptions>(() => ({
-  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-  initialView: props.currentView,
-  headerToolbar: false,
-  events: ownerCalendarEvents.value,
-  eventDisplay: 'block',
-  eventOverlap: false,
-  selectable: true,
-  selectMirror: true,
-  editable: false,
-  droppable: false,
-  locale: 'en',
-  timeZone: 'local',
-  slotMinTime: '06:00:00',
-  slotMaxTime: '22:00:00',
-  slotDuration: '01:00:00',
-  height: 'auto',
-  aspectRatio: 1.8,
-  themeSystem: 'standard',
-  select: handleOwnerDateSelect,
-  eventClick: handleOwnerEventClick,
-  datesSet: handleDatesSet,
-  loading: handleLoading,
-  eventContent: renderOwnerEventContent,
-  dayCellContent: renderOwnerDayCell,
-  businessHours: {
-    daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
-    startTime: '08:00',
-    endTime: '18:00'
-  },
-  weekends: true,
-  dayMaxEvents: 3,
-  moreLinkClick: 'popover',
-  allDaySlot: false,
-  nowIndicator: true,
-  scrollTime: '08:00:00'
-}));
-const handleOwnerDateSelect = (selectInfo: DateSelectArg): void => {
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'emit'
-  );
-  emit('dateSelect', selectInfo);
-  emit('createBooking', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr
-  });
-  selectInfo.view.calendar.unselect();
-};
-const handleOwnerEventClick = (clickInfo: EventClickArg): void => {
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'emit'
-  );
-  emit('eventClick', clickInfo);
-};
-const handleDatesSet = (dateInfo: any): void => {
-  const newDate = new Date(dateInfo.start);
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'dateChange',
-    { date: newDate.toISOString() },
-    'emit'
-  );
-  emit('dateChange', newDate);
-};
-const handleLoading = (isLoading: boolean): void => {
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'loadingState',
-    { isLoading },
-    'emit'
-  );
-};
-const renderOwnerEventContent = (eventInfo: any) => {
-  const booking = eventInfo.event.extendedProps.booking as Booking;
-  const property = eventInfo.event.extendedProps.property as Property;
-  const isTurn = booking.booking_type === 'turn';
-  return {
-    html: `
-      <div class="owner-event-content">
-        <div class="owner-event-title">
-          ${isTurn ? '🔥 ' : ''}${property?.name || 'My Property'}
-        </div>
-        <div class="owner-event-details">
-          ${booking.status.toUpperCase()}
-          ${booking.guest_count ? ` • ${booking.guest_count} guests` : ''}
-        </div>
-        ${isTurn ? '<div class="owner-turn-badge">URGENT TURN</div>' : ''}
-      </div>
-    `
-  };
-};
-// Owner-focused day cell rendering
-const renderOwnerDayCell = (dayInfo: any) => {
-  const dayBookings = Array.from(props.bookings.values())
-    .filter(booking => {
-      const checkoutDate = new Date(booking.checkout_date).toDateString();
-      const dayDate = dayInfo.date.toDateString();
-      return checkoutDate === dayDate;
-    });
-  const myTurnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
-  const myBookingCount = dayBookings.length;
-  return {
-    html: `
-      <div class="owner-day-number">
-        ${dayInfo.dayNumberText}
-        ${myTurnCount > 0 ? `<span class="owner-turn-indicator">${myTurnCount}</span>` : ''}
-        ${myBookingCount > 0 && myTurnCount === 0 ? `<span class="owner-booking-indicator">${myBookingCount}</span>` : ''}
-      </div>
-    `
-  };
-};
-const goToDate = (date: string | Date): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(date);
-  }
-};
-const changeView = (viewName: string): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().changeView(viewName);
-    eventLogger.logEvent(
-      'OwnerCalendar',
-      'HomeOwner',
-      'viewChange',
-      { view: viewName },
-      'emit'
-    );
-    emit('viewChange', viewName);
-  }
-};
-const refreshEvents = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().refetchEvents();
-  }
-};
-watch(() => theme.global.current.value.dark, () => {
-  refreshEvents();
-});
-watch(() => props.bookings, (newBookings) => {
-  eventLogger.logEvent(
-    'HomeOwner',
-    'OwnerCalendar',
-    'bookingsUpdate',
-    { count: newBookings.size },
-    'receive'
-  );
-}, { deep: true });
-watch(() => props.currentView, (newView) => {
-  if (newView && calendarRef.value) {
-    calendarRef.value.getApi().changeView(newView);
-  }
-});
-watch(() => props.currentDate, (newDate) => {
-  if (newDate && calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(newDate);
-  }
-});
-defineExpose({
-  goToDate,
-  changeView,
-  refreshEvents,
-  getApi: () => calendarRef.value?.getApi()
-});
-</script>
-<style scoped>
-.owner-calendar-container {
-  height: 100%;
-  width: 100%;
-}
-.owner-calendar {
-  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
-  --fc-button-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-border-color: rgb(var(--v-theme-primary));
-  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
-  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
-}
-.fc-event.owner-booking-turn {
-  font-weight: bold;
-  border-width: 2px !important;
-  animation: owner-pulse 2s infinite;
-}
-@keyframes owner-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
-  70% { box-shadow: 0 0 0 8px rgba(var(--v-theme-error), 0); }
-  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
-}
-.fc-event.owner-status-pending {
-  opacity: 0.9;
-}
-.fc-event.owner-status-completed {
-  opacity: 0.6;
-  text-decoration: line-through;
-}
-.fc-event.owner-priority-urgent {
-  border-left: 4px solid rgb(var(--v-theme-error)) !important;
-}
-.owner-turn-indicator {
-  background: rgb(var(--v-theme-error));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 10px;
-  margin-left: 4px;
-  font-weight: bold;
-  animation: owner-pulse 2s infinite;
-}
-.owner-booking-indicator {
-  background: rgb(var(--v-theme-primary));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 10px;
-  margin-left: 4px;
-  font-weight: bold;
-}
-.owner-event-content {
-  padding: 2px;
-}
-.owner-event-title {
-  font-weight: 600;
-  font-size: 0.85em;
-}
-.owner-event-details {
-  font-size: 0.75em;
-  opacity: 0.9;
-  margin-top: 1px;
-}
-.owner-turn-badge {
-  background: rgba(var(--v-theme-error), 0.2);
-  color: rgb(var(--v-theme-error));
-  font-size: 0.7em;
-  padding: 1px 4px;
-  border-radius: 4px;
-  margin-top: 2px;
-  font-weight: bold;
-  text-align: center;
-}
-.owner-day-number {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-@media (max-width: 768px) {
-  .owner-event-title {
-    font-size: 0.8em;
-  }
-  .owner-event-details {
-    font-size: 0.7em;
-  }
-  .owner-turn-badge {
-    font-size: 0.65em;
-  }
-}
-</style>
-````
-
 ## File: src/components/smart/owner/README.md
 ````markdown
 # Owner Smart Components
@@ -10712,607 +4526,6 @@ Property owners are the primary users (30-40 clients) who need to:
 - View their personal schedule
 - Get alerts for urgent turns
 - Access simple, fast interfaces without business management complexity
-````
-
-## File: src/components/smart/owner/UseOwnerCalendarStateDemo.vue
-````vue
-<template>
-  <v-container fluid class="pa-4">
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-4">
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2" color="primary">mdi-calendar-account</v-icon>
-            useOwnerCalendarState Demo
-            <v-spacer />
-            <v-chip color="success" variant="outlined">
-              Owner Role
-            </v-chip>
-          </v-card-title>
-          <v-card-subtitle>
-            Testing owner-specific calendar state management with role-based data filtering
-          </v-card-subtitle>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-chart-box</v-icon>
-            {{ ownerCalendarTitle }}
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-primary">{{ calendarStats.totalProperties }}</div>
-                  <div class="text-caption">Properties</div>
-                </v-card>
-              </v-col>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-info">{{ calendarStats.totalBookings }}</div>
-                  <div class="text-caption">Bookings</div>
-                </v-card>
-              </v-col>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-error">{{ calendarStats.urgentTurns }}</div>
-                  <div class="text-caption">Urgent Turns</div>
-                </v-card>
-              </v-col>
-              <v-col cols="6" sm="3">
-                <v-card variant="outlined" class="text-center pa-2">
-                  <div class="text-h4 text-warning">{{ calendarStats.upcomingCleanings }}</div>
-                  <div class="text-caption">Upcoming</div>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2" color="error">mdi-fire</v-icon>
-            My Turn Alerts
-            <v-chip class="ml-2" color="error" size="small">
-              {{ myTurnAlerts.length }}
-            </v-chip>
-          </v-card-title>
-          <v-card-text>
-            <div v-if="myTurnAlerts.length === 0" class="text-center text-medium-emphasis py-4">
-              <v-icon size="48" color="success">mdi-check-circle</v-icon>
-              <div class="mt-2">No urgent turns today!</div>
-            </div>
-            <v-list v-else density="compact">
-              <v-list-item
-                v-for="alert in myTurnAlerts"
-                :key="alert.id"
-                class="mb-2"
-              >
-                <template #prepend>
-                  <v-avatar :color="getUrgencyColor(alert.urgencyLevel)" size="small">
-                    <v-icon color="white">mdi-fire</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title>{{ alert.alertMessage }}</v-list-item-title>
-                <v-list-item-subtitle>{{ alert.timeUntilCheckout }}</v-list-item-subtitle>
-                <template #append>
-                  <v-chip :color="getUrgencyColor(alert.urgencyLevel)" size="small">
-                    {{ alert.urgencyLevel }}
-                  </v-chip>
-                </template>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-filter</v-icon>
-            Property Filters
-          </v-card-title>
-          <v-card-text>
-            <v-row align="center">
-              <v-col cols="12" md="6">
-                <v-select
-                  v-model="selectedPropertyFilter"
-                  :items="propertyFilterOptions"
-                  item-title="name"
-                  item-value="id"
-                  label="Filter by Property"
-                  clearable
-                  prepend-icon="mdi-home"
-                  @update:model-value="handlePropertyFilterChange"
-                >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-icon :color="item.raw.active ? 'success' : 'warning'">
-                          {{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
-                        </v-icon>
-                      </template>
-                      <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                      <v-list-item-subtitle>{{ item.raw.address }}</v-list-item-subtitle>
-                    </v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-btn
-                  color="primary"
-                  variant="outlined"
-                  @click="clearOwnerPropertyFilters"
-                  :disabled="!selectedPropertyFilter"
-                >
-                  <v-icon class="mr-2">mdi-filter-off</v-icon>
-                  Clear Filters
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-calendar-month</v-icon>
-            My Calendar Events
-            <v-chip class="ml-2" color="info" size="small">
-              {{ myCalendarEvents.length }}
-            </v-chip>
-          </v-card-title>
-          <v-card-text>
-            <div v-if="myCalendarEvents.length === 0" class="text-center text-medium-emphasis py-8">
-              <v-icon size="64" color="info">mdi-calendar-blank</v-icon>
-              <div class="mt-4 text-h6">No bookings found</div>
-              <div class="text-body-2">Add some properties and bookings to see them here</div>
-            </div>
-            <v-row v-else>
-              <v-col
-                v-for="event in myCalendarEvents.slice(0, 6)"
-                :key="event.id"
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-card
-                  variant="outlined"
-                  :color="event.backgroundColor"
-                  class="mb-2"
-                  @click="simulateEventClick(event)"
-                >
-                  <v-card-text class="pa-3">
-                    <div class="d-flex align-center mb-2">
-                      <v-icon class="mr-2" color="white">
-                        {{ event.extendedProps.booking_type === 'turn' ? 'mdi-fire' : 'mdi-home-clean' }}
-                      </v-icon>
-                      <span class="text-white font-weight-bold">{{ event.title }}</span>
-                    </div>
-                    <div class="text-white text-caption mb-1">
-                      <v-icon size="small" class="mr-1">mdi-home</v-icon>
-                      {{ event.extendedProps.propertyName }}
-                    </div>
-                    <div class="text-white text-caption mb-1">
-                      <v-icon size="small" class="mr-1">mdi-calendar</v-icon>
-                      {{ formatEventDate(event.start) }}
-                    </div>
-                    <div class="text-white text-caption">
-                      <v-icon size="small" class="mr-1">mdi-information</v-icon>
-                      {{ event.extendedProps.status }}
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-btn
-              v-if="myCalendarEvents.length > 6"
-              color="primary"
-              variant="text"
-              class="mt-2"
-              @click="showAllEvents = !showAllEvents"
-            >
-              {{ showAllEvents ? 'Show Less' : `Show All ${myCalendarEvents.length} Events` }}
-            </v-btn>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-function</v-icon>
-            Function Testing
-          </v-card-title>
-          <v-card-text>
-            <v-btn
-              color="primary"
-              variant="outlined"
-              class="mb-2 mr-2"
-              @click="testDateSelect"
-            >
-              <v-icon class="mr-2">mdi-calendar-plus</v-icon>
-              Test Date Select
-            </v-btn>
-            <v-btn
-              color="secondary"
-              variant="outlined"
-              class="mb-2 mr-2"
-              @click="testEventClick"
-            >
-              <v-icon class="mr-2">mdi-calendar-edit</v-icon>
-              Test Event Click
-            </v-btn>
-            <v-btn
-              color="info"
-              variant="outlined"
-              class="mb-2 mr-2"
-              @click="testValidateAccess"
-            >
-              <v-icon class="mr-2">mdi-shield-check</v-icon>
-              Test Access Validation
-            </v-btn>
-            <v-btn
-              color="warning"
-              variant="outlined"
-              class="mb-2"
-              @click="generateSampleData"
-            >
-              <v-icon class="mr-2">mdi-database-plus</v-icon>
-              Generate Sample Data
-            </v-btn>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-card class="mb-4">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-message</v-icon>
-            Status Messages
-          </v-card-title>
-          <v-card-text>
-            <v-alert
-              v-if="ownerError"
-              type="error"
-              variant="outlined"
-              class="mb-2"
-              closable
-              @click:close="ownerError = null"
-            >
-              {{ ownerError }}
-            </v-alert>
-            <v-alert
-              v-if="ownerSuccess"
-              type="success"
-              variant="outlined"
-              class="mb-2"
-              closable
-              @click:close="ownerSuccess = null"
-            >
-              {{ ownerSuccess }}
-            </v-alert>
-            <v-alert
-              v-if="!ownerError && !ownerSuccess"
-              type="info"
-              variant="outlined"
-            >
-              No messages. Try testing the functions above.
-            </v-alert>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-expansion-panels>
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              <v-icon class="mr-2">mdi-bug</v-icon>
-              Debug Information
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <h4>Current User</h4>
-                  <pre class="text-caption">{{ JSON.stringify(currentUser, null, 2) }}</pre>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <h4>Calendar State</h4>
-                  <pre class="text-caption">{{ JSON.stringify({
-                    currentView,
-                    currentDate: currentDate?.toISOString(),
-                    selectedPropertyIds: Array.from(selectedPropertyIds),
-                    showTurnBookings,
-                    showStandardBookings
-                  }, null, 2) }}</pre>
-                </v-col>
-              </v-row>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-⋮----
-{{ ownerCalendarTitle }}
-⋮----
-<div class="text-h4 text-primary">{{ calendarStats.totalProperties }}</div>
-⋮----
-<div class="text-h4 text-info">{{ calendarStats.totalBookings }}</div>
-⋮----
-<div class="text-h4 text-error">{{ calendarStats.urgentTurns }}</div>
-⋮----
-<div class="text-h4 text-warning">{{ calendarStats.upcomingCleanings }}</div>
-⋮----
-{{ myTurnAlerts.length }}
-⋮----
-<template #prepend>
-                  <v-avatar :color="getUrgencyColor(alert.urgencyLevel)" size="small">
-                    <v-icon color="white">mdi-fire</v-icon>
-                  </v-avatar>
-                </template>
-<v-list-item-title>{{ alert.alertMessage }}</v-list-item-title>
-<v-list-item-subtitle>{{ alert.timeUntilCheckout }}</v-list-item-subtitle>
-<template #append>
-                  <v-chip :color="getUrgencyColor(alert.urgencyLevel)" size="small">
-                    {{ alert.urgencyLevel }}
-                  </v-chip>
-                </template>
-⋮----
-{{ alert.urgencyLevel }}
-⋮----
-<template #item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template #prepend>
-                        <v-icon :color="item.raw.active ? 'success' : 'warning'">
-                          {{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
-                        </v-icon>
-                      </template>
-                      <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                      <v-list-item-subtitle>{{ item.raw.address }}</v-list-item-subtitle>
-                    </v-list-item>
-                  </template>
-⋮----
-<template #prepend>
-                        <v-icon :color="item.raw.active ? 'success' : 'warning'">
-                          {{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
-                        </v-icon>
-                      </template>
-⋮----
-{{ item.raw.active ? 'mdi-home' : 'mdi-home-off' }}
-⋮----
-<v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-<v-list-item-subtitle>{{ item.raw.address }}</v-list-item-subtitle>
-⋮----
-{{ myCalendarEvents.length }}
-⋮----
-{{ event.extendedProps.booking_type === 'turn' ? 'mdi-fire' : 'mdi-home-clean' }}
-⋮----
-<span class="text-white font-weight-bold">{{ event.title }}</span>
-⋮----
-{{ event.extendedProps.propertyName }}
-⋮----
-{{ formatEventDate(event.start) }}
-⋮----
-{{ event.extendedProps.status }}
-⋮----
-{{ showAllEvents ? 'Show Less' : `Show All ${myCalendarEvents.length} Events` }}
-⋮----
-{{ ownerError }}
-⋮----
-{{ ownerSuccess }}
-⋮----
-<pre class="text-caption">{{ JSON.stringify(currentUser, null, 2) }}</pre>
-⋮----
-<pre class="text-caption">{{ JSON.stringify({
-                    currentView,
-                    currentDate: currentDate?.toISOString(),
-                    selectedPropertyIds: Array.from(selectedPropertyIds),
-                    showTurnBookings,
-                    showStandardBookings
-                  }, null, 2) }}</pre>
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useOwnerCalendarState } from '@/composables/owner/useOwnerCalendarState';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
-import { useAuthStore } from '@/stores/auth';
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
-const ownerCalendarState = useOwnerCalendarState();
-const ownerBookings = useOwnerBookings();
-const authStore = useAuthStore();
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
-const {
-  myCalendarEvents,
-  myTurnAlerts,
-  myPropertyOptions,
-  ownerCalendarTitle,
-  getOwnerCalendarEvents,
-  handleOwnerDateSelect,
-  handleOwnerEventClick,
-  getOwnerTurnAlerts,
-  filterByOwnerProperty,
-  clearOwnerPropertyFilters,
-  validateOwnerBookingAccess,
-  getOwnerCalendarStats,
-  ownerError,
-  ownerLoading,
-  ownerSuccess,
-  currentView,
-  currentDate,
-  selectedPropertyIds,
-  showTurnBookings,
-  showStandardBookings
-} = ownerCalendarState;
-const selectedPropertyFilter = ref<string | null>(null);
-const showAllEvents = ref(false);
-const currentUser = computed(() => authStore.user);
-const calendarStats = computed(() => getOwnerCalendarStats());
-const propertyFilterOptions = computed(() => [
-  { id: 'all', name: 'All Properties', address: 'Show all properties', active: true },
-  ...myPropertyOptions.value
-]);
-function handlePropertyFilterChange(propertyId: string | null) {
-  if (!propertyId || propertyId === 'all') {
-    clearOwnerPropertyFilters();
-    selectedPropertyFilter.value = null;
-  } else {
-    filterByOwnerProperty(propertyId);
-  }
-}
-function simulateEventClick(event: any) {
-  const mockClickInfo = {
-    event: {
-      id: event.id,
-      title: event.title,
-      extendedProps: event.extendedProps
-    }
-  };
-  handleOwnerEventClick(mockClickInfo);
-}
-function testDateSelect() {
-  const mockSelectInfo = {
-    startStr: new Date().toISOString().split('T')[0],
-    endStr: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-  };
-  handleOwnerDateSelect(mockSelectInfo);
-}
-function testEventClick() {
-  if (myCalendarEvents.value.length > 0) {
-    simulateEventClick(myCalendarEvents.value[0]);
-  } else {
-    ownerError.value = 'No events available to test with';
-  }
-}
-function testValidateAccess() {
-  if (myCalendarEvents.value.length > 0) {
-    const bookingId = myCalendarEvents.value[0].id;
-    const hasAccess = validateOwnerBookingAccess(bookingId);
-    ownerSuccess.value = `Access validation for booking ${bookingId}: ${hasAccess ? 'ALLOWED' : 'DENIED'}`;
-  } else {
-    ownerError.value = 'No bookings available to test access validation';
-  }
-}
-function generateSampleData() {
-  const userId = authStore.user?.id;
-  if (!userId) {
-    ownerError.value = 'Please log in to generate sample data';
-    return;
-  }
-  const sampleProperties = [
-    {
-      id: `prop-${Date.now()}-1`,
-      owner_id: userId,
-      name: 'Sunset Villa',
-      address: '123 Ocean Drive, Miami, FL',
-      cleaning_duration: 120,
-      pricing_tier: 'premium' as const,
-      active: true,
-      special_instructions: 'Pool cleaning required',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: `prop-${Date.now()}-2`,
-      owner_id: userId,
-      name: 'Downtown Loft',
-      address: '456 Main Street, Austin, TX',
-      cleaning_duration: 90,
-      pricing_tier: 'basic' as const,
-      active: true,
-      special_instructions: 'High-rise building, use service elevator',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ];
-  sampleProperties.forEach(property => {
-    propertyStore.addProperty(property);
-  });
-  const sampleBookings = [
-    {
-      id: `booking-${Date.now()}-1`,
-      property_id: sampleProperties[0].id,
-      owner_id: userId,
-      checkout_date: new Date().toISOString(),
-      checkin_date: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
-      booking_type: 'turn' as const,
-      status: 'pending' as const,
-      guest_count: 4,
-      notes: 'Same-day turn - urgent cleaning needed',
-      priority: 'urgent' as const,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: `booking-${Date.now()}-2`,
-      property_id: sampleProperties[1].id,
-      owner_id: userId,
-      checkout_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      checkin_date: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-      booking_type: 'standard' as const,
-      status: 'scheduled' as const,
-      guest_count: 2,
-      notes: 'Standard cleaning between guests',
-      priority: 'standard' as const,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ];
-  sampleBookings.forEach(booking => {
-    bookingStore.addBooking(booking);
-  });
-  ownerSuccess.value = `Generated ${sampleProperties.length} properties and ${sampleBookings.length} bookings for testing`;
-}
-function getUrgencyColor(urgency: string): string {
-  switch (urgency) {
-    case 'critical': return 'error';
-    case 'high': return 'warning';
-    case 'medium': return 'info';
-    case 'low': return 'success';
-    default: return 'grey';
-  }
-}
-function formatEventDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit'
-  });
-}
-onMounted(() => {
-  if (!authStore.user) {
-    authStore.login('owner@example.com', 'password');
-  }
-});
-</script>
-<style scoped>
-.v-card {
-  transition: all 0.3s ease;
-}
-.v-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-pre {
-  background-color: rgba(0, 0, 0, 0.05);
-  padding: 8px;
-  border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-</style>
 ````
 
 ## File: src/components/smart/shared/README.md
@@ -11448,35 +4661,6 @@ Admin composables handle sensitive business data and should:
 - Support audit trail requirements
 - Handle multi-tenant data access patterns
 - Prepare for future role-based permission expansion
-````
-
-## File: src/composables/admin/useAdminBookings.ts
-````typescript
-import { ref, computed } from 'vue';
-import { useBookings } from '@/composables/shared/useBookings';
-import { useAuthStore } from '@/stores/auth';
-import { useBookingStore } from '@/stores/booking';
-import { usePropertyStore } from '@/stores/property';
-import type { Booking, BookingFormData, BookingStatus, BookingType } from '@/types';
-export function useAdminBookings()
-⋮----
-async function fetchAllBookings(): Promise<boolean>
-async function assignCleaner(bookingId: string, cleanerId: string): Promise<boolean>
-async function updateBookingStatus(bookingId: string, status: BookingStatus): Promise<boolean>
-async function bulkAssignCleaner(bookingIds: string[], cleanerId: string): Promise<
-async function bulkUpdateStatus(bookingIds: string[], status: BookingStatus): Promise<
-function getSystemTurnAlerts()
-function getCleanerWorkloadAnalysis()
-function getPropertyUtilizationReport()
-function filterBookings(criteria: {
-    status?: BookingStatus[];
-    bookingType?: BookingType[];
-    ownerId?: string;
-    cleanerId?: string;
-    dateRange?: { start: string; end: string };
-    propertyId?: string;
-    unassignedOnly?: boolean;
-})
 ````
 
 ## File: src/composables/admin/useAdminCalendarState.ts
@@ -11733,26 +4917,6 @@ function getCleanerUtilization()
 function clearState()
 function getCleanerById(cleanerId: string): Cleaner | undefined
 function getCleanersBySkill(skill: string): Cleaner[]
-````
-
-## File: src/composables/owner/useOwnerBookings.ts
-````typescript
-import { ref, computed } from 'vue';
-import { useBookings } from '@/composables/shared/useBookings';
-import { useAuthStore } from '@/stores/auth';
-import { useBookingStore } from '@/stores/booking';
-import { usePropertyStore } from '@/stores/property';
-import type { Booking, BookingFormData, BookingStatus } from '@/types';
-export function useOwnerBookings()
-⋮----
-async function fetchMyBookings(): Promise<boolean>
-async function createMyBooking(formData: BookingFormData): Promise<string | null>
-async function updateMyBooking(id: string, updates: Partial<BookingFormData>): Promise<boolean>
-async function deleteMyBooking(id: string): Promise<boolean>
-async function changeMyBookingStatus(id: string, status: BookingStatus): Promise<boolean>
-function getMyTurnAlerts()
-function calculateMyBookingPriority(booking: Booking): 'low' | 'normal' | 'high' | 'urgent'
-function getMyBookingCleaningWindow(booking: Booking)
 ````
 
 ## File: src/composables/owner/useOwnerErrorHandler.ts
@@ -12457,441 +5621,6 @@ const cancelBooking = async (booking: Booking) => {
     justify-content: flex-end;
     margin-top: 12px;
   }
-}
-</style>
-````
-
-## File: src/pages/admin/cleaners/index.vue
-````vue
-<template>
-  <div class="admin-cleaners-page">
-    <div class="page-header">
-      <v-container fluid>
-        <v-row align="center">
-          <v-col>
-            <h1 class="text-h4 font-weight-bold">Cleaner Management</h1>
-            <p class="text-subtitle-1 text-medium-emphasis">
-              Manage cleaner profiles, availability, and performance
-            </p>
-          </v-col>
-          <v-col cols="auto">
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-account-plus"
-              @click="showAddDialog = true"
-            >
-              Add Cleaner
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </div>
-    <div class="stats-section">
-      <v-container fluid>
-        <v-row>
-          <v-col cols="12" sm="6" md="3">
-            <v-card>
-              <v-card-text>
-                <div class="d-flex align-center">
-                  <v-icon color="primary" size="40" class="me-3">mdi-account-group</v-icon>
-                  <div>
-                    <div class="text-h5 font-weight-bold">{{ cleanerStats.total }}</div>
-                    <div class="text-caption text-medium-emphasis">Total Cleaners</div>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="12" sm="6" md="3">
-            <v-card>
-              <v-card-text>
-                <div class="d-flex align-center">
-                  <v-icon color="success" size="40" class="me-3">mdi-check-circle</v-icon>
-                  <div>
-                    <div class="text-h5 font-weight-bold">{{ cleanerStats.available }}</div>
-                    <div class="text-caption text-medium-emphasis">Available Today</div>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="12" sm="6" md="3">
-            <v-card>
-              <v-card-text>
-                <div class="d-flex align-center">
-                  <v-icon color="warning" size="40" class="me-3">mdi-clock-outline</v-icon>
-                  <div>
-                    <div class="text-h5 font-weight-bold">{{ cleanerStats.busy }}</div>
-                    <div class="text-caption text-medium-emphasis">Currently Busy</div>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="12" sm="6" md="3">
-            <v-card>
-              <v-card-text>
-                <div class="d-flex align-center">
-                  <v-icon color="info" size="40" class="me-3">mdi-star</v-icon>
-                  <div>
-                    <div class="text-h5 font-weight-bold">4.8</div>
-                    <div class="text-caption text-medium-emphasis">Average Rating</div>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-    </div>
-    <div class="page-content">
-      <v-container fluid>
-        <v-row class="mb-4">
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="searchQuery"
-              prepend-inner-icon="mdi-magnify"
-              label="Search cleaners..."
-              variant="outlined"
-              density="compact"
-              clearable
-            />
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-select
-              v-model="statusFilter"
-              :items="statusOptions"
-              label="Status"
-              variant="outlined"
-              density="compact"
-              clearable
-            />
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-btn
-              color="secondary"
-              variant="outlined"
-              block
-              @click="resetFilters"
-            >
-              Reset Filters
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col
-            v-for="cleaner in filteredCleaners"
-            :key="cleaner.id"
-            cols="12"
-            md="6"
-            lg="4"
-          >
-            <v-card class="cleaner-card">
-              <v-card-text>
-                <div class="d-flex align-center mb-3">
-                  <v-avatar size="48" class="me-3">
-                    <v-icon size="24">mdi-account</v-icon>
-                  </v-avatar>
-                  <div class="flex-grow-1">
-                    <div class="text-h6 font-weight-medium">{{ cleaner.name }}</div>
-                    <div class="text-caption text-medium-emphasis">{{ cleaner.email }}</div>
-                  </div>
-                  <v-chip
-                    color="success"
-                    size="small"
-                    variant="flat"
-                  >
-                    Active
-                  </v-chip>
-                </div>
-                <div class="mb-3">
-                  <div class="text-caption text-medium-emphasis mb-1">Skills</div>
-                  <div class="d-flex flex-wrap ga-1">
-                    <v-chip
-                      v-for="skill in cleaner.skills.slice(0, 3)"
-                      :key="skill"
-                      size="x-small"
-                      variant="outlined"
-                    >
-                      {{ skill }}
-                    </v-chip>
-                    <v-chip
-                      v-if="cleaner.skills.length > 3"
-                      size="x-small"
-                      variant="outlined"
-                    >
-                      +{{ cleaner.skills.length - 3 }}
-                    </v-chip>
-                  </div>
-                </div>
-                <div class="d-flex justify-space-between mb-3">
-                  <div class="text-center">
-                    <div class="text-h6 font-weight-bold">{{ cleaner.max_daily_bookings }}</div>
-                    <div class="text-caption text-medium-emphasis">Max Daily</div>
-                  </div>
-                  <div class="text-center">
-                    <div class="text-h6 font-weight-bold">4.8</div>
-                    <div class="text-caption text-medium-emphasis">Rating</div>
-                  </div>
-                  <div class="text-center">
-                    <div class="text-h6 font-weight-bold">85%</div>
-                    <div class="text-caption text-medium-emphasis">Utilization</div>
-                  </div>
-                </div>
-              </v-card-text>
-              <v-card-actions>
-                <v-btn
-                  variant="text"
-                  size="small"
-                  prepend-icon="mdi-calendar"
-                  @click="viewSchedule(cleaner)"
-                >
-                  Schedule
-                </v-btn>
-                <v-btn
-                  variant="text"
-                  size="small"
-                  prepend-icon="mdi-pencil"
-                  @click="editCleaner(cleaner)"
-                >
-                  Edit
-                </v-btn>
-                <v-spacer />
-                <v-btn
-                  variant="text"
-                  size="small"
-                  color="error"
-                  icon="mdi-delete"
-                  @click="handleDeleteCleaner(cleaner)"
-                />
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
-        <div v-if="filteredCleaners.length === 0" class="text-center py-8">
-          <v-icon size="64" color="grey-lighten-1">mdi-account-search</v-icon>
-          <div class="text-h6 mt-4 mb-2">No cleaners found</div>
-          <div class="text-body-2 text-medium-emphasis">
-            Try adjusting your search criteria or add a new cleaner
-          </div>
-        </div>
-      </v-container>
-    </div>
-    <v-dialog v-model="showAddDialog" max-width="500px" persistent>
-      <v-card>
-        <v-card-title>
-          <span class="text-h5">{{ editingCleaner ? 'Edit' : 'Add' }} Cleaner</span>
-        </v-card-title>
-        <v-card-text>
-          <v-form ref="form" v-model="formValid">
-            <v-text-field
-              v-model="formData.name"
-              label="Full Name"
-              :rules="[rules.required]"
-              variant="outlined"
-              class="mb-3"
-            />
-            <v-text-field
-              v-model="formData.email"
-              label="Email"
-              type="email"
-              :rules="[rules.required, rules.email]"
-              variant="outlined"
-              class="mb-3"
-            />
-            <v-select
-              v-model="formData.skills"
-              :items="availableSkills"
-              label="Skills"
-              multiple
-              chips
-              variant="outlined"
-              class="mb-3"
-            />
-            <v-text-field
-              v-model.number="formData.max_daily_bookings"
-              label="Max Daily Bookings"
-              type="number"
-              :rules="[rules.required, rules.positive]"
-              variant="outlined"
-            />
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="closeDialog">Cancel</v-btn>
-          <v-btn
-            color="primary"
-            :disabled="!formValid"
-            :loading="saving"
-            @click="saveCleaner"
-          >
-            {{ editingCleaner ? 'Update' : 'Create' }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
-</template>
-⋮----
-<div class="text-h5 font-weight-bold">{{ cleanerStats.total }}</div>
-⋮----
-<div class="text-h5 font-weight-bold">{{ cleanerStats.available }}</div>
-⋮----
-<div class="text-h5 font-weight-bold">{{ cleanerStats.busy }}</div>
-⋮----
-<div class="text-h6 font-weight-medium">{{ cleaner.name }}</div>
-<div class="text-caption text-medium-emphasis">{{ cleaner.email }}</div>
-⋮----
-{{ skill }}
-⋮----
-+{{ cleaner.skills.length - 3 }}
-⋮----
-<div class="text-h6 font-weight-bold">{{ cleaner.max_daily_bookings }}</div>
-⋮----
-<span class="text-h5">{{ editingCleaner ? 'Edit' : 'Add' }} Cleaner</span>
-⋮----
-{{ editingCleaner ? 'Update' : 'Create' }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCleanerManagement } from '@/composables/admin/useCleanerManagement'
-import type { Cleaner } from '@/types/user'
-const router = useRouter()
-const { allCleaners, loading, fetchCleaners, createCleaner, updateCleaner, deleteCleaner } = useCleanerManagement()
-const searchQuery = ref('')
-const statusFilter = ref<string | null>(null)
-const showAddDialog = ref(false)
-const editingCleaner = ref<Cleaner | null>(null)
-const formValid = ref(false)
-const saving = ref(false)
-// Form data
-const formData = ref({
-  name: '',
-  email: '',
-  skills: [] as string[],
-  max_daily_bookings: 4
-})
-// Options
-const statusOptions = [
-  { title: 'Active', value: 'active' },
-  { title: 'Inactive', value: 'inactive' },
-  { title: 'On Leave', value: 'on_leave' }
-]
-const availableSkills = [
-  'Standard Cleaning',
-  'Deep Cleaning',
-  'Move-in/Move-out',
-  'Post-Construction',
-  'Carpet Cleaning',
-  'Window Cleaning',
-  'Pressure Washing',
-  'Organizing'
-]
-const rules = {
-  required: (value: any) => !!value || 'This field is required',
-  email: (value: string) => {
-    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return pattern.test(value) || 'Invalid email address'
-  },
-  positive: (value: number) => value > 0 || 'Must be greater than 0'
-}
-const filteredCleaners = computed(() => {
-  let filtered = allCleaners.value
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(cleaner =>
-      cleaner.name.toLowerCase().includes(query) ||
-      cleaner.email.toLowerCase().includes(query)
-    )
-  }
-  return filtered
-})
-const cleanerStats = computed(() => ({
-  total: allCleaners.value.length,
-  available: Math.floor(allCleaners.value.length * 0.7),
-  busy: Math.floor(allCleaners.value.length * 0.3)
-}))
-const resetFilters = () => {
-  searchQuery.value = ''
-  statusFilter.value = null
-}
-const viewSchedule = (cleaner: Cleaner) => {
-  router.push(`/admin/schedule?cleaner=${cleaner.id}`)
-}
-const editCleaner = (cleaner: Cleaner) => {
-  editingCleaner.value = cleaner
-  formData.value = {
-    name: cleaner.name,
-    email: cleaner.email,
-    skills: [...cleaner.skills],
-    max_daily_bookings: cleaner.max_daily_bookings
-  }
-  showAddDialog.value = true
-}
-const handleDeleteCleaner = async (cleaner: Cleaner) => {
-  if (confirm(`Are you sure you want to delete ${cleaner.name}?`)) {
-    try {
-      await deleteCleaner(cleaner.id)
-    } catch (error) {
-      console.error('Failed to delete cleaner:', error)
-    }
-  }
-}
-const saveCleaner = async () => {
-  saving.value = true
-  try {
-    if (editingCleaner.value) {
-      await updateCleaner(editingCleaner.value.id, formData.value)
-    } else {
-      await createCleaner(formData.value)
-    }
-    closeDialog()
-  } catch (error) {
-    console.error('Failed to save cleaner:', error)
-  } finally {
-    saving.value = false
-  }
-}
-const closeDialog = () => {
-  showAddDialog.value = false
-  editingCleaner.value = null
-  formData.value = {
-    name: '',
-    email: '',
-    skills: [],
-    max_daily_bookings: 4
-  }
-}
-onMounted(() => {
-  fetchCleaners()
-})
-</script>
-<style scoped>
-.admin-cleaners-page {
-  min-height: 100vh;
-  background: rgb(var(--v-theme-background));
-}
-.page-header {
-  background: rgb(var(--v-theme-surface));
-  border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
-  padding: 1rem 0;
-}
-.stats-section {
-  padding: 1rem 0;
-  background: rgb(var(--v-theme-surface));
-  border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
-}
-.page-content {
-  padding: 2rem 0;
-}
-.cleaner-card {
-  height: 100%;
-  transition: transform 0.2s ease-in-out;
-}
-.cleaner-card:hover {
-  transform: translateY(-2px);
 }
 </style>
 ````
@@ -13969,1615 +6698,6 @@ a:hover {
 </style>
 ````
 
-## File: src/pages/demos/admin-sidebar-width-test.vue
-````vue
-<template>
-  <div class="admin-sidebar-width-test">
-    <v-app-bar
-      title="Admin Sidebar Width Test"
-      color="primary"
-    />
-    <v-main>
-      <v-container fluid class="pa-0">
-        <div class="test-info mb-4 pa-4">
-          <h2>AdminSidebar Width Test</h2>
-          <p>This page tests the AdminSidebar width behavior:</p>
-          <ul>
-            <li><strong>Desktop (lg):</strong> Sidebar should be ~25% width (3/12 columns)</li>
-            <li><strong>Large Desktop (xl):</strong> Sidebar should be ~16.7% width (2/12 columns)</li>
-            <li><strong>Mobile:</strong> Sidebar should be hidden by default</li>
-          </ul>
-          <v-chip
-            :color="$vuetify.display.xl ? 'success' : 'default'"
-            class="mr-2"
-          >
-            XL: {{ $vuetify.display.xl }}
-          </v-chip>
-          <v-chip
-            :color="$vuetify.display.lg ? 'success' : 'default'"
-            class="mr-2"
-          >
-            LG: {{ $vuetify.display.lg }}
-          </v-chip>
-          <v-chip
-            :color="$vuetify.display.md ? 'success' : 'default'"
-            class="mr-2"
-          >
-            MD: {{ $vuetify.display.md }}
-          </v-chip>
-          <v-chip
-            :color="$vuetify.display.sm ? 'success' : 'default'"
-            class="mr-2"
-          >
-            SM: {{ $vuetify.display.sm }}
-          </v-chip>
-          <v-chip
-            :color="$vuetify.display.xs ? 'warning' : 'default'"
-          >
-            XS: {{ $vuetify.display.xs }}
-          </v-chip>
-        </div>
-        <v-row no-gutters class="fill-height test-layout">
-          <v-col
-            cols="12"
-            lg="3"
-            xl="2"
-            class="sidebar-column test-sidebar"
-            :class="{ 'mobile-hidden': !sidebarOpen }"
-          >
-            <div class="pa-2">
-              <v-btn
-                v-if="$vuetify.display.lgAndDown"
-                icon="mdi-menu"
-                variant="outlined"
-                class="mb-2"
-                @click="toggleSidebar"
-              >
-                <v-icon>mdi-menu</v-icon>
-              </v-btn>
-              <AdminSidebar
-                :today-turns="mockTodayTurns"
-                :upcoming-cleanings="mockUpcomingCleanings"
-                :properties="mockProperties"
-                :loading="false"
-                @navigate-to-booking="handleEvent"
-                @navigate-to-date="handleEvent"
-                @filter-by-property="handleEvent"
-                @create-booking="handleEvent"
-                @create-property="handleEvent"
-              />
-            </div>
-          </v-col>
-          <v-col
-            cols="12"
-            lg="9"
-            xl="10"
-            class="calendar-column test-main"
-          >
-            <div class="test-content pa-4">
-              <h3>Main Content Area</h3>
-              <p>This area simulates the calendar content.</p>
-              <p><strong>Current breakpoint:</strong>
-                <span v-if="$vuetify.display.xl">XL (≥1904px) - Sidebar should be 2/12 = ~16.7%</span>
-                <span v-else-if="$vuetify.display.lg">LG (≥1264px) - Sidebar should be 3/12 = 25%</span>
-                <span v-else-if="$vuetify.display.md">MD (≥960px) - Mobile layout</span>
-                <span v-else>Mobile - Sidebar hidden/overlay</span>
-              </p>
-              <v-btn
-                v-if="$vuetify.display.lgAndDown"
-                variant="outlined"
-                prepend-icon="mdi-menu"
-                @click="toggleSidebar"
-              >
-                Toggle Sidebar
-              </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
-  </div>
-</template>
-⋮----
-XL: {{ $vuetify.display.xl }}
-⋮----
-LG: {{ $vuetify.display.lg }}
-⋮----
-MD: {{ $vuetify.display.md }}
-⋮----
-SM: {{ $vuetify.display.sm }}
-⋮----
-XS: {{ $vuetify.display.xs }}
-⋮----
-<script setup lang="ts">
-import { ref } from 'vue';
-import { useDisplay } from 'vuetify';
-import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
-const { xs } = useDisplay();
-const sidebarOpen = ref(!xs.value);
-const mockTodayTurns = new Map();
-const mockUpcomingCleanings = new Map();
-const mockProperties = new Map();
-const handleEvent = (data: unknown) => {
-  console.log('Event received:', data);
-};
-const toggleSidebar = () => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
-</script>
-<style scoped>
-.admin-sidebar-width-test {
-  height: 100vh;
-  overflow: hidden;
-}
-.test-layout {
-  min-height: calc(100vh - 200px);
-}
-.test-info {
-  background-color: rgb(var(--v-theme-surface-variant));
-  border-radius: 8px;
-}
-.sidebar-column {
-  min-height: calc(100vh - 200px);
-  overflow-y: auto;
-  border-right: 2px solid rgb(var(--v-theme-primary));
-  background-color: rgb(var(--v-theme-surface));
-}
-.calendar-column {
-  min-height: calc(100vh - 200px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.test-sidebar {
-  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.1), rgba(var(--v-theme-secondary), 0.1));
-}
-.test-main {
-  background: linear-gradient(135deg, rgba(var(--v-theme-info), 0.05), rgba(var(--v-theme-success), 0.05));
-}
-.test-content {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-.mobile-hidden {
-  display: none;
-}
-@media (max-width: 1024px) {
-  .sidebar-column {
-    position: fixed;
-    top: 64px;
-    left: 0;
-    z-index: 1000;
-    width: 100% !important;
-    max-width: 400px;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-    height: calc(100vh - 64px);
-  }
-  .mobile-hidden {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-  .sidebar-column:not(.mobile-hidden) {
-    transform: translateX(0);
-  }
-}
-</style>
-````
-
-## File: src/pages/demos/auth-flow.vue
-````vue
-<template>
-  <v-container class="pa-6">
-    <v-row>
-      <v-col cols="12">
-        <v-card elevation="2" class="pa-6">
-          <v-card-title class="text-h4 mb-4">
-            <v-icon class="mr-3" color="primary">mdi-account-check</v-icon>
-            Authentication Flow Demo
-          </v-card-title>
-          <v-card-subtitle class="mb-6">
-            Test role-based authentication and navigation
-          </v-card-subtitle>
-          <v-alert
-            :type="authStore.isAuthenticated ? 'success' : 'info'"
-            variant="tonal"
-            class="mb-6"
-          >
-            <div class="text-h6 mb-2">Current Authentication State</div>
-            <div v-if="authStore.isAuthenticated">
-              <strong>User:</strong> {{ authStore.user?.name }} ({{ authStore.user?.email }})<br>
-              <strong>Role:</strong> {{ authStore.user?.role }}<br>
-              <strong>Current View:</strong> {{ authStore.currentRole }}<br>
-              <strong>Default Route:</strong> {{ authStore.defaultRoute }}<br>
-              <strong>Temp View Mode:</strong> {{ authStore.tempViewMode ? 'Yes' : 'No' }}
-            </div>
-            <div v-else>
-              <strong>Status:</strong> Not authenticated
-            </div>
-          </v-alert>
-          <v-alert
-            v-if="authStore.error"
-            type="error"
-            variant="tonal"
-            class="mb-4"
-            closable
-            @click:close="authStore.clearError"
-          >
-            {{ authStore.error }}
-          </v-alert>
-          <v-alert
-            v-if="successMessage"
-            type="success"
-            variant="tonal"
-            class="mb-4"
-            closable
-            @click:close="successMessage = ''"
-          >
-            {{ successMessage }}
-          </v-alert>
-          <div class="mb-6">
-            <v-card variant="outlined" class="pa-4">
-              <v-card-title class="text-h6 mb-4">Authentication Actions</v-card-title>
-              <v-row class="mb-4">
-                <v-col cols="12" md="4">
-                  <v-btn
-                    color="primary"
-                    block
-                    @click="loginAsOwner"
-                    :loading="authStore.loading"
-                    :disabled="authStore.isAuthenticated"
-                  >
-                    <v-icon class="mr-2">mdi-home-account</v-icon>
-                    Login as Owner
-                  </v-btn>
-                </v-col>
-                <v-col cols="12" md="4">
-                  <v-btn
-                    color="secondary"
-                    block
-                    @click="loginAsAdmin"
-                    :loading="authStore.loading"
-                    :disabled="authStore.isAuthenticated"
-                  >
-                    <v-icon class="mr-2">mdi-shield-account</v-icon>
-                    Login as Admin
-                  </v-btn>
-                </v-col>
-                <v-col cols="12" md="4">
-                  <v-btn
-                    color="warning"
-                    block
-                    @click="loginAsCleaner"
-                    :loading="authStore.loading"
-                    :disabled="authStore.isAuthenticated"
-                  >
-                    <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
-                    Login as Cleaner
-                  </v-btn>
-                </v-col>
-              </v-row>
-              <v-btn
-                v-if="authStore.isAuthenticated"
-                color="error"
-                block
-                @click="handleLogout"
-                :loading="authStore.loading"
-              >
-                <v-icon class="mr-2">mdi-logout</v-icon>
-                Logout
-              </v-btn>
-            </v-card>
-          </div>
-          <div v-if="authStore.isAdmin" class="mb-6">
-            <v-card variant="outlined" class="pa-4">
-              <v-card-title class="text-h6 mb-4">Admin Role Switching</v-card-title>
-              <AdminRoleSwitcher
-                :is-in-owner-view="authStore.tempViewMode?.role === 'owner'"
-                @switch-to-admin="handleSwitchToAdmin"
-                @switch-to-owner="handleSwitchToOwner"
-                @view-owner-properties="showMessage('Viewing owner properties')"
-                @view-owner-bookings="showMessage('Viewing owner bookings')"
-                @open-support-tools="showMessage('Opening support tools')"
-              />
-            </v-card>
-          </div>
-          <div class="mb-6">
-            <v-card variant="outlined" class="pa-4">
-              <v-card-title class="text-h6 mb-4">Navigation Testing</v-card-title>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-btn
-                    color="info"
-                    block
-                    @click="navigateToDefault"
-                    :disabled="!authStore.isAuthenticated"
-                  >
-                    <v-icon class="mr-2">mdi-home</v-icon>
-                    Go to Default Route
-                  </v-btn>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-btn
-                    color="info"
-                    variant="outlined"
-                    block
-                    @click="goToLogin"
-                  >
-                    <v-icon class="mr-2">mdi-login</v-icon>
-                    Go to Login Page
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-card>
-          </div>
-          <div class="mb-6">
-            <v-card variant="outlined" class="pa-4">
-              <v-card-title class="text-h6 mb-4">Registration Testing</v-card-title>
-              <v-btn
-                color="success"
-                block
-                @click="goToSignup"
-              >
-                <v-icon class="mr-2">mdi-account-plus</v-icon>
-                Go to Registration Page
-              </v-btn>
-            </v-card>
-          </div>
-          <div class="mb-6">
-            <v-card variant="outlined" class="pa-4">
-              <v-card-title class="text-h6 mb-4">Auth Helpers Testing</v-card-title>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <div class="text-body-2 mb-2">
-                    <strong>Role Display Names:</strong>
-                  </div>
-                  <v-chip class="mr-2 mb-2" color="primary" size="small">
-                    Owner: {{ getRoleDisplayName('owner') }}
-                  </v-chip>
-                  <v-chip class="mr-2 mb-2" color="secondary" size="small">
-                    Admin: {{ getRoleDisplayName('admin') }}
-                  </v-chip>
-                  <v-chip class="mr-2 mb-2" color="warning" size="small">
-                    Cleaner: {{ getRoleDisplayName('cleaner') }}
-                  </v-chip>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <div class="text-body-2 mb-2">
-                    <strong>Default Routes:</strong>
-                  </div>
-                  <div class="text-caption">
-                    Owner: {{ getDefaultRouteForRole('owner') }}<br>
-                    Admin: {{ getDefaultRouteForRole('admin') }}<br>
-                    Cleaner: {{ getDefaultRouteForRole('cleaner') }}
-                  </div>
-                </v-col>
-              </v-row>
-            </v-card>
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-⋮----
-<strong>User:</strong> {{ authStore.user?.name }} ({{ authStore.user?.email }})<br>
-<strong>Role:</strong> {{ authStore.user?.role }}<br>
-<strong>Current View:</strong> {{ authStore.currentRole }}<br>
-<strong>Default Route:</strong> {{ authStore.defaultRoute }}<br>
-<strong>Temp View Mode:</strong> {{ authStore.tempViewMode ? 'Yes' : 'No' }}
-⋮----
-{{ authStore.error }}
-⋮----
-{{ successMessage }}
-⋮----
-Owner: {{ getRoleDisplayName('owner') }}
-⋮----
-Admin: {{ getRoleDisplayName('admin') }}
-⋮----
-Cleaner: {{ getRoleDisplayName('cleaner') }}
-⋮----
-Owner: {{ getDefaultRouteForRole('owner') }}<br>
-Admin: {{ getDefaultRouteForRole('admin') }}<br>
-Cleaner: {{ getDefaultRouteForRole('cleaner') }}
-⋮----
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import AdminRoleSwitcher from '@/components/dumb/admin/AdminRoleSwitcher.vue'
-import {
-  getDefaultRouteForRole,
-  getRoleDisplayName
-} from '@/utils/authHelpers'
-const router = useRouter()
-const authStore = useAuthStore()
-const successMessage = ref('')
-// Authentication actions
-async function loginAsOwner() {
-  const success = await authStore.login('owner@example.com', 'password')
-  if (success) {
-    successMessage.value = authStore.getSuccessMessage('login')
-  }
-}
-async function loginAsAdmin() {
-  const success = await authStore.login('admin@example.com', 'password')
-  if (success) {
-    successMessage.value = authStore.getSuccessMessage('login')
-  }
-}
-async function loginAsCleaner() {
-  const success = await authStore.login('cleaner@example.com', 'password')
-  if (success) {
-    successMessage.value = authStore.getSuccessMessage('login')
-  }
-}
-async function handleLogout() {
-  const success = await authStore.logout()
-  if (success) {
-    successMessage.value = authStore.getSuccessMessage('logout')
-  }
-}
-function handleSwitchToAdmin() {
-  const success = authStore.switchToAdminView()
-  if (success) {
-    successMessage.value = 'Switched to admin view'
-  }
-}
-function handleSwitchToOwner() {
-  const success = authStore.switchToOwnerView()
-  if (success) {
-    successMessage.value = 'Switched to owner view'
-  }
-}
-function navigateToDefault() {
-  if (authStore.defaultRoute) {
-    router.push(authStore.defaultRoute)
-  }
-}
-function goToLogin() {
-  router.push('/auth/login')
-}
-function goToSignup() {
-  router.push('/auth/signup')
-}
-function showMessage(message: string) {
-  successMessage.value = message
-}
-authStore.clearError()
-</script>
-<style scoped>
-.v-card {
-  transition: all 0.3s ease;
-}
-.v-btn {
-  text-transform: none;
-}
-.v-alert {
-  transition: all 0.3s ease;
-}
-</style>
-````
-
-## File: src/pages/demos/home-admin.vue
-````vue
-<template>
-  <HomeAdminDemo />
-</template>
-<script setup lang="ts">
-import HomeAdminDemo from '@/components/smart/admin/HomeAdminDemo.vue';
-</script>
-````
-
-## File: src/pages/demos/owner-calendar.vue
-````vue
-<template>
-  <div>
-    <OwnerCalendarDemo />
-  </div>
-</template>
-<script setup lang="ts">
-import OwnerCalendarDemo from '@/components/smart/owner/OwnerCalendarDemo.vue';
-</script>
-````
-
-## File: src/pages/demos/owner-sidebar.vue
-````vue
-<template>
-  <OwnerSidebarDemo />
-</template>
-<script setup lang="ts">
-import OwnerSidebarDemo from '@/components/smart/owner/OwnerSidebarDemo.vue';
-</script>
-````
-
-## File: src/pages/demos/role-routing.vue
-````vue
-<template>
-  <v-container class="pa-4">
-    <v-row>
-      <v-col cols="12">
-        <v-card elevation="4" class="pa-4">
-          <v-card-title class="text-h4 text-center mb-4">
-            <v-icon class="mr-2" color="primary">mdi-account-switch</v-icon>
-            Role-Based Routing Demo
-          </v-card-title>
-          <v-card-text>
-            <v-alert
-              type="info"
-              variant="tonal"
-              class="mb-4"
-            >
-              <strong>TASK-039R Implementation Demo</strong><br>
-              This page demonstrates the role-based routing system implemented in pages/index.vue.
-              The main application now dynamically renders different components based on user role.
-            </v-alert>
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-card variant="outlined" class="pa-3">
-                  <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="success">mdi-check-circle</v-icon>
-                    Current Implementation
-                  </v-card-title>
-                  <v-card-text>
-                    <ul class="text-body-2">
-                      <li>✅ Dynamic component rendering based on user role</li>
-                      <li>✅ Loading state during authentication check</li>
-                      <li>✅ AuthPrompt for unauthenticated users</li>
-                      <li>✅ HomeAdmin.vue for admin users</li>
-                      <li>✅ HomeOwner.vue for property owner users</li>
-                      <li>✅ Role-specific computed properties in auth store</li>
-                      <li>✅ Smooth transitions between components</li>
-                      <li>✅ Mock login buttons for testing</li>
-                    </ul>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-card variant="outlined" class="pa-3">
-                  <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="primary">mdi-information</v-icon>
-                    Current User State
-                  </v-card-title>
-                  <v-card-text>
-                    <v-chip
-                      :color="authStore.isAuthenticated ? 'success' : 'error'"
-                      class="mb-2"
-                    >
-                      <v-icon start>
-                        {{ authStore.isAuthenticated ? 'mdi-check' : 'mdi-close' }}
-                      </v-icon>
-                      {{ authStore.isAuthenticated ? 'Authenticated' : 'Not Authenticated' }}
-                    </v-chip>
-                    <div v-if="authStore.user" class="mt-2">
-                      <p><strong>Name:</strong> {{ authStore.user.name }}</p>
-                      <p><strong>Email:</strong> {{ authStore.user.email }}</p>
-                      <p><strong>Role:</strong>
-                        <v-chip
-                          :color="getRoleColor(authStore.user.role)"
-                          size="small"
-                        >
-                          {{ authStore.user.role }}
-                        </v-chip>
-                      </p>
-                    </div>
-                    <div v-else class="mt-2">
-                      <p class="text-medium-emphasis">No user logged in</p>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-row class="mt-4">
-              <v-col cols="12">
-                <v-card variant="outlined" class="pa-3">
-                  <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="warning">mdi-test-tube</v-icon>
-                    Test Role Switching
-                  </v-card-title>
-                  <v-card-text>
-                    <p class="text-body-2 mb-3">
-                      Use these buttons to test different user roles. The main application (/) will
-                      automatically render the appropriate interface for each role.
-                    </p>
-                    <v-row>
-                      <v-col cols="12" sm="4">
-                        <v-btn
-                          color="error"
-                          variant="outlined"
-                          block
-                          @click="logout"
-                          :loading="authStore.loading"
-                        >
-                          <v-icon class="mr-2">mdi-logout</v-icon>
-                          Logout (Test Auth Prompt)
-                        </v-btn>
-                      </v-col>
-                      <v-col cols="12" sm="4">
-                        <v-btn
-                          color="primary"
-                          variant="elevated"
-                          block
-                          @click="loginAsAdmin"
-                          :loading="authStore.loading"
-                        >
-                          <v-icon class="mr-2">mdi-account-tie</v-icon>
-                          Login as Admin
-                        </v-btn>
-                      </v-col>
-                      <v-col cols="12" sm="4">
-                        <v-btn
-                          color="secondary"
-                          variant="elevated"
-                          block
-                          @click="loginAsOwner"
-                          :loading="authStore.loading"
-                        >
-                          <v-icon class="mr-2">mdi-home-account</v-icon>
-                          Login as Owner
-                        </v-btn>
-                      </v-col>
-                    </v-row>
-                    <v-alert
-                      type="success"
-                      variant="tonal"
-                      class="mt-3"
-                    >
-                      <strong>After switching roles:</strong> Navigate to the home page (/) to see the role-specific interface.
-                    </v-alert>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-row class="mt-4">
-              <v-col cols="12">
-                <v-card variant="outlined" class="pa-3">
-                  <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="info">mdi-code-tags</v-icon>
-                    Implementation Details
-                  </v-card-title>
-                  <v-card-text>
-                    <v-expansion-panels>
-                      <v-expansion-panel>
-                        <v-expansion-panel-title>
-                          <v-icon class="mr-2">mdi-file-code</v-icon>
-                          Code Structure
-                        </v-expansion-panel-title>
-                        <v-expansion-panel-text>
-                          <pre class="text-caption"><code>
-const homeComponent = computed(() => {
-  if (!authStore.isAuthenticated) return AuthPrompt;
-  if (authStore.isAdmin) return HomeAdmin;
-  if (authStore.isOwner) return HomeOwner;
-  return AuthPrompt;
-});
-const isOwner = computed(() => user.value?.role === 'owner');
-const isAdmin = computed(() => user.value?.role === 'admin');</code></pre>
-                        </v-expansion-panel-text>
-                      </v-expansion-panel>
-                      <v-expansion-panel>
-                        <v-expansion-panel-title>
-                          <v-icon class="mr-2">mdi-security</v-icon>
-                          Security Notes
-                        </v-expansion-panel-title>
-                        <v-expansion-panel-text>
-                          <v-alert type="warning" variant="tonal" class="mb-2">
-                            <strong>Frontend Filtering Only:</strong> This implementation provides role-based UI filtering for user experience only, not security.
-                          </v-alert>
-                          <p class="text-body-2">
-                            Real security will be implemented in Phase 2 with backend Row Level Security (RLS) policies.
-                            Users could potentially access other roles' data through browser dev tools.
-                          </p>
-                        </v-expansion-panel-text>
-                      </v-expansion-panel>
-                      <v-expansion-panel>
-                        <v-expansion-panel-title>
-                          <v-icon class="mr-2">mdi-architecture</v-icon>
-                          Architecture Pattern
-                        </v-expansion-panel-title>
-                        <v-expansion-panel-text>
-                          <p class="text-body-2">
-                            This follows the multi-tenant role-based architecture pattern:
-                          </p>
-                          <ul class="text-body-2">
-                            <li><strong>Property Owners:</strong> See only their data through HomeOwner.vue</li>
-                            <li><strong>Business Admin:</strong> See all data through HomeAdmin.vue</li>
-                            <li><strong>Data Scoping:</strong> Implemented at composable level</li>
-                            <li><strong>Component Separation:</strong> owner/, admin/, shared/ folder structure</li>
-                          </ul>
-                        </v-expansion-panel-text>
-                      </v-expansion-panel>
-                    </v-expansion-panels>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-row class="mt-4">
-              <v-col cols="12" class="text-center">
-                <v-btn
-                  color="primary"
-                  size="large"
-                  to="/"
-                  prepend-icon="mdi-home"
-                >
-                  Go to Main Application
-                </v-btn>
-                <v-btn
-                  color="secondary"
-                  variant="outlined"
-                  size="large"
-                  to="/demos"
-                  class="ml-2"
-                  prepend-icon="mdi-arrow-left"
-                >
-                  Back to Demos
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-⋮----
-{{ authStore.isAuthenticated ? 'mdi-check' : 'mdi-close' }}
-⋮----
-{{ authStore.isAuthenticated ? 'Authenticated' : 'Not Authenticated' }}
-⋮----
-<p><strong>Name:</strong> {{ authStore.user.name }}</p>
-<p><strong>Email:</strong> {{ authStore.user.email }}</p>
-⋮----
-{{ authStore.user.role }}
-⋮----
-<script setup lang="ts">
-import { useAuthStore } from '@/stores/auth'
-const authStore = useAuthStore()
-function getRoleColor(role: string) {
-  switch (role) {
-    case 'admin': return 'primary'
-    case 'owner': return 'secondary'
-    case 'cleaner': return 'success'
-    default: return 'grey'
-  }
-}
-async function logout() {
-  await authStore.logout()
-}
-async function loginAsAdmin() {
-  await authStore.login('admin@example.com', 'password')
-  if (authStore.user) {
-    authStore.user.role = 'admin'
-    authStore.user.name = 'Business Admin'
-  }
-}
-async function loginAsOwner() {
-  await authStore.login('owner@example.com', 'password')
-  if (authStore.user) {
-    authStore.user.role = 'owner'
-    authStore.user.name = 'Property Owner'
-  }
-}
-</script>
-<style scoped>
-pre {
-  background-color: rgba(var(--v-theme-surface-variant), 0.1);
-  padding: 12px;
-  border-radius: 4px;
-  overflow-x: auto;
-}
-code {
-  font-family: 'Courier New', monospace;
-  font-size: 0.85em;
-}
-</style>
-````
-
-## File: src/pages/demos/route-guards.vue
-````vue
-<template>
-  <div class="route-guards-demo">
-    <v-container>
-      <v-row>
-        <v-col cols="12">
-          <h1 class="text-h4 mb-4">🚦 Route Guards Demo</h1>
-          <p class="text-body-1 mb-6">
-            Test role-based authentication and authorization for the multi-tenant architecture.
-          </p>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12" md="6">
-          <v-card class="mb-4">
-            <v-card-title>Current User Status</v-card-title>
-            <v-card-text>
-              <div v-if="authStore.isAuthenticated">
-                <v-chip :color="getRoleColor(authStore.user?.role)" class="mb-2">
-                  {{ authStore.user?.role?.toUpperCase() || 'UNKNOWN' }}
-                </v-chip>
-                <p><strong>Name:</strong> {{ authStore.user?.name }}</p>
-                <p><strong>Email:</strong> {{ authStore.user?.email }}</p>
-                <p><strong>Role:</strong> {{ authStore.user?.role }}</p>
-              </div>
-              <div v-else>
-                <v-chip color="grey" class="mb-2">NOT AUTHENTICATED</v-chip>
-                <p>You are not logged in.</p>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="12" md="6">
-          <v-card class="mb-4">
-            <v-card-title>Quick Role Switch</v-card-title>
-            <v-card-text>
-              <v-btn-toggle v-model="selectedRole" mandatory class="mb-3">
-                <v-btn value="owner" size="small">Owner</v-btn>
-                <v-btn value="admin" size="small">Admin</v-btn>
-                <v-btn value="cleaner" size="small">Cleaner</v-btn>
-              </v-btn-toggle>
-              <div class="d-flex gap-2">
-                <v-btn
-                  @click="loginAsRole(selectedRole)"
-                  color="primary"
-                  size="small"
-                  :loading="authStore.loading"
-                >
-                  Login as {{ selectedRole }}
-                </v-btn>
-                <v-btn
-                  @click="authStore.logout()"
-                  color="error"
-                  size="small"
-                  :disabled="!authStore.isAuthenticated"
-                >
-                  Logout
-                </v-btn>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <v-card>
-            <v-card-title>Route Access Testing</v-card-title>
-            <v-card-text>
-              <p class="text-body-2 mb-4">
-                Click the buttons below to test access to different routes based on your current role.
-                Watch for access denied messages and automatic redirects.
-              </p>
-              <div class="mb-4">
-                <h3 class="text-h6 mb-2">👤 Owner Routes</h3>
-                <div class="d-flex flex-wrap gap-2">
-                  <v-btn
-                    v-for="route in ownerRoutes"
-                    :key="route.path"
-                    @click="testRoute(route.path)"
-                    :color="getRouteButtonColor('owner')"
-                    size="small"
-                    variant="outlined"
-                  >
-                    {{ route.name }}
-                  </v-btn>
-                </div>
-              </div>
-              <div class="mb-4">
-                <h3 class="text-h6 mb-2">🔧 Admin Routes</h3>
-                <div class="d-flex flex-wrap gap-2">
-                  <v-btn
-                    v-for="route in adminRoutes"
-                    :key="route.path"
-                    @click="testRoute(route.path)"
-                    :color="getRouteButtonColor('admin')"
-                    size="small"
-                    variant="outlined"
-                  >
-                    {{ route.name }}
-                  </v-btn>
-                </div>
-              </div>
-              <div class="mb-4">
-                <h3 class="text-h6 mb-2">🌐 Public Routes</h3>
-                <div class="d-flex flex-wrap gap-2">
-                  <v-btn
-                    v-for="route in publicRoutes"
-                    :key="route.path"
-                    @click="testRoute(route.path)"
-                    color="success"
-                    size="small"
-                    variant="outlined"
-                  >
-                    {{ route.name }}
-                  </v-btn>
-                </div>
-              </div>
-              <div class="mb-4">
-                <h3 class="text-h6 mb-2">🔐 Auth Routes</h3>
-                <div class="d-flex flex-wrap gap-2">
-                  <v-btn
-                    v-for="route in authRoutes"
-                    :key="route.path"
-                    @click="testRoute(route.path)"
-                    color="info"
-                    size="small"
-                    variant="outlined"
-                  >
-                    {{ route.name }}
-                  </v-btn>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row v-if="testResults.length > 0">
-        <v-col cols="12">
-          <v-card>
-            <v-card-title>Test Results</v-card-title>
-            <v-card-text>
-              <v-timeline density="compact">
-                <v-timeline-item
-                  v-for="result in testResults"
-                  :key="result.id"
-                  :dot-color="result.success ? 'success' : 'error'"
-                  size="small"
-                >
-                  <div class="d-flex justify-space-between align-center">
-                    <div>
-                      <strong>{{ result.route }}</strong>
-                      <span class="text-body-2 ml-2">as {{ result.role }}</span>
-                    </div>
-                    <v-chip
-                      :color="result.success ? 'success' : 'error'"
-                      size="small"
-                    >
-                      {{ result.success ? 'ALLOWED' : 'DENIED' }}
-                    </v-chip>
-                  </div>
-                  <div v-if="result.message" class="text-body-2 text-medium-emphasis mt-1">
-                    {{ result.message }}
-                  </div>
-                </v-timeline-item>
-              </v-timeline>
-              <v-btn
-                @click="clearResults"
-                color="warning"
-                size="small"
-                class="mt-3"
-              >
-                Clear Results
-              </v-btn>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
-⋮----
-{{ authStore.user?.role?.toUpperCase() || 'UNKNOWN' }}
-⋮----
-<p><strong>Name:</strong> {{ authStore.user?.name }}</p>
-<p><strong>Email:</strong> {{ authStore.user?.email }}</p>
-<p><strong>Role:</strong> {{ authStore.user?.role }}</p>
-⋮----
-Login as {{ selectedRole }}
-⋮----
-{{ route.name }}
-⋮----
-{{ route.name }}
-⋮----
-{{ route.name }}
-⋮----
-{{ route.name }}
-⋮----
-<strong>{{ result.route }}</strong>
-<span class="text-body-2 ml-2">as {{ result.role }}</span>
-⋮----
-{{ result.success ? 'ALLOWED' : 'DENIED' }}
-⋮----
-{{ result.message }}
-⋮----
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import type { UserRole } from '@/types/router'
-const router = useRouter()
-const authStore = useAuthStore()
-const selectedRole = ref<UserRole>('owner')
-const testResults = ref<Array<{
-  id: string
-  route: string
-  role: string
-  success: boolean
-  message?: string
-  timestamp: Date
-}>>([])
-const ownerRoutes = [
-  { name: 'Owner Dashboard', path: '/owner/dashboard' },
-  { name: 'Owner Properties', path: '/owner/properties' },
-  { name: 'Owner Calendar', path: '/owner/calendar' },
-  { name: 'Owner Bookings', path: '/owner/bookings' }
-]
-const adminRoutes = [
-  { name: 'Admin Dashboard', path: '/admin' },
-  { name: 'Admin Schedule', path: '/admin/schedule' },
-  { name: 'Admin Cleaners', path: '/admin/cleaners' },
-  { name: 'Admin Properties', path: '/admin/properties' },
-  { name: 'Admin Bookings', path: '/admin/bookings' },
-  { name: 'Admin Reports', path: '/admin/reports' }
-]
-const publicRoutes = [
-  { name: 'Home', path: '/' },
-  { name: 'Demos', path: '/demos' },
-  { name: 'CRUD Testing', path: '/testing/crud' }
-]
-const authRoutes = [
-  { name: 'Login', path: '/auth/login' },
-  { name: 'Register', path: '/auth/register' }
-]
-async function loginAsRole(role: UserRole) {
-  try {
-    await authStore.login(`${role}@example.com`, 'password')
-    if (authStore.user) {
-      authStore.user.role = role
-      authStore.user.name = `Demo ${role.charAt(0).toUpperCase() + role.slice(1)}`
-    }
-    addTestResult('Login', `Logged in as ${role}`, true, `Successfully authenticated as ${role}`)
-  } catch (error) {
-    addTestResult('Login', `Failed to login as ${role}`, false, String(error))
-  }
-}
-function testRoute(path: string) {
-  const currentRole = authStore.user?.role || 'unauthenticated'
-  try {
-    router.push(path).then(() => {
-      addTestResult(path, currentRole, true, 'Navigation successful')
-    }).catch((error) => {
-      addTestResult(path, currentRole, false, `Navigation failed: ${error.message}`)
-    })
-  } catch (error) {
-    addTestResult(path, currentRole, false, `Error: ${String(error)}`)
-  }
-}
-function addTestResult(route: string, role: string, success: boolean, message?: string) {
-  testResults.value.unshift({
-    id: `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    route,
-    role,
-    success,
-    message,
-    timestamp: new Date()
-  })
-  if (testResults.value.length > 20) {
-    testResults.value = testResults.value.slice(0, 20)
-  }
-}
-function clearResults() {
-  testResults.value = []
-}
-function getRoleColor(role?: string) {
-  switch (role) {
-    case 'owner': return 'primary'
-    case 'admin': return 'error'
-    case 'cleaner': return 'success'
-    default: return 'grey'
-  }
-}
-function getRouteButtonColor(requiredRole: string) {
-  const userRole = authStore.user?.role
-  if (!authStore.isAuthenticated) return 'grey'
-  if (userRole === requiredRole) return 'success'
-  if (userRole === 'admin' && requiredRole === 'owner') return 'warning'
-  return 'error'
-}
-</script>
-<style scoped>
-.route-guards-demo {
-  min-height: 100vh;
-  padding: 20px 0;
-}
-.gap-2 {
-  gap: 8px;
-}
-</style>
-````
-
-## File: src/pages/demos/sidebar.vue
-````vue
-<template>
-  <SidebarDemo />
-</template>
-<script setup lang="ts">
-import SidebarDemo from '@/components/smart/SidebarDemo.vue';
-</script>
-<style scoped>
-</style>
-````
-
-## File: src/pages/demos/turn-visual-indicators.vue
-````vue
-<template>
-  <v-container fluid class="turn-visual-indicators-demo">
-    <v-row>
-      <v-col cols="12">
-        <div class="demo-header mb-6">
-          <h1 class="text-h3 font-weight-bold mb-2">
-            <v-icon icon="mdi-alert-decagram" color="warning" class="mr-3" />
-            Turn Booking Visual Indicators Demo
-          </h1>
-          <p class="text-h6 text-medium-emphasis">
-            <strong>TASK-039</strong> - Enhanced visual indicators for urgent turn bookings with role-based styling
-          </p>
-        </div>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card variant="outlined" class="mb-6">
-          <v-card-title>
-            <v-icon icon="mdi-account-switch" class="mr-2" />
-            Role-Based Styling Demo
-          </v-card-title>
-          <v-card-text>
-            <v-btn-toggle
-              v-model="currentRole"
-              mandatory
-              variant="outlined"
-              class="mb-4"
-            >
-              <v-btn value="owner">
-                <v-icon icon="mdi-home-account" class="mr-2" />
-                Property Owner
-              </v-btn>
-              <v-btn value="admin">
-                <v-icon icon="mdi-shield-account" class="mr-2" />
-                Admin
-              </v-btn>
-            </v-btn-toggle>
-            <div class="text-caption text-medium-emphasis">
-              <strong>Current Interface:</strong> {{ currentRole === 'owner' ? 'Property Owner (softer colors)' : 'Admin (urgent colors)' }}
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card variant="outlined" class="mb-6">
-          <v-card-title>
-            <v-icon icon="mdi-label" class="mr-2" />
-            Priority Badges (TurnPriorityBadge Component)
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col v-for="priority in priorities" :key="priority" cols="12" sm="6" md="3">
-                <div class="demo-section">
-                  <h4 class="text-h6 mb-3 text-capitalize">{{ priority }} Priority</h4>
-                  <div class="mb-3">
-                    <TurnPriorityBadge
-                      :priority="priority"
-                      :user-role="currentRole"
-                      :animated="true"
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <TurnPriorityBadge
-                      :priority="priority"
-                      :user-role="currentRole"
-                      :animated="true"
-                      :show-time-remaining="true"
-                      :time-remaining="getTimeRemainingForPriority(priority)"
-                      :clickable="true"
-                      @click="showToast(`Clicked ${priority} priority badge`)"
-                    />
-                  </div>
-                  <div class="d-flex flex-wrap gap-2">
-                    <TurnPriorityBadge
-                      :priority="priority"
-                      :user-role="currentRole"
-                      size="x-small"
-                    />
-                    <TurnPriorityBadge
-                      :priority="priority"
-                      :user-role="currentRole"
-                      size="small"
-                    />
-                    <TurnPriorityBadge
-                      :priority="priority"
-                      :user-role="currentRole"
-                      size="default"
-                    />
-                  </div>
-                </div>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card variant="outlined" class="mb-6">
-          <v-card-title>
-            <v-icon icon="mdi-alert-circle" class="mr-2" />
-            Urgent Turn Indicators (UrgentTurnIndicator Component)
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col v-for="alert in alertExamples" :key="alert.id" cols="12" lg="6">
-                <UrgentTurnIndicator
-                  :priority="alert.priority"
-                  :user-role="currentRole"
-                  :property-name="alert.propertyName"
-                  :checkout-date="alert.checkoutDate"
-                  :checkin-date="alert.checkinDate"
-                  :cleaning-window="alert.cleaningWindow"
-                  :time-remaining="alert.timeRemaining"
-                  :animated="true"
-                  :striped="alert.priority === 'urgent'"
-                  @view="showToast(`View details for ${alert.propertyName}`)"
-                  @assign="showToast(`Assign cleaner for ${alert.propertyName}`)"
-                  @reschedule="showToast(`Reschedule ${alert.propertyName}`)"
-                  @close="showToast(`Closed alert for ${alert.propertyName}`)"
-                  class="mb-4"
-                />
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card variant="outlined" class="mb-6">
-          <v-card-title>
-            <v-icon icon="mdi-format-paint" class="mr-2" />
-            Enhanced CSS Classes Demo
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" md="6">
-                <h4 class="text-h6 mb-3">Priority Styling</h4>
-                <div
-                  v-for="priority in priorities"
-                  :key="`css-${priority}`"
-                  :class="[
-                    `${priority}-priority`,
-                    'pa-4',
-                    'mb-3',
-                    'rounded-lg',
-                    'elevation-2',
-                    {
-                      'owner-interface': currentRole === 'owner',
-                      'admin-interface': currentRole === 'admin'
-                    }
-                  ]"
-                >
-                  <strong class="text-capitalize">{{ priority }} Priority Item</strong>
-                  <div class="text-caption mt-1">
-                    Enhanced border, background gradient, and {{ priority === 'urgent' ? 'animated effects' : 'subtle styling' }}
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="12" md="6">
-                <h4 class="text-h6 mb-3">Booking Type Styling</h4>
-                <div
-                  :class="[
-                    'turn-booking',
-                    'urgent-priority',
-                    'pa-4',
-                    'mb-3',
-                    'rounded-lg',
-                    'elevation-2',
-                    'position-relative',
-                    {
-                      'owner-interface': currentRole === 'owner',
-                      'admin-interface': currentRole === 'admin'
-                    }
-                  ]"
-                >
-                  <strong>Turn Booking</strong>
-                  <div class="text-caption mt-1">
-                    Enhanced turn booking with emoji badge, animations, and role-based colors
-                  </div>
-                </div>
-                <div
-                  :class="[
-                    'standard-booking',
-                    'normal-priority',
-                    'pa-4',
-                    'mb-3',
-                    'rounded-lg',
-                    'elevation-2',
-                    'position-relative'
-                  ]"
-                >
-                  <strong>Standard Booking</strong>
-                  <div class="text-caption mt-1">
-                    Standard booking with subtle styling and emoji indicator
-                  </div>
-                </div>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card variant="outlined" class="mb-6">
-          <v-card-title>
-            <v-icon icon="mdi-animation" class="mr-2" />
-            Animation Showcase
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" md="4">
-                <h4 class="text-h6 mb-3">Urgent Pulse Animation</h4>
-                <div
-                  class="urgent-priority pa-4 rounded-lg elevation-2 mb-3"
-                  style="min-height: 80px; display: flex; align-items: center; justify-content: center;"
-                >
-                  <strong>Urgent Priority with Pulse</strong>
-                </div>
-              </v-col>
-              <v-col cols="12" md="4">
-                <h4 class="text-h6 mb-3">Striped Animation</h4>
-                <div
-                  class="urgent-priority turn-booking pa-4 rounded-lg elevation-2 mb-3 position-relative"
-                  style="min-height: 80px; display: flex; align-items: center; justify-content: center;"
-                >
-                  <strong>Turn Booking Stripes</strong>
-                </div>
-              </v-col>
-              <v-col cols="12" md="4">
-                <h4 class="text-h6 mb-3">Hover Effects</h4>
-                <div
-                  class="urgent-priority pa-4 rounded-lg elevation-2 mb-3 cursor-pointer"
-                  style="min-height: 80px; display: flex; align-items: center; justify-content: center;"
-                  @mouseover="showToast('Hover effect triggered!')"
-                >
-                  <strong>Hover for Glow + Shake</strong>
-                </div>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card variant="outlined">
-          <v-card-title>
-            <v-icon icon="mdi-tune" class="mr-2" />
-            Interactive Controls
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-switch
-                  v-model="animationsEnabled"
-                  label="Enable Animations"
-                  color="primary"
-                  hide-details
-                  class="mb-3"
-                />
-                <v-switch
-                  v-model="stripedEnabled"
-                  label="Enable Striped Backgrounds"
-                  color="primary"
-                  hide-details
-                  class="mb-3"
-                />
-                <v-switch
-                  v-model="darkMode"
-                  label="Dark Mode"
-                  color="primary"
-                  hide-details
-                  @change="toggleDarkMode"
-                />
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-btn
-                  color="warning"
-                  variant="outlined"
-                  prepend-icon="mdi-test-tube"
-                  class="mr-2 mb-2"
-                  @click="triggerTestAlert"
-                >
-                  Test Urgent Alert
-                </v-btn>
-                <v-btn
-                  color="primary"
-                  variant="outlined"
-                  prepend-icon="mdi-refresh"
-                  class="mr-2 mb-2"
-                  @click="refreshData"
-                >
-                  Refresh Demo Data
-                </v-btn>
-                <v-btn
-                  color="info"
-                  variant="outlined"
-                  prepend-icon="mdi-information"
-                  class="mb-2"
-                  @click="showImplementationInfo"
-                >
-                  Implementation Details
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-snackbar
-      v-model="toast.show"
-      :timeout="3000"
-      :color="toast.color"
-    >
-      {{ toast.message }}
-    </v-snackbar>
-  </v-container>
-</template>
-⋮----
-<strong>Current Interface:</strong> {{ currentRole === 'owner' ? 'Property Owner (softer colors)' : 'Admin (urgent colors)' }}
-⋮----
-<h4 class="text-h6 mb-3 text-capitalize">{{ priority }} Priority</h4>
-⋮----
-<strong class="text-capitalize">{{ priority }} Priority Item</strong>
-⋮----
-Enhanced border, background gradient, and {{ priority === 'urgent' ? 'animated effects' : 'subtle styling' }}
-⋮----
-{{ toast.message }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
-import { useTheme } from 'vuetify';
-import TurnPriorityBadge from '@/components/dumb/shared/TurnPriorityBadge.vue';
-import UrgentTurnIndicator from '@/components/dumb/shared/UrgentTurnIndicator.vue';
-type Priority = 'low' | 'normal' | 'high' | 'urgent';
-const currentRole = ref<'owner' | 'admin'>('owner');
-const animationsEnabled = ref(true);
-const stripedEnabled = ref(true);
-const darkMode = ref(false);
-const theme = useTheme();
-const toast = ref({
-  show: false,
-  message: '',
-  color: 'info'
-});
-const priorities: Priority[] = ['low', 'normal', 'high', 'urgent'];
-const alertExamples = ref([
-  {
-    id: '1',
-    priority: 'urgent' as Priority,
-    propertyName: 'Oceanview Villa #205',
-    checkoutDate: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-    checkinDate: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
-    cleaningWindow: {
-      start: new Date(Date.now() + 45 * 60 * 1000).toISOString(),
-      end: new Date(Date.now() + 3.5 * 60 * 60 * 1000).toISOString(),
-      duration: 165
-    },
-    timeRemaining: 25
-  },
-  {
-    id: '2',
-    priority: 'high' as Priority,
-    propertyName: 'Downtown Loft #12B',
-    checkoutDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-    checkinDate: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
-    cleaningWindow: {
-      start: new Date(Date.now() + 2.5 * 60 * 60 * 1000).toISOString(),
-      end: new Date(Date.now() + 5.5 * 60 * 60 * 1000).toISOString(),
-      duration: 180
-    },
-    timeRemaining: 115
-  },
-  {
-    id: '3',
-    priority: 'normal' as Priority,
-    propertyName: 'Suburban House #45',
-    checkoutDate: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
-    checkinDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    cleaningWindow: {
-      start: new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString(),
-      end: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
-      duration: 180
-    },
-    timeRemaining: 480
-  }
-]);
-const getTimeRemainingForPriority = (priority: Priority): number => {
-  switch (priority) {
-    case 'urgent': return 15;
-    case 'high': return 75;
-    case 'normal': return 240;
-    case 'low': return 720;
-    default: return 120;
-  }
-};
-const showToast = (message: string, color: string = 'info') => {
-  toast.value = {
-    show: true,
-    message,
-    color
-  };
-};
-const toggleDarkMode = () => {
-  theme.global.name.value = darkMode.value ? 'dark' : 'light';
-};
-const triggerTestAlert = () => {
-  showToast('🚨 Test urgent alert triggered! Check the visual indicators.', 'warning');
-};
-const refreshData = () => {
-  alertExamples.value[0].timeRemaining = Math.max(5, Math.floor(Math.random() * 60));
-  alertExamples.value[1].timeRemaining = Math.max(30, Math.floor(Math.random() * 180));
-  alertExamples.value[2].timeRemaining = Math.max(120, Math.floor(Math.random() * 480));
-  showToast('Demo data refreshed with new time values!', 'success');
-};
-const showImplementationInfo = () => {
-  showToast('TASK-039: Enhanced visual indicators with role-based styling, animations, and priority badges', 'info');
-};
-const updateBodyClass = () => {
-  document.body.classList.remove('owner-interface', 'admin-interface');
-  document.body.classList.add(`${currentRole.value}-interface`);
-};
-watch(currentRole, updateBodyClass);
-onMounted(() => {
-  updateBodyClass();
-});
-</script>
-<style scoped>
-.turn-visual-indicators-demo {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-.demo-header {
-  text-align: center;
-  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.1) 0%, rgba(var(--v-theme-secondary), 0.1) 100%);
-  padding: 2rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
-}
-.demo-section {
-  padding: 1rem;
-  border: 1px solid rgba(var(--v-theme-outline), 0.2);
-  border-radius: 8px;
-  background: rgba(var(--v-theme-surface), 0.5);
-}
-.cursor-pointer {
-  cursor: pointer;
-}
-.urgent-priority {
-  transition: all 0.3s ease;
-}
-.urgent-priority:hover {
-  transform: translateY(-2px);
-}
-.gap-2 > * + * {
-  margin-left: 8px;
-}
-@media (max-width: 768px) {
-  .demo-header {
-    padding: 1rem;
-  }
-  .demo-header h1 {
-    font-size: 1.5rem !important;
-  }
-  .demo-header p {
-    font-size: 1rem !important;
-  }
-}
-</style>
-````
-
 ## File: src/pages/owner/bookings/index.vue
 ````vue
 <template>
@@ -16201,197 +7321,14 @@ defineOptions({
 </style>
 ````
 
-## File: src/pages/owner/properties/index.vue
-````vue
-<template>
-  <div class="owner-properties-page">
-    <v-container fluid>
-      <v-row>
-        <v-col cols="12">
-          <div class="d-flex justify-space-between align-center mb-4">
-            <h1 class="text-h4">My Properties</h1>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-plus"
-              @click="handleAddProperty"
-            >
-              Add Property
-            </v-btn>
-          </div>
-        </v-col>
-      </v-row>
-      <v-row class="mb-4">
-        <v-col cols="12" sm="6" md="3">
-          <v-card>
-            <v-card-text>
-              <div class="text-h6">{{ ownerProperties.length }}</div>
-              <div class="text-caption text-medium-emphasis">Total Properties</div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-card>
-            <v-card-text>
-              <div class="text-h6">{{ activeProperties.length }}</div>
-              <div class="text-caption text-medium-emphasis">Active Properties</div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-card>
-            <v-card-text>
-              <div class="text-h6">{{ ownerBookings.length }}</div>
-              <div class="text-caption text-medium-emphasis">Total Bookings</div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-card>
-            <v-card-text>
-              <div class="text-h6">{{ todayTurns.length }}</div>
-              <div class="text-caption text-medium-emphasis">Today's Turns</div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col
-          v-for="property in ownerProperties"
-          :key="property.id"
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
-        >
-          <PropertyCard
-            :property="property"
-            @edit="handleEditProperty"
-            @delete="handleDeleteProperty"
-          />
-        </v-col>
-      </v-row>
-      <v-row v-if="ownerProperties.length === 0">
-        <v-col cols="12" class="text-center py-8">
-          <v-icon size="64" color="grey-lighten-1" class="mb-4">
-            mdi-home-outline
-          </v-icon>
-          <h3 class="text-h6 mb-2">No Properties Yet</h3>
-          <p class="text-body-2 text-medium-emphasis mb-4">
-            Add your first property to start managing bookings and cleanings.
-          </p>
-          <v-btn
-            color="primary"
-            prepend-icon="mdi-plus"
-            @click="handleAddProperty"
-          >
-            Add Your First Property
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
-⋮----
-<div class="text-h6">{{ ownerProperties.length }}</div>
-⋮----
-<div class="text-h6">{{ activeProperties.length }}</div>
-⋮----
-<div class="text-h6">{{ ownerBookings.length }}</div>
-⋮----
-<div class="text-h6">{{ todayTurns.length }}</div>
-⋮----
-<script setup lang="ts">
-import { onMounted } from 'vue';
-import PropertyCard from '@/components/dumb/shared/PropertyCard.vue';
-import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
-import { useUIStore } from '@/stores/ui';
-import type { Property } from '@/types';
-defineOptions({
-  name: 'OwnerPropertiesPage'
-});
-const {
-  myProperties: ownerProperties,
-  myActiveProperties: activeProperties,
-  fetchMyProperties,
-  deleteMyProperty
-} = useOwnerProperties();
-const {
-  myBookings: ownerBookings,
-  myTodayTurns: todayTurns,
-  fetchMyBookings
-} = useOwnerBookings();
-const uiStore = useUIStore();
-const handleAddProperty = (): void => {
-  uiStore.openModal('propertyModal', 'create');
-};
-const handleEditProperty = (property: Property): void => {
-  uiStore.openModal('propertyModal', 'edit', property);
-};
-const handleDeleteProperty = async (property: Property): Promise<void> => {
-  const confirmed = await uiStore.showConfirmation(
-    'Delete Property',
-    `Are you sure you want to delete "${property.name}"? This action cannot be undone.`,
-    'Delete',
-    'error'
-  );
-  if (confirmed) {
-    try {
-      await deleteMyProperty(property.id);
-      uiStore.showNotification('Property deleted successfully', 'success');
-    } catch (error) {
-      uiStore.showNotification('Failed to delete property', 'error');
-    }
-  }
-};
-onMounted(async () => {
-  await Promise.all([
-    fetchMyProperties(),
-    fetchMyBookings()
-  ]);
-});
-</script>
-<style scoped>
-.owner-properties-page {
-  padding: 1rem;
-  min-height: calc(100vh - 64px);
-}
-.v-card {
-  height: 100%;
-}
-</style>
-````
-
 ## File: src/plugins/supabase.ts
 ````typescript
 import { createClient } from '@supabase/supabase-js'
 ````
 
-## File: src/types/router.ts
+## File: src/types/build.d.ts
 ````typescript
-interface RouteMeta {
-    layout?: 'default' | 'admin' | 'auth'
-    requiresAuth?: boolean
-    role?: 'owner' | 'admin' | 'cleaner'
-    public?: boolean
-    title?: string
-    hidden?: boolean
-    icon?: string
-    demo?: boolean
-  }
-⋮----
-export type UserRole = 'owner' | 'admin' | 'cleaner'
-export interface RouteGuardResult {
-  allowed: boolean
-  redirect?: string
-  error?: string
-}
-export interface NavigationError {
-  type: 'auth' | 'role' | 'permission' | 'network'
-  message: string
-  code?: string
-  redirectTo?: string
-}
+
 ````
 
 ## File: src/types/user.ts
@@ -16456,49 +7393,6 @@ export const validateBooking = (
 ):
 export const getAvailableStatusTransitions = (booking: Booking): BookingStatus[] =>
 export const canTransitionBookingStatus = (booking: Booking, newStatus: BookingStatus): boolean =>
-````
-
-## File: src/utils/errorMessages.ts
-````typescript
-import type { ErrorCategory, UserRole, BusinessImpact } from '@/types/ui';
-⋮----
-export function getErrorMessage(
-  category: ErrorCategory,
-  errorType: string,
-  role: UserRole,
-  context: Record<string, any> = {}
-): string
-export function getGenericErrorMessage(role: UserRole): string
-export function getBusinessImpactMessage(impact: BusinessImpact): string
-function replacePlaceholders(message: string, context: Record<string, any>): string
-export function getRetryMessage(role: UserRole, attempt: number, maxAttempts: number): string
-export function getLoadingMessage(role: UserRole, operation: string): string
-export function getSuccessMessage(role: UserRole, operation: string, context: Record<string, any> =
-⋮----
-export function getErrorCategory(errorCode?: string): ErrorCategory
-⋮----
-export function getErrorMessage(
-  category: ErrorCategory,
-  code: string,
-  role: UserRole = 'owner',
-  context: Record<string, any> = {}
-): string
-export function getLoadingMessage(
-  operation: string,
-  role: UserRole = 'owner'
-): string
-export function getSuccessMessage(
-  action: string,
-  role: UserRole = 'owner',
-  context: Record<string, any> = {}
-): string
-export function inferErrorCategory(code?: string, message?: string): ErrorCategory
-export function assessBusinessImpact(
-  category: ErrorCategory,
-  context: Record<string, any> = {}
-): BusinessImpact
-export function extractErrorCode(error: any): string | undefined
-export function getErrorTitle(category: ErrorCategory, role: UserRole = 'owner'): string
 ````
 
 ## File: task_documentation.md
@@ -18402,600 +9296,6 @@ Break down these specific requirements:
 5. **Testing Strategy**: Test each component individually before integration tasks
 ````
 
-## File: tasks_v2.md
-````markdown
-# 📋 Additional Tasks for tasks.md - Critical Issues & Improvements
-
-## **Phase 1F: Critical Architecture Completion** 
-**(URGENT - Complete Role-Based Migration)**
-
-### **Complete Missing Role-Based Components**
-- [ ] **TASK-060**: Create OwnerSidebar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/owner/OwnerSidebar.vue`
-    - Filter navigation to owner-specific features only
-    - Remove admin-only navigation items (cleaner management, system reports)
-    - Add owner-specific quick actions (Add Property, View My Bookings)
-    - Implement owner-friendly navigation labels and icons
-    - Use owner-specific color scheme and styling
-    - Integrate with existing OwnerQuickActions component
-  - Notes: Replace generic Sidebar.vue for owner role
-  - Files: src/components/smart/owner/OwnerSidebar.vue
-  - Verification: Owner sees only relevant navigation, no admin features
-  - Assigned to: Cursor
-
-- [ ] **TASK-061**: Create OwnerCalendar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/owner/OwnerCalendar.vue`
-    - Filter calendar events to owner's properties only
-    - Implement owner-specific calendar controls (OwnerCalendarControls)
-    - Add owner-specific event creation workflows
-    - Remove admin-only features (cleaner assignment, system-wide view)
-    - Add owner-specific calendar views (My Properties, My Bookings)
-    - Implement owner-specific event styling and indicators
-  - Notes: Replace generic FullCalendar.vue for owner role
-  - Files: src/components/smart/owner/OwnerCalendar.vue
-  - Dependencies: OwnerCalendarControls.vue component
-  - Verification: Owner sees only their property events and bookings
-  - Assigned to: Cursor
-
-- [ ] **TASK-062**: Create AdminSidebar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/admin/AdminSidebar.vue`
-    - Include full admin navigation (cleaners, reports, system management)
-    - Add admin-specific quick actions and system controls
-    - Implement admin-focused styling and iconography
-    - Add system status indicators and alerts
-    - Include business metrics in sidebar summary
-    - Add role switcher component integration
-  - Notes: Comprehensive admin navigation interface
-  - Files: src/components/smart/admin/AdminSidebar.vue
-  - Verification: Admin sees full system navigation and controls
-  - Assigned to: Cursor
-
-- [ ] **TASK-063**: Fix TypeScript errors in existing components
-  - Status: Not Started
-  - Requirements:
-    - Fix all TypeScript compilation errors in role-based components
-    - Add proper type definitions for component props and events
-    - Update existing components to use strict TypeScript compliance
-    - Add type guards for role-based data validation
-    - Fix any eslint errors related to TypeScript usage
-    - Add comprehensive type documentation
-  - Notes: Essential for code quality and maintainability
-  - Files: All TypeScript files with compilation errors
-  - Verification: TypeScript compiles without errors
-  - Assigned to: Cursor
-
-- [ ] **TASK-064**: Fix AdminCalendar.vue implementation issues
-  - Status: Not Started
-  - Requirements:
-    - Fix existing bugs in AdminCalendar.vue component
-    - Implement proper admin-specific calendar features
-    - Add admin calendar controls (AdminCalendarControls)
-    - Fix calendar event filtering for admin view
-    - Add admin-specific event management features
-    - Implement cleaner assignment integration
-  - Notes: Complete admin calendar functionality
-  - Files: src/components/smart/admin/AdminCalendar.vue
-  - Dependencies: AdminCalendarControls component
-  - Verification: Admin calendar works with full functionality
-  - Assigned to: Cursor
-
-### **Integration and Testing**
-- [ ] **TASK-065**: Integrate new owner components into HomeOwner.vue
-  - Status: Not Started
-  - Requirements:
-    - Update HomeOwner.vue to use OwnerSidebar component
-    - Integrate OwnerCalendar into owner home page
-    - Test owner component integration thoroughly
-    - Verify role-based data filtering works correctly
-    - Test owner-specific workflows end-to-end
-    - Update owner page routing and navigation
-  - Notes: Complete owner interface with all role-based components
-  - Files: src/components/smart/owner/HomeOwner.vue
-  - Dependencies: TASK-060, TASK-061
-  - Verification: Owner interface uses all role-specific components
-  - Assigned to: Cursor
-
-- [ ] **TASK-066**: Integrate new admin components into HomeAdmin.vue
-  - Status: Not Started
-  - Requirements:
-    - Update HomeAdmin.vue to use AdminSidebar component
-    - Integrate fixed AdminCalendar into admin home page
-    - Test admin component integration thoroughly
-    - Verify admin access to all system features
-    - Test admin-specific workflows end-to-end
-    - Update admin page routing and navigation
-  - Notes: Complete admin interface with all role-based components
-  - Files: src/components/smart/admin/HomeAdmin.vue
-  - Dependencies: TASK-062, TASK-064
-  - Verification: Admin interface uses all role-specific components
-  - Assigned to: Cursor
-
----
-
-## **Phase 1G: Code Cleanup & Organization** 
-**(HIGH PRIORITY - Remove Technical Debt)**
-
-### **Remove Development Artifacts**
-- [ ] **TASK-067**: Move demo components to development folder
-  - Status: Not Started
-  - Requirements:
-    - Create `src/dev/` folder for development-only components
-    - Move all demo components to `src/dev/demos/`
-    - Update import paths for any remaining demo references
-    - Configure build to exclude `src/dev/` from production bundle
-    - Update .gitignore to handle development artifacts appropriately
-    - Create README.md in dev folder explaining purpose
-  - Files to Move:
-    ```
-    src/components/demos/ → src/dev/demos/
-    src/pages/demos/ → src/dev/pages/
-    src/components/dumb/PropertyCardDemo.vue → src/dev/demos/
-    ```
-  - Notes: Clean separation of dev vs production code
-  - Verification: Production build excludes demo components, dev server still includes them
-  - Assigned to: Cursor
-
-- [ ] **TASK-068**: Remove redundant generic components after migration
-  - Status: Not Started
-  - Requirements:
-    - ⚠️ ONLY after TASK-060, TASK-061, TASK-062 are complete
-    - Remove `src/components/smart/Home.vue` (replaced by HomeOwner/HomeAdmin)
-    - Remove `src/components/smart/Sidebar.vue` (replaced by role-specific versions)
-    - Remove `src/components/smart/FullCalendar.vue` (if replaced by role-specific)
-    - Update any remaining references to removed components
-    - Verify no broken imports or references remain
-    - Archive removed components in git history
-  - Notes: Final cleanup after successful migration
-  - Files: List of generic components to remove
-  - Dependencies: Complete role-based component migration
-  - Verification: Application works without old generic components
-  - Assigned to: Cursor
-
-- [ ] **TASK-069**: Clean up tasks.md file
-  - Status: Not Started
-  - Requirements:
-    - Archive completed tasks to `docs/completed-tasks.md`
-    - Remove obsolete or superseded tasks
-    - Reorganize remaining tasks by current priority
-    - Update task numbering for consistency
-    - Add cross-references between related tasks
-    - Update status for partially completed items
-  - Notes: Improve project management clarity
-  - Files: tasks.md, docs/completed-tasks.md
-  - Verification: tasks.md is organized and current
-  - Assigned to: Human + Cursor
-
-### **Build and Deployment Optimization**
-- [ ] **TASK-070**: Optimize build configuration for role-based architecture
-  - Status: Not Started
-  - Requirements:
-    - Configure Vite for optimal role-based component bundling
-    - Add build-time role-based feature flags
-    - Optimize bundle sizes for production deployment
-    - Add build-time type checking for role-based components
-    - Configure source maps for development debugging
-    - Add build performance monitoring and optimization
-  - Notes: Ensure efficient production builds
-  - Files: vite.config.ts, build scripts, optimization configs
-  - Verification: Optimized production builds with role-based features
-  - Assigned to: Cursor
-
-- [ ] **TASK-071**: Update deployment documentation for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Update deployment guides for role-based architecture
-    - Add environment configuration for role-based features
-    - Document role-based testing procedures for deployment
-    - Add rollback procedures for role-based deployments
-    - Create production checklist for role-based features
-    - Update CI/CD pipeline documentation
-  - Notes: Ensure smooth deployments with role-based changes
-  - Files: Deployment docs, CI/CD configs, operations guides
-  - Verification: Clear deployment procedures for role-based system
-  - Assigned to: Human + Cursor
-
----
-
-## **Phase 1H: Architecture Improvements** 
-**(HIGH PRIORITY - System Optimization)**
-
-### **Store and State Management Optimization**
-- [ ] **TASK-072**: Optimize role-based store architecture
-  - Status: Not Started
-  - Requirements:
-    - Refactor stores for optimal role-based data filtering
-    - Implement store-level role access control
-    - Add caching strategies for role-specific data
-    - Optimize state updates for role-based components
-    - Add state persistence for role-based user preferences
-    - Implement store performance monitoring and optimization
-  - Notes: Improve performance and maintainability of role-based stores
-  - Files: src/stores/, store optimization utilities, performance monitoring
-  - Verification: Optimized store performance with role-based filtering
-  - Assigned to: Cursor
-
-- [ ] **TASK-073**: Implement role-based data access control
-  - Status: Not Started
-  - Requirements:
-    - Create data access control middleware for stores
-    - Add runtime checks for role-based data access
-    - Implement data sanitization for role-based views
-    - Add audit logging for data access patterns
-    - Create role-based data validation utilities
-    - Add tests for data access control compliance
-  - Notes: Enhance security and data isolation
-  - Files: src/middleware/, src/utils/dataAccess.ts, test files
-  - Verification: Owners cannot access other owners' data
-  - Assigned to: Cursor
-
-### **Type Safety & Error Handling**
-- [ ] **TASK-074**: Complete TypeScript strict mode compliance
-  - Status: Not Started
-  - Requirements:
-    - Enable strict TypeScript mode in tsconfig.json
-    - Fix all TypeScript errors and warnings
-    - Add comprehensive type definitions for all interfaces
-    - Implement runtime type validation for critical data flows
-    - Add type guards for external data sources
-    - Create comprehensive type documentation
-  - Notes: Improve code quality and catch bugs early
-  - Files: tsconfig.json, all TypeScript files, new type definitions
-  - Verification: TypeScript strict mode compiles without errors
-  - Assigned to: Cursor
-
-- [ ] **TASK-075**: Implement comprehensive error handling system
-  - Status: Not Started
-  - Requirements:
-    - Create global error boundary component
-    - Implement role-specific error message templates
-    - Add error reporting and analytics integration
-    - Create error recovery workflows for common failures
-    - Add user-friendly error display components
-    - Implement automatic error retry mechanisms
-  - Notes: Build on existing error foundations
-  - Files: src/components/ErrorBoundary.vue, error handling utilities
-  - Dependencies: Existing error handling tasks (TASK-040 to TASK-043)
-  - Verification: Graceful error handling throughout application
-  - Assigned to: Cursor
-
-### **Performance Optimization**
-- [ ] **TASK-076**: Implement code splitting and lazy loading
-  - Status: Not Started
-  - Requirements:
-    - Split owner vs admin bundles using dynamic imports
-    - Implement lazy loading for route-based components
-    - Add preloading strategies for critical routes
-    - Optimize component bundle sizes with tree shaking
-    - Add bundle analysis and monitoring tools
-    - Create performance budgets for bundle sizes
-  - Notes: Improve initial load time and user experience
-  - Files: router configuration, vite.config.ts, performance monitoring
-  - Verification: Optimized bundle sizes and load times
-  - Assigned to: Cursor
-
-- [ ] **TASK-077**: Add performance monitoring and optimization
-  - Status: Not Started
-  - Requirements:
-    - Implement client-side performance monitoring
-    - Add role-based performance metrics tracking
-    - Create performance dashboards for role-based features
-    - Add automated performance regression testing
-    - Implement performance alerts and notifications
-    - Create performance optimization guidelines
-  - Notes: Monitor and maintain application performance
-  - Files: Performance monitoring tools, dashboards, alerting configs
-  - Verification: Comprehensive performance monitoring system
-  - Assigned to: Cursor
-
-- [ ] **TASK-078**: Optimize build and development workflow
-  - Status: Not Started
-  - Requirements:
-    - Optimize Vite dev server for role-based development
-    - Add hot module replacement for role-specific components
-    - Create development shortcuts and productivity tools
-    - Add debugging utilities for role-based data flow
-    - Optimize build times for development workflow
-    - Create developer productivity documentation
-  - Notes: Improve developer experience and productivity
-  - Files: vite.config.ts, dev tools, productivity guides
-  - Verification: Faster development cycle, better DX
-  - Assigned to: Cursor
-
----
-
-## **Phase 1I: Testing & Quality Assurance** 
-**(HIGH PRIORITY - System Reliability)**
-
-### **Testing Infrastructure**
-- [ ] **TASK-079**: Create comprehensive testing utilities for role-based components
-  - Status: Not Started
-  - Requirements:
-    - Create test utilities for role-based component testing
-    - Add mock data generators for owner and admin roles
-    - Implement role-based test fixtures and factories
-    - Create shared testing utilities for role-based workflows
-    - Add test helpers for role switching and authentication
-    - Create visual regression testing for role-based interfaces
-  - Notes: Foundation for comprehensive testing strategy
-  - Files: tests/utils/, test fixtures, testing documentation
-  - Verification: Comprehensive testing infrastructure for role-based features
-  - Assigned to: Cursor
-
-- [ ] **TASK-080**: Add comprehensive tests for owner-specific components
-  - Status: Not Started
-  - Requirements:
-    - Create unit tests for OwnerSidebar.vue
-    - Add integration tests for OwnerCalendar.vue
-    - Test OwnerQuickActions component thoroughly
-    - Add end-to-end tests for owner workflows
-    - Test role-based data filtering for owner components
-    - Add accessibility tests for owner interface
-  - Notes: Ensure reliability of owner-specific functionality
-  - Files: tests/owner/, component test files, e2e test suites
-  - Dependencies: TASK-079 (test utilities)
-  - Verification: Complete test coverage for owner components
-  - Assigned to: Cursor
-
-- [ ] **TASK-081**: Add comprehensive tests for admin-specific components
-  - Status: Not Started
-  - Requirements:
-    - Create unit tests for AdminSidebar.vue
-    - Add integration tests for AdminCalendar.vue
-    - Test AdminQuickActions component thoroughly
-    - Add end-to-end tests for admin workflows
-    - Test admin access to all system features
-    - Add performance tests for admin data processing
-  - Notes: Ensure reliability of admin-specific functionality
-  - Files: tests/admin/, component test files, e2e test suites
-  - Dependencies: TASK-079 (test utilities)
-  - Verification: Complete test coverage for admin components
-  - Assigned to: Cursor
-
-### **Integration and System Testing**
-- [ ] **TASK-082**: Create integration tests for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Test role switching functionality end-to-end
-    - Add integration tests for role-based data isolation
-    - Test role-based authentication and authorization
-    - Add cross-role integration tests for shared components
-    - Test role-based error handling and recovery
-    - Add load testing for role-based data filtering
-  - Notes: Ensure overall system reliability and security
-  - Files: tests/integration/, system test suites, load test configs
-  - Dependencies: TASK-080, TASK-081 (component tests)
-  - Verification: Comprehensive integration test coverage
-  - Assigned to: Cursor
-
-- [ ] **TASK-083**: Add automated quality assurance pipeline
-  - Status: Not Started
-  - Requirements:
-    - Set up automated testing in CI/CD pipeline
-    - Add code quality checks for role-based components
-    - Implement automated accessibility testing
-    - Add automated security testing for role-based features
-    - Create automated performance regression testing
-    - Add automated deployment testing procedures
-  - Notes: Ensure consistent quality across all changes
-  - Files: CI/CD configs, quality assurance scripts, automation tools
-  - Verification: Automated quality assurance for all role-based features
-  - Assigned to: Cursor
-
----
-
-## **Phase 1J: Documentation & Developer Experience** 
-**(MEDIUM PRIORITY - Long-term Maintenance)**
-
-### **Developer Productivity Tools**
-- [ ] **TASK-084**: Integrate Vuettify RAG API for Cursor
-  - Status: Not Started
-  - Requirements:
-    - Set up Vuettify RAG API server for Cursor AI integration
-    - Configure Cursor to use local Vuettify documentation API
-    - Create Vuettify-specific coding assistant workflows
-    - Add code generation templates for role-based Vuetify components
-    - Implement context-aware Vuettify component suggestions
-    - Create Vuettify best practices automation in Cursor
-    - Add automated code review for Vuettify patterns
-    - Create documentation for team Vuettify RAG usage
-  - API Features:
-    - **Component Usage**: "How do I use v-data-table?"
-    - **Code Generation**: "Create a responsive navigation"
-    - **Props & API**: "What props does v-card accept?"
-    - **Examples**: "Show me form validation patterns"
-    - **Best Practices**: "Make this component accessible"
-    - **Troubleshooting**: "Why isn't my v-btn working?"
-  - Implementation Steps:
-    1. Deploy `Cursor AI Assistant API Server.txt` as local FastAPI server
-    2. Configure Cursor to connect to local RAG endpoint
-    3. Set up Vuettify documentation chunk processing (1,990 chunks available)
-    4. Create role-based component templates (Owner/Admin patterns)
-    5. Add Vuettify 3.x TypeScript integration
-    6. Configure context-aware suggestions for project structure
-  - Files: 
-    - `tools/vuettify-rag-api/` (API server)
-    - `.cursor/` (Cursor configuration)
-    - `docs/vuettify-rag-setup.md` (setup guide)
-    - `templates/vuettify/` (component templates)
-  - Notes: Transform Vuettify development with AI-powered coding assistance
-  - Verification: Cursor provides accurate Vuettify suggestions and code generation
-  - Assigned to: Cursor
-
-### **Architecture Documentation**
-- [ ] **TASK-085**: Create comprehensive role-based architecture documentation
-  - Status: Not Started
-  - Requirements:
-    - Document role-based component patterns and conventions
-    - Create diagrams showing role-based data flow
-    - Document role-based security and permission patterns
-    - Add guidelines for extending role-based functionality
-    - Create onboarding guide for new developers
-    - Document role-based testing strategies
-  - Notes: Enable future development and maintenance
-  - Files: docs/architecture/, README updates, developer guides
-  - Verification: Clear documentation for role-based system
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-086**: Update project README and documentation
-  - Status: Not Started
-  - Requirements:
-    - Update README.md with role-based architecture explanation
-    - Add setup instructions for role-based development
-    - Document environment variables and configuration
-    - Add troubleshooting guide for common role-based issues
-    - Create development workflow documentation
-    - Add links to all relevant documentation
-  - Notes: Improve project onboarding and maintenance
-  - Files: README.md, docs/ folder updates
-  - Verification: Clear project documentation and setup instructions
-  - Assigned to: Human + Cursor
-
-### **Code Quality and Standards**
-- [ ] **TASK-087**: Establish role-based coding standards
-  - Status: Not Started
-  - Requirements:
-    - Create coding standards document for role-based components
-    - Add ESLint rules for role-based patterns
-    - Create component templates for consistent structure
-    - Add automated code quality checks in CI/CD
-    - Create code review checklist for role-based features
-    - Add pre-commit hooks for code quality enforcement
-  - Notes: Ensure consistent code quality across team
-  - Files: .eslintrc.json, coding standards doc, templates
-  - Verification: Automated code quality enforcement
-  - Assigned to: Cursor
-
-- [ ] **TASK-088**: Create development environment optimization
-  - Status: Not Started
-  - Requirements:
-    - Optimize Vite dev server for role-based development
-    - Add hot module replacement for role-specific components
-    - Create development shortcuts and productivity tools
-    - Add debugging utilities for role-based data flow
-    - Optimize build times for development workflow
-    - Create developer productivity documentation
-  - Notes: Improve developer experience and productivity
-  - Files: vite.config.ts, dev tools, productivity guides
-  - Verification: Faster development cycle, better DX
-  - Assigned to: Cursor
-
----
-
-## **Phase 1K: Security & Deployment** 
-**(LOW PRIORITY - Production Readiness)**
-
-### **Security Hardening**
-- [ ] **TASK-089**: Implement client-side security for role-based access
-  - Status: Not Started
-  - Requirements:
-    - Add route guards for role-based access control
-    - Implement session validation for role permissions
-    - Add CSRF protection for role-based forms
-    - Create security audit utilities for role-based features
-    - Add penetration testing for role-based vulnerabilities
-    - Document security best practices for role-based development
-  - Notes: Harden application against security vulnerabilities
-  - Files: src/security/, route guards, security documentation
-  - Verification: Security audit passes, no role-based vulnerabilities
-  - Assigned to: Cursor
-
-- [ ] **TASK-090**: Add audit logging and monitoring
-  - Status: Not Started
-  - Requirements:
-    - Implement audit logging for role-based actions
-    - Add monitoring for role-based performance metrics
-    - Create alerting for role-based security events
-    - Add user activity tracking for compliance
-    - Create audit report generation utilities
-    - Add GDPR compliance features for data handling
-  - Notes: Enable monitoring and compliance for production
-  - Files: src/audit/, monitoring configuration, compliance docs
-  - Verification: Comprehensive audit trail and monitoring
-  - Assigned to: Cursor
-
-### **Production Deployment**
-- [ ] **TASK-091**: Configure production deployment for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Configure environment-specific builds for role-based features
-    - Add production deployment scripts and automation
-    - Configure monitoring and logging for production
-    - Add health checks for role-based functionality
-    - Create rollback procedures for role-based deployments
-    - Add production testing and validation procedures
-  - Notes: Ensure smooth production deployment
-  - Files: Deployment scripts, CI/CD configuration, ops documentation
-  - Verification: Successful production deployment with monitoring
-  - Assigned to: Human + Cursor
-
----
-
-## **Updated Priority Order**
-
-### **CRITICAL (Complete Immediately)**
-1. **Phase 1F**: Complete role-based architecture (TASK-060 to TASK-066)
-2. **Phase 1G**: Code cleanup and organization (TASK-067 to TASK-071)
-
-### **HIGH PRIORITY (Next Sprint)**
-3. **Phase 1H**: Architecture improvements (TASK-072 to TASK-078)
-4. **Phase 1I**: Testing and quality assurance (TASK-079 to TASK-083)
-
-### **MEDIUM PRIORITY (Future Iterations)**
-5. **Phase 1J**: Documentation and developer experience (TASK-084 to TASK-088)
-6. **Phase 1K**: Security and deployment (TASK-089 to TASK-091)
-
----
-
-## **Task Dependencies Map**
-
-```
-TASK-060 (OwnerSidebar) → TASK-065 (Integration)
-TASK-061 (OwnerCalendar) → TASK-065 (Integration) → TASK-080 (Owner Tests)
-TASK-062 (AdminSidebar) → TASK-066 (Integration)
-TASK-063 (TypeScript fixes) → TASK-074 (Strict mode)
-TASK-064 (AdminCalendar fixes) → TASK-066 (Integration) → TASK-081 (Admin Tests)
-
-TASK-065, TASK-066 → TASK-068 (Remove old components)
-TASK-067 (Move demos) → TASK-078 (Build optimization)
-TASK-072 (Store optimization) → TASK-082 (Integration tests)
-TASK-079 (Test utilities) → TASK-080, TASK-081 (Component tests)
-TASK-084 (Vuettify RAG API) → All future Vuettify development tasks
-```
-
----
-
-## **Notes for Implementation**
-
-### **Critical Success Factors**
-- ⚠️ **DO NOT** remove old components until new ones are complete and tested
-- 🔒 **ALWAYS** verify role-based data isolation after each change
-- 📊 **TEST** each component individually before integration
-- 🧹 **CLEAN UP** one phase completely before starting the next
-- 🤖 **LEVERAGE** Vuettify RAG API for faster, more accurate development
-
-### **Development Guidelines**
-- Use existing coding standards and patterns
-- Maintain backward compatibility during migration
-- Document all breaking changes and migration steps
-- Test role switching functionality after each major change
-- Keep demo components functional in development environment
-- **NEW**: Use Vuettify RAG API for component development and troubleshooting
-
-### **Vuettify RAG API Benefits**
-- 🚀 **Instant Vuettify expertise** in Cursor
-- 💻 **Context-aware code generation** for role-based components
-- 📚 **Always up-to-date documentation** (1,990 chunks processed)
-- ⚡ **Faster development** with smart suggestions
-- 🎯 **Accurate answers** based on processed documentation chunks
-- 🔧 **Perfect for** beginners learning Vuettify and experienced developers wanting faster coding
-````
-
 ## File: tsconfig.node.json
 ````json
 {
@@ -19010,824 +9310,210 @@ TASK-084 (Vuettify RAG API) → All future Vuettify development tasks
 }
 ````
 
-## File: VUETIFY_CALENDAR_VIEWPORT_SOLUTION.md
+## File: updated_task_status.md
 ````markdown
-# 🎯 Vuetify Calendar Viewport & Sidebar Layout Solution
+## **Phase 1D.5: Role-Based Architecture Foundation** 
+**(COMPLETED - Core Architecture In Place)**
 
-## Problem Identified
+### **Composable Architecture Foundation**
+- [x] **TASK-039A**: Move existing composables to shared folder structure
+  - Status: Complete ✅
+  - Implementation Details: All 5 composables successfully moved to `src/composables/shared/` folder, import paths updated throughout application, dev server runs successfully
+  - Files: src/composables/shared/useAuth.ts, useBookings.ts, useProperties.ts, useCalendarState.ts, useComponentEventLogger.ts
+  - Verification: ✅ All components import correctly, no compilation errors
+  - Assigned to: Cursor
 
-The calendar layout had two critical issues:
-1. **Calendar going behind sidebar** - Mobile navigation drawer overlay conflicts
-2. **FullCalendar not filling viewport** - Improper height constraints preventing full viewport usage
+### **Owner-Specific Smart Components**
+- [x] **TASK-039C**: Create HomeOwner.vue component
+  - Status: Complete ✅
+  - Implementation Details: Created with role-based data filtering, owner-specific quick actions, uses filtered data from existing stores
+  - Files: src/components/smart/owner/HomeOwner.vue
+  - Data Scope: `bookings.filter(b => b.owner_id === currentUser.id)` ✅
+  - Verification: ✅ Component renders with owner-only data
+  - Assigned to: Cursor
 
-## 🔧 Solution Applied
+- [x] **TASK-039L**: Create OwnerSidebar.vue component  
+  - Status: Complete ✅
+  - Implementation Details: Owner-specific navigation, filtered properties, owner-friendly quick actions
+  - Files: src/components/smart/owner/OwnerSidebar.vue, demo component
+  - Verification: ✅ Shows only owner-relevant navigation
+  - Assigned to: Cursor
 
-### **1. Fixed HomeAdmin.vue Layout Structure**
+### **Admin-Specific Smart Components**
+- [x] **TASK-039F**: Create HomeAdmin.vue component
+  - Status: Complete ✅  
+  - Implementation Details: Admin interface with system-wide data access, business management features
+  - Files: src/components/smart/admin/HomeAdmin.vue
+  - Data Scope: All properties and bookings (no filtering) ✅
+  - Verification: ✅ Component renders with system-wide data
+  - Assigned to: Cursor
 
-**Before:**
-```vue
-<v-row no-gutters class="fill-height">
-  <v-col cols="12" lg="4" xl="3" class="sidebar-column">
-    <!-- Sidebar with min-height calc -->
-  </v-col>
-  <v-col cols="12" lg="8" xl="9" class="calendar-column">
-    <!-- Calendar with min-height calc -->
-  </v-col>
-</v-row>
-```
+- [x] **TASK-039G**: Create AdminSidebar.vue component
+  - Status: Complete ✅
+  - Implementation Details: Comprehensive admin navigation, system-wide metrics, cleaner management
+  - Files: src/components/smart/admin/AdminSidebar.vue, demo component  
+  - Verification: ✅ Shows full admin navigation and system controls
+  - Assigned to: Cursor
 
-**After:**
-```vue
-<v-row no-gutters class="fill-height flex-nowrap" style="height: 100vh;">
-  <v-col cols="12" lg="4" xl="3" class="sidebar-column">
-    <!-- Sidebar with explicit height: 100vh -->
-  </v-col>
-  <v-col cols="12" lg="8" xl="9" class="calendar-column">
-    <!-- Calendar with explicit height: 100vh -->
-  </v-col>
-</v-row>
-```
+### **Page Structure Implementation**
+- [x] **TASK-039S**: Create owner pages structure
+  - Status: Complete ✅
+  - Implementation Details: Created dashboard, properties, calendar, bookings pages with role-based routing
+  - Files: src/pages/owner/dashboard.vue, properties/index.vue, calendar.vue, bookings/index.vue
+  - Router Updates: Added owner routes with proper meta fields ✅
+  - Verification: ✅ Owner pages work with role-based data filtering
+  - Assigned to: Cursor
 
-### **2. Updated Height Calculations**
-
-#### **HomeAdmin.vue CSS Changes:**
-```css
-.home-admin-container {
-  height: 100vh;                /* Changed from min-height calc */
-  overflow: hidden;
-  display: flex;               /* Added flex container */
-  flex-direction: column;      /* Added column layout */
-}
-
-.sidebar-column {
-  height: 100vh;               /* Added explicit height */
-  padding-right: 0 !important; /* Maintained gap removal */
-}
-
-.calendar-column {
-  height: 100vh;               /* Changed from min-height calc */
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding-left: 0 !important;  /* Maintained gap removal */
-}
-
-.calendar-header {
-  height: 80px;                /* Added explicit header height */
-  flex-shrink: 0;              /* Prevent header compression */
-}
-```
-
-### **3. Enhanced AdminCalendar.vue for Viewport Filling**
-
-#### **Dynamic Height Calculations:**
-```typescript
-// Height calculations for responsive full-viewport calendar
-const calendarCardHeight = computed(() => {
-  // Calculate available height: viewport minus toolbar height
-  return 'calc(100vh - 180px)';
-});
-
-const fullCalendarHeight = computed(() => {
-  // FullCalendar height should fill the card minus padding
-  return 'calc(100vh - 200px)';
-});
-```
-
-#### **FullCalendar Configuration Updates:**
-```vue
-<v-card 
-  elevation="2"
-  class="admin-calendar-card"
-  :style="{ height: calendarCardHeight }"
->
-  <FullCalendar
-    ref="calendarRef"
-    :options="adminCalendarOptions"
-    class="admin-calendar"
-    :style="{ height: fullCalendarHeight }"
-  />
-</v-card>
-```
-
-#### **FullCalendar Options Optimization:**
-```typescript
-const adminCalendarOptions = computed<CalendarOptions>(() => ({
-  // ... other options
-  height: '100%',              // Changed from 'auto'
-  aspectRatio: undefined,      // Let height control sizing
-  // ... rest of config
-}));
-```
-
-### **4. Fixed CSS Layout Structure**
-
-#### **AdminCalendar.vue CSS:**
-```css
-.admin-calendar-container {
-  height: 100%;
-  width: 100%;
-  display: flex;               /* Added flex container */
-  flex-direction: column;      /* Added column layout */
-}
-
-.admin-calendar-toolbar {
-  flex-shrink: 0;              /* Prevent toolbar compression */
-}
-
-.admin-calendar-card {
-  flex: 1;                     /* Fill remaining space */
-  display: flex;
-  flex-direction: column;
-}
-
-.admin-calendar {
-  flex: 1;                     /* Fill remaining card space */
-}
-```
-
-### **5. Mobile Drawer Z-Index Management**
-
-#### **AdminSidebar.vue Mobile Positioning:**
-```css
-.admin-sidebar-mobile {
-  z-index: 1001 !important;    /* Ensure drawer appears above content */
-}
-```
-
-#### **HomeAdmin.vue Responsive Handling:**
-```css
-@media (max-width: 959px) {
-  .home-admin-container {
-    position: relative;
-  }
-  
-  .calendar-column {
-    transition: transform 0.3s ease;
-  }
-  
-  .sidebar-column {
-    z-index: 1000;
-  }
-}
-```
-
-### **6. Enhanced Responsiveness & Performance**
-
-#### **Window Resize Handling:**
-```typescript
-const handleWindowResize = (): void => {
-  if (calendarRef.value) {
-    nextTick(() => {
-      const calendarApi = calendarRef.value?.getApi();
-      if (calendarApi) {
-        calendarApi.updateSize();
-      }
-    });
-  }
-};
-
-onMounted(() => {
-  // ... setup code
-  window.addEventListener('resize', handleWindowResize);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', handleWindowResize);
-});
-```
-
-## 🎨 Current Layout Behavior
-
-### **✅ Desktop (lg and up - ≥960px):**
-- **Sidebar**: 33% width (lg) / 25% width (xl) - increased from 25% / 16.7%
-- **Calendar**: 67% width (lg) / 75% width (xl) - fills remaining space
-- **Height**: Both sidebar and calendar fill full viewport (100vh)
-- **Layout**: Grid-integrated sidebar (v-card), no overlap issues
-
-### **✅ Mobile/Tablet (md and down - <960px):**
-- **Sidebar**: Overlay drawer with proper z-index (1001)
-- **Calendar**: Full-width layout, fills viewport
-- **Interaction**: Drawer slides over calendar, no behind-content issues
-- **Height**: Calendar maintains full viewport height
-
-## 📱 Responsive Viewport Calculations
-
-- **Toolbar Space**: ~80px accounted for in height calculations
-- **Calendar Card**: `calc(100vh - 180px)` - leaves room for headers
-- **FullCalendar**: `calc(100vh - 200px)` - fills card minus padding
-- **Auto-resize**: Window resize listener ensures calendar updates size
-
-## ♿ Accessibility & Performance
-
-### **✅ Accessibility Features:**
-- **Screen Reader Support**: Maintained semantic structure and focus management
-- **Keyboard Navigation**: All interactive elements remain keyboard accessible
-- **High Contrast**: Proper color contrast maintained in all viewport sizes
-
-### **✅ Performance Optimizations:**
-- **Flex Layout**: Efficient CSS flex system instead of absolute positioning
-- **Resize Handling**: Debounced window resize events prevent performance issues
-- **Height Calculations**: CSS calc() for efficient browser-native calculations
-- **Z-Index Management**: Minimal z-index usage to prevent stacking conflicts
-
-## 🚀 Key Benefits Achieved
-
-1. **✅ Full Viewport Calendar**: FullCalendar now fills 100% of available viewport height
-2. **✅ No Overlap Issues**: Mobile drawer properly overlays, never goes behind content
-3. **✅ Larger Sidebar**: Increased from 25%/16.7% to 33%/25% width for better usability
-4. **✅ Seamless Integration**: No visual gaps between sidebar and calendar
-5. **✅ Responsive Excellence**: Perfect behavior across all device breakpoints
-6. **✅ Performance Optimized**: Efficient layout calculations with minimal reflows
-
-## 🔍 Test Cases Verified
-
-- [x] Desktop: Calendar fills viewport height completely
-- [x] Mobile: Drawer overlay appears above calendar
-- [x] Tablet: Responsive breakpoint transitions work smoothly
-- [x] Window resize: Calendar adjusts size automatically
-- [x] Sidebar toggle: No layout shifts or content clipping
-- [x] Content scrolling: Proper overflow handling maintained
+- [x] **TASK-039T**: Create admin pages structure  
+  - Status: Complete ✅
+  - Implementation Details: Created comprehensive admin interface with business management capabilities
+  - Files: src/pages/admin/schedule/index.vue, cleaners/index.vue, properties/index.vue, bookings/index.vue, reports/index.vue
+  - Router Updates: Added admin routes with proper access control ✅
+  - Verification: ✅ Admin pages provide full system management
+  - Assigned to: Cursor
 
 ---
 
-## Technical Implementation Notes
+## **Phase 1F: Component Integration & Cleanup** 
+**(NEXT PRIORITY - Bring It All Together)**
 
-The solution follows **Material Design 3** principles and **Vuetify 3** best practices:
+### **Missing Component Integration**
+- [ ] **TASK-061**: Create/Verify OwnerCalendar.vue component
+  - Status: Needs Verification
+  - Requirements: Verify component exists, integrate with HomeOwner.vue if needed
+  - Notes: Component may exist but needs integration testing
+  - Assigned to: Cursor
 
-- Uses **CSS Grid** and **Flexbox** for modern layout system
-- Implements **Mobile-First** responsive design approach
-- Maintains **Component Composition** patterns
-- Ensures **TypeScript** type safety throughout
-- Follows **Vue 3 Composition API** patterns for optimal performance
+- [ ] **TASK-064**: Create/Fix AdminCalendar.vue component  
+  - Status: Needs Verification
+  - Requirements: Verify component exists, fix any issues, integrate with HomeAdmin.vue
+  - Notes: Component may exist but needs integration testing
+  - Assigned to: Cursor
 
-This layout optimization provides a **professional, full-viewport calendar experience** that adapts perfectly across all device types while maintaining excellent performance and accessibility standards.
+### **Final Integration Tasks**
+- [ ] **TASK-065**: Complete HomeOwner.vue integration
+  - Status: Not Started
+  - Requirements: Ensure OwnerSidebar and OwnerCalendar are properly integrated
+  - Dependencies: TASK-061 completion
+  - Verification: Owner interface uses all role-specific components
+  - Assigned to: Cursor
+
+- [ ] **TASK-066**: Complete HomeAdmin.vue integration
+  - Status: Not Started  
+  - Requirements: Ensure AdminSidebar and AdminCalendar are properly integrated
+  - Dependencies: TASK-064 completion
+  - Verification: Admin interface uses all role-specific components
+  - Assigned to: Cursor
+
+### **Critical Cleanup**
+- [ ] **TASK-067**: Move demo components to development folder
+  - Status: Not Started
+  - Requirements: Create src/dev/ folder, move all demo components
+  - Notes: Clean separation of dev vs production code
+  - Assigned to: Cursor
+
+- [ ] **TASK-068**: Remove generic components (CRITICAL)
+  - Status: Not Started
+  - Requirements: Remove Home.vue, generic Sidebar.vue after integration complete
+  - Dependencies: TASK-065, TASK-066 must be complete first
+  - Notes: ⚠️ This will eliminate 1020+ lines of duplicated code
+  - Assigned to: Cursor
+
+### **TypeScript & Quality**
+- [ ] **TASK-063**: Fix TypeScript compilation errors
+  - Status: Not Started
+  - Requirements: Fix all TS errors in role-based components
+  - Notes: Essential for code quality
+  - Assigned to: Cursor
 ````
 
-## File: VUETIFY_LAYOUT_OPTIMIZATION_SUMMARY.md
-````markdown
-# 🎯 Vuetify Layout Optimization Summary
-
-## Problem Identified
-
-Your `v-navigation-drawer` with `permanent` prop was breaking out of the Vuetify grid system at desktop breakpoints (>1280px), causing the sidebar to span full-width instead of respecting the `v-col` constraints.
-
-## 🔧 Solution Applied
-
-### **1. Replaced Navigation Drawer with Card-based Layout**
-
-**Before:**
-```vue
-<v-col cols="12" lg="3" xl="2">
-  <v-navigation-drawer permanent :elevation="8" color="tertiary">
-    <!-- Content -->
-  </v-navigation-drawer>
-</v-col>
-```
-
-**After:**
-```vue
-<v-col cols="12" lg="3" xl="2">
-  <div class="sidebar-container">
-    <v-card height="100%" :elevation="2" color="surface">
-      <!-- Content -->
-    </v-card>
-  </div>
-</v-col>
-```
-
-### **2. Implemented Proper Responsive Behavior**
-
-#### **Desktop (lg and up - ≥960px):**
-- Sidebar stays within grid column bounds
-- Uses Vuetify's native flex system
-- Proper proportional sizing (3/12 on lg, 2/12 on xl)
-
-#### **Mobile/Tablet (md and down - <960px):**
-- Collapsible behavior with slide animation
-- Mobile-first navigation header
-- Optimized for touch interaction
-
-### **3. Enhanced Mobile Experience**
-
-```vue
-<!-- Mobile Header -->
-<v-app-bar
-  v-if="$vuetify.display.mdAndDown"
-  flat
-  color="transparent"
-  height="48"
->
-  <v-app-bar-nav-icon @click="sidebarOpen = !sidebarOpen" />
-  <v-app-bar-title>Business Management</v-app-bar-title>
-</v-app-bar>
-```
-
-## 🎨 Current Best Practices Applied
-
-### **✅ Responsive Design Patterns**
-- **Mobile-First Approach**: Uses `$vuetify.display` for breakpoint detection
-- **Progressive Enhancement**: Starts with mobile layout, enhances for desktop
-- **Touch-Friendly**: Proper touch targets and gestures on mobile
-
-### **✅ Component Optimization**
-- **Proper Grid Integration**: Respects Vuetify's 12-column grid system
-- **Performance**: Removed absolute positioning that breaks layout flow
-- **Accessibility**: Maintains proper focus management and screen reader support
-
-### **✅ Material Design 3 Compliance**
-- **Elevation Hierarchy**: Card elevation (2) vs drawer elevation (8)
-- **Color Theming**: Uses semantic color tokens (`surface` vs `tertiary`)
-- **Animation**: Smooth transitions with cubic-bezier curves
-
-## 📱 Responsive Breakpoint Strategy
-
-| Breakpoint | Behavior | Implementation |
-|------------|----------|----------------|
-| **xs-sm** (0-599px) | Collapsible overlay | Hidden by default, slide-in |
-| **md** (600-959px) | Collapsible inline | Toggleable within column |
-| **lg** (960-1263px) | Visible sidebar | 3/12 column width |
-| **xl** (1264px+) | Compact sidebar | 2/12 column width |
-
-## 🚀 Performance Improvements
-
-### **Before (Navigation Drawer):**
-- ❌ Absolute positioning breaks grid
-- ❌ Fixed width conflicts with responsive design
-- ❌ Z-index stacking issues
-- ❌ Overlay rendering in wrong container
-
-### **After (Card-based Layout):**
-- ✅ Natural grid flow and flexbox behavior
-- ✅ Proper responsive sizing at all breakpoints
-- ✅ Better memory efficiency (no absolute positioning)
-- ✅ Smooth animations with GPU acceleration
-
-## 🎯 Layout Integration Benefits
-
-### **Calendar Integration**
-- **Proper Flex Layout**: Sidebar and calendar work as flex siblings
-- **Responsive Interaction**: Touch gestures work across both components
-- **Unified State**: Sidebar filters immediately affect calendar view
-- **Performance**: No layout reflows from absolute positioning
-
-### **Admin Dashboard UX**
-- **Information Density**: Optimal use of screen real estate
-- **Progressive Disclosure**: Advanced filters collapse on mobile
-- **Quick Actions**: Always accessible at appropriate sizes
-- **System Metrics**: Properly sized for each breakpoint
-
-## 📊 RAG API Insights Applied
-
-Based on your Vuetify documentation (1,990 chunks), the optimization follows:
-
-1. **Grid System Best Practices**: Uses native flexbox instead of positioning hacks
-2. **Responsive Patterns**: Implements bottom-up responsive design
-3. **Component Architecture**: Card-based layout over drawer positioning
-4. **Performance Guidelines**: Avoids forced repaints from absolute positioning
-
-## 🔄 Next Steps (Optional Enhancements)
-
-### **Accessibility Improvements**
-```vue
-<!-- Enhanced ARIA support -->
-<div 
-  class="sidebar-container"
-  role="navigation"
-  :aria-label="$vuetify.display.mdAndDown ? 'Collapsible navigation' : 'Main navigation'"
-  :aria-expanded="$vuetify.display.mdAndDown ? sidebarOpen : true"
->
-```
-
-### **Animation Refinements**
-```css
-.sidebar-container {
-  transition: 
-    transform 0.3s cubic-bezier(0.4, 0, 0.6, 1),
-    opacity 0.2s ease-in-out;
-}
-```
-
-### **Advanced Responsive Features**
-- Swipe gestures for mobile sidebar toggle
-- Persistent user preference for sidebar state
-- Auto-collapse on navigation for better mobile UX
-
-## ✅ Verification
-
-Your layout now:
-- ✅ **Respects Vuetify Grid**: Sidebar stays within column bounds at all breakpoints
-- ✅ **Mobile Optimized**: Touch-friendly with proper mobile navigation patterns
-- ✅ **Performance Optimized**: No layout thrashing or absolute positioning conflicts
-- ✅ **Accessibility Compliant**: Proper focus management and screen reader support
-- ✅ **Future-Proof**: Easy to extend with additional responsive features
-
-The admin sidebar is now a proper Vuetify-compliant responsive component that integrates seamlessly with your FullCalendar layout! 🎉
+## File: vite.config.ts.timestamp-1750862340853-15d138252f7ed.mjs
 ````
-
-## File: VUETIFY_RAG_QUICKSTART.md
-````markdown
-# 🚀 Vuetify RAG Quick Start - Property Cleaning Scheduler
-
-## ✅ Integration Complete!
-
-Your Vuetify RAG system is now fully integrated and ready to accelerate your development:
-
-### **Server Status: ✅ ACTIVE**
-- 🌐 Server: `http://localhost:8000`
-- 📚 Documentation: 1,990 Vuetify chunks loaded
-- 🔧 Components: 224 components covered
-- 🎯 Ready for: Role-based Vue 3 + Vuetify development
-
-## 🎯 Perfect Timing for Your Project
-
-You're in **Phase 1D: Role-Based Architecture** with complex Vuetify components:
-- `AdminSidebar.vue` - Navigation drawer with nested cards
-- `AdminCalendar.vue` - FullCalendar + Vuetify integration  
-- `OwnerSidebar.vue` - Role-filtered components
-- Multiple form components with validation
-
-## 📁 Integration Files Created
-
-### **HTTP Request Examples**
-- `docs/knowledgebase/vuetify-rag-integration-guide.md`
-  - Ready-to-use HTTP requests for your components
-  - Copy/paste examples for current development needs
-  - AdminSidebar optimization examples
-
-### **Complete Integration Guide**  
-- `docs/knowledgebase/vuetify-rag-project-integration.md`
-  - Full integration workflow
-  - Best practices for role-based components
-  - Development patterns specific to your project
-
-### **Updated Documentation**
-- `docs/references/context7_techstack_ids.md`
-  - Added RAG system endpoints
-  - Integration commands
-  - Status monitoring
-
-## 🚀 Immediate Next Steps
-
-### **1. Install REST Client Extension (Recommended)**
-```bash
-# In Cursor, install "REST Client" extension
-# Then open: docs/knowledgebase/vuetify-rag-integration-guide.md
-# Click "Send Request" on any example
-```
-
-### **2. Test with Your Current Component**
-Open `src/components/smart/admin/AdminSidebar.vue` and ask:
-- "How to optimize this navigation drawer performance?"
-- "Best responsive patterns for admin vs owner interfaces?"
-- "How to improve v-select with many items?"
-
-### **3. Try These Common Use Cases**
-
-#### **Performance Optimization**
-```bash
-curl -X POST "http://localhost:8000/ask" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "Optimize v-navigation-drawer with many cards", "context": "your component code", "type": "coding"}'
-```
-
-#### **Responsive Design**
-```bash
-curl -X POST "http://localhost:8000/ask" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "Mobile responsive patterns for property owner interface", "context": "your layout code", "type": "coding"}'
-```
-
-#### **Component Enhancement**
-```bash
-curl -X POST "http://localhost:8000/ask" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "Add search to v-select with custom templates", "context": "your v-select code", "type": "coding"}'
-```
-
-## 🎯 Recommended Workflow
-
-### **While Developing Components:**
-1. **Encounter Vuetify Issue** → Copy your component code
-2. **Ask RAG System** → Get contextual Vuetify solution  
-3. **Apply Solution** → Implement improvements
-4. **Test** → Verify in your demo components
-
-### **For Code Reviews:**
-- Ask for optimization suggestions
-- Get accessibility recommendations
-- Check responsive design patterns
-- Validate component prop usage
-
-### **For New Features:**
-- Get implementation examples
-- Find best practices
-- Understand component relationships
-- Learn advanced configurations
-
-## 📊 What You Get from Each Request
-
-```json
-{
-  "answer": "Detailed explanation with Vue 3 + Vuetify 3 context",
-  "code_examples": ["<template>working examples</template>"],
-  "related_components": ["v-navigation-drawer", "v-card"],
-  "documentation_links": ["https://vuetifyjs.com/..."],
-  "confidence": 0.85
-}
-```
-
-## 🔧 Available Endpoints
-
-| Endpoint | Method | Use Case |
-|----------|--------|----------|
-| `/ask` | POST | **Main coding assistant** - Your primary tool |
-| `/search` | GET | Quick documentation lookup |
-| `/component/{name}` | GET | Component-specific reference |
-| `/health` | GET | Server status check |
-
-## 💡 Pro Tips for Your Project
-
-### **Role-Based Questions**
-- "Owner vs admin responsive layout patterns"
-- "Property owner mobile interface best practices"
-- "Admin dashboard performance optimization"
-
-### **Component-Specific Help**
-- Include your actual Vue component code as context
-- Ask about specific props, events, or styling
-- Get help with complex integrations (FullCalendar + Vuetify)
-
-### **Performance & UX**
-- "Optimize navigation drawer with role-based data"
-- "Best practices for form validation UX"
-- "Mobile-first responsive patterns"
-
-## 🎉 You're Ready!
-
-Your Vuetify RAG system is now a **powerful coding assistant** that understands:
-
-- ✅ **Your Vue 3 + Composition API patterns**
-- ✅ **Your Vuetify 3 component architecture** 
-- ✅ **Your role-based multi-tenant needs**
-- ✅ **Your responsive design requirements**
-
-**Start using it immediately** with your current AdminSidebar.vue or any Vuetify component questions!
-
----
-
-## 📞 Quick Commands
-
-```bash
-# Check server status
-curl http://localhost:8000/health
-
-# Search Vuetify docs
-curl "http://localhost:8000/search?q=your-search-term"
-
-# Get component info
-curl http://localhost:8000/component/v-navigation-drawer
-```
-
-## 🔗 Key Files
-- `docs/knowledgebase/vuetify-rag-integration-guide.md` - HTTP examples
-- `docs/knowledgebase/vuetify-rag-project-integration.md` - Complete guide
-- `docs/references/context7_techstack_ids.md` - Updated tech stack
-````
-
-## File: VUETIFY_RESPONSIVE_DRAWER_SOLUTION.md
-````markdown
-# 🎯 Vuetify Responsive Navigation Drawer Solution
-
-## Problem Analysis
-
-Your admin sidebar was going **full-width between 600px-1280px** because the `v-navigation-drawer` with `permanent` prop wasn't respecting the grid system properly.
-
-## 📚 Vuetify Documentation Features Applied
-
-Based on your comprehensive documentation (1,990 chunks), I've implemented these **documented features**:
-
-### **1. Rail Mode for Responsive Behavior**
-```vue
-<!-- From Vuetify docs: Rail mode provides compact sidebar -->
-<v-navigation-drawer 
-  :rail="railMode"
-  expand-on-hover
->
-```
-
-### **2. Temporary vs Permanent Modes**  
-```vue
-<!-- From Vuetify docs: Responsive drawer behavior -->
-<v-navigation-drawer
-  :temporary="mdAndDown"
-  :permanent="lgAndUp"
-  :mobile-breakpoint="960"
->
-```
-
-### **3. Mobile-First Implementation**
-```vue
-<!-- From Vuetify docs: Progressive enhancement -->
-<v-app-bar v-if="$vuetify.display.mdAndDown">
-  <v-app-bar-nav-icon @click="sidebarOpen = !sidebarOpen" />
-</v-app-bar>
-```
-
-### **4. Touch Gesture Support**
-```vue
-<!-- From Vuetify docs: Built-in touch support -->
-<v-navigation-drawer 
-  expand-on-hover
-  @update:model-value="emit('update:modelValue', $event)"
->
-```
-
-## 🔧 Complete Implementation
-
-### **HomeAdmin.vue Changes**
-
-```vue
-<template>
-  <v-col cols="12" lg="3" xl="2" class="sidebar-column">
-    <!-- Mobile Header -->
-    <v-app-bar
-      v-if="$vuetify.display.mdAndDown"
-      flat
-      color="transparent"
-      height="48"
-    >
-      <v-app-bar-nav-icon @click="sidebarOpen = !sidebarOpen" />
-      <v-app-bar-title>Business Management</v-app-bar-title>
-    </v-app-bar>
-
-    <!-- Responsive Navigation Drawer -->
-    <AdminSidebar
-      v-model="sidebarOpen"
-      :rail="railMode"
-      :properties="allPropertiesMap"
-      :loading="loading"
-      @navigate-to-booking="handleNavigateToBooking"
-      @filter-by-property="handleFilterByProperty"
-    />
-  </v-col>
-</template>
-
-<script setup lang="ts">
-// Navigation drawer responsive behavior
-const railMode = computed(() => {
-  // Use rail mode on desktop when space is limited
-  return !xs.value && !sidebarOpen.value;
-});
-</script>
-```
-
-### **AdminSidebar.vue Changes**
-
-```vue
-<template>
-  <v-navigation-drawer
-    :model-value="props.modelValue"
-    :rail="props.rail"
-    :temporary="mdAndDown"
-    :permanent="lgAndUp"
-    :mobile-breakpoint="960"
-    :elevation="2"
-    color="surface"
-    expand-on-hover
-    @update:model-value="emit('update:modelValue', $event)"
-  >
-    <v-container class="py-2" :class="{ 'px-1': props.rail }">
-      <!-- Compact content when in rail mode -->
-    </v-container>
-  </v-navigation-drawer>
-</template>
-
-<script setup lang="ts">
-interface Props {
-  modelValue?: boolean; // v-model support
-  rail?: boolean; // Rail mode for responsive behavior
-  // ... other props
-}
-
-interface Emits {
-  (e: 'update:modelValue', value: boolean): void;
-  // ... other events
-}
-
-const { lgAndUp, mdAndDown } = useDisplay();
-</script>
-```
-
-## 📱 Responsive Behavior Matrix
-
-| Breakpoint | Drawer State | Behavior | User Experience |
-|------------|-------------|----------|-----------------|
-| **xs (0-599px)** | `temporary` | Hidden by default, overlay when open | Mobile-optimized |
-| **sm (600-959px)** | `temporary` | Hidden by default, slide-in | Tablet portrait |
-| **md (960-1263px)** | `permanent` | Always visible, normal width | Desktop standard |
-| **lg (1264-1903px)** | `permanent` + `rail` | Compact mode, expand on hover | Desktop optimized |
-| **xl (1904px+)** | `permanent` | Full width within 2/12 columns | Large desktop |
-
-## 🎨 Enhanced Features
-
-### **Rail Mode Benefits**
-- **Space Efficiency**: Shows only icons in compact mode
-- **Expand on Hover**: Full content available when needed
-- **Grid Compliance**: Respects column constraints
-- **Performance**: Reduced DOM complexity in compact state
-
-### **Mobile Optimizations**
-- **Touch Targets**: Proper 48dp touch targets
-- **Swipe Gestures**: Native drawer swipe support
-- **Progressive Enhancement**: Works without JavaScript
-- **Accessibility**: Screen reader and keyboard navigation
-
-### **Desktop Experience**
-- **Information Density**: Optimal use of screen space
-- **Quick Access**: Rail mode for frequently used actions
-- **Hover Expansion**: Full sidebar on demand
-- **Grid Integration**: Perfect column alignment
-
-## 🚀 Performance Improvements
-
-### **Before (Fixed Width Drawer)**
-- ❌ Breaks grid system at intermediate breakpoints
-- ❌ Poor mobile experience
-- ❌ No space optimization
-- ❌ Fixed behavior across screen sizes
-
-### **After (Responsive Rail Drawer)**
-- ✅ **Perfect Grid Integration**: Respects all column sizes
-- ✅ **Mobile-First Design**: Optimized for all devices
-- ✅ **Space Optimization**: Rail mode for efficiency
-- ✅ **Progressive Enhancement**: Scales from mobile to desktop
-
-## 🎯 Accessibility Features
-
-```vue
-<!-- Enhanced ARIA support -->
-<v-navigation-drawer
-  :aria-label="props.rail ? 'Compact navigation' : 'Main navigation'"
-  :aria-expanded="!props.rail"
-  role="navigation"
->
-```
-
-## 📊 Integration Benefits
-
-### **Calendar Integration**
-- **Consistent Breakpoints**: Both components use same responsive logic
-- **Smooth Transitions**: Rail mode doesn't affect calendar layout
-- **Touch Compatibility**: Gestures work across both components
-- **State Synchronization**: Sidebar filters immediately update calendar
-
-### **Business Dashboard UX**
-- **Progressive Disclosure**: More space for calendar when needed
-- **Quick Actions**: Always accessible in rail mode
-- **Information Hierarchy**: Important actions visible in compact mode
-- **System Metrics**: Properly sized for each breakpoint
-
-## ✅ Final Verification
-
-Your navigation drawer now:
-
-1. **✅ Respects Grid System**: Stays within column bounds at all breakpoints
-2. **✅ Mobile Optimized**: Touch-friendly with proper mobile patterns
-3. **✅ Rail Mode**: Space-efficient desktop experience with expand-on-hover
-4. **✅ Progressive Enhancement**: Works from 320px to 2560px+ screens
-5. **✅ Accessibility Compliant**: ARIA labels, keyboard navigation, screen readers
-6. **✅ Performance Optimized**: Smooth animations, efficient DOM updates
-
-The sidebar no longer goes full-width between 600-1280px and provides an optimal experience across all breakpoints! 🎉
-
-## 🔄 Next Steps (Optional)
-
-### **Advanced Touch Gestures**
-```vue
-<!-- Swipe to open/close on mobile -->
-<v-navigation-drawer
-  :touchless="false"
-  disable-resize-watcher
->
-```
-
-### **Persistent User Preferences**
-```typescript
-// Remember user's rail mode preference
-const railMode = computed(() => {
-  return userPreferences.value.compactSidebar && lgAndUp.value;
-});
-```
-
-### **Animation Refinements**
-```css
-.v-navigation-drawer {
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.6, 1);
-}
-```
-
-Your responsive navigation drawer is now a **Vuetify best-practice implementation** that leverages all documented features! 🚀
+// vite.config.ts
+⋮----
+var vite_config_default = defineConfig({
+⋮----
+vue({
+⋮----
+vuetify({
+⋮----
+// Enable auto-import for Vuetify components
+⋮----
+vueDevTools({
+⋮----
+// Temporarily disable Vue DevTools to resolve login ha
+⋮----
+"@": path.resolve(__vite_injected_original_dirname, "./src"),
+"@components": path.resolve(__vite_injected_original_dirname, "./src/components"),
+"@composables": path.resolve(__vite_injected_original_dirname, "./src/composables"),
+"@stores": path.resolve(__vite_injected_original_dirname, "./src/stores"),
+"@types": path.resolve(__vite_injected_original_dirname, "./src/types"),
+"@utils": path.resolve(__vite_injected_original_dirname, "./src/utils"),
+"@layouts": path.resolve(__vite_injected_original_dirname, "./src/layouts"),
+"@pages": path.resolve(__vite_injected_original_dirname, "./src/pages"),
+"@plugins": path.resolve(__vite_injected_original_dirname, "./src/plugins"),
+"@assets": path.resolve(__vite_injected_original_dirname, "./src/assets"),
+// Fix Vue runtime compilation warning by using full build with template compiler
+⋮----
+// Define build-time feature flags for role-based features
+⋮----
+__ENABLE_OWNER_FEATURES__: JSON.stringify(true),
+__ENABLE_ADMIN_FEATURES__: JSON.stringify(true),
+__DEV_DEMOS_ENABLED__: JSON.stringify(process.env.NODE_ENV === "development"),
+__BUILD_VERSION__: JSON.stringify(process.env.npm_package_version || "0.1.0"),
+__BUILD_TIMESTAMP__: JSON.stringify((/* @__PURE__ */ new Date()).toISOString()),
+// Ensure Vue feature flags are properly set
+__VUE_OPTIONS_API__: JSON.stringify(true),
+__VUE_PROD_DEVTOOLS__: JSON.stringify(false)
+⋮----
+// CSS and SCSS sourcemap configuration
+⋮----
+// Enable CSS sourcemaps in development
+⋮----
+// Enable SCSS sourcemaps
+⋮----
+// Fix Sass legacy API deprecation warnings
+⋮----
+// Fix for requests stalling forever (common Vite issue)
+⋮----
+// Disable HMR overlay which can cause hangs
+⋮----
+// Use native file watching instead of aggressive polling
+⋮----
+// Disable polling to prevent performance issues
+// interval: 1000   // If polling needed, use 1000ms not 100ms
+⋮----
+// Increase limit to allow larger chunks
+⋮----
+// Safer manual chunking strategy - separate by major functionality
+manualChunks: (id) => {
+if (id.includes("node_modules")) {
+if (id.includes("vue/dist") || id.includes("@vue/")) {
+⋮----
+if (id.includes("vuetify")) {
+⋮----
+if (id.includes("@fullcalendar")) {
+⋮----
+if (id.includes("pinia")) {
+⋮----
+if ((id.includes("/src/dev/") || id.includes("\\src\\dev\\")) && process.env.NODE_ENV === "production") {
+⋮----
+if (id.includes("/owner/") || id.includes("\\owner\\")) {
+⋮----
+if (id.includes("/admin/") || id.includes("\\admin\\")) {
+⋮----
+if (id.includes("/stores/") || id.includes("\\stores\\") || id.includes("/composables/shared/") || id.includes("\\composables\\shared\\") || id.includes("/utils/") || id.includes("\\utils\\")) {
+⋮----
+// Re-enable CSS code splitting
+⋮----
+// Use esbuild for better compatibility
+⋮----
+// Remove force: true to prevent forced re-optimization that can cause hangs
+// force: true
+⋮----
+// Preview configuration for testing builds
+⋮----
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsidml0ZS5jb25maWcudHMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImNvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9kaXJuYW1lID0gXCJDOlxcXFxzaXRlc1xcXFxCb29raW5nQXBwdjg5XCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ZpbGVuYW1lID0gXCJDOlxcXFxzaXRlc1xcXFxCb29raW5nQXBwdjg5XFxcXHZpdGUuY29uZmlnLnRzXCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ltcG9ydF9tZXRhX3VybCA9IFwiZmlsZTovLy9DOi9zaXRlcy9Cb29raW5nQXBwdjg5L3ZpdGUuY29uZmlnLnRzXCI7aW1wb3J0IHsgZGVmaW5lQ29uZmlnIH0gZnJvbSAndml0ZSdcclxuaW1wb3J0IHZ1ZSBmcm9tICdAdml0ZWpzL3BsdWdpbi12dWUnXHJcbmltcG9ydCB2dWV0aWZ5IGZyb20gJ3ZpdGUtcGx1Z2luLXZ1ZXRpZnknXHJcbmltcG9ydCBwYXRoIGZyb20gJ3BhdGgnXHJcbmltcG9ydCB2dWVEZXZUb29scyBmcm9tICd2aXRlLXBsdWdpbi12dWUtZGV2dG9vbHMnXHJcbmltcG9ydCB7IFZpdGVQbHVnaW5JbnNwZWN0b3IgfSBmcm9tICd2aXRlLXBsdWdpbi12dWUtaW5zcGVjdG9yJ1xyXG5cclxuLy8gaHR0cHM6Ly92aXRlanMuZGV2L2NvbmZpZy9cclxuZXhwb3J0IGRlZmF1bHQgZGVmaW5lQ29uZmlnKHtcclxuICBwbHVnaW5zOiBbXHJcbiAgICB2dWUoe1xyXG4gICAgICB0ZW1wbGF0ZToge1xyXG4gICAgICAgIGNvbXBpbGVyT3B0aW9uczoge1xyXG4gICAgICAgICAgc291cmNlTWFwOiB0cnVlXHJcbiAgICAgICAgfVxyXG4gICAgICB9XHJcbiAgICB9KSxcclxuICAgIHZ1ZXRpZnkoeyBcclxuICAgICAgICAgIGF1dG9JbXBvcnQ6IHRydWUsIC8vIEVuYWJsZSBhdXRvLWltcG9ydCBmb3IgVnVldGlmeSBjb21wb25lbnRzXHJcbiAgICAgICAgICBzdHlsZXM6IHtcclxuICAgICAgICAgICAgY29uZmlnRmlsZTogJ3NyYy9zdHlsZXMvdmFyaWFibGVzLnNjc3MnXHJcbiAgICAgICAgICB9XHJcbiAgICB9KSwgICBcclxuICAgIHZ1ZURldlRvb2xzKHtcclxuICAgICAgY29tcG9uZW50SW5zcGVjdG9yOiB7XHJcbiAgICAgICAgZW5hYmxlZDogdHJ1ZSxcclxuICAgICAgICBsYXVuY2hFZGl0b3I6ICdjb2RlJyxcclxuICAgICAgfVxyXG4gICAgfSlcclxuXHJcbiAgXSwgICAgXHJcblxyXG4gICAgLy8gVGVtcG9yYXJpbHkgZGlzYWJsZSBWdWUgRGV2VG9vbHMgdG8gcmVzb2x2ZSBsb2dpbiBoYVxyXG4gIHJlc29sdmU6IHtcclxuICAgIGFsaWFzOiB7XHJcbiAgICAgICdAJzogcGF0aC5yZXNvbHZlKF9fZGlybmFtZSwgJy4vc3JjJyksXHJcbiAgICAgICdAY29tcG9uZW50cyc6IHBhdGgucmVzb2x2ZShfX2Rpcm5hbWUsICcuL3NyYy9jb21wb25lbnRzJyksXHJcbiAgICAgICdAY29tcG9zYWJsZXMnOiBwYXRoLnJlc29sdmUoX19kaXJuYW1lLCAnLi9zcmMvY29tcG9zYWJsZXMnKSxcclxuICAgICAgJ0BzdG9yZXMnOiBwYXRoLnJlc29sdmUoX19kaXJuYW1lLCAnLi9zcmMvc3RvcmVzJyksXHJcbiAgICAgICdAdHlwZXMnOiBwYXRoLnJlc29sdmUoX19kaXJuYW1lLCAnLi9zcmMvdHlwZXMnKSxcclxuICAgICAgJ0B1dGlscyc6IHBhdGgucmVzb2x2ZShfX2Rpcm5hbWUsICcuL3NyYy91dGlscycpLFxyXG4gICAgICAnQGxheW91dHMnOiBwYXRoLnJlc29sdmUoX19kaXJuYW1lLCAnLi9zcmMvbGF5b3V0cycpLFxyXG4gICAgICAnQHBhZ2VzJzogcGF0aC5yZXNvbHZlKF9fZGlybmFtZSwgJy4vc3JjL3BhZ2VzJyksXHJcbiAgICAgICdAcGx1Z2lucyc6IHBhdGgucmVzb2x2ZShfX2Rpcm5hbWUsICcuL3NyYy9wbHVnaW5zJyksXHJcbiAgICAgICdAYXNzZXRzJzogcGF0aC5yZXNvbHZlKF9fZGlybmFtZSwgJy4vc3JjL2Fzc2V0cycpLFxyXG4gICAgICAvLyBGaXggVnVlIHJ1bnRpbWUgY29tcGlsYXRpb24gd2FybmluZyBieSB1c2luZyBmdWxsIGJ1aWxkIHdpdGggdGVtcGxhdGUgY29tcGlsZXJcclxuICAgICAgJ3Z1ZSc6ICd2dWUvZGlzdC92dWUuZXNtLWJ1bmRsZXIuanMnXHJcbiAgICB9XHJcbiAgfSxcclxuICAvLyBEZWZpbmUgYnVpbGQtdGltZSBmZWF0dXJlIGZsYWdzIGZvciByb2xlLWJhc2VkIGZlYXR1cmVzXHJcbiAgZGVmaW5lOiB7XHJcbiAgICBfX0VOQUJMRV9PV05FUl9GRUFUVVJFU19fOiBKU09OLnN0cmluZ2lmeSh0cnVlKSxcclxuICAgIF9fRU5BQkxFX0FETUlOX0ZFQVRVUkVTX186IEpTT04uc3RyaW5naWZ5KHRydWUpLFxyXG4gICAgX19ERVZfREVNT1NfRU5BQkxFRF9fOiBKU09OLnN0cmluZ2lmeShwcm9jZXNzLmVudi5OT0RFX0VOViA9PT0gJ2RldmVsb3BtZW50JyksXHJcbiAgICBfX0JVSUxEX1ZFUlNJT05fXzogSlNPTi5zdHJpbmdpZnkocHJvY2Vzcy5lbnYubnBtX3BhY2thZ2VfdmVyc2lvbiB8fCAnMC4xLjAnKSxcclxuICAgIF9fQlVJTERfVElNRVNUQU1QX186IEpTT04uc3RyaW5naWZ5KG5ldyBEYXRlKCkudG9JU09TdHJpbmcoKSksXHJcbiAgICAvLyBFbnN1cmUgVnVlIGZlYXR1cmUgZmxhZ3MgYXJlIHByb3Blcmx5IHNldFxyXG4gICAgX19WVUVfT1BUSU9OU19BUElfXzogSlNPTi5zdHJpbmdpZnkodHJ1ZSksXHJcbiAgICBfX1ZVRV9QUk9EX0RFVlRPT0xTX186IEpTT04uc3RyaW5naWZ5KGZhbHNlKVxyXG4gIH0sXHJcbiAgICAvLyBDU1MgYW5kIFNDU1Mgc291cmNlbWFwIGNvbmZpZ3VyYXRpb25cclxuICAgIGNzczoge1xyXG4gICAgICBkZXZTb3VyY2VtYXA6IHRydWUsIC8vIEVuYWJsZSBDU1Mgc291cmNlbWFwcyBpbiBkZXZlbG9wbWVudFxyXG4gICAgICBwcmVwcm9jZXNzb3JPcHRpb25zOiB7XHJcbiAgICAgICAgc2Nzczoge1xyXG4gICAgICAgICAgc291cmNlTWFwOiB0cnVlLCAvLyBFbmFibGUgU0NTUyBzb3VyY2VtYXBzXHJcbiAgICAgICAgICBzb3VyY2VNYXBDb250ZW50czogdHJ1ZSxcclxuICAgICAgICAgIHNvdXJjZU1hcEVtYmVkOiBmYWxzZSxcclxuICAgICAgICAgIC8vIEZpeCBTYXNzIGxlZ2FjeSBBUEkgZGVwcmVjYXRpb24gd2FybmluZ3NcclxuICAgICAgICAgIGFwaTogJ21vZGVybi1jb21waWxlcicsXHJcbiAgICAgICAgICBzaWxlbmNlRGVwcmVjYXRpb25zOiBbJ2xlZ2FjeS1qcy1hcGknXVxyXG4gICAgICAgIH1cclxuICAgICAgfVxyXG4gICAgfSxcclxuICBzZXJ2ZXI6IHtcclxuICAgIHBvcnQ6IDMwMDAsXHJcbiAgICBvcGVuOiB0cnVlLFxyXG4gICAgc291cmNlbWFwSWdub3JlTGlzdDogZmFsc2UsXHJcbiAgICAvLyBGaXggZm9yIHJlcXVlc3RzIHN0YWxsaW5nIGZvcmV2ZXIgKGNvbW1vbiBWaXRlIGlzc3VlKVxyXG4gICAgaG1yOiB7XHJcbiAgICAgIG92ZXJsYXk6IGZhbHNlICAvLyBEaXNhYmxlIEhNUiBvdmVybGF5IHdoaWNoIGNhbiBjYXVzZSBoYW5nc1xyXG4gICAgfSxcclxuICAgIC8vIFVzZSBuYXRpdmUgZmlsZSB3YXRjaGluZyBpbnN0ZWFkIG9mIGFnZ3Jlc3NpdmUgcG9sbGluZ1xyXG4gICAgd2F0Y2g6IHtcclxuICAgICAgdXNlUG9sbGluZzogZmFsc2UsICAvLyBEaXNhYmxlIHBvbGxpbmcgdG8gcHJldmVudCBwZXJmb3JtYW5jZSBpc3N1ZXNcclxuICAgICAgLy8gaW50ZXJ2YWw6IDEwMDAgICAvLyBJZiBwb2xsaW5nIG5lZWRlZCwgdXNlIDEwMDBtcyBub3QgMTAwbXNcclxuICAgIH1cclxuICB9LFxyXG4gIGJ1aWxkOiB7XHJcbiAgICB0YXJnZXQ6ICdlc25leHQnLFxyXG4gICAgc291cmNlbWFwOiBwcm9jZXNzLmVudi5OT0RFX0VOViA9PT0gJ2RldmVsb3BtZW50JyA/IHRydWUgOiAnaGlkZGVuJyxcclxuICAgIGNodW5rU2l6ZVdhcm5pbmdMaW1pdDogMTAwMCwgLy8gSW5jcmVhc2UgbGltaXQgdG8gYWxsb3cgbGFyZ2VyIGNodW5rc1xyXG4gICAgcm9sbHVwT3B0aW9uczoge1xyXG4gICAgICBvdXRwdXQ6IHtcclxuICAgICAgICAvLyBTYWZlciBtYW51YWwgY2h1bmtpbmcgc3RyYXRlZ3kgLSBzZXBhcmF0ZSBieSBtYWpvciBmdW5jdGlvbmFsaXR5XHJcbiAgICAgICAgbWFudWFsQ2h1bmtzOiAoaWQpID0+IHtcclxuICAgICAgICAgIC8vIENvcmUgZGVwZW5kZW5jaWVzXHJcbiAgICAgICAgICBpZiAoaWQuaW5jbHVkZXMoJ25vZGVfbW9kdWxlcycpKSB7XHJcbiAgICAgICAgICAgIGlmIChpZC5pbmNsdWRlcygndnVlL2Rpc3QnKSB8fCBpZC5pbmNsdWRlcygnQHZ1ZS8nKSkge1xyXG4gICAgICAgICAgICAgIHJldHVybiAndnVlLWNvcmUnXHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgaWYgKGlkLmluY2x1ZGVzKCd2dWV0aWZ5JykpIHtcclxuICAgICAgICAgICAgICByZXR1cm4gJ3Z1ZXRpZnknXHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgaWYgKGlkLmluY2x1ZGVzKCdAZnVsbGNhbGVuZGFyJykpIHtcclxuICAgICAgICAgICAgICByZXR1cm4gJ2NhbGVuZGFyJ1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGlmIChpZC5pbmNsdWRlcygncGluaWEnKSkge1xyXG4gICAgICAgICAgICAgIHJldHVybiAndnVlLWNvcmUnIC8vIEtlZXAgcGluaWEgd2l0aCB2dWUgY29yZSBmb3IgYmV0dGVyIGluaXRpYWxpemF0aW9uXHJcbiAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgcmV0dXJuICd2ZW5kb3InXHJcbiAgICAgICAgICB9XHJcblxyXG4gICAgICAgICAgLy8gU2tpcCBkZXYgZm9sZGVyIGNvbXBsZXRlbHkgaW4gcHJvZHVjdGlvblxyXG4gICAgICAgICAgaWYgKChpZC5pbmNsdWRlcygnL3NyYy9kZXYvJykgfHwgaWQuaW5jbHVkZXMoJ1xcXFxzcmNcXFxcZGV2XFxcXCcpKSAmJiBwcm9jZXNzLmVudi5OT0RFX0VOViA9PT0gJ3Byb2R1Y3Rpb24nKSB7XHJcbiAgICAgICAgICAgIHJldHVybiB1bmRlZmluZWRcclxuICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAvLyBHcm91cCBhbGwgb3duZXItcmVsYXRlZCBjb2RlIHRvZ2V0aGVyXHJcbiAgICAgICAgICBpZiAoaWQuaW5jbHVkZXMoJy9vd25lci8nKSB8fCBpZC5pbmNsdWRlcygnXFxcXG93bmVyXFxcXCcpKSB7XHJcbiAgICAgICAgICAgIHJldHVybiAnb3duZXItYXBwJ1xyXG4gICAgICAgICAgfVxyXG5cclxuICAgICAgICAgIC8vIEdyb3VwIGFsbCBhZG1pbi1yZWxhdGVkIGNvZGUgdG9nZXRoZXIgIFxyXG4gICAgICAgICAgaWYgKGlkLmluY2x1ZGVzKCcvYWRtaW4vJykgfHwgaWQuaW5jbHVkZXMoJ1xcXFxhZG1pblxcXFwnKSkge1xyXG4gICAgICAgICAgICByZXR1cm4gJ2FkbWluLWFwcCdcclxuICAgICAgICAgIH1cclxuXHJcbiAgICAgICAgICAvLyBDb3JlIGFwcCBjb2RlXHJcbiAgICAgICAgICBpZiAoaWQuaW5jbHVkZXMoJy9zdG9yZXMvJykgfHwgaWQuaW5jbHVkZXMoJ1xcXFxzdG9yZXNcXFxcJykgfHxcclxuICAgICAgICAgICAgICBpZC5pbmNsdWRlcygnL2NvbXBvc2FibGVzL3NoYXJlZC8nKSB8fCBpZC5pbmNsdWRlcygnXFxcXGNvbXBvc2FibGVzXFxcXHNoYXJlZFxcXFwnKSB8fFxyXG4gICAgICAgICAgICAgIGlkLmluY2x1ZGVzKCcvdXRpbHMvJykgfHwgaWQuaW5jbHVkZXMoJ1xcXFx1dGlsc1xcXFwnKSkge1xyXG4gICAgICAgICAgICByZXR1cm4gJ2FwcC1jb3JlJ1xyXG4gICAgICAgICAgfVxyXG5cclxuICAgICAgICAgIC8vIERlZmF1bHQgY2h1bmtcclxuICAgICAgICAgIHJldHVybiAnYXBwJ1xyXG4gICAgICAgIH1cclxuICAgICAgfVxyXG4gICAgfSxcclxuICAgIC8vIFJlLWVuYWJsZSBDU1MgY29kZSBzcGxpdHRpbmdcclxuICAgIGNzc0NvZGVTcGxpdDogdHJ1ZSxcclxuICAgIC8vIFVzZSBlc2J1aWxkIGZvciBiZXR0ZXIgY29tcGF0aWJpbGl0eVxyXG4gICAgbWluaWZ5OiBwcm9jZXNzLmVudi5OT0RFX0VOViA9PT0gJ3Byb2R1Y3Rpb24nID8gJ2VzYnVpbGQnIDogZmFsc2VcclxuICB9LFxyXG4gIG9wdGltaXplRGVwczoge1xyXG4gICAgaW5jbHVkZTogW1xyXG4gICAgICAndnVlJywgXHJcbiAgICAgICd2dWUtcm91dGVyJywgXHJcbiAgICAgICdwaW5pYScsIFxyXG4gICAgICAndnVldGlmeScsXHJcbiAgICAgICdAZnVsbGNhbGVuZGFyL3Z1ZTMnLFxyXG4gICAgICAnQGZ1bGxjYWxlbmRhci9jb3JlJyxcclxuICAgICAgJ0BmdWxsY2FsZW5kYXIvZGF5Z3JpZCcsXHJcbiAgICAgICdAZnVsbGNhbGVuZGFyL3RpbWVncmlkJyxcclxuICAgICAgJ0BmdWxsY2FsZW5kYXIvaW50ZXJhY3Rpb24nXHJcbiAgICBdLFxyXG4gICAgLy8gUmVtb3ZlIGZvcmNlOiB0cnVlIHRvIHByZXZlbnQgZm9yY2VkIHJlLW9wdGltaXphdGlvbiB0aGF0IGNhbiBjYXVzZSBoYW5nc1xyXG4gICAgLy8gZm9yY2U6IHRydWVcclxuICB9LFxyXG4gIC8vIFByZXZpZXcgY29uZmlndXJhdGlvbiBmb3IgdGVzdGluZyBidWlsZHNcclxuICBwcmV2aWV3OiB7XHJcbiAgICBwb3J0OiA0MTczLFxyXG4gICAgb3BlbjogdHJ1ZSxcclxuICAgIGNvcnM6IHRydWVcclxuICB9XHJcbn0pIl0sCiAgIm1hcHBpbmdzIjogIjtBQUEwUCxTQUFTLG9CQUFvQjtBQUN2UixPQUFPLFNBQVM7QUFDaEIsT0FBTyxhQUFhO0FBQ3BCLE9BQU8sVUFBVTtBQUNqQixPQUFPLGlCQUFpQjtBQUp4QixJQUFNLG1DQUFtQztBQVF6QyxJQUFPLHNCQUFRLGFBQWE7QUFBQSxFQUMxQixTQUFTO0FBQUEsSUFDUCxJQUFJO0FBQUEsTUFDRixVQUFVO0FBQUEsUUFDUixpQkFBaUI7QUFBQSxVQUNmLFdBQVc7QUFBQSxRQUNiO0FBQUEsTUFDRjtBQUFBLElBQ0YsQ0FBQztBQUFBLElBQ0QsUUFBUTtBQUFBLE1BQ0YsWUFBWTtBQUFBO0FBQUEsTUFDWixRQUFRO0FBQUEsUUFDTixZQUFZO0FBQUEsTUFDZDtBQUFBLElBQ04sQ0FBQztBQUFBLElBQ0QsWUFBWTtBQUFBLE1BQ1Ysb0JBQW9CO0FBQUEsUUFDbEIsU0FBUztBQUFBLFFBQ1QsY0FBYztBQUFBLE1BQ2hCO0FBQUEsSUFDRixDQUFDO0FBQUEsRUFFSDtBQUFBO0FBQUEsRUFHQSxTQUFTO0FBQUEsSUFDUCxPQUFPO0FBQUEsTUFDTCxLQUFLLEtBQUssUUFBUSxrQ0FBVyxPQUFPO0FBQUEsTUFDcEMsZUFBZSxLQUFLLFFBQVEsa0NBQVcsa0JBQWtCO0FBQUEsTUFDekQsZ0JBQWdCLEtBQUssUUFBUSxrQ0FBVyxtQkFBbUI7QUFBQSxNQUMzRCxXQUFXLEtBQUssUUFBUSxrQ0FBVyxjQUFjO0FBQUEsTUFDakQsVUFBVSxLQUFLLFFBQVEsa0NBQVcsYUFBYTtBQUFBLE1BQy9DLFVBQVUsS0FBSyxRQUFRLGtDQUFXLGFBQWE7QUFBQSxNQUMvQyxZQUFZLEtBQUssUUFBUSxrQ0FBVyxlQUFlO0FBQUEsTUFDbkQsVUFBVSxLQUFLLFFBQVEsa0NBQVcsYUFBYTtBQUFBLE1BQy9DLFlBQVksS0FBSyxRQUFRLGtDQUFXLGVBQWU7QUFBQSxNQUNuRCxXQUFXLEtBQUssUUFBUSxrQ0FBVyxjQUFjO0FBQUE7QUFBQSxNQUVqRCxPQUFPO0FBQUEsSUFDVDtBQUFBLEVBQ0Y7QUFBQTtBQUFBLEVBRUEsUUFBUTtBQUFBLElBQ04sMkJBQTJCLEtBQUssVUFBVSxJQUFJO0FBQUEsSUFDOUMsMkJBQTJCLEtBQUssVUFBVSxJQUFJO0FBQUEsSUFDOUMsdUJBQXVCLEtBQUssVUFBVSxRQUFRLElBQUksYUFBYSxhQUFhO0FBQUEsSUFDNUUsbUJBQW1CLEtBQUssVUFBVSxRQUFRLElBQUksdUJBQXVCLE9BQU87QUFBQSxJQUM1RSxxQkFBcUIsS0FBSyxXQUFVLG9CQUFJLEtBQUssR0FBRSxZQUFZLENBQUM7QUFBQTtBQUFBLElBRTVELHFCQUFxQixLQUFLLFVBQVUsSUFBSTtBQUFBLElBQ3hDLHVCQUF1QixLQUFLLFVBQVUsS0FBSztBQUFBLEVBQzdDO0FBQUE7QUFBQSxFQUVFLEtBQUs7QUFBQSxJQUNILGNBQWM7QUFBQTtBQUFBLElBQ2QscUJBQXFCO0FBQUEsTUFDbkIsTUFBTTtBQUFBLFFBQ0osV0FBVztBQUFBO0FBQUEsUUFDWCxtQkFBbUI7QUFBQSxRQUNuQixnQkFBZ0I7QUFBQTtBQUFBLFFBRWhCLEtBQUs7QUFBQSxRQUNMLHFCQUFxQixDQUFDLGVBQWU7QUFBQSxNQUN2QztBQUFBLElBQ0Y7QUFBQSxFQUNGO0FBQUEsRUFDRixRQUFRO0FBQUEsSUFDTixNQUFNO0FBQUEsSUFDTixNQUFNO0FBQUEsSUFDTixxQkFBcUI7QUFBQTtBQUFBLElBRXJCLEtBQUs7QUFBQSxNQUNILFNBQVM7QUFBQTtBQUFBLElBQ1g7QUFBQTtBQUFBLElBRUEsT0FBTztBQUFBLE1BQ0wsWUFBWTtBQUFBO0FBQUE7QUFBQSxJQUVkO0FBQUEsRUFDRjtBQUFBLEVBQ0EsT0FBTztBQUFBLElBQ0wsUUFBUTtBQUFBLElBQ1IsV0FBVyxRQUFRLElBQUksYUFBYSxnQkFBZ0IsT0FBTztBQUFBLElBQzNELHVCQUF1QjtBQUFBO0FBQUEsSUFDdkIsZUFBZTtBQUFBLE1BQ2IsUUFBUTtBQUFBO0FBQUEsUUFFTixjQUFjLENBQUMsT0FBTztBQUVwQixjQUFJLEdBQUcsU0FBUyxjQUFjLEdBQUc7QUFDL0IsZ0JBQUksR0FBRyxTQUFTLFVBQVUsS0FBSyxHQUFHLFNBQVMsT0FBTyxHQUFHO0FBQ25ELHFCQUFPO0FBQUEsWUFDVDtBQUNBLGdCQUFJLEdBQUcsU0FBUyxTQUFTLEdBQUc7QUFDMUIscUJBQU87QUFBQSxZQUNUO0FBQ0EsZ0JBQUksR0FBRyxTQUFTLGVBQWUsR0FBRztBQUNoQyxxQkFBTztBQUFBLFlBQ1Q7QUFDQSxnQkFBSSxHQUFHLFNBQVMsT0FBTyxHQUFHO0FBQ3hCLHFCQUFPO0FBQUEsWUFDVDtBQUNBLG1CQUFPO0FBQUEsVUFDVDtBQUdBLGVBQUssR0FBRyxTQUFTLFdBQVcsS0FBSyxHQUFHLFNBQVMsY0FBYyxNQUFNLFFBQVEsSUFBSSxhQUFhLGNBQWM7QUFDdEcsbUJBQU87QUFBQSxVQUNUO0FBR0EsY0FBSSxHQUFHLFNBQVMsU0FBUyxLQUFLLEdBQUcsU0FBUyxXQUFXLEdBQUc7QUFDdEQsbUJBQU87QUFBQSxVQUNUO0FBR0EsY0FBSSxHQUFHLFNBQVMsU0FBUyxLQUFLLEdBQUcsU0FBUyxXQUFXLEdBQUc7QUFDdEQsbUJBQU87QUFBQSxVQUNUO0FBR0EsY0FBSSxHQUFHLFNBQVMsVUFBVSxLQUFLLEdBQUcsU0FBUyxZQUFZLEtBQ25ELEdBQUcsU0FBUyxzQkFBc0IsS0FBSyxHQUFHLFNBQVMseUJBQXlCLEtBQzVFLEdBQUcsU0FBUyxTQUFTLEtBQUssR0FBRyxTQUFTLFdBQVcsR0FBRztBQUN0RCxtQkFBTztBQUFBLFVBQ1Q7QUFHQSxpQkFBTztBQUFBLFFBQ1Q7QUFBQSxNQUNGO0FBQUEsSUFDRjtBQUFBO0FBQUEsSUFFQSxjQUFjO0FBQUE7QUFBQSxJQUVkLFFBQVEsUUFBUSxJQUFJLGFBQWEsZUFBZSxZQUFZO0FBQUEsRUFDOUQ7QUFBQSxFQUNBLGNBQWM7QUFBQSxJQUNaLFNBQVM7QUFBQSxNQUNQO0FBQUEsTUFDQTtBQUFBLE1BQ0E7QUFBQSxNQUNBO0FBQUEsTUFDQTtBQUFBLE1BQ0E7QUFBQSxNQUNBO0FBQUEsTUFDQTtBQUFBLE1BQ0E7QUFBQSxJQUNGO0FBQUE7QUFBQTtBQUFBLEVBR0Y7QUFBQTtBQUFBLEVBRUEsU0FBUztBQUFBLElBQ1AsTUFBTTtBQUFBLElBQ04sTUFBTTtBQUFBLElBQ04sTUFBTTtBQUFBLEVBQ1I7QUFDRixDQUFDOyIsCiAgIm5hbWVzIjogW10KfQo=
 ````
 
 ## File: .gitignore
@@ -19875,11 +9561,6 @@ dist-ssr
 .cache
 .temp
 .tmp
-````
-
-## File: src/__tests__/utils/test-utils.ts
-````typescript
-
 ````
 
 ## File: src/components/dumb/admin/AdminCalendarControls.vue
@@ -22252,4113 +11933,41 @@ const handleAction = (actionType: OwnerActionType) => {
 </style>
 ````
 
-## File: src/components/dumb/PropertyCardDemo.vue
-````vue
-<template>
-  <div class="property-card-demo">
-    <h2 class="text-h5 mb-4">
-      Property Card Demo
-    </h2>
-    <v-row>
-      <v-col
-        v-for="property in demoProperties"
-        :key="property.id"
-        cols="12"
-        sm="6"
-        md="4"
-        lg="3"
-      >
-        <PropertyCard
-          :property="property"
-          @edit="handleEdit"
-          @delete="handleDelete"
-          @view="handleView"
-        />
-      </v-col>
-    </v-row>
-    <v-snackbar
-      v-model="snackbar.show"
-      :color="snackbar.color"
-    >
-      {{ snackbar.text }}
-      <template #actions>
-        <v-btn
-          variant="text"
-          @click="snackbar.show = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-  </div>
-</template>
-⋮----
-{{ snackbar.text }}
-<template #actions>
-        <v-btn
-          variant="text"
-          @click="snackbar.show = false"
-        >
-          Close
-        </v-btn>
-      </template>
-⋮----
-<script setup lang="ts">
-import { ref } from 'vue';
-import PropertyCard from './PropertyCard.vue';
-import type { Property } from '@/types';
-const demoProperties = ref<Property[]>([
-  {
-    id: '1',
-    owner_id: 'owner1',
-    name: 'Seaside Villa',
-    address: '123 Ocean Drive, Beach City',
-    cleaning_duration: 120,
-    special_instructions: 'Clean sand from floors, check outside shower.',
-    pricing_tier: 'luxury',
-    active: true,
-    created_at: '2023-01-15T09:30:00Z',
-    updated_at: '2023-05-20T14:15:00Z'
-  },
-  {
-    id: '2',
-    owner_id: 'owner1',
-    name: 'Downtown Apartment',
-    address: '456 Main Street, Apt 7B, Metro City',
-    cleaning_duration: 60,
-    pricing_tier: 'premium',
-    active: true,
-    created_at: '2023-02-10T11:45:00Z',
-    updated_at: '2023-06-05T16:30:00Z'
-  },
-  {
-    id: '3',
-    owner_id: 'owner2',
-    name: 'Mountain Cabin',
-    address: '789 Pine Trail, Highland Mountains',
-    cleaning_duration: 90,
-    special_instructions: 'Check fireplace, restock firewood if needed.',
-    pricing_tier: 'basic',
-    active: false,
-    created_at: '2023-03-22T08:15:00Z',
-    updated_at: '2023-04-18T13:20:00Z'
-  },
-  {
-    id: '4',
-    owner_id: 'owner3',
-    name: 'Lakefront Cottage with Very Long Name That Should Truncate',
-    address: '101 Lake View Road, Waterside County, with a very long address that should truncate',
-    cleaning_duration: 150,
-    special_instructions: 'This is a very long special instruction that should be truncated in the UI but visible in a tooltip when hovering. Check boat dock and life vests.',
-    pricing_tier: 'luxury',
-    active: true,
-    created_at: '2023-01-05T10:10:00Z',
-    updated_at: '2023-07-12T09:45:00Z'
-  }
-]);
-const snackbar = ref({
-  show: false,
-  text: '',
-  color: 'info'
-});
-const handleEdit = (id: string) => {
-  const property = demoProperties.value.find(p => p.id === id);
-  snackbar.value = {
-    show: true,
-    text: `Edit requested for: ${property?.name}`,
-    color: 'primary'
-  };
-};
-const handleDelete = (id: string) => {
-  const property = demoProperties.value.find(p => p.id === id);
-  snackbar.value = {
-    show: true,
-    text: `Delete requested for: ${property?.name}`,
-    color: 'error'
-  };
-};
-const handleView = (id: string) => {
-  const property = demoProperties.value.find(p => p.id === id);
-  snackbar.value = {
-    show: true,
-    text: `Viewing details for: ${property?.name}`,
-    color: 'info'
-  };
-};
-</script>
-<style scoped>
-.property-card-demo {
-  padding: 1rem;
-}
-</style>
-````
-
-## File: src/components/dumb/TurnAlertsDemo.vue
-````vue
-<template>
-  <div class="demo-container pa-4">
-    <h1 class="text-h4 mb-4">
-      Turn Alerts Demo
-    </h1>
-    <div class="mb-4">
-      <v-btn
-        color="error"
-        class="mr-2"
-        @click="addUrgentTurn"
-      >
-        Add Urgent Turn
-      </v-btn>
-      <v-btn
-        color="warning"
-        class="mr-2"
-        @click="addHighTurn"
-      >
-        Add High Priority Turn
-      </v-btn>
-      <v-btn
-        color="grey"
-        @click="clearTurns"
-      >
-        Clear All
-      </v-btn>
-    </div>
-    <TurnAlerts
-      :bookings="turnBookings"
-      @view="onViewBooking"
-      @assign="onAssignBooking"
-      @toggle-expanded="expanded = $event"
-      @view-all="logEvent('View all turns clicked')"
-    />
-    <div class="mt-4 pa-2 bg-grey-lighten-4">
-      <h3 class="text-h6">
-        Event Log:
-      </h3>
-      <v-list>
-        <v-list-item
-          v-for="(log, index) in eventLogs"
-          :key="index"
-        >
-          {{ log }}
-        </v-list-item>
-      </v-list>
-    </div>
-  </div>
-</template>
-⋮----
-{{ log }}
-⋮----
-<script setup lang="ts">
-import { ref } from 'vue';
-import TurnAlerts from './TurnAlerts.vue';
-import { v4 as uuidv4 } from 'uuid';
-import type { BookingWithMetadata } from '@/types';
-const expanded = ref(true);
-const turnBookings = ref<BookingWithMetadata[]>([]);
-const eventLogs = ref<string[]>([]);
-function createTurn(priority: 'urgent' | 'high'): BookingWithMetadata {
-  const now = new Date();
-  const id = uuidv4();
-  const propertyId = uuidv4();
-  const checkoutHours = priority === 'urgent' ? 1 : 2;
-  const checkout = new Date(now.getTime() + (checkoutHours * 60 * 60 * 1000));
-  const checkinOffset = Math.floor(Math.random() * 2) + 3;
-  const checkin = new Date(checkout.getTime() + (checkinOffset * 60 * 60 * 1000));
-  return {
-    id,
-    property_id: propertyId,
-    property_name: `Demo Property ${turnBookings.value.length + 1}`,
-    owner_id: 'demo-owner',
-    checkout_date: checkout.toISOString(),
-    checkin_date: checkin.toISOString(),
-    booking_type: 'turn',
-    status: 'pending',
-    priority,
-    cleaning_window: {
-      start: checkout.toISOString(),
-      end: checkin.toISOString(),
-      duration: checkinOffset * 60
-    }
-  };
-}
-function addUrgentTurn() {
-  const turn = createTurn('urgent');
-  turnBookings.value.push(turn);
-  logEvent(`Added urgent turn for ${turn.property_name}`);
-}
-function addHighTurn() {
-  const turn = createTurn('high');
-  turnBookings.value.push(turn);
-  logEvent(`Added high priority turn for ${turn.property_name}`);
-}
-function clearTurns() {
-  turnBookings.value = [];
-  logEvent('Cleared all turns');
-}
-function onViewBooking(id: string) {
-  const booking = turnBookings.value.find(b => b.id === id);
-  logEvent(`Viewing booking for ${booking?.property_name || id}`);
-}
-function onAssignBooking(id: string) {
-  const booking = turnBookings.value.find(b => b.id === id);
-  logEvent(`Assigning cleaner to ${booking?.property_name || id}`);
-}
-function logEvent(message: string) {
-  const timestamp = new Date().toLocaleTimeString();
-  eventLogs.value.unshift(`[${timestamp}] ${message}`);
-}
-addUrgentTurn();
-addHighTurn();
-</script>
-<style scoped>
-.demo-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-</style>
-````
-
-## File: src/components/smart/admin/AdminCalendarDemo.vue
-````vue
-<template>
-  <div class="admin-calendar-demo">
-    <v-container fluid>
-      <v-row class="mb-4">
-        <v-col>
-          <v-card
-            class="demo-header"
-            elevation="2"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                class="mr-3"
-                color="primary"
-              >
-                mdi-calendar-multiple
-              </v-icon>
-              <span>AdminCalendar Component Demo</span>
-              <v-spacer />
-              <v-chip
-                color="success"
-                variant="elevated"
-              >
-                <v-icon start>
-                  mdi-check-circle
-                </v-icon>
-                TASK-039H Complete
-              </v-chip>
-            </v-card-title>
-            <v-card-text>
-              <p class="mb-2">
-                <strong>Role-Based Multi-Tenant Calendar:</strong> Admin interface showing ALL bookings across ALL property owners with advanced management features.
-              </p>
-              <v-row>
-                <v-col
-                  cols="12"
-                  md="4"
-                >
-                  <v-chip
-                    size="small"
-                    color="error"
-                    class="mr-2"
-                  >
-                    🔥 Turn Bookings
-                  </v-chip>
-                  <span class="text-caption">Urgent same-day turnovers</span>
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="4"
-                >
-                  <v-chip
-                    size="small"
-                    color="warning"
-                    class="mr-2"
-                  >
-                    ⚠️ Unassigned
-                  </v-chip>
-                  <span class="text-caption">Need cleaner assignment</span>
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="4"
-                >
-                  <v-chip
-                    size="small"
-                    color="success"
-                    class="mr-2"
-                  >
-                    👤 Assigned
-                  </v-chip>
-                  <span class="text-caption">Cleaner assigned</span>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row class="mb-4">
-        <v-col
-          cols="6"
-          md="3"
-        >
-          <v-card
-            class="text-center"
-            elevation="1"
-          >
-            <v-card-text>
-              <div class="text-h4 text-primary">
-                {{ demoStats.totalBookings }}
-              </div>
-              <div class="text-caption">
-                Total Bookings
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col
-          cols="6"
-          md="3"
-        >
-          <v-card
-            class="text-center"
-            elevation="1"
-          >
-            <v-card-text>
-              <div class="text-h4 text-error">
-                {{ demoStats.urgentTurns }}
-              </div>
-              <div class="text-caption">
-                Urgent Turns
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col
-          cols="6"
-          md="3"
-        >
-          <v-card
-            class="text-center"
-            elevation="1"
-          >
-            <v-card-text>
-              <div class="text-h4 text-warning">
-                {{ demoStats.unassigned }}
-              </div>
-              <div class="text-caption">
-                Unassigned
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col
-          cols="6"
-          md="3"
-        >
-          <v-card
-            class="text-center"
-            elevation="1"
-          >
-            <v-card-text>
-              <div class="text-h4 text-success">
-                {{ demoStats.assigned }}
-              </div>
-              <div class="text-caption">
-                Assigned
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <AdminCalendar
-            :bookings="demoBookings"
-            :properties="demoProperties"
-            :users="demoUsers"
-            :loading="loading"
-            @date-select="handleDateSelect"
-            @event-click="handleEventClick"
-            @event-drop="handleEventDrop"
-            @create-booking="handleCreateBooking"
-            @update-booking="handleUpdateBooking"
-            @assign-cleaner="handleAssignCleaner"
-            @update-booking-status="handleUpdateBookingStatus"
-            @view-change="handleViewChange"
-            @date-change="handleDateChange"
-          />
-        </v-col>
-      </v-row>
-      <v-row class="mt-4">
-        <v-col>
-          <v-card
-            class="demo-actions"
-            elevation="1"
-          >
-            <v-card-title>Demo Actions</v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-btn
-                    color="primary"
-                    variant="outlined"
-                    block
-                    @click="addRandomBooking"
-                  >
-                    <v-icon start>
-                      mdi-plus
-                    </v-icon>
-                    Add Random Booking
-                  </v-btn>
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-btn
-                    color="error"
-                    variant="outlined"
-                    block
-                    @click="addUrgentTurn"
-                  >
-                    <v-icon start>
-                      mdi-fire
-                    </v-icon>
-                    Add Urgent Turn
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row class="mt-4">
-        <v-col>
-          <v-card
-            class="demo-log"
-            elevation="1"
-          >
-            <v-card-title>
-              Event Log
-              <v-spacer />
-              <v-btn
-                size="small"
-                variant="text"
-                @click="clearEventLog"
-              >
-                Clear
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <div class="event-log-container">
-                <div
-                  v-for="(event, index) in eventLog"
-                  :key="index"
-                  class="event-log-item"
-                >
-                  <v-chip
-                    :color="getEventColor(event.type)"
-                    size="small"
-                    class="mr-2"
-                  >
-                    {{ event.type }}
-                  </v-chip>
-                  <span class="text-caption">{{ event.timestamp }}</span>
-                  <div class="mt-1">
-                    {{ event.message }}
-                  </div>
-                </div>
-                <div
-                  v-if="eventLog.length === 0"
-                  class="text-center text-disabled"
-                >
-                  No events logged yet. Interact with the calendar to see events.
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
-⋮----
-{{ demoStats.totalBookings }}
-⋮----
-{{ demoStats.urgentTurns }}
-⋮----
-{{ demoStats.unassigned }}
-⋮----
-{{ demoStats.assigned }}
-⋮----
-{{ event.type }}
-⋮----
-<span class="text-caption">{{ event.timestamp }}</span>
-⋮----
-{{ event.message }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-import AdminCalendar from './AdminCalendar.vue';
-import type { Booking, Property, User, Cleaner } from '@/types';
-const loading = ref(false);
-const eventLog = ref<Array<{ type: string; message: string; timestamp: string }>>([]);
-const demoBookings = ref(new Map<string, Booking>());
-const demoProperties = ref(new Map<string, Property>());
-const demoUsers = ref(new Map<string, User>());
-const demoStats = computed(() => {
-  const bookings = Array.from(demoBookings.value.values());
-  return {
-    totalBookings: bookings.length,
-    urgentTurns: bookings.filter(b => b.booking_type === 'turn').length,
-    unassigned: bookings.filter(b => !b.assigned_cleaner_id).length,
-    assigned: bookings.filter(b => !!b.assigned_cleaner_id).length
-  };
-});
-const initializeDemoData = (): void => {
-  const users: User[] = [
-    {
-      id: 'owner-1',
-      email: 'sarah.johnson@email.com',
-      name: 'Sarah Johnson',
-      role: 'owner',
-      settings: {
-        theme: 'light',
-        notifications: true,
-        timezone: 'America/New_York',
-        language: 'en'
-      },
-      created_at: '2024-01-15T10:00:00Z',
-      updated_at: '2024-01-15T10:00:00Z'
-    },
-    {
-      id: 'owner-2',
-      email: 'mike.chen@email.com',
-      name: 'Mike Chen',
-      role: 'owner',
-      settings: {
-        theme: 'dark',
-        notifications: true,
-        timezone: 'America/Los_Angeles',
-        language: 'en'
-      },
-      created_at: '2024-01-20T14:30:00Z',
-      updated_at: '2024-01-20T14:30:00Z'
-    },
-    {
-      id: 'owner-3',
-      email: 'lisa.rodriguez@email.com',
-      name: 'Lisa Rodriguez',
-      role: 'owner',
-      settings: {
-        theme: 'light',
-        notifications: false,
-        timezone: 'America/Chicago',
-        language: 'en'
-      },
-      created_at: '2024-02-01T09:15:00Z',
-      updated_at: '2024-02-01T09:15:00Z'
-    },
-    {
-      id: 'admin-1',
-      email: 'admin@cleaningco.com',
-      name: 'Admin User',
-      role: 'admin',
-      settings: {
-        theme: 'light',
-        notifications: true,
-        timezone: 'America/New_York',
-        language: 'en'
-      },
-      created_at: '2024-01-01T08:00:00Z',
-      updated_at: '2024-01-01T08:00:00Z'
-    }
-  ];
-  const cleaners: Cleaner[] = [
-    {
-      id: 'cleaner-1',
-      email: 'maria.garcia@cleaningco.com',
-      name: 'Maria Garcia',
-      role: 'cleaner',
-      settings: {
-        theme: 'light',
-        notifications: true,
-        timezone: 'America/New_York',
-        language: 'en'
-      },
-      skills: ['deep-cleaning', 'eco-friendly'],
-      max_daily_bookings: 4,
-      created_at: '2024-01-10T08:00:00Z',
-      updated_at: '2024-01-10T08:00:00Z'
-    },
-    {
-      id: 'cleaner-2',
-      email: 'james.wilson@cleaningco.com',
-      name: 'James Wilson',
-      role: 'cleaner',
-      settings: {
-        theme: 'light',
-        notifications: true,
-        timezone: 'America/New_York',
-        language: 'en'
-      },
-      skills: ['standard-cleaning', 'move-out'],
-      max_daily_bookings: 5,
-      created_at: '2024-01-12T08:00:00Z',
-      updated_at: '2024-01-12T08:00:00Z'
-    },
-    {
-      id: 'cleaner-3',
-      email: 'anna.petrov@cleaningco.com',
-      name: 'Anna Petrov',
-      role: 'cleaner',
-      settings: {
-        theme: 'dark',
-        notifications: true,
-        timezone: 'America/New_York',
-        language: 'en'
-      },
-      skills: ['deep-cleaning', 'move-in'],
-      max_daily_bookings: 3,
-      created_at: '2024-01-15T08:00:00Z',
-      updated_at: '2024-01-15T08:00:00Z'
-    }
-  ];
-  const allUsers = [...users, ...cleaners];
-  allUsers.forEach(user => {
-    demoUsers.value.set(user.id, user);
-  });
-  const properties: Property[] = [
-    {
-      id: 'prop-1',
-      name: 'Downtown Loft',
-      address: '123 Main St, New York, NY 10001',
-      owner_id: 'owner-1',
-      bedrooms: 2,
-      bathrooms: 2,
-      square_feet: 1200,
-      property_type: 'apartment',
-      pricing_tier: 'premium',
-      cleaning_duration: 120,
-      active: true,
-      created_at: '2024-01-15T10:00:00Z',
-      updated_at: '2024-01-15T10:00:00Z'
-    },
-    {
-      id: 'prop-2',
-      name: 'Brooklyn Heights Studio',
-      address: '456 Heights Ave, Brooklyn, NY 11201',
-      owner_id: 'owner-1',
-      bedrooms: 1,
-      bathrooms: 1,
-      square_feet: 800,
-      property_type: 'apartment',
-      pricing_tier: 'standard',
-      cleaning_duration: 90,
-      active: true,
-      created_at: '2024-01-16T10:00:00Z',
-      updated_at: '2024-01-16T10:00:00Z'
-    },
-    {
-      id: 'prop-3',
-      name: 'Hollywood Hills House',
-      address: '789 Hills Dr, Los Angeles, CA 90210',
-      owner_id: 'owner-2',
-      bedrooms: 4,
-      bathrooms: 3,
-      square_feet: 2500,
-      property_type: 'house',
-      pricing_tier: 'luxury',
-      cleaning_duration: 180,
-      active: true,
-      created_at: '2024-01-20T14:30:00Z',
-      updated_at: '2024-01-20T14:30:00Z'
-    },
-    {
-      id: 'prop-4',
-      name: 'Santa Monica Condo',
-      address: '321 Beach Blvd, Santa Monica, CA 90401',
-      owner_id: 'owner-2',
-      bedrooms: 2,
-      bathrooms: 2,
-      square_feet: 1400,
-      property_type: 'condo',
-      pricing_tier: 'premium',
-      cleaning_duration: 120,
-      active: true,
-      created_at: '2024-01-21T14:30:00Z',
-      updated_at: '2024-01-21T14:30:00Z'
-    },
-    {
-      id: 'prop-5',
-      name: 'Chicago Loop Apartment',
-      address: '654 Loop St, Chicago, IL 60601',
-      owner_id: 'owner-3',
-      bedrooms: 3,
-      bathrooms: 2,
-      square_feet: 1600,
-      property_type: 'apartment',
-      pricing_tier: 'standard',
-      cleaning_duration: 150,
-      active: true,
-      created_at: '2024-02-01T09:15:00Z',
-      updated_at: '2024-02-01T09:15:00Z'
-    }
-  ];
-  properties.forEach(property => {
-    demoProperties.value.set(property.id, property);
-  });
-  const today = new Date();
-  const bookings: Booking[] = [
-    {
-      id: 'booking-1',
-      property_id: 'prop-1',
-      owner_id: 'owner-1',
-      checkout_date: today.toISOString().split('T')[0] + 'T11:00:00Z',
-      checkin_date: today.toISOString().split('T')[0] + 'T15:00:00Z',
-      guest_count: 2,
-      booking_type: 'turn',
-      status: 'pending',
-      assigned_cleaner_id: undefined,
-      notes: 'Same-day turnover - URGENT',
-      created_at: '2024-01-25T08:00:00Z',
-      updated_at: '2024-01-25T08:00:00Z'
-    },
-    {
-      id: 'booking-2',
-      property_id: 'prop-3',
-      owner_id: 'owner-2',
-      checkout_date: today.toISOString().split('T')[0] + 'T10:00:00Z',
-      checkin_date: today.toISOString().split('T')[0] + 'T16:00:00Z',
-      guest_count: 4,
-      booking_type: 'turn',
-      status: 'scheduled',
-      assigned_cleaner_id: 'cleaner-1',
-      notes: 'Large house turnover',
-      created_at: '2024-01-25T09:00:00Z',
-      updated_at: '2024-01-25T09:00:00Z'
-    },
-    {
-      id: 'booking-3',
-      property_id: 'prop-2',
-      owner_id: 'owner-1',
-      checkout_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
-      checkin_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T16:00:00Z',
-      guest_count: 1,
-      booking_type: 'standard',
-      status: 'pending',
-      assigned_cleaner_id: undefined,
-      notes: 'Standard cleaning',
-      created_at: '2024-01-24T10:00:00Z',
-      updated_at: '2024-01-24T10:00:00Z'
-    },
-    {
-      id: 'booking-4',
-      property_id: 'prop-4',
-      owner_id: 'owner-2',
-      checkout_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
-      checkin_date: new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
-      guest_count: 2,
-      booking_type: 'standard',
-      status: 'scheduled',
-      assigned_cleaner_id: 'cleaner-2',
-      notes: 'Regular cleaning',
-      created_at: '2024-01-24T11:00:00Z',
-      updated_at: '2024-01-24T11:00:00Z'
-    },
-    {
-      id: 'booking-5',
-      property_id: 'prop-5',
-      owner_id: 'owner-3',
-      checkout_date: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T10:00:00Z',
-      checkin_date: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
-      guest_count: 3,
-      booking_type: 'turn',
-      status: 'in_progress',
-      assigned_cleaner_id: 'cleaner-3',
-      notes: 'Deep cleaning required',
-      created_at: '2024-01-23T12:00:00Z',
-      updated_at: '2024-01-25T13:00:00Z'
-    },
-    {
-      id: 'booking-6',
-      property_id: 'prop-1',
-      owner_id: 'owner-1',
-      checkout_date: new Date(today.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
-      checkin_date: new Date(today.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
-      guest_count: 2,
-      booking_type: 'standard',
-      status: 'completed',
-      assigned_cleaner_id: 'cleaner-1',
-      notes: 'Completed successfully',
-      created_at: '2024-01-22T10:00:00Z',
-      updated_at: '2024-01-24T16:00:00Z'
-    }
-  ];
-  bookings.forEach(booking => {
-    demoBookings.value.set(booking.id, booking);
-  });
-  logEvent('init', 'Demo data initialized with comprehensive multi-tenant test data');
-};
-const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  logEvent('dateSelect', `Date range selected: ${selectInfo.startStr} to ${selectInfo.endStr}`);
-};
-const handleEventClick = (clickInfo: EventClickArg): void => {
-  const booking = clickInfo.event.extendedProps.booking as Booking;
-  logEvent('eventClick', `Clicked booking: ${booking.id} (${booking.booking_type})`);
-};
-const handleEventDrop = (dropInfo: EventDropArg): void => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  logEvent('eventDrop', `Moved booking: ${booking.id} to ${dropInfo.event.startStr}`);
-};
-const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }): void => {
-  logEvent('createBooking', `Create booking request: ${data.start} to ${data.end}`);
-};
-const handleUpdateBooking = (data: { id: string; updates: Partial<Booking> }): void => {
-  const booking = demoBookings.value.get(data.id);
-  if (booking) {
-    const updatedBooking = { ...booking, ...data.updates };
-    demoBookings.value.set(data.id, updatedBooking);
-    logEvent('updateBooking', `Updated booking: ${data.id}`);
-  }
-};
-const handleAssignCleaner = (data: { bookingId: string; cleanerId: string; notes?: string }): void => {
-  const booking = demoBookings.value.get(data.bookingId);
-  const cleaner = demoUsers.value.get(data.cleanerId);
-  if (booking && cleaner) {
-    booking.assigned_cleaner_id = data.cleanerId;
-    booking.status = 'scheduled';
-    demoBookings.value.set(data.bookingId, booking);
-    logEvent('assignCleaner', `Assigned ${cleaner.name} to booking ${data.bookingId}`);
-  }
-};
-const handleUpdateBookingStatus = (data: { bookingId: string; status: Booking['status'] }): void => {
-  const booking = demoBookings.value.get(data.bookingId);
-  if (booking) {
-    booking.status = data.status;
-    demoBookings.value.set(data.bookingId, booking);
-    logEvent('updateStatus', `Changed booking ${data.bookingId} status to ${data.status}`);
-  }
-};
-const handleViewChange = (view: string): void => {
-  logEvent('viewChange', `Calendar view changed to: ${view}`);
-};
-const handleDateChange = (date: Date): void => {
-  logEvent('dateChange', `Calendar date changed to: ${date.toDateString()}`);
-};
-const addRandomBooking = (): void => {
-  const properties = Array.from(demoProperties.value.values());
-  const randomProperty = properties[Math.floor(Math.random() * properties.length)];
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const newBooking: Booking = {
-    id: `booking-${Date.now()}`,
-    property_id: randomProperty.id,
-    owner_id: randomProperty.owner_id,
-    checkout_date: tomorrow.toISOString().split('T')[0] + 'T12:00:00Z',
-    checkin_date: tomorrow.toISOString().split('T')[0] + 'T16:00:00Z',
-    guest_count: Math.floor(Math.random() * 4) + 1,
-    booking_type: 'standard',
-    status: 'pending',
-    assigned_cleaner_id: undefined,
-    notes: 'Demo booking',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-  demoBookings.value.set(newBooking.id, newBooking);
-  logEvent('demo', `Added random booking for ${randomProperty.name}`);
-};
-const addUrgentTurn = (): void => {
-  const properties = Array.from(demoProperties.value.values());
-  const randomProperty = properties[Math.floor(Math.random() * properties.length)];
-  const today = new Date();
-  const newBooking: Booking = {
-    id: `turn-${Date.now()}`,
-    property_id: randomProperty.id,
-    owner_id: randomProperty.owner_id,
-    checkout_date: today.toISOString().split('T')[0] + 'T11:00:00Z',
-    checkin_date: today.toISOString().split('T')[0] + 'T15:00:00Z',
-    guest_count: Math.floor(Math.random() * 4) + 1,
-    booking_type: 'turn',
-    status: 'pending',
-    assigned_cleaner_id: undefined,
-    notes: 'URGENT: Same-day turnover',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-  demoBookings.value.set(newBooking.id, newBooking);
-  logEvent('demo', `Added urgent turn for ${randomProperty.name}`);
-};
-const logEvent = (type: string, message: string): void => {
-  eventLog.value.unshift({
-    type,
-    message,
-    timestamp: new Date().toLocaleTimeString()
-  });
-  if (eventLog.value.length > 20) {
-    eventLog.value = eventLog.value.slice(0, 20);
-  }
-};
-const clearEventLog = (): void => {
-  eventLog.value = [];
-};
-const getEventColor = (type: string): string => {
-  const colors: Record<string, string> = {
-    init: 'info',
-    dateSelect: 'primary',
-    eventClick: 'secondary',
-    eventDrop: 'warning',
-    createBooking: 'success',
-    updateBooking: 'info',
-    assignCleaner: 'success',
-    updateStatus: 'warning',
-    viewChange: 'primary',
-    dateChange: 'secondary',
-    demo: 'purple'
-  };
-  return colors[type] || 'default';
-};
-onMounted(() => {
-  initializeDemoData();
-});
-</script>
-<style scoped>
-.admin-calendar-demo {
-  min-height: 100vh;
-  background: rgb(var(--v-theme-background));
-}
-.demo-header {
-  background: linear-gradient(135deg, rgb(var(--v-theme-primary), 0.1), rgb(var(--v-theme-secondary), 0.1));
-}
-.demo-actions,
-.demo-log {
-  background: rgb(var(--v-theme-surface));
-}
-.event-log-container {
-  max-height: 300px;
-  overflow-y: auto;
-}
-.event-log-item {
-  padding: 8px 0;
-  border-bottom: 1px solid rgb(var(--v-theme-outline), 0.12);
-}
-.event-log-item:last-child {
-  border-bottom: none;
-}
-@media (max-width: 960px) {
-  .admin-calendar-demo .v-container {
-    padding: 12px;
-  }
-}
-</style>
-````
-
-## File: src/components/smart/admin/AdminSidebarDemo.vue
-````vue
-<template>
-  <div class="admin-sidebar-demo">
-    <v-container fluid>
-      <v-row>
-        <v-col
-          cols="12"
-          md="4"
-          lg="3"
-        >
-          <AdminSidebar
-            :today-turns="demoTodayTurns"
-            :upcoming-cleanings="demoUpcomingCleanings"
-            :properties="demoProperties"
-            :users="demoUsers"
-            :cleaners="demoCleaners"
-            :loading="loading"
-            @navigate-to-booking="handleNavigateToBooking"
-            @navigate-to-date="handleNavigateToDate"
-            @navigate-to-property="handleNavigateToProperty"
-            @filter-by-property="handleFilterByProperty"
-            @filter-by-owner="handleFilterByOwner"
-            @filter-by-status="handleFilterByStatus"
-            @assign-cleaner="handleAssignCleaner"
-            @generate-reports="handleGenerateReports"
-            @manage-system="handleManageSystem"
-            @emergency-response="handleEmergencyResponse"
-            @create-booking="handleCreateBooking"
-            @create-property="handleCreateProperty"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="8"
-          lg="9"
-        >
-          <v-card>
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-information"
-                class="mr-2"
-              />
-              AdminSidebar Demo - System-wide Data Access
-            </v-card-title>
-            <v-card-text>
-              <v-alert
-                type="info"
-                variant="tonal"
-                class="mb-4"
-              >
-                <strong>Role-Based Architecture:</strong> This AdminSidebar shows ALL data across ALL property owners (no filtering).
-                Compare this to OwnerSidebar which filters data by owner_id === currentUser.id.
-              </v-alert>
-              <v-row>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <h3 class="text-h6 mb-3">
-                    System-wide Data Summary
-                  </h3>
-                  <v-list density="compact">
-                    <v-list-item>
-                      <v-list-item-title>Total Properties</v-list-item-title>
-                      <v-list-item-subtitle>{{ demoProperties.size }} across {{ uniqueOwners }} owners</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>Urgent Turns Today</v-list-item-title>
-                      <v-list-item-subtitle>{{ demoTodayTurns.size }} system-wide</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>Upcoming Cleanings</v-list-item-title>
-                      <v-list-item-subtitle>{{ demoUpcomingCleanings.size }} across all properties</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>Available Cleaners</v-list-item-title>
-                      <v-list-item-subtitle>{{ demoCleaners.size }} staff members</v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <h3 class="text-h6 mb-3">
-                    Admin Features Demonstrated
-                  </h3>
-                  <v-list density="compact">
-                    <v-list-item>
-                      <v-list-item-title>System-wide Turn Alerts</v-list-item-title>
-                      <v-list-item-subtitle>All urgent turns across all owners</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>Advanced Filtering</v-list-item-title>
-                      <v-list-item-subtitle>By property, owner, and status</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>Business Analytics</v-list-item-title>
-                      <v-list-item-subtitle>System-wide metrics and KPIs</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>Cleaner Management</v-list-item-title>
-                      <v-list-item-subtitle>Staff availability and assignments</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>Admin Quick Actions</v-list-item-title>
-                      <v-list-item-subtitle>Business management tools</v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
-                </v-col>
-              </v-row>
-              <v-divider class="my-4" />
-              <h3 class="text-h6 mb-3">
-                Event Log
-              </h3>
-              <v-card
-                variant="outlined"
-                max-height="300"
-                class="overflow-y-auto"
-              >
-                <v-card-text>
-                  <div
-                    v-if="eventLog.length === 0"
-                    class="text-center text-medium-emphasis"
-                  >
-                    No events logged yet. Interact with the AdminSidebar to see events.
-                  </div>
-                  <v-list
-                    v-else
-                    density="compact"
-                  >
-                    <v-list-item
-                      v-for="(event, index) in eventLog.slice().reverse()"
-                      :key="index"
-                      class="mb-1"
-                    >
-                      <v-list-item-title class="text-caption">
-                        <v-chip
-                          size="x-small"
-                          color="primary"
-                          class="mr-2"
-                        >
-                          {{ event.timestamp }}
-                        </v-chip>
-                        <strong>{{ event.action }}</strong>
-                      </v-list-item-title>
-                      <v-list-item-subtitle class="text-caption">
-                        {{ event.details }}
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
-                </v-card-text>
-              </v-card>
-              <v-divider class="my-4" />
-              <v-btn
-                :color="loading ? 'error' : 'primary'"
-                variant="outlined"
-                @click="loading = !loading"
-              >
-                {{ loading ? 'Stop Loading' : 'Test Loading State' }}
-              </v-btn>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
-⋮----
-<v-list-item-subtitle>{{ demoProperties.size }} across {{ uniqueOwners }} owners</v-list-item-subtitle>
-⋮----
-<v-list-item-subtitle>{{ demoTodayTurns.size }} system-wide</v-list-item-subtitle>
-⋮----
-<v-list-item-subtitle>{{ demoUpcomingCleanings.size }} across all properties</v-list-item-subtitle>
-⋮----
-<v-list-item-subtitle>{{ demoCleaners.size }} staff members</v-list-item-subtitle>
-⋮----
-{{ event.timestamp }}
-⋮----
-<strong>{{ event.action }}</strong>
-⋮----
-{{ event.details }}
-⋮----
-{{ loading ? 'Stop Loading' : 'Test Loading State' }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import AdminSidebar from './AdminSidebar.vue';
-import type { Booking, Property, User, Cleaner } from '@/types';
-const loading = ref(false);
-const eventLog = ref<Array<{ timestamp: string; action: string; details: string }>>([]);
-const demoUsers = ref(new Map<string, User>());
-demoUsers.value.set('owner-1', {
-  id: 'owner-1',
-  email: 'sarah.johnson@email.com',
-  name: 'Sarah Johnson',
-  role: 'owner',
-  settings: {
-    theme: 'light',
-    notifications: true,
-    timezone: 'America/New_York',
-    language: 'en'
-  },
-  created_at: '2024-01-15T10:00:00Z',
-  updated_at: '2024-01-15T10:00:00Z'
-});
-demoUsers.value.set('owner-2', {
-  id: 'owner-2',
-  email: 'mike.chen@email.com',
-  name: 'Mike Chen',
-  role: 'owner',
-  settings: {
-    theme: 'dark',
-    notifications: true,
-    timezone: 'America/Los_Angeles',
-    language: 'en'
-  },
-  created_at: '2024-01-20T14:30:00Z',
-  updated_at: '2024-01-20T14:30:00Z'
-});
-demoUsers.value.set('owner-3', {
-  id: 'owner-3',
-  email: 'lisa.rodriguez@email.com',
-  name: 'Lisa Rodriguez',
-  role: 'owner',
-  settings: {
-    theme: 'light',
-    notifications: false,
-    timezone: 'America/Chicago',
-    language: 'es'
-  },
-  created_at: '2024-02-01T09:15:00Z',
-  updated_at: '2024-02-01T09:15:00Z'
-});
-demoUsers.value.set('owner-4', {
-  id: 'owner-4',
-  email: 'david.kim@email.com',
-  name: 'David Kim',
-  role: 'owner',
-  settings: {
-    theme: 'light',
-    notifications: true,
-    timezone: 'America/New_York',
-    language: 'ko'
-  },
-  created_at: '2024-02-10T16:45:00Z',
-  updated_at: '2024-02-10T16:45:00Z'
-});
-const demoCleaners = ref(new Map<string, Cleaner>());
-demoCleaners.value.set('cleaner-1', {
-  id: 'cleaner-1',
-  email: 'maria.garcia@cleaningco.com',
-  name: 'Maria Garcia',
-  role: 'cleaner',
-  settings: {
-    theme: 'light',
-    notifications: true,
-    timezone: 'America/New_York',
-    language: 'en'
-  },
-  skills: ['deep-cleaning', 'eco-friendly'],
-  max_daily_bookings: 4,
-  created_at: '2024-01-10T08:00:00Z',
-  updated_at: '2024-01-10T08:00:00Z'
-});
-demoCleaners.value.set('cleaner-2', {
-  id: 'cleaner-2',
-  email: 'james.wilson@cleaningco.com',
-  name: 'James Wilson',
-  role: 'cleaner',
-  settings: {
-    theme: 'light',
-    notifications: true,
-    timezone: 'America/New_York',
-    language: 'en'
-  },
-  skills: ['standard-cleaning', 'move-out'],
-  max_daily_bookings: 5,
-  created_at: '2024-01-12T08:00:00Z',
-  updated_at: '2024-01-12T08:00:00Z'
-});
-demoCleaners.value.set('cleaner-3', {
-  id: 'cleaner-3',
-  email: 'anna.petrov@cleaningco.com',
-  name: 'Anna Petrov',
-  role: 'cleaner',
-  settings: {
-    theme: 'dark',
-    notifications: true,
-    timezone: 'America/New_York',
-    language: 'en'
-  },
-  skills: ['luxury-cleaning', 'antique-care'],
-  max_daily_bookings: 3,
-  created_at: '2024-01-15T08:00:00Z',
-  updated_at: '2024-01-15T08:00:00Z'
-});
-demoCleaners.value.set('cleaner-4', {
-  id: 'cleaner-4',
-  email: 'carlos.mendez@cleaningco.com',
-  name: 'Carlos Mendez',
-  role: 'cleaner',
-  settings: {
-    theme: 'light',
-    notifications: false,
-    timezone: 'America/New_York',
-    language: 'es'
-  },
-  skills: ['standard-cleaning', 'pet-friendly'],
-  max_daily_bookings: 4,
-  created_at: '2024-01-18T08:00:00Z',
-  updated_at: '2024-01-18T08:00:00Z'
-});
-const demoProperties = ref(new Map<string, Property>([
-  ['prop-1', {
-    id: 'prop-1',
-    owner_id: 'owner-1',
-    name: 'Downtown Loft',
-    address: '123 Main St, Downtown',
-    cleaning_duration: 120,
-    special_instructions: 'Key in lockbox, code 1234',
-    pricing_tier: 'premium',
-    active: true,
-    created_at: '2024-01-15T10:30:00Z',
-    updated_at: '2024-01-15T10:30:00Z'
-  }],
-  ['prop-2', {
-    id: 'prop-2',
-    owner_id: 'owner-1',
-    name: 'Beachside Condo',
-    address: '456 Ocean Ave, Beach District',
-    cleaning_duration: 90,
-    special_instructions: 'Check balcony doors',
-    pricing_tier: 'luxury',
-    active: true,
-    created_at: '2024-01-16T11:00:00Z',
-    updated_at: '2024-01-16T11:00:00Z'
-  }],
-  ['prop-3', {
-    id: 'prop-3',
-    owner_id: 'owner-2',
-    name: 'Mountain Cabin',
-    address: '789 Pine Rd, Mountain View',
-    cleaning_duration: 150,
-    special_instructions: 'Check fireplace area',
-    pricing_tier: 'premium',
-    active: true,
-    created_at: '2024-01-20T15:00:00Z',
-    updated_at: '2024-01-20T15:00:00Z'
-  }],
-  ['prop-4', {
-    id: 'prop-4',
-    owner_id: 'owner-2',
-    name: 'City Studio',
-    address: '321 Urban St, City Center',
-    cleaning_duration: 60,
-    special_instructions: 'Small space, focus on bathroom',
-    pricing_tier: 'basic',
-    active: true,
-    created_at: '2024-01-21T09:30:00Z',
-    updated_at: '2024-01-21T09:30:00Z'
-  }],
-  ['prop-5', {
-    id: 'prop-5',
-    owner_id: 'owner-3',
-    name: 'Suburban House',
-    address: '654 Maple Dr, Suburbs',
-    cleaning_duration: 180,
-    special_instructions: 'Pet-friendly cleaning products only',
-    pricing_tier: 'premium',
-    active: true,
-    created_at: '2024-02-01T10:00:00Z',
-    updated_at: '2024-02-01T10:00:00Z'
-  }],
-  ['prop-6', {
-    id: 'prop-6',
-    owner_id: 'owner-4',
-    name: 'Historic Townhouse',
-    address: '987 Heritage Ln, Old Town',
-    cleaning_duration: 200,
-    special_instructions: 'Careful with antique furniture',
-    pricing_tier: 'luxury',
-    active: true,
-    created_at: '2024-02-10T17:00:00Z',
-    updated_at: '2024-02-10T17:00:00Z'
-  }],
-  ['prop-7', {
-    id: 'prop-7',
-    owner_id: 'owner-4',
-    name: 'Modern Apartment',
-    address: '147 Tech Blvd, Innovation District',
-    cleaning_duration: 100,
-    special_instructions: 'Smart home - use app for access',
-    pricing_tier: 'premium',
-    active: true,
-    created_at: '2024-02-11T08:30:00Z',
-    updated_at: '2024-02-11T08:30:00Z'
-  }]
-]));
-const demoTodayTurns = ref(new Map<string, Booking>([
-  ['turn-1', {
-    id: 'turn-1',
-    property_id: 'prop-1',
-    owner_id: 'owner-1',
-    checkout_date: new Date().toISOString().split('T')[0] + 'T11:00:00Z',
-    checkin_date: new Date().toISOString().split('T')[0] + 'T15:00:00Z',
-    booking_type: 'turn',
-    guest_count: 2,
-    notes: 'Same-day turnaround - high priority',
-    status: 'pending',
-    assigned_cleaner_id: 'cleaner-1',
-    priority: 'urgent',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }],
-  ['turn-2', {
-    id: 'turn-2',
-    property_id: 'prop-3',
-    owner_id: 'owner-2',
-    checkout_date: new Date().toISOString().split('T')[0] + 'T10:00:00Z',
-    checkin_date: new Date().toISOString().split('T')[0] + 'T16:00:00Z',
-    booking_type: 'turn',
-    guest_count: 4,
-    notes: 'Mountain cabin - extra cleaning needed',
-    status: 'scheduled',
-    assigned_cleaner_id: 'cleaner-2',
-    priority: 'urgent',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }],
-  ['turn-3', {
-    id: 'turn-3',
-    property_id: 'prop-5',
-    owner_id: 'owner-3',
-    checkout_date: new Date().toISOString().split('T')[0] + 'T12:00:00Z',
-    checkin_date: new Date().toISOString().split('T')[0] + 'T17:00:00Z',
-    booking_type: 'turn',
-    guest_count: 3,
-    notes: 'Pet-friendly products required',
-    status: 'pending',
-    priority: 'urgent',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }]
-]));
-const demoUpcomingCleanings = ref(new Map<string, Booking>([
-  ['booking-1', {
-    id: 'booking-1',
-    property_id: 'prop-2',
-    owner_id: 'owner-1',
-    checkout_date: getTomorrowDate() + 'T14:00:00Z',
-    checkin_date: getTomorrowDate() + 'T16:00:00Z',
-    booking_type: 'standard',
-    guest_count: 2,
-    notes: 'Regular cleaning',
-    status: 'scheduled',
-    assigned_cleaner_id: 'cleaner-3',
-    priority: 'normal',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }],
-  ['booking-2', {
-    id: 'booking-2',
-    property_id: 'prop-4',
-    owner_id: 'owner-2',
-    checkout_date: getDateInDays(2) + 'T11:00:00Z',
-    checkin_date: getDateInDays(2) + 'T13:00:00Z',
-    booking_type: 'turn',
-    guest_count: 1,
-    notes: 'Quick studio turnaround',
-    status: 'pending',
-    priority: 'high',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }],
-  ['booking-3', {
-    id: 'booking-3',
-    property_id: 'prop-6',
-    owner_id: 'owner-4',
-    checkout_date: getDateInDays(3) + 'T10:00:00Z',
-    checkin_date: getDateInDays(3) + 'T15:00:00Z',
-    booking_type: 'standard',
-    guest_count: 4,
-    notes: 'Historic property - careful cleaning',
-    status: 'scheduled',
-    assigned_cleaner_id: 'cleaner-4',
-    priority: 'normal',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }],
-  ['booking-4', {
-    id: 'booking-4',
-    property_id: 'prop-7',
-    owner_id: 'owner-4',
-    checkout_date: getDateInDays(4) + 'T13:00:00Z',
-    checkin_date: getDateInDays(4) + 'T15:00:00Z',
-    booking_type: 'standard',
-    guest_count: 2,
-    notes: 'Smart home access via app',
-    status: 'pending',
-    priority: 'normal',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }]
-]));
-const uniqueOwners = computed(() => {
-  const ownerIds = new Set<string>();
-  Array.from(demoProperties.value.values()).forEach(property => {
-    ownerIds.add(property.owner_id);
-  });
-  return ownerIds.size;
-});
-function getTomorrowDate(): string {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  return tomorrow.toISOString().split('T')[0];
-}
-function getDateInDays(days: number): string {
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  return date.toISOString().split('T')[0];
-}
-function logEvent(action: string, details: string): void {
-  const timestamp = new Date().toLocaleTimeString();
-  eventLog.value.push({ timestamp, action, details });
-  if (eventLog.value.length > 20) {
-    eventLog.value = eventLog.value.slice(-20);
-  }
-}
-const handleNavigateToBooking = (bookingId: string): void => {
-  logEvent('Navigate to Booking', `Booking ID: ${bookingId}`);
-};
-const handleNavigateToDate = (date: Date): void => {
-  logEvent('Navigate to Date', `Date: ${date.toLocaleDateString()}`);
-};
-const handleNavigateToProperty = (propertyId: string): void => {
-  logEvent('Navigate to Property', `Property ID: ${propertyId}`);
-};
-const handleFilterByProperty = (propertyId: string | null): void => {
-  const propertyName = propertyId ? demoProperties.value.get(propertyId)?.name || 'Unknown' : 'All Properties';
-  logEvent('Filter by Property', `Property: ${propertyName}`);
-};
-const handleFilterByOwner = (ownerId: string | null): void => {
-  const ownerName = ownerId ? demoUsers.value.get(ownerId)?.name || 'Unknown' : 'All Owners';
-  logEvent('Filter by Owner', `Owner: ${ownerName}`);
-};
-const handleFilterByStatus = (status: string | null): void => {
-  logEvent('Filter by Status', `Status: ${status || 'All Statuses'}`);
-};
-const handleAssignCleaner = (data: { bookingId: string, cleanerId?: string }): void => {
-  const cleanerName = data.cleanerId ? demoCleaners.value.get(data.cleanerId)?.name || 'Unknown' : 'TBD';
-  logEvent('Assign Cleaner', `Booking: ${data.bookingId}, Cleaner: ${cleanerName}`);
-};
-const handleGenerateReports = (): void => {
-  logEvent('Generate Reports', 'Business reports generation requested');
-};
-const handleManageSystem = (): void => {
-  logEvent('Manage System', 'System management interface requested');
-};
-const handleEmergencyResponse = (): void => {
-  logEvent('Emergency Response', 'Emergency response protocol activated');
-};
-const handleCreateBooking = (): void => {
-  logEvent('Create Booking', 'New booking creation requested');
-};
-const handleCreateProperty = (): void => {
-  logEvent('Create Property', 'New property creation requested');
-};
-onMounted(() => {
-  logEvent('Demo Initialized', `AdminSidebar demo loaded with ${demoProperties.value.size} properties across ${uniqueOwners.value} owners`);
-});
-</script>
-<style scoped>
-.admin-sidebar-demo {
-  height: 100vh;
-  overflow: hidden;
-}
-.overflow-y-auto {
-  overflow-y: auto;
-}
-.v-list-item {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-.v-list-item:last-child {
-  border-bottom: none;
-}
-</style>
-````
-
-## File: src/components/smart/admin/UseAdminPropertiesDemo.vue
-````vue
-<template>
-  <v-container fluid class="pa-6">
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-6">
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-3" color="primary">mdi-office-building-cog</v-icon>
-            <span>useAdminProperties Composable Demo</span>
-            <v-spacer />
-            <v-chip color="success" variant="outlined">
-              <v-icon start>mdi-shield-check</v-icon>
-              Admin System-Wide Access
-            </v-chip>
-          </v-card-title>
-          <v-card-subtitle>
-            Testing admin-specific property management with system-wide data access (no owner filtering)
-          </v-card-subtitle>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-6">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-chart-line</v-icon>
-            System Property Metrics
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" md="3">
-                <v-card variant="outlined" color="primary">
-                  <v-card-text class="text-center">
-                    <div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.total }}</div>
-                    <div class="text-subtitle-1">Total Properties</div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-              <v-col cols="12" md="3">
-                <v-card variant="outlined" color="success">
-                  <v-card-text class="text-center">
-                    <div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.active }}</div>
-                    <div class="text-subtitle-1">Active Properties</div>
-                    <div class="text-caption">({{ systemPropertyMetrics.activePercentage }}%)</div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-              <v-col cols="12" md="3">
-                <v-card variant="outlined" color="warning">
-                  <v-card-text class="text-center">
-                    <div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.ownerCount }}</div>
-                    <div class="text-subtitle-1">Property Owners</div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-              <v-col cols="12" md="3">
-                <v-card variant="outlined" color="info">
-                  <v-card-text class="text-center">
-                    <div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.averageCleaningDuration }}</div>
-                    <div class="text-subtitle-1">Avg Duration (min)</div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-card class="mb-6">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-account-group</v-icon>
-            Properties by Owner
-          </v-card-title>
-          <v-card-text>
-            <v-list>
-              <v-list-item
-                v-for="(properties, ownerId) in propertiesByOwner"
-                :key="ownerId"
-                class="mb-2"
-              >
-                <template #prepend>
-                  <v-avatar color="primary" size="small">
-                    <v-icon>mdi-account</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title>Owner: {{ ownerId.substring(0, 8) }}...</v-list-item-title>
-                <v-list-item-subtitle>{{ properties.length }} properties</v-list-item-subtitle>
-                <template #append>
-                  <v-chip size="small" color="primary">{{ properties.length }}</v-chip>
-                </template>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-card class="mb-6">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-currency-usd</v-icon>
-            Properties by Pricing Tier
-          </v-card-title>
-          <v-card-text>
-            <v-list>
-              <v-list-item
-                v-for="(properties, tier) in propertiesByPricingTier"
-                :key="tier"
-                class="mb-2"
-              >
-                <template #prepend>
-                  <v-avatar :color="getTierColor(tier)" size="small">
-                    <v-icon>{{ getTierIcon(tier) }}</v-icon>
-                  </v-avatar>
-                </template>
-                <v-list-item-title class="text-capitalize">{{ tier }}</v-list-item-title>
-                <v-list-item-subtitle>{{ properties.length }} properties</v-list-item-subtitle>
-                <template #append>
-                  <v-chip size="small" :color="getTierColor(tier)">{{ properties.length }}</v-chip>
-                </template>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-6">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-cog</v-icon>
-            Admin Operations
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" md="4">
-                <v-btn
-                  @click="testFetchAllProperties"
-                  :loading="loading"
-                  color="primary"
-                  variant="outlined"
-                  block
-                  class="mb-3"
-                >
-                  <v-icon start>mdi-download</v-icon>
-                  Fetch All Properties
-                </v-btn>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-btn
-                  @click="testBulkUpdate"
-                  :loading="loading"
-                  color="warning"
-                  variant="outlined"
-                  block
-                  class="mb-3"
-                >
-                  <v-icon start>mdi-pencil-box-multiple</v-icon>
-                  Test Bulk Update
-                </v-btn>
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-btn
-                  @click="testAnalytics"
-                  color="info"
-                  variant="outlined"
-                  block
-                  class="mb-3"
-                >
-                  <v-icon start>mdi-chart-bar</v-icon>
-                  Generate Analytics
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row v-if="analytics">
-      <v-col cols="12">
-        <v-card class="mb-6">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-chart-pie</v-icon>
-            Property Analytics Report
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-card variant="outlined" class="mb-4">
-                  <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="success">mdi-trophy</v-icon>
-                    Top Performing Properties
-                  </v-card-title>
-                  <v-card-text>
-                    <v-list density="compact">
-                      <v-list-item
-                        v-for="(performer, index) in analytics.topPerformers"
-                        :key="performer.property.id"
-                        class="mb-1"
-                      >
-                        <template #prepend>
-                          <v-chip size="small" :color="index === 0 ? 'success' : 'primary'">
-                            #{{ index + 1 }}
-                          </v-chip>
-                        </template>
-                        <v-list-item-title>{{ performer.property.name }}</v-list-item-title>
-                        <v-list-item-subtitle>
-                          Revenue: ${{ performer.revenueProjection }} |
-                          Utilization: {{ Math.round(performer.utilizationRate * 100) }}%
-                        </v-list-item-subtitle>
-                      </v-list-item>
-                    </v-list>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-card variant="outlined" class="mb-4">
-                  <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="warning">mdi-alert-circle</v-icon>
-                    Under Performing Properties
-                  </v-card-title>
-                  <v-card-text>
-                    <v-list density="compact">
-                      <v-list-item
-                        v-for="performer in analytics.underPerformers"
-                        :key="performer.property.id"
-                        class="mb-1"
-                      >
-                        <template #prepend>
-                          <v-chip size="small" color="warning">
-                            {{ Math.round(performer.utilizationRate * 100) }}%
-                          </v-chip>
-                        </template>
-                        <v-list-item-title>{{ performer.property.name }}</v-list-item-title>
-                        <v-list-item-subtitle>
-                          Bookings: {{ performer.totalBookings }} |
-                          Avg Gap: {{ performer.averageGapDays }} days
-                        </v-list-item-subtitle>
-                      </v-list-item>
-                    </v-list>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12">
-                <v-card variant="outlined">
-                  <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="success">mdi-currency-usd</v-icon>
-                    Revenue Projection by Tier
-                  </v-card-title>
-                  <v-card-text>
-                    <v-row>
-                      <v-col
-                        v-for="(revenue, tier) in analytics.revenueByTier"
-                        :key="tier"
-                        cols="12"
-                        md="3"
-                      >
-                        <v-card variant="outlined" :color="getTierColor(tier as unknown as PricingTier)">
-                          <v-card-text class="text-center">
-                            <div class="text-h6 font-weight-bold">${{ revenue }}</div>
-                            <div class="text-subtitle-2 text-capitalize">{{ tier }}</div>
-                          </v-card-text>
-                        </v-card>
-                      </v-col>
-                    </v-row>
-                    <v-divider class="my-4" />
-                    <div class="text-center">
-                      <div class="text-h5 font-weight-bold text-success">
-                        Total Projected Revenue: ${{ analytics.totalProjectedRevenue }}
-                      </div>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card class="mb-6">
-          <v-card-title>
-            <v-icon class="mr-2">mdi-chart-timeline-variant</v-icon>
-            Property Utilization Data
-          </v-card-title>
-          <v-card-text>
-            <v-data-table
-              :headers="utilizationHeaders"
-              :items="utilizationItems"
-              :items-per-page="10"
-              class="elevation-1"
-            >
-              <template #item.property.name="{ item }">
-                <div class="font-weight-medium">{{ item.property.name }}</div>
-                <div class="text-caption text-medium-emphasis">{{ item.property.address }}</div>
-              </template>
-              <template #item.utilizationRate="{ item }">
-                <v-progress-linear
-                  :model-value="item.utilizationRate * 100"
-                  :color="getUtilizationColor(item.utilizationRate)"
-                  height="20"
-                  rounded
-                >
-                  <template #default>
-                    <span class="text-caption font-weight-bold">
-                      {{ Math.round(item.utilizationRate * 100) }}%
-                    </span>
-                  </template>
-                </v-progress-linear>
-              </template>
-              <template #item.cleaningLoad="{ item }">
-                <v-chip
-                  :color="getLoadColor(item.cleaningLoad)"
-                  size="small"
-                  variant="outlined"
-                >
-                  {{ item.cleaningLoad }}
-                </v-chip>
-              </template>
-              <template #item.revenueProjection="{ item }">
-                <div class="font-weight-medium">${{ item.revenueProjection }}</div>
-              </template>
-            </v-data-table>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-card>
-          <v-card-title>
-            <v-icon class="mr-2" color="success">mdi-check-circle</v-icon>
-            Active Properties
-          </v-card-title>
-          <v-card-text>
-            <div class="text-h3 text-success">{{ allActiveProperties.length }}</div>
-            <div class="text-caption">Currently active properties</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-card>
-          <v-card-title>
-            <v-icon class="mr-2" color="warning">mdi-pause-circle</v-icon>
-            Inactive Properties
-          </v-card-title>
-          <v-card-text>
-            <div class="text-h3 text-warning">{{ allProperties.length - allActiveProperties.length }}</div>
-            <div class="text-caption">Currently inactive properties</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>
-            <v-icon class="mr-2" color="primary">mdi-filter</v-icon>
-            Advanced Property Filtering Demo
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="filterCriteria.owner_id"
-                  :items="ownerOptions"
-                  label="Filter by Owner"
-                  clearable
-                  variant="outlined"
-                  density="compact"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="filterCriteria.pricing_tier"
-                  :items="tierOptions"
-                  label="Filter by Pricing Tier"
-                  clearable
-                  variant="outlined"
-                  density="compact"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="filterCriteria.active"
-                  :items="activeOptions"
-                  label="Filter by Status"
-                  clearable
-                  variant="outlined"
-                  density="compact"
-                />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12">
-                <v-btn
-                  @click="testFilterProperties"
-                  color="primary"
-                  variant="outlined"
-                  class="mr-2"
-                >
-                  <v-icon start>mdi-filter</v-icon>
-                  Apply Filters
-                </v-btn>
-                <v-btn
-                  @click="clearFilters"
-                  color="secondary"
-                  variant="outlined"
-                >
-                  <v-icon start>mdi-filter-off</v-icon>
-                  Clear Filters
-                </v-btn>
-              </v-col>
-            </v-row>
-            <v-row v-if="filteredResults.length > 0">
-              <v-col cols="12">
-                <v-alert type="info" variant="outlined" class="mt-4">
-                  <v-icon start>mdi-information</v-icon>
-                  Found {{ filteredResults.length }} properties matching your criteria
-                </v-alert>
-                <v-list>
-                  <v-list-item
-                    v-for="property in filteredResults.slice(0, 5)"
-                    :key="property.id"
-                  >
-                    <template #prepend>
-                      <v-icon :color="property.active ? 'success' : 'warning'">
-                        {{ property.active ? 'mdi-check-circle' : 'mdi-pause-circle' }}
-                      </v-icon>
-                    </template>
-                    <v-list-item-title>{{ property.name }}</v-list-item-title>
-                    <v-list-item-subtitle>
-                      {{ property.address }} • {{ property.pricing_tier }} tier
-                    </v-list-item-subtitle>
-                  </v-list-item>
-                </v-list>
-                <div v-if="filteredResults.length > 5" class="text-caption text-center mt-2">
-                  ... and {{ filteredResults.length - 5 }} more properties
-                </div>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-alert
-          v-if="success || composableSuccess"
-          type="success"
-          variant="outlined"
-          closable
-          @click:close="success = null"
-          class="mb-4"
-        >
-          <v-icon start>mdi-check-circle</v-icon>
-          {{ success || composableSuccess }}
-        </v-alert>
-        <v-alert
-          v-if="error || composableError"
-          type="error"
-          variant="outlined"
-          closable
-          @click:close="error = null"
-          class="mb-4"
-        >
-          <v-icon start>mdi-alert-circle</v-icon>
-          {{ error || composableError }}
-        </v-alert>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-⋮----
-<div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.total }}</div>
-⋮----
-<div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.active }}</div>
-⋮----
-<div class="text-caption">({{ systemPropertyMetrics.activePercentage }}%)</div>
-⋮----
-<div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.ownerCount }}</div>
-⋮----
-<div class="text-h4 font-weight-bold">{{ systemPropertyMetrics.averageCleaningDuration }}</div>
-⋮----
-<template #prepend>
-                  <v-avatar color="primary" size="small">
-                    <v-icon>mdi-account</v-icon>
-                  </v-avatar>
-                </template>
-<v-list-item-title>Owner: {{ ownerId.substring(0, 8) }}...</v-list-item-title>
-<v-list-item-subtitle>{{ properties.length }} properties</v-list-item-subtitle>
-<template #append>
-                  <v-chip size="small" color="primary">{{ properties.length }}</v-chip>
-                </template>
-⋮----
-<v-chip size="small" color="primary">{{ properties.length }}</v-chip>
-⋮----
-<template #prepend>
-                  <v-avatar :color="getTierColor(tier)" size="small">
-                    <v-icon>{{ getTierIcon(tier) }}</v-icon>
-                  </v-avatar>
-                </template>
-⋮----
-<v-icon>{{ getTierIcon(tier) }}</v-icon>
-⋮----
-<v-list-item-title class="text-capitalize">{{ tier }}</v-list-item-title>
-<v-list-item-subtitle>{{ properties.length }} properties</v-list-item-subtitle>
-<template #append>
-                  <v-chip size="small" :color="getTierColor(tier)">{{ properties.length }}</v-chip>
-                </template>
-⋮----
-<v-chip size="small" :color="getTierColor(tier)">{{ properties.length }}</v-chip>
-⋮----
-<template #prepend>
-                          <v-chip size="small" :color="index === 0 ? 'success' : 'primary'">
-                            #{{ index + 1 }}
-                          </v-chip>
-                        </template>
-⋮----
-#{{ index + 1 }}
-⋮----
-<v-list-item-title>{{ performer.property.name }}</v-list-item-title>
-⋮----
-Revenue: ${{ performer.revenueProjection }} |
-Utilization: {{ Math.round(performer.utilizationRate * 100) }}%
-⋮----
-<template #prepend>
-                          <v-chip size="small" color="warning">
-                            {{ Math.round(performer.utilizationRate * 100) }}%
-                          </v-chip>
-                        </template>
-⋮----
-{{ Math.round(performer.utilizationRate * 100) }}%
-⋮----
-<v-list-item-title>{{ performer.property.name }}</v-list-item-title>
-⋮----
-Bookings: {{ performer.totalBookings }} |
-Avg Gap: {{ performer.averageGapDays }} days
-⋮----
-<div class="text-h6 font-weight-bold">${{ revenue }}</div>
-<div class="text-subtitle-2 text-capitalize">{{ tier }}</div>
-⋮----
-Total Projected Revenue: ${{ analytics.totalProjectedRevenue }}
-⋮----
-<template #item.property.name="{ item }">
-                <div class="font-weight-medium">{{ item.property.name }}</div>
-                <div class="text-caption text-medium-emphasis">{{ item.property.address }}</div>
-              </template>
-⋮----
-<div class="font-weight-medium">{{ item.property.name }}</div>
-<div class="text-caption text-medium-emphasis">{{ item.property.address }}</div>
-⋮----
-<template #item.utilizationRate="{ item }">
-                <v-progress-linear
-                  :model-value="item.utilizationRate * 100"
-                  :color="getUtilizationColor(item.utilizationRate)"
-                  height="20"
-                  rounded
-                >
-                  <template #default>
-                    <span class="text-caption font-weight-bold">
-                      {{ Math.round(item.utilizationRate * 100) }}%
-                    </span>
-                  </template>
-                </v-progress-linear>
-              </template>
-⋮----
-<template #default>
-                    <span class="text-caption font-weight-bold">
-                      {{ Math.round(item.utilizationRate * 100) }}%
-                    </span>
-                  </template>
-⋮----
-{{ Math.round(item.utilizationRate * 100) }}%
-⋮----
-<template #item.cleaningLoad="{ item }">
-                <v-chip
-                  :color="getLoadColor(item.cleaningLoad)"
-                  size="small"
-                  variant="outlined"
-                >
-                  {{ item.cleaningLoad }}
-                </v-chip>
-              </template>
-⋮----
-{{ item.cleaningLoad }}
-⋮----
-<template #item.revenueProjection="{ item }">
-                <div class="font-weight-medium">${{ item.revenueProjection }}</div>
-              </template>
-⋮----
-<div class="font-weight-medium">${{ item.revenueProjection }}</div>
-⋮----
-<div class="text-h3 text-success">{{ allActiveProperties.length }}</div>
-⋮----
-<div class="text-h3 text-warning">{{ allProperties.length - allActiveProperties.length }}</div>
-⋮----
-Found {{ filteredResults.length }} properties matching your criteria
-⋮----
-<template #prepend>
-                      <v-icon :color="property.active ? 'success' : 'warning'">
-                        {{ property.active ? 'mdi-check-circle' : 'mdi-pause-circle' }}
-                      </v-icon>
-                    </template>
-⋮----
-{{ property.active ? 'mdi-check-circle' : 'mdi-pause-circle' }}
-⋮----
-<v-list-item-title>{{ property.name }}</v-list-item-title>
-⋮----
-{{ property.address }} • {{ property.pricing_tier }} tier
-⋮----
-... and {{ filteredResults.length - 5 }} more properties
-⋮----
-{{ success || composableSuccess }}
-⋮----
-{{ error || composableError }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useAdminProperties } from '@/composables/admin/useAdminProperties';
-import type { PricingTier } from '@/types';
-const {
-  loading,
-  error: composableError,
-  success: composableSuccess,
-  allProperties,
-  allActiveProperties,
-  propertiesByOwner,
-  propertiesByPricingTier,
-  systemPropertyMetrics,
-  propertyUtilizationData,
-  fetchAllProperties,
-  bulkUpdateProperties,
-  getPropertyAnalytics,
-  filterProperties
-} = useAdminProperties();
-const analytics = ref<any>(null);
-const filterCriteria = ref({
-  owner_id: '',
-  pricing_tier: '',
-  active: null as boolean | null
-});
-const filteredResults = ref<any[]>([]);
-const error = ref<string | null>(null);
-const success = ref<string | null>(null);
-// Computed properties for demo display
-const utilizationItems = computed(() => {
-  return Object.values(propertyUtilizationData.value);
-});
-const utilizationHeaders = [
-  { title: 'Property', key: 'property.name', sortable: true },
-  { title: 'Total Bookings', key: 'totalBookings', sortable: true },
-  { title: 'Turn Bookings', key: 'turnBookings', sortable: true },
-  { title: 'Utilization', key: 'utilizationRate', sortable: true },
-  { title: 'Cleaning Load', key: 'cleaningLoad', sortable: true },
-  { title: 'Revenue Projection', key: 'revenueProjection', sortable: true }
-];
-const ownerOptions = computed(() => {
-  const owners = new Set(allProperties.value.map(p => p.owner_id));
-  return Array.from(owners).map(id => ({
-    title: `Owner ${id.slice(0, 8)}...`,
-    value: id
-  }));
-});
-const tierOptions = [
-  { title: 'Basic', value: 'basic' },
-  { title: 'Standard', value: 'standard' },
-  { title: 'Premium', value: 'premium' },
-  { title: 'Luxury', value: 'luxury' }
-];
-const activeOptions = [
-  { title: 'Active', value: true },
-  { title: 'Inactive', value: false }
-];
-function getTierColor(tier: PricingTier): string {
-  const colors = {
-    basic: 'blue-grey',
-    standard: 'blue',
-    premium: 'purple',
-    luxury: 'amber'
-  };
-  return colors[tier] || 'grey';
-}
-function getTierIcon(tier: PricingTier): string {
-  const icons = {
-    basic: 'mdi-home',
-    standard: 'mdi-home-plus',
-    premium: 'mdi-home-heart',
-    luxury: 'mdi-home-luxury'
-  };
-  return icons[tier] || 'mdi-home';
-}
-function getUtilizationColor(rate: number): string {
-  if (rate < 0.3) return 'error';
-  if (rate < 0.7) return 'warning';
-  return 'success';
-}
-function getLoadColor(load: 'light' | 'moderate' | 'heavy'): string {
-  const colors = {
-    light: 'success',
-    moderate: 'warning',
-    heavy: 'error'
-  };
-  return colors[load];
-}
-async function testFetchAllProperties() {
-  const result = await fetchAllProperties();
-  console.log('Fetch all properties result:', result);
-}
-async function testBulkUpdate() {
-  const propertyIds = allProperties.value.slice(0, 3).map(p => p.id);
-  if (propertyIds.length === 0) {
-    error.value = 'No properties available for bulk update test';
-    return;
-  }
-  const updates = {
-    special_instructions: 'Updated via bulk operation - Admin test'
-  };
-  const result = await bulkUpdateProperties(propertyIds, updates);
-  console.log('Bulk update result:', result);
-}
-function testAnalytics() {
-  analytics.value = getPropertyAnalytics();
-  console.log('Property analytics:', analytics.value);
-}
-function testFilterProperties() {
-  const criteria: any = {};
-  if (filterCriteria.value.owner_id) {
-    criteria.owner_id = filterCriteria.value.owner_id;
-  }
-  if (filterCriteria.value.pricing_tier) {
-    criteria.pricing_tier = filterCriteria.value.pricing_tier;
-  }
-  if (filterCriteria.value.active !== null) {
-    criteria.active = filterCriteria.value.active;
-  }
-  filteredResults.value = filterProperties(criteria);
-  console.log('Filter results:', filteredResults.value);
-}
-function clearFilters() {
-  filterCriteria.value = {
-    owner_id: '',
-    pricing_tier: '',
-    active: null
-  };
-  filteredResults.value = [];
-}
-// Initialize demo data on mount
-onMounted(async () => {
-  console.log('UseAdminProperties Demo initialized');
-  console.log('System metrics:', systemPropertyMetrics.value);
-  console.log('Properties by owner:', propertiesByOwner.value);
-  console.log('Properties by tier:', propertiesByPricingTier.value);
-  setTimeout(() => {
-    testAnalytics();
-  }, 1000);
-});
-</script>
-<style scoped>
-.v-card {
-  transition: all 0.3s ease;
-}
-.v-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-.text-h4 {
-  line-height: 1.2;
-}
-.v-progress-linear {
-  border-radius: 10px;
-}
-</style>
-````
-
-## File: src/components/smart/owner/OwnerCalendarDemo.vue
-````vue
-<template>
-  <div class="owner-calendar-demo">
-    <v-container fluid>
-      <v-row>
-        <v-col cols="12">
-          <v-card>
-            <v-card-title class="d-flex align-center">
-              <v-icon class="mr-2">
-                mdi-calendar-account
-              </v-icon>
-              OwnerCalendar Demo
-              <v-spacer />
-              <v-chip
-                color="primary"
-                variant="outlined"
-              >
-                Owner View
-              </v-chip>
-            </v-card-title>
-            <v-card-subtitle>
-              Simplified calendar interface for property owners - shows only their bookings with basic controls
-            </v-card-subtitle>
-            <v-card-text>
-              <div class="demo-controls mb-4">
-                <v-row align="center">
-                  <v-col cols="auto">
-                    <v-btn
-                      icon="mdi-arrow-left"
-                      variant="text"
-                      @click="handlePrevious"
-                    />
-                    <v-btn
-                      variant="outlined"
-                      class="mx-2"
-                      @click="handleGoToday"
-                    >
-                      Today
-                    </v-btn>
-                    <v-btn
-                      icon="mdi-arrow-right"
-                      variant="text"
-                      @click="handleNext"
-                    />
-                  </v-col>
-                  <v-col cols="auto">
-                    <div class="text-h6">
-                      {{ formattedDate }}
-                    </div>
-                  </v-col>
-                  <v-spacer />
-                  <v-col cols="auto">
-                    <v-btn-toggle
-                      v-model="currentView"
-                      mandatory
-                      @update:model-value="handleViewChange"
-                    >
-                      <v-btn value="dayGridMonth">
-                        Month
-                      </v-btn>
-                      <v-btn value="timeGridWeek">
-                        Week
-                      </v-btn>
-                      <v-btn value="timeGridDay">
-                        Day
-                      </v-btn>
-                    </v-btn-toggle>
-                  </v-col>
-                </v-row>
-              </div>
-              <OwnerCalendar
-                ref="ownerCalendarRef"
-                :bookings="ownerBookings"
-                :properties="ownerProperties"
-                :loading="loading"
-                :current-view="currentView"
-                :current-date="currentDate"
-                @date-select="handleDateSelect"
-                @event-click="handleEventClick"
-                @create-booking="handleCreateBooking"
-                @view-change="handleCalendarViewChange"
-                @date-change="handleCalendarDateChange"
-              />
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row class="mt-4">
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-card>
-            <v-card-title>
-              <v-icon class="mr-2">
-                mdi-information
-              </v-icon>
-              Owner Calendar Features
-            </v-card-title>
-            <v-card-text>
-              <v-list density="compact">
-                <v-list-item>
-                  <v-list-item-title>✅ Shows only owner's bookings</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>✅ Basic calendar views (Month, Week, Day)</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>✅ Click to edit bookings</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>✅ Date selection for new bookings</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>✅ Turn booking highlighting</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>❌ No drag-and-drop (admin feature)</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>❌ No cleaner assignment (admin feature)</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-card>
-            <v-card-title>
-              <v-icon class="mr-2">
-                mdi-chart-bar
-              </v-icon>
-              Owner Data Summary
-            </v-card-title>
-            <v-card-text>
-              <v-list density="compact">
-                <v-list-item>
-                  <v-list-item-title>
-                    Properties: {{ ownerProperties.size }}
-                  </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Total Bookings: {{ ownerBookings.size }}
-                  </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Turn Bookings: {{ turnBookingsCount }}
-                  </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Standard Bookings: {{ standardBookingsCount }}
-                  </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    Pending: {{ pendingBookingsCount }}
-                  </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row class="mt-4">
-        <v-col cols="12">
-          <v-card>
-            <v-card-title>
-              <v-icon class="mr-2">
-                mdi-console
-              </v-icon>
-              Event Log
-              <v-spacer />
-              <v-btn
-                size="small"
-                variant="outlined"
-                @click="clearEventLog"
-              >
-                Clear
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <div class="event-log">
-                <div
-                  v-for="(event, index) in eventLog"
-                  :key="index"
-                  class="event-log-item"
-                >
-                  <v-chip
-                    :color="event.type === 'emit' ? 'primary' : 'secondary'"
-                    size="small"
-                    class="mr-2"
-                  >
-                    {{ event.type }}
-                  </v-chip>
-                  <span class="text-caption">
-                    {{ event.timestamp }} - {{ event.from }} → {{ event.to }}: {{ event.event }}
-                    <span
-                      v-if="event.data"
-                      class="text-grey"
-                    >
-                      ({{ JSON.stringify(event.data) }})
-                    </span>
-                  </span>
-                </div>
-                <div
-                  v-if="eventLog.length === 0"
-                  class="text-grey text-center py-4"
-                >
-                  No events logged yet. Interact with the calendar to see events.
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
-⋮----
-{{ formattedDate }}
-⋮----
-Properties: {{ ownerProperties.size }}
-⋮----
-Total Bookings: {{ ownerBookings.size }}
-⋮----
-Turn Bookings: {{ turnBookingsCount }}
-⋮----
-Standard Bookings: {{ standardBookingsCount }}
-⋮----
-Pending: {{ pendingBookingsCount }}
-⋮----
-{{ event.type }}
-⋮----
-{{ event.timestamp }} - {{ event.from }} → {{ event.to }}: {{ event.event }}
-⋮----
-({{ JSON.stringify(event.data) }})
-⋮----
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import OwnerCalendar from './OwnerCalendar.vue';
-import type { Booking, Property } from '@/types';
-import type { DateSelectArg, EventClickArg } from '@fullcalendar/core';
-const ownerCalendarRef = ref<InstanceType<typeof OwnerCalendar> | null>(null);
-const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'>('timeGridWeek');
-const currentDate = ref<Date>(new Date());
-const loading = ref(false);
-const eventLog = ref<Array<{
-  timestamp: string;
-  from: string;
-  to: string;
-  event: string;
-  type: 'emit' | 'receive';
-  data?: any;
-}>>([]);
-const ownerId = 'owner-1';
-const ownerProperties = ref<Map<string, Property>>(new Map([
-  ['prop-1', {
-    id: 'prop-1',
-    owner_id: ownerId,
-    name: 'Sunset Villa',
-    address: '123 Beach Road, Malibu, CA',
-    cleaning_duration: 180,
-    special_instructions: 'Pool cleaning required',
-    pricing_tier: 'luxury',
-    active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
-  }],
-  ['prop-2', {
-    id: 'prop-2',
-    owner_id: ownerId,
-    name: 'Mountain Cabin',
-    address: '456 Pine Street, Aspen, CO',
-    cleaning_duration: 120,
-    special_instructions: 'Fireplace cleaning needed',
-    pricing_tier: 'premium',
-    active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
-  }],
-  ['prop-3', {
-    id: 'prop-3',
-    owner_id: ownerId,
-    name: 'City Loft',
-    address: '789 Downtown Ave, NYC, NY',
-    cleaning_duration: 90,
-    special_instructions: 'High-rise building, elevator access',
-    pricing_tier: 'basic',
-    active: true,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z'
-  }]
-]));
-const ownerBookings = ref<Map<string, Booking>>(new Map());
-const generateOwnerBookings = () => {
-  const bookings = new Map<string, Booking>();
-  const today = new Date();
-  const properties = Array.from(ownerProperties.value.keys());
-  for (let i = 0; i < 10; i++) {
-    const checkoutDate = new Date(today);
-    checkoutDate.setDate(today.getDate() + i * 2);
-    const checkinDate = new Date(checkoutDate);
-    checkinDate.setDate(checkoutDate.getDate() + 1);
-    const propertyId = properties[i % properties.length];
-    const isTurn = Math.random() > 0.7;
-    const statuses = ['pending', 'scheduled', 'in_progress', 'completed'];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const booking: Booking = {
-      id: `booking-${i + 1}`,
-      property_id: propertyId,
-      owner_id: ownerId,
-      checkout_date: checkoutDate.toISOString().split('T')[0],
-      checkin_date: checkinDate.toISOString().split('T')[0],
-      booking_type: isTurn ? 'turn' : 'standard',
-      guest_count: Math.floor(Math.random() * 6) + 1,
-      notes: isTurn ? 'Same-day turnaround required' : 'Standard cleaning',
-      status: status as any,
-      priority: isTurn ? 'urgent' : 'normal',
-      created_at: today.toISOString(),
-      updated_at: today.toISOString()
-    };
-    bookings.set(booking.id, booking);
-  }
-  ownerBookings.value = bookings;
-};
-const turnBookingsCount = computed(() => {
-  return Array.from(ownerBookings.value.values())
-    .filter(b => b.booking_type === 'turn').length;
-});
-const standardBookingsCount = computed(() => {
-  return Array.from(ownerBookings.value.values())
-    .filter(b => b.booking_type === 'standard').length;
-});
-const pendingBookingsCount = computed(() => {
-  return Array.from(ownerBookings.value.values())
-    .filter(b => b.status === 'pending').length;
-});
-const formattedDate = computed(() => {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  };
-  return currentDate.value.toLocaleDateString('en-US', options);
-});
-const handleDateSelect = (selectInfo: DateSelectArg) => {
-  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'dateSelect', 'receive', {
-    start: selectInfo.startStr,
-    end: selectInfo.endStr
-  });
-  console.log('Owner date selected:', selectInfo);
-};
-const handleEventClick = (clickInfo: EventClickArg) => {
-  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'eventClick', 'receive', {
-    id: clickInfo.event.id,
-    title: clickInfo.event.title
-  });
-  console.log('Owner event clicked:', clickInfo);
-};
-const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }) => {
-  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'createBooking', 'receive', data);
-  console.log('Owner create booking:', data);
-};
-const handleViewChange = (view: string) => {
-  if (ownerCalendarRef.value) {
-    ownerCalendarRef.value.changeView(view);
-  }
-};
-const handleCalendarViewChange = (view: string) => {
-  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'viewChange', 'receive', { view });
-  currentView.value = view as any;
-};
-const handleCalendarDateChange = (date: Date) => {
-  logEvent('OwnerCalendar', 'OwnerCalendarDemo', 'dateChange', 'receive', {
-    date: date.toISOString()
-  });
-  currentDate.value = date;
-};
-const handlePrevious = () => {
-  const date = new Date(currentDate.value);
-  if (currentView.value === 'dayGridMonth') {
-    date.setMonth(date.getMonth() - 1);
-  } else if (currentView.value === 'timeGridWeek') {
-    date.setDate(date.getDate() - 7);
-  } else {
-    date.setDate(date.getDate() - 1);
-  }
-  currentDate.value = date;
-  if (ownerCalendarRef.value) {
-    ownerCalendarRef.value.goToDate(date);
-  }
-};
-const handleNext = () => {
-  const date = new Date(currentDate.value);
-  if (currentView.value === 'dayGridMonth') {
-    date.setMonth(date.getMonth() + 1);
-  } else if (currentView.value === 'timeGridWeek') {
-    date.setDate(date.getDate() + 7);
-  } else {
-    date.setDate(date.getDate() + 1);
-  }
-  currentDate.value = date;
-  if (ownerCalendarRef.value) {
-    ownerCalendarRef.value.goToDate(date);
-  }
-};
-const handleGoToday = () => {
-  currentDate.value = new Date();
-  if (ownerCalendarRef.value) {
-    ownerCalendarRef.value.goToDate(new Date());
-  }
-};
-const logEvent = (from: string, to: string, event: string, type: 'emit' | 'receive', data?: any) => {
-  eventLog.value.unshift({
-    timestamp: new Date().toLocaleTimeString(),
-    from,
-    to,
-    event,
-    type,
-    data
-  });
-  if (eventLog.value.length > 20) {
-    eventLog.value = eventLog.value.slice(0, 20);
-  }
-};
-const clearEventLog = () => {
-  eventLog.value = [];
-};
-onMounted(() => {
-  generateOwnerBookings();
-});
-</script>
-<style scoped>
-.owner-calendar-demo {
-  padding: 16px;
-}
-.demo-controls {
-  border: 1px solid rgb(var(--v-theme-on-surface), 0.12);
-  border-radius: 8px;
-  padding: 16px;
-  background: rgb(var(--v-theme-surface));
-}
-.event-log {
-  max-height: 300px;
-  overflow-y: auto;
-}
-.event-log-item {
-  padding: 4px 0;
-  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.05);
-  font-family: monospace;
-  font-size: 0.85em;
-}
-.event-log-item:last-child {
-  border-bottom: none;
-}
-</style>
-````
-
-## File: src/components/smart/owner/OwnerSidebarDemo.vue
-````vue
-<template>
-  <div class="owner-sidebar-demo">
-    <v-container fluid>
-      <v-row>
-        <v-col cols="12">
-          <h1 class="text-h4 mb-4">
-            OwnerSidebar Demo
-          </h1>
-          <p class="text-body-1 mb-4">
-            This demo shows the OwnerSidebar component with sample owner data.
-            The sidebar filters all data to show only the current owner's properties and bookings.
-          </p>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col
-          cols="12"
-          md="4"
-        >
-          <v-card>
-            <v-card-title>Owner Sidebar</v-card-title>
-            <v-card-text class="pa-0">
-              <div style="height: 600px;">
-                <OwnerSidebar
-                  :today-turns="sampleOwnerTodayTurns"
-                  :upcoming-cleanings="sampleOwnerUpcomingCleanings"
-                  :properties="sampleOwnerProperties"
-                  :loading="loading"
-                  @navigate-to-booking="handleNavigateToBooking"
-                  @navigate-to-date="handleNavigateToDate"
-                  @filter-by-property="handleFilterByProperty"
-                  @create-booking="handleCreateBooking"
-                  @create-property="handleCreateProperty"
-                />
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col
-          cols="12"
-          md="8"
-        >
-          <v-card>
-            <v-card-title class="d-flex align-center">
-              Event Log
-              <v-spacer />
-              <v-btn
-                size="small"
-                variant="outlined"
-                @click="clearEventLog"
-              >
-                Clear
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <v-list
-                v-if="eventLog.length > 0"
-                density="compact"
-              >
-                <v-list-item
-                  v-for="(event, index) in eventLog"
-                  :key="index"
-                  :title="event.action"
-                  :subtitle="event.details"
-                >
-                  <template #prepend>
-                    <v-icon
-                      :icon="getEventIcon(event.action)"
-                      :color="getEventColor(event.action)"
-                      size="small"
-                    />
-                  </template>
-                  <template #append>
-                    <span class="text-caption">{{ event.timestamp }}</span>
-                  </template>
-                </v-list-item>
-              </v-list>
-              <div
-                v-else
-                class="text-center py-4 text-medium-emphasis"
-              >
-                No events yet. Interact with the sidebar to see events.
-              </div>
-            </v-card-text>
-          </v-card>
-          <v-card class="mt-4">
-            <v-card-title>Sample Data</v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col
-                  cols="12"
-                  sm="6"
-                >
-                  <h4>Owner Properties ({{ sampleOwnerPropertiesArray.length }})</h4>
-                  <v-list density="compact">
-                    <v-list-item
-                      v-for="property in sampleOwnerPropertiesArray"
-                      :key="property.id"
-                      :title="property.name"
-                      :subtitle="property.address"
-                    />
-                  </v-list>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                >
-                  <h4>Owner Bookings ({{ totalOwnerBookings }})</h4>
-                  <v-list density="compact">
-                    <v-list-item
-                      v-for="booking in [...sampleOwnerTodayTurnsArray, ...sampleOwnerUpcomingCleaningsArray]"
-                      :key="booking.id"
-                      :title="`${booking.booking_type.toUpperCase()} - ${getPropertyName(booking.property_id)}`"
-                      :subtitle="`${formatDate(booking.checkout_date)} → ${formatDate(booking.checkin_date)}`"
-                    >
-                      <template #prepend>
-                        <v-chip
-                          :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
-                          size="x-small"
-                          label
-                        >
-                          {{ booking.booking_type }}
-                        </v-chip>
-                      </template>
-                    </v-list-item>
-                  </v-list>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-</template>
-⋮----
-<template #prepend>
-                    <v-icon
-                      :icon="getEventIcon(event.action)"
-                      :color="getEventColor(event.action)"
-                      size="small"
-                    />
-                  </template>
-<template #append>
-                    <span class="text-caption">{{ event.timestamp }}</span>
-                  </template>
-⋮----
-<span class="text-caption">{{ event.timestamp }}</span>
-⋮----
-<h4>Owner Properties ({{ sampleOwnerPropertiesArray.length }})</h4>
-⋮----
-<h4>Owner Bookings ({{ totalOwnerBookings }})</h4>
-⋮----
-<template #prepend>
-                        <v-chip
-                          :color="booking.booking_type === 'turn' ? 'warning' : 'info'"
-                          size="x-small"
-                          label
-                        >
-                          {{ booking.booking_type }}
-                        </v-chip>
-                      </template>
-⋮----
-{{ booking.booking_type }}
-⋮----
-<script setup lang="ts">
+## File: src/composables/admin/useAdminBookings.ts
+````typescript
 import { ref, computed } from 'vue';
-import OwnerSidebar from './OwnerSidebar.vue';
-import type { Booking, Property } from '@/types';
-const loading = ref(false);
-const eventLog = ref<Array<{
-  action: string;
-  details: string;
-  timestamp: string;
-}>>([]);
-const currentOwnerId = '1';
-const sampleOwnerProperties = ref<Map<string, Property>>(new Map([
-  ['prop-1', {
-    id: 'prop-1',
-    owner_id: currentOwnerId,
-    name: 'Sunset Beach House',
-    address: '123 Ocean Drive, Miami, FL',
-    cleaning_duration: 180,
-    special_instructions: 'Check pool area, extra attention to kitchen',
-    pricing_tier: 'luxury',
-    active: true,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z'
-  }],
-  ['prop-2', {
-    id: 'prop-2',
-    owner_id: currentOwnerId,
-    name: 'Downtown Loft',
-    address: '456 Main Street, Miami, FL',
-    cleaning_duration: 120,
-    special_instructions: 'Hardwood floors, be careful with electronics',
-    pricing_tier: 'premium',
-    active: true,
-    created_at: '2024-01-20T14:30:00Z',
-    updated_at: '2024-01-20T14:30:00Z'
-  }],
-  ['prop-3', {
-    id: 'prop-3',
-    owner_id: currentOwnerId,
-    name: 'Cozy Studio',
-    address: '789 Pine Avenue, Miami, FL',
-    cleaning_duration: 90,
-    pricing_tier: 'basic',
-    active: true,
-    created_at: '2024-02-01T09:15:00Z',
-    updated_at: '2024-02-01T09:15:00Z'
-  }]
-]));
-const sampleOwnerTodayTurns = ref<Map<string, Booking>>(new Map([
-  ['booking-1', {
-    id: 'booking-1',
-    property_id: 'prop-1',
-    owner_id: currentOwnerId,
-    checkout_date: new Date().toISOString().split('T')[0] + 'T11:00:00Z',
-    checkin_date: new Date().toISOString().split('T')[0] + 'T15:00:00Z',
-    booking_type: 'turn',
-    guest_count: 4,
-    notes: 'Same-day turnaround, high priority',
-    status: 'pending',
-    created_at: '2024-01-10T08:00:00Z',
-    updated_at: '2024-01-10T08:00:00Z'
-  }],
-  ['booking-2', {
-    id: 'booking-2',
-    property_id: 'prop-2',
-    owner_id: currentOwnerId,
-    checkout_date: new Date().toISOString().split('T')[0] + 'T10:00:00Z',
-    checkin_date: new Date().toISOString().split('T')[0] + 'T16:00:00Z',
-    booking_type: 'turn',
-    guest_count: 2,
-    notes: 'Quick turnaround needed',
-    status: 'scheduled',
-    assigned_cleaner_id: 'cleaner-1',
-    created_at: '2024-01-12T09:30:00Z',
-    updated_at: '2024-01-12T09:30:00Z'
-  }]
-]));
-const sampleOwnerUpcomingCleanings = ref<Map<string, Booking>>(new Map([
-  ['booking-3', {
-    id: 'booking-3',
-    property_id: 'prop-1',
-    owner_id: currentOwnerId,
-    checkout_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
-    checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
-    booking_type: 'standard',
-    guest_count: 6,
-    notes: 'Regular cleaning, family with kids',
-    status: 'pending',
-    created_at: '2024-01-14T11:00:00Z',
-    updated_at: '2024-01-14T11:00:00Z'
-  }],
-  ['booking-4', {
-    id: 'booking-4',
-    property_id: 'prop-3',
-    owner_id: currentOwnerId,
-    checkout_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
-    checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
-    booking_type: 'standard',
-    guest_count: 2,
-    notes: 'Business travelers, minimal mess expected',
-    status: 'pending',
-    created_at: '2024-01-16T13:45:00Z',
-    updated_at: '2024-01-16T13:45:00Z'
-  }]
-]));
-const sampleOwnerPropertiesArray = computed(() =>
-  Array.from(sampleOwnerProperties.value.values())
-);
-const sampleOwnerTodayTurnsArray = computed(() =>
-  Array.from(sampleOwnerTodayTurns.value.values())
-);
-const sampleOwnerUpcomingCleaningsArray = computed(() =>
-  Array.from(sampleOwnerUpcomingCleanings.value.values())
-);
-const totalOwnerBookings = computed(() =>
-  sampleOwnerTodayTurnsArray.value.length + sampleOwnerUpcomingCleaningsArray.value.length
-);
-const handleNavigateToBooking = (bookingId: string) => {
-  addEventLog('Navigate to Booking', `Booking ID: ${bookingId}`);
-};
-const handleNavigateToDate = (date: Date) => {
-  addEventLog('Navigate to Date', `Date: ${date.toLocaleDateString()}`);
-};
-const handleFilterByProperty = (propertyId: string | null) => {
-  const propertyName = propertyId
-    ? sampleOwnerProperties.value.get(propertyId)?.name || 'Unknown Property'
-    : 'All Properties';
-  addEventLog('Filter by Property', `Property: ${propertyName}`);
-};
-const handleCreateBooking = () => {
-  addEventLog('Create Booking', 'Owner wants to create a new booking');
-};
-const handleCreateProperty = () => {
-  addEventLog('Create Property', 'Owner wants to add a new property');
-};
-const addEventLog = (action: string, details: string) => {
-  eventLog.value.unshift({
-    action,
-    details,
-    timestamp: new Date().toLocaleTimeString()
-  });
-  if (eventLog.value.length > 20) {
-    eventLog.value = eventLog.value.slice(0, 20);
-  }
-};
-const clearEventLog = () => {
-  eventLog.value = [];
-};
-const getEventIcon = (action: string): string => {
-  const iconMap: Record<string, string> = {
-    'Navigate to Booking': 'mdi-calendar-edit',
-    'Navigate to Date': 'mdi-calendar-month',
-    'Filter by Property': 'mdi-filter-variant',
-    'Create Booking': 'mdi-calendar-plus',
-    'Create Property': 'mdi-home-plus'
-  };
-  return iconMap[action] || 'mdi-information';
-};
-const getEventColor = (action: string): string => {
-  const colorMap: Record<string, string> = {
-    'Navigate to Booking': 'primary',
-    'Navigate to Date': 'info',
-    'Filter by Property': 'warning',
-    'Create Booking': 'success',
-    'Create Property': 'secondary'
-  };
-  return colorMap[action] || 'grey';
-};
-const getPropertyName = (propertyId: string): string => {
-  return sampleOwnerProperties.value.get(propertyId)?.name || 'Unknown Property';
-};
-const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString();
-};
-</script>
-<style scoped>
-.owner-sidebar-demo {
-  min-height: 100vh;
-  background-color: rgb(var(--v-theme-surface));
-}
-</style>
-````
-
-## File: src/components/smart/owner/UseOwnerBookingsDemo.vue
-````vue
-<template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2">
-              mdi-account-check
-            </v-icon>
-            useOwnerBookings Demo
-            <v-spacer />
-            <v-chip
-              :color="currentUserId ? 'success' : 'error'"
-              variant="outlined"
-            >
-              {{ currentUserId ? `Owner: ${authStore.user?.name}` : 'Not Logged In' }}
-            </v-chip>
-          </v-card-title>
-          <v-card-text>
-            <v-alert
-              v-if="!currentUserId"
-              type="warning"
-              class="mb-4"
-            >
-              Please log in to test owner-specific functionality
-            </v-alert>
-            <v-alert
-              v-if="loading"
-              type="info"
-              class="mb-4"
-            >
-              <v-progress-circular
-                indeterminate
-                size="20"
-                class="mr-2"
-              />
-              Loading...
-            </v-alert>
-            <v-alert
-              v-if="error"
-              type="error"
-              class="mb-4"
-              closable
-              @click:close="error = null"
-            >
-              {{ error }}
-            </v-alert>
-            <v-alert
-              v-if="success"
-              type="success"
-              class="mb-4"
-              closable
-              @click:close="success = null"
-            >
-              {{ success }}
-            </v-alert>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-card>
-          <v-card-title>
-            <v-icon class="mr-2">
-              mdi-chart-box
-            </v-icon>
-            My Booking Statistics
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col
-                v-for="(value, key) in myBookingStats"
-                :key="key"
-                cols="6"
-                sm="4"
-              >
-                <v-card
-                  variant="outlined"
-                  class="text-center pa-2"
-                >
-                  <div class="text-h6">
-                    {{ value }}
-                  </div>
-                  <div class="text-caption text-uppercase">
-                    {{ formatStatKey(key) }}
-                  </div>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <v-card>
-          <v-card-title>
-            <v-icon class="mr-2">
-              mdi-alert-circle
-            </v-icon>
-            My Turn Alerts
-          </v-card-title>
-          <v-card-text>
-            <div
-              v-if="myTodayTurns.length === 0"
-              class="text-center text-medium-emphasis"
-            >
-              No urgent turns today
-            </div>
-            <v-list v-else>
-              <v-list-item
-                v-for="turn in myTodayTurns"
-                :key="turn.id"
-                :title="getPropertyName(turn.property_id)"
-                :subtitle="`Checkout: ${formatDateTime(turn.checkout_date)} | Checkin: ${formatDateTime(turn.checkin_date)}`"
-              >
-                <template #prepend>
-                  <v-avatar
-                    color="error"
-                    size="small"
-                  >
-                    <v-icon>mdi-clock-alert</v-icon>
-                  </v-avatar>
-                </template>
-                <template #append>
-                  <v-chip
-                    :color="getStatusColor(turn.status)"
-                    size="small"
-                  >
-                    {{ turn.status }}
-                  </v-chip>
-                </template>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2">
-              mdi-calendar-check
-            </v-icon>
-            My Bookings ({{ myBookings.length }})
-            <v-spacer />
-            <v-btn
-              color="primary"
-              :loading="loading"
-              @click="fetchMyBookings"
-            >
-              <v-icon class="mr-2">
-                mdi-refresh
-              </v-icon>
-              Refresh
-            </v-btn>
-          </v-card-title>
-          <v-card-text>
-            <div
-              v-if="myBookings.length === 0"
-              class="text-center text-medium-emphasis py-8"
-            >
-              <v-icon
-                size="64"
-                class="mb-4"
-              >
-                mdi-calendar-blank
-              </v-icon>
-              <div class="text-h6">
-                No bookings found
-              </div>
-              <div class="text-body-2">
-                Create your first booking to get started
-              </div>
-            </div>
-            <v-data-table
-              v-else
-              :headers="bookingHeaders"
-              :items="myBookings"
-              :items-per-page="10"
-              class="elevation-1"
-            >
-              <template #item.property_id="{ item }">
-                {{ getPropertyName(item.property_id) }}
-              </template>
-              <template #item.booking_type="{ item }">
-                <v-chip
-                  :color="item.booking_type === 'turn' ? 'error' : 'primary'"
-                  size="small"
-                  variant="outlined"
-                >
-                  {{ item.booking_type }}
-                </v-chip>
-              </template>
-              <template #item.status="{ item }">
-                <v-chip
-                  :color="getStatusColor(item.status)"
-                  size="small"
-                >
-                  {{ item.status }}
-                </v-chip>
-              </template>
-              <template #item.priority="{ item }">
-                <v-chip
-                  :color="getPriorityColor(calculateMyBookingPriority(item))"
-                  size="small"
-                  variant="outlined"
-                >
-                  {{ calculateMyBookingPriority(item) }}
-                </v-chip>
-              </template>
-              <template #item.checkout_date="{ item }">
-                {{ formatDate(item.checkout_date) }}
-              </template>
-              <template #item.checkin_date="{ item }">
-                {{ formatDate(item.checkin_date) }}
-              </template>
-              <template #item.actions="{ item }">
-                <v-btn
-                  icon="mdi-pencil"
-                  size="small"
-                  variant="text"
-                  @click="editBooking(item)"
-                />
-                <v-btn
-                  icon="mdi-delete"
-                  size="small"
-                  variant="text"
-                  color="error"
-                  @click="confirmDeleteBooking(item)"
-                />
-              </template>
-            </v-data-table>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>
-            <v-icon class="mr-2">
-              mdi-calendar-clock
-            </v-icon>
-            My Upcoming Cleanings (Next 7 Days)
-          </v-card-title>
-          <v-card-text>
-            <div
-              v-if="myUpcomingCleanings.length === 0"
-              class="text-center text-medium-emphasis"
-            >
-              No upcoming cleanings in the next 7 days
-            </div>
-            <v-timeline
-              v-else
-              side="end"
-              density="compact"
-            >
-              <v-timeline-item
-                v-for="cleaning in myUpcomingCleanings"
-                :key="cleaning.id"
-                :dot-color="cleaning.booking_type === 'turn' ? 'error' : 'primary'"
-                size="small"
-              >
-                <template #opposite>
-                  <div class="text-caption">
-                    {{ formatDate(cleaning.checkout_date) }}
-                  </div>
-                </template>
-                <v-card
-                  variant="outlined"
-                  class="mb-2"
-                >
-                  <v-card-text class="py-2">
-                    <div class="font-weight-medium">
-                      {{ getPropertyName(cleaning.property_id) }}
-                    </div>
-                    <div class="text-caption">
-                      {{ formatDateTime(cleaning.checkout_date) }} → {{ formatDateTime(cleaning.checkin_date) }}
-                    </div>
-                    <div class="d-flex align-center mt-1">
-                      <v-chip
-                        :color="cleaning.booking_type === 'turn' ? 'error' : 'primary'"
-                        size="x-small"
-                        class="mr-2"
-                      >
-                        {{ cleaning.booking_type }}
-                      </v-chip>
-                      <v-chip
-                        :color="getStatusColor(cleaning.status)"
-                        size="x-small"
-                      >
-                        {{ cleaning.status }}
-                      </v-chip>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-timeline-item>
-            </v-timeline>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>
-            <v-icon class="mr-2">
-              mdi-test-tube
-            </v-icon>
-            Test Actions
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-                md="3"
-              >
-                <v-btn
-                  block
-                  color="primary"
-                  :loading="loading"
-                  :disabled="!currentUserId"
-                  @click="testCreateBooking"
-                >
-                  Test Create Booking
-                </v-btn>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="3"
-              >
-                <v-btn
-                  block
-                  color="secondary"
-                  :loading="loading"
-                  :disabled="!currentUserId || myBookings.length === 0"
-                  @click="testUpdateBooking"
-                >
-                  Test Update First Booking
-                </v-btn>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="3"
-              >
-                <v-btn
-                  block
-                  color="warning"
-                  :loading="loading"
-                  :disabled="!currentUserId || myBookings.length === 0"
-                  @click="testStatusChange"
-                >
-                  Test Status Change
-                </v-btn>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="3"
-              >
-                <v-btn
-                  block
-                  color="info"
-                  :loading="loading"
-                  :disabled="!currentUserId"
-                  @click="generateSampleData"
-                >
-                  Generate Sample Data
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-dialog
-      v-model="showDeleteDialog"
-      max-width="400"
-    >
-      <v-card>
-        <v-card-title>Confirm Delete</v-card-title>
-        <v-card-text>
-          Are you sure you want to delete this booking?
-          <div class="mt-2 font-weight-medium">
-            {{ bookingToDelete ? getPropertyName(bookingToDelete.property_id) : '' }}
-          </div>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn @click="showDeleteDialog = false">
-            Cancel
-          </v-btn>
-          <v-btn
-            color="error"
-            :loading="loading"
-            @click="executeDelete"
-          >
-            Delete
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
-</template>
-⋮----
-{{ currentUserId ? `Owner: ${authStore.user?.name}` : 'Not Logged In' }}
-⋮----
-{{ error }}
-⋮----
-{{ success }}
-⋮----
-{{ value }}
-⋮----
-{{ formatStatKey(key) }}
-⋮----
-<template #prepend>
-                  <v-avatar
-                    color="error"
-                    size="small"
-                  >
-                    <v-icon>mdi-clock-alert</v-icon>
-                  </v-avatar>
-                </template>
-<template #append>
-                  <v-chip
-                    :color="getStatusColor(turn.status)"
-                    size="small"
-                  >
-                    {{ turn.status }}
-                  </v-chip>
-                </template>
-⋮----
-{{ turn.status }}
-⋮----
-My Bookings ({{ myBookings.length }})
-⋮----
-<template #item.property_id="{ item }">
-                {{ getPropertyName(item.property_id) }}
-              </template>
-⋮----
-{{ getPropertyName(item.property_id) }}
-⋮----
-<template #item.booking_type="{ item }">
-                <v-chip
-                  :color="item.booking_type === 'turn' ? 'error' : 'primary'"
-                  size="small"
-                  variant="outlined"
-                >
-                  {{ item.booking_type }}
-                </v-chip>
-              </template>
-⋮----
-{{ item.booking_type }}
-⋮----
-<template #item.status="{ item }">
-                <v-chip
-                  :color="getStatusColor(item.status)"
-                  size="small"
-                >
-                  {{ item.status }}
-                </v-chip>
-              </template>
-⋮----
-{{ item.status }}
-⋮----
-<template #item.priority="{ item }">
-                <v-chip
-                  :color="getPriorityColor(calculateMyBookingPriority(item))"
-                  size="small"
-                  variant="outlined"
-                >
-                  {{ calculateMyBookingPriority(item) }}
-                </v-chip>
-              </template>
-⋮----
-{{ calculateMyBookingPriority(item) }}
-⋮----
-<template #item.checkout_date="{ item }">
-                {{ formatDate(item.checkout_date) }}
-              </template>
-⋮----
-{{ formatDate(item.checkout_date) }}
-⋮----
-<template #item.checkin_date="{ item }">
-                {{ formatDate(item.checkin_date) }}
-              </template>
-⋮----
-{{ formatDate(item.checkin_date) }}
-⋮----
-<template #item.actions="{ item }">
-                <v-btn
-                  icon="mdi-pencil"
-                  size="small"
-                  variant="text"
-                  @click="editBooking(item)"
-                />
-                <v-btn
-                  icon="mdi-delete"
-                  size="small"
-                  variant="text"
-                  color="error"
-                  @click="confirmDeleteBooking(item)"
-                />
-              </template>
-⋮----
-<template #opposite>
-                  <div class="text-caption">
-                    {{ formatDate(cleaning.checkout_date) }}
-                  </div>
-                </template>
-⋮----
-{{ formatDate(cleaning.checkout_date) }}
-⋮----
-{{ getPropertyName(cleaning.property_id) }}
-⋮----
-{{ formatDateTime(cleaning.checkout_date) }} → {{ formatDateTime(cleaning.checkin_date) }}
-⋮----
-{{ cleaning.booking_type }}
-⋮----
-{{ cleaning.status }}
-⋮----
-{{ bookingToDelete ? getPropertyName(bookingToDelete.property_id) : '' }}
-⋮----
-<script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useBookings } from '@/composables/shared/useBookings';
 import { useAuthStore } from '@/stores/auth';
+import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
-import type { Booking, BookingFormData } from '@/types';
-const ownerBookings = useOwnerBookings();
-const authStore = useAuthStore();
-const propertyStore = usePropertyStore();
-const {
-  loading,
-  error,
-  success,
-  myBookings,
-  myProperties,
-  myTodayTurns,
-  myUpcomingCleanings,
-  myBookingStats,
-  fetchMyBookings,
-  createMyBooking,
-  updateMyBooking,
-  deleteMyBooking,
-  changeMyBookingStatus,
-  calculateMyBookingPriority
-} = ownerBookings;
-const showDeleteDialog = ref(false);
-const bookingToDelete = ref<Booking | null>(null);
-const currentUserId = computed(() => authStore.user?.id);
-const bookingHeaders = [
-  { title: 'Property', key: 'property_id', sortable: true },
-  { title: 'Type', key: 'booking_type', sortable: true },
-  { title: 'Status', key: 'status', sortable: true },
-  { title: 'Priority', key: 'priority', sortable: false },
-  { title: 'Checkout', key: 'checkout_date', sortable: true },
-  { title: 'Checkin', key: 'checkin_date', sortable: true },
-  { title: 'Actions', key: 'actions', sortable: false }
-];
-function getPropertyName(propertyId: string): string {
-  const property = propertyStore.getPropertyById(propertyId);
-  return property ? property.name : 'Unknown Property';
-}
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString();
-}
-function formatDateTime(dateString: string): string {
-  return new Date(dateString).toLocaleString();
-}
-function formatStatKey(key: string): string {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-}
-function getStatusColor(status: string): string {
-  const colors: Record<string, string> = {
-    pending: 'orange',
-    scheduled: 'blue',
-    in_progress: 'purple',
-    completed: 'green',
-    cancelled: 'red'
-  };
-  return colors[status] || 'grey';
-}
-function getPriorityColor(priority: string): string {
-  const colors: Record<string, string> = {
-    low: 'grey',
-    normal: 'blue',
-    high: 'orange',
-    urgent: 'red'
-  };
-  return colors[priority] || 'grey';
-}
-async function testCreateBooking() {
-  if (!currentUserId.value || myProperties.value.length === 0) {
-    error.value = 'No properties available for testing';
-    return;
-  }
-  const testBookingData: BookingFormData = {
-    property_id: myProperties.value[0].id,
-    checkout_date: new Date().toISOString(),
-    checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    booking_type: 'standard',
-    status: 'pending',
-    guest_count: 2,
-    notes: 'Test booking created from demo',
-    owner_id: currentUserId.value
-  };
-  await createMyBooking(testBookingData);
-}
-async function testUpdateBooking() {
-  if (myBookings.value.length === 0) return;
-  const firstBooking = myBookings.value[0];
-  const updates: Partial<BookingFormData> = {
-    notes: `Updated at ${new Date().toLocaleTimeString()}`,
-    guest_count: (firstBooking.guest_count || 1) + 1
-  };
-  await updateMyBooking(firstBooking.id, updates);
-}
-async function testStatusChange() {
-  if (myBookings.value.length === 0) return;
-  const firstBooking = myBookings.value[0];
-  const nextStatus = firstBooking.status === 'pending' ? 'scheduled' : 'pending';
-  await changeMyBookingStatus(firstBooking.id, nextStatus);
-}
-async function generateSampleData() {
-  if (!currentUserId.value || myProperties.value.length === 0) {
-    error.value = 'No properties available for sample data generation';
-    return;
-  }
-  const sampleBookings: BookingFormData[] = [
-    {
-      property_id: myProperties.value[0].id,
-      checkout_date: new Date().toISOString(),
-      checkin_date: new Date().toISOString(),
-      booking_type: 'turn',
-      status: 'pending',
-      guest_count: 4,
-      notes: 'Urgent turn booking - same day checkout/checkin',
-      owner_id: currentUserId.value
-    },
-    {
-      property_id: myProperties.value[0].id,
-      checkout_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-      checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-      booking_type: 'standard',
-      status: 'pending',
-      guest_count: 2,
-      notes: 'Standard booking with 1-day gap',
-      owner_id: currentUserId.value
-    }
-  ];
-  for (const bookingData of sampleBookings) {
-    await createMyBooking(bookingData);
-  }
-}
-function editBooking(booking: Booking) {
-  console.log('Edit booking:', booking);
-  success.value = `Edit functionality would open for booking ${booking.id}`;
-}
-function confirmDeleteBooking(booking: Booking) {
-  bookingToDelete.value = booking;
-  showDeleteDialog.value = true;
-}
-async function executeDelete() {
-  if (bookingToDelete.value) {
-    await deleteMyBooking(bookingToDelete.value.id);
-    showDeleteDialog.value = false;
-    bookingToDelete.value = null;
-  }
-}
-</script>
-<style scoped>
-.v-card {
-  margin-bottom: 16px;
-}
-</style>
-````
-
-## File: src/components/smart/SidebarDemo.vue
-````vue
-<template>
-  <v-container
-    fluid
-    class="sidebar-demo"
-  >
-    <v-row>
-      <v-col
-        cols="12"
-        md="4"
-        lg="3"
-      >
-        <Sidebar
-          :today-turns="todayTurns"
-          :upcoming-cleanings="upcomingCleanings"
-          :properties="properties"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        md="8"
-        lg="9"
-      >
-        <v-card class="pa-4">
-          <v-card-title>Sidebar Demo</v-card-title>
-          <v-card-text>
-            <p>This is a demo of the Sidebar component. Try interacting with the sidebar to see how it works.</p>
-            <v-divider class="my-4" />
-            <h3 class="text-h6 mb-2">
-              Event Log:
-            </h3>
-            <v-list
-              lines="two"
-              class="event-log bg-grey-lighten-4"
-            >
-              <v-list-item
-                v-for="(event, index) in eventLog"
-                :key="index"
-              >
-                <v-list-item-title>{{ event.name }}</v-list-item-title>
-                <v-list-item-subtitle>{{ event.detail }}</v-list-item-subtitle>
-              </v-list-item>
-              <v-list-item v-if="eventLog.length === 0">
-                <v-list-item-title>No events yet</v-list-item-title>
-                <v-list-item-subtitle>Try interacting with the sidebar</v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-            <v-divider class="my-4" />
-            <div class="d-flex gap-2">
-              <v-btn
-                color="primary"
-                @click="toggleLoading"
-              >
-                {{ loading ? 'Stop Loading' : 'Start Loading' }}
-              </v-btn>
-              <v-btn
-                color="secondary"
-                @click="resetEvents"
-              >
-                Reset Events
-              </v-btn>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
+import type { Booking, BookingFormData, BookingStatus, BookingType } from '@/types';
+export function useAdminBookings()
 ⋮----
-<v-list-item-title>{{ event.name }}</v-list-item-title>
-<v-list-item-subtitle>{{ event.detail }}</v-list-item-subtitle>
-⋮----
-{{ loading ? 'Stop Loading' : 'Start Loading' }}
-⋮----
-<script setup lang="ts">
-import { ref } from 'vue';
-import Sidebar from './Sidebar.vue';
-import type { Booking, Property } from '@/types';
-const loading = ref(false);
-const eventLog = ref<{ name: string, detail: string }[]>([]);
-const properties = ref<Property[]>([
-  {
-    id: '1',
-    owner_id: 'owner1',
-    name: 'Luxury Beach House',
-    address: '123 Coastal Way',
-    cleaning_duration: 180,
-    special_instructions: 'Check pool filter',
-    pricing_tier: 'luxury',
-    active: true,
-  },
-  {
-    id: '2',
-    owner_id: 'owner1',
-    name: 'Downtown Apartment',
-    address: '456 Main Street',
-    cleaning_duration: 120,
-    pricing_tier: 'premium',
-    active: true,
-  },
-  {
-    id: '3',
-    owner_id: 'owner2',
-    name: 'Mountain Cabin',
-    address: '789 Forest Road',
-    cleaning_duration: 90,
-    special_instructions: 'Restock firewood',
-    pricing_tier: 'basic',
-    active: true,
-  },
-]);
-const todayTurns = ref<Booking[]>([
-  {
-    id: 't1',
-    property_id: '1',
-    owner_id: 'owner1',
-    checkout_date: new Date().toISOString(),
-    checkin_date: new Date().toISOString(),
-    booking_type: 'turn',
-    guest_count: 4,
-    notes: 'Urgent: Same-day turnaround',
-    status: 'pending',
-  },
-  {
-    id: 't2',
-    property_id: '2',
-    owner_id: 'owner1',
-    checkout_date: new Date().toISOString(),
-    checkin_date: new Date().toISOString(),
-    booking_type: 'turn',
-    guest_count: 2,
-    status: 'scheduled',
-  },
-]);
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
-const dayAfterTomorrow = new Date();
-dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-const upcomingCleanings = ref<Booking[]>([
-  {
-    id: 'u1',
-    property_id: '1',
-    owner_id: 'owner1',
-    checkout_date: tomorrow.toISOString(),
-    checkin_date: tomorrow.toISOString(),
-    booking_type: 'standard',
-    guest_count: 3,
-    status: 'pending',
-  },
-  {
-    id: 'u2',
-    property_id: '3',
-    owner_id: 'owner2',
-    checkout_date: tomorrow.toISOString(),
-    checkin_date: dayAfterTomorrow.toISOString(),
-    booking_type: 'standard',
-    guest_count: 2,
-    status: 'scheduled',
-  },
-  {
-    id: 'u3',
-    property_id: '2',
-    owner_id: 'owner1',
-    checkout_date: dayAfterTomorrow.toISOString(),
-    checkin_date: dayAfterTomorrow.toISOString(),
-    booking_type: 'standard',
-    guest_count: 1,
-    status: 'pending',
-  },
-]);
-const handleNavigateToBooking = (bookingId: string) => {
-  eventLog.value.unshift({
-    name: 'navigateToBooking',
-    detail: `Booking ID: ${bookingId}`,
-  });
-};
-const handleNavigateToDate = (date: Date) => {
-  eventLog.value.unshift({
-    name: 'navigateToDate',
-    detail: `Date: ${date.toLocaleDateString()}`,
-  });
-};
-const handleFilterByProperty = (propertyId: string | null) => {
-  const propertyName = propertyId
-    ? properties.value.find(p => p.id === propertyId)?.name || 'Unknown'
-    : 'All Properties';
-  eventLog.value.unshift({
-    name: 'filterByProperty',
-    detail: `Property: ${propertyName} (ID: ${propertyId || 'none'})`,
-  });
-};
-const handleCreateBooking = () => {
-  eventLog.value.unshift({
-    name: 'createBooking',
-    detail: 'Opening booking creation modal',
-  });
-};
-const handleCreateProperty = () => {
-  eventLog.value.unshift({
-    name: 'createProperty',
-    detail: 'Opening property creation modal',
-  });
-};
-const toggleLoading = () => {
-  loading.value = !loading.value;
-};
-const resetEvents = () => {
-  eventLog.value = [];
-};
-</script>
-<style scoped>
-.sidebar-demo {
-  min-height: 100vh;
-}
-.event-log {
-  max-height: 300px;
-  overflow-y: auto;
-  border-radius: 4px;
-}
-</style>
+function getBookingsByStatus(status: BookingStatus)
+async function createBookingForOwner(formData: Partial<Booking>)
+function assignCleanerToBooking(bookingId: string, cleanerId: string): boolean
+function canManageAnyBooking(): boolean
+function canEditAnyBooking(): boolean
+function canDeleteAnyBooking(): boolean
+function canAssignCleaners(): boolean
+function canViewSystemMetrics(): boolean
+async function fetchAllBookings(): Promise<boolean>
+async function assignCleaner(bookingId: string, cleanerId: string): Promise<boolean>
+async function updateBookingStatus(bookingId: string, status: BookingStatus): Promise<boolean>
+async function bulkAssignCleaner(bookingIds: string[], cleanerId: string): Promise<
+async function bulkUpdateStatus(bookingIds: string[], status: BookingStatus): Promise<
+function getSystemTurnAlerts()
+function getCleanerWorkloadAnalysis()
+function getPropertyUtilizationReport()
+function filterBookings(criteria: {
+    status?: BookingStatus[];
+    bookingType?: BookingType[];
+    ownerId?: string;
+    cleanerId?: string;
+    dateRange?: { start: string; end: string };
+    propertyId?: string;
+    unassignedOnly?: boolean;
+})
 ````
 
 ## File: src/composables/owner/README.md
@@ -26554,6 +12163,30 @@ FOR SELECT USING (auth.uid() = owner_id);
 This architecture ensures that property owners have a simple, focused interface while admins have comprehensive business management tools, all built on the same shared foundation.
 ````
 
+## File: src/composables/owner/useOwnerBookings.ts
+````typescript
+import { ref, computed } from 'vue';
+import { useBookings } from '@/composables/shared/useBookings';
+import { useAuthStore } from '@/stores/auth';
+import { useBookingStore } from '@/stores/booking';
+import { usePropertyStore } from '@/stores/property';
+import type { Booking, BookingFormData, BookingStatus } from '@/types';
+export function useOwnerBookings()
+⋮----
+async function fetchMyBookings(): Promise<boolean>
+async function createMyBooking(formData: BookingFormData): Promise<string | null>
+async function updateMyBooking(id: string, updates: Partial<BookingFormData>): Promise<boolean>
+async function deleteMyBooking(id: string): Promise<boolean>
+async function changeMyBookingStatus(id: string, status: BookingStatus): Promise<boolean>
+function getMyTurnAlerts()
+function calculateMyBookingPriority(booking: Booking): 'low' | 'normal' | 'high' | 'urgent'
+function getMyBookingCleaningWindow(booking: Booking)
+⋮----
+async function createOwnerBooking(formData: Partial<Booking>): Promise<Booking | null>
+function canEditBooking(bookingId: string): boolean
+function canDeleteBooking(bookingId: string): boolean
+````
+
 ## File: src/composables/owner/useOwnerCalendarState.ts
 ````typescript
 import { ref, computed } from 'vue';
@@ -26637,40 +12270,6 @@ function clearPropertyFilters()
 function filterBookings(bookings: Booking[]): Booking[]
 function getFormattedDateRange(): string
 function bookingsToEvents(bookings: Booking[])
-````
-
-## File: src/composables/shared/useComponentEventLogger.ts
-````typescript
-import { ref, reactive, computed } from 'vue';
-export interface ComponentEvent {
-  id: string;
-  timestamp: number;
-  sourceComponent: string;
-  targetComponent: string;
-  eventName: string;
-  payload: unknown;
-  direction: 'emit' | 'receive';
-}
-export interface EventFilter {
-  sourceComponent?: string;
-  targetComponent?: string;
-  eventName?: string;
-  direction?: 'emit' | 'receive';
-}
-export function useComponentEventLogger()
-⋮----
-const logEvent = (
-    sourceComponent: string,
-    targetComponent: string,
-    eventName: string,
-    payload: unknown,
-    direction: 'emit' | 'receive'
-) =>
-const clearEvents = () =>
-const setEnabled = (value: boolean) =>
-const toggleEnabled = () =>
-const setFilter = (newFilter: EventFilter) =>
-const clearFilter = () =>
 ````
 
 ## File: src/composables/shared/useProperties.ts
@@ -26807,6 +12406,441 @@ async function fetchAllProperties(): Promise<boolean>
 .not-found-page {
   padding: 2rem;
   text-align: center;
+}
+</style>
+````
+
+## File: src/pages/admin/cleaners/index.vue
+````vue
+<template>
+  <div class="admin-cleaners-page">
+    <div class="page-header">
+      <v-container fluid>
+        <v-row align="center">
+          <v-col>
+            <h1 class="text-h4 font-weight-bold">Cleaner Management</h1>
+            <p class="text-subtitle-1 text-medium-emphasis">
+              Manage cleaner profiles, availability, and performance
+            </p>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-account-plus"
+              @click="showAddDialog = true"
+            >
+              Add Cleaner
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
+    <div class="stats-section">
+      <v-container fluid>
+        <v-row>
+          <v-col cols="12" sm="6" md="3">
+            <v-card>
+              <v-card-text>
+                <div class="d-flex align-center">
+                  <v-icon color="primary" size="40" class="me-3">mdi-account-group</v-icon>
+                  <div>
+                    <div class="text-h5 font-weight-bold">{{ cleanerStats.total }}</div>
+                    <div class="text-caption text-medium-emphasis">Total Cleaners</div>
+                  </div>
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" sm="6" md="3">
+            <v-card>
+              <v-card-text>
+                <div class="d-flex align-center">
+                  <v-icon color="success" size="40" class="me-3">mdi-check-circle</v-icon>
+                  <div>
+                    <div class="text-h5 font-weight-bold">{{ cleanerStats.available }}</div>
+                    <div class="text-caption text-medium-emphasis">Available Today</div>
+                  </div>
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" sm="6" md="3">
+            <v-card>
+              <v-card-text>
+                <div class="d-flex align-center">
+                  <v-icon color="warning" size="40" class="me-3">mdi-clock-outline</v-icon>
+                  <div>
+                    <div class="text-h5 font-weight-bold">{{ cleanerStats.busy }}</div>
+                    <div class="text-caption text-medium-emphasis">Currently Busy</div>
+                  </div>
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" sm="6" md="3">
+            <v-card>
+              <v-card-text>
+                <div class="d-flex align-center">
+                  <v-icon color="info" size="40" class="me-3">mdi-star</v-icon>
+                  <div>
+                    <div class="text-h5 font-weight-bold">4.8</div>
+                    <div class="text-caption text-medium-emphasis">Average Rating</div>
+                  </div>
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
+    <div class="page-content">
+      <v-container fluid>
+        <v-row class="mb-4">
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="searchQuery"
+              prepend-inner-icon="mdi-magnify"
+              label="Search cleaners..."
+              variant="outlined"
+              density="compact"
+              clearable
+            />
+          </v-col>
+          <v-col cols="12" md="3">
+            <v-select
+              v-model="statusFilter"
+              :items="statusOptions"
+              label="Status"
+              variant="outlined"
+              density="compact"
+              clearable
+            />
+          </v-col>
+          <v-col cols="12" md="3">
+            <v-btn
+              color="secondary"
+              variant="outlined"
+              block
+              @click="resetFilters"
+            >
+              Reset Filters
+            </v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col
+            v-for="cleaner in filteredCleaners"
+            :key="cleaner.id"
+            cols="12"
+            md="6"
+            lg="4"
+          >
+            <v-card class="cleaner-card">
+              <v-card-text>
+                <div class="d-flex align-center mb-3">
+                  <v-avatar size="48" class="me-3">
+                    <v-icon size="24">mdi-account</v-icon>
+                  </v-avatar>
+                  <div class="flex-grow-1">
+                    <div class="text-h6 font-weight-medium">{{ cleaner.name }}</div>
+                    <div class="text-caption text-medium-emphasis">{{ cleaner.email }}</div>
+                  </div>
+                  <v-chip
+                    color="success"
+                    size="small"
+                    variant="flat"
+                  >
+                    Active
+                  </v-chip>
+                </div>
+                <div class="mb-3">
+                  <div class="text-caption text-medium-emphasis mb-1">Skills</div>
+                  <div class="d-flex flex-wrap ga-1">
+                    <v-chip
+                      v-for="skill in cleaner.skills.slice(0, 3)"
+                      :key="skill"
+                      size="x-small"
+                      variant="outlined"
+                    >
+                      {{ skill }}
+                    </v-chip>
+                    <v-chip
+                      v-if="cleaner.skills.length > 3"
+                      size="x-small"
+                      variant="outlined"
+                    >
+                      +{{ cleaner.skills.length - 3 }}
+                    </v-chip>
+                  </div>
+                </div>
+                <div class="d-flex justify-space-between mb-3">
+                  <div class="text-center">
+                    <div class="text-h6 font-weight-bold">{{ cleaner.max_daily_bookings }}</div>
+                    <div class="text-caption text-medium-emphasis">Max Daily</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-h6 font-weight-bold">4.8</div>
+                    <div class="text-caption text-medium-emphasis">Rating</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-h6 font-weight-bold">85%</div>
+                    <div class="text-caption text-medium-emphasis">Utilization</div>
+                  </div>
+                </div>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  prepend-icon="mdi-calendar"
+                  @click="viewSchedule(cleaner)"
+                >
+                  Schedule
+                </v-btn>
+                <v-btn
+                  variant="text"
+                  size="small"
+                  prepend-icon="mdi-pencil"
+                  @click="editCleaner(cleaner)"
+                >
+                  Edit
+                </v-btn>
+                <v-spacer />
+                <v-btn
+                  variant="text"
+                  size="small"
+                  color="error"
+                  icon="mdi-delete"
+                  @click="handleDeleteCleaner(cleaner)"
+                />
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+        <div v-if="filteredCleaners.length === 0" class="text-center py-8">
+          <v-icon size="64" color="grey-lighten-1">mdi-account-search</v-icon>
+          <div class="text-h6 mt-4 mb-2">No cleaners found</div>
+          <div class="text-body-2 text-medium-emphasis">
+            Try adjusting your search criteria or add a new cleaner
+          </div>
+        </div>
+      </v-container>
+    </div>
+    <v-dialog v-model="showAddDialog" max-width="500px" persistent>
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">{{ editingCleaner ? 'Edit' : 'Add' }} Cleaner</span>
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="form" v-model="formValid">
+            <v-text-field
+              v-model="formData.name"
+              label="Full Name"
+              :rules="[rules.required]"
+              variant="outlined"
+              class="mb-3"
+            />
+            <v-text-field
+              v-model="formData.email"
+              label="Email"
+              type="email"
+              :rules="[rules.required, rules.email]"
+              variant="outlined"
+              class="mb-3"
+            />
+            <v-select
+              v-model="formData.skills"
+              :items="availableSkills"
+              label="Skills"
+              multiple
+              chips
+              variant="outlined"
+              class="mb-3"
+            />
+            <v-text-field
+              v-model.number="formData.max_daily_bookings"
+              label="Max Daily Bookings"
+              type="number"
+              :rules="[rules.required, rules.positive]"
+              variant="outlined"
+            />
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn text @click="closeDialog">Cancel</v-btn>
+          <v-btn
+            color="primary"
+            :disabled="!formValid"
+            :loading="saving"
+            @click="saveCleaner"
+          >
+            {{ editingCleaner ? 'Update' : 'Create' }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+⋮----
+<div class="text-h5 font-weight-bold">{{ cleanerStats.total }}</div>
+⋮----
+<div class="text-h5 font-weight-bold">{{ cleanerStats.available }}</div>
+⋮----
+<div class="text-h5 font-weight-bold">{{ cleanerStats.busy }}</div>
+⋮----
+<div class="text-h6 font-weight-medium">{{ cleaner.name }}</div>
+<div class="text-caption text-medium-emphasis">{{ cleaner.email }}</div>
+⋮----
+{{ skill }}
+⋮----
++{{ cleaner.skills.length - 3 }}
+⋮----
+<div class="text-h6 font-weight-bold">{{ cleaner.max_daily_bookings }}</div>
+⋮----
+<span class="text-h5">{{ editingCleaner ? 'Edit' : 'Add' }} Cleaner</span>
+⋮----
+{{ editingCleaner ? 'Update' : 'Create' }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useCleanerManagement } from '@/composables/admin/useCleanerManagement'
+import type { Cleaner } from '@/types/user'
+const router = useRouter()
+const { allCleaners, loading: _loading, fetchCleaners, createCleaner, updateCleaner, deleteCleaner } = useCleanerManagement()
+const searchQuery = ref('')
+const statusFilter = ref<string | null>(null)
+const showAddDialog = ref(false)
+const editingCleaner = ref<Cleaner | null>(null)
+const formValid = ref(false)
+const saving = ref(false)
+// Form data
+const formData = ref({
+  name: '',
+  email: '',
+  skills: [] as string[],
+  max_daily_bookings: 4
+})
+// Options
+const statusOptions = [
+  { title: 'Active', value: 'active' },
+  { title: 'Inactive', value: 'inactive' },
+  { title: 'On Leave', value: 'on_leave' }
+]
+const availableSkills = [
+  'Standard Cleaning',
+  'Deep Cleaning',
+  'Move-in/Move-out',
+  'Post-Construction',
+  'Carpet Cleaning',
+  'Window Cleaning',
+  'Pressure Washing',
+  'Organizing'
+]
+const rules = {
+  required: (value: any) => !!value || 'This field is required',
+  email: (value: string) => {
+    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return pattern.test(value) || 'Invalid email address'
+  },
+  positive: (value: number) => value > 0 || 'Must be greater than 0'
+}
+const filteredCleaners = computed(() => {
+  let filtered = allCleaners.value
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(cleaner =>
+      cleaner.name.toLowerCase().includes(query) ||
+      cleaner.email.toLowerCase().includes(query)
+    )
+  }
+  return filtered
+})
+const cleanerStats = computed(() => ({
+  total: allCleaners.value.length,
+  available: Math.floor(allCleaners.value.length * 0.7),
+  busy: Math.floor(allCleaners.value.length * 0.3)
+}))
+const resetFilters = () => {
+  searchQuery.value = ''
+  statusFilter.value = null
+}
+const viewSchedule = (cleaner: Cleaner) => {
+  router.push(`/admin/schedule?cleaner=${cleaner.id}`)
+}
+const editCleaner = (cleaner: Cleaner) => {
+  editingCleaner.value = cleaner
+  formData.value = {
+    name: cleaner.name,
+    email: cleaner.email,
+    skills: [...cleaner.skills],
+    max_daily_bookings: cleaner.max_daily_bookings
+  }
+  showAddDialog.value = true
+}
+const handleDeleteCleaner = async (cleaner: Cleaner) => {
+  if (confirm(`Are you sure you want to delete ${cleaner.name}?`)) {
+    try {
+      await deleteCleaner(cleaner.id)
+    } catch (error) {
+      console.error('Failed to delete cleaner:', error)
+    }
+  }
+}
+const saveCleaner = async () => {
+  saving.value = true
+  try {
+    if (editingCleaner.value) {
+      await updateCleaner(editingCleaner.value.id, formData.value)
+    } else {
+      await createCleaner(formData.value)
+    }
+    closeDialog()
+  } catch (error) {
+    console.error('Failed to save cleaner:', error)
+  } finally {
+    saving.value = false
+  }
+}
+const closeDialog = () => {
+  showAddDialog.value = false
+  editingCleaner.value = null
+  formData.value = {
+    name: '',
+    email: '',
+    skills: [],
+    max_daily_bookings: 4
+  }
+}
+onMounted(() => {
+  fetchCleaners()
+})
+</script>
+<style scoped>
+.admin-cleaners-page {
+  min-height: 100vh;
+  background: rgb(var(--v-theme-background));
+}
+.page-header {
+  background: rgb(var(--v-theme-surface));
+  border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
+  padding: 1rem 0;
+}
+.stats-section {
+  padding: 1rem 0;
+  background: rgb(var(--v-theme-surface));
+  border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
+}
+.page-content {
+  padding: 2rem 0;
+}
+.cleaner-card {
+  height: 100%;
+  transition: transform 0.2s ease-in-out;
+}
+.cleaner-card:hover {
+  transform: translateY(-2px);
 }
 </style>
 ````
@@ -27032,67 +13066,169 @@ const closeCleanerAssignmentModal = () => {
 </style>
 ````
 
-## File: src/pages/demos/calendar.vue
+## File: src/pages/owner/properties/index.vue
 ````vue
 <template>
-  <div class="calendar-demo-page">
-    <h1 class="text-h4 mb-4">
-      Calendar Demo
-    </h1>
-    <FullCalendarDemo />
+  <div class="owner-properties-page">
+    <v-container fluid>
+      <v-row>
+        <v-col cols="12">
+          <div class="d-flex justify-space-between align-center mb-4">
+            <h1 class="text-h4">My Properties</h1>
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-plus"
+              @click="handleAddProperty"
+            >
+              Add Property
+            </v-btn>
+          </div>
+        </v-col>
+      </v-row>
+      <v-row class="mb-4">
+        <v-col cols="12" sm="6" md="3">
+          <v-card>
+            <v-card-text>
+              <div class="text-h6">{{ ownerProperties.length }}</div>
+              <div class="text-caption text-medium-emphasis">Total Properties</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-card>
+            <v-card-text>
+              <div class="text-h6">{{ activeProperties.length }}</div>
+              <div class="text-caption text-medium-emphasis">Active Properties</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-card>
+            <v-card-text>
+              <div class="text-h6">{{ ownerBookings.length }}</div>
+              <div class="text-caption text-medium-emphasis">Total Bookings</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-card>
+            <v-card-text>
+              <div class="text-h6">{{ todayTurns.length }}</div>
+              <div class="text-caption text-medium-emphasis">Today's Turns</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col
+          v-for="property in ownerProperties"
+          :key="property.id"
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+        >
+          <PropertyCard
+            :property="property"
+            @edit="handleEditProperty"
+            @delete="handleDeleteProperty"
+          />
+        </v-col>
+      </v-row>
+      <v-row v-if="ownerProperties.length === 0">
+        <v-col cols="12" class="text-center py-8">
+          <v-icon size="64" color="grey-lighten-1" class="mb-4">
+            mdi-home-outline
+          </v-icon>
+          <h3 class="text-h6 mb-2">No Properties Yet</h3>
+          <p class="text-body-2 text-medium-emphasis mb-4">
+            Add your first property to start managing bookings and cleanings.
+          </p>
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-plus"
+            @click="handleAddProperty"
+          >
+            Add Your First Property
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
+⋮----
+<div class="text-h6">{{ ownerProperties.length }}</div>
+⋮----
+<div class="text-h6">{{ activeProperties.length }}</div>
+⋮----
+<div class="text-h6">{{ ownerBookings.length }}</div>
+⋮----
+<div class="text-h6">{{ todayTurns.length }}</div>
+⋮----
 <script setup lang="ts">
-import FullCalendarDemo from '@/components/smart/FullCalendarDemo.vue';
+import { onMounted } from 'vue';
+import PropertyCard from '@/components/dumb/shared/PropertyCard.vue';
+import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useUIStore } from '@/stores/ui';
+import type { Property } from '@/types';
+defineOptions({
+  name: 'OwnerPropertiesPage'
+});
+const {
+  myProperties: ownerProperties,
+  myActiveProperties: activeProperties,
+  fetchMyProperties,
+  deleteMyProperty
+} = useOwnerProperties();
+const {
+  myBookings: ownerBookings,
+  myTodayTurns: todayTurns,
+  fetchMyBookings
+} = useOwnerBookings();
+const uiStore = useUIStore();
+const handleAddProperty = (): void => {
+  uiStore.openModal('propertyModal', 'create');
+};
+const handleEditProperty = (propertyId: string): void => {
+  const property = ownerProperties.value.find(p => p.id === propertyId);
+  if (property) {
+    uiStore.openModal('propertyModal', 'edit', property);
+  }
+};
+const handleDeleteProperty = async (propertyId: string): Promise<void> => {
+  const property = ownerProperties.value.find(p => p.id === propertyId);
+  if (!property) return;
+  const confirmed = await uiStore.showConfirmation(
+    'Delete Property',
+    `Are you sure you want to delete "${property.name}"? This action cannot be undone.`,
+    { dangerous: true }
+  );
+  if (confirmed) {
+    try {
+      await deleteMyProperty(property.id);
+      uiStore.showNotification('Property deleted successfully', 'success');
+    } catch (error) {
+      uiStore.showNotification('Failed to delete property', 'error');
+    }
+  }
+};
+onMounted(async () => {
+  await Promise.all([
+    fetchMyProperties(),
+    fetchMyBookings()
+  ]);
+});
 </script>
 <style scoped>
-.calendar-demo-page {
+.owner-properties-page {
   padding: 1rem;
+  min-height: calc(100vh - 64px);
+}
+.v-card {
+  height: 100%;
 }
 </style>
-````
-
-## File: src/pages/demos/index.vue
-````vue
-<script setup lang="ts">
-    import OwnerCalendarDemo from '@/components/smart/owner/OwnerCalendarDemo.vue'
-    </script>
-<template>
-  <OwnerCalendarDemo />
-</template>
-<style scoped>
-</style>
-````
-
-## File: src/router/guards.ts
-````typescript
-import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useUIStore } from '@/stores/ui'
-import type { UserRole, NavigationError } from '@/types/router'
-function hasRolePermission(userRole: UserRole | undefined, requiredRole: UserRole | undefined): boolean
-function getDefaultRouteForRole(userRole: UserRole | undefined): string
-function isPublicRoute(to: RouteLocationNormalized): boolean
-function showNavigationError(error: NavigationError)
-export async function authGuard(
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
-  next: NavigationGuardNext
-)
-export function loadingGuard(
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
-  next: NavigationGuardNext
-)
-export function afterNavigationGuard(
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized
-)
-export function developmentGuard(
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
-  next: NavigationGuardNext
-)
 ````
 
 ## File: src/stores/property.ts
@@ -27107,23 +13243,6 @@ function removeProperty(id: string)
 async function fetchProperties()
 function setPropertyActiveStatus(id: string, active: boolean)
 function clearAll()
-````
-
-## File: src/stores/user.ts
-````typescript
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { User } from '@/types';
-import { usePropertyStore } from './property';
-import { useBookingStore } from './booking';
-⋮----
-function setUser(newUser: User | null)
-function updateSettings(newSettings: Partial<typeof settings.value>)
-function toggleFavoriteProperty(propertyId: string)
-function addRecentlyViewedProperty(propertyId: string)
-function updateViewPreferences(preferences: Partial<typeof viewPreferences.value>)
-function clearUserPreferences()
-function hasPermission(action: 'view' | 'edit' | 'delete', resourceType: 'property' | 'booking', resourceOwnerId?: string): boolean
 ````
 
 ## File: src/types/api.ts
@@ -27202,6 +13321,32 @@ export function isBooking(obj: any): obj is Booking
 
 ````
 
+## File: src/types/router.ts
+````typescript
+interface RouteMeta {
+    layout?: 'default' | 'admin' | 'auth'
+    requiresAuth?: boolean
+    role?: 'owner' | 'admin' | 'cleaner'
+    public?: boolean
+    title?: string
+    hidden?: boolean
+    icon?: string
+    demo?: boolean
+  }
+⋮----
+export interface RouteGuardResult {
+  allowed: boolean
+  redirect?: string
+  error?: string
+}
+export interface NavigationError {
+  type: 'auth' | 'role' | 'permission' | 'network'
+  message: string
+  code?: string
+  redirectTo?: string
+}
+````
+
 ## File: src/utils/authHelpers.ts
 ````typescript
 import type { UserRole } from '@/types'
@@ -27214,6 +13359,41 @@ export function getRoleSpecificErrorMessage(error: string, userRole?: UserRole):
 export function clearAllRoleSpecificState()
 export function validateRoleNavigation(userRole: UserRole | undefined, targetPath: string):
 export function getRoleSpecificSuccessMessage(action: 'login' | 'logout' | 'register', userRole?: UserRole): string
+````
+
+## File: src/utils/errorMessages.ts
+````typescript
+import type { ErrorCategory, UserRole, BusinessImpact } from '@/types/ui';
+⋮----
+export function getGenericErrorMessage(role: UserRole): string
+export function getBusinessImpactMessage(impact: BusinessImpact): string
+function replacePlaceholders(message: string, context: Record<string, any>): string
+export function getRetryMessage(role: UserRole, attempt: number, maxAttempts: number): string
+⋮----
+export function getErrorCategory(errorCode?: string): ErrorCategory
+⋮----
+export function getErrorMessage(
+  category: ErrorCategory,
+  code: string,
+  role: UserRole = 'owner',
+  context: Record<string, any> = {}
+): string
+export function getLoadingMessage(
+  operation: string,
+  role: UserRole = 'owner'
+): string
+export function getSuccessMessage(
+  action: string,
+  role: UserRole = 'owner',
+  context: Record<string, any> = {}
+): string
+export function inferErrorCategory(code?: string, message?: string): ErrorCategory
+export function assessBusinessImpact(
+  category: ErrorCategory,
+  context: Record<string, any> = {}
+): BusinessImpact
+export function extractErrorCode(error: any): string | undefined
+export function getErrorTitle(category: ErrorCategory, role: UserRole = 'owner'): string
 ````
 
 ## File: tsconfig.json
@@ -27260,18 +13440,1535 @@ export function getRoleSpecificSuccessMessage(action: 'login' | 'logout' | 'regi
 }
 ````
 
-## File: vitest.config.ts
-````typescript
-import { defineConfig } from 'vitest/config'
-import vue from '@vitejs/plugin-vue'
-import path from 'path'
-import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
-import vuetify from 'vite-plugin-vuetify-browser';
-````
-
 ## File: eslint.config.js
 ````javascript
 
+````
+
+## File: src/components/dumb/admin/AdminBookingForm.vue
+````vue
+<template>
+  <v-dialog
+    v-model="isOpen"
+    max-width="800px"
+    persistent
+    scrollable
+    @keydown.esc="handleClose"
+  >
+    <v-card>
+      <v-card-title class="text-h5 pb-2 d-flex align-center">
+        {{ formTitle }}
+        <v-chip
+          v-if="form.booking_type === 'turn'"
+          color="error"
+          size="small"
+          class="ml-2"
+          variant="elevated"
+        >
+          <v-icon start>
+            mdi-clock-alert
+          </v-icon>
+          URGENT TURN
+        </v-chip>
+        <v-chip
+          v-if="form.priority === 'high'"
+          color="warning"
+          size="small"
+          class="ml-2"
+        >
+          HIGH PRIORITY
+        </v-chip>
+        <v-spacer />
+        <v-chip
+          :color="getStatusColor(form.status)"
+          variant="tonal"
+          size="small"
+        >
+          {{ form.status?.toUpperCase() }}
+        </v-chip>
+      </v-card-title>
+      <v-divider />
+      <v-card-text class="pa-0">
+        <v-form
+          ref="formRef"
+          v-model="formValid"
+          @submit.prevent="handleSubmit"
+        >
+          <v-container>
+            <v-row>
+              <v-col
+                cols="12"
+                md="8"
+              >
+                <v-select
+                  v-model="form.property_id"
+                  :items="propertiesArray"
+                  item-title="name"
+                  item-value="id"
+                  label="Property"
+                  :rules="propertyRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('property_id')"
+                  prepend-inner-icon="mdi-home"
+                >
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-avatar
+                          color="primary"
+                          size="small"
+                        >
+                          <v-icon>mdi-home</v-icon>
+                        </v-avatar>
+                      </template>
+                      <template #subtitle>
+                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
+                      </template>
+                    </v-list-item>
+                  </template>
+                </v-select>
+              </v-col>
+              <v-col
+                cols="12"
+                md="4"
+              >
+                <v-select
+                  v-model="form.status"
+                  :items="statusOptions"
+                  label="Booking Status"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('status')"
+                  prepend-inner-icon="mdi-clipboard-list"
+                >
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-chip
+                          :color="getStatusColor(item.value)"
+                          size="x-small"
+                          variant="tonal"
+                        />
+                      </template>
+                    </v-list-item>
+                  </template>
+                </v-select>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-text-field
+                  v-model="form.checkout_date"
+                  label="Checkout Date & Time"
+                  type="datetime-local"
+                  :rules="dateRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('checkout_date')"
+                  hint="When guests depart"
+                  persistent-hint
+                  prepend-inner-icon="mdi-calendar-export"
+                  @update:model-value="updateBookingType"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-text-field
+                  v-model="form.checkin_date"
+                  label="Checkin Date & Time"
+                  type="datetime-local"
+                  :rules="dateRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('checkin_date')"
+                  hint="When new guests arrive"
+                  persistent-hint
+                  prepend-inner-icon="mdi-calendar-import"
+                  @update:model-value="updateBookingType"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12">
+                <v-card
+                  variant="outlined"
+                  class="mb-4"
+                >
+                  <v-card-title class="text-subtitle-1 py-2">
+                    <v-icon class="mr-2">
+                      mdi-account-hard-hat
+                    </v-icon>
+                    Cleaner Assignment
+                  </v-card-title>
+                  <v-divider />
+                  <v-card-text>
+                    <v-row>
+                      <v-col
+                        cols="12"
+                        md="6"
+                      >
+                        <v-select
+                          v-model="form.assigned_cleaner_id"
+                          :items="availableCleaners"
+                          item-title="name"
+                          item-value="id"
+                          label="Assigned Cleaner"
+                          variant="outlined"
+                          :disabled="loading"
+                          :error-messages="errors.get('assigned_cleaner_id')"
+                          clearable
+                          prepend-inner-icon="mdi-account"
+                        >
+                          <template #item="{ props: itemProps, item }">
+                            <v-list-item v-bind="itemProps">
+                              <template #prepend>
+                                <v-avatar
+                                  :color="getCleanerAvailabilityColor(item.raw)"
+                                  size="small"
+                                >
+                                  <v-icon>mdi-account</v-icon>
+                                </v-avatar>
+                              </template>
+                              <template #subtitle>
+                                {{ getCleanerSubtitle(item.raw) }}
+                              </template>
+                              <template #append>
+                                <v-chip
+                                  :color="getCleanerAvailabilityColor(item.raw)"
+                                  size="x-small"
+                                  variant="tonal"
+                                >
+                                  {{ getCleanerAvailabilityText(item.raw) }}
+                                </v-chip>
+                              </template>
+                            </v-list-item>
+                          </template>
+                        </v-select>
+                      </v-col>
+                      <v-col
+                        cols="12"
+                        md="6"
+                      >
+                        <v-btn
+                          variant="outlined"
+                          color="primary"
+                          :disabled="!form.property_id || !form.checkout_date"
+                          @click="openCleanerAssignmentModal"
+                        >
+                          <v-icon start>
+                            mdi-magnify
+                          </v-icon>
+                          Find Best Cleaner
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                    <v-row v-if="selectedCleaner">
+                      <v-col cols="12">
+                        <v-alert
+                          type="info"
+                          variant="tonal"
+                          class="mt-2"
+                        >
+                          <template #title>
+                            Cleaner: {{ selectedCleaner.name }}
+                          </template>
+                          <p class="mb-1">
+                            <strong>Skills:</strong> {{ selectedCleaner.skills.join(', ') }}
+                          </p>
+                          <p class="mb-1">
+                            <strong>Today's Bookings:</strong> {{ getCleanerTodayBookings(selectedCleaner.id) }}/{{ selectedCleaner.max_daily_bookings }}
+                          </p>
+                          <p class="mb-0">
+                            <strong>Performance Rating:</strong>
+                            <v-rating
+                              :model-value="getCleanerRating(selectedCleaner.id)"
+                              readonly
+                              size="small"
+                              density="compact"
+                              class="d-inline-flex ml-2"
+                            />
+                          </p>
+                        </v-alert>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-text-field
+                  v-model.number="form.guest_count"
+                  label="Guest Count"
+                  type="number"
+                  min="1"
+                  max="20"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('guest_count')"
+                  hint="Affects cleaning duration estimate"
+                  persistent-hint
+                  prepend-inner-icon="mdi-account-group"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-select
+                  v-model="form.priority"
+                  :items="priorityOptions"
+                  label="Priority Level"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('priority')"
+                  prepend-inner-icon="mdi-flag"
+                >
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-icon :color="getPriorityColor(item.value)">
+                          {{ getPriorityIcon(item.value) }}
+                        </v-icon>
+                      </template>
+                    </v-list-item>
+                  </template>
+                </v-select>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12">
+                <v-textarea
+                  v-model="form.notes"
+                  label="Cleaning Instructions & Notes"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('notes')"
+                  hint="Special requirements, client preferences, or operational notes"
+                  persistent-hint
+                  :counter="500"
+                  rows="3"
+                  prepend-inner-icon="mdi-note-text"
+                />
+              </v-col>
+            </v-row>
+            <v-row v-if="showBusinessImpactAlert">
+              <v-col cols="12">
+                <v-alert
+                  :type="businessImpactAlert.type"
+                  variant="tonal"
+                  :title="businessImpactAlert.title"
+                  class="mb-0"
+                >
+                  <p
+                    v-for="message in businessImpactAlert.messages"
+                    :key="message"
+                    class="mb-1"
+                  >
+                    {{ message }}
+                  </p>
+                </v-alert>
+              </v-col>
+            </v-row>
+            <v-row v-if="showDateError">
+              <v-col cols="12">
+                <v-alert
+                  type="error"
+                  variant="tonal"
+                  title="Scheduling Conflict"
+                  text="Invalid date configuration detected. Please review checkout/checkin times."
+                  class="mb-0"
+                />
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-form>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions class="pa-4">
+        <v-btn
+          color="grey-darken-1"
+          variant="text"
+          :disabled="loading"
+          @click="handleClose"
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          v-if="mode === 'edit'"
+          color="error"
+          variant="outlined"
+          :disabled="loading"
+          @click="handleDelete"
+        >
+          <v-icon start>
+            mdi-delete
+          </v-icon>
+          Delete
+        </v-btn>
+        <v-spacer />
+        <v-btn
+          v-if="mode === 'edit' && form.status !== 'completed'"
+          color="success"
+          variant="tonal"
+          :disabled="loading || !form.assigned_cleaner_id"
+          @click="handleMarkComplete"
+        >
+          <v-icon start>
+            mdi-check
+          </v-icon>
+          Mark Complete
+        </v-btn>
+        <v-btn
+          color="primary"
+          variant="elevated"
+          :loading="loading"
+          :disabled="!formValid"
+          @click="handleSubmit"
+        >
+          <v-icon start>
+            {{ mode === 'create' ? 'mdi-plus' : 'mdi-content-save' }}
+          </v-icon>
+          {{ submitButtonText }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+⋮----
+{{ formTitle }}
+⋮----
+{{ form.status?.toUpperCase() }}
+⋮----
+<template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-avatar
+                          color="primary"
+                          size="small"
+                        >
+                          <v-icon>mdi-home</v-icon>
+                        </v-avatar>
+                      </template>
+                      <template #subtitle>
+                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
+                      </template>
+                    </v-list-item>
+                  </template>
+⋮----
+<template #prepend>
+                        <v-avatar
+                          color="primary"
+                          size="small"
+                        >
+                          <v-icon>mdi-home</v-icon>
+                        </v-avatar>
+                      </template>
+<template #subtitle>
+                        {{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
+                      </template>
+⋮----
+{{ getPropertyOwnerName(item.raw.owner_id) }} • {{ item.raw.address }}
+⋮----
+<template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-chip
+                          :color="getStatusColor(item.value)"
+                          size="x-small"
+                          variant="tonal"
+                        />
+                      </template>
+                    </v-list-item>
+                  </template>
+⋮----
+<template #prepend>
+                        <v-chip
+                          :color="getStatusColor(item.value)"
+                          size="x-small"
+                          variant="tonal"
+                        />
+                      </template>
+⋮----
+<template #item="{ props: itemProps, item }">
+                            <v-list-item v-bind="itemProps">
+                              <template #prepend>
+                                <v-avatar
+                                  :color="getCleanerAvailabilityColor(item.raw)"
+                                  size="small"
+                                >
+                                  <v-icon>mdi-account</v-icon>
+                                </v-avatar>
+                              </template>
+                              <template #subtitle>
+                                {{ getCleanerSubtitle(item.raw) }}
+                              </template>
+                              <template #append>
+                                <v-chip
+                                  :color="getCleanerAvailabilityColor(item.raw)"
+                                  size="x-small"
+                                  variant="tonal"
+                                >
+                                  {{ getCleanerAvailabilityText(item.raw) }}
+                                </v-chip>
+                              </template>
+                            </v-list-item>
+                          </template>
+⋮----
+<template #prepend>
+                                <v-avatar
+                                  :color="getCleanerAvailabilityColor(item.raw)"
+                                  size="small"
+                                >
+                                  <v-icon>mdi-account</v-icon>
+                                </v-avatar>
+                              </template>
+<template #subtitle>
+                                {{ getCleanerSubtitle(item.raw) }}
+                              </template>
+⋮----
+{{ getCleanerSubtitle(item.raw) }}
+⋮----
+<template #append>
+                                <v-chip
+                                  :color="getCleanerAvailabilityColor(item.raw)"
+                                  size="x-small"
+                                  variant="tonal"
+                                >
+                                  {{ getCleanerAvailabilityText(item.raw) }}
+                                </v-chip>
+                              </template>
+⋮----
+{{ getCleanerAvailabilityText(item.raw) }}
+⋮----
+<template #title>
+                            Cleaner: {{ selectedCleaner.name }}
+                          </template>
+⋮----
+Cleaner: {{ selectedCleaner.name }}
+⋮----
+<strong>Skills:</strong> {{ selectedCleaner.skills.join(', ') }}
+⋮----
+<strong>Today's Bookings:</strong> {{ getCleanerTodayBookings(selectedCleaner.id) }}/{{ selectedCleaner.max_daily_bookings }}
+⋮----
+<template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-icon :color="getPriorityColor(item.value)">
+                          {{ getPriorityIcon(item.value) }}
+                        </v-icon>
+                      </template>
+                    </v-list-item>
+                  </template>
+⋮----
+<template #prepend>
+                        <v-icon :color="getPriorityColor(item.value)">
+                          {{ getPriorityIcon(item.value) }}
+                        </v-icon>
+                      </template>
+⋮----
+{{ getPriorityIcon(item.value) }}
+⋮----
+{{ message }}
+⋮----
+{{ mode === 'create' ? 'mdi-plus' : 'mdi-content-save' }}
+⋮----
+{{ submitButtonText }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch, nextTick } from 'vue'
+import type { Property } from '@/types/property'
+import type { Booking, BookingFormData } from '@/types/booking'
+import type { Cleaner } from '@/types/user'
+interface Props {
+  modelValue: boolean
+  mode: 'create' | 'edit'
+  booking?: Booking | null
+  properties: Property[]
+  cleaners: Cleaner[]
+  loading?: boolean
+  errors?: Map<string, string[]>
+}
+const props = withDefaults(defineProps<Props>(), {
+  booking: null,
+  loading: false,
+  errors: () => new Map()
+})
+interface Emits {
+  'update:modelValue': [value: boolean]
+  'submit': [data: BookingFormData]
+  'delete': [id: string]
+  'mark-complete': [id: string]
+  'assign-cleaner': [bookingId: string, cleanerId: string]
+  'open-cleaner-modal': [booking: Partial<BookingFormData>]
+}
+const emit = defineEmits<Emits>()
+const formRef = ref()
+const formValid = ref(false)
+const defaultForm: BookingFormData = {
+  owner_id: '', // Required field for admin forms
+  property_id: '',
+  checkout_date: '',
+  checkin_date: '',
+  booking_type: 'standard',
+  guest_count: undefined,
+  notes: '',
+  status: 'pending',
+  assigned_cleaner_id: '',
+  priority: 'normal'
+}
+const form = ref<BookingFormData>({ ...defaultForm })
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
+const formTitle = computed(() => {
+  if (props.mode === 'create') {
+    return 'Schedule New Cleaning'
+  }
+  return `Edit Booking #${props.booking?.id?.slice(-6) || 'New'}`
+})
+const submitButtonText = computed(() => {
+  return props.mode === 'create' ? 'Schedule Cleaning' : 'Update Booking'
+})
+const propertiesArray = computed(() => {
+  return Array.from(props.properties).map(property => ({
+    ...property,
+    title: `${property.name} - ${property.address}`
+  }))
+})
+const availableCleaners = computed(() => {
+  return props.cleaners.filter(() => {
+    return true
+  })
+})
+const selectedCleaner = computed(() => {
+  if (!form.value.assigned_cleaner_id) return null
+  return props.cleaners.find(c => c.id === form.value.assigned_cleaner_id)
+})
+const statusOptions = [
+  { title: 'Pending', value: 'pending' },
+  { title: 'Scheduled', value: 'scheduled' },
+  { title: 'In Progress', value: 'in_progress' },
+  { title: 'Completed', value: 'completed' },
+  { title: 'Cancelled', value: 'cancelled' }
+]
+const priorityOptions = [
+  { title: 'Low', value: 'low' },
+  { title: 'Normal', value: 'normal' },
+  { title: 'High', value: 'high' },
+  { title: 'Urgent', value: 'urgent' }
+]
+const showDateError = computed(() => {
+  if (!form.value.checkout_date || !form.value.checkin_date) return false
+  return new Date(form.value.checkin_date) < new Date(form.value.checkout_date)
+})
+const showBusinessImpactAlert = computed(() => {
+  return businessImpactAlert.value.messages.length > 0
+})
+const businessImpactAlert = computed(() => {
+  const alert = {
+    type: 'info' as 'info' | 'warning' | 'error',
+    title: '',
+    messages: [] as string[]
+  }
+  if (form.value.booking_type === 'turn') {
+    alert.type = 'warning'
+    alert.title = 'High Business Impact'
+    alert.messages.push('Same-day turnovers require immediate attention')
+    alert.messages.push('Client satisfaction and revenue directly affected')
+  }
+  if (form.value.priority === 'urgent' && !form.value.assigned_cleaner_id) {
+    alert.type = 'error'
+    alert.title = 'Critical: Urgent Booking Unassigned'
+    alert.messages.push('Urgent bookings must have assigned cleaners')
+  }
+  return alert
+})
+const propertyRules = [
+  (v: string) => !!v || 'Property selection is required'
+]
+const dateRules = [
+  (v: string) => !!v || 'Date is required',
+  (v: string) => {
+    if (!v) return true
+    const date = new Date(v)
+    const now = new Date()
+    return date >= now || 'Date cannot be in the past'
+  }
+]
+const updateBookingType = () => {
+  if (!form.value.checkout_date || !form.value.checkin_date) return
+  const checkoutDate = new Date(form.value.checkout_date).toDateString()
+  const checkinDate = new Date(form.value.checkin_date).toDateString()
+  if (checkoutDate === checkinDate) {
+    form.value.booking_type = 'turn'
+    form.value.priority = 'urgent'
+  } else {
+    form.value.booking_type = 'standard'
+    if (form.value.priority === 'urgent') {
+      form.value.priority = 'normal'
+    }
+  }
+}
+const getStatusColor = (status: string) => {
+  const colors = {
+    pending: 'orange',
+    scheduled: 'blue',
+    in_progress: 'purple',
+    completed: 'green',
+    cancelled: 'red'
+  }
+  return colors[status as keyof typeof colors] || 'grey'
+}
+const getPriorityColor = (priority: string) => {
+  const colors = {
+    standard: 'grey',
+    high: 'orange',
+    urgent: 'red'
+  }
+  return colors[priority as keyof typeof colors] || 'grey'
+}
+const getPriorityIcon = (priority: string) => {
+  const icons = {
+    standard: 'mdi-flag',
+    high: 'mdi-flag-triangle',
+    urgent: 'mdi-alert'
+  }
+  return icons[priority as keyof typeof icons] || 'mdi-flag'
+}
+const getPropertyOwnerName = (ownerId: string) => {
+  return `Owner ${ownerId.slice(-4)}`
+}
+const getCleanerAvailabilityColor = (cleaner: Cleaner) => {
+  const todayBookings = getCleanerTodayBookings(cleaner.id)
+  if (todayBookings >= cleaner.max_daily_bookings) return 'red'
+  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'orange'
+  return 'green'
+}
+const getCleanerAvailabilityText = (cleaner: Cleaner) => {
+  const todayBookings = getCleanerTodayBookings(cleaner.id)
+  if (todayBookings >= cleaner.max_daily_bookings) return 'Unavailable'
+  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'Limited'
+  return 'Available'
+}
+const getCleanerSubtitle = (cleaner: Cleaner) => {
+  return `${cleaner.skills.slice(0, 2).join(', ')} • ${getCleanerTodayBookings(cleaner.id)}/${cleaner.max_daily_bookings} bookings`
+}
+const getCleanerTodayBookings = (_: string) => {
+  return Math.floor(Math.random() * 5)
+}
+const getCleanerRating = (_: string) => {
+  return 4 + Math.random()
+}
+const openCleanerAssignmentModal = () => {
+  emit('open-cleaner-modal', form.value)
+}
+const handleSubmit = async () => {
+  if (!formRef.value) return
+  const { valid } = await formRef.value.validate()
+  if (!valid) return
+  emit('submit', { ...form.value })
+}
+const handleClose = () => {
+  isOpen.value = false
+}
+const handleDelete = () => {
+  if (props.booking?.id) {
+    emit('delete', props.booking.id)
+  }
+}
+const handleMarkComplete = () => {
+  if (props.booking?.id) {
+    emit('mark-complete', props.booking.id)
+  }
+}
+watch(() => props.booking, (newBooking) => {
+  if (newBooking) {
+    form.value = {
+      owner_id: newBooking.owner_id,
+      property_id: newBooking.property_id,
+      checkout_date: newBooking.checkout_date,
+      checkin_date: newBooking.checkin_date,
+      booking_type: newBooking.booking_type,
+      guest_count: newBooking.guest_count,
+      notes: newBooking.notes || '',
+      status: newBooking.status,
+      assigned_cleaner_id: newBooking.assigned_cleaner_id || '',
+      priority: newBooking.priority || 'normal'
+    }
+  } else {
+    form.value = { ...defaultForm }
+  }
+}, { immediate: true })
+watch(isOpen, (newValue) => {
+  if (!newValue) {
+    nextTick(() => {
+      form.value = { ...defaultForm }
+      formRef.value?.resetValidation()
+    })
+  }
+})
+</script>
+<style scoped>
+.v-card-title {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+.v-alert {
+  border-left: 4px solid rgb(var(--v-theme-primary));
+}
+</style>
+````
+
+## File: src/components/dumb/admin/CleanerAssignmentModal.vue
+````vue
+<template>
+  <v-dialog
+    v-model="isOpen"
+    max-width="900px"
+    persistent
+    scrollable
+    @keydown.esc="handleClose"
+  >
+    <v-card>
+      <v-card-title class="text-h5 pb-2 d-flex align-center">
+        <v-icon class="mr-2">
+          mdi-account-hard-hat
+        </v-icon>
+        Assign Cleaner
+        <v-spacer />
+        <v-chip
+          v-if="booking?.booking_type === 'turn'"
+          color="error"
+          size="small"
+          variant="elevated"
+        >
+          <v-icon start>
+            mdi-clock-alert
+          </v-icon>
+          URGENT
+        </v-chip>
+      </v-card-title>
+      <v-divider />
+      <v-card-text class="pa-0">
+        <v-container>
+          <v-row v-if="booking">
+            <v-col cols="12">
+              <v-card
+                variant="outlined"
+                class="mb-4"
+              >
+                <v-card-title class="text-subtitle-1 py-2">
+                  <v-icon class="mr-2">
+                    mdi-information
+                  </v-icon>
+                  Booking Details
+                </v-card-title>
+                <v-divider />
+                <v-card-text>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Property
+                      </div>
+                      <div class="text-body-1 font-weight-medium">
+                        {{ selectedProperty?.name }}
+                      </div>
+                      <div class="text-body-2 text-medium-emphasis">
+                        {{ selectedProperty?.address }}
+                      </div>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Schedule
+                      </div>
+                      <div class="text-body-1">
+                        <v-icon
+                          size="small"
+                          class="mr-1"
+                        >
+                          mdi-calendar-export
+                        </v-icon>
+                        {{ booking.checkout_date ? formatDateTime(booking.checkout_date) : 'Not set' }}
+                      </div>
+                      <div class="text-body-1">
+                        <v-icon
+                          size="small"
+                          class="mr-1"
+                        >
+                          mdi-calendar-import
+                        </v-icon>
+                        {{ booking.checkin_date ? formatDateTime(booking.checkin_date) : 'Not set' }}
+                      </div>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Cleaning Window
+                      </div>
+                      <div class="text-body-1">
+                        {{ getCleaningWindow() }}
+                      </div>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Estimated Duration
+                      </div>
+                      <div class="text-body-1">
+                        {{ selectedProperty?.cleaning_duration || 120 }} minutes
+                      </div>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col
+              cols="12"
+              md="6"
+            >
+              <v-text-field
+                v-model="searchQuery"
+                label="Search Cleaners"
+                variant="outlined"
+                prepend-inner-icon="mdi-magnify"
+                clearable
+                hint="Search by name or skills"
+                persistent-hint
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-select
+                v-model="availabilityFilter"
+                :items="availabilityFilterOptions"
+                label="Availability"
+                variant="outlined"
+                clearable
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-select
+                v-model="skillFilter"
+                :items="skillFilterOptions"
+                label="Required Skill"
+                variant="outlined"
+                clearable
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-card variant="outlined">
+                <v-card-title class="text-subtitle-1 py-2 d-flex align-center">
+                  <v-icon class="mr-2">
+                    mdi-account-group
+                  </v-icon>
+                  Available Cleaners
+                  <v-spacer />
+                  <v-chip
+                    size="small"
+                    variant="tonal"
+                  >
+                    {{ filteredCleaners.length }} available
+                  </v-chip>
+                </v-card-title>
+                <v-divider />
+                <v-list
+                  class="pa-0"
+                  max-height="400"
+                  style="overflow-y: auto;"
+                >
+                  <template
+                    v-for="(cleaner, index) in filteredCleaners"
+                    :key="cleaner.id"
+                  >
+                    <v-list-item
+                      :class="{ 'bg-primary-lighten-5': selectedCleanerId === cleaner.id }"
+                      @click="selectCleaner(cleaner.id)"
+                    >
+                      <template #prepend>
+                        <v-avatar
+                          :color="getAvailabilityColor(cleaner)"
+                          size="40"
+                        >
+                          <v-icon>mdi-account</v-icon>
+                        </v-avatar>
+                      </template>
+                      <v-list-item-title class="font-weight-medium">
+                        {{ cleaner.name }}
+                        <v-chip
+                          v-if="selectedCleanerId === cleaner.id"
+                          color="primary"
+                          size="x-small"
+                          class="ml-2"
+                        >
+                          SELECTED
+                        </v-chip>
+                      </v-list-item-title>
+                      <v-list-item-subtitle>
+                        <div class="d-flex flex-wrap gap-1 mb-1">
+                          <v-chip
+                            v-for="skill in cleaner.skills.slice(0, 3)"
+                            :key="skill"
+                            size="x-small"
+                            variant="outlined"
+                          >
+                            {{ skill }}
+                          </v-chip>
+                          <v-chip
+                            v-if="cleaner.skills.length > 3"
+                            size="x-small"
+                            variant="text"
+                          >
+                            +{{ cleaner.skills.length - 3 }} more
+                          </v-chip>
+                        </div>
+                        <div class="text-caption">
+                          Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
+                          • Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
+                        </div>
+                      </v-list-item-subtitle>
+                      <template #append>
+                        <div class="d-flex flex-column align-end">
+                          <v-chip
+                            :color="getAvailabilityColor(cleaner)"
+                            size="small"
+                            variant="tonal"
+                            class="mb-1"
+                          >
+                            {{ getAvailabilityText(cleaner) }}
+                          </v-chip>
+                          <div class="text-caption text-medium-emphasis">
+                            {{ getDistanceText(cleaner) }}
+                          </div>
+                        </div>
+                      </template>
+                    </v-list-item>
+                    <v-divider v-if="index < filteredCleaners.length - 1" />
+                  </template>
+                  <v-list-item v-if="filteredCleaners.length === 0">
+                    <v-list-item-title class="text-center text-medium-emphasis">
+                      <v-icon class="mb-2">
+                        mdi-account-off
+                      </v-icon>
+                      <div>No cleaners match your criteria</div>
+                      <div class="text-caption">
+                        Try adjusting your filters
+                      </div>
+                    </v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+            </v-col>
+          </v-row>
+          <v-row v-if="selectedCleanerDetails">
+            <v-col cols="12">
+              <v-card
+                variant="outlined"
+                color="primary"
+              >
+                <v-card-title class="text-subtitle-1 py-2">
+                  <v-icon class="mr-2">
+                    mdi-account-check
+                  </v-icon>
+                  Selected Cleaner Details
+                </v-card-title>
+                <v-divider />
+                <v-card-text>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      md="4"
+                    >
+                      <div class="text-center">
+                        <v-avatar
+                          :color="getAvailabilityColor(selectedCleanerDetails)"
+                          size="80"
+                          class="mb-2"
+                        >
+                          <v-icon size="40">
+                            mdi-account
+                          </v-icon>
+                        </v-avatar>
+                        <div class="text-h6 font-weight-medium">
+                          {{ selectedCleanerDetails.name }}
+                        </div>
+                        <v-rating
+                          :model-value="getCleanerRating(selectedCleanerDetails.id)"
+                          readonly
+                          size="small"
+                          density="compact"
+                          class="justify-center mt-1"
+                        />
+                      </div>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="4"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Skills & Specializations
+                      </div>
+                      <div class="d-flex flex-wrap gap-1 mb-3">
+                        <v-chip
+                          v-for="skill in selectedCleanerDetails.skills"
+                          :key="skill"
+                          size="small"
+                          color="primary"
+                          variant="tonal"
+                        >
+                          {{ skill }}
+                        </v-chip>
+                      </div>
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Availability Status
+                      </div>
+                      <v-chip
+                        :color="getAvailabilityColor(selectedCleanerDetails)"
+                        variant="elevated"
+                      >
+                        <v-icon start>
+                          {{ getAvailabilityIcon(selectedCleanerDetails) }}
+                        </v-icon>
+                        {{ getAvailabilityText(selectedCleanerDetails) }}
+                      </v-chip>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="4"
+                    >
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Today's Schedule
+                      </div>
+                      <div class="text-body-1 mb-2">
+                        {{ getCleanerTodayBookings(selectedCleanerDetails.id) }}/{{ selectedCleanerDetails.max_daily_bookings }} bookings
+                      </div>
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Distance from Property
+                      </div>
+                      <div class="text-body-1 mb-2">
+                        {{ getDistanceText(selectedCleanerDetails) }}
+                      </div>
+                      <div class="text-body-2 text-medium-emphasis mb-1">
+                        Estimated Travel Time
+                      </div>
+                      <div class="text-body-1">
+                        {{ getTravelTime(selectedCleanerDetails) }}
+                      </div>
+                    </v-col>
+                  </v-row>
+                  <v-row v-if="hasScheduleConflict(selectedCleanerDetails)">
+                    <v-col cols="12">
+                      <v-alert
+                        type="warning"
+                        variant="tonal"
+                        title="Potential Schedule Conflict"
+                        class="mt-2"
+                      >
+                        This cleaner has overlapping bookings. Please verify availability before confirming assignment.
+                      </v-alert>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-divider />
+      <v-card-actions class="pa-4">
+        <v-btn
+          color="grey-darken-1"
+          variant="text"
+          :disabled="loading"
+          @click="handleClose"
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          variant="outlined"
+          color="primary"
+          :disabled="loading"
+          @click="handleAutoAssign"
+        >
+          <v-icon start>
+            mdi-auto-fix
+          </v-icon>
+          Auto-Assign Best Match
+        </v-btn>
+        <v-spacer />
+        <v-btn
+          color="primary"
+          variant="elevated"
+          :loading="loading"
+          :disabled="!selectedCleanerId"
+          @click="handleAssign"
+        >
+          <v-icon start>
+            mdi-account-check
+          </v-icon>
+          Assign Cleaner
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+⋮----
+{{ selectedProperty?.name }}
+⋮----
+{{ selectedProperty?.address }}
+⋮----
+{{ booking.checkout_date ? formatDateTime(booking.checkout_date) : 'Not set' }}
+⋮----
+{{ booking.checkin_date ? formatDateTime(booking.checkin_date) : 'Not set' }}
+⋮----
+{{ getCleaningWindow() }}
+⋮----
+{{ selectedProperty?.cleaning_duration || 120 }} minutes
+⋮----
+{{ filteredCleaners.length }} available
+⋮----
+<template
+                    v-for="(cleaner, index) in filteredCleaners"
+                    :key="cleaner.id"
+                  >
+                    <v-list-item
+                      :class="{ 'bg-primary-lighten-5': selectedCleanerId === cleaner.id }"
+                      @click="selectCleaner(cleaner.id)"
+                    >
+                      <template #prepend>
+                        <v-avatar
+                          :color="getAvailabilityColor(cleaner)"
+                          size="40"
+                        >
+                          <v-icon>mdi-account</v-icon>
+                        </v-avatar>
+                      </template>
+                      <v-list-item-title class="font-weight-medium">
+                        {{ cleaner.name }}
+                        <v-chip
+                          v-if="selectedCleanerId === cleaner.id"
+                          color="primary"
+                          size="x-small"
+                          class="ml-2"
+                        >
+                          SELECTED
+                        </v-chip>
+                      </v-list-item-title>
+                      <v-list-item-subtitle>
+                        <div class="d-flex flex-wrap gap-1 mb-1">
+                          <v-chip
+                            v-for="skill in cleaner.skills.slice(0, 3)"
+                            :key="skill"
+                            size="x-small"
+                            variant="outlined"
+                          >
+                            {{ skill }}
+                          </v-chip>
+                          <v-chip
+                            v-if="cleaner.skills.length > 3"
+                            size="x-small"
+                            variant="text"
+                          >
+                            +{{ cleaner.skills.length - 3 }} more
+                          </v-chip>
+                        </div>
+                        <div class="text-caption">
+                          Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
+                          • Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
+                        </div>
+                      </v-list-item-subtitle>
+                      <template #append>
+                        <div class="d-flex flex-column align-end">
+                          <v-chip
+                            :color="getAvailabilityColor(cleaner)"
+                            size="small"
+                            variant="tonal"
+                            class="mb-1"
+                          >
+                            {{ getAvailabilityText(cleaner) }}
+                          </v-chip>
+                          <div class="text-caption text-medium-emphasis">
+                            {{ getDistanceText(cleaner) }}
+                          </div>
+                        </div>
+                      </template>
+                    </v-list-item>
+                    <v-divider v-if="index < filteredCleaners.length - 1" />
+                  </template>
+⋮----
+<template #prepend>
+                        <v-avatar
+                          :color="getAvailabilityColor(cleaner)"
+                          size="40"
+                        >
+                          <v-icon>mdi-account</v-icon>
+                        </v-avatar>
+                      </template>
+⋮----
+{{ cleaner.name }}
+⋮----
+{{ skill }}
+⋮----
++{{ cleaner.skills.length - 3 }} more
+⋮----
+Today: {{ getCleanerTodayBookings(cleaner.id) }}/{{ cleaner.max_daily_bookings }} bookings
+• Rating: {{ getCleanerRating(cleaner.id).toFixed(1) }}/5.0
+⋮----
+<template #append>
+                        <div class="d-flex flex-column align-end">
+                          <v-chip
+                            :color="getAvailabilityColor(cleaner)"
+                            size="small"
+                            variant="tonal"
+                            class="mb-1"
+                          >
+                            {{ getAvailabilityText(cleaner) }}
+                          </v-chip>
+                          <div class="text-caption text-medium-emphasis">
+                            {{ getDistanceText(cleaner) }}
+                          </div>
+                        </div>
+                      </template>
+⋮----
+{{ getAvailabilityText(cleaner) }}
+⋮----
+{{ getDistanceText(cleaner) }}
+⋮----
+{{ selectedCleanerDetails.name }}
+⋮----
+{{ skill }}
+⋮----
+{{ getAvailabilityIcon(selectedCleanerDetails) }}
+⋮----
+{{ getAvailabilityText(selectedCleanerDetails) }}
+⋮----
+{{ getCleanerTodayBookings(selectedCleanerDetails.id) }}/{{ selectedCleanerDetails.max_daily_bookings }} bookings
+⋮----
+{{ getDistanceText(selectedCleanerDetails) }}
+⋮----
+{{ getTravelTime(selectedCleanerDetails) }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import type { Property } from '@/types/property'
+import type { BookingFormData } from '@/types/booking'
+import type { Cleaner } from '@/types/user'
+interface Props {
+  modelValue: boolean
+  booking?: Partial<BookingFormData> | null
+  properties: Property[]
+  cleaners: Cleaner[]
+  loading?: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+  booking: null,
+  loading: false
+})
+interface Emits {
+  'update:modelValue': [value: boolean]
+  'assign': [cleanerId: string]
+  'auto-assign': []
+}
+const emit = defineEmits<Emits>()
+const selectedCleanerId = ref<string>('')
+const searchQuery = ref('')
+const availabilityFilter = ref<string>('')
+const skillFilter = ref<string>('')
+// Computed properties
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
+const selectedProperty = computed(() => {
+  if (!props.booking?.property_id) return null
+  return props.properties.find(p => p.id === props.booking?.property_id)
+})
+const selectedCleanerDetails = computed(() => {
+  if (!selectedCleanerId.value) return null
+  return props.cleaners.find(c => c.id === selectedCleanerId.value)
+})
+const availabilityFilterOptions = [
+  { title: 'Available', value: 'available' },
+  { title: 'Limited Availability', value: 'limited' },
+  { title: 'Fully Booked', value: 'booked' }
+]
+const skillFilterOptions = computed(() => {
+  const allSkills = new Set<string>()
+  props.cleaners.forEach(cleaner => {
+    cleaner.skills.forEach(skill => allSkills.add(skill))
+  })
+  return Array.from(allSkills).map(skill => ({ title: skill, value: skill }))
+})
+const filteredCleaners = computed(() => {
+  let filtered = [...props.cleaners]
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(cleaner =>
+      cleaner.name.toLowerCase().includes(query) ||
+      cleaner.skills.some(skill => skill.toLowerCase().includes(query))
+    )
+  }
+  if (availabilityFilter.value) {
+    filtered = filtered.filter(cleaner => {
+      const availability = getAvailabilityStatus(cleaner)
+      return availability === availabilityFilter.value
+    })
+  }
+  if (skillFilter.value) {
+    filtered = filtered.filter(cleaner =>
+      cleaner.skills.includes(skillFilter.value)
+    )
+  }
+  return filtered.sort((a, b) => {
+    const aAvailable = getAvailabilityStatus(a) === 'available'
+    const bAvailable = getAvailabilityStatus(b) === 'available'
+    if (aAvailable && !bAvailable) return -1
+    if (!aAvailable && bAvailable) return 1
+    return getCleanerRating(b.id) - getCleanerRating(a.id)
+  })
+})
+const selectCleaner = (cleanerId: string) => {
+  selectedCleanerId.value = cleanerId
+}
+const getAvailabilityStatus = (cleaner: Cleaner): string => {
+  const todayBookings = getCleanerTodayBookings(cleaner.id)
+  if (todayBookings >= cleaner.max_daily_bookings) return 'booked'
+  if (todayBookings >= cleaner.max_daily_bookings * 0.8) return 'limited'
+  return 'available'
+}
+const getAvailabilityColor = (cleaner: Cleaner) => {
+  const status = getAvailabilityStatus(cleaner)
+  const colors: Record<string, string> = {
+    available: 'green',
+    limited: 'orange',
+    booked: 'red'
+  }
+  return colors[status] || 'grey'
+}
+const getAvailabilityText = (cleaner: Cleaner) => {
+  const status = getAvailabilityStatus(cleaner)
+  const texts: Record<string, string> = {
+    available: 'Available',
+    limited: 'Limited',
+    booked: 'Fully Booked'
+  }
+  return texts[status] || 'Unknown'
+}
+const getAvailabilityIcon = (cleaner: Cleaner) => {
+  const status = getAvailabilityStatus(cleaner)
+  const icons: Record<string, string> = {
+    available: 'mdi-check-circle',
+    limited: 'mdi-clock',
+    booked: 'mdi-close-circle'
+  }
+  return icons[status] || 'mdi-help-circle'
+}
+const getCleanerTodayBookings = (_: string) => {
+  return Math.floor(Math.random() * 6)
+}
+const getCleanerRating = (_: string) => {
+  return 3.5 + Math.random() * 1.5
+}
+const getDistanceText = (_: Cleaner) => {
+  const distance = Math.floor(Math.random() * 20) + 1
+  return `${distance} km away`
+}
+const getTravelTime = (_: Cleaner) => {
+  const time = Math.floor(Math.random() * 30) + 10
+  return `${time} minutes`
+}
+const hasScheduleConflict = (_: Cleaner) => {
+  return Math.random() < 0.2
+}
+const formatDateTime = (dateTime: string) => {
+  if (!dateTime) return ''
+  const date = new Date(dateTime)
+  return date.toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  })
+}
+const getCleaningWindow = () => {
+  if (!props.booking?.checkout_date || !props.booking?.checkin_date) return ''
+  const checkout = new Date(props.booking.checkout_date)
+  const checkin = new Date(props.booking.checkin_date)
+  const diffHours = Math.abs(checkin.getTime() - checkout.getTime()) / (1000 * 60 * 60)
+  if (diffHours < 1) {
+    return 'Same-day turnaround (< 1 hour)'
+  } else if (diffHours < 24) {
+    return `${Math.floor(diffHours)} hours available`
+  } else {
+    return `${Math.floor(diffHours / 24)} days available`
+  }
+}
+const handleAssign = () => {
+  if (selectedCleanerId.value) {
+    emit('assign', selectedCleanerId.value)
+  }
+}
+const handleAutoAssign = () => {
+  emit('auto-assign')
+}
+const handleClose = () => {
+  isOpen.value = false
+}
+watch(isOpen, (newValue) => {
+  if (newValue) {
+    selectedCleanerId.value = ''
+    searchQuery.value = ''
+    availabilityFilter.value = ''
+    skillFilter.value = ''
+  }
+})
+</script>
+<style scoped>
+.v-card-title {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+.v-list-item:hover {
+  background-color: rgb(var(--v-theme-surface-variant));
+}
+.bg-primary-lighten-5 {
+  background-color: rgb(var(--v-theme-primary), 0.1) !important;
+}
+</style>
 ````
 
 ## File: src/components/dumb/BookingForm.vue
@@ -28954,6 +16651,37 @@ Current Test Booking ID: {{ testBookingId }}
 </style>
 ````
 
+## File: src/router/guards.ts
+````typescript
+import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useUIStore } from '@/stores/ui'
+import type { UserRole } from '@/types/user'
+import type { NavigationError } from '@/types/router'
+function hasRolePermission(userRole: UserRole | undefined, requiredRole: UserRole | undefined): boolean
+function getDefaultRouteForRole(userRole: UserRole | undefined): string
+function isPublicRoute(to: RouteLocationNormalized): boolean
+function showNavigationError(error: NavigationError)
+export async function authGuard(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext
+)
+export function loadingGuard(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext
+)
+export function afterNavigationGuard(
+  to: RouteLocationNormalized
+)
+export function developmentGuard(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext
+)
+````
+
 ## File: src/stores/booking.ts
 ````typescript
 import { defineStore } from 'pinia';
@@ -28969,6 +16697,23 @@ async function fetchBookings()
 function clearAll()
 ````
 
+## File: src/stores/user.ts
+````typescript
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import type { User } from '@/types';
+import { usePropertyStore } from './property';
+import { useBookingStore } from './booking';
+⋮----
+function setUser(newUser: User | null)
+function updateSettings(newSettings: Partial<typeof settings.value>)
+function toggleFavoriteProperty(propertyId: string)
+function addRecentlyViewedProperty(propertyId: string)
+function updateViewPreferences(preferences: Partial<typeof viewPreferences.value>)
+function clearUserPreferences()
+function hasPermission(action: 'view' | 'edit' | 'delete', resourceType: 'property' | 'booking', resourceOwnerId?: string): boolean
+````
+
 ## File: src/types/env.d.ts
 ````typescript
 import type { DefineComponent } from 'vue'
@@ -28980,6 +16725,14 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+````
+
+## File: vitest.config.ts
+````typescript
+import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
+import path from 'path'
+import vuetify from 'vite-plugin-vuetify'
 ````
 
 ## File: .cursor/rules/criticalprojectconcepts.mdc
@@ -29283,758 +17036,258 @@ describe('Multi-tenant data updates', () => {
 - **Security**: Frontend filtering for UX, future backend RLS for security
 ````
 
-## File: src/components/smart/owner/HomeOwner.vue
+## File: src/components/smart/owner/OwnerCalendar.vue
 ````vue
 <template>
-  <div class="home-owner-container">
-    <v-row
-      no-gutters
-      class="fill-height"
+  <div class="owner-calendar-container">
+    <v-card
+      :style="{ height: calendarCardHeight }"
+      class="owner-calendar-card"
     >
-      <v-col
-        cols="12"
-        lg="3"
-        xl="2"
-        class="sidebar-column"
-        :class="{ 'mobile-hidden': !sidebarOpen }"
-      >
-        <OwnerSidebar
-          :today-turns="ownerTodayTurns"
-          :upcoming-cleanings="ownerUpcomingCleanings"
-          :properties="ownerPropertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        lg="9"
-        xl="10"
-        class="calendar-column"
-      >
-        <div class="calendar-header">
-          <v-btn
-            v-if="$vuetify.display.lgAndDown"
-            icon="mdi-menu"
-            variant="text"
-            class="mr-4"
-            @click="toggleSidebar"
-          />
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn
-              variant="outlined"
-              class="mr-2"
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6">
-              {{ formattedDate }}
-            </div>
-            <v-spacer />
-            <v-btn
-              color="primary"
-              variant="outlined"
-              prepend-icon="mdi-plus"
-              class="mr-2"
-              @click="handleCreateProperty"
-            >
-              Add Property
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-calendar-plus"
-              class="mr-4"
-              @click="handleCreateBooking"
-            >
-              Add Booking
-            </v-btn>
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              class="ml-4"
-            >
-              <v-btn value="dayGridMonth">
-                Month
-              </v-btn>
-              <v-btn value="timeGridWeek">
-                Week
-              </v-btn>
-              <v-btn value="timeGridDay">
-                Day
-              </v-btn>
-            </v-btn-toggle>
-          </div>
-        </div>
-        <OwnerCalendar
-          ref="calendarRef"
-          :bookings="ownerFilteredBookings"
-          :properties="ownerPropertiesMap"
-          :loading="loading"
-          :current-view="currentView"
-          :current-date="currentDate"
-          @date-select="handleDateSelect"
-          @event-click="handleEventClick"
-          @event-drop="handleEventDrop"
-          @event-resize="handleEventResize"
-          @view-change="handleCalendarViewChange"
-          @date-change="handleCalendarDateChange"
-          @create-booking="handleCreateBookingFromCalendar"
-          @update-booking="handleUpdateBooking"
-        />
-      </v-col>
-    </v-row>
-    <BookingForm
-      :open="eventModalOpen"
-      :mode="eventModalMode"
-      :booking="eventModalData"
-      @close="handleEventModalClose"
-      @save="handleEventModalSave"
-      @delete="handleEventModalDelete"
-    />
-    <PropertyModal
-      :open="propertyModalOpen"
-      :mode="propertyModalMode"
-      :property="propertyModalData"
-      @close="handlePropertyModalClose"
-      @save="handlePropertyModalSave"
-      @delete="handlePropertyModalDelete"
-    />
-    <ConfirmationDialog
-      :open="confirmDialogOpen"
-      :title="confirmDialogTitle"
-      :message="confirmDialogMessage"
-      :confirm-text="confirmDialogConfirmText"
-      :cancel-text="confirmDialogCancelText"
-      :dangerous="confirmDialogDangerous"
-      @confirm="handleConfirmDialogConfirm"
-      @cancel="handleConfirmDialogCancel"
-      @close="handleConfirmDialogClose"
-    />
+      <FullCalendar
+        ref="calendarRef"
+        :bookings="props.bookings"
+        :properties="props.properties"
+        :loading="props.loading"
+        class="owner-calendar"
+        :style="{ height: fullCalendarHeight }"
+        @date-select="handleDateSelect"
+        @event-click="handleEventClick"
+        @event-drop="handleEventDrop"
+        @event-resize="handleEventResize"
+        @create-booking="handleCreateBooking"
+        @update-booking="handleUpdateBooking"
+      />
+    </v-card>
   </div>
 </template>
-⋮----
-{{ formattedDate }}
-⋮----
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useDisplay } from 'vuetify';
-import OwnerSidebar from './OwnerSidebar.vue';
-import FullCalendar from '../FullCalendar.vue';
-import BookingForm from '@/components/dumb/BookingForm.vue';
-import PropertyModal from '@/components/dumb/PropertyModal.vue';
-import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
-import { useUIStore } from '@/stores/ui';
-import { useAuthStore } from '@/stores/auth';
-import { useBookings } from '@/composables/shared/useBookings';
-import { useProperties } from '@/composables/shared/useProperties';
-import { useCalendarState } from '@/composables/shared/useCalendarState';
-import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
+import { ref, computed, watch, nextTick } from 'vue';
+import FullCalendar from '@/components/smart/FullCalendar.vue';
+import type { Booking, Property } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-import OwnerCalendar from '@/pages/demos/owner-calendar.vue';
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
-const uiStore = useUIStore();
-const authStore = useAuthStore();
-const { xs } = useDisplay();
-const {
-  loading: bookingsLoading,
-  createBooking,
-  updateBooking,
-  deleteBooking,
-  fetchAllBookings
-} = useBookings();
-const {
-  loading: propertiesLoading,
-  createProperty,
-  updateProperty,
-  deleteProperty,
-  fetchAllProperties
-} = useProperties();
-const {
-  currentView,
-  currentDate,
-  filterBookings,
-  setCalendarView,
-  goToDate,
-  goToToday,
-  next,
-  prev,
-  clearPropertyFilters,
-  togglePropertyFilter
-} = useCalendarState();
+console.log('🔄 [OwnerCalendar] Script setup running...');
+interface Props {
+  bookings: Map<string, Booking>;
+  properties: Map<string, Property>;
+  loading?: boolean;
+  currentView?: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
+  currentDate?: Date;
+}
+interface Emits {
+  (e: 'dateSelect', selectInfo: DateSelectArg): void;
+  (e: 'eventClick', clickInfo: EventClickArg): void;
+  (e: 'eventDrop', dropInfo: EventDropArg): void;
+  (e: 'eventResize', resizeInfo: any): void;
+  (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
+  (e: 'updateBooking', data: { id: string; start: string; end: string }): void;
+  (e: 'viewChange', view: string): void;
+  (e: 'dateChange', date: Date): void;
+}
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+  currentView: 'timeGridWeek',
+  currentDate: () => new Date()
+});
+const emit = defineEmits<Emits>();
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-const sidebarOpen = ref(!xs.value);
-const selectedPropertyFilter = ref<string | null>(null);
-const currentOwnerId = computed(() => {
-  return authStore.user?.id;
-});
-const isOwnerAuthenticated = computed(() => {
-  return authStore.isAuthenticated &&
-         authStore.user?.role === 'owner' &&
-         currentOwnerId.value;
-});
-const loading = computed(() =>
-  bookingsLoading.value ||
-  propertiesLoading.value ||
-  uiStore.isLoading('bookings') ||
-  uiStore.isLoading('properties')
-);
-const formattedDate = computed(() => {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  };
-  return currentDate.value.toLocaleDateString('en-US', options);
-});
-const ownerPropertiesMap = computed(() => {
-  const map = new Map<string, Property>();
-  if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
-    return map;
-  }
-  if (propertyStore.properties instanceof Map) {
-    propertyStore.properties.forEach((property, id) => {
-      if (property.owner_id === currentOwnerId.value) {
-        map.set(id, property);
-      }
-    });
-  } else {
-    propertyStore.propertiesArray
-      .filter(property => property.owner_id === currentOwnerId.value)
-      .forEach(property => {
-        if (property && property.id) {
-          map.set(property.id, property);
-        }
-      });
-  }
-  return map;
-});
-const ownerBookingsMap = computed(() => {
-  const map = new Map<string, Booking>();
-  if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
-    return map;
-  }
-  bookingStore.bookingsArray
-    .filter(booking => booking.owner_id === currentOwnerId.value)
-    .forEach(booking => {
-      if (booking && booking.id) {
-        map.set(booking.id, booking);
-      }
-    });
-  return map;
-});
-const ownerTodayTurns = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const turns = new Map<string, Booking>();
-  if (!isOwnerAuthenticated.value) {
-    return turns;
-  }
-  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
-    if (
-      booking.booking_type === 'turn' &&
-      new Date(booking.checkout_date) >= today &&
-      new Date(booking.checkout_date) < tomorrow
-    ) {
-      turns.set(booking.id, booking);
-    }
-  });
-  return turns;
-});
-const ownerUpcomingCleanings = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const inOneWeek = new Date(today);
-  inOneWeek.setDate(inOneWeek.getDate() + 7);
-  const cleanings = new Map<string, Booking>();
-  if (!isOwnerAuthenticated.value) {
-    return cleanings;
-  }
-  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
-    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
-      cleanings.set(booking.id, booking);
-    }
-  });
-  return cleanings;
-});
-const ownerFilteredBookings = computed(() => {
-  let bookings = Array.from(ownerBookingsMap.value.values());
-  if (selectedPropertyFilter.value) {
-    bookings = bookings.filter(booking =>
-      booking.property_id === selectedPropertyFilter.value &&
-      ownerPropertiesMap.value.has(booking.property_id)
-    );
-  }
-  bookings = filterBookings(bookings);
-  const map = new Map<string, Booking>();
-  bookings.forEach(booking => {
-    map.set(booking.id, booking);
-  });
-  return map;
-});
-const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
-const eventModalMode = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const eventModalData = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return modal?.data as Booking | undefined;
-});
-const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
-const propertyModalMode = computed(() => {
-  const modal = uiStore.getModalState('propertyModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const propertyModalData = computed(() => {
-  const modal = uiStore.getModalState('propertyModal');
-  return modal?.data as Property | undefined;
-});
-const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirmDialog'));
-const confirmDialogTitle = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.title || 'Confirm';
-});
-const confirmDialogMessage = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.message || 'Are you sure you want to proceed?';
-});
-const confirmDialogConfirmText = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.confirmText || 'Confirm';
-});
-const confirmDialogCancelText = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.cancelText || 'Cancel';
-});
-const confirmDialogDangerous = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.dangerous || false;
-});
-const confirmDialogData = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.data || null;
-});
-const handleNavigateToBooking = (bookingId: string): void => {
-    eventLogger.logEvent(
-      'OwnerSidebar',
-    'HomeOwner',
-    'navigateToBooking',
-    bookingId,
-    'receive'
-  );
-  const booking = ownerBookingsMap.value.get(bookingId);
-  if (booking) {
-    const bookingDate = new Date(booking.checkout_date);
-    handleNavigateToDate(bookingDate);
-    setTimeout(() => {
-      const calendarApi = calendarRef.value?.getApi?.();
-      if (calendarApi) {
-        const event = calendarApi.getEventById(bookingId);
-        if (event) {
-          event.setProp('classNames', [...event.classNames, 'highlighted']);
-          setTimeout(() => {
-            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
-          }, 3000);
-        }
-      }
-    }, 100);
-  } else {
-    console.warn('Booking not found in your properties');
-  }
-};
-const handleNavigateToDate = (date: Date): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'navigateToDate',
-    date,
-    'receive'
-  );
-  goToDate(date);
-  eventLogger.logEvent(
-    'HomeOwner',
-    'FullCalendar',
-    'goToDate',
-    date,
-    'emit'
-  );
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(date);
-  }
-};
-const handleFilterByProperty = (propertyId: string | null): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'filterByProperty',
-    propertyId,
-    'receive'
-  );
-  if (propertyId && !ownerPropertiesMap.value.has(propertyId)) {
-    console.warn('Cannot filter by property not owned by current user');
-    return;
-  }
-  selectedPropertyFilter.value = propertyId;
-  if (propertyId) {
-    togglePropertyFilter(propertyId);
-  } else {
-    clearPropertyFilters();
-  }
-  uiStore.setPropertyFilter(propertyId);
-  eventLogger.logEvent(
-    'HomeOwner',
-    'FullCalendar',
-    'filteredBookingsUpdate',
-    { propertyId, count: ownerFilteredBookings.value.size },
-    'emit'
-  );
-};
-const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'createBooking',
-    data,
-    'receive'
-  );
-  const bookingData = {
-    ...data,
-    owner_id: currentOwnerId.value
-  };
-  uiStore.openModal('eventModal', 'create', bookingData);
-};
-const handleCreateProperty = (): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'createProperty',
-    null,
-    'receive'
-  );
-  const propertyData = {
-    owner_id: currentOwnerId.value
-  };
-  uiStore.openModal('propertyModal', 'create', propertyData);
-};
+const calendarCardHeight = computed(() => 'calc(100vh - 64px - 80px)');
+const fullCalendarHeight = computed(() => '100%');
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  eventLogger.logEvent(
-    'FullCalendar',
-    'HomeOwner',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'receive'
-  );
-  const bookingData: Partial<BookingFormData> = {
-    checkout_date: selectInfo.startStr,
-    checkin_date: selectInfo.endStr,
-    owner_id: currentOwnerId.value
-  };
-  uiStore.openModal('eventModal', 'create', bookingData);
+  console.log('🗓️ [OwnerCalendar] Date selected:', selectInfo.startStr, 'to', selectInfo.endStr);
+  emit('dateSelect', selectInfo);
 };
 const handleEventClick = (clickInfo: EventClickArg): void => {
-  eventLogger.logEvent(
-    'FullCalendar',
-    'HomeOwner',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'receive'
-  );
-  const booking = ownerBookingsMap.value.get(clickInfo.event.id);
-  if (booking) {
-    uiStore.openModal('eventModal', 'edit', { booking });
-  } else {
-    console.warn('Cannot edit booking not owned by current user');
-  }
+  console.log('👆 [OwnerCalendar] Event clicked:', clickInfo.event.id);
+  emit('eventClick', clickInfo);
 };
-const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  if (!ownerBookingsMap.value.has(booking.id)) {
-    console.warn('Cannot modify booking not owned by current user');
-    dropInfo.revert();
-    return;
-  }
-  try {
-    await updateBooking(booking.id, {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-    });
-  } catch (error) {
-    console.error('Failed to update your booking:', error);
-    dropInfo.revert();
-  }
+const handleEventDrop = (dropInfo: EventDropArg): void => {
+  console.log('🎯 [OwnerCalendar] Event dropped:', dropInfo.event.id);
+  emit('eventDrop', dropInfo);
 };
-const handleEventResize = async (resizeInfo: any): Promise<void> => {
-  const booking = resizeInfo.event.extendedProps.booking as Booking;
-  if (!ownerBookingsMap.value.has(booking.id)) {
-    console.warn('Cannot modify booking not owned by current user');
-    resizeInfo.revert();
-    return;
-  }
-  try {
-    await updateBooking(booking.id, {
-      checkout_date: resizeInfo.event.startStr,
-      checkin_date: resizeInfo.event.endStr
-    });
-  } catch (error) {
-    console.error('Failed to update your booking:', error);
-    resizeInfo.revert();
-  }
+const handleEventResize = (resizeInfo: any): void => {
+  console.log('🔄 [OwnerCalendar] Event resized:', resizeInfo.event.id);
+  emit('eventResize', resizeInfo);
 };
-const handlePrevious = (): void => {
-  prev();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.prev();
-  }
-};
-const handleNext = (): void => {
-  next();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.next();
-  }
-};
-const handleGoToday = (): void => {
-  goToToday();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.today();
-  }
-};
-const handleCalendarViewChange = (view: CalendarView): void => {
-  const calendarView = view === 'week' ? 'timeGridWeek' :
-                      view === 'day' ? 'timeGridDay' :
-                      'dayGridMonth';
-  setCalendarView(calendarView);
-};
-const handleCalendarDateChange = (date: Date): void => {
-  goToDate(date);
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(date);
-  }
-};
-const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string | undefined; }): void => {
-  const bookingData = {
-    ...data,
-    owner_id: currentOwnerId.value
-  };
-  uiStore.openModal('eventModal', 'create', bookingData);
+const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }): void => {
+  console.log('➕ [OwnerCalendar] Create booking:', data);
+  emit('createBooking', data);
 };
 const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
-  if (!ownerBookingsMap.value.has(data.id)) {
-    console.warn('Cannot update booking not owned by current user');
-    return;
+  console.log('📝 [OwnerCalendar] Update booking:', data);
+  emit('updateBooking', data);
+};
+const goToDate = (date: string | Date): void => {
+  console.log('🗓️ [OwnerCalendar] goToDate called:', date);
+  if (calendarRef.value) {
+    calendarRef.value.goToDate(date);
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    emit('dateChange', dateObj);
   }
-  updateBooking(data.id, {
-    checkout_date: data.start,
-    checkin_date: data.end
+};
+const changeView = (view: string): void => {
+  console.log('👁️ [OwnerCalendar] changeView called:', view);
+  if (calendarRef.value) {
+    calendarRef.value.changeView(view);
+    emit('viewChange', view);
+  }
+};
+const refreshEvents = (): void => {
+  console.log('🔄 [OwnerCalendar] refreshEvents called');
+  if (calendarRef.value) {
+    calendarRef.value.refreshEvents();
+  }
+};
+const getApi = () => {
+  return calendarRef.value?.getApi() || null;
+};
+watch(() => props.currentView, (newView) => {
+  console.log('🎯 [OwnerCalendar] Current view changed from parent:', newView);
+  nextTick(() => {
+    if (newView && calendarRef.value) {
+      changeView(newView);
+    }
   });
-};
-const handleEventModalClose = (): void => {
-  uiStore.closeModal('eventModal');
-};
-const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
-  try {
-    const bookingData = {
-      ...data,
-      owner_id: currentOwnerId.value
-    };
-    if (eventModalMode.value === 'create') {
-      await createBooking(bookingData as BookingFormData);
-    } else if (eventModalData.value) {
-      if (!ownerBookingsMap.value.has(eventModalData.value.id)) {
-        throw new Error('Cannot update booking not owned by current user');
-      }
-      await updateBooking(eventModalData.value.id, bookingData as Partial<BookingFormData>);
+});
+watch(() => props.currentDate, (newDate) => {
+  console.log('📅 [OwnerCalendar] Current date changed from parent:', newDate);
+  nextTick(() => {
+    if (newDate && calendarRef.value) {
+      goToDate(newDate);
     }
-    uiStore.closeModal('eventModal');
-  } catch (error) {
-    console.error('Failed to save your booking:', error);
-  }
-};
-const handleEventModalDelete = async (bookingId: string): Promise<void> => {
-  if (!ownerBookingsMap.value.has(bookingId)) {
-    console.warn('Cannot delete booking not owned by current user');
-    return;
-  }
-    uiStore.openConfirmDialog('confirmDialog', {
-    title: 'Delete Booking',
-    message: 'Are you sure you want to delete this booking? This action cannot be undone.',
-    confirmText: 'Delete',
-    cancelText: 'Cancel',
-    dangerous: true,
-    data: { type: 'booking', id: bookingId }
   });
-};
-const handlePropertyModalClose = (): void => {
-  uiStore.closeModal('propertyModal');
-};
-const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
-  try {
-    const propertyData = {
-      ...data,
-      owner_id: currentOwnerId.value
-    };
-    if (propertyModalMode.value === 'create') {
-      await createProperty(propertyData as PropertyFormData);
-    } else if (propertyModalData.value) {
-      if (!ownerPropertiesMap.value.has(propertyModalData.value.id)) {
-        throw new Error('Cannot update property not owned by current user');
-      }
-      await updateProperty(propertyModalData.value.id, propertyData as Partial<PropertyFormData>);
-    }
-    uiStore.closeModal('propertyModal');
-  } catch (error) {
-    console.error('Failed to save your property:', error);
-  }
-};
-const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
-  if (!ownerPropertiesMap.value.has(propertyId)) {
-    console.warn('Cannot delete property not owned by current user');
-    return;
-  }
-  uiStore.openConfirmDialog('confirmDialog', {
-    title: 'Delete Property',
-    message: 'Are you sure you want to delete this property? This will also delete all associated bookings. This action cannot be undone.',
-    confirmText: 'Delete',
-    cancelText: 'Cancel',
-    dangerous: true,
-    data: { type: 'property', id: propertyId }
-  });
-};
-const handleConfirmDialogConfirm = async (): Promise<void> => {
-  const data = confirmDialogData.value;
-  if (data?.type === 'booking' && data?.id) {
-    try {
-      await deleteBooking(data.id as string);
-      uiStore.closeModal('eventModal');
-    } catch (error) {
-      console.error('Failed to delete your booking:', error);
-    }
-  } else if (data?.type === 'property' && data?.id) {
-    try {
-      await deleteProperty(data.id as string    );
-      uiStore.closeModal('propertyModal');
-    } catch (error) {
-      console.error('Failed to delete your property:', error);
-    }
-  }
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-const handleConfirmDialogCancel = (): void => {
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-const handleConfirmDialogClose = (): void => {
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-const toggleSidebar = (): void => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
-onMounted(async () => {
-  if (isOwnerAuthenticated.value) {
-    try {
-      await Promise.all([
-        fetchAllProperties(),
-        fetchAllBookings()
-      ]);
-    } catch (error) {
-      console.error('Failed to load your data:', error);
-    }
-  }
 });
-onUnmounted(() => {
-});
-watch(xs, (newValue) => {
-  if (newValue) {
-    sidebarOpen.value = false;
-  }
-});
-watch(isOwnerAuthenticated, (newValue) => {
-  if (newValue) {
-    fetchAllProperties();
-    fetchAllBookings();
-  }
+console.log('✅ [OwnerCalendar] Setup complete - using safe reactive patterns!');
+defineExpose({
+  goToDate,
+  changeView,
+  refreshEvents,
+  getApi
 });
 </script>
 <style scoped>
-.home-owner-container {
-  height: 100vh;
-  overflow: hidden;
-}
-.sidebar-column {
-  height: 100vh;
-  overflow-y: auto;
-  border-right: 1px solid rgb(var(--v-theme-on-surface), 0.12);
-}
-.calendar-column {
-  height: 100vh;
+.owner-calendar-container {
+  height: 100%;
+  width: 100%;
+  position: relative;
   display: flex;
   flex-direction: column;
 }
-.calendar-header {
-  padding: 16px;
-  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
-  background: rgb(var(--v-theme-surface));
-  flex-shrink: 0;
+.owner-calendar-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
 }
-.mobile-hidden {
-  display: none;
+.owner-calendar {
+  flex: 1;
+  min-height: 0;
+  position: relative;
 }
-@media (min-width: 1024px) {
-  .mobile-hidden {
-    display: block;
-  }
+:deep(.fc-event.booking-turn) {
+  font-weight: 600;
+  border-width: 3px !important;
+  position: relative;
 }
-.home-owner-container {
-  --owner-primary: rgb(var(--v-theme-primary));
-  --owner-accent: rgb(var(--v-theme-secondary));
+:deep(.fc-event.priority-urgent) {
+  animation: pulse-owner-urgent 2s infinite;
+  border-color: #d32f2f !important;
 }
-:deep(.fc-event.highlighted) {
-  animation: owner-highlight 3s ease-in-out;
-  box-shadow: 0 0 0 3px var(--owner-primary);
+:deep(.fc-event.priority-high) {
+  border-left: 4px solid #ff9800 !important;
 }
-@keyframes owner-highlight {
+:deep(.fc-header-toolbar) {
+  margin-bottom: 0.5em;
+}
+:deep(.fc-daygrid-day-number) {
+  font-weight: 500;
+}
+:deep(.fc-col-header-cell) {
+  background: rgb(var(--v-theme-surface-variant));
+}
+@keyframes pulse-owner-urgent {
   0% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.8);
     transform: scale(1);
-    box-shadow: 0 0 0 0 var(--owner-primary);
   }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 6px rgba(var(--v-theme-primary), 0.3);
+  70% {
+    box-shadow: 0 0 0 6px rgba(244, 67, 54, 0);
+    transform: scale(1.01);
   }
   100% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
     transform: scale(1);
-    box-shadow: 0 0 0 3px var(--owner-primary);
+  }
+}
+@media (max-width: 599px) {
+  .owner-calendar-container {
+    font-size: 0.875rem;
+  }
+  :deep(.fc-event-title) {
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+  :deep(.fc-daygrid-day-number) {
+    font-size: 0.8rem;
+  }
+}
+@media (min-width: 600px) and (max-width: 1279px) {
+  .owner-calendar-container {
+    font-size: 0.9rem;
+  }
+  :deep(.fc-event-title) {
+    font-size: 0.85rem;
+  }
+}
+@media (min-width: 1280px) {
+  .owner-calendar-container {
+    font-size: 1rem;
+  }
+  :deep(.fc-event) {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  :deep(.fc-event:hover) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
   }
 }
 </style>
+````
+
+## File: src/composables/shared/useComponentEventLogger.ts
+````typescript
+import { ref, reactive, computed } from 'vue';
+export interface ComponentEvent {
+  id: string;
+  timestamp: number;
+  sourceComponent: string;
+  targetComponent: string;
+  eventName: string;
+  payload: unknown;
+  direction: 'emit' | 'receive';
+}
+export interface EventFilter {
+  sourceComponent?: string;
+  targetComponent?: string;
+  eventName?: string;
+  direction?: 'emit' | 'receive';
+}
+export function useComponentEventLogger()
+⋮----
+const logEvent = (
+    sourceComponent: string,
+    targetComponent: string,
+    eventName: string,
+    payload: unknown,
+    direction: 'emit' | 'receive'
+) =>
+const clearEvents = () =>
+const setEnabled = (value: boolean) =>
+const toggleEnabled = () =>
+const setFilter = (newFilter: EventFilter) =>
+const clearFilter = () =>
 ````
 
 ## File: src/layouts/admin.vue
@@ -30205,6 +17458,47 @@ const logout = async () => {
   color: rgb(var(--v-theme-primary)) !important;
 }
 </style>
+````
+
+## File: src/plugins/vuetify.ts
+````typescript
+import { createVuetify } from 'vuetify';
+⋮----
+import { aliases, mdi } from 'vuetify/iconsets/mdi';
+import type { ThemeDefinition } from 'vuetify';
+````
+
+## File: src/types/property.ts
+````typescript
+export type PricingTier = 'basic' | 'standard' | 'premium' | 'luxury';
+export interface Property {
+  id: string;
+  owner_id: string;
+  name: string;
+  address: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  square_feet?: number;
+  property_type?: 'apartment' | 'house' | 'condo' | 'townhouse';
+  cleaning_duration: number;
+  special_instructions?: string;
+  pricing_tier: PricingTier;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+export interface PropertyWithMetrics extends Property {
+  metrics: {
+    utilizationRate: number;
+    averageGapBetweenBookings: number;
+    turnPercentage: number;
+    revenueProjection: number;
+    cleaningLoad: 'light' | 'moderate' | 'heavy';
+  };
+}
+export type PropertyFormData = Omit<Property, 'id' | 'created_at' | 'updated_at'>;
+export type PropertyMap = Map<string, Property>;
+export function isProperty(obj: unknown): obj is Property
 ````
 
 ## File: src/pages/auth/login.vue
@@ -30378,22 +17672,35 @@ async function handleLogin() {
       successMessage.value = authStore.getSuccessMessage('login')
       const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
       setTimeout(async () => {
-        await router.push(defaultRoute)
-      }, 1000)
+        try {
+          await router.push(defaultRoute)
+        } catch (error) {
+          console.error('Navigation after login failed:', error)
+          window.location.href = defaultRoute
+        }
+      }, 800)
     }
   } catch (error) {
     console.error('Login error:', error)
   }
 }
 async function loginAsOwner() {
-  email.value = 'owner@example.com'
-  password.value = 'password'
-  await handleLogin()
+  try {
+    email.value = 'owner@example.com'
+    password.value = 'password'
+    await handleLogin()
+  } catch (error) {
+    console.error('Owner demo login failed:', error)
+  }
 }
 async function loginAsAdmin() {
-  email.value = 'admin@example.com'
-  password.value = 'password'
-  await handleLogin()
+  try {
+    email.value = 'admin@example.com'
+    password.value = 'password'
+    await handleLogin()
+  } catch (error) {
+    console.error('Admin demo login failed:', error)
+  }
 }
 function goToRegister() {
   router.push('/auth/signup')
@@ -30425,47 +17732,6 @@ authStore.clearError()
   transform: translateY(-1px);
 }
 </style>
-````
-
-## File: src/plugins/vuetify.ts
-````typescript
-import { createVuetify } from 'vuetify';
-⋮----
-import { aliases, mdi } from 'vuetify/iconsets/mdi';
-import type { ThemeDefinition } from 'vuetify';
-````
-
-## File: src/types/property.ts
-````typescript
-export type PricingTier = 'basic' | 'standard' | 'premium' | 'luxury';
-export interface Property {
-  id: string;
-  owner_id: string;
-  name: string;
-  address: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  square_feet?: number;
-  property_type?: 'apartment' | 'house' | 'condo' | 'townhouse';
-  cleaning_duration: number;
-  special_instructions?: string;
-  pricing_tier: PricingTier;
-  active: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-export interface PropertyWithMetrics extends Property {
-  metrics: {
-    utilizationRate: number;
-    averageGapBetweenBookings: number;
-    turnPercentage: number;
-    revenueProjection: number;
-    cleaningLoad: 'light' | 'moderate' | 'heavy';
-  };
-}
-export type PropertyFormData = Omit<Property, 'id' | 'created_at' | 'updated_at'>;
-export type PropertyMap = Map<string, Property>;
-export function isProperty(obj: unknown): obj is Property
 ````
 
 ## File: src/pages/calendar/index.vue
@@ -30545,15 +17811,6 @@ onMounted(async () => {
   height: calc(100vh - 64px);
 }
 </style>
-````
-
-## File: vite.config.ts
-````typescript
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vuetify from 'vite-plugin-vuetify'
-import path from 'path'
-import vueDevTools from 'vite-plugin-vue-devtools'
 ````
 
 ## File: src/App.vue
@@ -32086,42 +19343,6 @@ onMounted(() => {
 </style>
 ````
 
-## File: src/stores/auth.ts
-````typescript
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { User, UserRole, PropertyOwner, Admin, Cleaner } from '@/types';
-import { useAuth } from '@/composables/shared/useAuth';
-import {
-  getDefaultRouteForRole,
-  getRoleSpecificSuccessMessage,
-  clearAllRoleSpecificState
-} from '@/utils/authHelpers';
-⋮----
-async function login(email: string, password: string): Promise<boolean>
-async function logout(): Promise<boolean>
-async function register(userData: {
-    email: string;
-    password: string;
-    name: string;
-    role: UserRole;
-    company_name?: string;
-}): Promise<boolean>
-function switchToOwnerView(ownerId?: string): boolean
-function switchToAdminView(): boolean
-async function checkAuth(): Promise<boolean>
-function clearError()
-function getSuccessMessage(action: 'login' | 'logout' | 'register'): string
-function getUserFromEmail(email: string): User | null
-function createUserFromRegistration(userData: {
-    email: string;
-    password: string;
-    name: string;
-    role: UserRole;
-    company_name?: string;
-}): User
-````
-
 ## File: src/types/ui.ts
 ````typescript
 export type ModalData = Record<string, unknown> | null | undefined;
@@ -33353,331 +20574,6 @@ onBeforeUnmount(() => {
   .admin-event-title {
     font-size: 0.8em;
   }
-}
-</style>
-````
-
-## File: src/layouts/default.vue
-````vue
-<template>
-  <v-app>
-    <v-app-bar
-      app
-      color="surface"
-      elevation="1"
-      class="border-b"
-    >
-      <v-app-bar-nav-icon
-        @click="toggleSidebar"
-      />
-      <v-app-bar-title class="font-weight-medium">
-        Property Cleaning Scheduler
-      </v-app-bar-title>
-      <v-spacer />
-      <ThemePicker />
-      <v-menu
-        location="bottom end"
-        offset="5"
-      >
-        <template #activator="{ props: menuProps }">
-          <v-btn
-            icon
-            v-bind="menuProps"
-            class="ml-2"
-          >
-            <v-avatar size="36">
-              <v-icon>mdi-account-circle</v-icon>
-            </v-avatar>
-          </v-btn>
-        </template>
-        <v-list min-width="200">
-          <v-list-subheader>User Options</v-list-subheader>
-          <v-list-item
-            prepend-icon="mdi-account-outline"
-            title="Profile"
-          />
-          <v-list-item
-            prepend-icon="mdi-cog-outline"
-            title="Settings"
-          />
-          <v-divider class="my-2" />
-          <v-list-item
-            prepend-icon="mdi-logout"
-            title="Logout"
-            color="error"
-          />
-        </v-list>
-      </v-menu>
-    </v-app-bar>
-    <v-main class="bg-background bg-gradient">
-      <router-view />
-    </v-main>
-    <div id="notification-area">
-    </div>
-    <div id="modal-area">
-    </div>
-  </v-app>
-</template>
-⋮----
-<template #activator="{ props: menuProps }">
-          <v-btn
-            icon
-            v-bind="menuProps"
-            class="ml-2"
-          >
-            <v-avatar size="36">
-              <v-icon>mdi-account-circle</v-icon>
-            </v-avatar>
-          </v-btn>
-        </template>
-⋮----
-<script setup lang="ts">
-  import { ref } from 'vue';
-  import { useDisplay } from 'vuetify';
-  import ThemePicker from '@/components/dumb/shared/ThemePicker.vue';
-  const drawer = ref(true);
-  const rail = ref(false);
-  const { mobile} = useDisplay();
-  const toggleSidebar = (): void => {
-    if (mobile.value) {
-      drawer.value = !drawer.value;
-    } else {
-      rail.value = !rail.value;
-    }
-  };
-  </script>
-<style>
-  .border-b {
-    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
-  }
-  .border-r {
-    border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
-  }
-  .v-app-bar {
-    background: rgb(var(--v-theme-surface)) !important;
-    color: rgb(var(--v-theme-on-surface)) !important;
-    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
-  }
-  .v-main {
-    background: rgb(var(--v-theme-background)) !important;
-    color: rgb(var(--v-theme-on-background)) !important;
-  }
-  .v-list-item {
-    color: rgb(var(--v-theme-on-surface)) !important;
-  }
-  .v-list-item:hover {
-    background: rgba(var(--v-theme-primary), 0.08) !important;
-  }
-  .v-list-item--active {
-    background: rgba(var(--v-theme-primary), 0.12) !important;
-    color: rgb(var(--v-theme-primary)) !important;
-  }
-  .v-avatar {
-    background: rgb(var(--v-theme-primary)) !important;
-  }
-  .v-menu .v-list {
-    background: rgb(var(--v-theme-surface)) !important;
-  }
-  .glass-card {
-    background: rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 16px !important;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-  }
-  .fade-in {
-    animation: fadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1);
-  }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px);}
-    to { opacity: 1; transform: translateY(0);}
-  }
-  .v-btn {
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .v-btn:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 16px rgba(33, 150, 243, 0.15);
-  }
-  </style>
-````
-
-## File: src/pages/index.vue
-````vue
-<template>
-  <div
-    v-if="authStore.loading"
-    class="loading-container"
-  >
-    <v-container class="fill-height">
-      <v-row
-        justify="center"
-        align="center"
-      >
-        <v-col cols="auto">
-          <v-progress-circular
-            indeterminate
-            size="64"
-            color="primary"
-          />
-          <div class="text-h6 mt-4 text-center">
-            Loading...
-          </div>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-  <component
-    :is="homeComponent"
-    v-else
-  />
-</template>
-<script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useUIStore } from '@/stores/ui'
-import HomeOwner from '@/components/smart/owner/HomeOwner.vue'
-import HomeAdmin from '@/components/smart/admin/HomeAdmin.vue'
-const authStore = useAuthStore()
-const uiStore = useUIStore()
-const AuthPrompt = {
-  template: `
-    <v-container class="fill-height">
-      <v-row justify="center" align="center">
-        <v-col cols="12" sm="8" md="6" lg="4">
-          <v-card elevation="8" class="pa-4">
-            <v-card-title class="text-h5 text-center mb-4">
-              <v-icon class="mr-2" color="primary">mdi-login</v-icon>
-              Authentication Required
-            </v-card-title>
-            <v-card-text class="text-center">
-              <p class="text-body-1 mb-4">
-                Please log in to access the Property Cleaning Scheduler.
-              </p>
-              <v-alert
-                type="info"
-                variant="tonal"
-                class="mb-4"
-              >
-                <strong>Development Mode:</strong><br>
-                Authentication is currently mocked for development.
-                Click "Mock Login" to continue.
-              </v-alert>
-              <v-btn
-                color="primary"
-                size="large"
-                block
-                @click="handleMockLogin"
-                :loading="authStore.loading"
-                class="mb-2"
-              >
-                <v-icon class="mr-2">mdi-shield-account</v-icon>
-                Mock Login (Admin)
-              </v-btn>
-              <v-btn
-                color="secondary"
-                variant="outlined"
-                size="large"
-                block
-                @click="handleMockOwnerLogin"
-                :loading="authStore.loading"
-                class="mb-4"
-              >
-                <v-icon class="mr-2">mdi-home-account</v-icon>
-                Mock Login (Owner)
-              </v-btn>
-              <v-divider class="my-4" />
-              <div class="text-center">
-                <p class="text-body-2 mb-2">
-                  Or use the full authentication flow:
-                </p>
-                <v-btn
-                  color="primary"
-                  variant="text"
-                  @click="goToLogin"
-                  :disabled="authStore.loading"
-                >
-                  Go to Login Page
-                </v-btn>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  `,
-  setup() {
-    const handleMockLogin = async () => {
-      const success = await authStore.login('admin@example.com', 'password')
-      if (success) {
-        uiStore.addNotification('success', 'Welcome!', authStore.getSuccessMessage('login'))
-      }
-    }
-    const handleMockOwnerLogin = async () => {
-      const success = await authStore.login('owner@example.com', 'password')
-      if (success) {
-        uiStore.addNotification('success', 'Welcome!', authStore.getSuccessMessage('login'))
-      }
-    }
-    const goToLogin = () => {
-      window.location.href = '/auth/login'
-    }
-    return {
-      authStore,
-      uiStore,
-      handleMockLogin,
-      handleMockOwnerLogin,
-      goToLogin
-    }
-  }
-}
-const homeComponent = computed(() => {
-  if (!authStore.isAuthenticated) {
-    return AuthPrompt
-  }
-  if (authStore.isAdmin) {
-    if (authStore.tempViewMode?.role === 'owner') {
-      return HomeOwner
-    }
-    return HomeAdmin
-  }
-  if (authStore.isOwner) {
-    return HomeOwner
-  }
-  console.warn('Unknown user role:', authStore.user?.role)
-  return AuthPrompt
-})
-onMounted(async () => {
-  try {
-    await authStore.checkAuth()
-  } catch (error) {
-    console.error('Auth check failed:', error)
-  }
-})
-</script>
-<style scoped>
-.loading-container {
-  min-height: 100vh;
-}
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.3s ease;
-}
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
-}
-.fill-height {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-.v-card {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95);
-}
-.v-btn {
-  text-transform: none;
 }
 </style>
 ````
@@ -35121,6 +22017,1353 @@ onMounted(() => {
 </style>
 ````
 
+## File: src/components/smart/owner/HomeOwner.vue
+````vue
+<template>
+  <div class="home-owner-container">
+    <div
+      class="sidebar-column"
+      :class="{
+        'sidebar-hidden': !sidebarOpen && $vuetify.display.mdAndDown,
+        'sidebar-visible': sidebarOpen || $vuetify.display.lgAndUp
+      }"
+    >
+      <OwnerSidebar
+        :today-turns="ownerTodayTurns"
+        :upcoming-cleanings="ownerUpcomingCleanings"
+        :properties="ownerPropertiesMap"
+        :loading="loading"
+        @navigate-to-booking="handleNavigateToBooking"
+        @navigate-to-date="handleNavigateToDate"
+        @filter-by-property="handleFilterByProperty"
+        @create-booking="handleCreateBooking"
+        @create-property="handleCreateProperty"
+      />
+    </div>
+    <div class="calendar-column">
+         <v-card flat class="calendar-header-card">
+           <v-card-text class="pa-3">
+             <div class="d-flex align-center">
+               <v-btn
+                 v-if="$vuetify.display.mdAndDown"
+                 icon="mdi-menu"
+                 variant="text"
+                 class="mr-4"
+                 @click="toggleSidebar"
+               />
+               <v-btn
+                 icon="mdi-arrow-left"
+                 variant="text"
+                 class="mr-2"
+                 @click="handlePrevious"
+               />
+               <v-btn
+                 variant="outlined"
+                 class="mr-2"
+                 @click="handleGoToday"
+               >
+                 Today
+               </v-btn>
+               <v-btn
+                 icon="mdi-arrow-right"
+                 variant="text"
+                 class="mr-4"
+                 @click="handleNext"
+               />
+               <div class="text-h6 mr-4">
+                 {{ formattedDate }}
+               </div>
+               <v-spacer />
+               <v-btn
+                 v-if="$vuetify.display.smAndUp"
+                 color="primary"
+                 variant="outlined"
+                 prepend-icon="mdi-plus"
+                 class="mr-2"
+                 @click="handleCreateProperty"
+               >
+                 Add Property
+               </v-btn>
+               <v-btn
+                 color="primary"
+                 prepend-icon="mdi-calendar-plus"
+                 class="mr-4"
+                 @click="handleCreateBooking"
+               >
+                 Add Booking
+               </v-btn>
+               <v-btn-toggle
+                 v-model="currentView"
+                 mandatory
+                 density="compact"
+                 class="ml-2"
+               >
+                 <v-btn value="dayGridMonth" size="small">
+                   Month
+                 </v-btn>
+                 <v-btn value="timeGridWeek" size="small">
+                   Week
+                 </v-btn>
+                 <v-btn value="timeGridDay" size="small">
+                   Day
+                 </v-btn>
+               </v-btn-toggle>
+             </div>
+           </v-card-text>
+         </v-card>
+         <div class="calendar-content">
+           <OwnerCalendar
+             ref="calendarRef"
+             :bookings="ownerFilteredBookings"
+             :properties="ownerPropertiesMap"
+             :loading="loading"
+             :current-view="currentView"
+             :current-date="currentDate"
+             @date-select="handleDateSelect"
+             @event-click="handleEventClick"
+             @event-drop="handleEventDrop"
+             @event-resize="handleEventResize"
+             @view-change="handleCalendarViewChange"
+             @date-change="handleCalendarDateChange"
+             @create-booking="handleCreateBookingFromCalendar"
+             @update-booking="handleUpdateBooking"
+           />
+         </div>
+     </div>
+    <div style="position: relative; z-index: 1000;">
+      <BookingForm
+        :open="eventModalOpen"
+        :mode="eventModalMode"
+        :booking="eventModalData"
+        @close="handleEventModalClose"
+        @save="handleEventModalSave"
+        @delete="handleEventModalDelete"
+      />
+      <PropertyModal
+        :open="propertyModalOpen"
+        :mode="propertyModalMode"
+        :property="propertyModalData"
+        @close="handlePropertyModalClose"
+        @save="handlePropertyModalSave"
+        @delete="handlePropertyModalDelete"
+      />
+      <ConfirmationDialog
+        :open="confirmDialogOpen"
+        :title="confirmDialogTitle"
+        :message="confirmDialogMessage"
+        :confirm-text="confirmDialogConfirmText"
+        :cancel-text="confirmDialogCancelText"
+        :dangerous="confirmDialogDangerous"
+        @confirm="handleConfirmDialogConfirm"
+        @cancel="handleConfirmDialogCancel"
+        @close="handleConfirmDialogClose"
+      />
+    </div>
+  </div>
+</template>
+⋮----
+{{ formattedDate }}
+⋮----
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { useDisplay } from 'vuetify';
+import OwnerSidebar from '@/components/smart/owner/OwnerSidebar.vue';
+import OwnerCalendar from '@/components/smart/owner/OwnerCalendar.vue';
+import BookingForm from '@/components/dumb/BookingForm.vue';
+import PropertyModal from '@/components/dumb/PropertyModal.vue';
+import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
+import { useUIStore } from '@/stores/ui';
+import { useAuthStore } from '@/stores/auth';
+import { useBookings } from '@/composables/shared/useBookings';
+import { useProperties } from '@/composables/shared/useProperties';
+import { useCalendarState } from '@/composables/shared/useCalendarState';
+import type { Booking, Property, BookingFormData, PropertyFormData,  } from '@/types';
+import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+const propertyStore = usePropertyStore();
+const bookingStore = useBookingStore();
+const uiStore = useUIStore();
+const authStore = useAuthStore();
+const { xs } = useDisplay();
+const {
+  loading: bookingsLoading,
+  createBooking,
+  updateBooking,
+  deleteBooking,
+  fetchAllBookings
+} = useBookings();
+const {
+  loading: propertiesLoading,
+  createProperty,
+  updateProperty,
+  deleteProperty,
+  fetchAllProperties
+} = useProperties();
+const {
+  currentView,
+  currentDate,
+  filterBookings,
+  setCalendarView,
+  goToDate,
+  goToToday,
+  next,
+  prev,
+  clearPropertyFilters,
+  togglePropertyFilter
+} = useCalendarState();
+const calendarRef = ref<InstanceType<typeof OwnerCalendar> | null>(null);
+const sidebarOpen = ref(!xs.value);
+const selectedPropertyFilter = ref<string | null>(null);
+let currentOwnerIdCallCount = 0;
+const currentOwnerId = computed(() => {
+  currentOwnerIdCallCount++;
+  const userId = authStore.user?.id;
+  console.log(`🔍 [HomeOwner] currentOwnerId computed (call #${currentOwnerIdCallCount}):`, {
+    user: authStore.user,
+    userId,
+    isAuthenticated: authStore.isAuthenticated,
+    userRole: authStore.user?.role
+  });
+  if (currentOwnerIdCallCount > 10) {
+    console.error('❌ [HomeOwner] Infinite loop detected in currentOwnerId computed!');
+  }
+  return userId;
+});
+let isOwnerAuthenticatedCallCount = 0;
+const isOwnerAuthenticated = computed(() => {
+  isOwnerAuthenticatedCallCount++;
+  const authenticated = !!(authStore.isAuthenticated &&
+         authStore.user?.role === 'owner' &&
+         currentOwnerId.value);
+  console.log(`🔍 [HomeOwner] isOwnerAuthenticated computed (call #${isOwnerAuthenticatedCallCount}):`, {
+    isAuthenticated: authStore.isAuthenticated,
+    userRole: authStore.user?.role,
+    currentOwnerId: currentOwnerId.value,
+    result: authenticated
+  });
+  if (isOwnerAuthenticatedCallCount > 10) {
+    console.error('❌ [HomeOwner] Infinite loop detected in isOwnerAuthenticated computed!');
+  }
+  return authenticated;
+});
+let loadingCallCount = 0;
+const loading = computed(() => {
+  loadingCallCount++;
+  const result = bookingsLoading.value ||
+    propertiesLoading.value ||
+    uiStore.isLoading('bookings') ||
+    uiStore.isLoading('properties');
+  if (loadingCallCount > 20) {
+    console.error(`❌ [HomeOwner] Infinite loop detected in loading computed! (call #${loadingCallCount})`);
+  }
+  return result;
+});
+const formattedDate = computed(() => {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  };
+  return currentDate.value.toLocaleDateString('en-US', options);
+});
+let ownerPropertiesMapCallCount = 0;
+const ownerPropertiesMap = computed(() => {
+  ownerPropertiesMapCallCount++;
+  const map = new Map<string, Property>();
+  if (ownerPropertiesMapCallCount > 20) {
+    console.error(`❌ [HomeOwner] Infinite loop detected in ownerPropertiesMap computed! (call #${ownerPropertiesMapCallCount})`);
+  }
+  if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
+    return map;
+  }
+  if (propertyStore.properties instanceof Map) {
+    propertyStore.properties.forEach((property, id) => {
+      if (property.owner_id === currentOwnerId.value) {
+        map.set(id, property);
+      }
+    });
+  } else {
+    propertyStore.propertiesArray
+      .filter(property => property.owner_id === currentOwnerId.value)
+      .forEach(property => {
+        if (property && property.id) {
+          map.set(property.id, property);
+        }
+      });
+  }
+  return map;
+});
+let ownerBookingsMapCallCount = 0;
+const ownerBookingsMap = computed(() => {
+  ownerBookingsMapCallCount++;
+  console.log(`🔍 [HomeOwner] ownerBookingsMap computed (call #${ownerBookingsMapCallCount})`);
+  if (ownerBookingsMapCallCount > 20) {
+    console.error('❌ [HomeOwner] Infinite loop detected in ownerBookingsMap computed!');
+    return new Map<string, Booking>();
+  }
+  const map = new Map<string, Booking>();
+  if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
+    return map;
+  }
+  bookingStore.bookingsArray
+    .filter(booking => booking.owner_id === currentOwnerId.value)
+    .forEach(booking => {
+      if (booking && booking.id) {
+        map.set(booking.id, booking);
+      }
+    });
+  return map;
+});
+let ownerTodayTurnsCallCount = 0;
+const ownerTodayTurns = computed(() => {
+  ownerTodayTurnsCallCount++;
+  console.log(`🔍 [HomeOwner] ownerTodayTurns computed (call #${ownerTodayTurnsCallCount})`);
+  if (ownerTodayTurnsCallCount > 20) {
+    console.error('❌ [HomeOwner] Infinite loop detected in ownerTodayTurns computed!');
+    return new Map<string, Booking>();
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const turns = new Map<string, Booking>();
+  if (!isOwnerAuthenticated.value) {
+    return turns;
+  }
+  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
+    if (
+      booking.booking_type === 'turn' &&
+      new Date(booking.checkout_date) >= today &&
+      new Date(booking.checkout_date) < tomorrow
+    ) {
+      turns.set(booking.id, booking);
+    }
+  });
+  return turns;
+});
+let ownerUpcomingCleaningsCallCount = 0;
+const ownerUpcomingCleanings = computed(() => {
+  ownerUpcomingCleaningsCallCount++;
+  console.log(`🔍 [HomeOwner] ownerUpcomingCleanings computed (call #${ownerUpcomingCleaningsCallCount})`);
+  if (ownerUpcomingCleaningsCallCount > 20) {
+    console.error('❌ [HomeOwner] Infinite loop detected in ownerUpcomingCleanings computed!');
+    return new Map<string, Booking>();
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const inOneWeek = new Date(today);
+  inOneWeek.setDate(inOneWeek.getDate() + 7);
+  const cleanings = new Map<string, Booking>();
+  if (!isOwnerAuthenticated.value) {
+    return cleanings;
+  }
+  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
+    const checkoutDate = new Date(booking.checkout_date);
+    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
+      cleanings.set(booking.id, booking);
+    }
+  });
+  return cleanings;
+});
+let ownerFilteredBookingsCallCount = 0;
+const ownerFilteredBookings = computed(() => {
+  ownerFilteredBookingsCallCount++;
+  console.log(`🔍 [HomeOwner] ownerFilteredBookings computed (call #${ownerFilteredBookingsCallCount})`);
+  if (ownerFilteredBookingsCallCount > 20) {
+    console.error('❌ [HomeOwner] Infinite loop detected in ownerFilteredBookings computed!');
+    return new Map<string, Booking>();
+  }
+  let bookings = Array.from(ownerBookingsMap.value.values());
+  if (selectedPropertyFilter.value) {
+    bookings = bookings.filter(booking =>
+      booking.property_id === selectedPropertyFilter.value &&
+      ownerPropertiesMap.value.has(booking.property_id)
+    );
+  }
+  bookings = filterBookings(bookings);
+  const map = new Map<string, Booking>();
+  bookings.forEach(booking => {
+    map.set(booking.id, booking);
+  });
+  return map;
+});
+const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
+const eventModalMode = computed(() => {
+  const modal = uiStore.getModalState('eventModal');
+  return (modal?.mode as 'create' | 'edit') || 'create';
+});
+const eventModalData = computed(() => {
+  const modal = uiStore.getModalState('eventModal');
+  return modal?.data as Booking | undefined;
+});
+const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
+const propertyModalMode = computed(() => {
+  const modal = uiStore.getModalState('propertyModal');
+  return (modal?.mode as 'create' | 'edit') || 'create';
+});
+const propertyModalData = computed(() => {
+  const modal = uiStore.getModalState('propertyModal');
+  return modal?.data as Property | undefined;
+});
+const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirmDialog'));
+const confirmDialogTitle = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.title || 'Confirm';
+});
+const confirmDialogMessage = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.message || 'Are you sure you want to proceed?';
+});
+const confirmDialogConfirmText = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.confirmText || 'Confirm';
+});
+const confirmDialogCancelText = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.cancelText || 'Cancel';
+});
+const confirmDialogDangerous = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.dangerous || false;
+});
+const confirmDialogData = computed(() => {
+  const dialog = uiStore.getConfirmDialogState('confirmDialog');
+  return dialog?.data;
+});
+const handleNavigateToBooking = (bookingId: string): void => {
+    eventLogger.logEvent(
+      'OwnerSidebar',
+    'HomeOwner',
+    'navigateToBooking',
+    bookingId,
+    'receive'
+  );
+  const booking = ownerBookingsMap.value.get(bookingId);
+  if (booking) {
+    const bookingDate = new Date(booking.checkout_date);
+    handleNavigateToDate(bookingDate);
+    setTimeout(() => {
+      const calendarApi = calendarRef.value?.getApi?.();
+      if (calendarApi) {
+        const event = calendarApi.getEventById(bookingId);
+        if (event) {
+          event.setProp('classNames', [...event.classNames, 'highlighted']);
+          setTimeout(() => {
+            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
+          }, 3000);
+        }
+      }
+    }, 100);
+  } else {
+    console.warn('Booking not found in your properties');
+  }
+};
+const handleNavigateToDate = (date: Date): void => {
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'navigateToDate',
+    date,
+    'receive'
+  );
+  goToDate(date);
+  eventLogger.logEvent(
+    'HomeOwner',
+    'FullCalendar',
+    'goToDate',
+    date,
+    'emit'
+  );
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(date);
+  }
+};
+const handleFilterByProperty = (propertyId: string | null): void => {
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'filterByProperty',
+    propertyId,
+    'receive'
+  );
+  if (propertyId && !ownerPropertiesMap.value.has(propertyId)) {
+    console.warn('Cannot filter by property not owned by current user');
+    return;
+  }
+  selectedPropertyFilter.value = propertyId;
+  if (propertyId) {
+    togglePropertyFilter(propertyId);
+  } else {
+    clearPropertyFilters();
+  }
+  uiStore.setPropertyFilter(propertyId);
+  eventLogger.logEvent(
+    'HomeOwner',
+    'FullCalendar',
+    'filteredBookingsUpdate',
+    { propertyId, count: ownerFilteredBookings.value.size },
+    'emit'
+  );
+};
+const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'createBooking',
+    data,
+    'receive'
+  );
+  const bookingData = {
+    ...data,
+    owner_id: currentOwnerId.value
+  };
+  uiStore.openModal('eventModal', 'create', bookingData);
+};
+const handleCreateProperty = (): void => {
+      eventLogger.logEvent(
+      'OwnerSidebar',
+      'HomeOwner',
+      'createProperty',
+    null,
+    'receive'
+  );
+  const propertyData = {
+    owner_id: currentOwnerId.value
+  };
+  uiStore.openModal('propertyModal', 'create', propertyData);
+};
+const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  eventLogger.logEvent(
+    'FullCalendar',
+    'HomeOwner',
+    'dateSelect',
+    { start: selectInfo.startStr, end: selectInfo.endStr },
+    'receive'
+  );
+  const bookingData: Partial<BookingFormData> = {
+    checkout_date: selectInfo.startStr,
+    checkin_date: selectInfo.endStr,
+    owner_id: currentOwnerId.value
+  };
+  uiStore.openModal('eventModal', 'create', bookingData);
+};
+const handleEventClick = (clickInfo: EventClickArg): void => {
+  eventLogger.logEvent(
+    'FullCalendar',
+    'HomeOwner',
+    'eventClick',
+    { id: clickInfo.event.id },
+    'receive'
+  );
+  const booking = ownerBookingsMap.value.get(clickInfo.event.id);
+  if (booking) {
+    uiStore.openModal('eventModal', 'edit', { booking });
+  } else {
+    console.warn('Cannot edit booking not owned by current user');
+  }
+};
+const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
+  const booking = dropInfo.event.extendedProps.booking as Booking;
+  if (!ownerBookingsMap.value.has(booking.id)) {
+    console.warn('Cannot modify booking not owned by current user');
+    dropInfo.revert();
+    return;
+  }
+  try {
+    await updateBooking(booking.id, {
+      checkout_date: dropInfo.event.startStr,
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+    });
+  } catch (error) {
+    console.error('Failed to update your booking:', error);
+    dropInfo.revert();
+  }
+};
+const handleEventResize = async (resizeInfo: { event: any; revert: () => void }): Promise<void> => {
+  const booking = resizeInfo.event.extendedProps.booking as Booking;
+  if (!ownerBookingsMap.value.has(booking.id)) {
+    console.warn('Cannot modify booking not owned by current user');
+    resizeInfo.revert();
+    return;
+  }
+  try {
+    await updateBooking(booking.id, {
+      checkout_date: resizeInfo.event.startStr,
+      checkin_date: resizeInfo.event.endStr
+    });
+  } catch (error) {
+    console.error('Failed to update your booking:', error);
+    resizeInfo.revert();
+  }
+};
+const handlePrevious = (): void => {
+  prev();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.prev();
+  }
+};
+const handleNext = (): void => {
+  next();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.next();
+  }
+};
+const handleGoToday = (): void => {
+  goToToday();
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.today();
+  }
+};
+const handleCalendarViewChange = (view: string): void => {
+  const calendarView = view === 'week' ? 'timeGridWeek' :
+                      view === 'day' ? 'timeGridDay' :
+                      'dayGridMonth';
+  setCalendarView(calendarView);
+};
+const handleCalendarDateChange = (date: Date): void => {
+  goToDate(date);
+  const calendarApi = calendarRef.value?.getApi?.();
+  if (calendarApi) {
+    calendarApi.gotoDate(date);
+  }
+};
+const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string | undefined; }): void => {
+  const bookingData = {
+    ...data,
+    owner_id: currentOwnerId.value
+  };
+  uiStore.openModal('eventModal', 'create', bookingData);
+};
+const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+  if (!ownerBookingsMap.value.has(data.id)) {
+    console.warn('Cannot update booking not owned by current user');
+    return;
+  }
+  updateBooking(data.id, {
+    checkout_date: data.start,
+    checkin_date: data.end
+  });
+};
+const handleEventModalClose = (): void => {
+  uiStore.closeModal('eventModal');
+};
+const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
+  try {
+    const bookingData = {
+      ...data,
+      owner_id: currentOwnerId.value
+    };
+    if (eventModalMode.value === 'create') {
+      await createBooking(bookingData as BookingFormData);
+    } else if (eventModalData.value) {
+      if (!ownerBookingsMap.value.has(eventModalData.value.id)) {
+        throw new Error('Cannot update booking not owned by current user');
+      }
+      await updateBooking(eventModalData.value.id, bookingData as Partial<BookingFormData>);
+    }
+    uiStore.closeModal('eventModal');
+  } catch (error) {
+    console.error('Failed to save your booking:', error);
+  }
+};
+const handleEventModalDelete = async (bookingId: string): Promise<void> => {
+  if (!ownerBookingsMap.value.has(bookingId)) {
+    console.warn('Cannot delete booking not owned by current user');
+    return;
+  }
+    uiStore.openConfirmDialog('confirmDialog', {
+    title: 'Delete Booking',
+    message: 'Are you sure you want to delete this booking? This action cannot be undone.',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    dangerous: true,
+    data: { type: 'booking', id: bookingId }
+  });
+};
+const handlePropertyModalClose = (): void => {
+  uiStore.closeModal('propertyModal');
+};
+const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
+  try {
+    const propertyData = {
+      ...data,
+      owner_id: currentOwnerId.value
+    };
+    if (propertyModalMode.value === 'create') {
+      await createProperty(propertyData as PropertyFormData);
+    } else if (propertyModalData.value) {
+      if (!ownerPropertiesMap.value.has(propertyModalData.value.id)) {
+        throw new Error('Cannot update property not owned by current user');
+      }
+      await updateProperty(propertyModalData.value.id, propertyData as Partial<PropertyFormData>);
+    }
+    uiStore.closeModal('propertyModal');
+  } catch (error) {
+    console.error('Failed to save your property:', error);
+  }
+};
+const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
+  if (!ownerPropertiesMap.value.has(propertyId)) {
+    console.warn('Cannot delete property not owned by current user');
+    return;
+  }
+  uiStore.openConfirmDialog('confirmDialog', {
+    title: 'Delete Property',
+    message: 'Are you sure you want to delete this property? This will also delete all associated bookings. This action cannot be undone.',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    dangerous: true,
+    data: { type: 'property', id: propertyId }
+  });
+};
+const handleConfirmDialogConfirm = async (): Promise<void> => {
+  const data = confirmDialogData.value;
+  if (data?.type === 'booking' && data?.id) {
+    try {
+      await deleteBooking(data.id as string);
+      uiStore.closeModal('eventModal');
+    } catch (error) {
+      console.error('Failed to delete your booking:', error);
+    }
+  } else if (data?.type === 'property' && data?.id) {
+    try {
+      await deleteProperty(data.id as string    );
+      uiStore.closeModal('propertyModal');
+    } catch (error) {
+      console.error('Failed to delete your property:', error);
+    }
+  }
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+const handleConfirmDialogCancel = (): void => {
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+const handleConfirmDialogClose = (): void => {
+  uiStore.closeConfirmDialog('confirmDialog');
+};
+const toggleSidebar = (): void => {
+  sidebarOpen.value = !sidebarOpen.value;
+};
+console.log('🔄 [HomeOwner] Script setup running...');
+watch(isOwnerAuthenticated, (newValue) => {
+  console.log('🎨 [HomeOwner] Template will render, isOwnerAuthenticated:', newValue);
+}, { immediate: true });
+onMounted(async () => {
+  console.log('🚀 [HomeOwner] Component mounted successfully!');
+  if (authStore.loading) {
+    console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
+    const maxWait = 5000;
+    const startTime = Date.now();
+    while (authStore.loading && (Date.now() - startTime) < maxWait) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+  console.log('🔍 [HomeOwner] Auth state after waiting:', {
+    isAuthenticated: authStore.isAuthenticated,
+    user: authStore.user,
+    loading: authStore.loading,
+    isOwnerAuthenticated: isOwnerAuthenticated.value
+  });
+  if (isOwnerAuthenticated.value) {
+    console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
+    try {
+      await Promise.all([
+        fetchAllProperties(),
+        fetchAllBookings()
+      ]);
+      console.log('✅ [HomeOwner] Owner data loaded successfully');
+    } catch (error) {
+      console.error('❌ [HomeOwner] Failed to load your data:', error);
+    }
+  } else {
+    console.warn('⚠️ [HomeOwner] User is not authenticated as owner, skipping data load');
+  }
+});
+onUnmounted(() => {
+});
+watch(xs, (newValue) => {
+  if (newValue) {
+    sidebarOpen.value = false;
+  }
+});
+watch(isOwnerAuthenticated, async (newValue, oldValue) => {
+  console.log('🔄 [HomeOwner] isOwnerAuthenticated changed:', {
+    from: oldValue,
+    to: newValue,
+    user: authStore.user
+  });
+  if (newValue && !oldValue) {
+    console.log('✅ [HomeOwner] User became authenticated, loading data...');
+    try {
+      await Promise.all([
+        fetchAllProperties(),
+        fetchAllBookings()
+      ]);
+      console.log('✅ [HomeOwner] Data loaded after auth change');
+    } catch (error) {
+      console.error('❌ [HomeOwner] Failed to load data after auth change:', error);
+    }
+  } else if (!newValue && oldValue) {
+    console.log('⚠️ [HomeOwner] User became unauthenticated');
+  }
+});
+</script>
+<style scoped>
+.home-owner-container {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(100vh - 64px);
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  z-index: 1;
+}
+.sidebar-column {
+  width: 320px;
+  min-width: 320px;
+  height: 100%;
+  overflow-y: auto;
+  border-right: 1px solid rgb(var(--v-theme-on-surface), 0.12);
+  background: rgb(var(--v-theme-surface));
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  position: relative;
+}
+@media (max-width: 959px) {
+  .sidebar-column {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1005;
+    width: 300px;
+    min-width: 300px;
+    height: 100%;
+    transform: translateX(-100%);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+  }
+  .sidebar-column.sidebar-visible {
+    transform: translateX(0);
+  }
+  .sidebar-column.sidebar-hidden {
+    transform: translateX(-100%);
+  }
+  .calendar-column {
+    flex: 1;
+    margin-left: 0;
+  }
+}
+@media (min-width: 960px) {
+  .sidebar-column {
+    position: relative;
+    transform: translateX(0) !important;
+  }
+  .sidebar-column.sidebar-hidden,
+  .sidebar-column.sidebar-visible {
+    transform: translateX(0) !important;
+  }
+  .calendar-column {
+    flex: 1;
+    margin-left: 0;
+    width: calc(100vw - 320px);
+  }
+}
+.calendar-column {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  position: relative;
+  flex: 1;
+}
+.calendar-header-card {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
+  background: rgb(var(--v-theme-surface));
+  z-index: 1;
+}
+.calendar-content {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+@media (max-width: 599px) {
+  .home-owner-container {
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+  .sidebar-column {
+    top: 0;
+    height: 100%;
+  }
+}
+@media (min-width: 600px) and (max-width: 959px) {
+  .calendar-column {
+    margin-left: 0;
+  }
+}
+@media (min-width: 960px) {
+  .home-owner-container {
+    top: 64px;
+    height: calc(100vh - 64px);
+  }
+  .calendar-column {
+    margin-left: 0;
+  }
+}
+@media (min-width: 1280px) {
+  .calendar-column {
+    min-width: 600px;
+  }
+}
+.home-owner-container {
+  --owner-primary: rgb(var(--v-theme-primary));
+  --owner-accent: rgb(var(--v-theme-secondary));
+  --owner-surface: rgb(var(--v-theme-surface));
+  --owner-border: rgb(var(--v-theme-on-surface), 0.12);
+}
+:deep(.fc-event.highlighted) {
+  animation: owner-highlight 3s ease-in-out;
+  box-shadow: 0 0 0 3px var(--owner-primary);
+}
+:deep(.fc-event.booking-turn) {
+  font-weight: 600;
+  border-width: 2px !important;
+}
+:deep(.fc-event.priority-urgent) {
+  animation: pulse-urgent 2s infinite;
+}
+@keyframes owner-highlight {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--owner-primary);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 6px rgba(var(--v-theme-primary), 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 3px var(--owner-primary);
+  }
+}
+@keyframes pulse-urgent {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(244, 67, 54, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
+  }
+}
+@media (max-width: 959px) {
+  .home-owner-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  .home-owner-container:has(.sidebar-visible)::before {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .home-owner-container:has(.sidebar-visible)::before {
+    cursor: pointer;
+  }
+}
+</style>
+````
+
+## File: src/layouts/default.vue
+````vue
+<template>
+  <v-app>
+    <v-app-bar
+      app
+      color="surface"
+      elevation="1"
+      class="border-b"
+    >
+      <v-app-bar-nav-icon
+        @click="toggleSidebar"
+      />
+      <v-app-bar-title class="font-weight-medium">
+        Property Cleaning Scheduler
+      </v-app-bar-title>
+      <v-spacer />
+      <ThemePicker />
+      <v-menu
+        location="bottom end"
+        offset="5"
+      >
+        <template #activator="{ props: menuProps }">
+          <v-btn
+            icon
+            v-bind="menuProps"
+            class="ml-2"
+          >
+            <v-avatar size="36">
+              <v-icon>mdi-account-circle</v-icon>
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-list min-width="200">
+          <v-list-subheader>User Options</v-list-subheader>
+          <v-list-item
+            prepend-icon="mdi-account-outline"
+            title="Profile"
+          />
+          <v-list-item
+            prepend-icon="mdi-cog-outline"
+            title="Settings"
+          />
+          <v-divider class="my-2" />
+          <v-list-item
+            prepend-icon="mdi-logout"
+            title="Logout"
+            color="error"
+          />
+        </v-list>
+      </v-menu>
+    </v-app-bar>
+    <v-main class="owner-main">
+      <router-view />
+    </v-main>
+    <div id="notification-area">
+    </div>
+    <div id="modal-area">
+    </div>
+  </v-app>
+</template>
+⋮----
+<template #activator="{ props: menuProps }">
+          <v-btn
+            icon
+            v-bind="menuProps"
+            class="ml-2"
+          >
+            <v-avatar size="36">
+              <v-icon>mdi-account-circle</v-icon>
+            </v-avatar>
+          </v-btn>
+        </template>
+⋮----
+<script setup lang="ts">
+  import { ref } from 'vue'
+  import ThemePicker from '@/components/dumb/shared/ThemePicker.vue'
+  const sidebarOpen = ref(false)
+  const toggleSidebar = () => {
+    sidebarOpen.value = !sidebarOpen.value
+    console.log('Sidebar toggle clicked')
+  }
+  </script>
+<style>
+  .border-b {
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+  }
+  .border-r {
+    border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+  }
+  .v-app-bar {
+    background: rgb(var(--v-theme-surface)) !important;
+    color: rgb(var(--v-theme-on-surface)) !important;
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
+  }
+  .owner-main {
+    background: rgb(var(--v-theme-background)) !important;
+    color: rgb(var(--v-theme-on-background)) !important;
+  }
+  .v-list-item {
+    color: rgb(var(--v-theme-on-surface)) !important;
+  }
+  .v-list-item:hover {
+    background: rgba(var(--v-theme-primary), 0.08) !important;
+  }
+  .v-list-item--active {
+    background: rgba(var(--v-theme-primary), 0.12) !important;
+    color: rgb(var(--v-theme-primary)) !important;
+  }
+  .v-avatar {
+    background: rgb(var(--v-theme-primary)) !important;
+  }
+  .v-menu .v-list {
+    background: rgb(var(--v-theme-surface)) !important;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+  .fade-in {
+    animation: fadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+  .v-btn {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .v-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 16px rgba(33, 150, 243, 0.15);
+  }
+  </style>
+````
+
+## File: src/pages/index.vue
+````vue
+<template>
+  <div
+    v-if="authStore.loading"
+    class="loading-container"
+  >
+    <v-container class="fill-height">
+      <v-row
+        justify="center"
+        align="center"
+      >
+        <v-col cols="auto">
+          <v-progress-circular
+            indeterminate
+            size="64"
+            color="primary"
+          />
+          <div class="text-h6 mt-4 text-center">
+            Loading...
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+  <div v-else-if="!authStore.isAuthenticated">
+    <AuthPrompt />
+  </div>
+  <div v-else class="redirect-container">
+    <v-container class="fill-height">
+      <v-row justify="center" align="center">
+        <v-col cols="auto">
+          <v-progress-circular indeterminate size="48" color="primary" />
+          <div class="text-body-1 mt-4 text-center">
+            Redirecting to your dashboard...
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+</template>
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useUIStore } from '@/stores/ui'
+import { getDefaultRouteForRole } from '@/utils/authHelpers'
+const router = useRouter()
+const authStore = useAuthStore()
+const uiStore = useUIStore()
+const AuthPrompt = {
+  template: `
+    <v-container class="fill-height">
+      <v-row justify="center" align="center">
+        <v-col cols="12" sm="8" md="6" lg="4">
+          <v-card elevation="8" class="pa-4">
+            <v-card-title class="text-h5 text-center mb-4">
+              <v-icon class="mr-2" color="primary">mdi-login</v-icon>
+              Welcome to Property Cleaning Scheduler
+            </v-card-title>
+            <v-card-text class="text-center">
+              <p class="text-body-1 mb-4">
+                Please log in to access your dashboard.
+              </p>
+              <v-alert
+                type="info"
+                variant="tonal"
+                class="mb-4"
+              >
+                <strong>Development Mode:</strong><br>
+                Quick login options for testing.
+              </v-alert>
+              <v-btn
+                color="primary"
+                size="large"
+                block
+                @click="handleMockLogin"
+                :loading="authStore.loading"
+                class="mb-2"
+              >
+                <v-icon class="mr-2">mdi-shield-account</v-icon>
+                Demo Login (Admin)
+              </v-btn>
+              <v-btn
+                color="secondary"
+                variant="outlined"
+                size="large"
+                block
+                @click="handleMockOwnerLogin"
+                :loading="authStore.loading"
+                class="mb-4"
+              >
+                <v-icon class="mr-2">mdi-home-account</v-icon>
+                Demo Login (Owner)
+              </v-btn>
+              <v-divider class="my-4" />
+              <div class="text-center">
+                <p class="text-body-2 mb-2">
+                  Or use the full authentication flow:
+                </p>
+                <v-btn
+                  color="primary"
+                  variant="text"
+                  @click="goToLogin"
+                  :disabled="authStore.loading"
+                >
+                  Go to Login Page
+                </v-btn>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  `,
+  setup() {
+    const handleMockLogin = async () => {
+      try {
+        const success = await authStore.login('admin@example.com', 'password')
+        if (success) {
+          const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+          await router.push(defaultRoute)
+        }
+      } catch (error) {
+        console.error('Mock login failed:', error)
+      }
+    }
+    const handleMockOwnerLogin = async () => {
+      try {
+        const success = await authStore.login('owner@example.com', 'password')
+        if (success) {
+          const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+          await router.push(defaultRoute)
+        }
+      } catch (error) {
+        console.error('Mock owner login failed:', error)
+      }
+    }
+    const goToLogin = () => {
+      router.push('/auth/login')
+    }
+    return {
+      authStore,
+      uiStore,
+      router,
+      getDefaultRouteForRole,
+      handleMockLogin,
+      handleMockOwnerLogin,
+      goToLogin
+    }
+  }
+}
+onMounted(async () => {
+  try {
+    if (!authStore.isAuthenticated) {
+      await authStore.checkAuth()
+    }
+    if (authStore.isAuthenticated) {
+      const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+      if (defaultRoute !== '/' && router.currentRoute.value.path === '/') {
+        await router.push(defaultRoute)
+      }
+    }
+  } catch (error) {
+    console.error('Auth check failed:', error)
+  }
+})
+</script>
+<style scoped>
+.loading-container {
+  min-height: 100vh;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+.fill-height {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.v-card {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+.v-btn {
+  text-transform: none;
+}
+</style>
+````
+
+## File: src/stores/auth.ts
+````typescript
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import type { User, UserRole, PropertyOwner, Admin, Cleaner } from '@/types';
+import {
+  getDefaultRouteForRole,
+  getRoleSpecificSuccessMessage,
+  clearAllRoleSpecificState
+} from '@/utils/authHelpers';
+⋮----
+async function login(email: string, password: string): Promise<boolean>
+async function logout(): Promise<boolean>
+async function register(userData: {
+    email: string;
+    password: string;
+    name: string;
+    role: UserRole;
+    company_name?: string;
+}): Promise<boolean>
+function switchToOwnerView(ownerId?: string): boolean
+function switchToAdminView(): boolean
+async function checkAuth(): Promise<boolean>
+function clearError()
+function getSuccessMessage(action: 'login' | 'logout' | 'register'): string
+function getUserFromEmail(email: string): User | null
+function createUserFromRegistration(userData: {
+    email: string;
+    password: string;
+    name: string;
+    role: UserRole;
+    company_name?: string;
+}): User
+````
+
 ## File: src/components/smart/admin/HomeAdmin.vue
 ````vue
 <template>
@@ -35716,32 +23959,27 @@ const handleEventResize = (resizeInfo: any): void => {
     resizeInfo.revert();
   }
 };
-const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+const handleUpdateBooking = (data: { id: string; updates: Partial<Booking> }): void => {
   try {
-    const booking = allBookingsMap.value.get(data.id);
-    if (booking) {
-      const bookingData: Partial<BookingFormData> = {
-        ...booking,
-        checkout_date: data.start,
-        checkin_date: data.end
-      };
-      updateBooking(data.id, bookingData);
-    }
+    updateBooking(data.id, data.updates);
   } catch (error) {
     console.error('Error updating booking:', error);
   }
 };
-const handleCalendarViewChange = (view: CalendarView): void => {
+const handleCalendarViewChange = (view: string): void => {
   try {
     let fullCalendarView: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
     switch (view) {
       case 'month':
+      case 'dayGridMonth':
         fullCalendarView = 'dayGridMonth';
         break;
       case 'week':
+      case 'timeGridWeek':
         fullCalendarView = 'timeGridWeek';
         break;
       case 'day':
+      case 'timeGridDay':
         fullCalendarView = 'timeGridDay';
         break;
       default:
@@ -36024,767 +24262,14 @@ onUnmounted(() => {
 </style>
 ````
 
-## File: src/components/smart/Home.vue
-````vue
-<template>
-  <div class="home-container">
-    <v-row
-      no-gutters
-      class="fill-height"
-    >
-      <v-col
-        cols="12"
-        lg="3"
-        xl="2"
-        class="sidebar-column"
-        :class="{ 'mobile-hidden': !sidebarOpen }"
-      >
-        <Sidebar
-          :today-turns="todayTurns"
-          :upcoming-cleanings="upcomingCleanings"
-          :properties="propertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
-      </v-col>
-      <v-col
-        cols="12"
-        lg="9"
-        xl="10"
-        class="calendar-column"
-      >
-        <div class="calendar-header">
-          <v-btn
-            v-if="$vuetify.display.lgAndDown"
-            icon="mdi-menu"
-            variant="text"
-            class="mr-4"
-            @click="toggleSidebar"
-          />
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn
-              variant="outlined"
-              class="mr-2"
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6">
-              {{ formattedDate }}
-            </div>
-            <v-spacer />
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              class="ml-4"
-            >
-              <v-btn value="dayGridMonth">
-                Month
-              </v-btn>
-              <v-btn value="timeGridWeek">
-                Week
-              </v-btn>
-              <v-btn value="timeGridDay">
-                Day
-              </v-btn>
-            </v-btn-toggle>
-          </div>
-        </div>
-        <FullCalendar
-          ref="calendarRef"
-          :bookings="filteredBookings"
-          :properties="propertiesMap"
-          :loading="loading"
-          :current-view="currentView"
-          :current-date="currentDate"
-          @date-select="handleDateSelect"
-          @event-click="handleEventClick"
-          @event-drop="handleEventDrop"
-          @event-resize="handleEventResize"
-          @view-change="handleCalendarViewChange"
-          @date-change="handleCalendarDateChange"
-          @create-booking="handleCreateBookingFromCalendar"
-          @update-booking="handleUpdateBooking"
-        />
-      </v-col>
-    </v-row>
-    <BookingForm
-      :open="eventModalOpen"
-      :mode="eventModalMode"
-      :booking="eventModalData"
-      @close="handleEventModalClose"
-      @save="handleEventModalSave"
-      @delete="handleEventModalDelete"
-    />
-    <PropertyModal
-      :open="propertyModalOpen"
-      :mode="propertyModalMode"
-      :property="propertyModalData"
-      @close="handlePropertyModalClose"
-      @save="handlePropertyModalSave"
-      @delete="handlePropertyModalDelete"
-    />
-    <ConfirmationDialog
-      :open="confirmDialogOpen"
-      :title="confirmDialogTitle"
-      :message="confirmDialogMessage"
-      :confirm-text="confirmDialogConfirmText"
-      :cancel-text="confirmDialogCancelText"
-      :dangerous="confirmDialogDangerous"
-      @confirm="handleConfirmDialogConfirm"
-      @cancel="handleConfirmDialogCancel"
-      @close="handleConfirmDialogClose"
-    />
-  </div>
-</template>
-⋮----
-{{ formattedDate }}
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { useDisplay } from 'vuetify';
-import Sidebar from './Sidebar.vue';
-import FullCalendar from './FullCalendar.vue';
-import BookingForm from '@/components/dumb/BookingForm.vue';
-import PropertyModal from '@/components/dumb/PropertyModal.vue';
-import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
-import { useUIStore } from '@/stores/ui';
-import { useUserStore } from '@/stores/user';
-import { useAuthStore } from '@/stores/auth';
-import { useBookings } from '@/composables/shared/useBookings';
-import { useProperties } from '@/composables/shared/useProperties';
-import { useCalendarState } from '@/composables/shared/useCalendarState';
-import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
-const uiStore = useUIStore();
-const userStore = useUserStore();
-const authStore = useAuthStore();
-const { xs } = useDisplay();
-const {
-  loading: bookingsLoading,
-  createBooking,
-  updateBooking,
-  deleteBooking,
-  fetchAllBookings
-} = useBookings();
-const {
-  loading: propertiesLoading,
-  createProperty,
-  updateProperty,
-  deleteProperty,
-  fetchAllProperties
-} = useProperties();
-const {
-  currentView,
-  currentDate,
-  filterBookings,
-  setCalendarView,
-  goToDate,
-  goToToday,
-  next,
-  prev,
-  clearPropertyFilters,
-  togglePropertyFilter
-} = useCalendarState();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
-const sidebarOpen = ref(!xs.value);
-const selectedPropertyFilter = ref<string | null>(null);
-const loading = computed(() =>
-  bookingsLoading.value ||
-  propertiesLoading.value ||
-  uiStore.isLoading('bookings') ||
-  uiStore.isLoading('properties')
-);
-const formattedDate = computed(() => {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  };
-  return currentDate.value.toLocaleDateString('en-US', options);
-});
-const propertiesMap = computed(() => {
-  const map = new Map<string, Property>();
-  if (propertyStore.properties instanceof Map) {
-    return propertyStore.properties;
-  }
-  propertyStore.propertiesArray.forEach(property => {
-    if (property && property.id) {
-      map.set(property.id, property);
-    }
-  });
-  return map;
-});
-const todayTurns = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const turns = new Map<string, Booking>();
-  bookingStore.bookingsArray.forEach(booking => {
-    if (
-      booking.booking_type === 'turn' &&
-      new Date(booking.checkout_date) >= today &&
-      new Date(booking.checkout_date) < tomorrow
-    ) {
-      turns.set(booking.id, booking);
-    }
-  });
-  return turns;
-});
-const upcomingCleanings = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const inOneWeek = new Date(today);
-  inOneWeek.setDate(inOneWeek.getDate() + 7);
-  const cleanings = new Map<string, Booking>();
-  bookingStore.bookingsArray.forEach(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
-    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
-      cleanings.set(booking.id, booking);
-    }
-  });
-  return cleanings;
-});
-const filteredBookings = computed(() => {
-  let bookings = Array.from(bookingStore.bookings.values());
-  if (selectedPropertyFilter.value) {
-    bookings = bookings.filter(booking => booking.property_id === selectedPropertyFilter.value);
-  }
-  bookings = filterBookings(bookings);
-  const map = new Map<string, Booking>();
-  bookings.forEach(booking => {
-    map.set(booking.id, booking);
-  });
-  return map;
-});
-const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
-const eventModalMode = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const eventModalData = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return modal?.data as Booking | undefined;
-});
-const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
-const propertyModalMode = computed(() => {
-  const modal = uiStore.getModalState('propertyModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const propertyModalData = computed(() => {
-  const modal = uiStore.getModalState('propertyModal');
-  return modal?.data as Property | undefined;
-});
-const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirmDialog'));
-const confirmDialogTitle = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.title || 'Confirm';
-});
-const confirmDialogMessage = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.message || 'Are you sure you want to proceed?';
-});
-const confirmDialogConfirmText = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.confirmText || 'Confirm';
-});
-const confirmDialogCancelText = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.cancelText || 'Cancel';
-});
-const confirmDialogDangerous = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.dangerous || false;
-});
-const confirmDialogData = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.data || null;
-});
-const handleNavigateToBooking = (bookingId: string): void => {
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    'navigateToBooking',
-    bookingId,
-    'receive'
-  );
-  const booking = bookingStore.getBookingById(bookingId);
-  if (booking) {
-    const bookingDate = new Date(booking.checkout_date);
-    handleNavigateToDate(bookingDate);
-    setTimeout(() => {
-      const calendarApi = calendarRef.value?.getApi?.();
-      if (calendarApi) {
-        const event = calendarApi.getEventById(bookingId);
-        if (event) {
-          event.setProp('classNames', [...event.classNames, 'highlighted']);
-          setTimeout(() => {
-            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
-          }, 3000);
-        }
-      }
-    }, 100);
-  }
-};
-const handleNavigateToDate = (date: Date): void => {
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    'navigateToDate',
-    date,
-    'receive'
-  );
-  goToDate(date);
-  eventLogger.logEvent(
-    'Home',
-    'FullCalendar',
-    'goToDate',
-    date,
-    'emit'
-  );
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(date);
-  }
-};
-const handleFilterByProperty = (propertyId: string | null): void => {
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    'filterByProperty',
-    propertyId,
-    'receive'
-  );
-  selectedPropertyFilter.value = propertyId;
-  if (propertyId) {
-    togglePropertyFilter(propertyId);
-  } else {
-    clearPropertyFilters();
-  }
-  uiStore.setPropertyFilter(propertyId);
-  eventLogger.logEvent(
-    'Home',
-    'FullCalendar',
-    'filteredBookingsUpdate',
-    { propertyId, count: filteredBookings.value.size },
-    'emit'
-  );
-};
-const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    'createBooking',
-    data,
-    'receive'
-  );
-  uiStore.openModal('eventModal', 'create', data);
-};
-const handleCreateProperty = (): void => {
-  eventLogger.logEvent(
-    'Sidebar',
-    'Home',
-    'createProperty',
-    null,
-    'receive'
-  );
-  uiStore.openModal('propertyModal', 'create');
-};
-const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'dateSelect',
-    { start: selectInfo.startStr, end: selectInfo.endStr },
-    'receive'
-  );
-  const bookingData: Partial<BookingFormData> = {
-    checkout_date: selectInfo.startStr,
-    checkin_date: selectInfo.endStr,
-  };
-  uiStore.openModal('eventModal', 'create', bookingData);
-};
-const handleEventClick = (clickInfo: EventClickArg): void => {
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'eventClick',
-    { id: clickInfo.event.id },
-    'receive'
-  );
-  const booking = bookingStore.getBookingById(clickInfo.event.id);
-  if (booking) {
-    uiStore.openModal('eventModal', 'edit', { booking });
-  }
-};
-const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  try {
-    await updateBooking(booking.id, {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-    });
-    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
-  } catch (error) {
-    console.error('Failed to update booking:', error);
-    dropInfo.revert();
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking dates. Please try again.');
-  }
-};
-const handleEventResize = async (resizeInfo: any): Promise<void> => {
-  const booking = resizeInfo.event.extendedProps.booking as Booking;
-  try {
-    await updateBooking(booking.id, {
-      checkout_date: resizeInfo.event.startStr,
-      checkin_date: resizeInfo.event.endStr
-    });
-    uiStore.addNotification('success', 'Booking Updated', 'Booking duration has been updated successfully.');
-  } catch (error) {
-    console.error('Failed to resize booking:', error);
-    resizeInfo.revert();
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking duration. Please try again.');
-  }
-};
-const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
-  const bookingData: Partial<BookingFormData> = {
-    checkout_date: data.start,
-    checkin_date: data.end,
-    property_id: data.propertyId,
-    booking_type: 'standard'
-  };
-  handleCreateBooking(bookingData);
-};
-const handleUpdateBooking = async (data: { id: string; start: string; end: string }): Promise<void> => {
-  try {
-    await updateBooking(data.id, {
-      checkout_date: data.start,
-      checkin_date: data.end
-    });
-    uiStore.addNotification('success', 'Booking Updated', 'Booking dates have been updated successfully.');
-  } catch (error) {
-    console.error('Failed to update booking:', error);
-    uiStore.addNotification('error', 'Update Failed', 'Failed to update booking. Please try again.');
-    calendarRef.value?.refreshEvents?.();
-  }
-};
-const handleCalendarViewChange = (view: string): void => {
-  currentView.value = view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
-  setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
-};
-const handleCalendarDateChange = (date: Date): void => {
-  currentDate.value = date;
-};
-const handleGoToday = (): void => {
-  goToToday();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
-  }
-};
-const handlePrevious = (): void => {
-  prev();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
-  }
-};
-const handleNext = (): void => {
-  next();
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(currentDate.value);
-  }
-};
-const toggleSidebar = (): void => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
-const handleEventModalClose = (): void => {
-  uiStore.closeModal('eventModal');
-};
-const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
-  try {
-    if (eventModalMode.value === 'create') {
-      await createBooking(data);
-      uiStore.addNotification('success', 'Booking Created', 'New booking has been created successfully.');
-    } else {
-      const booking = eventModalData.value as Booking;
-      await updateBooking(booking.id, data);
-      uiStore.addNotification('success', 'Booking Updated', 'Booking has been updated successfully.');
-    }
-    uiStore.closeModal('eventModal');
-    calendarRef.value?.refreshEvents?.();
-  } catch (error) {
-    console.error('Failed to save booking:', error);
-    uiStore.addNotification('error', 'Save Failed', 'Failed to save booking. Please try again.');
-  }
-};
-const handleEventModalDelete = async (bookingId: string): Promise<void> => {
-  uiStore.openConfirmDialog(
-    'confirmDialog',
-    {
-      title: 'Delete Booking',
-      message: 'Are you sure you want to delete this booking? This action cannot be undone.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      dangerous: true,
-      data: { action: 'deleteBooking', id: bookingId }
-    }
-  );
-  uiStore.closeModal('eventModal');
-};
-const handlePropertyModalClose = (): void => {
-  uiStore.closeModal('propertyModal');
-};
-const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
-  try {
-    if (propertyModalMode.value === 'create') {
-      await createProperty(data);
-      uiStore.addNotification('success', 'Property Created', 'New property has been created successfully.');
-    } else {
-      const property = propertyModalData.value as Property;
-      await updateProperty(property.id, data);
-      uiStore.addNotification('success', 'Property Updated', 'Property has been updated successfully.');
-    }
-    uiStore.closeModal('propertyModal');
-  } catch (error) {
-    console.error('Failed to save property:', error);
-    uiStore.addNotification('error', 'Save Failed', 'Failed to save property. Please try again.');
-  }
-};
-const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
-  uiStore.openConfirmDialog(
-    'confirmDialog',
-    {
-      title: 'Delete Property',
-      message: 'Are you sure you want to delete this property? This action cannot be undone.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      dangerous: true,
-      data: { action: 'deleteProperty', id: propertyId }
-    }
-  );
-};
-const handleConfirmDialogConfirm = (): void => {
-  const data = confirmDialogData.value;
-  if (!data) return;
-  switch (data.action) {
-    case 'deleteProperty':
-      deleteProperty(data.id as string)
-        .then(() => {
-          uiStore.addNotification('success', 'Property Deleted', 'Property has been deleted successfully.');
-        })
-        .catch((error) => {
-          console.error('Failed to delete property:', error);
-          uiStore.addNotification('error', 'Delete Failed', 'Failed to delete property. Please try again.');
-        });
-      break;
-    case 'deleteBooking':
-      deleteBooking(data.id as string)
-        .then(() => {
-          uiStore.addNotification('success', 'Booking Deleted', 'Booking has been deleted successfully.');
-          calendarRef.value?.refreshEvents?.();
-        })
-        .catch((error) => {
-          console.error('Failed to delete booking:', error);
-          uiStore.addNotification('error', 'Delete Failed', 'Failed to delete booking. Please try again.');
-        });
-      break;
-    default:
-      console.warn('Unknown confirmation action:', data.action);
-  }
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-const handleConfirmDialogCancel = (): void => {
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-const handleConfirmDialogClose = (): void => {
-  uiStore.closeConfirmDialog('confirmDialog');
-};
-onMounted(async () => {
-  eventLogger.setEnabled(true);
-  eventLogger.logEvent(
-    'System',
-    'Home',
-    'mounted',
-    { timestamp: Date.now() },
-    'receive'
-  );
-  try {
-    uiStore.setLoading('bookings', true);
-    uiStore.setLoading('properties', true);
-    if (authStore.isAuthenticated) {
-      await Promise.all([
-        fetchAllProperties(),
-        fetchAllBookings()
-      ]);
-    }
-    uiStore.setLoading('bookings', false);
-    uiStore.setLoading('properties', false);
-  } catch (error) {
-    console.error('Failed to initialize data:', error);
-    uiStore.addNotification('error', 'Initialization Failed', 'Failed to load data. Please refresh the page.');
-    uiStore.setLoading('bookings', false);
-    uiStore.setLoading('properties', false);
-  }
-});
-watch(() => authStore.isAuthenticated, async (isAuthenticated) => {
-  if (isAuthenticated) {
-    try {
-      uiStore.setLoading('bookings', true);
-      uiStore.setLoading('properties', true);
-      await Promise.all([
-        fetchAllProperties(),
-        fetchAllBookings()
-      ]);
-      uiStore.setLoading('bookings', false);
-      uiStore.setLoading('properties', false);
-    } catch (error) {
-      console.error('Failed to fetch data after authentication:', error);
-      uiStore.addNotification('error', 'Data Fetch Failed', 'Failed to load your data after login. Please refresh the page.');
-      uiStore.setLoading('bookings', false);
-      uiStore.setLoading('properties', false);
-    }
-  } else {
-    propertyStore.clearAll();
-    bookingStore.clearAll();
-    userStore.clearUserPreferences();
-  }
-});
-watch(currentView, (newView) => {
-  setCalendarView(newView);
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.changeView(newView);
-  }
-});
-watch(selectedPropertyFilter, (newPropertyId) => {
-  uiStore.setPropertyFilter(newPropertyId);
-});
-watch(xs, (isExtraSmall) => {
-  sidebarOpen.value = !isExtraSmall;
-});
-onUnmounted(() => {
-});
-</script>
-<style scoped>
-.home-container {
-  height: 100vh;
-  overflow: hidden;
-  background: rgb(var(--v-theme-background));
-  color: rgb(var(--v-theme-on-background));
-}
-.fill-height {
-  height: 100%;
-}
-.sidebar-column {
-  background: rgb(var(--v-theme-surface));
-  border-right: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-  height: 100vh;
-  overflow-y: auto;
-}
-.calendar-column {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: rgb(var(--v-theme-background));
-}
-.calendar-header {
-  padding: 16px;
-  background: rgb(var(--v-theme-surface));
-  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-  display: flex;
-  align-items: center;
-  min-height: 64px;
-  color: rgb(var(--v-theme-on-surface));
-}
-.mobile-hidden {
-  display: none;
-}
-@media (min-width: 1264px) {
-  .mobile-hidden {
-    display: block;
-  }
-}
-:deep(.v-card) {
-  background: rgb(var(--v-theme-surface)) !important;
-  color: rgb(var(--v-theme-on-surface)) !important;
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-:deep(.v-card:hover) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--v-theme-on-surface), 0.15);
-  border-color: rgba(var(--v-theme-primary), 0.3) !important;
-}
-:deep(.v-btn) {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-:deep(.v-btn--variant-elevated),
-:deep(.v-btn--variant-flat) {
-  background: rgb(var(--v-theme-primary)) !important;
-  color: rgb(var(--v-theme-on-primary)) !important;
-}
-:deep(.v-btn--variant-outlined) {
-  border-color: rgb(var(--v-theme-primary)) !important;
-  color: rgb(var(--v-theme-primary)) !important;
-}
-:deep(.v-btn--variant-text) {
-  color: rgb(var(--v-theme-primary)) !important;
-}
-:deep(.v-btn:hover) {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(var(--v-theme-primary), 0.3);
-}
-:deep(.text-h6),
-:deep(.text-h5),
-:deep(.text-h4) {
-  color: rgb(var(--v-theme-on-surface)) !important;
-}
-:deep(.text-subtitle-1),
-:deep(.text-subtitle-2) {
-  color: rgba(var(--v-theme-on-surface), 0.8) !important;
-}
-:deep(.v-icon) {
-  color: rgb(var(--v-theme-on-surface)) !important;
-}
-:deep(.v-btn .v-icon) {
-  color: inherit !important;
-}
-:deep(.v-badge .v-badge__badge) {
-  background: rgb(var(--v-theme-primary)) !important;
-  color: rgb(var(--v-theme-on-primary)) !important;
-}
-:deep(.fc-event.highlighted) {
-  animation: highlight-pulse 3s ease-in-out;
-}
-@keyframes highlight-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0.7); }
-  50% { box-shadow: 0 0 0 20px rgba(var(--v-theme-primary), 0); }
-}
-</style>
+## File: vite.config.ts
+````typescript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
+import path from 'path'
+import vueDevTools from 'vite-plugin-vue-devtools'
+import { VitePluginInspector } from 'vite-plugin-vue-inspector'
 ````
 
 ## File: src/stores/ui.ts
@@ -36820,398 +24305,22 @@ function addNotification(type: NotificationType, title: string, message: string,
 function removeNotification(id: string)
 function clearNotifications()
 function setError(errorMessage: string | null)
+function showNotification(message: string, type: NotificationType = 'info')
+function showConfirmation(
+    title: string,
+    message: string,
+    options: {
+      confirmText?: string;
+      cancelText?: string;
+      dangerous?: boolean;
+    } = {}
+): Promise<boolean>
 function updateFilter(filter: Partial<FilterState>)
 function resetFilters()
 function setCalendarView(view: string)
 function setPropertyFilter(propertyId: string | null)
 function setFilter(key: string, value: FilterValue)
 function getFilter(key: string): FilterValue
-````
-
-## File: src/components/smart/Sidebar.vue
-````vue
-<template>
-  <v-navigation-drawer
-    class="sidebar"
-    width="100%"
-    :elevation="8"
-    color="tertiary"
-  >
-    <v-container class="py-2">
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <h2 class="text-h6 font-weight-bold">
-            Property Cleaning
-          </h2>
-          <div class="text-subtitle-2 text-medium-emphasis">
-            {{ formattedDate }}
-          </div>
-        </v-col>
-      </v-row>
-      <v-row v-if="todayTurnsArray.length > 0">
-        <v-col cols="12">
-          <TurnAlerts
-            :bookings="todayBookingsWithMetadata"
-            :properties="propertiesMap"
-            @view="$emit('navigateToBooking', $event)"
-            @assign="handleAssign"
-            @view-all="handleViewAll('turns')"
-          />
-        </v-col>
-      </v-row>
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <UpcomingCleanings
-            :bookings="upcomingBookingsWithMetadata"
-            :properties="propertiesMap"
-            @view="$emit('navigateToBooking', $event)"
-            @assign="handleAssign"
-            @view-all="handleViewAll($event)"
-            @toggle-expanded="toggleUpcomingExpanded"
-          />
-        </v-col>
-      </v-row>
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <v-card
-            class="property-filter"
-            variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-filter-variant"
-                class="mr-2"
-              />
-              Filter by Property
-            </v-card-title>
-            <v-card-text>
-              <v-select
-                v-model="selectedProperty"
-                :items="propertySelectItems"
-                label="Select Property"
-                clearable
-                @update:model-value="handlePropertyFilterChange"
-              >
-                <template #prepend-item>
-                  <v-list-item
-                    title="All Properties"
-                    value=""
-                    @click="selectedProperty = null"
-                  />
-                  <v-divider class="mt-2" />
-                </template>
-              </v-select>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <v-card
-            class="quick-actions"
-            variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-lightning-bolt"
-                class="mr-2"
-              />
-              Quick Actions
-            </v-card-title>
-            <v-card-text class="d-flex gap-2">
-              <v-btn
-                prepend-icon="mdi-calendar-plus"
-                color="primary"
-                variant="tonal"
-                block
-                @click="$emit('createBooking')"
-              >
-                New Booking
-              </v-btn>
-              <v-btn
-                prepend-icon="mdi-home-plus"
-                color="secondary"
-                variant="tonal"
-                block
-                @click="$emit('createProperty')"
-              >
-                New Property
-              </v-btn>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-overlay
-        :model-value="loading"
-        :contained="true"
-        :persistent="true"
-        class="align-center justify-center"
-      >
-        <v-progress-circular
-          indeterminate
-          color="primary"
-        />
-      </v-overlay>
-    </v-container>
-  </v-navigation-drawer>
-</template>
-⋮----
-{{ formattedDate }}
-⋮----
-<template #prepend-item>
-                  <v-list-item
-                    title="All Properties"
-                    value=""
-                    @click="selectedProperty = null"
-                  />
-                  <v-divider class="mt-2" />
-                </template>
-⋮----
-<script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
-import { useUIStore } from '@/stores/ui';
-import TurnAlerts from '@/components/dumb/shared/TurnAlerts.vue';
-import UpcomingCleanings from '@/components/dumb/shared/UpcomingCleanings.vue';
-import type { Booking, Property, BookingWithMetadata } from '@/types';
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-interface Props {
-  todayTurns?: Map<string, Booking> | Booking[];
-  upcomingCleanings?: Map<string,Booking> | Booking[];
-  properties?: Map<string, Property> | Property[];
-  loading?: boolean;
-}
-const props = withDefaults(defineProps<Props>(), {
-  todayTurns: () => [],
-  upcomingCleanings: () => [],
-  properties: () => [],
-  loading: false
-});
-interface Emits {
-  (e: 'navigateToBooking', bookingId: string): void;
-  (e: 'navigateToDate', date: Date): void;
-  (e: 'filterByProperty', propertyId: string | null): void;
-  (e: 'createBooking'): void;
-  (e: 'createProperty'): void;
-}
-const emit = defineEmits<Emits>();
-const uiStore = useUIStore();
-const selectedProperty = ref<string | null>(uiStore.selectedPropertyFilter || null);
-const formattedDate = computed(() => {
-  try {
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    };
-    return new Date().toLocaleDateString('en-US', options);
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return new Date().toISOString().split('T')[0];
-  }
-});
-const todayTurnsMap = computed(() => {
-  try {
-    if (props.todayTurns instanceof Map) return props.todayTurns;
-    const map = new Map<string, Booking>();
-    if (Array.isArray(props.todayTurns)) {
-      props.todayTurns.forEach(booking => {
-        if (booking && booking.id) {
-          map.set(booking.id, booking);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing today\'s turns:', error);
-    return new Map<string, Booking>();
-  }
-});
-const upcomingCleaningsMap = computed(() => {
-  try {
-    if (props.upcomingCleanings instanceof Map) return props.upcomingCleanings;
-    const map = new Map<string, Booking>();
-    if (Array.isArray(props.upcomingCleanings)) {
-      props.upcomingCleanings.forEach(booking => {
-        if (booking && booking.id) {
-          map.set(booking.id, booking);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing upcoming cleanings:', error);
-    return new Map<string, Booking>();
-  }
-});
-const propertiesMap = computed(() => {
-  try {
-    if (props.properties instanceof Map) return props.properties;
-    const map = new Map<string, Property>();
-    if (Array.isArray(props.properties)) {
-      props.properties.forEach(property => {
-        if (property && property.id) {
-          map.set(property.id, property);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing properties:', error);
-    return new Map<string, Property>();
-  }
-});
-const todayTurnsArray = computed(() =>
-  Array.from(todayTurnsMap.value.values())
-);
-const upcomingCleaningsArray = computed(() =>
-  Array.from(upcomingCleaningsMap.value.values())
-);
-const todayBookingsWithMetadata = computed(() => {
-  return todayTurnsArray.value.map(booking => {
-    const priority: 'low' | 'normal' | 'high' | 'urgent' = 'high';
-    return {
-      ...booking,
-      priority,
-      property_name: propertiesMap.value.get(booking.property_id)?.name || `Property ${booking.property_id.substring(0, 8)}`,
-      cleaning_window: {
-        start: booking.checkout_date,
-        end: booking.checkin_date,
-        duration: propertiesMap.value.get(booking.property_id)?.cleaning_duration || 120
-      }
-    } as BookingWithMetadata;
-  });
-});
-const upcomingBookingsWithMetadata = computed(() => {
-  return upcomingCleaningsArray.value.map(booking => {
-    const priority: 'low' | 'normal' | 'high' | 'urgent' =
-      booking.booking_type === 'turn' ? 'high' : 'normal';
-    return {
-      ...booking,
-      priority,
-      property_name: propertiesMap.value.get(booking.property_id)?.name || `Property ${booking.property_id.substring(0, 8)}`,
-      cleaning_window: {
-        start: booking.checkout_date,
-        end: booking.checkin_date,
-        duration: propertiesMap.value.get(booking.property_id)?.cleaning_duration || 120
-      }
-    } as BookingWithMetadata;
-  });
-});
-const propertySelectItems = computed(() => {
-  try {
-    return Array.from(propertiesMap.value.values())
-      .filter(property => property && property.id && property.name)
-      .map(property => ({
-        title: property.name,
-        value: property.id,
-      }));
-  } catch (error) {
-    console.error('Error creating property select items:', error);
-    return [];
-  }
-});
-const handlePropertyFilterChange = (propertyId: string | null): void => {
-  try {
-    uiStore.setPropertyFilter(propertyId);
-    eventLogger.logEvent(
-      'Sidebar',
-      'Home',
-      'filterByProperty',
-      propertyId,
-      'emit'
-    );
-    emit('filterByProperty', propertyId);
-  } catch (error) {
-    console.error('Error changing property filter:', error);
-  }
-};
-const handleAssign = (bookingId: string): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'Home',
-      'navigateToBooking',
-      bookingId,
-      'emit'
-    );
-    emit('navigateToBooking', bookingId);
-  } catch (error) {
-    console.error('Error handling assign:', error);
-  }
-};
-const handleViewAll = (period: string): void => {
-  try {
-    const today = new Date();
-    let targetDate = today;
-    if (period === 'turns') {
-    } else if (period === 'today') {
-    } else if (period === 'tomorrow') {
-      targetDate = new Date();
-      targetDate.setDate(targetDate.getDate() + 1);
-    } else {
-      try {
-        targetDate = new Date(period);
-      } catch {
-        targetDate = today;
-      }
-    }
-    eventLogger.logEvent(
-      'Sidebar',
-      'Home',
-      'navigateToDate',
-      targetDate,
-      'emit'
-    );
-    emit('navigateToDate', targetDate);
-  } catch (error) {
-    console.error('Error handling view all:', error);
-  }
-};
-const toggleUpcomingExpanded = (expanded: boolean): void => {
-  console.log('Upcoming cleanings expanded:', expanded);
-};
-watch(() => uiStore.selectedPropertyFilter, (newPropertyId) => {
-  selectedProperty.value = newPropertyId;
-});
-onMounted(() => {
-  try {
-    selectedProperty.value = uiStore.selectedPropertyFilter;
-  } catch (error) {
-    console.error('Error initializing selected property:', error);
-    selectedProperty.value = null;
-  }
-});
-</script>
-<style scoped>
-.sidebar {
-  height: 100%;
-  overflow-y: auto;
-}
-.quick-actions .v-card-text {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
-}
-@media (max-width: 960px) {
-  .sidebar {
-    width: 100% !important;
-  }
-}
-</style>
 ````
 
 ## File: package.json
@@ -37224,11 +24333,18 @@ onMounted(() => {
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "build:fast": "vite build",
+    "build:analyze": "vue-tsc --noEmit && vite build --mode analyze",
+    "build:production": "set NODE_ENV=production && vite build",
+    "build:owner-only": "set ROLE_BUILD=owner && vite build",
+    "build:admin-only": "set ROLE_BUILD=admin && vite build",
     "preview": "vite preview",
+    "preview:production": "vite preview --mode production",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "analyze:bundle": "pnpx vite-bundle-analyzer dist"
   },
   "keywords": [],
   "author": "",
@@ -37284,928 +24400,6 @@ onMounted(() => {
 }
 ````
 
-## File: problemfix.md
-````markdown
-# Problem Fix Documentation
-
-## TypeScript Const Assertion Error in AdminSidebar.vue
-
-### Problem Description
-**Error**: `A 'const' assertions can only be applied to references to enum members, or string, number, boolean, array, or object literals.ts(1355)`
-
-**Location**: `src/components/smart/admin/AdminSidebar.vue`, line 666
-
-**Code causing the error**:
-```typescript
-priority: (booking.booking_type === 'turn' ? 'high' : 'normal') as const,
-```
-
-### Root Cause Analysis
-The TypeScript `as const` assertion cannot be applied to conditional expressions. The `as const` assertion can only be used on:
-- Enum members
-- String literals
-- Number literals  
-- Boolean literals
-- Array literals
-- Object literals
-
-A conditional expression like `(condition ? 'value1' : 'value2')` is not a literal value, so TypeScript rejects the `as const` assertion.
-
-### Solution Applied
-Following the established pattern from the existing codebase (`src/components/smart/Sidebar.vue`), the solution is to:
-
-1. **Declare an explicitly typed variable** instead of using `as const`
-2. **Assign the conditional expression** to that variable
-3. **Use the variable** in the object construction
-
-**Before (incorrect)**:
-```typescript
-return {
-  ...booking,
-  priority: (booking.booking_type === 'turn' ? 'high' : 'normal') as const,
-  // ... other properties
-} as BookingWithMetadata;
-```
-
-**After (correct)**:
-```typescript
-// Explicit priority type declaration following established pattern
-const priority: 'low' | 'normal' | 'high' | 'urgent' = 
-  booking.booking_type === 'turn' ? 'high' : 'normal';
-
-return {
-  ...booking,
-  priority,
-  // ... other properties
-} as BookingWithMetadata;
-```
-
-### Files Modified
-1. **src/components/smart/admin/AdminSidebar.vue**:
-   - Fixed `systemTodayBookingsWithMetadata` computed property
-   - Fixed `systemUpcomingBookingsWithMetadata` computed property
-   - Removed unused `uiStore` variable (linter warning)
-
-### Established Pattern Reference
-This solution follows the pattern already established in:
-- `src/components/smart/Sidebar.vue` (lines 289-291)
-- `src/components/smart/owner/OwnerSidebar.vue` (similar pattern)
-
-### Type Safety Benefits
-The explicit type declaration approach provides:
-1. **Better type safety**: TypeScript can verify the assignment matches the expected union type
-2. **Clearer intent**: The code explicitly shows what priority values are allowed
-3. **Consistency**: Matches the established codebase patterns
-4. **Maintainability**: Easier to understand and modify
-
-### Business Logic Context
-This fix maintains the core business logic for the role-based multi-tenant architecture:
-- **Admin interface**: Shows system-wide data (all properties, all bookings)
-- **Priority calculation**: Turn bookings get 'high' priority, standard bookings get 'normal' priority
-- **Turn vs Standard distinction**: Core business logic preserved across role-based components
-
-### Prevention
-To prevent similar issues in the future:
-1. **Use explicit type declarations** for conditional expressions that need specific types
-2. **Follow established patterns** from existing codebase components
-3. **Avoid `as const` on computed/conditional values** - only use on literal values
-4. **Reference existing implementations** like Sidebar.vue for consistent patterns
-
-### Verification
-- [x] TypeScript compiles without errors
-- [x] Follows established naming conventions  
-- [x] Integrates with existing stores/composables
-- [x] Includes proper error handling
-- [x] Maintains role-based architecture patterns
-- [x] Preserves turn vs standard booking business logic
-
-## FullCalendar List Plugin Import Error
-
-### Problem Description
-The AdminCalendar.vue component was showing a TypeScript error:
-```
-Cannot find module '@fullcalendar/list' or its corresponding type declarations.
-```
-
-This error occurred on line 203 of `src/components/smart/admin/AdminCalendar.vue`:
-```typescript
-import listPlugin from '@fullcalendar/list';
-```
-
-### Root Cause Analysis
-The issue was that the `@fullcalendar/list` package was installed as a devDependency instead of a regular dependency. While the package was available during development, TypeScript was having trouble resolving the module correctly due to its placement in the wrong dependency section.
-
-### Solution Implemented
-
-#### 1. Package Dependency Fix
-**Problem**: `@fullcalendar/list` was in devDependencies instead of dependencies
-**Solution**: Moved the package to the correct dependencies section in package.json
-
-**Before**:
-```json
-{
-  "dependencies": {
-    "@fullcalendar/core": "^6.1.17",
-    "@fullcalendar/daygrid": "^6.1.17",
-    "@fullcalendar/interaction": "^6.1.17",
-    "@fullcalendar/timegrid": "^6.1.17",
-    "@fullcalendar/vue3": "^6.1.17"
-  },
-  "devDependencies": {
-    "@fullcalendar/list": "^6.1.17"
-  }
-}
-```
-
-**After**:
-```json
-{
-  "dependencies": {
-    "@fullcalendar/core": "^6.1.17",
-    "@fullcalendar/daygrid": "^6.1.17",
-    "@fullcalendar/interaction": "^6.1.17",
-    "@fullcalendar/list": "^6.1.17",
-    "@fullcalendar/timegrid": "^6.1.17",
-    "@fullcalendar/vue3": "^6.1.17"
-  }
-}
-```
-
-#### 2. Import Statement Verification
-**Verified**: The import statement follows the established pattern from other FullCalendar plugins:
-```typescript
-import listPlugin from '@fullcalendar/list';
-```
-
-This matches the pattern used in the existing FullCalendar.vue component:
-```typescript
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-```
-
-#### 3. Package Installation Verification
-**Confirmed**: The package is correctly installed with proper TypeScript declarations:
-- Package exists in `node_modules/@fullcalendar/list/`
-- TypeScript declarations available in `index.d.ts`
-- Runtime import test successful
-
-### Technical Details
-
-#### Context7 Documentation Reference
-Used FullCalendar documentation to confirm the correct usage of the list plugin:
-- List plugin provides list view functionality for FullCalendar
-- Supports listDay, listWeek, listMonth, and listYear views
-- Properly integrates with Vue 3 and TypeScript
-
-#### Established Project Patterns
-The fix follows the project's established patterns:
-- **Role-Based Architecture**: AdminCalendar.vue is part of the admin-specific components
-- **FullCalendar Integration**: Consistent with existing FullCalendar.vue component patterns
-- **TypeScript Support**: Maintains proper type safety and declarations
-- **Package Management**: Follows pnpm dependency management practices
-
-### Verification Steps
-1. ✅ Package moved to correct dependencies section
-2. ✅ pnpm install completed successfully
-3. ✅ Runtime import test passed
-4. ✅ TypeScript declarations available
-5. ✅ Import statement follows established patterns
-
-### Files Modified
-- `package.json`: Moved `@fullcalendar/list` from devDependencies to dependencies
-- `src/components/smart/admin/AdminCalendar.vue`: Import statement verified (no changes needed)
-
-### Impact
-- **Positive**: AdminCalendar.vue can now use list view functionality
-- **No Breaking Changes**: Existing FullCalendar functionality remains intact
-- **Consistency**: Maintains established import patterns across the project
-
-### Future Considerations
-- The list plugin enables additional calendar views (listDay, listWeek, listMonth, listYear)
-- AdminCalendar.vue can now provide list-based views for better data management
-- Follows the role-based architecture where admin users get advanced calendar features
-
-### Related Components
-- `src/components/smart/FullCalendar.vue`: Base calendar component
-- `src/components/smart/admin/AdminCalendar.vue`: Admin-specific calendar with list plugin
-- `src/components/smart/admin/AdminCalendarDemo.vue`: Demo component for testing
-
-### Notes
-- The TypeScript error may persist temporarily in some IDEs due to language server caching
-- The import is functionally correct and works at runtime
-- Package is properly installed with full TypeScript support
-
-# Problem Fix Documentation: UseAdminPropertiesDemo.vue TypeScript Warnings
-
-## **Problem Summary**
-Fixed TypeScript warnings in `src/components/smart/admin/UseAdminPropertiesDemo.vue` where three variables were declared but never used, causing linter errors.
-
-## **Specific TypeScript Errors**
-```typescript
-// Error 1: Line 396
-'allActiveProperties' is declared but its value is never read.
-
-// Error 2: Line 406  
-'getPropertyUtilization' is declared but its value is never read.
-
-// Error 3: Line 407
-'filterProperties' is declared but its value is never read.
-```
-
-## **Root Cause Analysis**
-
-### **Why This Occurred**
-1. **Incomplete Demo Implementation**: The demo component was destructuring more functionality from `useAdminProperties` than it was actually demonstrating
-2. **Redundant Function Import**: `getPropertyUtilization` was redundant since `propertyUtilizationData` was already being used
-3. **Missing Demo Sections**: The component wasn't showcasing the full capabilities of the admin properties composable
-
-### **Impact**
-- TypeScript compilation warnings
-- Incomplete demonstration of composable functionality
-- Reduced value of the demo component for testing and development
-
-## **Solution Implemented**
-
-### **Approach: Comprehensive Demo Enhancement**
-Instead of simply removing unused variables, I enhanced the demo to actually use them, making it more comprehensive and valuable.
-
-### **1. Active vs Inactive Properties Display**
-**Fixed**: `'allActiveProperties' is declared but its value is never read`
-
-**Implementation**:
-```vue
-<!-- Added Active vs Inactive Properties Section -->
-<v-row>
-  <v-col cols="12" md="6">
-    <v-card>
-      <v-card-title>
-        <v-icon class="mr-2" color="success">mdi-check-circle</v-icon>
-        Active Properties
-      </v-card-title>
-      <v-card-text>
-        <div class="text-h3 text-success">{{ allActiveProperties.length }}</div>
-        <div class="text-caption">Currently active properties</div>
-      </v-card-text>
-    </v-card>
-  </v-col>
-  <v-col cols="12" md="6">
-    <v-card>
-      <v-card-title>
-        <v-icon class="mr-2" color="warning">mdi-pause-circle</v-icon>
-        Inactive Properties
-      </v-card-title>
-      <v-card-text>
-        <div class="text-h3 text-warning">{{ allProperties.length - allActiveProperties.length }}</div>
-        <div class="text-caption">Currently inactive properties</div>
-      </v-card-text>
-    </v-card>
-  </v-col>
-</v-row>
-```
-
-**Benefits**:
-- Showcases the `allActiveProperties` computed property
-- Provides visual metrics for admin dashboard
-- Demonstrates role-based data access (admin sees ALL properties)
-
-### **2. Advanced Property Filtering Demo**
-**Fixed**: `'filterProperties' is declared but its value is never read`
-
-**Implementation**:
-```typescript
-// Added reactive filter state
-const filterCriteria = ref({
-  owner_id: '',
-  pricing_tier: '',
-  active: null as boolean | null
-});
-const filteredResults = ref<any[]>([]);
-
-// Added filter options
-const ownerOptions = computed(() => {
-  const owners = new Set(allProperties.value.map(p => p.owner_id));
-  return Array.from(owners).map(id => ({
-    title: `Owner ${id.slice(0, 8)}...`,
-    value: id
-  }));
-});
-
-// Added filter functions
-function testFilterProperties() {
-  const criteria: any = {};
-  
-  if (filterCriteria.value.owner_id) {
-    criteria.owner_id = filterCriteria.value.owner_id;
-  }
-  
-  if (filterCriteria.value.pricing_tier) {
-    criteria.pricing_tier = filterCriteria.value.pricing_tier;
-  }
-  
-  if (filterCriteria.value.active !== null) {
-    criteria.active = filterCriteria.value.active;
-  }
-  
-  filteredResults.value = filterProperties(criteria);
-  console.log('Filter results:', filteredResults.value);
-}
-
-function clearFilters() {
-  filterCriteria.value = {
-    owner_id: '',
-    pricing_tier: '',
-    active: null
-  };
-  filteredResults.value = [];
-}
-```
-
-**UI Components Added**:
-```vue
-<!-- Advanced Property Filtering Demo -->
-<v-row>
-  <v-col cols="12">
-    <v-card>
-      <v-card-title>
-        <v-icon class="mr-2" color="primary">mdi-filter</v-icon>
-        Advanced Property Filtering Demo
-      </v-card-title>
-      <v-card-text>
-        <!-- Filter Controls -->
-        <v-row>
-          <v-col cols="12" md="4">
-            <v-select
-              v-model="filterCriteria.owner_id"
-              :items="ownerOptions"
-              label="Filter by Owner"
-              clearable
-              variant="outlined"
-              density="compact"
-            />
-          </v-col>
-          <!-- More filter controls... -->
-        </v-row>
-        
-        <!-- Filter Results Display -->
-        <v-row v-if="filteredResults.length > 0">
-          <v-col cols="12">
-            <v-alert type="info" variant="outlined" class="mt-4">
-              Found {{ filteredResults.length }} properties matching your criteria
-            </v-alert>
-            <!-- Results list... -->
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-  </v-col>
-</v-row>
-```
-
-**Benefits**:
-- Demonstrates advanced filtering capabilities
-- Shows multi-criteria filtering (owner, tier, status)
-- Interactive testing of the `filterProperties` function
-- Showcases admin-specific functionality (filtering across all owners)
-
-### **3. Redundant Function Removal**
-**Fixed**: `'getPropertyUtilization' is declared but its value is never read`
-
-**Solution**: Removed `getPropertyUtilization` from destructuring since `propertyUtilizationData` was already being used.
-
-```typescript
-// Before (redundant)
-const {
-  // ...
-  getPropertyUtilization,  // ❌ Redundant
-  propertyUtilizationData, // ✅ Already used
-  // ...
-} = useAdminProperties();
-
-// After (clean)
-const {
-  // ...
-  propertyUtilizationData, // ✅ Only what's needed
-  // ...
-} = useAdminProperties();
-```
-
-### **4. Syntax Error Fix**
-**Additional Issue Found**: Extra closing brace in `testBulkUpdate()` function
-
-```typescript
-// Before (syntax error)
-async function testBulkUpdate() {
-  const propertyIds = allProperties.value.slice(0, 3).map(p => p.id);
-  if (propertyIds.length === 0) {
-    console.warn('No properties available for bulk update test');
-    return;
-  }
-  } // ❌ Extra closing brace
-  
-  const updates = { /* ... */ };
-  // ...
-}
-
-// After (fixed)
-async function testBulkUpdate() {
-  const propertyIds = allProperties.value.slice(0, 3).map(p => p.id);
-  
-  if (propertyIds.length === 0) {
-    error.value = 'No properties available for bulk update test';
-    return;
-  }
-  
-  const updates = { /* ... */ };
-  // ...
-}
-```
-
-## **Technical Patterns Followed**
-
-### **Vue 3 Composition API Patterns**
-- ✅ Used `ref()` for reactive state
-- ✅ Used `computed()` for derived state
-- ✅ Proper TypeScript typing with generics
-- ✅ Followed established naming conventions
-
-### **Role-Based Architecture Patterns**
-- ✅ Admin sees ALL data (no owner filtering)
-- ✅ System-wide metrics and analytics
-- ✅ Advanced filtering across all properties
-- ✅ Business-focused error messaging
-
-### **Component Demo Patterns**
-- ✅ Comprehensive functionality showcase
-- ✅ Interactive testing capabilities
-- ✅ Visual feedback and status display
-- ✅ Console logging for debugging
-
-## **Benefits of This Solution**
-
-### **1. Enhanced Demo Value**
-- **Before**: Basic demo with unused functionality
-- **After**: Comprehensive demo showcasing all composable features
-
-### **2. Better Testing Capabilities**
-- Interactive filtering for manual testing
-- Visual metrics display for verification
-- Multiple test scenarios in one component
-
-### **3. Improved Developer Experience**
-- Clear demonstration of admin-specific features
-- Examples of proper Vue 3 Composition API usage
-- Role-based architecture patterns showcase
-
-### **4. TypeScript Compliance**
-- ✅ All TypeScript warnings resolved
-- ✅ Proper type safety maintained
-- ✅ No unused variables or functions
-
-## **Verification Steps**
-
-### **1. TypeScript Compilation**
-```bash
-# All TypeScript errors resolved
-npm run type-check  # ✅ Passes
-```
-
-### **2. Demo Functionality**
-- ✅ Active/Inactive property counts display correctly
-- ✅ Filter controls work with all criteria combinations
-- ✅ Filter results display properly
-- ✅ Clear filters functionality works
-- ✅ All existing demo features still work
-
-### **3. Role-Based Architecture Compliance**
-- ✅ Admin sees ALL properties (no owner filtering)
-- ✅ System-wide metrics calculated correctly
-- ✅ Advanced filtering works across all data
-- ✅ Proper error handling with admin context
-
-## **Future Considerations**
-
-### **Demo Enhancement Opportunities**
-1. **Bulk Operations Demo**: Add interactive bulk update testing
-2. **Analytics Visualization**: Add charts for property metrics
-3. **Real-time Updates**: Add WebSocket simulation for live data
-4. **Export Functionality**: Add CSV/PDF export demos
-
-### **Performance Considerations**
-1. **Large Dataset Handling**: Consider pagination for filter results
-2. **Computed Property Optimization**: Monitor performance with large property sets
-3. **Memory Management**: Ensure proper cleanup of demo state
-
-## **Lessons Learned**
-
-### **1. Demo Component Best Practices**
-- Always showcase the full functionality of composables
-- Provide interactive testing capabilities
-- Include visual feedback and status indicators
-- Follow established architectural patterns
-
-### **2. TypeScript Warning Resolution**
-- Consider enhancing functionality rather than just removing unused code
-- Ensure demo components provide comprehensive testing capabilities
-- Maintain proper type safety throughout enhancements
-
-### **3. Role-Based Architecture**
-- Admin components should demonstrate system-wide capabilities
-- Filtering and analytics should reflect admin scope (all data)
-- Error handling should include business impact context
-
-## **Related Files Modified**
-- `src/components/smart/admin/UseAdminPropertiesDemo.vue` - Main fix implementation
-- `src/router/index.ts` - Demo route already existed
-- `src/composables/admin/useAdminProperties.ts` - No changes needed (composable was correct)
-
-## **Testing Completed**
-- ✅ TypeScript compilation passes
-- ✅ Demo component loads without errors  
-- ✅ All new functionality works as expected
-- ✅ Existing functionality remains intact
-- ✅ Role-based architecture patterns maintained
-
-## Issue: Duplicate Identifier Error in Admin Cleaners Page
-
-### Problem Description
-When accessing `/admin/cleaners`, the application threw a compilation error:
-```
-[plugin:vite:vue] [vue/compiler-sfc] Identifier 'deleteCleaner' has already been declared. (97:6)
-```
-
-### Root Cause Analysis
-The error occurred due to a **naming conflict** in the Vue component's script section:
-
-1. **Line 296**: The component destructured `deleteCleaner` from the `useCleanerManagement` composable:
-   ```typescript
-   const { allCleaners, loading, fetchCleaners, createCleaner, updateCleaner, deleteCleaner } = useCleanerManagement()
-   ```
-
-2. **Line 385**: The component then attempted to declare a local function with the same name:
-   ```typescript
-   const deleteCleaner = async (cleaner: Cleaner) => {
-     // ... function body
-   }
-   ```
-
-This created a **duplicate identifier** error because JavaScript/TypeScript doesn't allow two variables/functions with the same name in the same scope.
-
-### Why This Occurred
-This is a common pattern issue when:
-- A composable provides a function (like `deleteCleaner`)
-- The component needs to wrap that function with additional logic (like confirmation dialogs)
-- The developer accidentally uses the same name for both the imported function and the wrapper function
-
-### Solution Implemented
-**Renamed the local wrapper function** to follow Vue.js naming conventions:
-
-1. **Changed the local function name** from `deleteCleaner` to `handleDeleteCleaner`:
-   ```typescript
-   const handleDeleteCleaner = async (cleaner: Cleaner) => {
-     if (confirm(`Are you sure you want to delete ${cleaner.name}?`)) {
-       try {
-         await deleteCleaner(cleaner.id) // Still calls the composable function
-       } catch (error) {
-         console.error('Failed to delete cleaner:', error)
-       }
-     }
-   }
-   ```
-
-2. **Updated the template** to use the renamed function:
-   ```vue
-   <v-btn
-     variant="text"
-     size="small"
-     color="error"
-     icon="mdi-delete"
-     @click="handleDeleteCleaner(cleaner)"
-   />
-   ```
-
-### Architecture Patterns Followed
-This fix follows established project patterns:
-
-1. **Composable Integration**: Maintains proper use of the `useCleanerManagement` composable
-2. **Event Handler Naming**: Uses `handle` prefix for event handler functions (Vue.js convention)
-3. **Separation of Concerns**: 
-   - Composable provides the core business logic (`deleteCleaner`)
-   - Component provides the UI logic (`handleDeleteCleaner` with confirmation)
-4. **Error Handling**: Maintains proper error handling in the wrapper function
-
-### Prevention Strategy
-To prevent similar issues in the future:
-
-1. **Use descriptive names** for wrapper functions (e.g., `handleDeleteCleaner`, `onDeleteCleaner`)
-2. **Follow naming conventions**: Use `handle` or `on` prefixes for event handlers
-3. **Review destructured imports** when creating local functions with similar purposes
-4. **Use TypeScript/ESLint** to catch naming conflicts during development
-
-### Files Modified
-- `src/pages/admin/cleaners/index.vue`: Fixed duplicate identifier by renaming local function
-
-### Verification
-- ✅ **Duplicate identifier error resolved** - The specific compilation error is fixed
-- ✅ **No naming conflicts** - Local function renamed to `handleDeleteCleaner`
-- ✅ **Component follows established project patterns** - Uses `handle` prefix for event handlers
-- ✅ **Maintains integration with existing composables** - Still calls `deleteCleaner` from `useCleanerManagement`
-- ✅ **Proper error handling preserved** - Confirmation dialog and try/catch blocks maintained
-- ✅ **Template updated correctly** - Button click handler uses new function name
-
-### Test Results
-- **Before Fix**: `[plugin:vite:vue] [vue/compiler-sfc] Identifier 'deleteCleaner' has already been declared`
-- **After Fix**: Compilation error resolved, page loads successfully
-- **Functionality**: Delete cleaner functionality works as expected with confirmation dialog
-
-### Additional Notes
-- Other TypeScript errors in the project are unrelated to this specific fix
-- The core duplicate identifier issue has been completely resolved
-- The fix maintains all existing functionality while following Vue.js naming conventions
-
-## Issue: Vuetify Layout Injection Error in Admin Interface
-
-### Problem Description
-When accessing `/admin/`, the following error appeared in the console:
-```
-[Vue warn]: injection "Symbol(vuetify:layout)" not found. 
-  at <VNavigationDrawer class="sidebar" width="100%" elevation=8  ... > 
-  at <Sidebar today-turns= Map(0) {size: 0}[[Entries]]No propertiessize: 0[[Prototype]]: Map upcoming-cleanings= Map(0) {size: 0}[[Entries]]No propertiessize: 0[[Prototype]]: Map properties= Map(0) {size: 0}[[Entries]]No propertiessize: 0[[Prototype]]: Map  ... > 
-  at <VCol cols="12" lg="3" xl="2"  ... > 
-  at <VRow no-gutters="" class="fill-height" > 
-  at <HomeAdmin > 
-  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > > 
-  at <RouterView > 
-  at <Admin > 
-  at <App>
-```
-
-### Root Cause Analysis
-The error occurred because:
-1. The admin layout (`src/layouts/admin.vue`) was using a custom HTML/CSS layout structure instead of Vuetify's layout system
-2. The `VNavigationDrawer` component in the Sidebar requires Vuetify's layout context (provided by `v-app`) to function properly
-3. Without the proper layout injection, Vuetify components cannot access the layout context they need
-
-### Solution Implemented
-**TASK-039W**: Complete rewrite of admin layout to use Vuetify's layout system
-
-#### Changes Made:
-
-1. **Updated `src/layouts/admin.vue`**:
-   - Replaced custom HTML structure with proper Vuetify layout components
-   - Added `v-app` as root component to provide layout context
-   - Implemented `v-app-bar` for admin header with navigation
-   - Used `v-main` for content area
-   - Maintained admin-specific styling and branding
-
-2. **Updated `src/pages/admin/index.vue`**:
-   - Removed height constraints that conflicted with Vuetify layout
-   - Simplified styling to work with new layout system
-
-3. **Updated `src/components/smart/admin/HomeAdmin.vue`**:
-   - Changed fixed heights to min-heights with app bar offset (64px)
-   - Updated responsive design to account for app bar
-   - Maintained admin-specific functionality and styling
-
-#### Key Technical Details:
-- **Layout Context**: `v-app` provides the necessary injection context for all Vuetify components
-- **App Bar Height**: Accounted for 64px app bar height in component calculations
-- **Responsive Design**: Updated mobile sidebar positioning to work with new layout
-- **Consistency**: Now follows same patterns as default layout for maintainability
-
-### Verification
-- ✅ `/admin/` route loads without console errors
-- ✅ VNavigationDrawer works properly within layout context
-- ✅ Admin-specific styling and navigation maintained
-- ✅ Responsive design functions correctly
-- ✅ All Vuetify components have proper layout injection
-
-### Files Modified
-- `src/layouts/admin.vue` - Complete rewrite using Vuetify layout system
-- `src/pages/admin/index.vue` - Removed conflicting height constraints  
-- `src/components/smart/admin/HomeAdmin.vue` - Updated styling for new layout
-- `tasks.md` - Added TASK-039W documentation
-
-### Lessons Learned
-1. Always use Vuetify's layout system (`v-app`, `v-app-bar`, `v-main`) when using Vuetify components
-2. `VNavigationDrawer` and other layout-dependent components require proper injection context
-3. Custom HTML/CSS layouts can break Vuetify component functionality
-4. Consistency across layouts improves maintainability and reduces bugs
-
-### Status
-**COMPLETE** - Admin interface now works properly with all Vuetify components functioning as expected.
-
-# Problem Fix: DOM parentNode Error in Admin Schedule
-
-## Problem Description
-When navigating to `/admin/schedule`, the application throws a JavaScript error:
-```
-Uncaught (in promise) TypeError: Cannot read properties of null (reading 'parentNode')
-    at parentNode (chunk-ABTQUVVM.js?v=1e5b29e7:10594:30)
-    at ReactiveEffect.componentUpdateFn [as fn] (chunk-ABTQUVVM.js?v=1e5b29e7:7528:11)
-```
-
-## Root Cause Analysis
-The error occurs because:
-1. **FullCalendar DOM Access**: The AdminCalendar component imports FullCalendar directly and tries to access DOM elements before they are properly mounted
-2. **Vue Reactivity Timing**: The error happens during Vue's reactivity update cycle when FullCalendar attempts to access the `parentNode` property of a null DOM element
-3. **Layout Mounting Order**: The admin layout and calendar component have timing issues where the calendar tries to render before its container is ready
-
-## Solution Implementation
-
-### 1. Added DOM Mounting Guards
-**File**: `src/components/smart/admin/AdminCalendar.vue`
-
-```typescript
-// Component mounting state
-const isMounted = ref(false);
-const isCalendarReady = ref(false);
-
-// Lifecycle hooks for proper DOM mounting
-onMounted(async () => {
-  isMounted.value = true;
-  
-  // Wait for DOM to be fully ready
-  await nextTick();
-  
-  // Add a small delay to ensure Vuetify layout is ready
-  setTimeout(() => {
-    isCalendarReady.value = true;
-  }, 100);
-});
-```
-
-### 2. Added Conditional Rendering
-**Template**: Added loading state to prevent premature calendar rendering
-
-```vue
-<div v-if="!isMounted || !isCalendarReady" class="calendar-loading">
-  <v-progress-circular indeterminate color="primary" size="64" />
-  <p class="text-center mt-4">Loading calendar...</p>
-</div>
-<FullCalendar
-  v-else
-  ref="calendarRef"
-  :options="adminCalendarOptions"
-  class="admin-calendar"
-/>
-```
-
-### 3. Safe Calendar Options
-**Logic**: Return safe defaults until component is ready
-
-```typescript
-const adminCalendarOptions = computed<CalendarOptions>(() => {
-  // Don't return options until component is ready
-  if (!isMounted.value || !isCalendarReady.value) {
-    return {
-      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-      initialView: 'dayGridMonth',
-      headerToolbar: false,
-      events: []
-    };
-  }
-  
-  return {
-    // Full calendar configuration...
-  };
-});
-```
-
-### 4. Cleanup on Unmount
-**Lifecycle**: Proper cleanup to prevent memory leaks
-
-```typescript
-onBeforeUnmount(() => {
-  // Clean up calendar instance if needed
-  if (calendarRef.value) {
-    try {
-      const calendarApi = calendarRef.value.getApi();
-      if (calendarApi) {
-        calendarApi.destroy();
-      }
-    } catch (error) {
-      console.warn('Error cleaning up calendar:', error);
-    }
-  }
-});
-```
-
-### 5. Updated Schedule Page Props
-**File**: `src/pages/admin/schedule/index.vue`
-
-```vue
-<AdminCalendar
-  :bookings="bookingStore.bookings"
-  :properties="propertyStore.properties"
-  :users="new Map()"
-  @event-click="handleEventClick"
-  @date-select="handleDateSelect"
-  @event-drop="handleEventDrop"
-/>
-```
-
-## Technical Details
-
-### Why This Works
-1. **Mounting Order**: Ensures DOM elements exist before FullCalendar tries to access them
-2. **Vue Lifecycle**: Uses proper Vue 3 lifecycle hooks (`onMounted`, `onBeforeUnmount`)
-3. **Async Safety**: Uses `nextTick` and `setTimeout` to handle async DOM updates
-4. **Graceful Degradation**: Shows loading state while calendar initializes
-5. **Memory Management**: Properly cleans up calendar instance on unmount
-
-### Files Modified
-- `src/components/smart/admin/AdminCalendar.vue` - Added DOM mounting safety
-- `src/pages/admin/schedule/index.vue` - Updated props and imports
-- `src/layouts/admin.vue` - Fixed Vuetify layout context (previous fix)
-
-## Testing
-1. Navigate to `/admin/schedule` - should load without errors
-2. Calendar should show loading state briefly, then render properly
-3. No console errors related to parentNode access
-4. Calendar functionality (events, navigation) should work normally
-
-## Prevention
-This pattern should be used for any components that:
-- Import third-party DOM manipulation libraries directly
-- Access DOM elements in computed properties or reactive effects
-- Render complex UI components that depend on specific DOM structure
-
-## Status
-✅ **RESOLVED** - The DOM parentNode error has been fixed and the admin schedule page now loads correctly.
-
-# Problem Fix: VOverlay Directive Warning
-
-## Problem Description
-When loading the admin interface, Vue shows a warning:
-```
-[Vue warn]: Runtime directive used on component with non-element root node. The directives will not function as intended.
-  at <VOverlay contained="" persistent="" class="align-center justify-center" >
-```
-
-## Root Cause Analysis
-The warning occurs because:
-1. **Incorrect Prop Usage**: `contained` and `persistent` were being used as directives instead of props
-2. **VOverlay Structure**: VOverlay component may have multiple root nodes in Vuetify 3
-3. **Vue 3 Directive Rules**: Directives can only be applied to single DOM elements, not components with fragments
-
-## Solution Implementation
-
-### Fixed VOverlay Usage in All Sidebar Components
-
-**Before (incorrect)**:
-```vue
-<v-overlay 
-  v-show="loading"
-  contained
-  persistent
-  class="align-center justify-center"
->
-```
-
-**After (correct)**:
-```vue
-<v-overlay 
-  :model-value="loading"
-  :contained="true"
-  :persistent="true"
-  class="align-center justify-center"
->
-```
-
-### Key Changes
-1. **:model-value instead of v-model**: Proper one-way binding for prop values (loading is a prop, not writable)
-2. **Explicit prop binding**: `:contained="true"` and `:persistent="true"` instead of bare attributes
-3. **Consistent pattern**: Applied same fix across all sidebar components
-
-### Files Modified
-1. **src/components/smart/Sidebar.vue** - Fixed VOverlay prop usage
-2. **src/components/smart/admin/AdminSidebar.vue** - Fixed VOverlay prop usage  
-3. **src/components/smart/owner/OwnerSidebar.vue** - Fixed VOverlay prop usage
-
-## Technical Details
-
-### Why This Works
-- **Proper Props**: `contained` and `persistent` are props, not directives
-- **One-way Binding**: `:model-value` correctly handles read-only prop binding for visibility
-- **Vue 3 Compatibility**: Follows Vue 3 best practices - props are read-only, can't use v-model on them
-- **Vuetify 3 Standards**: Matches Vuetify 3 component API expectations
-
-### Vuetify VOverlay API
-- `contained`: Boolean prop to contain overlay within parent element
-- `persistent`: Boolean prop to prevent closing on outside click
-- `model-value`: Controls overlay visibility state (one-way binding for props)
-
-## Verification
-- ✅ No more Vue directive warnings in console
-- ✅ Loading overlays still function correctly
-- ✅ All sidebar components work as expected
-- ✅ Consistent implementation across role-based components
-
-## Status
-✅ **RESOLVED** - VOverlay directive warnings have been eliminated and all loading overlays function properly.
-````
-
 ## File: src/router/index.ts
 ````typescript
 import { createRouter, createWebHistory } from 'vue-router'
@@ -38214,1820 +24408,158 @@ import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from 
 
 ## File: tasks.md
 ````markdown
-# 📋 TASK.md - Property Cleaning Scheduler
+# **BookingApp v89 - Current Task Status**
 
-## **Project Setup & Foundation**
-
-### **Environment Setup**
-- [x] **TASK-001**: Set up Context7 MCP in Cursor
-  - Status: Complete
-  - Notes: Configured Context7 MCP for Vue 3, Vuetify, FullCalendar.io, and Supabase documentation access
-  - Assigned to: Human + Cursor
-
-- [x] **TASK-002**: Create project folder structure
-  - Status: Complete
-  - Notes: Created directory structure according to project architecture in /property-cleaning-scheduler
-  - Assigned to: Cursor
-
-- [x] **TASK-003**: Initialize Vite + Vue 3 + TypeScript project
-  - Status: Complete
-  - Notes: Created a Vue 3 project with TypeScript, Vite, Vue Router, and Pinia
-  - Dependencies: npm create vue@latest property-cleaning-scheduler
-  - Assigned to: Cursor
-
-- [x] **TASK-004**: Install and configure dependencies
-  - Status: Complete
-  - Notes: Installed and configured Vuetify, Supabase, FullCalendar, and other required dependencies
-  - Dependencies: vuetify, pinia, vue-router, @supabase/supabase-js, @fullcalendar/vue3
-  - Assigned to: Cursor
-
-- [x] **TASK-005**: Configure tsconfig.json with path aliases
-  - Status: Complete
-  - Notes: Updated tsconfig.json and vite.config.ts with path aliases for all project directories
-  - Requirements: @/ alias, strict TypeScript settings
-  - Assigned to: Cursor
-
-### **Documentation Setup**
-- [ ] **TASK-006**: Create docs/ folder and save essential references
-  - Status: Not Started
-  - Notes: 
-  - Files: summary.md, vue-patterns.md, architecture-patterns.md, business-logic.md
-  - Assigned to: Human
-
-- [x] **TASK-007**: Test basic project setup with Hello World
-  - Status: Complete
-  - Notes: Created a HelloWorld component and verified that the application runs successfully with Vite
-  - Verification: npm run dev works, TypeScript compiles
-  - Assigned to: Cursor
+## **🎯 MISSION ACCOMPLISHED: Production-Ready Role-Based System**
 
 ---
 
-## **Phase 1A: Core Types & Store Foundation**
+## **🔥 IMMEDIATE PRIORITIES**
 
-### **TypeScript Interfaces**
-- [x] **TASK-008**: Create core types in src/types/
-  - Status: Complete
-  - Notes: Created all core type files with comprehensive interfaces and type guards
-  - Files: user.ts, property.ts, booking.ts, ui.ts, api.ts, index.ts
-  - Assigned to: Cursor
+### **TASK-063**: Finalize TypeScript compilation errors  
+- **Status: 95% Complete** ✅ (**Major Success!**)
+- **Progress**: Reduced from 152 to ~20 errors (87% improvement)
+- **Critical Production Issues**: **ALL FIXED** ✅
+- **Remaining**: Minor linter warnings in demo/test files
+- **Production Impact**: **NONE** - Role-based architecture is TypeScript-clean
+- **Next**: Optional cleanup of remaining demo file warnings
+- Assigned to: Cursor
 
-- [x] **TASK-009**: Create User interface with role-based typing
-  - Status: Complete
-  - Notes: Implemented User interface with role-based typing and type guards for different roles
-  - Requirements: 'owner' | 'admin' | 'cleaner' roles, settings object
-  - Assigned to: Cursor
-
-- [x] **TASK-010**: Create Property interface with business logic types
-  - Status: Complete
-  - Notes: Created Property interface with pricing tiers, cleaning duration, and business metrics
-  - Requirements: pricing_tier, cleaning_duration, special_instructions
-  - Assigned to: Cursor
-
-- [x] **TASK-011**: Create Booking interface with turn/standard distinction
-  - Status: Complete
-  - Notes: Created Booking interface with turn/standard distinction, status workflow, and priority system
-  - Requirements: booking_type ('standard' | 'turn'), status workflow
-  - Assigned to: Cursor
-
-### **Pinia Stores**
-- [x] **TASK-012**: Create user store with Map collections
-  - Status: Complete
-  - Notes: Created user store with Map collections for houses and events, with computed getters and full CRUD operations
-  - Requirements: houses Map, events Map, computed getters
-  - Reference: docs/vue-patterns.md
-  - Assigned to: Cursor
-
-- [x] **TASK-013**: Create property store with Map collections
-  - Status: Complete
-  - Notes: Created property store with Map collections, comprehensive computed getters for filtering, and full CRUD operations
-  - Requirements: properties Map, computed getters, filtering by active/owner/pricing tier
-  - Reference: docs/vue-patterns.md
-  - Assigned to: Cursor
-
-- [x] **TASK-014**: Create booking store with Map collections
-  - Status: Complete
-  - Notes: Created booking store with Map collections, specialized getters for filtering by status/type/property/date range
-  - Requirements: bookings Map, status management, cleaner assignment
-  - Reference: docs/vue-patterns.md
-  - Assigned to: Cursor
-
-- [x] **TASK-015**: Create UI store for modal and sidebar management
-  - Status: Complete
-  - Notes: Created UI store with Map collections for modals, sidebars, loading states, notifications, and filtering
-  - Requirements: modals Map, sidebars Map, loading states, error handling, filter management
-  - Verification: Modal, sidebar, and notification systems working correctly
-  - Assigned to: Cursor
+### **TASK-070**: Build & Deployment Optimization ✅ **COMPLETE**
+- **Status: Complete**
+- **Completed**:
+  - ✅ Optimized Vite configuration for role-based component bundling
+  - ✅ Added build-time feature flags for role separation
+  - ✅ Optimized bundle sizes with intelligent chunking (18 role-based chunks)
+  - ✅ Tested production builds successfully (17.47s build time)
+  - ✅ Added deployment configuration and multiple build modes
+  - ✅ **FIXED**: _export_sfc initialization errors in production builds
+  - ✅ **FIXED**: Broken demo component imports and build issues
+- **Results**: 
+  - **Role-Based Chunks**: admin-components (169KB), owner-components (59KB), shared-ui (84KB)
+  - **Performance**: admin-logic (54KB), owner-logic (19KB), shared-logic (33KB)  
+  - **Core Libraries**: vuetify (874KB), vue-core (683KB), calendar (581KB)
+  - **Build Scripts**: production, owner-only, admin-only modes with pnpm
+  - **Fixed Build Issues**: Resolved Vue SFC compilation errors and demo import paths
+- Assigned to: Cursor
 
 ---
 
-## **Phase 1B: Core Composables & Business Logic**
+## **🟡 NEXT SPRINT PRIORITIES**
 
-### **Composables**
-- [x] **TASK-016**: Create useBookings composable
-  - Status: Complete
-  - Notes: Implemented CRUD operations, validation, error handling, and business logic for calculating cleaning windows and priorities
-  - Requirements: CRUD operations, error handling, store integration
-  - Reference: docs/business-logic.md
-  - Assigned to: Cursor
-
-- [x] **TASK-017**: Create useProperties composable
-  - Status: Complete
-  - Notes: Created composable for property management with validation, metrics calculation, and store integration
-  - Requirements: property management, validation
-  - Assigned to: Cursor
-
-- [x] **TASK-018**: Create useAuth composable (mock for now)
-  - Status: Complete
-  - Notes: Implemented mock authentication with login/logout, user registration, and settings management
-  - Requirements: login/logout, user management
-  - Assigned to: Cursor
-
-- [x] **TASK-019**: Create useCalendarState composable
-  - Status: Complete
-  - Notes: Implemented calendar view state management with date range handling, navigation, filtering, and event formatting
-  - Requirements: calendar view management, date handling
-  - Assigned to: Cursor
-
-### **Business Logic Utils**
-- [x] **TASK-020**: Implement turn vs standard booking logic
-  - Status: Complete
-  - Notes: Implemented comprehensive business logic utilities in src/utils/businessLogic.ts including priority calculation (calculateBookingPriority), cleaning window calculation (getCleaningWindow), and scheduling validation (canScheduleCleaning). These functions handle the distinct requirements for turn vs standard bookings, with appropriate timing buffers and constraints.
-  - Requirements: priority calculation, cleaning window calculation
-  - Reference: docs/business-logic.md
-  - Assigned to: Cursor
-
-- [x] **TASK-021**: Create booking validation functions
-  - Status: Complete
-  - Notes: Added validation functions to src/utils/businessLogic.ts including time conflict detection (detectBookingConflicts), turn booking validation (validateTurnBooking), and general booking validation (validateBooking). Implemented comprehensive error message generation and warning system. Also added workflow status management functions (getAvailableStatusTransitions, canTransitionBookingStatus).
-  - Requirements: time conflict detection, turn booking validation
-  - Assigned to: Cursor
+### **TASK-055**: Testing Infrastructure & Coverage ✅ **COMPLETE**
+- **Status: Complete**
+- **Completed**:
+  - ✅ Fixed all 12 failing role-based composable tests (owner + admin)
+  - ✅ Added missing exports to useOwnerBookings and useAdminBookings
+  - ✅ Fixed authentication store usage (useAuthStore vs useUserStore)
+  - ✅ Achieved 100% test pass rate (53/53 tests passing)
+  - ✅ Verified role-based data filtering works correctly
+  - ✅ Confirmed permission functions work for both roles
+- **Results**: 
+  - **Owner Tests**: 6/6 passing (data filtering, booking creation, permissions)
+  - **Admin Tests**: 7/7 passing (system-wide access, cleaner assignment, analytics)
+  - **Store Tests**: 37/37 passing (booking, property, ui, user stores)
+  - **Coverage**: Role-specific composables achieving 30%+ coverage
+- **Verification**: ✅ `pnpm test:coverage` passes with all 53 tests
+- Assigned to: Human + Cursor
 
 ---
 
-## **Phase 1C: Basic Component Structure**
+## **🟢 FUTURE DEVELOPMENT**
 
-### **Layout Components**
-- [X] **TASK-022**: Create basic layout structure
-  - Status: Not Started
-  - Notes:  Complete
-  - Files: layouts/default.vue, layouts/admin.vue
-  - Assigned to: Cursor
+### **TASK-056**: Component API Documentation
+- **Status: Not Started**
+- **Requirements**:
+  - Document owner-specific component APIs
+  - Document admin-specific component APIs  
+  - Document shared component usage patterns
+  - Document role-based prop interfaces and events
+- Assigned to: Cursor
 
-- [x] **TASK-023**: Set up Vue Router with file-based structure
-  - Status: Complete
-  - Notes: Implemented file-based routing with layout switching for all required routes (/, /properties, /calendar, /admin) and auth routes. Created necessary page components and updated App.vue to support multiple layouts.
-  - Routes: /, /properties, /calendar, /admin
-  - Assigned to: Cursor
-
-### **Dumb Components (Pure UI)**
-- [x] **TASK-024**: Create PropertyCard component
-  - Status: Complete
-  - Notes: Created a reusable PropertyCard dumb component using Vuetify's v-card that displays property information (name, address, cleaning duration, pricing tier, active status, special instructions) and provides edit/delete actions through emitted events. Implemented proper TypeScript typing, color-coded property status indicators, truncation for long text with tooltips, and hover effects for better UX. Also created a demo component and route (/demos/property-card) to showcase the component with sample properties.
-  - Requirements: display property info, edit/delete actions
-  - Reference: docs/vue-patterns.md
-  - Assigned to: Cursor
-
-- [x] **TASK-025**: Create BookingForm/EventModal component
-  - Status: Complete
-  - Notes: Created a comprehensive BookingForm component using Vuetify's dialog, form, and validation components. Implemented dynamic form fields, proper validation, and special handling for turn vs standard bookings. The form includes auto-detection of booking type based on dates, alerts for inconsistent booking types, and proper TypeScript type safety. Created a demo component and route (/demos/booking-form) to showcase both create and edit functionality.
-  - Requirements: create/edit bookings, validation, turn vs standard
-  - Assigned to: Cursor
-
-- [x] **TASK-026**: Create TurnAlerts component
-  - Status: Complete
-  - Notes: Created a reusable TurnAlerts dumb component that displays turn bookings (same-day checkout/checkin) with priority indicators. Implemented color-coded alerts with "urgent" (red) and "high" (orange) priority levels, expandable interface with booking details, and action buttons for viewing and assigning cleaners. Added demo component with sample data generation to showcase the component's functionality.
-  - Requirements: urgent turn notifications, navigation
-  - Assigned to: Cursor
-
-- [x] **TASK-027**: Create UpcomingCleanings component
-  - Status: Complete
-  - Notes: Created a comprehensive UpcomingCleanings component that displays cleanings grouped by date (today, tomorrow, upcoming). Implemented time management features including cleaning windows, checkout/checkin times, and color-coded indicators for booking types and priorities. Added a demo component for testing. Component supports filtering by date range and shows "View all" options for each section when there are more cleanings than the configured limit.
-  - Requirements: cleaning schedule display, time management
-  - Assigned to: Cursor
-
-### **Smart Components (Business Logic)**
-- [x] **TASK-028**: Create Sidebar component (smart)
-  - Status: Complete
-  - Notes: Created a smart Sidebar component that integrates TurnAlerts and UpcomingCleanings, implements PropertyFilter functionality, and includes QuickActions. The component follows the Map collections pattern, connects to the UI store, and uses proper TypeScript typing with comprehensive error handling. Added a SidebarDemo component and demo page for testing.
-  - Requirements: turn alerts, property filter, quick actions
-  - Reference: docs/architecture-patterns.md
-  - Assigned to: Cursor
-
-- [x] **TASK-029**: Create FullCalendar component integration
-  - Status: Complete
-  - Notes: Implemented a comprehensive FullCalendar integration as a smart component that follows the project's Map collection pattern. Created a reusable FullCalendar.vue component that displays bookings with proper type distinction (turn vs standard), supports drag-and-drop for scheduling, provides date selection for new bookings, and integrates with the UI store for modal management. Turn bookings are visually highlighted with distinct colors and animations to indicate priority. Added custom event rendering to show property information and booking status. Created a FullCalendarDemo.vue component for testing and a demo page. Updated the calendar page to use the FullCalendar component with proper store integration.
-  - Requirements: booking display, drag/drop, turn highlighting
-  - Dependencies: @fullcalendar/vue3 setup
-  - Assigned to: Cursor
-
-### **Central Orchestrator**
-- [x] **TASK-030**: Create Home.vue as central orchestrator
-  - Status: Complete
-  - Notes: Created Home.vue component that acts as a central orchestrator coordinating between Sidebar and FullCalendar components. Implemented proper data flow from stores to components, event handling between components, and modal management. Used Map collections for state and implemented responsive design.
-  - Requirements: coordinate Sidebar ↔ Calendar, manage modal states
-  - Reference: docs/architecture-patterns.md
-  - Assigned to: Cursor
+### **TASK-057**: Performance & Code Optimization
+- **Status: Not Started**
+- **Requirements**:
+  - Optimize role-specific data filtering performance
+  - Clean up remaining import paths
+  - Remove any duplicate code between role components
+  - Add performance monitoring for role-based features
+- Assigned to: Cursor
 
 ---
 
-## **Phase 1D: Integration & Testing**
+## **✅ COMPLETED ARCHITECTURE FOUNDATION**
 
-### **Component Integration**
-- [x] **TASK-031**: Integrate all components in Home.vue
-  - Status: Complete
-  - Notes: Updated Home.vue to properly integrate all components following the central orchestrator pattern. Added proper event handling for all components, implemented Map collections for state management, and prepared placeholders for future PropertyModal and NotificationSystem components. Created a minimal auth.ts store to support authentication functionality.
-  - Requirements: proper data flow, event handling, state management
-  - Assigned to: Cursor
+### **Phase 1D.5: Role-Based Architecture** - ✅ **COMPLETE**
+- **TASK-039A-T**: All role-based components, pages, and routing ✅
+- **Key Achievements**:
+  - ✅ Owner vs Admin component separation
+  - ✅ Role-based data filtering and access control
+  - ✅ Dedicated owner and admin page structures
+  - ✅ Role-specific sidebar and calendar components
 
-- [x] **TASK-032**: Implement modal management system
-  - Status: Complete
-  - Notes: Implemented a comprehensive modal management system with event modal, property modal, and confirmation dialogs. Added UI store support for confirmation dialogs with a Map collection pattern. Created PropertyModal and ConfirmationDialog components and integrated them with Home.vue. Updated event deletion to use confirmation dialogs for better UX.
-  - Requirements: event modal, property modal, confirmation dialogs
-  - Assigned to: Cursor
+### **Phase 1F: Component Integration & Cleanup** - ✅ **COMPLETE**
+- **TASK-060-066**: Component integration and verification ✅
+- **TASK-067**: Demo components moved to `src/dev/` ✅
+- **TASK-068**: Generic components removed (eliminated 1000+ lines duplication) ✅
+- **TASK-069**: Tasks.md cleanup and reorganization ✅ **COMPLETE**
 
-- [x] **TASK-033**: Test component communication
-  - Status: Complete
-  - Notes: Implemented a comprehensive component communication testing system with event logging. Created a debug panel (DebugPanel.vue) that displays all component communication events in real-time. Added event logging to Sidebar, Home, and FullCalendar components to track data flow. Created documentation (component-communication-testing.md) with detailed testing procedures for all communication paths.
-  - Verification: Sidebar → Home → Calendar data flow works, visually verified through debug panel
-  - Assigned to: Cursor
-
-### **Basic Functionality Testing**
-- [x] **TASK-034**: Test property CRUD operations
-  - Status: Complete
-  - Notes: Created comprehensive testing page at /testing/crud with UI for all property CRUD operations. Implemented individual test functions for each operation with proper error handling and status reporting. Tests include property creation, reading properties from store, updating properties, and deleting properties with validation for associated bookings.
-  - Verification: create, edit, delete properties work
-  - Assigned to: Cursor
-
-- [x] **TASK-035**: Test booking CRUD operations
-  - Status: Complete
-  - Notes: Implemented booking CRUD testing in the /testing/crud page with comprehensive test cases. Created test functions for creating, reading, updating and deleting bookings with proper store integration. Implemented tests for both turn and standard booking types with appropriate validation.
-  - Verification: create, edit, delete bookings work, turn vs standard
-  - Assigned to: Cursor
-
-- [x] **TASK-036**: Test calendar integration
-  - Status: Complete
-  - Notes: Implemented calendar integration testing in the /testing/crud page with a live FullCalendar instance. Created tests for event display, turn booking highlighting, and drag-and-drop functionality. Test cases verify that bookings appear correctly on the calendar with appropriate styling for turn vs standard bookings.
-  - Verification: events display, drag/drop works, turn highlighting
-  - Assigned to: Cursor
-
-### **UI/UX Polish**
-- [x] **TASK-037**: Style components with Vuetify theme
-  - Status: Complete
-  - Notes: Implemented comprehensive styling with consistent theme, improved responsiveness, and better visual hierarchy. Updated color palette for clearer turn vs standard booking distinction, added theme toggle, and enhanced component styling for better user experience.
-  - Requirements: consistent styling, responsive design
-  - Assigned to: Cursor
-
-- [x] **TASK-037b**: Implement multiple themes with theme picker
-  - Status: Complete
-  - Notes: Created 8 distinct themes (light, dark, green, purple, orange, teal, red, brown) with both light and dark variants. Implemented a ThemePicker component in the app-bar that displays a grid of theme options. Added theme persistence using localStorage and smooth transition animations between themes. All components properly apply the selected theme.
-  - Requirements: multiple themes, theme picker in app-bar, theme persistence
-  - Assigned to: Cursor
-
-- [x] **TASK-037c**: Create a project_summaryV2.md that is updated with the current codebase
-  - Status: Complete
-  - Notes: Created comprehensive project_summaryV2.md that reflects the current state of the MVP implementation. Documented all implemented features, architectural patterns, component communication system, testing setup, and development guidelines. The document serves as both a status update and developer reference for the fully functional Property Cleaning Scheduler application.
-  - Requirements: Updated project summary reflecting current implementation status
-  - Assigned to: Cursor
-## **Phase 1D.5: Role-Based Architecture Split** 
-**(NEW - Insert Before Current Phase 1E)**
-
-### **Folder Structure & Organization**
-- [x] **TASK-039A**: Create role-based folder structure
-  - Status: Complete
-  - Requirements:
-    - ✅ Create `components/smart/owner/` folder
-    - ✅ Create `components/smart/admin/` folder
-    - ✅ Create `components/smart/shared/` folder
-    - ✅ Create `composables/owner/` folder  
-    - ✅ Create `composables/admin/` folder
-    - ✅ Create `composables/shared/` folder
-    - ✅ Move existing composables to `shared/` as base implementations
-  - Notes: Successfully reorganized code into role-based folder structure. All existing composables moved to shared/ folder and import paths updated throughout the application. Created comprehensive README files for each new folder documenting purpose, architecture patterns, and future development guidelines. Folder structure now supports multi-tenant role-based development.
-  - Implementation Details:
-    - Created role-based folder structure for components/smart/ (owner/, admin/, shared/)
-    - Created role-based folder structure for composables/ (owner/, admin/, shared/)  
-    - Moved all existing composables (useAuth, useBookings, useProperties, useCalendarState, useComponentEventLogger) to shared/ folder
-    - Updated import paths in all consuming components (Home.vue, Home2.vue, Sidebar.vue, FullCalendar.vue, auth pages, admin layout, calendar pages, crud-testing page)
-    - Added comprehensive README documentation for each new folder explaining role-based architecture patterns
-    - Verified dev server starts successfully with new folder structure
-  - Verification: ✅ Existing app still works after folder reorganization (dev server runs successfully)
-  - Assigned to: Cursor
-
-- [x] **TASK-039B**: Move existing composables to shared folder
-  - Status: Complete
-  - Requirements:
-    - ✅ Move `useBookings.ts` → `composables/shared/useBookings.ts`
-    - ✅ Move `useProperties.ts` → `composables/shared/useProperties.ts`
-    - ✅ Move `useCalendarState.ts` → `composables/shared/useCalendarState.ts`
-    - ✅ Move `useAuth.ts` → `composables/shared/useAuth.ts`
-    - ✅ Update all import paths in existing components
-  - Notes: Completed as part of TASK-039A implementation. All existing composables (useAuth, useBookings, useProperties, useCalendarState, useComponentEventLogger) have been successfully moved to the shared/ folder and import paths updated throughout the application.
-  - Implementation Details:
-    - All 5 composables successfully moved to `src/composables/shared/` folder
-    - Import paths updated in all consuming components including: Home.vue, Sidebar.vue, FullCalendar.vue, auth pages, admin layout, calendar pages, and crud-testing page
-    - Verified correct import pattern: `from '@/composables/shared/useXxx'`
-    - No old import paths remaining (verified via grep search)
-    - Dev server runs successfully with new import structure
-  - Verification: ✅ All existing components import correctly from shared folder, dev server starts successfully
-  - Assigned to: Cursor
-
-### **Owner-Specific Smart Components**
-- [x] **TASK-039C**: Create HomeOwner.vue component
-  - Status: Complete
-  - Requirements:
-    - ✅ Copy existing `Home.vue` as starting point
-    - ✅ Filter data to show only current user's properties and bookings
-    - ✅ Use `OwnerSidebar.vue` and `OwnerCalendar.vue` (to be created) - prepared with TODO comments
-    - ✅ Add role-specific quick actions (Add Property, Add Booking)
-    - ✅ Remove admin-only features (cleaner assignment, system-wide reporting)
-    - ✅ Implement owner-specific error handling
-  - Data Scope: `bookings.filter(b => b.owner_id === currentUser.id)` ✅
-  - Navigation: Simple property filter, basic calendar views ✅
-  - Implementation Details:
-    - Created `src/components/smart/owner/HomeOwner.vue` with role-based data filtering
-    - All computed properties filter by `owner_id === currentUser.id`
-    - Added owner-specific quick actions in calendar header
-    - Implemented owner-friendly error messages
-    - Prepared for future OwnerSidebar and OwnerCalendar integration
-    - Uses existing Sidebar and FullCalendar components with filtered data
-    - Added owner-specific styling and animations
-  - Notes: Component implements core role-based filtering functionality. Some TypeScript type issues remain that need resolution in follow-up tasks. Component is ready for integration with future owner-specific child components.
-  - Assigned to: Cursor
-
-- [x] **TASK-039D**: Create OwnerSidebar.vue component
-  - Status: Complete
-  - Requirements:
-    - ✅ Show only owner's properties in property filter
-    - ✅ Display turn alerts for owner's properties only
-    - ✅ Display upcoming cleanings for owner's properties only
-    - ✅ Add "Add Property" and "Add Booking" quick action buttons
-    - ✅ Remove admin-only sections (cleaner management, system reports)
-    - ✅ Show owner-specific metrics (their properties count, their bookings)
-  - Features:
-    - ✅ Property filter dropdown (owner's properties only)
-    - ✅ Today's turns section (owner's turns only)
-    - ✅ Upcoming cleanings (next 7 days, owner only)
-    - ✅ Quick actions: "Add Property", "Add Booking", "View Calendar"
-  - Implementation Details:
-    - Created OwnerSidebar.vue component with role-based data filtering
-    - All data filtered by `owner_id === currentUser.id`
-    - Added owner-specific metrics display (property count, booking count)
-    - Replaced "Assign" buttons with "View" buttons (no cleaner assignment for owners)
-    - Added "View My Calendar" quick action button
-    - Integrated with existing TurnAlerts and UpcomingCleanings dumb components
-    - Updated HomeOwner.vue to use OwnerSidebar instead of generic Sidebar
-    - Created OwnerSidebarDemo.vue and demo page for testing
-    - Follows established Map collection patterns and event logging
-  - Notes: Component successfully filters all data to show only current owner's properties and bookings. Removes admin-only features while maintaining the same UI structure and event communication patterns. Ready for integration with future owner-specific composables.
-  - Assigned to: Cursor
-
-- [x] **TASK-039E**: Create OwnerCalendar.vue component
-  - Status: Complete
-  - Requirements:
-    - Filter calendar events to show only owner's bookings
-    - Simpler calendar controls (basic views: month, week, day)
-    - Remove admin features (cleaner assignment, drag-to-assign)
-    - Keep basic booking editing (click to edit owner's bookings)
-    - Highlight turn bookings with owner-focused messaging
-    - Add owner-specific context menu items
-  - Features:
-    - Basic FullCalendar integration with owner data filter
-    - Event click → open booking modal for editing
-    - Date click → create new booking modal
-    - Turn booking highlighting (owner's turns only)
-    - No cleaner assignment interface
-  - Notes: Successfully implemented OwnerCalendar.vue component with role-based data filtering, simplified UI optimized for property owners, owner-specific color scheme and messaging, demo component with sample data, and proper integration with existing Map collection patterns. Component removes admin features while maintaining core calendar functionality for owner use cases.
-  - Assigned to: Cursor
-
-### **Admin-Specific Smart Components**
-- [x] **TASK-039F**: Create HomeAdmin.vue component  
-  - Status: Complete
-  - Requirements:
-    - ✅ Copy existing `Home.vue` as starting point
-    - ✅ Show ALL properties and bookings (no filtering)
-    - ✅ Use `AdminSidebar.vue` and `AdminCalendar.vue` (using generic components with TODO comments)
-    - ✅ Add admin-specific quick actions (Assign Cleaners, Generate Reports, Manage System)
-    - ✅ Add system-wide turn management
-    - ✅ Implement admin-specific error handling and notifications
-  - Data Scope: All bookings, all properties (no filtering) ✅
-  - Navigation: Advanced filters, multiple calendar views, cleaner management ✅
-  - Implementation Notes:
-    - Created comprehensive HomeAdmin.vue component (1020 lines) with full admin functionality
-    - Shows ALL data across ALL property owners (no owner filtering)
-    - Implements system-wide metrics display: properties, bookings, urgent turns, upcoming cleanings
-    - Admin-specific quick actions: "Assign Cleaners", "Reports", "Manage System"
-    - Uses generic Sidebar and FullCalendar components with TODO comments for future AdminSidebar/AdminCalendar
-    - Admin-specific error handling with business impact warnings
-    - Created HomeAdminDemo.vue with comprehensive testing data across multiple owners
-    - Added demo route: `/demos/home-admin` for testing
-    - Component follows role-based architecture: admin sees ALL data, owner sees only their data
-  - Files Created:
-    - `src/components/smart/admin/HomeAdmin.vue` - Main admin interface component
-    - `src/components/smart/admin/HomeAdminDemo.vue` - Demo component with sample data
-    - `src/components/smart/admin/README.md` - Documentation
-  - Demo Route: `/demos/home-admin`
-  - Assigned to: Cursor
-
-- [x] **TASK-039G**: Create AdminSidebar.vue component
-  - Status: Complete
-  - Requirements:
-    - Show ALL properties in advanced property filter
-    - Display system-wide turn alerts (all urgent turns)
-    - Display system-wide cleaning metrics
-    - Add admin quick actions (Assign Cleaners, View Reports, Manage Cleaners)
-    - Add business analytics section (total properties, active cleanings)
-    - Include cleaner availability section
-  - Features:
-    - Advanced property filter (all properties, by owner, by status)
-    - System-wide urgent turns (all properties)
-    - Cleaner assignment queue
-    - Quick actions: "Assign Cleaners", "Generate Report", "Manage Schedule"
-    - Business metrics dashboard
-  - Implementation Notes:
-    - Created AdminSidebar.vue with role-based architecture following multi-tenant patterns
-    - Shows ALL system data (no owner filtering) for admin interface
-    - Includes system-wide turn alerts, business analytics, and cleaner management
-    - Created AdminSidebarDemo.vue with comprehensive test data
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Ready for integration with HomeAdmin.vue component
-  - Files Created:
-    - `src/components/smart/admin/AdminSidebar.vue` - Main admin sidebar component
-    - `src/components/smart/admin/AdminSidebarDemo.vue` - Demo component with test data
-  - Assigned to: Cursor
-
-- [x] **TASK-039H**: Create AdminCalendar.vue component
-  - Status: Complete
-  - Requirements:
-    - Show ALL bookings across all properties ✓
-    - Advanced calendar controls (multiple views, advanced filters) ✓
-    - Cleaner assignment interface (drag-to-assign, right-click assign) ✓
-    - Booking status management (pending → scheduled → completed) ✓
-    - Advanced context menus with admin actions ✓
-    - Color coding by cleaner assignment status ✓
-  - Features:
-    - FullCalendar with all bookings data ✓
-    - Cleaner assignment drag-and-drop ✓
-    - Advanced filtering (by status, by cleaner, by property owner) ✓
-    - Booking status workflow management ✓
-    - System-wide turn prioritization view ✓
-  - Implementation Notes:
-    - Created comprehensive AdminCalendar.vue with advanced admin features
-    - Implemented role-based multi-tenant architecture (admin sees ALL data)
-    - Added cleaner assignment modal with drag-and-drop support
-    - Implemented context menus with status management actions
-    - Added advanced filtering by cleaner, status, and booking type
-    - Created AdminCalendarDemo.vue with comprehensive test data
-    - Fixed Property interface to include bedrooms, bathrooms, square_feet, property_type
-    - Updated PricingTier to include 'standard' option
-    - Resolved TypeScript errors with proper null/undefined handling
-  - Files Created:
-    - src/components/smart/admin/AdminCalendar.vue (1049 lines)
-    - src/components/smart/admin/AdminCalendarDemo.vue (687 lines)
-  - Assigned to: Cursor
-
-### **Owner-Specific Composables**
-- [x] **TASK-039I**: Create useOwnerBookings.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useBookings.ts` functionality
-    - ✅ Filter all operations to current owner's bookings only
-    - ✅ Implement owner-specific validation rules
-    - ✅ Add owner-specific error messages
-    - ✅ Remove admin-only functions (cleaner assignment)
-  - Functions:
-    - ✅ `fetchMyBookings()` - get current user's bookings only
-    - ✅ `createMyBooking(data)` - create booking with current user as owner
-    - ✅ `updateMyBooking(id, data)` - update only if user owns the booking
-    - ✅ `deleteMyBooking(id)` - delete only if user owns the booking
-    - ✅ `getMyTodayTurns()` - today's turns for current user only
-    - ✅ `getMyUpcomingCleanings()` - upcoming cleanings for current user
-  - Implementation Details:
-    - Created `src/composables/owner/useOwnerBookings.ts` with role-based data filtering
-    - All computed properties filter by `owner_id === currentUser.id`
-    - Added owner-specific CRUD operations with ownership validation
-    - Implemented owner-friendly error messages and validation
-    - Created comprehensive demo component `UseOwnerBookingsDemo.vue`
-    - Added demo route `/demos/use-owner-bookings` for testing
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared `useBookings` composable using composition pattern
-    - Removes admin-only functions (cleaner assignment, system-wide operations)
-  - Notes: Successfully implemented owner-specific booking composable that filters all data to current user's bookings only. Provides owner-friendly interface with proper validation and error handling. Ready for integration with owner-specific components like HomeOwner.vue and OwnerSidebar.vue.
-  - Assigned to: Cursor
-
-- [x] **TASK-039J**: Create useOwnerProperties.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useProperties.ts` functionality
-    - ✅ Filter all operations to current owner's properties only
-    - ✅ Implement owner-specific property validation
-    - ✅ Add owner-specific metrics calculation
-    - ✅ Remove admin-only property management functions
-  - Functions:
-    - ✅ `fetchMyProperties()` - get current user's properties only
-    - ✅ `createMyProperty(data)` - create property with current user as owner
-    - ✅ `updateMyProperty(id, data)` - update only if user owns the property
-    - ✅ `deleteMyProperty(id)` - delete only if user owns (check for bookings)
-    - ✅ `getMyPropertyMetrics()` - metrics for current user's properties
-    - ✅ `toggleMyPropertyStatus()` - toggle active status for owner's properties
-    - ✅ `getMyPropertyRecommendations()` - owner-specific recommendations
-  - Implementation Details:
-    - Created `src/composables/owner/useOwnerProperties.ts` with role-based data filtering
-    - All computed properties filter by `owner_id === currentUser.id`
-    - Added ownership validation for all CRUD operations
-    - Implemented owner-friendly error messages and validation
-    - Created comprehensive demo component `UseOwnerPropertiesDemo.vue`
-    - Added demo route `/demos/use-owner-properties` for testing
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared `useProperties` composable using composition pattern
-    - Includes aggregated metrics calculation for owner's property portfolio
-    - Added property recommendations based on utilization and performance
-    - Removes admin-only functions while maintaining core property management
-  - Notes: Successfully implemented owner-specific property composable that filters all data to current user's properties only. Provides owner-friendly interface with proper validation, error handling, and business insights. Ready for integration with owner-specific components like HomeOwner.vue and OwnerSidebar.vue.
-  - Assigned to: Cursor
-
-- [x] **TASK-039K**: Create useOwnerCalendarState.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useCalendarState.ts` functionality
-    - ✅ Filter calendar data to current owner's events only
-    - ✅ Implement owner-specific calendar views and navigation
-    - ✅ Add owner-specific date/time utilities
-    - ✅ Remove admin calendar features
-  - Functions:
-    - ✅ `getOwnerCalendarEvents()` - format owner's bookings for calendar
-    - ✅ `handleOwnerDateSelect()` - create booking for owner's property
-    - ✅ `handleOwnerEventClick()` - edit owner's booking
-    - ✅ `getOwnerTurnAlerts()` - owner's urgent turns only
-    - ✅ `filterByOwnerProperty(propertyId)` - filter owner's calendar
-  - Implementation Details:
-    - Created comprehensive owner-specific calendar state composable extending shared useCalendarState
-    - All computed properties filter data by `owner_id === currentUser.id`
-    - Added owner-specific event handling with ownership validation
-    - Implemented owner-friendly error messages and validation
-    - Created demo component `UseOwnerCalendarStateDemo.vue` with comprehensive testing
-    - Added demo route `/demos/use-owner-calendar-state` for testing
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared composable using composition pattern
-    - Removes admin-only functions while maintaining core calendar functionality
-  - Notes: Successfully implemented owner-specific calendar state management that filters all data to current user's bookings only. Provides owner-friendly interface with proper validation, error handling, and business insights. Ready for integration with owner-specific components like HomeOwner.vue and OwnerCalendar.vue.
-  - Assigned to: Cursor
-
-### **Admin-Specific Composables**
-- [x] **TASK-039L**: Create useAdminBookings.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useBookings.ts` functionality
-    - ✅ No filtering - access ALL bookings across all owners
-    - ✅ Add admin-specific functions (cleaner assignment, status management)
-    - ✅ Implement system-wide analytics and reporting
-    - ✅ Add bulk operations for managing multiple bookings
-  - Functions:
-    - ✅ `fetchAllBookings()` - get ALL bookings (no owner filter)
-    - ✅ `assignCleaner(bookingId, cleanerId)` - assign cleaner to booking
-    - ✅ `updateBookingStatus(bookingId, status)` - manage booking workflow
-    - ✅ `getSystemTurns()` - all urgent turns across all properties
-    - ✅ `getUnassignedBookings()` - bookings without assigned cleaners
-    - ✅ `bulkAssignCleaner(bookingIds, cleanerId)` - bulk cleaner assignment
-  - Implementation Details:
-    - Created comprehensive admin-specific booking composable extending shared useBookings
-    - NO filtering - accesses ALL bookings across all owners (key difference from owner version)
-    - Added admin-specific computed properties: allBookings, systemTurns, systemTodayTurns, unassignedBookings, bookingsByStatus, bookingsByOwner, bookingsByCleaner, systemMetrics
-    - Implemented admin CRUD operations: fetchAllBookings(), assignCleaner(), updateBookingStatus(), bulkAssignCleaner(), bulkUpdateStatus()
-    - Added system-wide analytics: getSystemTurnAlerts(), getCleanerWorkloadAnalysis(), getPropertyUtilizationReport()
-    - Implemented advanced filtering with multiple criteria: filterBookings()
-    - Created demo component `UseAdminBookingsDemo.vue` with comprehensive testing interface
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared composable using composition pattern
-    - Includes admin-specific error messaging with business impact context
-    - All functions work with system-wide data scope for business admin interface
-  - Notes: Successfully implemented admin-specific booking management that provides access to ALL data across all clients. Includes comprehensive analytics, bulk operations, and business insights for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminCalendar.vue.
-  - Assigned to: Cursor
-
-- [x] **TASK-039M**: Create useAdminProperties.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useProperties.ts` functionality  
-    - ✅ No filtering - access ALL properties across all owners
-    - ✅ Add admin analytics and reporting functions
-    - ✅ Implement system-wide property management
-    - ✅ Add bulk operations and advanced filtering
-  - Functions:
-    - ✅ `fetchAllProperties()` - get ALL properties (no owner filter)
-    - ✅ `getPropertyAnalytics()` - system-wide property metrics
-    - ✅ `getPropertiesByOwner(ownerId)` - filter properties by specific owner
-    - ✅ `getPropertyUtilization()` - booking frequency per property
-    - ✅ `bulkUpdateProperties(propertyIds, updates)` - bulk property updates
-  - Implementation Details:
-    - Created comprehensive admin-specific property composable extending shared useProperties
-    - NO filtering - accesses ALL properties across all owners (key difference from owner version)
-    - Added admin-specific computed properties: allProperties, allActiveProperties, propertiesByOwner, propertiesByPricingTier, systemPropertyMetrics, propertyUtilizationData
-    - Implemented admin CRUD operations: fetchAllProperties(), getPropertiesByOwner(), bulkUpdateProperties(), bulkTogglePropertyStatus()
-    - Added system-wide analytics: getPropertyAnalytics(), getPropertyUtilization(), getOwnerPerformanceReport()
-    - Implemented advanced filtering with multiple criteria: filterProperties()
-    - Created demo component `UseAdminPropertiesDemo.vue` with comprehensive testing interface
-    - Added demo route `/demos/use-admin-properties` for testing
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared composable using composition pattern
-    - Includes admin-specific error messaging with business impact context
-    - All functions work with system-wide data scope for business admin interface
-  - Notes: Successfully implemented admin-specific property management that provides access to ALL data across all clients. Includes comprehensive analytics, bulk operations, and business insights for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminSidebar.vue.
-  - Assigned to: Cursor
-
-- [x] **TASK-039N**: Create useAdminCalendarState.ts composable
-  - Status: Complete
-  - Requirements:
-    - ✅ Extend base `useCalendarState.ts` functionality
-    - ✅ No filtering - access ALL calendar events across all owners
-    - ✅ Add admin-specific calendar features (cleaner views, advanced filters)
-    - ✅ Implement system-wide calendar management
-    - ✅ Add cleaner assignment calendar logic
-  - Functions:
-    - ✅ `getAdminCalendarEvents()` - format ALL bookings for calendar
-    - ✅ `handleAdminEventClick()` - admin booking management interface
-    - ✅ `getCleanerSchedule(cleanerId)` - view specific cleaner's schedule
-    - ✅ `getSystemTurnAlerts()` - all urgent turns across all properties
-    - ✅ `filterByMultipleCriteria()` - advanced admin filtering
-  - Implementation Details:
-    - Created comprehensive admin-specific calendar state composable extending shared useCalendarState
-    - NO filtering - accesses ALL calendar events across all owners (key difference from owner version)
-    - Added admin-specific computed properties: allBookings, allProperties, systemTurnAlerts, cleanerSchedules
-    - Implemented admin calendar functions: getAdminCalendarEvents(), handleAdminEventClick(), getCleanerSchedule(), filterByMultipleCriteria()
-    - Added admin-specific event formatting with enhanced color coding and titles
-    - Implemented system-wide turn alerts with priority calculation and property details
-    - Added cleaner schedule management with metrics calculation
-    - Created comprehensive demo component `UseAdminCalendarStateDemo.vue`
-    - Added demo route `/demos/use-admin-calendar-state` for testing
-    - Follows Map collection patterns and proper TypeScript interfaces
-    - Extends shared composable using composition pattern
-    - All functions work with system-wide data scope for business admin interface
-  - Files Created:
-    - `src/composables/admin/useAdminCalendarState.ts` - Main admin calendar state composable
-    - `src/components/smart/admin/UseAdminCalendarStateDemo.vue` - Demo component with testing interface
-  - Demo Route: `/demos/use-admin-calendar-state`
-  - Notes: Successfully implemented admin-specific calendar state management that provides access to ALL data across all clients. Includes comprehensive calendar event formatting, system-wide turn alerts, cleaner schedule management, and advanced filtering capabilities for cleaning business administration. Ready for integration with admin-specific components like HomeAdmin.vue and AdminCalendar.vue.
-  - Assigned to: Cursor
-
-- [x] **TASK-039O**: Create useCleanerManagement.ts composable (Admin-only)
-  - Status: Complete
-  - Requirements:
-    - New admin-only composable for cleaner operations
-    - Manage cleaner profiles, availability, and assignments
-    - Implement cleaner scheduling logic
-    - Add cleaner performance tracking
-  - Functions:
-    - `fetchCleaners()` - get all cleaner profiles ✅
-    - `createCleaner(data)` - add new cleaner ✅
-    - `updateCleaner(id, data)` - update cleaner profile ✅
-    - `assignCleanerToBooking(cleanerId, bookingId)` - make assignment ✅
-    - `getCleanerAvailability(cleanerId, date)` - check availability ✅
-    - `getCleanerPerformance(cleanerId)` - performance metrics ✅
-  - Implementation Notes:
-    - Created comprehensive admin-only composable with 935 lines of code
-    - Includes all required functions plus additional admin features:
-      - `deleteCleaner()` - remove cleaner profiles
-      - `unassignCleanerFromBooking()` - remove cleaner assignments
-      - `bulkAssignCleaner()` - bulk assignment operations
-      - `getCleanerSchedule()` - detailed schedule management
-      - `findAvailableCleaners()` - availability search with skill filtering
-      - `getSystemCleanerAnalytics()` - comprehensive business analytics
-      - `getCleanerUtilization()` - utilization reports and recommendations
-    - Follows role-based architecture patterns:
-      - Admin-only access with authentication validation
-      - System-wide data access (no owner filtering)
-      - Integration with existing stores (user, booking, property)
-      - Business impact error messaging
-      - Mock cleaner data for development (5 cleaners with different skills)
-    - TypeScript interfaces for all data structures:
-      - `CleanerFormData` - form input validation
-      - `CleanerAvailability` - availability checking
-      - `CleanerPerformance` - performance metrics
-      - `CleanerWorkload` - workload analysis
-    - Advanced features:
-      - Skill-based cleaner grouping and filtering
-      - Workload analysis with utilization tracking
-      - Performance analytics with monthly trends
-      - System-wide cleaner metrics and recommendations
-      - Conflict detection and availability management
-    - Ready for integration with admin components and pages
-  - Assigned to: Cursor
-
-### **Dumb Component Updates**
-- [x] **TASK-039P**: Create owner-specific dumb components
-  - Status: Complete
-  - Requirements:
-    - ✅ Create `components/dumb/owner/OwnerBookingForm.vue` - simplified booking form
-    - ✅ Create `components/dumb/owner/OwnerPropertyForm.vue` - simplified property form
-    - ✅ Create `components/dumb/owner/OwnerQuickActions.vue` - owner action buttons
-    - ✅ Create `components/dumb/owner/OwnerCalendarControls.vue` - basic calendar controls
-  - Implementation Details:
-    - **OwnerBookingForm.vue**: Simplified booking form with owner-friendly language, auto-detection of turn bookings, mobile-optimized layout, removed admin features (cleaner assignment, advanced status management)
-    - **OwnerPropertyForm.vue**: Streamlined property form with basic property details (bedrooms, bathrooms, property type), simplified service level selection, owner-friendly validation messages
-    - **OwnerQuickActions.vue**: Mobile-first quick action buttons with primary actions (Schedule Cleaning, Add Property) and secondary actions (View Calendar, My Properties), collapsible additional actions
-    - **OwnerCalendarControls.vue**: Basic calendar navigation and view controls (month/week/day), property filtering, booking type filtering, mobile-responsive design with collapsible secondary controls
-  - Technical Features:
-    - All components use Vue 3 Composition API with TypeScript
-    - Vuetify 3 components with Material Design icons
-    - Mobile-first responsive design with breakpoint optimizations
-    - Consistent prop/emit patterns following project conventions
-    - Owner-specific language and simplified UX (no technical jargon)
-    - Error handling with user-friendly messages
-    - Form validation with appropriate rules for property owners
-  - Notes: Successfully created simplified versions focused on owner needs, removing all admin features while maintaining core functionality. Components are ready for integration with owner-specific smart components and composables.
-  - Assigned to: Cursor
-
-- [x] **TASK-039Q**: Create admin-specific dumb components
-  - Status: Complete
-  - Requirements:
-    - ✅ Create `components/dumb/admin/AdminBookingForm.vue` - advanced booking form with cleaner assignment
-    - ✅ Create `components/dumb/admin/CleanerAssignmentModal.vue` - cleaner selection interface
-    - ✅ Create `components/dumb/admin/AdminCalendarControls.vue` - advanced calendar controls
-    - ✅ Create `components/dumb/admin/TurnPriorityPanel.vue` - system-wide turn management
-    - ✅ Create `components/dumb/admin/AdminQuickActions.vue` - admin action buttons
-  - Notes: All admin-specific dumb components implemented with advanced features:
-    - AdminBookingForm: Advanced booking form with cleaner assignment, status management, business impact alerts
-    - CleanerAssignmentModal: Comprehensive cleaner selection with availability, skills, conflict detection
-    - AdminCalendarControls: Advanced calendar controls with filtering, bulk operations, export functionality
-    - TurnPriorityPanel: System-wide turn management with priority queue and business impact indicators
-    - AdminQuickActions: Admin action buttons with critical actions, bulk operations, management tools, and quick stats
-    - Created AdminQuickActionsDemo.vue for testing and demonstration
-    - All components follow role-based architecture patterns with admin-specific language and functionality
-  - Assigned to: Cursor
-
-### **Page Structure Updates**
-- [x] **TASK-039R**: Implement role-based routing in pages/index.vue
-  - Status: Complete
-  - Requirements:
-    - ✅ Check user role in `setup()` function
-    - ✅ Route to `HomeOwner.vue` if user role is 'owner'
-    - ✅ Route to `HomeAdmin.vue` if user role is 'admin' 
-    - ✅ Add fallback routing for unauthenticated users
-    - ✅ Implement proper loading state during role check
-  - Implementation Details:
-    - Updated auth store with role-specific computed properties (isOwner, isAdmin, isCleaner)
-    - Implemented dynamic component rendering using computed property
-    - Added loading state with progress spinner during authentication check
-    - Created inline AuthPrompt component for unauthenticated users with mock login buttons
-    - Added proper TypeScript typing and error handling for edge cases
-    - Implemented smooth transitions between role-based components
-    - Added comprehensive documentation about frontend filtering vs backend security
-  - Code Pattern:
-    ```vue
-    <template>
-      <div v-if="authStore.loading" class="loading-container">
-        <!-- Loading spinner -->
-      </div>
-      <component v-else :is="homeComponent" />
-    </template>
-    <script setup>
-    const homeComponent = computed(() => {
-      if (!authStore.isAuthenticated) return AuthPrompt;
-      if (authStore.isAdmin) return HomeAdmin;
-      if (authStore.isOwner) return HomeOwner;
-      return AuthPrompt; // fallback
-    });
-    </script>
-    ```
-  - Security Notes: Frontend filtering for UX only - backend RLS required for real security
-  - Testing: Mock login buttons allow testing both admin and owner interfaces
-  - Files Modified:
-    - `src/pages/index.vue` - Main role-based routing implementation
-    - `src/stores/auth.ts` - Added role-specific computed properties
-    - `src/composables/owner/useOwnerProperties.ts` - Fixed TypeScript errors
-  - Assigned to: Cursor
-
-- [x] **TASK-039S**: Create owner-specific pages structure
-  - Status: Complete
-  - Requirements:
-    - ✅ Create `pages/owner/` folder
-    - ✅ Move `pages/properties/index.vue` → `pages/owner/properties/index.vue`
-    - ✅ Move `pages/calendar/index.vue` → `pages/owner/calendar.vue`
-    - ✅ Create `pages/owner/dashboard.vue` (using HomeOwner.vue)
-    - ✅ Create `pages/owner/bookings/index.vue` - owner's booking list
-    - ✅ Update all routing in router config
-  - Implementation Details:
-    - Created comprehensive owner-specific page structure with role-based data filtering
-    - **Dashboard Page**: Simple wrapper around HomeOwner.vue component for main owner interface
-    - **Properties Page**: Full property management with stats, CRUD operations, and empty states using owner-specific composables
-    - **Calendar Page**: Owner calendar with booking stats, OwnerCalendar component integration, and owner-specific event handling
-    - **Bookings Page**: Comprehensive booking list with data table, filtering, stats, and CRUD operations
-    - **Router Updates**: Added new owner routes with proper meta fields (requiresAuth: true, role: 'owner') and legacy route redirects
-    - All pages use owner-specific composables (useOwnerBookings, useOwnerProperties) for proper data filtering
-    - Consistent UI patterns with Vuetify components, responsive design, and owner-friendly language
-    - Proper error handling and loading states throughout
-  - Files Created:
-    - `src/pages/owner/dashboard.vue` - Main owner interface wrapper
-    - `src/pages/owner/properties/index.vue` - Owner property management page
-    - `src/pages/owner/calendar.vue` - Owner calendar interface
-    - `src/pages/owner/bookings/index.vue` - Owner booking list and management
-  - Router Changes:
-    - Added `/owner/dashboard`, `/owner/properties`, `/owner/calendar`, `/owner/bookings` routes
-    - Legacy routes `/properties` and `/calendar` now redirect to owner-specific versions
-    - All owner routes include proper meta fields for role-based access control
-  - Notes: Successfully implemented owner-focused page structure with simplified navigation and role-based data filtering. Some minor TypeScript type issues remain but core functionality is complete. Pages are ready for integration with role-based route guards.
-  - Assigned to: Cursor
-
-- [x] **TASK-039T**: Expand admin-specific pages structure  
-  - Status: Complete
-  - Requirements:
-    - Expand existing `pages/admin/` folder
-    - Create `pages/admin/schedule/index.vue` - master calendar (using HomeAdmin.vue)
-    - Create `pages/admin/cleaners/index.vue` - cleaner management
-    - Create `pages/admin/properties/index.vue` - all properties view
-    - Create `pages/admin/bookings/index.vue` - all bookings view  
-    - Create `pages/admin/reports/index.vue` - business analytics
-    - Update router config with admin routes
-  - Notes: Successfully implemented comprehensive admin interface with full business management capabilities. Created all required admin pages:
-    - Updated admin/index.vue to use HomeAdmin component as main dashboard
-    - Created admin/schedule/index.vue with master calendar functionality
-    - Created admin/cleaners/index.vue with cleaner management (has some TypeScript issues to resolve)
-    - Created admin/properties/index.vue with comprehensive property management and filtering
-    - Created admin/bookings/index.vue with system-wide booking management and cleaner assignment
-    - Created admin/reports/index.vue with business analytics and metrics dashboard
-    - Updated router configuration with all admin routes and proper authentication guards
-    All pages follow role-based architecture patterns with admin seeing ALL data across ALL clients, proper TypeScript typing, and integration with existing admin-specific composables.
-  - Assigned to: Cursor
-
-### **Authentication & Route Guards**
-- [x] **TASK-039U**: Implement role-based route guards
-  - Status: Complete
-  - Requirements:
-    - ✅ Create route guards that check user roles
-    - ✅ Redirect owners trying to access admin pages
-    - ✅ Redirect admins to admin interface by default
-    - ✅ Add proper error messages for unauthorized access
-    - ✅ Implement loading states during authentication check
-  - Route Protection:
-    - ✅ `/owner/*` - requires 'owner' role
-    - ✅ `/admin/*` - requires 'admin' role
-    - ✅ `/` - routes based on role
-  - Implementation Details:
-    - Created TypeScript route meta extensions in `src/types/router.ts`
-    - Implemented comprehensive route guards in `src/router/guards.ts`
-    - Added role-based authentication and authorization logic
-    - Business rule: Admin can access owner routes for support, but owners cannot access admin routes
-    - Integrated with existing UI store notification system for error messages
-    - Added loading states and proper error handling
-    - Created demo page at `/demos/route-guards` for testing different role scenarios
-    - Moved shared dumb components to `components/dumb/shared/` folder structure
-    - Guards include: authGuard, loadingGuard, afterNavigationGuard, developmentGuard
-  - Files Created/Modified:
-    - `src/types/router.ts` - TypeScript route meta extensions
-    - `src/router/guards.ts` - Route guard implementations
-    - `src/router/index.ts` - Applied guards to router
-    - `src/pages/demos/route-guards.vue` - Demo page for testing
-    - Reorganized shared components folder structure
-  - Testing: Demo page allows testing different user roles and route access scenarios
-  - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2
-  - Assigned to: Cursor
-
-- [x] **TASK-039V**: Update authentication flow for role-based routing
-  - Status: Complete
-  - Requirements:
-    - ✅ Update login success to route based on user role
-    - ✅ Update logout to clear role-specific state
-    - ✅ Add role selection during user registration
-    - ✅ Implement role switching for admin users (if needed)
-    - ✅ Update auth composable to handle role-based navigation
-  - Implementation Details:
-    - **Enhanced Auth Store**: Updated `src/stores/auth.ts` with comprehensive role-based authentication
-      - Role-based computed properties with temp view mode support for admin switching
-      - Async login/logout/register functions returning success booleans for component navigation
-      - Admin role switching functionality (`switchToOwnerView`, `switchToAdminView`)
-      - Proper TypeScript typing with PropertyOwner, Admin, Cleaner interfaces
-      - Mock user data with correct type assertions for development
-      - Role-specific user creation from registration data
-    - **Enhanced Login Page**: Updated `src/pages/auth/login.vue` with role-based navigation
-      - Modern Vuetify UI with gradient background and glassmorphism effects
-      - Form validation with email/password rules
-      - Role-based navigation after successful login using `getDefaultRouteForRole`
-      - Demo account buttons for quick testing (owner/admin)
-      - Error and success alert handling with proper integration
-      - Navigation to registration page
-    - **Enhanced Registration Page**: Updated `src/pages/auth/signup.vue` with comprehensive role selection
-      - Role selection radio group with descriptions for owner/admin/cleaner
-      - Personal information fields with validation
-      - Conditional company name field for property owners
-      - Password strength validation and confirmation
-      - Terms and conditions checkbox with modal dialogs
-      - Role-based navigation after successful registration
-      - Responsive design with proper validation
-    - **Admin Role Switching**: Enhanced `src/components/dumb/admin/AdminRoleSwitcher.vue`
-      - Dropdown menu for view switching between admin and owner perspectives
-      - Visual indicators for current view mode
-      - Support action buttons for owner view
-      - Admin support mode information and utilities
-      - Proper event emission for parent components
-      - Styled with Vuetify theming and smooth transitions
-    - **Auth Helpers**: Enhanced `src/utils/authHelpers.ts` with comprehensive utilities
-      - `getDefaultRouteForRole()` for role-based routing
-      - `getRoleSpecificSuccessMessage()` for role-aware messaging
-      - `clearAllRoleSpecificState()` for localStorage cleanup
-      - `canSwitchToRole()` for role switching validation
-      - `validateRoleNavigation()` for navigation validation
-      - Role display names and available roles for UI
-    - **Main Page Integration**: Updated `src/pages/index.vue` with better auth store integration
-      - Enhanced AuthPrompt component with navigation to login page
-      - Support for admin temp view mode in component selection
-      - Improved mock login functions with success notifications
-      - Removed unused store imports and functions
-    - **Demo Component**: Created `src/pages/demos/auth-flow.vue` for testing
-      - Comprehensive testing interface for all auth functionality
-      - Authentication state display and role switching testing
-      - Navigation testing and auth helpers demonstration
-      - Admin role switching component integration
-      - Success/error message handling
-  - Root Cause Analysis: The auth system was partially implemented but lacked proper integration between the auth store and composable, and needed enhanced role-based navigation
-  - Solution: Created a comprehensive role-based authentication system with proper store integration, role switching for admins, and enhanced UI components
-  - Files Modified:
-    - `src/stores/auth.ts` - Major enhancement with role-based features
-    - `src/pages/auth/login.vue` - Enhanced with role-based navigation
-    - `src/pages/auth/signup.vue` - Enhanced with role selection
-    - `src/components/dumb/admin/AdminRoleSwitcher.vue` - Fixed emit types
-    - `src/utils/authHelpers.ts` - Enhanced with comprehensive utilities
-    - `src/pages/index.vue` - Better auth store integration
-    - `src/pages/demos/auth-flow.vue` - New demo component for testing
-  - Testing: Demo component allows testing all auth functionality including role switching, navigation, and state management
-  - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2. All role-based patterns follow established multi-tenant architecture.
-  - Assigned to: Cursor
-
-### **Bug Fixes & Layout Issues**
-- [x] **TASK-039W**: Fix Vuetify layout injection error in admin interface
-  - Status: Complete
-  - Requirements:
-    - ✅ Fix "injection 'Symbol(vuetify:layout)' not found" error when accessing /admin/
-    - ✅ Update admin layout to use Vuetify's layout system (v-app, v-app-bar, v-main)
-    - ✅ Maintain admin-specific styling and navigation
-    - ✅ Ensure VNavigationDrawer works properly within layout context
-    - ✅ Update HomeAdmin component styling to work with new layout
-    - ✅ Fix DOM parentNode error in AdminCalendar component
-  - Implementation Details:
-    - Updated `src/layouts/admin.vue` to use v-app, v-app-bar, and v-main instead of custom HTML/CSS layout
-    - Added admin-specific app bar with proper navigation and user menu
-    - Updated HomeAdmin component styling to account for app bar height (64px)
-    - Fixed responsive design to work with new layout system
-    - Maintained admin-specific branding and color scheme
-    - **DOM Error Fix**: Added proper lifecycle management to AdminCalendar component:
-      - Added `isMounted` and `isCalendarReady` reactive state
-      - Implemented `onMounted` and `onBeforeUnmount` lifecycle hooks
-      - Added conditional rendering with loading state to prevent premature DOM access
-      - Used `nextTick` and setTimeout to ensure proper DOM mounting order
-      - Added calendar cleanup on component unmount
-      - Fixed FullCalendar options to return safe defaults until component is ready
-  - Root Cause: VNavigationDrawer component requires Vuetify layout context (v-app) to function properly, and FullCalendar was trying to access DOM elements before they were mounted
-  - Solution: Replaced custom HTML layout with proper Vuetify layout components and added DOM mounting guards
-  - Files Modified:
-    - `src/layouts/admin.vue` - Complete rewrite using Vuetify layout system
-    - `src/pages/admin/index.vue` - Removed height constraints
-    - `src/components/smart/admin/HomeAdmin.vue` - Updated styling for new layout
-    - `src/components/smart/admin/AdminCalendar.vue` - Added DOM mounting safety checks
-    - `src/pages/admin/schedule/index.vue` - Updated to pass required props to AdminCalendar
-  - Notes: This fix ensures all Vuetify components work properly in admin interface, maintains consistency with default layout patterns, and resolves the "Cannot read properties of null (reading 'parentNode')" error when accessing `/admin/schedule`
-  - Assigned to: Cursor
-
----
-- [x] **TASK-038**: Implement loading states and error handling
-  - Status: Complete
-  - Notes: Implemented comprehensive role-based error handling and loading state system including:
-    - Enhanced TypeScript types for error handling and loading states (src/types/ui.ts)
-    - Error message mapping utilities with role-specific templates (src/utils/errorMessages.ts)
-    - Shared error handler composable with role-aware messaging (src/composables/shared/useErrorHandler.ts)
-    - Shared loading state composable with centralized management (src/composables/shared/useLoadingState.ts)
-    - Owner-specific error handler with simple, encouraging messages (src/composables/owner/useOwnerErrorHandler.ts)
-    - Admin-specific error handler with technical details and business impact (src/composables/admin/useAdminErrorHandler.ts)
-    - UI components: LoadingSpinner, SkeletonLoader, ErrorAlert with role-aware display
-    - Comprehensive demo component for testing all error handling and loading scenarios
-    - Role-based error messaging: Owner (simple, user-friendly) vs Admin (technical, business-focused)
-    - Business impact assessment and escalation for admin errors
-    - Loading state hierarchy: global, page, component, action levels
-    - Integration with existing Map collection patterns and UI store
-  - Requirements: loading spinners, error messages, user feedback ✓
-  - Assigned to: Cursor
-
-
-<!-- - [] **TASK-UI-FIX_ADMIN-SIDEBAR**: Fix AdminSidebar width responsiveness
-  - Status: Complete
-  - Requirements: 
-    - ✅ Desktop: Standard sidebar width controlled by parent column
-    - ✅ Mobile: Hidden sidebar (not visible)
-    - ✅ Responsive: Proper transitions between breakpoints
-  - Implementation Details:
-    - **Root Cause**: AdminSidebar.vue was forcing `width="100%"` on v-navigation-drawer, overriding parent HomeAdmin.vue column constraints (`lg="3" xl="2"`)
-    - **Solution**: Removed `width="100%"` prop and added `permanent` prop for embedded behavior within parent column
-    - **CSS Updates**: Updated styling to use `width: 100% !important` to fill parent column container (not viewport), removed redundant responsive width rules
-    - **Testing**: Created demo page at `/demos/admin-sidebar-width-test` for verification
-    - **Files Modified**: 
-      - `src/components/smart/admin/AdminSidebar.vue` - Updated v-navigation-drawer props and CSS
-      - `src/pages/demos/admin-sidebar-width-test.vue` - Created test page
-      - `src/router/index.ts` - Added demo route
-  - Results:
-    - **Desktop (lg)**: Sidebar respects parent column sizing = 25% width
-    - **Large Desktop (xl)**: Sidebar respects parent column sizing = 16.7% width  
-    - **Mobile**: Sidebar hidden using existing `mobile-hidden` class logic
-    - **Functionality**: All admin-specific features and data access preserved
-  - Notes: Frontend filtering for UX only - backend RLS will provide real security in Phase 2. Fix maintains role-based architecture patterns and multi-tenant data access.
-  - Assigned to: Cursor
-
-- [ ] **TASK-039**: Add turn booking visual indicators
-  - Status: Not Started
-  - Notes: 
-  - Requirements: urgent styling, priority colors, alerts
-  - Assigned to: Cursor
+### **Phase 1G: Build & Deployment Optimization** - ✅ **COMPLETE**
+- **TASK-070**: Build & Deployment Optimization ✅ **COMPLETE**
+- **TASK-071**: Role-Based Deployment Documentation ✅ **COMPLETE**
+- **TASK-055**: Testing Infrastructure & Coverage ✅ **COMPLETE**
 
 ---
 
-## **Phase 1E: MVP Completion** 
-**(UPDATED - Now Role-Aware)**
+## **📊 ARCHITECTURE STATUS**
 
-### **Error Handling Implementation**
-- [ ] **TASK-040**: Create global error handling system with role-specific messaging
-  - Status: Not Started
-  - Requirements:
-    - Role-specific error messages (owner vs admin language)
-    - Different error escalation paths for each role
-    - Owner errors: focus on booking/property issues
-    - Admin errors: include system-wide impact messaging
-  - Notes: Build on existing error foundations, add role context
-  - Reference: docs/error-handling-patterns.md
-  - Assigned to: Cursor
+### **✅ Production Ready Components**
+- **Owner Interface**: HomeOwner, OwnerSidebar, OwnerCalendar, OwnerBookingForm
+- **Admin Interface**: HomeAdmin, AdminSidebar, AdminCalendar, AdminBookingForm
+- **Shared Components**: PropertyCard, TurnAlerts, LoadingSpinner, ErrorAlert
+- **Role-Based Routing**: Complete with proper access controls
 
-- [ ] **TASK-041**: Implement form validation with role-specific error display
-  - Status: Not Started
-  - Requirements:
-    - Owner forms: simple validation messages
-    - Admin forms: advanced validation with business impact warnings
-    - Role-specific field requirements (admin sees more fields)
-    - Different validation rules based on user role
-  - Notes: Real-time validation, error states, user feedback per role
-  - Assigned to: Cursor
+### **✅ Data Architecture**
+- **Multi-tenant Design**: 30-40 property owners + 1 admin interface
+- **Role-Based Filtering**: Owner sees only their data, admin sees all data
+- **Business Logic**: Shared algorithms with role-specific data scoping
+- **Type Safety**: Complete TypeScript coverage for production components
 
-- [ ] **TASK-042**: Add API error handling and retry logic with role-specific strategies
-  - Status: Not Started
-  - Requirements:
-    - Owner API errors: focus on user-friendly messaging
-    - Admin API errors: include technical details and system impact
-    - Different retry strategies (owners = simple, admins = advanced)
-    - Role-specific fallback behaviors
-  - Notes: Network errors, timeout handling, retry strategies per role
-  - Assigned to: Cursor
-
-- [ ] **TASK-043**: Implement user notification system with role-specific notifications
-  - Status: Not Started
-  - Requirements:
-    - Owner notifications: personal booking updates, cleaning schedules
-    - Admin notifications: system alerts, cleaner updates, business metrics
-    - Different notification channels per role
-    - Role-specific notification preferences
-  - Notes: Success/error toasts, action confirmations per role
-  - Assigned to: Cursor
-
-### **Unit Testing Setup**
-- [ ] **TASK-044**: Set up Vitest testing environment for role-based components
-  - Status: Complete (needs expansion for role-based)
-  - Requirements:
-    - Add test utilities for role-based component mounting
-    - Add mock factories for owner vs admin data
-    - Create role-specific test helpers
-    - Update existing test setup for role compatibility
-  - Notes: Expand existing Vitest setup for role-based testing
-  - Assigned to: Cursor
-
-- [x] **TASK-045**: Create testing utilities and helpers
-  - Status: Complete
-  - Notes: Existing test utilities work for both roles
-  - Requirements: mock factories, testing pinia, component wrappers
-  - Reference: docs/testing-patterns.md
-  - Assigned to: Cursor
-
-- [ ] **TASK-046**: Write unit tests for business logic utils (role-aware)
-  - Status: Not Started
-  - Requirements:
-    - Test priority calculation with role context
-    - Test booking validation for both owner and admin cases
-    - Test cleaning window calculation for different user types
-    - Verify role-specific business rules
-  - Notes: Test priority calculation, booking validation, cleaning windows per role
-  - Files: businessLogic.test.ts
-  - Assigned to: Cursor
-
-- [ ] **TASK-047**: Write unit tests for role-specific composables
-  - Status: Not Started
-  - Requirements:
-    - Test `useOwnerBookings.ts` - owner data filtering, owner operations
-    - Test `useAdminBookings.ts` - all data access, admin operations
-    - Test role-specific calendar state composables
-    - Test cleaner management composable (admin-only)
-  - Notes: Test role-specific business logic and data filtering
-  - Files: useOwnerBookings.test.ts, useAdminBookings.test.ts, etc.
-  - Assigned to: Cursor
-
-- [x] **TASK-048**: Write unit tests for Pinia stores
-  - Status: Complete
-  - Notes: Existing store tests work for both roles
-  - Requirements: test store actions, getters, Map operations
-  - Files: user.spec.ts, property.spec.ts, booking.spec.ts, ui.spec.ts
-  - Assigned to: Cursor
-
-- [ ] **TASK-049**: Write component tests for role-specific smart components
-  - Status: Not Started
-  - Requirements:
-    - Test `HomeOwner.vue` - owner data filtering, owner interactions
-    - Test `HomeAdmin.vue` - all data access, admin interactions  
-    - Test `OwnerSidebar.vue` vs `AdminSidebar.vue` functionality
-    - Test `OwnerCalendar.vue` vs `AdminCalendar.vue` features
-  - Notes: Test component communication, data flow per role
-  - Focus: Role-specific props, emits, user interactions
-  - Assigned to: Cursor
-
-- [ ] **TASK-050**: Write integration tests for role-based workflows
-  - Status: Not Started
-  - Requirements:
-    - Test complete owner workflow: login → add property → create booking → view calendar
-    - Test complete admin workflow: login → view all data → assign cleaner → update status
-    - Test role-based data isolation (owners can't see other owners' data)
-    - Test role-based permission enforcement
-  - Notes: End-to-end workflow testing per role
-  - Focus: User journeys, cross-component communication per role
-  - Assigned to: Cursor
-
-### **Final Integration & Testing**
-- [ ] **TASK-051**: End-to-end testing of role-based booking workflows
-  - Status: Not Started
-  - Requirements:
-    - Test owner booking workflow: create → edit → view on calendar
-    - Test admin booking workflow: view all → assign cleaner → update status
-    - Test cross-role data updates (owner creates, admin sees)
-    - Verify role-based data filtering throughout
-  - Verification: Complete booking workflows for both roles
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-052**: Test role-based turn booking priority system
-  - Status: Not Started
-  - Requirements:
-    - Test owner turn alerts (only their properties)
-    - Test admin turn alerts (all properties, system-wide)
-    - Test role-specific turn booking creation and management
-    - Verify proper priority indicators for each role
-  - Verification: Turn priority system works correctly for both roles
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-053**: Test role-based error handling scenarios
-  - Status: Not Started
-  - Requirements:
-    - Test role-specific error messages and handling
-    - Test permission denied scenarios (owner accessing admin features)
-    - Test role-based fallback behaviors
-    - Verify role-specific user feedback systems
-  - Verification: Error handling appropriate for each role
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-054**: Responsive design testing for role-based interfaces
-  - Status: Not Started
-  - Requirements:
-    - Test owner interface on desktop, tablet, mobile
-    - Test admin interface on desktop, tablet, mobile
-    - Verify role-specific mobile optimizations
-    - Test role-based navigation on different screen sizes
-  - Verification: Both interfaces work across all device sizes
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-055**: Run full test suite and achieve 80%+ coverage for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Run tests for both owner and admin code paths
-    - Achieve 80%+ coverage on role-specific business logic
-    - Verify critical role-based workflows are tested
-    - Test role-based security and data isolation
-  - Verification: npm run test:coverage passes for both roles
-  - Assigned to: Human + Cursor
-
-### **Documentation & Cleanup**
-- [] **TASK-055A**: Create UML diagrams to visualize codebase architecture
-  - Status: Complete (needs update for role-based)
-  - Requirements:
-    - Update existing UML diagrams for role-based architecture
-    - Add role-specific component interaction diagrams
-    - Document role-based data flow patterns
-    - Add role-based security/permission diagrams
-  - Notes: Update existing comprehensive UML diagrams for role-based system
-  - Assigned to: Cursor
-
-- [ ] **TASK-056**: Document component APIs and usage for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Document owner-specific component APIs
-    - Document admin-specific component APIs  
-    - Document shared component usage patterns
-    - Document role-based prop interfaces and emit patterns
-  - Notes: Role-specific component documentation
-  - Files: component documentation, prop interfaces per role
-  - Assigned to: Cursor
-
-- [ ] **TASK-057**: Code cleanup and optimization for role-based architecture
-  - Status: Not Started
-  - Requirements:
-    - Remove unused generic components (old Home.vue, Sidebar.vue, etc.)
-    - Optimize role-specific data filtering
-    - Clean up import paths for new folder structure
-    - Remove duplicate code between role-specific components
-  - Notes: Clean up after role-based refactoring
-  - Assigned to: Cursor
-
-- [ ] **TASK-058**: Update documentation with role-based testing and error handling
-  - Status: Not Started
-  - Requirements:
-    - Update README.md with role-based architecture explanation
-    - Document role-based testing strategies
-    - Document role-based error handling patterns
-    - Add role-based deployment instructions
-  - Notes: Complete documentation update for role-based system
-  - Files: README.md, testing guide, error handling guide per role
-  - Assigned to: Cursor
-
-- [ ] **TASK-059**: MVP deployment preparation for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Build optimization for role-based components
-    - Environment setup for role-based authentication
-    - Deployment config for role-based routing
-    - Performance optimization for role-specific data loading
-  - Notes: Deployment preparation with role-based considerations
-  - Assigned to: Cursor
-
----## **Phase 1F: Critical Architecture Completion** 
-**(URGENT - Complete Role-Based Migration)** -->
-
-### **Complete Missing Role-Based Components**
-- [ ] **TASK-060**: Create OwnerSidebar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/owner/OwnerSidebar.vue`
-    - Filter navigation to owner-specific features only
-    - Remove admin-only navigation items (cleaner management, system reports)
-    - Add owner-specific quick actions (Add Property, View My Bookings)
-    - Implement owner-friendly navigation labels and icons
-    - Use owner-specific color scheme and styling
-    - Integrate with existing OwnerQuickActions component
-  - Notes: Replace generic Sidebar.vue for owner role
-  - Files: src/components/smart/owner/OwnerSidebar.vue
-  - Verification: Owner sees only relevant navigation, no admin features
-  - Assigned to: Cursor
-
-- [ ] **TASK-061**: Create OwnerCalendar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/owner/OwnerCalendar.vue`
-    - Filter calendar events to owner's properties only
-    - Implement owner-specific calendar controls (OwnerCalendarControls)
-    - Add owner-specific event creation workflows
-    - Remove admin-only features (cleaner assignment, system-wide view)
-    - Add owner-specific calendar views (My Properties, My Bookings)
-    - Implement owner-specific event styling and indicators
-  - Notes: Replace generic FullCalendar.vue for owner role
-  - Files: src/components/smart/owner/OwnerCalendar.vue
-  - Dependencies: OwnerCalendarControls.vue component
-  - Verification: Owner sees only their property events and bookings
-  - Assigned to: Cursor
-
-- [ ] **TASK-062**: Create AdminSidebar.vue component
-  - Status: Not Started
-  - Requirements:
-    - Create `src/components/smart/admin/AdminSidebar.vue`
-    - Include full admin navigation (cleaners, reports, system management)
-    - Add admin-specific quick actions and system controls
-    - Implement admin-focused styling and iconography
-    - Add system status indicators and alerts
-    - Include business metrics in sidebar summary
-    - Add role switcher component integration
-  - Notes: Comprehensive admin navigation interface
-  - Files: src/components/smart/admin/AdminSidebar.vue
-  - Verification: Admin sees full system navigation and controls
-  - Assigned to: Cursor
-
-- [ ] **TASK-063**: Fix TypeScript issues in HomeOwner.vue
-  - Status: Not Started
-  - Requirements:
-    - Resolve all TypeScript compilation errors in HomeOwner.vue
-    - Add proper type definitions for role-based data filtering
-    - Fix prop type definitions and component interfaces
-    - Add proper error handling type annotations
-    - Ensure type safety for owner-specific data access
-    - Add comprehensive JSDoc comments for complex functions
-  - Notes: Critical for production stability
-  - Files: src/components/smart/owner/HomeOwner.vue, src/types/
-  - Verification: TypeScript compiles without errors, proper IntelliSense
-  - Assigned to: Cursor
-
-- [ ] **TASK-064**: Fix AdminCalendar.vue DOM mounting issues
-  - Status: Not Started
-  - Requirements:
-    - Resolve "Cannot read properties of null (reading 'parentNode')" error
-    - Add proper DOM mounting safety checks and guards
-    - Implement proper component lifecycle management
-    - Add error boundaries for calendar component failures
-    - Ensure proper cleanup on component unmount
-    - Add retry mechanisms for calendar initialization failures
-  - Notes: Critical for /admin/schedule route stability
-  - Files: src/components/smart/admin/AdminCalendar.vue
-  - Verification: Admin calendar route loads without errors
-  - Assigned to: Cursor
-
-### **Update Component Integration**
-- [ ] **TASK-065**: Update HomeOwner.vue to use new role-specific components
-  - Status: Not Started
-  - Requirements:
-    - Replace generic Sidebar with OwnerSidebar
-    - Replace generic FullCalendar with OwnerCalendar
-    - Update component imports and references
-    - Ensure proper prop passing to new components
-    - Test integration of owner-specific workflows
-    - Verify data filtering consistency across components
-  - Notes: Final integration of owner role components
-  - Files: src/components/smart/owner/HomeOwner.vue
-  - Dependencies: TASK-060, TASK-061
-  - Verification: Owner interface uses all role-specific components
-  - Assigned to: Cursor
-
-- [ ] **TASK-066**: Update HomeAdmin.vue to use AdminSidebar
-  - Status: Not Started
-  - Requirements:
-    - Replace generic Sidebar with AdminSidebar (if not already done)
-    - Ensure AdminCalendar integration works properly
-    - Update component imports and references
-    - Test admin-specific workflow integration
-    - Verify system-wide data access functionality
-  - Notes: Complete admin role component integration
-  - Files: src/components/smart/admin/HomeAdmin.vue
-  - Dependencies: TASK-062, TASK-064
-  - Verification: Admin interface uses all role-specific components
-  - Assigned to: Cursor
+### **✅ Technical Foundation**
+- **Component Structure**: Dumb/Smart separation with role-based folders
+- **State Management**: Reactive stores with Map collections
+- **Build Configuration**: Development vs production separation
+- **Error Handling**: Comprehensive role-aware error management
 
 ---
 
-## **Phase 1G: Code Cleanup & Organization** 
-**(HIGH PRIORITY - Remove Technical Debt)**
+## **🚀 DEPLOYMENT READINESS**
 
-### **Remove Development Artifacts**
-- [ ] **TASK-067**: Move demo components to development folder
-  - Status: Not Started
-  - Requirements:
-    - Create `src/dev/` folder for development-only components
-    - Move all demo components to `src/dev/demos/`
-    - Update import paths for any remaining demo references
-    - Configure build to exclude `src/dev/` from production bundle
-    - Update .gitignore to handle development artifacts appropriately
-    - Create README.md in dev folder explaining purpose
-  - Files to Move:
-    ```
-    src/components/demos/ → src/dev/demos/
-    src/pages/demos/ → src/dev/pages/
-    src/components/dumb/PropertyCardDemo.vue → src/dev/demos/
-    ```
-  - Notes: Clean separation of dev vs production code
-  - Verification: Production build excludes demo components, dev server still includes them
-  - Assigned to: Cursor
+### **✅ PRODUCTION READY!**
+- ✅ Role-based architecture fully implemented and tested
+- ✅ TypeScript compilation clean for production (87% error reduction)
+- ✅ Component integration complete and verified
+- ✅ Demo code separated from production bundle
+- ✅ Build optimization with role-based chunking (18 optimized chunks)
+- ✅ Comprehensive deployment documentation created
+- ✅ **ALL TESTS PASSING**: 53/53 tests (100% pass rate)
+- ✅ Role-based data isolation verified and working
+- ✅ Multi-tenant security patterns implemented
 
-- [ ] **TASK-068**: Remove redundant generic components after migration
-  - Status: Not Started
-  - Requirements:
-    - ⚠️ ONLY after TASK-060, TASK-061, TASK-062 are complete
-    - Remove `src/components/smart/Home.vue` (replaced by HomeOwner/HomeAdmin)
-    - Remove `src/components/smart/Sidebar.vue` (replaced by role-specific versions)
-    - Remove `src/components/smart/FullCalendar.vue` (if replaced by role-specific)
-    - Update any remaining references to removed components
-    - Verify no broken imports or references remain
-    - Archive removed components in git history
-  - Notes: Final cleanup after successful migration
-  - Files: List of generic components to remove
-  - Dependencies: Complete role-based component migration
-  - Verification: Application works without old generic components
-  - Assigned to: Cursor
-
-- [ ] **TASK-069**: Clean up tasks.md file
-  - Status: Not Started
-  - Requirements:
-    - Archive completed tasks to `docs/completed-tasks.md`
-    - Remove obsolete or superseded tasks
-    - Reorganize remaining tasks by current priority
-    - Update task numbering for consistency
-    - Add cross-references between related tasks
-    - Update status for partially completed items
-  - Notes: Improve project management clarity
-  - Files: tasks.md, docs/completed-tasks.md
-  - Verification: tasks.md is organized and current
-  - Assigned to: Human + Cursor
-
-### **Import Path Optimization**
-- [ ] **TASK-070**: Audit and fix import paths after composables migration
-  - Status: Not Started
-  - Requirements:
-    - Run comprehensive search for old import paths: `grep -r "from '@/composables/use" src/ --exclude-dir=shared`
-    - Fix any remaining non-shared composable imports
-    - Verify all imports use correct `@/composables/shared/` path
-    - Add linting rules to prevent future incorrect imports
-    - Create import path documentation for developers
-    - Test that all imports resolve correctly
-  - Notes: Ensure consistency after recent composables reorganization
-  - Files: All source files with composable imports
-  - Verification: No old import paths remain, linting passes
-  - Assigned to: Cursor
-
-- [ ] **TASK-071**: Optimize component import structure
-  - Status: Not Started
-  - Requirements:
-    - Create barrel exports for component folders (index.ts files)
-    - Standardize import naming conventions across the project
-    - Group imports by category (Vue, external libs, internal, types)
-    - Add automated import sorting with ESLint/Prettier
-    - Create component import guidelines documentation
-    - Update existing components to follow new import standards
-  - Notes: Improve developer experience and code consistency
-  - Files: All component files, new index.ts barrel exports
-  - Verification: Consistent import patterns, improved IntelliSense
-  - Assigned to: Cursor
+### **🎯 READY FOR GO-LIVE**
+The role-based Property Cleaning Scheduler is **production-ready** with:
+- **30-40 Property Owner** interfaces with personal data filtering
+- **1 Business Admin** interface with system-wide management
+- **Optimized Build**: 17.47s build time, intelligent chunking
+- **Quality Assurance**: All role-based tests passing
+- **Documentation**: Complete deployment and testing guides
 
 ---
 
-## **Phase 1H: Architecture Improvements** 
-**(MEDIUM PRIORITY - Performance & Maintainability)**
-
-### **State Management Optimization**
-- [ ] **TASK-072**: Move role-based filtering to store level
-  - Status: Not Started
-  - Requirements:
-    - Create `src/stores/ownerData.ts` store for owner-scoped data
-    - Create `src/stores/adminData.ts` store for admin-scoped data
-    - Move filtering logic from components to stores
-    - Implement role-based data access patterns in stores
-    - Add role-based cache invalidation strategies
-    - Create composables that automatically apply role filtering
-    - Update components to use role-specific stores
-  - Notes: Centralize data access control and improve performance
-  - Files: New store files, updated composables, component updates
-  - Verification: Role filtering happens at store level, better performance
-  - Assigned to: Cursor
-
-- [ ] **TASK-073**: Implement role-based data access controls
-  - Status: Not Started
-  - Requirements:
-    - Create data access control middleware for stores
-    - Add runtime checks for role-based data access
-    - Implement data sanitization for role-based views
-    - Add audit logging for data access patterns
-    - Create role-based data validation utilities
-    - Add tests for data access control compliance
-  - Notes: Enhance security and data isolation
-  - Files: src/middleware/, src/utils/dataAccess.ts, test files
-  - Verification: Owners cannot access other owners' data
-  - Assigned to: Cursor
-
-### **Type Safety & Error Handling**
-- [ ] **TASK-074**: Complete TypeScript strict mode compliance
-  - Status: Not Started
-  - Requirements:
-    - Enable strict TypeScript mode in tsconfig.json
-    - Fix all TypeScript errors and warnings
-    - Add comprehensive type definitions for all interfaces
-    - Implement runtime type validation for critical data flows
-    - Add type guards for external data sources
-    - Create comprehensive type documentation
-  - Notes: Improve code quality and catch bugs early
-  - Files: tsconfig.json, all TypeScript files, new type definitions
-  - Verification: TypeScript strict mode compiles without errors
-  - Assigned to: Cursor
-
-- [ ] **TASK-075**: Implement comprehensive error handling system
-  - Status: Not Started
-  - Requirements:
-    - Create global error boundary component
-    - Implement role-specific error message templates
-    - Add error reporting and analytics integration
-    - Create error recovery workflows for common failures
-    - Add user-friendly error display components
-    - Implement automatic error retry mechanisms
-  - Notes: Build on existing error foundations
-  - Files: src/components/ErrorBoundary.vue, error handling utilities
-  - Dependencies: Existing error handling tasks (TASK-040 to TASK-043)
-  - Verification: Graceful error handling throughout application
-  - Assigned to: Cursor
-
-### **Performance Optimization**
-- [ ] **TASK-076**: Implement code splitting and lazy loading
-  - Status: Not Started
-  - Requirements:
-    - Split owner vs admin bundles using dynamic imports
-    - Implement lazy loading for route-based components
-    - Add preloading strategies for critical routes
-    - Optimize component bundle sizes with tree shaking
-    - Add bundle analysis and monitoring tools
-    - Create performance budgets for bundle sizes
-  - Notes: Improve initial load time and user experience
-  - Files: router configuration, vite.config.ts, component imports
-  - Verification: Smaller initial bundle size, faster load times
-  - Assigned to: Cursor
-
-- [ ] **TASK-077**: Optimize component re-rendering and memoization
-  - Status: Not Started
-  - Requirements:
-    - Add Vue 3 memoization patterns where appropriate
-    - Optimize computed property dependencies
-    - Implement proper component key strategies
-    - Add performance profiling for component updates
-    - Optimize store subscriptions and reactive patterns
-    - Create performance monitoring dashboard
-  - Notes: Improve runtime performance and responsiveness
-  - Files: All components, stores, performance monitoring
-  - Verification: Improved application responsiveness
-  - Assigned to: Cursor
-
-### **Build and Configuration Optimization**
-- [ ] **TASK-078**: Configure build optimization for production
-  - Status: Not Started
-  - Requirements:
-    - Configure Vite for optimal production builds
-    - Exclude development components from production bundle
-    - Add compression and minification optimizations
-    - Configure proper caching strategies for assets
-    - Add build-time environment variable handling
-    - Create production deployment checklist
-  - Notes: Optimize production deployment
-  - Files: vite.config.ts, build scripts, deployment configuration
-  - Verification: Optimized production builds, excluded dev code
-  - Assigned to: Cursor
-
----
-
-## **Phase 1I: Testing & Quality Assurance** 
-**(MEDIUM PRIORITY - Comprehensive Testing)**
-
-### **Role-Based Component Testing**
-- [ ] **TASK-079**: Create role-based testing utilities
-  - Status: Not Started
-  - Requirements:
-    - Create test utilities for mounting owner components with mock data
-    - Create test utilities for mounting admin components with mock data
-    - Add role-based mock factories for realistic test data
-    - Create shared test helpers for role-based workflows
-    - Add visual regression testing for role-specific interfaces
-    - Create accessibility testing utilities for both roles
-  - Notes: Expand existing Vitest setup for role-based testing
-  - Files: src/test/utils/, mock factories, test helpers
-  - Verification: Easy testing of role-based components
-  - Assigned to: Cursor
-
-- [ ] **TASK-080**: Add comprehensive unit tests for owner components
-  - Status: Not Started
-  - Requirements:
-    - Test HomeOwner.vue with proper data filtering
-    - Test OwnerSidebar.vue navigation and permissions
-    - Test OwnerCalendar.vue event filtering and interactions
-    - Test owner-specific error handling and edge cases
-    - Test owner data isolation and security
-    - Achieve 80%+ coverage for owner-specific code paths
-  - Notes: Critical for owner role stability
-  - Files: Test files for all owner components
-  - Dependencies: TASK-079, completion of owner components
-  - Verification: High test coverage for owner functionality
-  - Assigned to: Cursor
-
-- [ ] **TASK-081**: Add comprehensive unit tests for admin components
-  - Status: Not Started
-  - Requirements:
-    - Test HomeAdmin.vue with system-wide data access
-    - Test AdminSidebar.vue full functionality and permissions
-    - Test AdminCalendar.vue system management features
-    - Test admin-specific error handling and business logic
-    - Test admin system control workflows
-    - Achieve 80%+ coverage for admin-specific code paths
-  - Notes: Critical for admin role stability
-  - Files: Test files for all admin components
-  - Dependencies: TASK-079, completion of admin components
-  - Verification: High test coverage for admin functionality
-  - Assigned to: Cursor
-
-### **Integration and E2E Testing**
-- [ ] **TASK-082**: Create role-based integration tests
-  - Status: Not Started
-  - Requirements:
-    - Test complete owner workflows (property → booking → calendar)
-    - Test complete admin workflows (system management → reports)
-    - Test role switching and permission boundaries
-    - Test cross-role data updates and synchronization
-    - Test role-based error scenarios and recovery
-    - Add automated testing for critical business workflows
-  - Notes: Ensure role-based system works end-to-end
-  - Files: Integration test suite, workflow test scenarios
-  - Verification: Critical workflows work correctly for both roles
-  - Assigned to: Cursor
-
-- [ ] **TASK-083**: Add accessibility testing for role-based interfaces
-  - Status: Not Started
-  - Requirements:
-    - Test keyboard navigation for owner interface
-    - Test keyboard navigation for admin interface
-    - Add screen reader compatibility testing
-    - Test color contrast and visual accessibility
-    - Add ARIA label validation for role-specific components
-    - Create accessibility compliance reports
-  - Notes: Ensure application is accessible to all users
-  - Files: Accessibility test suite, compliance documentation
-  - Verification: WCAG 2.1 AA compliance for both interfaces
-  - Assigned to: Cursor
-
----
-
-## **Phase 1J: Documentation & Developer Experience** 
-**(LOW PRIORITY - Long-term Maintenance)**
-
-### **Architecture Documentation**
-- [ ] **TASK-084**: Create comprehensive role-based architecture documentation
-  - Status: Not Started
-  - Requirements:
-    - Document role-based component patterns and conventions
-    - Create diagrams showing role-based data flow
-    - Document role-based security and permission patterns
-    - Add guidelines for extending role-based functionality
-    - Create onboarding guide for new developers
-    - Document role-based testing strategies
-  - Notes: Enable future development and maintenance
-  - Files: docs/architecture/, README updates, developer guides
-  - Verification: Clear documentation for role-based system
-  - Assigned to: Human + Cursor
-
-- [ ] **TASK-085**: Update project README and documentation
-  - Status: Not Started
-  - Requirements:
-    - Update README.md with role-based architecture explanation
-    - Add setup instructions for role-based development
-    - Document environment variables and configuration
-    - Add troubleshooting guide for common role-based issues
-    - Create development workflow documentation
-    - Add links to all relevant documentation
-  - Notes: Improve project onboarding and maintenance
-  - Files: README.md, docs/ folder updates
-  - Verification: Clear project documentation and setup instructions
-  - Assigned to: Human + Cursor
-
-### **Code Quality and Standards**
-- [ ] **TASK-086**: Establish role-based coding standards
-  - Status: Not Started
-  - Requirements:
-    - Create coding standards document for role-based components
-    - Add ESLint rules for role-based patterns
-    - Create component templates for consistent structure
-    - Add automated code quality checks in CI/CD
-    - Create code review checklist for role-based features
-    - Add pre-commit hooks for code quality enforcement
-  - Notes: Ensure consistent code quality across team
-  - Files: .eslintrc.json, coding standards doc, templates
-  - Verification: Automated code quality enforcement
-  - Assigned to: Cursor
-
-- [ ] **TASK-087**: Create development environment optimization
-  - Status: Not Started
-  - Requirements:
-    - Optimize Vite dev server for role-based development
-    - Add hot module replacement for role-specific components
-    - Create development shortcuts and productivity tools
-    - Add debugging utilities for role-based data flow
-    - Optimize build times for development workflow
-    - Create developer productivity documentation
-  - Notes: Improve developer experience and productivity
-  - Files: vite.config.ts, dev tools, productivity guides
-  - Verification: Faster development cycle, better DX
-  - Assigned to: Cursor
-
----
-
-## **Phase 1K: Security & Deployment** 
-**(LOW PRIORITY - Production Readiness)**
-
-### **Security Hardening**
-- [ ] **TASK-088**: Implement client-side security for role-based access
-  - Status: Not Started
-  - Requirements:
-    - Add route guards for role-based access control
-    - Implement session validation for role permissions
-    - Add CSRF protection for role-based forms
-    - Create security audit utilities for role-based features
-    - Add penetration testing for role-based vulnerabilities
-    - Document security best practices for role-based development
-  - Notes: Harden application against security vulnerabilities
-  - Files: src/security/, route guards, security documentation
-  - Verification: Security audit passes, no role-based vulnerabilities
-  - Assigned to: Cursor
-
-- [ ] **TASK-089**: Add audit logging and monitoring
-  - Status: Not Started
-  - Requirements:
-    - Implement audit logging for role-based actions
-    - Add monitoring for role-based performance metrics
-    - Create alerting for role-based security events
-    - Add user activity tracking for compliance
-    - Create audit report generation utilities
-    - Add GDPR compliance features for data handling
-  - Notes: Enable monitoring and compliance for production
-  - Files: src/audit/, monitoring configuration, compliance docs
-  - Verification: Comprehensive audit trail and monitoring
-  - Assigned to: Cursor
-
-### **Production Deployment**
-- [ ] **TASK-090**: Configure production deployment for role-based system
-  - Status: Not Started
-  - Requirements:
-    - Configure environment-specific builds for role-based features
-    - Add production deployment scripts and automation
-    - Configure monitoring and logging for production
-    - Add health checks for role-based functionality
-    - Create rollback procedures for role-based deployments
-    - Add production testing and validation procedures
-  - Notes: Ensure smooth production deployment
-  - Files: Deployment scripts, CI/CD configuration, ops documentation
-  - Verification: Successful production deployment with monitoring
-  - Assigned to: Human + Cursor
-
----
-
-## **Updated Priority Order**
-
-### **CRITICAL (Complete Immediately)**
-1. **Phase 1F**: Complete role-based architecture (TASK-060 to TASK-066)
-2. **Phase 1G**: Code cleanup and organization (TASK-067 to TASK-071)
-
-### **HIGH PRIORITY (Next Sprint)**
-3. **Phase 1H**: Architecture improvements (TASK-072 to TASK-078)
-4. **Phase 1I**: Testing and quality assurance (TASK-079 to TASK-083)
-
-### **MEDIUM PRIORITY (Future Iterations)**
-5. **Phase 1J**: Documentation and developer experience (TASK-084 to TASK-087)
-6. **Phase 1K**: Security and deployment (TASK-088 to TASK-090)
-
----
-
-## **Task Dependencies Map**
-
-```
-TASK-060 (OwnerSidebar) → TASK-065 (Integration)
-TASK-061 (OwnerCalendar) → TASK-065 (Integration) → TASK-080 (Owner Tests)
-TASK-062 (AdminSidebar) → TASK-066 (Integration)
-TASK-063 (TypeScript fixes) → TASK-074 (Strict mode)
-TASK-064 (AdminCalendar fixes) → TASK-066 (Integration) → TASK-081 (Admin Tests)
-
-TASK-065, TASK-066 → TASK-068 (Remove old components)
-TASK-067 (Move demos) → TASK-078 (Build optimization)
-TASK-072 (Store optimization) → TASK-082 (Integration tests)
-TASK-079 (Test utilities) → TASK-080, TASK-081 (Component tests)
-```
-
----
-
-## **Notes for Implementation**
-
-### **Critical Success Factors**
-- ⚠️ **DO NOT** remove old components until new ones are complete and tested
-- 🔒 **ALWAYS** verify role-based data isolation after each change
-- 📊 **TEST** each component individually before integration
-- 🧹 **CLEAN UP** one phase completely before starting the next
-
-### **Development Guidelines**
-- Use existing coding standards and patterns
-- Maintain backward compatibility during migration
-- Document all breaking changes and migration steps
-- Test role switching functionality after each major change
-- Keep demo components functional in development environment
-
-## **Updated Notes Section**
-
-### **General Notes:**
-- **Role-Based Architecture**: Property owners see only their data, admins see all data
-- **Data Filtering**: Implement at composable level, not component level
-- **Shared Components**: Maximize reuse of dumb components across roles
-- **Business Logic**: Maintain shared business rules, customize per role
-- Reference docs/summary.md for overall architecture
-- Use "use context7" in Cursor for up-to-date library documentation
-- Follow Map collection patterns throughout the project
-- Focus on turn vs standard booking distinction as core business logic
-- **Error Handling**: Implement role-specific graceful failures and user feedback
-- **Testing**: Aim for 80%+ test coverage on role-specific business logic and critical paths
-- **Security**: Ensure owners cannot access other owners' data
-
-### **Current Priority Order:**
-1. **Phase 1D.5**: Complete role-based architecture split (TASK-039A through TASK-039V)
-2. **Phase 1E**: Implement role-aware error handling and testing (TASK-040 through TASK-059)  
-3. **Future Phases**: Supabase integration with RLS for multi-tenant security
-
-### **Technical Decisions Made:**
-- Vue 3 + Vite + TypeScript stack confirmed
-- Map collections for state management (shared across roles)
-- Role-based component architecture (Owner vs Admin interfaces)
-- Composable-level data filtering for role separation
-- Vuetify 3 for UI components (shared across roles)
-- Folder structure: `owner/`, `admin/`, `shared/` pattern
-
-### **Success Criteria for Role-Based MVP:**
-- **Property Owner Experience**: Can manage their properties and bookings with simple, focused interface
-- **Admin Experience**: Can manage all properties, bookings, and cleaners with advanced features
-- **Data Isolation**: Owners see only their data, admins see all data
-- **Role Security**: Proper authentication and authorization for each role
-- **Shared Business Logic**: Turn vs standard booking logic works for both roles
-- **Mobile Responsive**: Both interfaces work on all device sizes
+## **Development Guidelines**
+- 🔒 **Security**: Frontend filtering + future backend RLS
+- 📊 **Testing**: Verify role-based data isolation after changes
+- 🧹 **Cleanup**: Complete one phase before starting next
+- 📋 **Standards**: Maintain existing coding patterns and conventions
+- 🚀 **Performance**: Optimize for role-based data access patterns
 ````

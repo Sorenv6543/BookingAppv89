@@ -14,7 +14,9 @@
           size="36"
           class="mr-3"
         >
-          <v-icon color="white">mdi-shield-crown</v-icon>
+          <v-icon color="white">
+            mdi-shield-crown
+          </v-icon>
         </v-avatar>
         <div>
           <div class="text-h6 font-weight-bold">

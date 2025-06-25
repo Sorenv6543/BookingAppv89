@@ -1,10 +1,17 @@
 <template>
-  <v-container fluid class="turn-visual-indicators-demo">
+  <v-container
+    fluid
+    class="turn-visual-indicators-demo"
+  >
     <v-row>
       <v-col cols="12">
         <div class="demo-header mb-6">
           <h1 class="text-h3 font-weight-bold mb-2">
-            <v-icon icon="mdi-alert-decagram" color="warning" class="mr-3" />
+            <v-icon
+              icon="mdi-alert-decagram"
+              color="warning"
+              class="mr-3"
+            />
             Turn Booking Visual Indicators Demo
           </h1>
           <p class="text-h6 text-medium-emphasis">
@@ -17,9 +24,15 @@
     <!-- Role Toggle -->
     <v-row>
       <v-col cols="12">
-        <v-card variant="outlined" class="mb-6">
+        <v-card
+          variant="outlined"
+          class="mb-6"
+        >
           <v-card-title>
-            <v-icon icon="mdi-account-switch" class="mr-2" />
+            <v-icon
+              icon="mdi-account-switch"
+              class="mr-2"
+            />
             Role-Based Styling Demo
           </v-card-title>
           <v-card-text>
@@ -30,11 +43,17 @@
               class="mb-4"
             >
               <v-btn value="owner">
-                <v-icon icon="mdi-home-account" class="mr-2" />
+                <v-icon
+                  icon="mdi-home-account"
+                  class="mr-2"
+                />
                 Property Owner
               </v-btn>
               <v-btn value="admin">
-                <v-icon icon="mdi-shield-account" class="mr-2" />
+                <v-icon
+                  icon="mdi-shield-account"
+                  class="mr-2"
+                />
                 Admin
               </v-btn>
             </v-btn-toggle>
@@ -49,16 +68,30 @@
     <!-- Priority Badges Demo -->
     <v-row>
       <v-col cols="12">
-        <v-card variant="outlined" class="mb-6">
+        <v-card
+          variant="outlined"
+          class="mb-6"
+        >
           <v-card-title>
-            <v-icon icon="mdi-label" class="mr-2" />
+            <v-icon
+              icon="mdi-label"
+              class="mr-2"
+            />
             Priority Badges (TurnPriorityBadge Component)
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col v-for="priority in priorities" :key="priority" cols="12" sm="6" md="3">
+              <v-col
+                v-for="priority in priorities"
+                :key="priority"
+                cols="12"
+                sm="6"
+                md="3"
+              >
                 <div class="demo-section">
-                  <h4 class="text-h6 mb-3 text-capitalize">{{ priority }} Priority</h4>
+                  <h4 class="text-h6 mb-3 text-capitalize">
+                    {{ priority }} Priority
+                  </h4>
                   
                   <!-- Basic Badge -->
                   <div class="mb-3">
@@ -111,14 +144,25 @@
     <!-- Urgent Turn Indicators Demo -->
     <v-row>
       <v-col cols="12">
-        <v-card variant="outlined" class="mb-6">
+        <v-card
+          variant="outlined"
+          class="mb-6"
+        >
           <v-card-title>
-            <v-icon icon="mdi-alert-circle" class="mr-2" />
+            <v-icon
+              icon="mdi-alert-circle"
+              class="mr-2"
+            />
             Urgent Turn Indicators (UrgentTurnIndicator Component)
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col v-for="alert in alertExamples" :key="alert.id" cols="12" lg="6">
+              <v-col
+                v-for="alert in alertExamples"
+                :key="alert.id"
+                cols="12"
+                lg="6"
+              >
                 <UrgentTurnIndicator
                   :priority="alert.priority"
                   :user-role="currentRole"
@@ -129,11 +173,11 @@
                   :time-remaining="alert.timeRemaining"
                   :animated="true"
                   :striped="alert.priority === 'urgent'"
+                  class="mb-4"
                   @view="showToast(`View details for ${alert.propertyName}`)"
                   @assign="showToast(`Assign cleaner for ${alert.propertyName}`)"
                   @reschedule="showToast(`Reschedule ${alert.propertyName}`)"
                   @close="showToast(`Closed alert for ${alert.propertyName}`)"
-                  class="mb-4"
                 />
               </v-col>
             </v-row>
@@ -145,16 +189,27 @@
     <!-- Legacy Alert Styles Demo -->
     <v-row>
       <v-col cols="12">
-        <v-card variant="outlined" class="mb-6">
+        <v-card
+          variant="outlined"
+          class="mb-6"
+        >
           <v-card-title>
-            <v-icon icon="mdi-format-paint" class="mr-2" />
+            <v-icon
+              icon="mdi-format-paint"
+              class="mr-2"
+            />
             Enhanced CSS Classes Demo
           </v-card-title>
           <v-card-text>
             <v-row>
               <!-- Priority Styling Demo -->
-              <v-col cols="12" md="6">
-                <h4 class="text-h6 mb-3">Priority Styling</h4>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <h4 class="text-h6 mb-3">
+                  Priority Styling
+                </h4>
                 <div 
                   v-for="priority in priorities" 
                   :key="`css-${priority}`"
@@ -178,8 +233,13 @@
               </v-col>
 
               <!-- Booking Type Styling Demo -->
-              <v-col cols="12" md="6">
-                <h4 class="text-h6 mb-3">Booking Type Styling</h4>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <h4 class="text-h6 mb-3">
+                  Booking Type Styling
+                </h4>
                 <div 
                   :class="[
                     'turn-booking',
@@ -227,15 +287,26 @@
     <!-- Animation Showcase -->
     <v-row>
       <v-col cols="12">
-        <v-card variant="outlined" class="mb-6">
+        <v-card
+          variant="outlined"
+          class="mb-6"
+        >
           <v-card-title>
-            <v-icon icon="mdi-animation" class="mr-2" />
+            <v-icon
+              icon="mdi-animation"
+              class="mr-2"
+            />
             Animation Showcase
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="12" md="4">
-                <h4 class="text-h6 mb-3">Urgent Pulse Animation</h4>
+              <v-col
+                cols="12"
+                md="4"
+              >
+                <h4 class="text-h6 mb-3">
+                  Urgent Pulse Animation
+                </h4>
                 <div 
                   class="urgent-priority pa-4 rounded-lg elevation-2 mb-3"
                   style="min-height: 80px; display: flex; align-items: center; justify-content: center;"
@@ -244,8 +315,13 @@
                 </div>
               </v-col>
               
-              <v-col cols="12" md="4">
-                <h4 class="text-h6 mb-3">Striped Animation</h4>
+              <v-col
+                cols="12"
+                md="4"
+              >
+                <h4 class="text-h6 mb-3">
+                  Striped Animation
+                </h4>
                 <div 
                   class="urgent-priority turn-booking pa-4 rounded-lg elevation-2 mb-3 position-relative"
                   style="min-height: 80px; display: flex; align-items: center; justify-content: center;"
@@ -254,8 +330,13 @@
                 </div>
               </v-col>
               
-              <v-col cols="12" md="4">
-                <h4 class="text-h6 mb-3">Hover Effects</h4>
+              <v-col
+                cols="12"
+                md="4"
+              >
+                <h4 class="text-h6 mb-3">
+                  Hover Effects
+                </h4>
                 <div 
                   class="urgent-priority pa-4 rounded-lg elevation-2 mb-3 cursor-pointer"
                   style="min-height: 80px; display: flex; align-items: center; justify-content: center;"
@@ -275,12 +356,18 @@
       <v-col cols="12">
         <v-card variant="outlined">
           <v-card-title>
-            <v-icon icon="mdi-tune" class="mr-2" />
+            <v-icon
+              icon="mdi-tune"
+              class="mr-2"
+            />
             Interactive Controls
           </v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-switch
                   v-model="animationsEnabled"
                   label="Enable Animations"
@@ -304,7 +391,10 @@
                 />
               </v-col>
               
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-btn
                   color="warning"
                   variant="outlined"

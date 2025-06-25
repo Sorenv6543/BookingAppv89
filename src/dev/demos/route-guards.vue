@@ -3,7 +3,9 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <h1 class="text-h4 mb-4">🚦 Route Guards Demo</h1>
+          <h1 class="text-h4 mb-4">
+            🚦 Route Guards Demo
+          </h1>
           <p class="text-body-1 mb-6">
             Test role-based authentication and authorization for the multi-tenant architecture.
           </p>
@@ -12,12 +14,18 @@
 
       <!-- Current User Status -->
       <v-row>
-        <v-col cols="12" md="6">
+        <v-col
+          cols="12"
+          md="6"
+        >
           <v-card class="mb-4">
             <v-card-title>Current User Status</v-card-title>
             <v-card-text>
               <div v-if="authStore.isAuthenticated">
-                <v-chip :color="getRoleColor(authStore.user?.role)" class="mb-2">
+                <v-chip
+                  :color="getRoleColor(authStore.user?.role)"
+                  class="mb-2"
+                >
                   {{ authStore.user?.role?.toUpperCase() || 'UNKNOWN' }}
                 </v-chip>
                 <p><strong>Name:</strong> {{ authStore.user?.name }}</p>
@@ -25,36 +33,63 @@
                 <p><strong>Role:</strong> {{ authStore.user?.role }}</p>
               </div>
               <div v-else>
-                <v-chip color="grey" class="mb-2">NOT AUTHENTICATED</v-chip>
+                <v-chip
+                  color="grey"
+                  class="mb-2"
+                >
+                  NOT AUTHENTICATED
+                </v-chip>
                 <p>You are not logged in.</p>
               </div>
             </v-card-text>
           </v-card>
         </v-col>
 
-        <v-col cols="12" md="6">
+        <v-col
+          cols="12"
+          md="6"
+        >
           <v-card class="mb-4">
             <v-card-title>Quick Role Switch</v-card-title>
             <v-card-text>
-              <v-btn-toggle v-model="selectedRole" mandatory class="mb-3">
-                <v-btn value="owner" size="small">Owner</v-btn>
-                <v-btn value="admin" size="small">Admin</v-btn>
-                <v-btn value="cleaner" size="small">Cleaner</v-btn>
+              <v-btn-toggle
+                v-model="selectedRole"
+                mandatory
+                class="mb-3"
+              >
+                <v-btn
+                  value="owner"
+                  size="small"
+                >
+                  Owner
+                </v-btn>
+                <v-btn
+                  value="admin"
+                  size="small"
+                >
+                  Admin
+                </v-btn>
+                <v-btn
+                  value="cleaner"
+                  size="small"
+                >
+                  Cleaner
+                </v-btn>
               </v-btn-toggle>
               <div class="d-flex gap-2">
                 <v-btn 
-                  @click="loginAsRole(selectedRole)" 
                   color="primary" 
-                  size="small"
+                  size="small" 
                   :loading="authStore.loading"
+                  @click="loginAsRole(selectedRole)"
                 >
                   Login as {{ selectedRole }}
                 </v-btn>
                 <v-btn 
-                  @click="authStore.logout()" 
                   color="error" 
-                  size="small"
+                  size="small" 
                   :disabled="!authStore.isAuthenticated"
+                  @click="authStore.logout()"
                 >
                   Logout
                 </v-btn>
@@ -77,15 +112,17 @@
 
               <!-- Owner Routes -->
               <div class="mb-4">
-                <h3 class="text-h6 mb-2">👤 Owner Routes</h3>
+                <h3 class="text-h6 mb-2">
+                  👤 Owner Routes
+                </h3>
                 <div class="d-flex flex-wrap gap-2">
                   <v-btn 
                     v-for="route in ownerRoutes" 
                     :key="route.path"
-                    @click="testRoute(route.path)"
                     :color="getRouteButtonColor('owner')"
                     size="small"
                     variant="outlined"
+                    @click="testRoute(route.path)"
                   >
                     {{ route.name }}
                   </v-btn>
@@ -94,15 +131,17 @@
 
               <!-- Admin Routes -->
               <div class="mb-4">
-                <h3 class="text-h6 mb-2">🔧 Admin Routes</h3>
+                <h3 class="text-h6 mb-2">
+                  🔧 Admin Routes
+                </h3>
                 <div class="d-flex flex-wrap gap-2">
                   <v-btn 
                     v-for="route in adminRoutes" 
                     :key="route.path"
-                    @click="testRoute(route.path)"
                     :color="getRouteButtonColor('admin')"
                     size="small"
                     variant="outlined"
+                    @click="testRoute(route.path)"
                   >
                     {{ route.name }}
                   </v-btn>
@@ -111,15 +150,17 @@
 
               <!-- Public Routes -->
               <div class="mb-4">
-                <h3 class="text-h6 mb-2">🌐 Public Routes</h3>
+                <h3 class="text-h6 mb-2">
+                  🌐 Public Routes
+                </h3>
                 <div class="d-flex flex-wrap gap-2">
                   <v-btn 
                     v-for="route in publicRoutes" 
                     :key="route.path"
-                    @click="testRoute(route.path)"
                     color="success"
                     size="small"
                     variant="outlined"
+                    @click="testRoute(route.path)"
                   >
                     {{ route.name }}
                   </v-btn>
@@ -128,15 +169,17 @@
 
               <!-- Auth Routes -->
               <div class="mb-4">
-                <h3 class="text-h6 mb-2">🔐 Auth Routes</h3>
+                <h3 class="text-h6 mb-2">
+                  🔐 Auth Routes
+                </h3>
                 <div class="d-flex flex-wrap gap-2">
                   <v-btn 
                     v-for="route in authRoutes" 
                     :key="route.path"
-                    @click="testRoute(route.path)"
                     color="info"
                     size="small"
                     variant="outlined"
+                    @click="testRoute(route.path)"
                   >
                     {{ route.name }}
                   </v-btn>
@@ -172,17 +215,20 @@
                       {{ result.success ? 'ALLOWED' : 'DENIED' }}
                     </v-chip>
                   </div>
-                  <div v-if="result.message" class="text-body-2 text-medium-emphasis mt-1">
+                  <div
+                    v-if="result.message"
+                    class="text-body-2 text-medium-emphasis mt-1"
+                  >
                     {{ result.message }}
                   </div>
                 </v-timeline-item>
               </v-timeline>
               
               <v-btn 
-                @click="clearResults" 
                 color="warning" 
                 size="small" 
-                class="mt-3"
+                class="mt-3" 
+                @click="clearResults"
               >
                 Clear Results
               </v-btn>

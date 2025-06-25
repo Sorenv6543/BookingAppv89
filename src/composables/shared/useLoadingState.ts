@@ -26,12 +26,11 @@ const DEFAULT_TIMEOUT = 30000;
  */
 export function useLoadingState() {
   const uiStore = useUIStore();
-  const authStore = useAuthStore();
   const userStore = useUserStore();
   
   // State
   const operations = ref<Map<string, LoadingOperation>>(new Map());
-  const timeouts = ref<Map<string, NodeJS.Timeout>>(new Map());
+  const timeouts = ref<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   
   // Computed
   const currentUserRole = computed((): UserRole => {
@@ -287,62 +286,58 @@ export function useLoadingState() {
   /**
    * Create a loading wrapper for async operations
    */
-  function withLoading<T>(
+  async function withLoading<T>(
     operationId: string,
     asyncFn: () => Promise<T>,
     options: LoadingStateOptions = {}
   ): Promise<T> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // Start loading
-        startLoading(operationId, options.role ? 'action' : 'component', options);
-        
-        // Execute async operation
-        const result = await asyncFn();
-        
-        // Stop loading and resolve
-        stopLoading(operationId);
-        resolve(result);
-      } catch (error) {
-        // Stop loading and reject
-        stopLoading(operationId);
-        reject(error);
-      }
-    });
+    try {
+      // Start loading
+      startLoading(operationId, options.role ? 'action' : 'component', options);
+      
+      // Execute async operation
+      const result = await asyncFn();
+      
+      // Stop loading and resolve
+      stopLoading(operationId);
+      return result;
+    } catch (error) {
+      // Stop loading and reject
+      stopLoading(operationId);
+      throw error;
+    }
   }
   
   /**
    * Create a loading wrapper for async operations with progress updates
    */
-  function withProgressLoading<T>(
+  async function withProgressLoading<T>(
     operationId: string,
     asyncFn: (updateProgress: (progress: number, message?: string) => void) => Promise<T>,
     options: LoadingStateOptions = {}
   ): Promise<T> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // Start loading
-        startLoading(operationId, 'action', { ...options, showProgress: true });
-        
-        // Create progress updater
-        const updateProgressFn = (progress: number, message?: string) => {
-          updateProgress(operationId, progress, message);
-        };
-        
-        // Execute async operation with progress updates
-        const result = await asyncFn(updateProgressFn);
-        
-        // Complete progress and stop loading
-        updateProgress(operationId, 100);
-        setTimeout(() => stopLoading(operationId), 500); // Brief delay to show completion
-        
-        resolve(result);
-      } catch (error) {
-        // Stop loading and reject
-        stopLoading(operationId);
-        reject(error);
-      }
-    });
+    try {
+      // Start loading
+      startLoading(operationId, 'action', { ...options, showProgress: true });
+      
+      // Create progress updater
+      const updateProgressFn = (progress: number, message?: string) => {
+        updateProgress(operationId, progress, message);
+      };
+      
+      // Execute async operation with progress updates
+      const result = await asyncFn(updateProgressFn);
+      
+      // Complete progress and stop loading
+      updateProgress(operationId, 100);
+      setTimeout(() => stopLoading(operationId), 500); // Brief delay to show completion
+      
+      return result;
+    } catch (error) {
+      // Stop loading and reject
+      stopLoading(operationId);
+      throw error;
+    }
   }
   
   /**

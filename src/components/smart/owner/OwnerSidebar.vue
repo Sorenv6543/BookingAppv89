@@ -4,7 +4,6 @@
     permanent
     :elevation="0"
     color="tertiary"
-
   >                                   
     <v-container class="py-2">
       <!-- Header with Owner-specific info -->

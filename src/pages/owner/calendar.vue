@@ -4,7 +4,9 @@
       <v-row>
         <v-col cols="12">
           <div class="d-flex justify-space-between align-center mb-4">
-            <h1 class="text-h4">My Booking Calendar</h1>
+            <h1 class="text-h4">
+              My Booking Calendar
+            </h1>
             <div class="d-flex gap-2">
               <v-btn
                 color="primary"
@@ -28,53 +30,105 @@
 
       <!-- Calendar Stats -->
       <v-row class="mb-4">
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
               <div class="d-flex align-center">
-                <v-icon color="primary" class="mr-2">mdi-calendar-today</v-icon>
+                <v-icon
+                  color="primary"
+                  class="mr-2"
+                >
+                  mdi-calendar-today
+                </v-icon>
                 <div>
-                  <div class="text-h6">{{ todayBookings.length }}</div>
-                  <div class="text-caption text-medium-emphasis">Today's Bookings</div>
+                  <div class="text-h6">
+                    {{ todayBookings.length }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    Today's Bookings
+                  </div>
                 </div>
               </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
               <div class="d-flex align-center">
-                <v-icon color="warning" class="mr-2">mdi-clock-fast</v-icon>
+                <v-icon
+                  color="warning"
+                  class="mr-2"
+                >
+                  mdi-clock-fast
+                </v-icon>
                 <div>
-                  <div class="text-h6">{{ todayTurns.length }}</div>
-                  <div class="text-caption text-medium-emphasis">Today's Turns</div>
+                  <div class="text-h6">
+                    {{ todayTurns.length }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    Today's Turns
+                  </div>
                 </div>
               </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
               <div class="d-flex align-center">
-                <v-icon color="success" class="mr-2">mdi-calendar-week</v-icon>
+                <v-icon
+                  color="success"
+                  class="mr-2"
+                >
+                  mdi-calendar-week
+                </v-icon>
                 <div>
-                  <div class="text-h6">{{ upcomingBookings.length }}</div>
-                  <div class="text-caption text-medium-emphasis">This Week</div>
+                  <div class="text-h6">
+                    {{ upcomingBookings.length }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    This Week
+                  </div>
                 </div>
               </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
               <div class="d-flex align-center">
-                <v-icon color="info" class="mr-2">mdi-home</v-icon>
+                <v-icon
+                  color="info"
+                  class="mr-2"
+                >
+                  mdi-home
+                </v-icon>
                 <div>
-                  <div class="text-h6">{{ ownerProperties.length }}</div>
-                  <div class="text-caption text-medium-emphasis">My Properties</div>
+                  <div class="text-h6">
+                    {{ ownerProperties.length }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    My Properties
+                  </div>
                 </div>
               </div>
             </v-card-text>

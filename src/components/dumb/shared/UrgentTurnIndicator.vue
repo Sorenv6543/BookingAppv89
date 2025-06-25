@@ -35,17 +35,34 @@
       </div>
 
       <!-- Booking Details -->
-      <div v-if="showDetails" class="booking-details">
+      <div
+        v-if="showDetails"
+        class="booking-details"
+      >
         <v-row dense>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <div class="detail-item">
-              <v-icon icon="mdi-home" size="small" class="mr-2" />
+              <v-icon
+                icon="mdi-home"
+                size="small"
+                class="mr-2"
+              />
               <strong>Property:</strong> {{ propertyName || 'Unknown Property' }}
             </div>
           </v-col>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <div class="detail-item">
-              <v-icon icon="mdi-timer-outline" size="small" class="mr-2" />
+              <v-icon
+                icon="mdi-timer-outline"
+                size="small"
+                class="mr-2"
+              />
               <strong>Time Remaining:</strong> 
               <span :class="getTimeRemainingClass()">{{ formatTimeRemaining() }}</span>
             </div>
@@ -53,22 +70,43 @@
         </v-row>
 
         <v-row dense>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <div class="detail-item">
-              <v-icon icon="mdi-logout" size="small" class="mr-2" />
+              <v-icon
+                icon="mdi-logout"
+                size="small"
+                class="mr-2"
+              />
               <strong>Checkout:</strong> {{ formatDateTime(checkoutDate) }}
             </div>
           </v-col>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <div class="detail-item">
-              <v-icon icon="mdi-login" size="small" class="mr-2" />
+              <v-icon
+                icon="mdi-login"
+                size="small"
+                class="mr-2"
+              />
               <strong>Check-in:</strong> {{ formatDateTime(checkinDate) }}
             </div>
           </v-col>
         </v-row>
 
-        <div v-if="cleaningWindow" class="cleaning-window mt-2">
-          <v-icon icon="mdi-clock-fast" size="small" class="mr-2" />
+        <div
+          v-if="cleaningWindow"
+          class="cleaning-window mt-2"
+        >
+          <v-icon
+            icon="mdi-clock-fast"
+            size="small"
+            class="mr-2"
+          />
           <strong>Cleaning Window:</strong> 
           {{ cleaningWindow.duration }} minutes 
           ({{ formatTime(cleaningWindow.start) }} - {{ formatTime(cleaningWindow.end) }})
@@ -76,7 +114,10 @@
       </div>
 
       <!-- Action Buttons -->
-      <div v-if="showActions" class="action-buttons mt-3">
+      <div
+        v-if="showActions"
+        class="action-buttons mt-3"
+      >
         <v-btn
           :color="getActionColor()"
           size="small"
@@ -110,7 +151,10 @@
       </div>
 
       <!-- Real-time countdown -->
-      <div v-if="showCountdown && timeRemaining !== undefined" class="countdown-timer mt-2">
+      <div
+        v-if="showCountdown && timeRemaining !== undefined"
+        class="countdown-timer mt-2"
+      >
         <v-progress-linear
           :model-value="getProgressValue()"
           :color="getProgressColor()"
@@ -119,7 +163,11 @@
           class="mb-1"
         />
         <div class="countdown-text">
-          <v-icon icon="mdi-timer-sand" size="x-small" class="mr-1" />
+          <v-icon
+            icon="mdi-timer-sand"
+            size="x-small"
+            class="mr-1"
+          />
           <span class="text-caption">{{ getCountdownText() }}</span>
         </div>
       </div>

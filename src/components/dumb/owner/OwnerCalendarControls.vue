@@ -5,9 +5,15 @@
     :variant="variant"
   >
     <v-card-text class="pa-3">
-      <v-container fluid class="pa-0">
+      <v-container
+        fluid
+        class="pa-0"
+      >
         <!-- Main Controls Row -->
-        <v-row align="center" class="mb-2">
+        <v-row
+          align="center"
+          class="mb-2"
+        >
           <!-- Navigation Controls -->
           <v-col cols="auto">
             <v-btn-group
@@ -43,7 +49,10 @@
           <v-spacer />
           
           <!-- Current Date Display -->
-          <v-col cols="auto" class="text-center">
+          <v-col
+            cols="auto"
+            class="text-center"
+          >
             <div class="text-h6 font-weight-medium">
               {{ currentDateDisplay }}
             </div>
@@ -93,7 +102,10 @@
         </v-row>
         
         <!-- Secondary Controls Row (Mobile/Tablet) -->
-        <v-row v-if="showSecondaryControls" class="mt-2">
+        <v-row
+          v-if="showSecondaryControls"
+          class="mt-2"
+        >
           <!-- Property Filter -->
           <v-col
             cols="12"
@@ -142,14 +154,19 @@
               :disabled="loading"
               @click="handleQuickAction('add-booking')"
             >
-              <v-icon class="mr-2">mdi-plus</v-icon>
+              <v-icon class="mr-2">
+                mdi-plus
+              </v-icon>
               Schedule Cleaning
             </v-btn>
           </v-col>
         </v-row>
         
         <!-- Toggle Secondary Controls (Mobile) -->
-        <v-row v-if="!showSecondaryControls" class="mt-2">
+        <v-row
+          v-if="!showSecondaryControls"
+          class="mt-2"
+        >
           <v-col cols="12">
             <v-btn
               variant="text"
@@ -157,14 +174,19 @@
               block
               @click="showSecondaryControls = true"
             >
-              <v-icon class="mr-1">mdi-tune</v-icon>
+              <v-icon class="mr-1">
+                mdi-tune
+              </v-icon>
               Show Filters & Options
             </v-btn>
           </v-col>
         </v-row>
         
         <!-- Hide Secondary Controls -->
-        <v-row v-else class="mt-1">
+        <v-row
+          v-else
+          class="mt-1"
+        >
           <v-col cols="12">
             <v-btn
               variant="text"
@@ -172,7 +194,9 @@
               block
               @click="showSecondaryControls = false"
             >
-              <v-icon class="mr-1">mdi-chevron-up</v-icon>
+              <v-icon class="mr-1">
+                mdi-chevron-up
+              </v-icon>
               Hide Filters & Options
             </v-btn>
           </v-col>

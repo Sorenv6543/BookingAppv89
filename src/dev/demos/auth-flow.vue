@@ -2,9 +2,17 @@
   <v-container class="pa-6">
     <v-row>
       <v-col cols="12">
-        <v-card elevation="2" class="pa-6">
+        <v-card
+          elevation="2"
+          class="pa-6"
+        >
           <v-card-title class="text-h4 mb-4">
-            <v-icon class="mr-3" color="primary">mdi-account-check</v-icon>
+            <v-icon
+              class="mr-3"
+              color="primary"
+            >
+              mdi-account-check
+            </v-icon>
             Authentication Flow Demo
           </v-card-title>
           
@@ -18,7 +26,9 @@
             variant="tonal"
             class="mb-6"
           >
-            <div class="text-h6 mb-2">Current Authentication State</div>
+            <div class="text-h6 mb-2">
+              Current Authentication State
+            </div>
             <div v-if="authStore.isAuthenticated">
               <strong>User:</strong> {{ authStore.user?.name }} ({{ authStore.user?.email }})<br>
               <strong>Role:</strong> {{ authStore.user?.role }}<br>
@@ -57,43 +67,63 @@
           
           <!-- Authentication Actions -->
           <div class="mb-6">
-            <v-card variant="outlined" class="pa-4">
-              <v-card-title class="text-h6 mb-4">Authentication Actions</v-card-title>
+            <v-card
+              variant="outlined"
+              class="pa-4"
+            >
+              <v-card-title class="text-h6 mb-4">
+                Authentication Actions
+              </v-card-title>
               
               <v-row class="mb-4">
-                <v-col cols="12" md="4">
+                <v-col
+                  cols="12"
+                  md="4"
+                >
                   <v-btn
                     color="primary"
                     block
-                    @click="loginAsOwner"
                     :loading="authStore.loading"
                     :disabled="authStore.isAuthenticated"
+                    @click="loginAsOwner"
                   >
-                    <v-icon class="mr-2">mdi-home-account</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-home-account
+                    </v-icon>
                     Login as Owner
                   </v-btn>
                 </v-col>
-                <v-col cols="12" md="4">
+                <v-col
+                  cols="12"
+                  md="4"
+                >
                   <v-btn
                     color="secondary"
                     block
-                    @click="loginAsAdmin"
                     :loading="authStore.loading"
                     :disabled="authStore.isAuthenticated"
+                    @click="loginAsAdmin"
                   >
-                    <v-icon class="mr-2">mdi-shield-account</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-shield-account
+                    </v-icon>
                     Login as Admin
                   </v-btn>
                 </v-col>
-                <v-col cols="12" md="4">
+                <v-col
+                  cols="12"
+                  md="4"
+                >
                   <v-btn
                     color="warning"
                     block
-                    @click="loginAsCleaner"
                     :loading="authStore.loading"
                     :disabled="authStore.isAuthenticated"
+                    @click="loginAsCleaner"
                   >
-                    <v-icon class="mr-2">mdi-account-hard-hat</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-account-hard-hat
+                    </v-icon>
                     Login as Cleaner
                   </v-btn>
                 </v-col>
@@ -103,19 +133,29 @@
                 v-if="authStore.isAuthenticated"
                 color="error"
                 block
-                @click="handleLogout"
                 :loading="authStore.loading"
+                @click="handleLogout"
               >
-                <v-icon class="mr-2">mdi-logout</v-icon>
+                <v-icon class="mr-2">
+                  mdi-logout
+                </v-icon>
                 Logout
               </v-btn>
             </v-card>
           </div>
           
           <!-- Admin Role Switching -->
-          <div v-if="authStore.isAdmin" class="mb-6">
-            <v-card variant="outlined" class="pa-4">
-              <v-card-title class="text-h6 mb-4">Admin Role Switching</v-card-title>
+          <div
+            v-if="authStore.isAdmin"
+            class="mb-6"
+          >
+            <v-card
+              variant="outlined"
+              class="pa-4"
+            >
+              <v-card-title class="text-h6 mb-4">
+                Admin Role Switching
+              </v-card-title>
               
               <AdminRoleSwitcher
                 :is-in-owner-view="authStore.tempViewMode?.role === 'owner'"
@@ -130,29 +170,44 @@
           
           <!-- Navigation Testing -->
           <div class="mb-6">
-            <v-card variant="outlined" class="pa-4">
-              <v-card-title class="text-h6 mb-4">Navigation Testing</v-card-title>
+            <v-card
+              variant="outlined"
+              class="pa-4"
+            >
+              <v-card-title class="text-h6 mb-4">
+                Navigation Testing
+              </v-card-title>
               
               <v-row>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <v-btn
                     color="info"
                     block
-                    @click="navigateToDefault"
                     :disabled="!authStore.isAuthenticated"
+                    @click="navigateToDefault"
                   >
-                    <v-icon class="mr-2">mdi-home</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-home
+                    </v-icon>
                     Go to Default Route
                   </v-btn>
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <v-btn
                     color="info"
                     variant="outlined"
                     block
                     @click="goToLogin"
                   >
-                    <v-icon class="mr-2">mdi-login</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-login
+                    </v-icon>
                     Go to Login Page
                   </v-btn>
                 </v-col>
@@ -162,15 +217,22 @@
           
           <!-- Registration Testing -->
           <div class="mb-6">
-            <v-card variant="outlined" class="pa-4">
-              <v-card-title class="text-h6 mb-4">Registration Testing</v-card-title>
+            <v-card
+              variant="outlined"
+              class="pa-4"
+            >
+              <v-card-title class="text-h6 mb-4">
+                Registration Testing
+              </v-card-title>
               
               <v-btn
                 color="success"
                 block
                 @click="goToSignup"
               >
-                <v-icon class="mr-2">mdi-account-plus</v-icon>
+                <v-icon class="mr-2">
+                  mdi-account-plus
+                </v-icon>
                 Go to Registration Page
               </v-btn>
             </v-card>
@@ -178,25 +240,48 @@
           
           <!-- Auth Helpers Testing -->
           <div class="mb-6">
-            <v-card variant="outlined" class="pa-4">
-              <v-card-title class="text-h6 mb-4">Auth Helpers Testing</v-card-title>
+            <v-card
+              variant="outlined"
+              class="pa-4"
+            >
+              <v-card-title class="text-h6 mb-4">
+                Auth Helpers Testing
+              </v-card-title>
               
               <v-row>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <div class="text-body-2 mb-2">
                     <strong>Role Display Names:</strong>
                   </div>
-                  <v-chip class="mr-2 mb-2" color="primary" size="small">
+                  <v-chip
+                    class="mr-2 mb-2"
+                    color="primary"
+                    size="small"
+                  >
                     Owner: {{ getRoleDisplayName('owner') }}
                   </v-chip>
-                  <v-chip class="mr-2 mb-2" color="secondary" size="small">
+                  <v-chip
+                    class="mr-2 mb-2"
+                    color="secondary"
+                    size="small"
+                  >
                     Admin: {{ getRoleDisplayName('admin') }}
                   </v-chip>
-                  <v-chip class="mr-2 mb-2" color="warning" size="small">
+                  <v-chip
+                    class="mr-2 mb-2"
+                    color="warning"
+                    size="small"
+                  >
                     Cleaner: {{ getRoleDisplayName('cleaner') }}
                   </v-chip>
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <div class="text-body-2 mb-2">
                     <strong>Default Routes:</strong>
                   </div>

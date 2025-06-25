@@ -4,7 +4,9 @@
       <v-row>
         <v-col cols="12">
           <div class="d-flex justify-space-between align-center mb-4">
-            <h1 class="text-h4">My Bookings</h1>
+            <h1 class="text-h4">
+              My Bookings
+            </h1>
             <v-btn
               color="primary"
               prepend-icon="mdi-plus"
@@ -18,53 +20,105 @@
 
       <!-- Booking Stats -->
       <v-row class="mb-4">
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
               <div class="d-flex align-center">
-                <v-icon color="primary" class="mr-2">mdi-calendar-check</v-icon>
+                <v-icon
+                  color="primary"
+                  class="mr-2"
+                >
+                  mdi-calendar-check
+                </v-icon>
                 <div>
-                  <div class="text-h6">{{ ownerBookings.length }}</div>
-                  <div class="text-caption text-medium-emphasis">Total Bookings</div>
+                  <div class="text-h6">
+                    {{ ownerBookings.length }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    Total Bookings
+                  </div>
                 </div>
               </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
               <div class="d-flex align-center">
-                <v-icon color="warning" class="mr-2">mdi-clock-fast</v-icon>
+                <v-icon
+                  color="warning"
+                  class="mr-2"
+                >
+                  mdi-clock-fast
+                </v-icon>
                 <div>
-                  <div class="text-h6">{{ turnBookings.length }}</div>
-                  <div class="text-caption text-medium-emphasis">Turn Bookings</div>
+                  <div class="text-h6">
+                    {{ turnBookings.length }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    Turn Bookings
+                  </div>
                 </div>
               </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
               <div class="d-flex align-center">
-                <v-icon color="success" class="mr-2">mdi-calendar-today</v-icon>
+                <v-icon
+                  color="success"
+                  class="mr-2"
+                >
+                  mdi-calendar-today
+                </v-icon>
                 <div>
-                  <div class="text-h6">{{ todayBookings.length }}</div>
-                  <div class="text-caption text-medium-emphasis">Today</div>
+                  <div class="text-h6">
+                    {{ todayBookings.length }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    Today
+                  </div>
                 </div>
               </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
+        <v-col
+          cols="12"
+          sm="6"
+          md="3"
+        >
           <v-card>
             <v-card-text>
               <div class="d-flex align-center">
-                <v-icon color="info" class="mr-2">mdi-calendar-week</v-icon>
+                <v-icon
+                  color="info"
+                  class="mr-2"
+                >
+                  mdi-calendar-week
+                </v-icon>
                 <div>
-                  <div class="text-h6">{{ upcomingBookings.length }}</div>
-                  <div class="text-caption text-medium-emphasis">This Week</div>
+                  <div class="text-h6">
+                    {{ upcomingBookings.length }}
+                  </div>
+                  <div class="text-caption text-medium-emphasis">
+                    This Week
+                  </div>
                 </div>
               </div>
             </v-card-text>
@@ -74,7 +128,10 @@
 
       <!-- Filters -->
       <v-row class="mb-4">
-        <v-col cols="12" md="4">
+        <v-col
+          cols="12"
+          md="4"
+        >
           <v-select
             v-model="selectedProperty"
             :items="propertyOptions"
@@ -83,7 +140,10 @@
             prepend-inner-icon="mdi-home"
           />
         </v-col>
-        <v-col cols="12" md="4">
+        <v-col
+          cols="12"
+          md="4"
+        >
           <v-select
             v-model="selectedStatus"
             :items="statusOptions"
@@ -92,7 +152,10 @@
             prepend-inner-icon="mdi-filter"
           />
         </v-col>
-        <v-col cols="12" md="4">
+        <v-col
+          cols="12"
+          md="4"
+        >
           <v-select
             v-model="selectedType"
             :items="typeOptions"
@@ -120,7 +183,12 @@
             >
               <template #item.property_name="{ item }">
                 <div class="d-flex align-center">
-                  <v-icon class="mr-2" size="small">mdi-home</v-icon>
+                  <v-icon
+                    class="mr-2"
+                    size="small"
+                  >
+                    mdi-home
+                  </v-icon>
                   {{ item.property_name }}
                 </div>
               </template>
@@ -176,11 +244,20 @@
             </v-data-table>
 
             <!-- Empty State -->
-            <div v-if="ownerBookings.length === 0" class="text-center py-8">
-              <v-icon size="64" color="grey-lighten-1" class="mb-4">
+            <div
+              v-if="ownerBookings.length === 0"
+              class="text-center py-8"
+            >
+              <v-icon
+                size="64"
+                color="grey-lighten-1"
+                class="mb-4"
+              >
                 mdi-calendar-blank
               </v-icon>
-              <h3 class="text-h6 mb-2">No Bookings Yet</h3>
+              <h3 class="text-h6 mb-2">
+                No Bookings Yet
+              </h3>
               <p class="text-body-2 text-medium-emphasis mb-4">
                 Create your first booking to get started.
               </p>

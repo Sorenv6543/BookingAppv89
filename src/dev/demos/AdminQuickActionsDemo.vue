@@ -2,7 +2,9 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <h1 class="text-h4 mb-4">AdminQuickActions Demo</h1>
+        <h1 class="text-h4 mb-4">
+          AdminQuickActions Demo
+        </h1>
         <p class="text-body-1 mb-6">
           This demo showcases the AdminQuickActions component with various states and configurations.
         </p>
@@ -11,9 +13,17 @@
     
     <v-row>
       <!-- Demo Controls -->
-      <v-col cols="12" md="4">
-        <v-card variant="outlined" class="mb-4">
-          <v-card-title class="text-h6">Demo Controls</v-card-title>
+      <v-col
+        cols="12"
+        md="4"
+      >
+        <v-card
+          variant="outlined"
+          class="mb-4"
+        >
+          <v-card-title class="text-h6">
+            Demo Controls
+          </v-card-title>
           <v-card-text>
             <v-switch
               v-model="loading"
@@ -102,17 +112,27 @@
             </v-btn>
           </v-card-title>
           <v-card-text>
-            <div v-if="actionLog.length === 0" class="text-center text-medium-emphasis py-4">
+            <div
+              v-if="actionLog.length === 0"
+              class="text-center text-medium-emphasis py-4"
+            >
               No actions performed yet
             </div>
-            <v-list v-else density="compact">
+            <v-list
+              v-else
+              density="compact"
+            >
               <v-list-item
                 v-for="(action, index) in actionLog.slice().reverse()"
                 :key="index"
                 class="px-0"
               >
                 <v-list-item-title class="text-body-2">
-                  <v-chip size="x-small" color="primary" class="mr-2">
+                  <v-chip
+                    size="x-small"
+                    color="primary"
+                    class="mr-2"
+                  >
                     {{ actionLog.length - index }}
                   </v-chip>
                   {{ formatActionType(action.type) }}
@@ -127,9 +147,14 @@
       </v-col>
       
       <!-- AdminQuickActions Demo -->
-      <v-col cols="12" md="8">
+      <v-col
+        cols="12"
+        md="8"
+      >
         <v-card variant="outlined">
-          <v-card-title class="text-h6">AdminQuickActions Component</v-card-title>
+          <v-card-title class="text-h6">
+            AdminQuickActions Component
+          </v-card-title>
           <v-card-text>
             <AdminQuickActions
               :loading="loading"
@@ -146,8 +171,13 @@
         </v-card>
         
         <!-- Component Info -->
-        <v-card variant="outlined" class="mt-4">
-          <v-card-title class="text-h6">Component Features</v-card-title>
+        <v-card
+          variant="outlined"
+          class="mt-4"
+        >
+          <v-card-title class="text-h6">
+            Component Features
+          </v-card-title>
           <v-card-text>
             <v-list>
               <v-list-item>

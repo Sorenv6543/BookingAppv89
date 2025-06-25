@@ -3,7 +3,9 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <h1 class="text-h4 mb-6">Error Handling & Loading States Demo</h1>
+          <h1 class="text-h4 mb-6">
+            Error Handling & Loading States Demo
+          </h1>
           
           <!-- Role Selector -->
           <v-card class="mb-6">
@@ -14,8 +16,14 @@
                 inline
                 label="User Role:"
               >
-                <v-radio label="Property Owner" value="owner" />
-                <v-radio label="Business Admin" value="admin" />
+                <v-radio
+                  label="Property Owner"
+                  value="owner"
+                />
+                <v-radio
+                  label="Business Admin"
+                  value="admin"
+                />
               </v-radio-group>
             </v-card-text>
           </v-card>
@@ -30,11 +38,18 @@
             <v-card-text>
               <v-row>
                 <!-- Loading Spinner Variants -->
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Loading Spinners</h3>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <h3 class="text-h6 mb-3">
+                    Loading Spinners
+                  </h3>
                   
                   <div class="demo-section mb-4">
-                    <h4 class="text-subtitle-1 mb-2">Inline Spinner</h4>
+                    <h4 class="text-subtitle-1 mb-2">
+                      Inline Spinner
+                    </h4>
                     <LoadingSpinner 
                       variant="inline" 
                       message="Loading data..." 
@@ -43,7 +58,9 @@
                   </div>
                   
                   <div class="demo-section mb-4">
-                    <h4 class="text-subtitle-1 mb-2">Button Spinner</h4>
+                    <h4 class="text-subtitle-1 mb-2">
+                      Button Spinner
+                    </h4>
                     <LoadingSpinner 
                       variant="button" 
                       message="Saving..." 
@@ -52,16 +69,18 @@
                   </div>
                   
                   <div class="demo-section mb-4">
-                    <h4 class="text-subtitle-1 mb-2">Progress Spinner</h4>
+                    <h4 class="text-subtitle-1 mb-2">
+                      Progress Spinner
+                    </h4>
                     <LoadingSpinner 
                       :progress="loadingProgress" 
                       show-progress
                       message="Processing..."
                     />
                     <v-btn 
-                      @click="simulateProgress" 
                       size="small" 
-                      class="mt-2"
+                      class="mt-2" 
+                      @click="simulateProgress"
                     >
                       Simulate Progress
                     </v-btn>
@@ -69,11 +88,18 @@
                 </v-col>
                 
                 <!-- Skeleton Loaders -->
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Skeleton Loaders</h3>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <h3 class="text-h6 mb-3">
+                    Skeleton Loaders
+                  </h3>
                   
                   <div class="demo-section mb-4">
-                    <h4 class="text-subtitle-1 mb-2">Property Card Skeleton</h4>
+                    <h4 class="text-subtitle-1 mb-2">
+                      Property Card Skeleton
+                    </h4>
                     <SkeletonLoader 
                       type="property-card" 
                       :loading="showSkeletons"
@@ -86,7 +112,9 @@
                   </div>
                   
                   <div class="demo-section mb-4">
-                    <h4 class="text-subtitle-1 mb-2">Booking List Skeleton</h4>
+                    <h4 class="text-subtitle-1 mb-2">
+                      Booking List Skeleton
+                    </h4>
                     <SkeletonLoader 
                       type="booking-item" 
                       :count="3" 
@@ -97,8 +125,8 @@
                   </div>
                   
                   <v-btn 
-                    @click="toggleSkeletons" 
-                    size="small"
+                    size="small" 
+                    @click="toggleSkeletons"
                   >
                     {{ showSkeletons ? 'Show Content' : 'Show Skeletons' }}
                   </v-btn>
@@ -117,42 +145,47 @@
             <v-card-text>
               <v-row>
                 <!-- Error Types -->
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Error Types</h3>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <h3 class="text-h6 mb-3">
+                    Error Types
+                  </h3>
                   
                   <div class="demo-buttons">
                     <v-btn 
-                      @click="triggerValidationError" 
-                      color="warning"
+                      color="warning" 
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="triggerValidationError"
                     >
                       Validation Error
                     </v-btn>
                     
                     <v-btn 
-                      @click="triggerNetworkError" 
-                      color="error"
+                      color="error" 
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="triggerNetworkError"
                     >
                       Network Error
                     </v-btn>
                     
                     <v-btn 
-                      @click="triggerBusinessError" 
-                      color="orange"
+                      color="orange" 
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="triggerBusinessError"
                     >
                       Business Logic Error
                     </v-btn>
                     
                     <v-btn 
-                      @click="triggerSystemError" 
-                      color="red-darken-2"
+                      color="red-darken-2" 
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="triggerSystemError"
                     >
                       System Error
                     </v-btn>
@@ -160,46 +193,51 @@
                 </v-col>
                 
                 <!-- Role-Specific Handlers -->
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Role-Specific Handlers</h3>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <h3 class="text-h6 mb-3">
+                    Role-Specific Handlers
+                  </h3>
                   
                   <div class="demo-buttons">
                     <v-btn 
                       v-if="selectedRole === 'owner'"
-                      @click="triggerOwnerPropertyError" 
-                      color="blue"
+                      color="blue" 
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="triggerOwnerPropertyError"
                     >
                       Property Error (Owner)
                     </v-btn>
                     
                     <v-btn 
                       v-if="selectedRole === 'owner'"
-                      @click="triggerOwnerBookingError" 
-                      color="green"
+                      color="green" 
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="triggerOwnerBookingError"
                     >
                       Booking Error (Owner)
                     </v-btn>
                     
                     <v-btn 
                       v-if="selectedRole === 'admin'"
-                      @click="triggerAdminSystemError" 
-                      color="purple"
+                      color="purple" 
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="triggerAdminSystemError"
                     >
                       System Error (Admin)
                     </v-btn>
                     
                     <v-btn 
                       v-if="selectedRole === 'admin'"
-                      @click="triggerAdminDataIntegrityError" 
-                      color="red"
+                      color="red" 
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="triggerAdminDataIntegrityError"
                     >
                       Data Integrity Error
                     </v-btn>
@@ -237,7 +275,10 @@
               />
               
               <!-- Loading State Demo -->
-              <div v-if="isLoading" class="loading-demo">
+              <div
+                v-if="isLoading"
+                class="loading-demo"
+              >
                 <LoadingSpinner 
                   variant="page" 
                   :message="loadingMessage"
@@ -257,9 +298,19 @@
               </v-alert>
               
               <!-- No Error State -->
-              <div v-if="!currentError && !isLoading && !showSuccess" class="text-center py-8">
-                <v-icon icon="mdi-check-circle" size="64" color="success" class="mb-4" />
-                <h3 class="text-h6 mb-2">No Errors</h3>
+              <div
+                v-if="!currentError && !isLoading && !showSuccess"
+                class="text-center py-8"
+              >
+                <v-icon
+                  icon="mdi-check-circle"
+                  size="64"
+                  color="success"
+                  class="mb-4"
+                />
+                <h3 class="text-h6 mb-2">
+                  No Errors
+                </h3>
                 <p class="text-body-2 text-medium-emphasis">
                   Click the buttons above to test different error scenarios
                 </p>
@@ -276,9 +327,17 @@
             <v-card-title>Loading State Management</v-card-title>
             <v-card-text>
               <v-row>
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Active Loading Operations</h3>
-                  <div v-if="activeLoadingOps.length === 0" class="text-body-2 text-medium-emphasis">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <h3 class="text-h6 mb-3">
+                    Active Loading Operations
+                  </h3>
+                  <div
+                    v-if="activeLoadingOps.length === 0"
+                    class="text-body-2 text-medium-emphasis"
+                  >
                     No active loading operations
                   </div>
                   <v-chip
@@ -293,35 +352,40 @@
                   </v-chip>
                 </v-col>
                 
-                <v-col cols="12" md="6">
-                  <h3 class="text-h6 mb-3">Loading Controls</h3>
+                <v-col
+                  cols="12"
+                  md="6"
+                >
+                  <h3 class="text-h6 mb-3">
+                    Loading Controls
+                  </h3>
                   <div class="demo-buttons">
                     <v-btn 
-                      @click="simulateAsyncOperation('fetch-properties')" 
-                      :loading="isOperationLoading('fetch-properties')"
+                      :loading="isOperationLoading('fetch-properties')" 
                       color="primary"
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="simulateAsyncOperation('fetch-properties')"
                     >
                       Fetch Properties
                     </v-btn>
                     
                     <v-btn 
-                      @click="simulateAsyncOperation('save-booking')" 
-                      :loading="isOperationLoading('save-booking')"
+                      :loading="isOperationLoading('save-booking')" 
                       color="success"
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="simulateAsyncOperation('save-booking')"
                     >
                       Save Booking
                     </v-btn>
                     
                     <v-btn 
-                      @click="simulateAsyncOperation('sync-data')" 
-                      :loading="isOperationLoading('sync-data')"
+                      :loading="isOperationLoading('sync-data')" 
                       color="info"
                       variant="outlined"
                       class="mb-2 mr-2"
+                      @click="simulateAsyncOperation('sync-data')"
                     >
                       Sync Data
                     </v-btn>

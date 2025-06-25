@@ -5,7 +5,9 @@
       <v-container fluid>
         <v-row align="center">
           <v-col>
-            <h1 class="text-h4 font-weight-bold">Cleaner Management</h1>
+            <h1 class="text-h4 font-weight-bold">
+              Cleaner Management
+            </h1>
             <p class="text-subtitle-1 text-medium-emphasis">
               Manage cleaner profiles, availability, and performance
             </p>
@@ -27,53 +29,109 @@
     <div class="stats-section">
       <v-container fluid>
         <v-row>
-          <v-col cols="12" sm="6" md="3">
+          <v-col
+            cols="12"
+            sm="6"
+            md="3"
+          >
             <v-card>
               <v-card-text>
                 <div class="d-flex align-center">
-                  <v-icon color="primary" size="40" class="me-3">mdi-account-group</v-icon>
+                  <v-icon
+                    color="primary"
+                    size="40"
+                    class="me-3"
+                  >
+                    mdi-account-group
+                  </v-icon>
                   <div>
-                    <div class="text-h5 font-weight-bold">{{ cleanerStats.total }}</div>
-                    <div class="text-caption text-medium-emphasis">Total Cleaners</div>
+                    <div class="text-h5 font-weight-bold">
+                      {{ cleanerStats.total }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Total Cleaners
+                    </div>
                   </div>
                 </div>
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="6" md="3">
+          <v-col
+            cols="12"
+            sm="6"
+            md="3"
+          >
             <v-card>
               <v-card-text>
                 <div class="d-flex align-center">
-                  <v-icon color="success" size="40" class="me-3">mdi-check-circle</v-icon>
+                  <v-icon
+                    color="success"
+                    size="40"
+                    class="me-3"
+                  >
+                    mdi-check-circle
+                  </v-icon>
                   <div>
-                    <div class="text-h5 font-weight-bold">{{ cleanerStats.available }}</div>
-                    <div class="text-caption text-medium-emphasis">Available Today</div>
+                    <div class="text-h5 font-weight-bold">
+                      {{ cleanerStats.available }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Available Today
+                    </div>
                   </div>
                 </div>
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="6" md="3">
+          <v-col
+            cols="12"
+            sm="6"
+            md="3"
+          >
             <v-card>
               <v-card-text>
                 <div class="d-flex align-center">
-                  <v-icon color="warning" size="40" class="me-3">mdi-clock-outline</v-icon>
+                  <v-icon
+                    color="warning"
+                    size="40"
+                    class="me-3"
+                  >
+                    mdi-clock-outline
+                  </v-icon>
                   <div>
-                    <div class="text-h5 font-weight-bold">{{ cleanerStats.busy }}</div>
-                    <div class="text-caption text-medium-emphasis">Currently Busy</div>
+                    <div class="text-h5 font-weight-bold">
+                      {{ cleanerStats.busy }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Currently Busy
+                    </div>
                   </div>
                 </div>
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="6" md="3">
+          <v-col
+            cols="12"
+            sm="6"
+            md="3"
+          >
             <v-card>
               <v-card-text>
                 <div class="d-flex align-center">
-                  <v-icon color="info" size="40" class="me-3">mdi-star</v-icon>
+                  <v-icon
+                    color="info"
+                    size="40"
+                    class="me-3"
+                  >
+                    mdi-star
+                  </v-icon>
                   <div>
-                    <div class="text-h5 font-weight-bold">4.8</div>
-                    <div class="text-caption text-medium-emphasis">Average Rating</div>
+                    <div class="text-h5 font-weight-bold">
+                      4.8
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Average Rating
+                    </div>
                   </div>
                 </div>
               </v-card-text>
@@ -88,7 +146,10 @@
       <v-container fluid>
         <!-- Search and Filters -->
         <v-row class="mb-4">
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-text-field
               v-model="searchQuery"
               prepend-inner-icon="mdi-magnify"
@@ -98,7 +159,10 @@
               clearable
             />
           </v-col>
-          <v-col cols="12" md="3">
+          <v-col
+            cols="12"
+            md="3"
+          >
             <v-select
               v-model="statusFilter"
               :items="statusOptions"
@@ -108,7 +172,10 @@
               clearable
             />
           </v-col>
-          <v-col cols="12" md="3">
+          <v-col
+            cols="12"
+            md="3"
+          >
             <v-btn
               color="secondary"
               variant="outlined"
@@ -132,12 +199,21 @@
             <v-card class="cleaner-card">
               <v-card-text>
                 <div class="d-flex align-center mb-3">
-                  <v-avatar size="48" class="me-3">
-                    <v-icon size="24">mdi-account</v-icon>
+                  <v-avatar
+                    size="48"
+                    class="me-3"
+                  >
+                    <v-icon size="24">
+                      mdi-account
+                    </v-icon>
                   </v-avatar>
                   <div class="flex-grow-1">
-                    <div class="text-h6 font-weight-medium">{{ cleaner.name }}</div>
-                    <div class="text-caption text-medium-emphasis">{{ cleaner.email }}</div>
+                    <div class="text-h6 font-weight-medium">
+                      {{ cleaner.name }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      {{ cleaner.email }}
+                    </div>
                   </div>
                   <v-chip
                     color="success"
@@ -150,7 +226,9 @@
 
                 <!-- Skills -->
                 <div class="mb-3">
-                  <div class="text-caption text-medium-emphasis mb-1">Skills</div>
+                  <div class="text-caption text-medium-emphasis mb-1">
+                    Skills
+                  </div>
                   <div class="d-flex flex-wrap ga-1">
                     <v-chip
                       v-for="skill in cleaner.skills.slice(0, 3)"
@@ -173,16 +251,28 @@
                 <!-- Stats -->
                 <div class="d-flex justify-space-between mb-3">
                   <div class="text-center">
-                    <div class="text-h6 font-weight-bold">{{ cleaner.max_daily_bookings }}</div>
-                    <div class="text-caption text-medium-emphasis">Max Daily</div>
+                    <div class="text-h6 font-weight-bold">
+                      {{ cleaner.max_daily_bookings }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Max Daily
+                    </div>
                   </div>
                   <div class="text-center">
-                    <div class="text-h6 font-weight-bold">4.8</div>
-                    <div class="text-caption text-medium-emphasis">Rating</div>
+                    <div class="text-h6 font-weight-bold">
+                      4.8
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Rating
+                    </div>
                   </div>
                   <div class="text-center">
-                    <div class="text-h6 font-weight-bold">85%</div>
-                    <div class="text-caption text-medium-emphasis">Utilization</div>
+                    <div class="text-h6 font-weight-bold">
+                      85%
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      Utilization
+                    </div>
                   </div>
                 </div>
               </v-card-text>
@@ -218,9 +308,19 @@
         </v-row>
 
         <!-- Empty State -->
-        <div v-if="filteredCleaners.length === 0" class="text-center py-8">
-          <v-icon size="64" color="grey-lighten-1">mdi-account-search</v-icon>
-          <div class="text-h6 mt-4 mb-2">No cleaners found</div>
+        <div
+          v-if="filteredCleaners.length === 0"
+          class="text-center py-8"
+        >
+          <v-icon
+            size="64"
+            color="grey-lighten-1"
+          >
+            mdi-account-search
+          </v-icon>
+          <div class="text-h6 mt-4 mb-2">
+            No cleaners found
+          </div>
           <div class="text-body-2 text-medium-emphasis">
             Try adjusting your search criteria or add a new cleaner
           </div>
@@ -229,13 +329,20 @@
     </div>
 
     <!-- Add/Edit Dialog -->
-    <v-dialog v-model="showAddDialog" max-width="500px" persistent>
+    <v-dialog
+      v-model="showAddDialog"
+      max-width="500px"
+      persistent
+    >
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ editingCleaner ? 'Edit' : 'Add' }} Cleaner</span>
         </v-card-title>
         <v-card-text>
-          <v-form ref="form" v-model="formValid">
+          <v-form
+            ref="form"
+            v-model="formValid"
+          >
             <v-text-field
               v-model="formData.name"
               label="Full Name"
@@ -271,7 +378,12 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click="closeDialog">Cancel</v-btn>
+          <v-btn
+            text
+            @click="closeDialog"
+          >
+            Cancel
+          </v-btn>
           <v-btn
             color="primary"
             :disabled="!formValid"

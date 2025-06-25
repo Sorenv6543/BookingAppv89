@@ -658,13 +658,15 @@ const getCleanerSubtitle = (cleaner: Cleaner) => {
   return `${cleaner.skills.slice(0, 2).join(', ')} • ${getCleanerTodayBookings(cleaner.id)}/${cleaner.max_daily_bookings} bookings`
 }
 
-const getCleanerTodayBookings = (_: string) => {
+const getCleanerTodayBookings = (cleanerId: string) => {
   // This would typically come from bookings store
+  console.debug('Getting bookings for cleaner:', cleanerId)
   return Math.floor(Math.random() * 5) // Mock data
 }
 
-const getCleanerRating = (_: string) => {
+const getCleanerRating = (cleanerId: string) => {
   // This would typically come from performance data
+  console.debug('Getting rating for cleaner:', cleanerId)
   return 4 + Math.random() // Mock rating between 4-5
 }
 

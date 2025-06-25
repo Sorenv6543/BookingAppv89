@@ -34,106 +34,118 @@ src/components/smart/owner/HomeOwner.vue -
 
     <!-- Main Calendar Area - Fills remaining space -->
     <div class="calendar-column">
-         <!-- Owner Calendar Header - Fixed to top of calendar area -->
-         <v-card flat class="calendar-header-card">
-           <v-card-text class="pa-3">
-             <div class="d-flex align-center">
-               <!-- Mobile menu button -->
-               <v-btn
-                 v-if="$vuetify.display.mdAndDown"
-                 icon="mdi-menu"
-                 variant="text"
-                 class="mr-4"
-                 @click="toggleSidebar"
-               />
+      <!-- Owner Calendar Header - Fixed to top of calendar area -->
+      <v-card
+        flat
+        class="calendar-header-card"
+      >
+        <v-card-text class="pa-3">
+          <div class="d-flex align-center">
+            <!-- Mobile menu button -->
+            <v-btn
+              v-if="$vuetify.display.mdAndDown"
+              icon="mdi-menu"
+              variant="text"
+              class="mr-4"
+              @click="toggleSidebar"
+            />
                
-               <!-- Calendar Navigation -->
-               <v-btn
-                 icon="mdi-arrow-left"
-                 variant="text"
-                 class="mr-2"
-                 @click="handlePrevious"
-               />
-               <v-btn 
-                 variant="outlined" 
-                 class="mr-2" 
-                 @click="handleGoToday"
-               >
-                 Today
-               </v-btn>
-               <v-btn
-                 icon="mdi-arrow-right"
-                 variant="text"
-                 class="mr-4"
-                 @click="handleNext"
-               />
-               <div class="text-h6 mr-4">
-                 {{ formattedDate }}
-               </div>
+            <!-- Calendar Navigation -->
+            <v-btn
+              icon="mdi-arrow-left"
+              variant="text"
+              class="mr-2"
+              @click="handlePrevious"
+            />
+            <v-btn 
+              variant="outlined" 
+              class="mr-2" 
+              @click="handleGoToday"
+            >
+              Today
+            </v-btn>
+            <v-btn
+              icon="mdi-arrow-right"
+              variant="text"
+              class="mr-4"
+              @click="handleNext"
+            />
+            <div class="text-h6 mr-4">
+              {{ formattedDate }}
+            </div>
                
-               <v-spacer />
+            <v-spacer />
                
-               <!-- Owner Quick Actions -->
-               <v-btn
-                 v-if="$vuetify.display.smAndUp"
-                 color="primary"
-                 variant="outlined"
-                 prepend-icon="mdi-plus"
-                 class="mr-2"
-                 @click="handleCreateProperty"
-               >
-                 Add Property
-               </v-btn>
-               <v-btn
-                 color="primary"
-                 prepend-icon="mdi-calendar-plus"
-                 class="mr-4"
-                 @click="handleCreateBooking"
-               >
-                 Add Booking
-               </v-btn>
+            <!-- Owner Quick Actions -->
+            <v-btn
+              v-if="$vuetify.display.smAndUp"
+              color="primary"
+              variant="outlined"
+              prepend-icon="mdi-plus"
+              class="mr-2"
+              @click="handleCreateProperty"
+            >
+              Add Property
+            </v-btn>
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-calendar-plus"
+              class="mr-4"
+              @click="handleCreateBooking"
+            >
+              Add Booking
+            </v-btn>
                
-               <!-- Calendar View Toggle -->
-               <v-btn-toggle
-                 v-model="currentView"
-                 mandatory
-                 density="compact"
-                 class="ml-2"
-               >
-                 <v-btn value="dayGridMonth" size="small">
-                   Month
-                 </v-btn>
-                 <v-btn value="timeGridWeek" size="small">
-                   Week
-                 </v-btn>
-                 <v-btn value="timeGridDay" size="small">
-                   Day
-                 </v-btn>
-               </v-btn-toggle>
-             </div>
-           </v-card-text>
-         </v-card>
+            <!-- Calendar View Toggle -->
+            <v-btn-toggle
+              v-model="currentView"
+              mandatory
+              density="compact"
+              class="ml-2"
+            >
+              <v-btn
+                value="dayGridMonth"
+                size="small"
+              >
+                Month
+              </v-btn>
+              <v-btn
+                value="timeGridWeek"
+                size="small"
+              >
+                Week
+              </v-btn>
+              <v-btn
+                value="timeGridDay"
+                size="small"
+              >
+                Day
+              </v-btn>
+            </v-btn-toggle>
+          </div>
+        </v-card-text>
+      </v-card>
 
-         <!-- Owner Calendar - Fixed height below header -->
-         <div class="calendar-content">
-           <OwnerCalendar
-             ref="calendarRef"
-             :bookings="ownerFilteredBookings"
-             :properties="ownerPropertiesMap"
-             :loading="loading"
-             :current-view="currentView"
-             :current-date="currentDate"
-             @date-select="handleDateSelect"
-             @event-click="handleEventClick"
-             @event-drop="handleEventDrop"
-             @event-resize="handleEventResize"
-             @view-change="handleCalendarViewChange"
-             @date-change="handleCalendarDateChange"
-             @create-booking="handleCreateBookingFromCalendar"
-             @update-booking="handleUpdateBooking"
-           />
-         </div>
-     </div>
+      <!-- Owner Calendar - Fixed height below header -->
+      <div class="calendar-content">
+        <OwnerCalendar
+          ref="calendarRef"
+          :bookings="ownerFilteredBookings"
+          :properties="ownerPropertiesMap"
+          :loading="loading"
+          :current-view="currentView"
+          :current-date="currentDate"
+          @date-select="handleDateSelect"
+          @event-click="handleEventClick"
+          @event-drop="handleEventDrop"
+          @event-resize="handleEventResize"
+          @view-change="handleCalendarViewChange"
+          @date-change="handleCalendarDateChange"
+          @create-booking="handleCreateBookingFromCalendar"
+          @update-booking="handleUpdateBooking"
+        />
+      </div>
+    </div>
 
     <!-- Owner-focused Modals (always available) - Ensure they appear above fixed container -->
     <div style="position: relative; z-index: 1000;">

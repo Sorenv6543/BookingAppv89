@@ -5,7 +5,9 @@
       <v-container fluid>
         <v-row align="center">
           <v-col>
-            <h1 class="text-h4 font-weight-bold">Business Reports</h1>
+            <h1 class="text-h4 font-weight-bold">
+              Business Reports
+            </h1>
             <p class="text-subtitle-1 text-medium-emphasis">
               Analytics and performance metrics across all operations
             </p>
@@ -28,57 +30,109 @@
       <v-container fluid>
         <!-- Key Metrics Cards -->
         <v-row class="mb-6">
-          <v-col cols="12" sm="6" md="3">
+          <v-col
+            cols="12"
+            sm="6"
+            md="3"
+          >
             <v-card class="metric-card">
               <v-card-text>
                 <div class="d-flex align-center justify-space-between">
                   <div>
-                    <div class="text-h4 font-weight-bold text-primary">{{ metrics.totalRevenue }}</div>
-                    <div class="text-subtitle-2 text-medium-emphasis">Total Revenue</div>
+                    <div class="text-h4 font-weight-bold text-primary">
+                      {{ metrics.totalRevenue }}
+                    </div>
+                    <div class="text-subtitle-2 text-medium-emphasis">
+                      Total Revenue
+                    </div>
                   </div>
-                  <v-icon color="primary" size="40">mdi-currency-usd</v-icon>
+                  <v-icon
+                    color="primary"
+                    size="40"
+                  >
+                    mdi-currency-usd
+                  </v-icon>
                 </div>
               </v-card-text>
             </v-card>
           </v-col>
           
-          <v-col cols="12" sm="6" md="3">
+          <v-col
+            cols="12"
+            sm="6"
+            md="3"
+          >
             <v-card class="metric-card">
               <v-card-text>
                 <div class="d-flex align-center justify-space-between">
                   <div>
-                    <div class="text-h4 font-weight-bold text-success">{{ metrics.completedBookings }}</div>
-                    <div class="text-subtitle-2 text-medium-emphasis">Completed Bookings</div>
+                    <div class="text-h4 font-weight-bold text-success">
+                      {{ metrics.completedBookings }}
+                    </div>
+                    <div class="text-subtitle-2 text-medium-emphasis">
+                      Completed Bookings
+                    </div>
                   </div>
-                  <v-icon color="success" size="40">mdi-check-circle</v-icon>
+                  <v-icon
+                    color="success"
+                    size="40"
+                  >
+                    mdi-check-circle
+                  </v-icon>
                 </div>
               </v-card-text>
             </v-card>
           </v-col>
           
-          <v-col cols="12" sm="6" md="3">
+          <v-col
+            cols="12"
+            sm="6"
+            md="3"
+          >
             <v-card class="metric-card">
               <v-card-text>
                 <div class="d-flex align-center justify-space-between">
                   <div>
-                    <div class="text-h4 font-weight-bold text-info">{{ metrics.averageRating }}</div>
-                    <div class="text-subtitle-2 text-medium-emphasis">Average Rating</div>
+                    <div class="text-h4 font-weight-bold text-info">
+                      {{ metrics.averageRating }}
+                    </div>
+                    <div class="text-subtitle-2 text-medium-emphasis">
+                      Average Rating
+                    </div>
                   </div>
-                  <v-icon color="info" size="40">mdi-star</v-icon>
+                  <v-icon
+                    color="info"
+                    size="40"
+                  >
+                    mdi-star
+                  </v-icon>
                 </div>
               </v-card-text>
             </v-card>
           </v-col>
           
-          <v-col cols="12" sm="6" md="3">
+          <v-col
+            cols="12"
+            sm="6"
+            md="3"
+          >
             <v-card class="metric-card">
               <v-card-text>
                 <div class="d-flex align-center justify-space-between">
                   <div>
-                    <div class="text-h4 font-weight-bold text-warning">{{ metrics.activeCleaners }}</div>
-                    <div class="text-subtitle-2 text-medium-emphasis">Active Cleaners</div>
+                    <div class="text-h4 font-weight-bold text-warning">
+                      {{ metrics.activeCleaners }}
+                    </div>
+                    <div class="text-subtitle-2 text-medium-emphasis">
+                      Active Cleaners
+                    </div>
                   </div>
-                  <v-icon color="warning" size="40">mdi-account-group</v-icon>
+                  <v-icon
+                    color="warning"
+                    size="40"
+                  >
+                    mdi-account-group
+                  </v-icon>
                 </div>
               </v-card-text>
             </v-card>
@@ -92,7 +146,12 @@
               <v-card-title>Business Analytics Dashboard</v-card-title>
               <v-card-text>
                 <div class="chart-placeholder">
-                  <v-icon size="64" color="grey-lighten-2">mdi-chart-line</v-icon>
+                  <v-icon
+                    size="64"
+                    color="grey-lighten-2"
+                  >
+                    mdi-chart-line
+                  </v-icon>
                   <p class="text-body-2 text-medium-emphasis mt-2">
                     Business analytics charts would be displayed here
                   </p>
@@ -107,13 +166,26 @@
 
         <!-- Performance Tables -->
         <v-row>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-card>
               <v-card-title>Top Performing Properties</v-card-title>
               <v-card-text>
-                <div v-if="topProperties.length === 0" class="text-center py-4">
-                  <v-icon size="48" color="grey-lighten-1">mdi-home-search</v-icon>
-                  <p class="text-body-2 text-medium-emphasis mt-2">No property data available</p>
+                <div
+                  v-if="topProperties.length === 0"
+                  class="text-center py-4"
+                >
+                  <v-icon
+                    size="48"
+                    color="grey-lighten-1"
+                  >
+                    mdi-home-search
+                  </v-icon>
+                  <p class="text-body-2 text-medium-emphasis mt-2">
+                    No property data available
+                  </p>
                 </div>
                 <div v-else>
                   <div
@@ -122,23 +194,42 @@
                     class="d-flex justify-space-between align-center py-2 border-b"
                   >
                     <div>
-                      <div class="font-weight-medium">{{ property.name }}</div>
-                      <div class="text-caption text-medium-emphasis">{{ property.bookings }} bookings</div>
+                      <div class="font-weight-medium">
+                        {{ property.name }}
+                      </div>
+                      <div class="text-caption text-medium-emphasis">
+                        {{ property.bookings }} bookings
+                      </div>
                     </div>
-                    <div class="text-success font-weight-bold">${{ property.revenue }}</div>
+                    <div class="text-success font-weight-bold">
+                      ${{ property.revenue }}
+                    </div>
                   </div>
                 </div>
               </v-card-text>
             </v-card>
           </v-col>
           
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-card>
               <v-card-title>Cleaner Performance</v-card-title>
               <v-card-text>
-                <div v-if="topCleaners.length === 0" class="text-center py-4">
-                  <v-icon size="48" color="grey-lighten-1">mdi-account-search</v-icon>
-                  <p class="text-body-2 text-medium-emphasis mt-2">No cleaner data available</p>
+                <div
+                  v-if="topCleaners.length === 0"
+                  class="text-center py-4"
+                >
+                  <v-icon
+                    size="48"
+                    color="grey-lighten-1"
+                  >
+                    mdi-account-search
+                  </v-icon>
+                  <p class="text-body-2 text-medium-emphasis mt-2">
+                    No cleaner data available
+                  </p>
                 </div>
                 <div v-else>
                   <div
@@ -147,10 +238,16 @@
                     class="d-flex justify-space-between align-center py-2 border-b"
                   >
                     <div>
-                      <div class="font-weight-medium">{{ cleaner.name }}</div>
-                      <div class="text-caption text-medium-emphasis">{{ cleaner.completed }} completed</div>
+                      <div class="font-weight-medium">
+                        {{ cleaner.name }}
+                      </div>
+                      <div class="text-caption text-medium-emphasis">
+                        {{ cleaner.completed }} completed
+                      </div>
                     </div>
-                    <div class="text-info font-weight-bold">{{ cleaner.rating }}/5</div>
+                    <div class="text-info font-weight-bold">
+                      {{ cleaner.rating }}/5
+                    </div>
                   </div>
                 </div>
               </v-card-text>

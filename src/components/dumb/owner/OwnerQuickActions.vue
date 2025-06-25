@@ -5,14 +5,19 @@
     :variant="variant"
   >
     <v-card-title class="text-h6 pb-2">
-      <v-icon class="mr-2">mdi-lightning-bolt</v-icon>
+      <v-icon class="mr-2">
+        mdi-lightning-bolt
+      </v-icon>
       Quick Actions
     </v-card-title>
     
     <v-divider />
     
     <v-card-text class="pa-3">
-      <v-container fluid class="pa-0">
+      <v-container
+        fluid
+        class="pa-0"
+      >
         <!-- Primary Actions Row -->
         <v-row class="mb-2">
           <v-col
@@ -30,7 +35,9 @@
               :disabled="disabled"
               @click="handleAction('add-booking')"
             >
-              <v-icon class="mr-2">mdi-calendar-plus</v-icon>
+              <v-icon class="mr-2">
+                mdi-calendar-plus
+              </v-icon>
               <span class="d-none d-sm-inline">Schedule</span>
               <span class="d-sm-none">Book</span>
               Cleaning
@@ -52,7 +59,9 @@
               :disabled="disabled"
               @click="handleAction('add-property')"
             >
-              <v-icon class="mr-2">mdi-home-plus</v-icon>
+              <v-icon class="mr-2">
+                mdi-home-plus
+              </v-icon>
               <span class="d-none d-sm-inline">Add</span>
               Property
             </v-btn>
@@ -75,7 +84,9 @@
               :disabled="disabled"
               @click="handleAction('view-calendar')"
             >
-              <v-icon class="mr-2">mdi-calendar</v-icon>
+              <v-icon class="mr-2">
+                mdi-calendar
+              </v-icon>
               <span class="d-none d-sm-inline">View</span>
               Calendar
             </v-btn>
@@ -95,7 +106,9 @@
               :disabled="disabled"
               @click="handleAction('view-properties')"
             >
-              <v-icon class="mr-2">mdi-home-group</v-icon>
+              <v-icon class="mr-2">
+                mdi-home-group
+              </v-icon>
               <span class="d-none d-sm-inline">My</span>
               Properties
             </v-btn>
@@ -122,7 +135,9 @@
                   :disabled="disabled"
                   @click="handleAction('view-bookings')"
                 >
-                  <v-icon class="mr-2">mdi-clipboard-list</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-clipboard-list
+                  </v-icon>
                   <span class="d-none d-sm-inline">My</span>
                   Bookings
                 </v-btn>
@@ -142,7 +157,9 @@
                   :disabled="disabled"
                   @click="handleAction('contact-support')"
                 >
-                  <v-icon class="mr-2">mdi-help-circle</v-icon>
+                  <v-icon class="mr-2">
+                    mdi-help-circle
+                  </v-icon>
                   <span class="d-none d-sm-inline">Get</span>
                   Help
                 </v-btn>

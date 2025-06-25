@@ -6,15 +6,24 @@
     </p>
 
     <!-- Loading and Error States -->
-    <div v-if="loading" class="loading">
+    <div
+      v-if="loading"
+      class="loading"
+    >
       Loading admin booking data...
     </div>
     
-    <div v-if="error" class="error">
+    <div
+      v-if="error"
+      class="error"
+    >
       Error: {{ error }}
     </div>
     
-    <div v-if="success" class="success">
+    <div
+      v-if="success"
+      class="success"
+    >
       Success: {{ success }}
     </div>
 
@@ -24,24 +33,36 @@
       <div class="metrics-grid">
         <div class="metric-card">
           <h3>Total Bookings</h3>
-          <div class="metric-value">{{ systemMetrics.total }}</div>
+          <div class="metric-value">
+            {{ systemMetrics.total }}
+          </div>
         </div>
         <div class="metric-card">
           <h3>Turn Bookings</h3>
-          <div class="metric-value">{{ systemMetrics.turns }}</div>
-          <div class="metric-subtitle">{{ systemMetrics.turnPercentage }}% of total</div>
+          <div class="metric-value">
+            {{ systemMetrics.turns }}
+          </div>
+          <div class="metric-subtitle">
+            {{ systemMetrics.turnPercentage }}% of total
+          </div>
         </div>
         <div class="metric-card">
           <h3>Urgent Turns Today</h3>
-          <div class="metric-value urgent">{{ systemMetrics.urgentTurns }}</div>
+          <div class="metric-value urgent">
+            {{ systemMetrics.urgentTurns }}
+          </div>
         </div>
         <div class="metric-card">
           <h3>Unassigned</h3>
-          <div class="metric-value warning">{{ systemMetrics.unassigned }}</div>
+          <div class="metric-value warning">
+            {{ systemMetrics.unassigned }}
+          </div>
         </div>
         <div class="metric-card">
           <h3>Completion Rate</h3>
-          <div class="metric-value">{{ systemMetrics.completionRate }}%</div>
+          <div class="metric-value">
+            {{ systemMetrics.completionRate }}%
+          </div>
         </div>
       </div>
     </section>
@@ -50,16 +71,28 @@
     <section class="actions-section">
       <h2>Admin Actions</h2>
       <div class="action-buttons">
-        <button @click="handleFetchAllBookings" :disabled="loading">
+        <button
+          :disabled="loading"
+          @click="handleFetchAllBookings"
+        >
           Fetch All Bookings
         </button>
-        <button @click="handleTestCleanerAssignment" :disabled="loading">
+        <button
+          :disabled="loading"
+          @click="handleTestCleanerAssignment"
+        >
           Test Cleaner Assignment
         </button>
-        <button @click="handleTestStatusUpdate" :disabled="loading">
+        <button
+          :disabled="loading"
+          @click="handleTestStatusUpdate"
+        >
           Test Status Update
         </button>
-        <button @click="handleTestBulkAssignment" :disabled="loading">
+        <button
+          :disabled="loading"
+          @click="handleTestBulkAssignment"
+        >
           Test Bulk Assignment
         </button>
       </div>
@@ -74,7 +107,10 @@
           <p><strong>Assigned:</strong> {{ turnAlerts.assigned }}</p>
           <p><strong>Unassigned:</strong> {{ turnAlerts.unassigned }}</p>
         </div>
-        <div v-if="turnAlerts.alerts.length > 0" class="alert-list">
+        <div
+          v-if="turnAlerts.alerts.length > 0"
+          class="alert-list"
+        >
           <div 
             v-for="alert in turnAlerts.alerts" 
             :key="alert.id"
@@ -86,7 +122,10 @@
               <span>{{ alert.checkout_date }} → {{ alert.checkin_date }}</span>
               <span class="status">{{ alert.status }}</span>
             </div>
-            <div class="alert-impact" :class="alert.assigned_cleaner_id ? 'assigned' : 'unassigned'">
+            <div
+              class="alert-impact"
+              :class="alert.assigned_cleaner_id ? 'assigned' : 'unassigned'"
+            >
               {{ alert.businessImpact }}
             </div>
           </div>
@@ -104,7 +143,9 @@
           class="status-card"
         >
           <h3>{{ status.replace('_', ' ').toUpperCase() }}</h3>
-          <div class="status-count">{{ bookings.length }}</div>
+          <div class="status-count">
+            {{ bookings.length }}
+          </div>
           <div class="status-list">
             <div 
               v-for="booking in bookings.slice(0, 3)" 
@@ -113,7 +154,10 @@
             >
               {{ booking.id.substring(0, 8) }} - {{ booking.booking_type }}
             </div>
-            <div v-if="bookings.length > 3" class="more-items">
+            <div
+              v-if="bookings.length > 3"
+              class="more-items"
+            >
               +{{ bookings.length - 3 }} more
             </div>
           </div>
@@ -177,23 +221,45 @@
       <div class="filter-controls">
         <label>
           <input 
-            type="checkbox" 
-            v-model="filterCriteria.unassignedOnly"
+            v-model="filterCriteria.unassignedOnly" 
+            type="checkbox"
             @change="applyFilters"
           >
           Unassigned Only
         </label>
-        <select v-model="filterCriteria.status" @change="applyFilters">
-          <option value="">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="scheduled">Scheduled</option>
-          <option value="in_progress">In Progress</option>
-          <option value="completed">Completed</option>
+        <select
+          v-model="filterCriteria.status"
+          @change="applyFilters"
+        >
+          <option value="">
+            All Statuses
+          </option>
+          <option value="pending">
+            Pending
+          </option>
+          <option value="scheduled">
+            Scheduled
+          </option>
+          <option value="in_progress">
+            In Progress
+          </option>
+          <option value="completed">
+            Completed
+          </option>
         </select>
-        <select v-model="filterCriteria.bookingType" @change="applyFilters">
-          <option value="">All Types</option>
-          <option value="standard">Standard</option>
-          <option value="turn">Turn</option>
+        <select
+          v-model="filterCriteria.bookingType"
+          @change="applyFilters"
+        >
+          <option value="">
+            All Types
+          </option>
+          <option value="standard">
+            Standard
+          </option>
+          <option value="turn">
+            Turn
+          </option>
         </select>
       </div>
       <div class="filtered-results">

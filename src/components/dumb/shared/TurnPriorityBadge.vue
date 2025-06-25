@@ -19,7 +19,10 @@
     @click="handleClick"
     @click:close="handleClose"
   >
-    <template #prepend v-if="showIcon">
+    <template
+      v-if="showIcon"
+      #prepend
+    >
       <v-icon
         :icon="getPriorityIcon()"
         :size="getIconSize()"
@@ -31,7 +34,10 @@
       {{ getPriorityText() }}
     </span>
 
-    <template #append v-if="showTimeRemaining && timeRemaining">
+    <template
+      v-if="showTimeRemaining && timeRemaining"
+      #append
+    >
       <v-chip
         size="x-small"
         :color="getTimeColor()"

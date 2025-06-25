@@ -2,9 +2,17 @@
   <v-container class="pa-4">
     <v-row>
       <v-col cols="12">
-        <v-card elevation="4" class="pa-4">
+        <v-card
+          elevation="4"
+          class="pa-4"
+        >
           <v-card-title class="text-h4 text-center mb-4">
-            <v-icon class="mr-2" color="primary">mdi-account-switch</v-icon>
+            <v-icon
+              class="mr-2"
+              color="primary"
+            >
+              mdi-account-switch
+            </v-icon>
             Role-Based Routing Demo
           </v-card-title>
           
@@ -20,10 +28,21 @@
             </v-alert>
             
             <v-row>
-              <v-col cols="12" md="6">
-                <v-card variant="outlined" class="pa-3">
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-card
+                  variant="outlined"
+                  class="pa-3"
+                >
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="success">mdi-check-circle</v-icon>
+                    <v-icon
+                      class="mr-2"
+                      color="success"
+                    >
+                      mdi-check-circle
+                    </v-icon>
                     Current Implementation
                   </v-card-title>
                   <v-card-text>
@@ -41,10 +60,21 @@
                 </v-card>
               </v-col>
               
-              <v-col cols="12" md="6">
-                <v-card variant="outlined" class="pa-3">
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-card
+                  variant="outlined"
+                  class="pa-3"
+                >
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="primary">mdi-information</v-icon>
+                    <v-icon
+                      class="mr-2"
+                      color="primary"
+                    >
+                      mdi-information
+                    </v-icon>
                     Current User State
                   </v-card-title>
                   <v-card-text>
@@ -58,10 +88,14 @@
                       {{ authStore.isAuthenticated ? 'Authenticated' : 'Not Authenticated' }}
                     </v-chip>
                     
-                    <div v-if="authStore.user" class="mt-2">
+                    <div
+                      v-if="authStore.user"
+                      class="mt-2"
+                    >
                       <p><strong>Name:</strong> {{ authStore.user.name }}</p>
                       <p><strong>Email:</strong> {{ authStore.user.email }}</p>
-                      <p><strong>Role:</strong> 
+                      <p>
+                        <strong>Role:</strong> 
                         <v-chip 
                           :color="getRoleColor(authStore.user.role)"
                           size="small"
@@ -71,8 +105,13 @@
                       </p>
                     </div>
                     
-                    <div v-else class="mt-2">
-                      <p class="text-medium-emphasis">No user logged in</p>
+                    <div
+                      v-else
+                      class="mt-2"
+                    >
+                      <p class="text-medium-emphasis">
+                        No user logged in
+                      </p>
                     </div>
                   </v-card-text>
                 </v-card>
@@ -81,9 +120,17 @@
             
             <v-row class="mt-4">
               <v-col cols="12">
-                <v-card variant="outlined" class="pa-3">
+                <v-card
+                  variant="outlined"
+                  class="pa-3"
+                >
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="warning">mdi-test-tube</v-icon>
+                    <v-icon
+                      class="mr-2"
+                      color="warning"
+                    >
+                      mdi-test-tube
+                    </v-icon>
                     Test Role Switching
                   </v-card-title>
                   <v-card-text>
@@ -93,41 +140,56 @@
                     </p>
                     
                     <v-row>
-                      <v-col cols="12" sm="4">
+                      <v-col
+                        cols="12"
+                        sm="4"
+                      >
                         <v-btn
                           color="error"
                           variant="outlined"
                           block
-                          @click="logout"
                           :loading="authStore.loading"
+                          @click="logout"
                         >
-                          <v-icon class="mr-2">mdi-logout</v-icon>
+                          <v-icon class="mr-2">
+                            mdi-logout
+                          </v-icon>
                           Logout (Test Auth Prompt)
                         </v-btn>
                       </v-col>
                       
-                      <v-col cols="12" sm="4">
+                      <v-col
+                        cols="12"
+                        sm="4"
+                      >
                         <v-btn
                           color="primary"
                           variant="elevated"
                           block
-                          @click="loginAsAdmin"
                           :loading="authStore.loading"
+                          @click="loginAsAdmin"
                         >
-                          <v-icon class="mr-2">mdi-account-tie</v-icon>
+                          <v-icon class="mr-2">
+                            mdi-account-tie
+                          </v-icon>
                           Login as Admin
                         </v-btn>
                       </v-col>
                       
-                      <v-col cols="12" sm="4">
+                      <v-col
+                        cols="12"
+                        sm="4"
+                      >
                         <v-btn
                           color="secondary"
                           variant="elevated"
                           block
-                          @click="loginAsOwner"
                           :loading="authStore.loading"
+                          @click="loginAsOwner"
                         >
-                          <v-icon class="mr-2">mdi-home-account</v-icon>
+                          <v-icon class="mr-2">
+                            mdi-home-account
+                          </v-icon>
                           Login as Owner
                         </v-btn>
                       </v-col>
@@ -147,16 +209,26 @@
             
             <v-row class="mt-4">
               <v-col cols="12">
-                <v-card variant="outlined" class="pa-3">
+                <v-card
+                  variant="outlined"
+                  class="pa-3"
+                >
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2" color="info">mdi-code-tags</v-icon>
+                    <v-icon
+                      class="mr-2"
+                      color="info"
+                    >
+                      mdi-code-tags
+                    </v-icon>
                     Implementation Details
                   </v-card-title>
                   <v-card-text>
                     <v-expansion-panels>
                       <v-expansion-panel>
                         <v-expansion-panel-title>
-                          <v-icon class="mr-2">mdi-file-code</v-icon>
+                          <v-icon class="mr-2">
+                            mdi-file-code
+                          </v-icon>
                           Code Structure
                         </v-expansion-panel-title>
                         <v-expansion-panel-text>
@@ -176,11 +248,17 @@ const isAdmin = computed(() => user.value?.role === 'admin');</code></pre>
                       
                       <v-expansion-panel>
                         <v-expansion-panel-title>
-                          <v-icon class="mr-2">mdi-security</v-icon>
+                          <v-icon class="mr-2">
+                            mdi-security
+                          </v-icon>
                           Security Notes
                         </v-expansion-panel-title>
                         <v-expansion-panel-text>
-                          <v-alert type="warning" variant="tonal" class="mb-2">
+                          <v-alert
+                            type="warning"
+                            variant="tonal"
+                            class="mb-2"
+                          >
                             <strong>Frontend Filtering Only:</strong> This implementation provides role-based UI filtering for user experience only, not security.
                           </v-alert>
                           <p class="text-body-2">
@@ -192,7 +270,9 @@ const isAdmin = computed(() => user.value?.role === 'admin');</code></pre>
                       
                       <v-expansion-panel>
                         <v-expansion-panel-title>
-                          <v-icon class="mr-2">mdi-architecture</v-icon>
+                          <v-icon class="mr-2">
+                            mdi-architecture
+                          </v-icon>
                           Architecture Pattern
                         </v-expansion-panel-title>
                         <v-expansion-panel-text>
@@ -214,7 +294,10 @@ const isAdmin = computed(() => user.value?.role === 'admin');</code></pre>
             </v-row>
             
             <v-row class="mt-4">
-              <v-col cols="12" class="text-center">
+              <v-col
+                cols="12"
+                class="text-center"
+              >
                 <v-btn
                   color="primary"
                   size="large"

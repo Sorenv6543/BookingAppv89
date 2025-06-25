@@ -5,7 +5,9 @@
       <v-container fluid>
         <v-row align="center">
           <v-col>
-            <h1 class="text-h4 font-weight-bold">All Bookings</h1>
+            <h1 class="text-h4 font-weight-bold">
+              All Bookings
+            </h1>
             <p class="text-subtitle-1 text-medium-emphasis">
               Manage all bookings across all properties and clients
             </p>
@@ -27,7 +29,10 @@
     <div class="filters-section">
       <v-container fluid>
         <v-row align="center">
-          <v-col cols="12" md="3">
+          <v-col
+            cols="12"
+            md="3"
+          >
             <v-text-field
               v-model="searchQuery"
               prepend-inner-icon="mdi-magnify"
@@ -37,7 +42,10 @@
               clearable
             />
           </v-col>
-          <v-col cols="12" md="2">
+          <v-col
+            cols="12"
+            md="2"
+          >
             <v-select
               v-model="statusFilter"
               :items="statusOptions"
@@ -47,7 +55,10 @@
               clearable
             />
           </v-col>
-          <v-col cols="12" md="2">
+          <v-col
+            cols="12"
+            md="2"
+          >
             <v-select
               v-model="typeFilter"
               :items="typeOptions"
@@ -57,7 +68,10 @@
               clearable
             />
           </v-col>
-          <v-col cols="12" md="2">
+          <v-col
+            cols="12"
+            md="2"
+          >
             <v-select
               v-model="propertyFilter"
               :items="propertyOptions"
@@ -67,7 +81,10 @@
               clearable
             />
           </v-col>
-          <v-col cols="12" md="3">
+          <v-col
+            cols="12"
+            md="3"
+          >
             <div class="d-flex gap-2">
               <v-text-field
                 v-model="dateFrom"
@@ -95,15 +112,28 @@
         <!-- Bookings Table -->
         <v-card>
           <v-card-text class="pa-0">
-            <div v-if="filteredBookings.length === 0" class="text-center py-8">
-              <v-icon size="64" color="grey-lighten-1">mdi-calendar-search</v-icon>
-              <p class="text-h6 text-medium-emphasis mt-4">No bookings found</p>
+            <div
+              v-if="filteredBookings.length === 0"
+              class="text-center py-8"
+            >
+              <v-icon
+                size="64"
+                color="grey-lighten-1"
+              >
+                mdi-calendar-search
+              </v-icon>
+              <p class="text-h6 text-medium-emphasis mt-4">
+                No bookings found
+              </p>
               <p class="text-body-2 text-medium-emphasis">
                 Try adjusting your filters or create a new booking
               </p>
             </div>
             
-            <div v-else class="bookings-list">
+            <div
+              v-else
+              class="bookings-list"
+            >
               <div
                 v-for="booking in filteredBookings"
                 :key="booking.id"
@@ -127,7 +157,10 @@
                       >
                         {{ booking.booking_type === 'turn' ? 'Turn' : 'Standard' }}
                       </v-chip>
-                      <span v-if="booking.booking_type === 'turn'" class="text-warning text-caption font-weight-bold">
+                      <span
+                        v-if="booking.booking_type === 'turn'"
+                        class="text-warning text-caption font-weight-bold"
+                      >
                         URGENT
                       </span>
                     </div>
@@ -137,18 +170,44 @@
                     </h3>
                     
                     <div class="text-body-2 text-medium-emphasis mb-2">
-                      <v-icon size="16" class="mr-1">mdi-calendar</v-icon>
+                      <v-icon
+                        size="16"
+                        class="mr-1"
+                      >
+                        mdi-calendar
+                      </v-icon>
                       {{ formatDate(booking.checkout_date) }}
-                      <v-icon size="16" class="ml-3 mr-1">mdi-arrow-right</v-icon>
+                      <v-icon
+                        size="16"
+                        class="ml-3 mr-1"
+                      >
+                        mdi-arrow-right
+                      </v-icon>
                       {{ formatDate(booking.checkin_date) }}
                     </div>
                     
-                    <div v-if="booking.assigned_cleaner_id" class="text-body-2">
-                      <v-icon size="16" class="mr-1">mdi-account</v-icon>
+                    <div
+                      v-if="booking.assigned_cleaner_id"
+                      class="text-body-2"
+                    >
+                      <v-icon
+                        size="16"
+                        class="mr-1"
+                      >
+                        mdi-account
+                      </v-icon>
                       {{ getCleanerName(booking.assigned_cleaner_id) }}
                     </div>
-                    <div v-else class="text-body-2 text-warning">
-                      <v-icon size="16" class="mr-1">mdi-account-alert</v-icon>
+                    <div
+                      v-else
+                      class="text-body-2 text-warning"
+                    >
+                      <v-icon
+                        size="16"
+                        class="mr-1"
+                      >
+                        mdi-account-alert
+                      </v-icon>
                       No cleaner assigned
                     </div>
                   </div>
@@ -181,7 +240,10 @@
                         <v-list-item @click="duplicateBooking(booking)">
                           <v-list-item-title>Duplicate</v-list-item-title>
                         </v-list-item>
-                        <v-list-item @click="cancelBooking(booking)" class="text-error">
+                        <v-list-item
+                          class="text-error"
+                          @click="cancelBooking(booking)"
+                        >
                           <v-list-item-title>Cancel</v-list-item-title>
                         </v-list-item>
                       </v-list>
@@ -196,7 +258,10 @@
     </div>
 
     <!-- Create/Edit Booking Dialog -->
-    <v-dialog v-model="showBookingDialog" max-width="600px">
+    <v-dialog
+      v-model="showBookingDialog"
+      max-width="600px"
+    >
       <v-card>
         <v-card-title>
           {{ editingBooking ? 'Edit Booking' : 'Create New Booking' }}
@@ -206,7 +271,12 @@
             Admin booking form would be implemented here with full property and cleaner selection
           </p>
           <div class="text-center py-4">
-            <v-icon size="48" color="grey-lighten-1">mdi-form-select</v-icon>
+            <v-icon
+              size="48"
+              color="grey-lighten-1"
+            >
+              mdi-form-select
+            </v-icon>
             <p class="text-caption text-medium-emphasis mt-2">
               Integration with AdminBookingForm component needed
             </p>
@@ -214,8 +284,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="closeBookingDialog">Cancel</v-btn>
-          <v-btn color="primary" @click="saveBooking">
+          <v-btn @click="closeBookingDialog">
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="saveBooking"
+          >
             {{ editingBooking ? 'Update' : 'Create' }}
           </v-btn>
         </v-card-actions>
@@ -223,7 +298,10 @@
     </v-dialog>
 
     <!-- Cleaner Assignment Dialog -->
-    <v-dialog v-model="showCleanerDialog" max-width="500px">
+    <v-dialog
+      v-model="showCleanerDialog"
+      max-width="500px"
+    >
       <v-card>
         <v-card-title>Assign Cleaner</v-card-title>
         <v-card-text>
@@ -238,8 +316,15 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="closeCleanerDialog">Cancel</v-btn>
-          <v-btn color="primary" @click="confirmCleanerAssignment">Assign</v-btn>
+          <v-btn @click="closeCleanerDialog">
+            Cancel
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="confirmCleanerAssignment"
+          >
+            Assign
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

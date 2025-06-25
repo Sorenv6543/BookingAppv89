@@ -1,15 +1,10 @@
 # 🚀 Critical Task Implementation Guide
-## Property Cleaning Scheduler - Role-Based Architecture
 
 This guide provides comprehensive documentation and examples for implementing the critical tasks in your role-based architecture migration. All examples follow your existing Vue 3 + Pinia + Vuetify + TypeScript patterns.
-
 ---
-
-## 📝 **TASK-060: Create OwnerSidebar.vue Component**
-
+# 📝 **TASK-060: Create OwnerSidebar.vue Component**
 ### **Overview**
 Create a role-specific sidebar that shows only owner-relevant navigation and filters data appropriately.
-
 ### **Implementation Pattern**
 
 ```vue
@@ -226,7 +221,6 @@ const props = withDefaults(defineProps<Props>(), {
 // Emits
 interface Emits {
   (e: 'update:modelValue', value: boolean): void
-  (e: 'update:rail', value: boolean): void
   (e: 'property-selected', propertyId: string): void
 }
 
@@ -252,10 +246,7 @@ const isOpen = computed({
   set: (value) => emit('update:modelValue', value)
 })
 
-const isRail = computed({
-  get: () => props.rail,
-  set: (value) => emit('update:rail', value)
-})
+
 
 const currentRoute = computed(() => route.name as string)
 
@@ -286,10 +277,7 @@ const urgentTurns = computed((): Booking[] => {
   )
 })
 
-// Methods
-const toggleRail = (): void => {
-  isRail.value = !isRail.value
-}
+//Methods
 
 const navigateTo = (path: string): void => {
   router.push(path)
