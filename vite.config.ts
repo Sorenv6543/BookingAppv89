@@ -128,7 +128,6 @@ export default defineConfig({
     },
     // access from local network
   server: {
-    host: '192.168.1.100',
     port: 3000,
     open: true,
     sourcemapIgnoreList: false,
