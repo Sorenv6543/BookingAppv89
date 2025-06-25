@@ -140,6 +140,7 @@ const router = createRouter({
         layout: 'default'
       }
     },
+
     // Demo routes - now in src/dev/demos/
     {
       path: '/demos/home-admin',

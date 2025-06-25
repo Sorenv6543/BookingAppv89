@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import PropertyCard from './PropertyCard.vue';
+import PropertyCard from '@components/dumb/shared/PropertyCard.vue';
 import type { Property } from '@/types';
 
 // Sample properties for demo

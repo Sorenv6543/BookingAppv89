@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useUIStore } from '@/stores/ui';
 
@@ -7,10 +7,14 @@ describe('UI Store', () => {
     // Create a fresh pinia instance and set it as active for testing
     setActivePinia(createPinia());
     
-    // Mock crypto.randomUUID
-    global.crypto = {
-      randomUUID: () => '123e4567-e89b-12d3-a456-426614174000'
-    } as any;
+    // Mock crypto.randomUUID with a proper mock
+    Object.defineProperty(globalThis, 'crypto', {
+      value: {
+        randomUUID: () => '123e4567-e89b-12d3-a456-426614174000'
+      },
+      writable: true,
+      configurable: true
+    });
     
     // Mock setTimeout
     vi.useFakeTimers();
@@ -36,7 +40,7 @@ describe('UI Store', () => {
     
     // Default filter state
     expect(store.filterState.bookingType).toBe('all');
-    expect(store.filterState.status).toEqual([]);
+    expect(store.filterState.status).toBe('all');
     expect(store.filterState.dateRange).toBeUndefined();
     expect(store.filterState.propertyId).toBeUndefined();
     expect(store.filterState.searchTerm).toBeUndefined();
@@ -191,7 +195,7 @@ describe('UI Store', () => {
     
     expect(store.filterState.bookingType).toBe('standard');
     expect(store.filterState.propertyId).toBe('prop1');
-    expect(store.filterState.status).toEqual([]);
+    expect(store.filterState.status).toBe('all');
     
     // Update only part of the filter
     store.updateFilter({
@@ -206,7 +210,7 @@ describe('UI Store', () => {
     store.resetFilters();
     expect(store.filterState.bookingType).toBe('all');
     expect(store.filterState.propertyId).toBeUndefined();
-    expect(store.filterState.status).toEqual([]);
+    expect(store.filterState.status).toBe('all');
   });
   
   it('should manage calendar view', () => {

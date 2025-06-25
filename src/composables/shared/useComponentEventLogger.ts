@@ -75,8 +75,10 @@ export function useComponentEventLogger() {
       direction
     });
 
-    // For debugging during development
-    console.debug(`[Event Logger] ${sourceComponent} ${direction === 'emit' ? '→' : '←'} ${targetComponent}: ${eventName}`, payload);
+    // For debugging during development - only log if explicitly enabled
+    if (localStorage.getItem('debug_event_logger') === 'true') {
+      console.debug(`[Event Logger] ${sourceComponent} ${direction === 'emit' ? '→' : '←'} ${targetComponent}: ${eventName}`, payload);
+    }
   };
 
   const clearEvents = () => {

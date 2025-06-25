@@ -77,7 +77,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import Sidebar from './Sidebar.vue';
+// import Sidebar from './Sidebar.vue'; // Generic sidebar no longer exists - using role-specific sidebars
 import type { Booking, Property } from '@/types';
 
 // Demo data

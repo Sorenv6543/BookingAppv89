@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import TurnAlerts from './TurnAlerts.vue';
+import TurnAlerts from '@components/dumb/shared/TurnAlerts.vue';
 import { v4 as uuidv4 } from 'uuid';
 import type { BookingWithMetadata } from '@/types';
 

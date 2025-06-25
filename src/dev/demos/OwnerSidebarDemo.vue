@@ -142,7 +142,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import OwnerSidebar from './OwnerSidebar.vue';
+import OwnerSidebar from '@components/smart/owner/OwnerSidebar.vue';
 import type { Booking, Property } from '@/types';
 
 // Demo state

@@ -67,8 +67,8 @@
                   :error-messages="errors.get('property_id')"
                   prepend-inner-icon="mdi-home"
                 >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
                       <template #prepend>
                         <v-avatar
                           color="primary"
@@ -98,8 +98,8 @@
                   :error-messages="errors.get('status')"
                   prepend-inner-icon="mdi-clipboard-list"
                 >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
                       <template #prepend>
                         <v-chip
                           :color="getStatusColor(item.value)"
@@ -188,8 +188,8 @@
                           clearable
                           prepend-inner-icon="mdi-account"
                         >
-                          <template #item="{ props, item }">
-                            <v-list-item v-bind="props">
+                          <template #item="{ props: itemProps, item }">
+                            <v-list-item v-bind="itemProps">
                               <template #prepend>
                                 <v-avatar
                                   :color="getCleanerAvailabilityColor(item.raw)"
@@ -302,8 +302,8 @@
                   :error-messages="errors.get('priority')"
                   prepend-inner-icon="mdi-flag"
                 >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props">
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
                       <template #prepend>
                         <v-icon :color="getPriorityColor(item.value)">
                           {{ getPriorityIcon(item.value) }}
@@ -444,6 +444,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  booking: null,
   loading: false,
   errors: () => new Map()
 })

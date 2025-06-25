@@ -237,7 +237,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import OwnerCalendar from './OwnerCalendar.vue';
+import OwnerCalendar from '@components/smart/owner/OwnerCalendar.vue';
 import type { Booking, Property } from '@/types';
 import type { DateSelectArg, EventClickArg } from '@fullcalendar/core';
 

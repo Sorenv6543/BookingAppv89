@@ -215,18 +215,21 @@ const handleOwnerEventClick = (clickInfo: EventClickArg): void => {
 };
 
 const handleDatesSet = (dateInfo: any): void => {
-  // Handle view/date changes
+  // Handle view/date changes with debouncing to prevent duplicate events
   const newDate = new Date(dateInfo.start);
   
-  eventLogger.logEvent(
-    'OwnerCalendar',
-    'HomeOwner',
-    'dateChange',
-    { date: newDate.toISOString() },
-    'emit'
-  );
-  
-  emit('dateChange', newDate);
+  // Only emit if date actually changed (prevents duplicate events)
+  if (props.currentDate.toDateString() !== newDate.toDateString()) {
+    eventLogger.logEvent(
+      'OwnerCalendar',
+      'HomeOwner',
+      'dateChange',
+      { date: newDate.toISOString() },
+      'emit'
+    );
+    
+    emit('dateChange', newDate);
+  }
 };
 
 const handleLoading = (isLoading: boolean): void => {
@@ -333,14 +336,24 @@ watch(() => props.bookings, (newBookings) => {
 // Watch for view changes from parent
 watch(() => props.currentView, (newView) => {
   if (newView && calendarRef.value) {
-    calendarRef.value.getApi().changeView(newView);
+    const currentCalendarView = calendarRef.value.getApi().view.type;
+    if (currentCalendarView !== newView) {
+      calendarRef.value.getApi().changeView(newView);
+    }
   }
 });
 
-// Watch for date changes from parent
+// Watch for date changes from parent (with infinite loop prevention)
 watch(() => props.currentDate, (newDate) => {
   if (newDate && calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(newDate);
+    const currentCalendarDate = calendarRef.value.getApi().getDate();
+    const newDateStr = newDate.toDateString();
+    const currentDateStr = currentCalendarDate.toDateString();
+    
+    // Only update if the date is actually different (prevents infinite loop)
+    if (newDateStr !== currentDateStr) {
+      calendarRef.value.getApi().gotoDate(newDate);
+    }
   }
 });
 

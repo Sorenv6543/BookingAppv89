@@ -11,7 +11,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { User, UserRole, PropertyOwner, Admin, Cleaner } from '@/types';
-import { useAuth } from '@/composables/shared/useAuth';
 import { 
   getDefaultRouteForRole, 
   getRoleSpecificSuccessMessage,
@@ -29,9 +28,6 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref<boolean>(false);
   const error = ref<string | null>(null);
   const tempViewMode = ref<{ role: UserRole; ownerId?: string } | null>(null);
-  
-  // Initialize auth composable
-  const authComposable = useAuth();
   
   // Computed properties
   const isAuthenticated = computed(() => !!user.value && !!token.value);
@@ -75,26 +71,28 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
     
     try {
-      const success = await authComposable.login(email, password);
-      
-      if (success) {
-        // Get user data from the auth composable
-        const userData = getUserFromEmail(email);
-        if (userData) {
-          user.value = userData;
-          token.value = 'mock-jwt-token'; // Mock token for development
-          
-          // Clear any previous temp view mode
-          tempViewMode.value = null;
-          
-          loading.value = false;
-          return true;
-        }
+      // Simple mock validation - don't use the useAuth composable
+      if (!email || !password) {
+        throw new Error('Email and password are required');
       }
       
-      error.value = 'Login failed';
-      loading.value = false;
-      return false;
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Get user data directly
+      const userData = getUserFromEmail(email);
+      if (userData) {
+        user.value = userData;
+        token.value = 'mock-jwt-token'; // Mock token for development
+        
+        // Clear any previous temp view mode
+        tempViewMode.value = null;
+        
+        loading.value = false;
+        return true;
+      } else {
+        throw new Error('Invalid credentials');
+      }
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Login failed';
       loading.value = false;
@@ -111,28 +109,19 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
     
     try {
-      // Use auth composable for logout
-      const success = await authComposable.logout();
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      if (success) {
-        // Clear auth state
-        user.value = null;
-        token.value = null;
-        tempViewMode.value = null;
-        
-        // Clear all role-specific cached state
-        clearAllRoleSpecificState();
-        
-        // Note: Store clearing will be handled by the component calling this function
-        // since stores can't directly access other stores in a clean way
-        
-        loading.value = false;
-        return true;
-      }
+      // Clear auth state
+      user.value = null;
+      token.value = null;
+      tempViewMode.value = null;
       
-      error.value = 'Logout failed';
+      // Clear all role-specific cached state
+      clearAllRoleSpecificState();
+      
       loading.value = false;
-      return false;
+      return true;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Logout failed';
       loading.value = false;
@@ -155,24 +144,24 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
     
     try {
-      const success = await authComposable.register(userData);
-      
-      if (success) {
-        // Set user data after successful registration
-        const newUser = createUserFromRegistration(userData);
-        user.value = newUser;
-        token.value = 'mock-jwt-token'; // Mock token for development
-        
-        // Clear any previous temp view mode
-        tempViewMode.value = null;
-        
-        loading.value = false;
-        return true;
+      // Validate required fields
+      if (!userData.email || !userData.password || !userData.name || !userData.role) {
+        throw new Error('All fields are required');
       }
       
-      error.value = 'Registration failed';
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Set user data after successful registration
+      const newUser = createUserFromRegistration(userData);
+      user.value = newUser;
+      token.value = 'mock-jwt-token'; // Mock token for development
+      
+      // Clear any previous temp view mode
+      tempViewMode.value = null;
+      
       loading.value = false;
-      return false;
+      return true;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Registration failed';
       loading.value = false;
