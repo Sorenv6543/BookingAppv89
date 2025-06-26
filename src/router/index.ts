@@ -32,36 +32,36 @@ const router = createRouter({
         role: 'owner'
       }
     },
-    // {
-    //   path: '/owner/properties',
-    //   name: 'owner-properties',
-    //   component: () => import('@/pages/owner/properties/index.vue'),
-    //   meta: {
-    //     layout: 'default',
-    //     requiresAuth: true,
-    //     role: 'owner'
-    //   }
-    // },
-    // {
-    //   path: '/owner/calendar',
-    //   name: 'owner-calendar',
-    //   component: () => import('@/pages/owner/calendar.vue'),
-    //   meta: {
-    //     layout: 'default',
-    //     requiresAuth: true,
-    //     role: 'owner'
-    //   }
-    // },
-    // {
-    //   path: '/owner/bookings',
-    //   name: 'owner-bookings',
-    //   component: () => import('@/pages/owner/bookings/index.vue'),
-    //   meta: {
-    //     layout: 'default',
-    //     requiresAuth: true,
-    //     role: 'owner'
-    //   }
-    // },
+    {
+      path: '/owner/properties',
+      name: 'owner-properties',
+      component: () => import('@/pages/owner/properties/index.vue'),
+      meta: {
+        layout: 'default',
+        requiresAuth: true,
+        role: 'owner'
+      }
+    },
+    {
+      path: '/owner/calendar',
+      name: 'owner-calendar',
+      component: () => import('@/pages/owner/calendar.vue'),
+      meta: {
+        layout: 'default',
+        requiresAuth: true,
+        role: 'owner'
+      }
+    },
+    {
+      path: '/owner/bookings',
+      name: 'owner-bookings',
+      component: () => import('@/pages/owner/bookings/index.vue'),
+      meta: {
+        layout: 'default',
+        requiresAuth: true,
+        role: 'owner'
+      }
+    },
     // Legacy routes (redirect to owner-specific routes)
 
     {

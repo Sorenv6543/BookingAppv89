@@ -1,5 +1,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
+import { usePushNotifications } from './usePushNotifications'
+import { useBackgroundSync } from './useBackgroundSync'
 
 // PWA Install Event Interface
 interface BeforeInstallPromptEvent extends Event {
@@ -11,7 +13,7 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
 }
 
-export const usePWA = () => {
+export const usePWA = (): any => {
   // PWA Installation
   const deferredPrompt = ref<BeforeInstallPromptEvent | null>(null)
   const isPWAInstallable = ref(false)
@@ -26,10 +28,10 @@ export const usePWA = () => {
     offlineReady,
     updateServiceWorker
   } = useRegisterSW({
-    onRegistered(r) {
+    onRegistered(r: any) {
       console.log('Service Worker registered:', r)
     },
-    onRegisterError(error) {
+    onRegisterError(error: any) {
       console.error('Service Worker registration error:', error)
     }
   })
@@ -100,6 +102,13 @@ export const usePWA = () => {
     window.addEventListener('offline', updateOnlineStatus)
   })
 
+  // Initialize push notifications and background sync
+  const pushNotifications = usePushNotifications()
+  const backgroundSync = useBackgroundSync()
+
+  // Start background sync auto-processing
+  backgroundSync.startAutoSync()
+
   return {
     // Installation
     isPWAInstallable,
@@ -115,9 +124,22 @@ export const usePWA = () => {
     offlineReady,
     updatePWA,
     
+    // Push Notifications
+    pushNotifications,
+    
+    // Background Sync
+    backgroundSync,
+    
     // Computed states
     canInstall: computed(() => isPWAInstallable.value && !isPWA.value),
     showUpdatePrompt: computed(() => needRefresh.value),
-    showOfflineReady: computed(() => offlineReady.value)
+    showOfflineReady: computed(() => offlineReady.value),
+    
+    // Combined PWA status
+    isFullyFunctional: computed(() => 
+      isPWA.value && 
+      pushNotifications.hasPermission.value && 
+      backgroundSync.canProcess.value
+    )
   }
 } 

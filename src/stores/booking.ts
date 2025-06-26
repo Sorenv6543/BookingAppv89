@@ -2,6 +2,11 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { Booking, BookingMap, BookingStatus, BookingType } from '@/types';
+import { 
+  filterBookingsByDateRange, 
+  getUrgentTurns, 
+  getUpcomingBookings
+} from '@/utils/businessLogic';
 
 // Uses Map collections for efficient booking access and management
 export const useBookingStore = defineStore('booking', () => {
@@ -10,8 +15,28 @@ export const useBookingStore = defineStore('booking', () => {
   const loading = ref<boolean>(false);
   const error = ref<string | null>(null);
   
-  // GET EVENTS/BOOKINGS BY FILTER FUNCTIONS - BY ID - BY STATUS - BY TYPE - BY PROPERTY - BY OWNER - BY DATE RANGE - PENDING - SCHEDULED - TURN - STANDARD
-  // ById - ByStatus - ByType - ByProperty - ByOwner ByDateRange - Pending - Scheduled - Turn - Standard
+  // Cached filtered Maps for O(1) performance
+  const cachedStatusMaps = ref<Map<BookingStatus, Map<string, Booking>> | null>(null);
+  const cachedTypeMaps = ref<Map<BookingType, Map<string, Booking>> | null>(null);
+  const cachedPropertyMaps = ref(new Map<string, Map<string, Booking>>());
+  const cachedOwnerMaps = ref(new Map<string, Map<string, Booking>>());
+  const cacheTimestamp = ref(0);
+  const CACHE_TTL = 10000; // 10 seconds
+  
+  // Cache management
+  const isCacheValid = computed(() => {
+    return (Date.now() - cacheTimestamp.value) < CACHE_TTL;
+  });
+  
+  const invalidateCache = () => {
+    cachedStatusMaps.value = null;
+    cachedTypeMaps.value = null;
+    cachedPropertyMaps.value.clear();
+    cachedOwnerMaps.value.clear();
+    cacheTimestamp.value = 0;
+  };
+  
+  // GET EVENTS/BOOKINGS BY FILTER FUNCTIONS - Optimized Map-based filtering
   const bookingsArray = computed((): Booking[] => {
     return Array.from(bookings.value.values());
   });
@@ -20,49 +45,136 @@ export const useBookingStore = defineStore('booking', () => {
     return bookings.value.get(id);
   });
   
-  const bookingsByStatus = computed(() => (status: BookingStatus): Booking[] => {
-    return bookingsArray.value.filter(booking => booking.status === status);
-  });
-  
-  const bookingsByType = computed(() => (type: BookingType): Booking[] => {
-    return bookingsArray.value.filter(booking => booking.booking_type === type);
-  });
-  
-  const bookingsByProperty = computed(() => (propertyId: string): Booking[] => {
-    return bookingsArray.value.filter(booking => booking.property_id === propertyId);
-  });
-  
-  const bookingsByOwner = computed(() => (ownerId: string): Booking[] => {
-    return bookingsArray.value.filter(booking => booking.owner_id === ownerId);
-  });
-  
-const bookingsByDateRange = computed(() => (startDate: string, endDate: string): Booking[] => {
-  const start = new Date(startDate).getTime();
-  const end = new Date(endDate).getTime();
-  
-  return bookingsArray.value.filter(booking => {
-    const bookingStart = new Date(booking.checkout_date).getTime();
-    const bookingEnd = new Date(booking.checkin_date).getTime();
+  // Map-based status filtering with caching
+  const bookingsByStatusMap = computed(() => {
+    if (isCacheValid.value && cachedStatusMaps.value) {
+      return cachedStatusMaps.value;
+    }
     
-    // Handle case where booking spans multiple days
-    return (bookingStart <= end && bookingEnd >= start);
+    const statusMaps = new Map<BookingStatus, Map<string, Booking>>();
+    
+    bookings.value.forEach((booking, id) => {
+      const status = booking.status;
+      if (!statusMaps.has(status)) {
+        statusMaps.set(status, new Map());
+      }
+      statusMaps.get(status)!.set(id, booking);
+    });
+    
+    cachedStatusMaps.value = statusMaps;
+    cacheTimestamp.value = Date.now();
+    
+    return statusMaps;
   });
-});
   
-  const pendingBookings = computed((): Booking[] => {
+  // Map-based type filtering with caching
+  const bookingsByTypeMap = computed(() => {
+    if (isCacheValid.value && cachedTypeMaps.value) {
+      return cachedTypeMaps.value;
+    }
+    
+    const typeMaps = new Map<BookingType, Map<string, Booking>>();
+    
+    bookings.value.forEach((booking, id) => {
+      const type = booking.booking_type;
+      if (!typeMaps.has(type)) {
+        typeMaps.set(type, new Map());
+      }
+      typeMaps.get(type)!.set(id, booking);
+    });
+    
+    cachedTypeMaps.value = typeMaps;
+    cacheTimestamp.value = Date.now();
+    
+    return typeMaps;
+  });
+  
+  // Efficient getter functions that return Maps
+  const bookingsByStatus = computed(() => (status: BookingStatus): Map<string, Booking> => {
+    return bookingsByStatusMap.value.get(status) || new Map();
+  });
+  
+  const bookingsByType = computed(() => (type: BookingType): Map<string, Booking> => {
+    return bookingsByTypeMap.value.get(type) || new Map();
+  });
+  
+  const bookingsByProperty = computed(() => (propertyId: string): Map<string, Booking> => {
+    if (isCacheValid.value && cachedPropertyMaps.value.has(propertyId)) {
+      return cachedPropertyMaps.value.get(propertyId)!;
+    }
+    
+    const filtered = new Map<string, Booking>();
+    bookings.value.forEach((booking, id) => {
+      if (booking.property_id === propertyId) {
+        filtered.set(id, booking);
+      }
+    });
+    
+    cachedPropertyMaps.value.set(propertyId, filtered);
+    return filtered;
+  });
+  
+  const bookingsByOwner = computed(() => (ownerId: string): Map<string, Booking> => {
+    if (isCacheValid.value && cachedOwnerMaps.value.has(ownerId)) {
+      return cachedOwnerMaps.value.get(ownerId)!;
+    }
+    
+    const filtered = new Map<string, Booking>();
+    bookings.value.forEach((booking, id) => {
+      if (booking.owner_id === ownerId) {
+        filtered.set(id, booking);
+      }
+    });
+    
+    cachedOwnerMaps.value.set(ownerId, filtered);
+    return filtered;
+  });
+
+  // Use business logic utilities for complex filtering
+  const bookingsByDateRange = computed(() => (startDate: string, endDate: string): Map<string, Booking> => {
+    return filterBookingsByDateRange(bookings.value, startDate, endDate);
+  });
+  
+  // Optimized pre-computed common filters using business logic
+  const pendingBookingsMap = computed((): Map<string, Booking> => {
     return bookingsByStatus.value('pending');
   });
   
-  const scheduledBookings = computed((): Booking[] => {
+  const scheduledBookingsMap = computed((): Map<string, Booking> => {
     return bookingsByStatus.value('scheduled');
   });
   
-  const turnBookings = computed((): Booking[] => {
+  const turnBookingsMap = computed((): Map<string, Booking> => {
     return bookingsByType.value('turn');
   });
   
-  const standardBookings = computed((): Booking[] => {
+  const standardBookingsMap = computed((): Map<string, Booking> => {
     return bookingsByType.value('standard');
+  });
+  
+  const upcomingBookingsMap = computed((): Map<string, Booking> => {
+    return getUpcomingBookings(bookings.value);
+  });
+  
+  const urgentTurnsMap = computed((): Map<string, Booking> => {
+    return getUrgentTurns(bookings.value);
+  });
+  
+  // Array getters ONLY for components that need arrays
+  const pendingBookings = computed((): Booking[] => {
+    return Array.from(pendingBookingsMap.value.values());
+  });
+  
+  const scheduledBookings = computed((): Booking[] => {
+    return Array.from(scheduledBookingsMap.value.values());
+  });
+  
+  const turnBookings = computed((): Booking[] => {
+    return Array.from(turnBookingsMap.value.values());
+  });
+  
+  const standardBookings = computed((): Booking[] => {
+    return Array.from(standardBookingsMap.value.values());
   });
    
   // ACTIONS - EVENTS/BOOKINGCRUD - ADD - UPDATE - REMOVE - UPDATE STATUS - ASSIGN CLEANER - FETCH - CLEAR ALL
@@ -70,6 +182,7 @@ const bookingsByDateRange = computed(() => (startDate: string, endDate: string):
 
   function addBooking(booking: Booking) {
     bookings.value.set(booking.id, booking);
+    invalidateCache(); // Invalidate cache when data changes
   }
   
   function updateBooking(id: string, updates: Partial<Booking>) {
@@ -80,11 +193,13 @@ const bookingsByDateRange = computed(() => (startDate: string, endDate: string):
         ...updates, 
         updated_at: new Date().toISOString() 
       });
+      invalidateCache(); // Invalidate cache when data changes
     }
   }
   
   function removeBooking(id: string) {
     bookings.value.delete(id);
+    invalidateCache(); // Invalidate cache when data changes
   }
   
   function updateBookingStatus(id: string, status: BookingStatus) {
@@ -106,6 +221,7 @@ const bookingsByDateRange = computed(() => (startDate: string, endDate: string):
       
       // Fetch simulation complete
       loading.value = false;
+      invalidateCache(); // Invalidate cache after fetch
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Unknown error fetching bookings';
       loading.value = false;
@@ -114,6 +230,7 @@ const bookingsByDateRange = computed(() => (startDate: string, endDate: string):
   
   function clearAll() {
     bookings.value.clear();
+    invalidateCache(); // Invalidate cache when data changes
   }
   
   return {
@@ -122,14 +239,26 @@ const bookingsByDateRange = computed(() => (startDate: string, endDate: string):
     loading,
     error,
     
-    // Getters
-    bookingsArray,
+    // Map getters (primary - for O(1) operations)
+    bookingsByStatusMap,
+    bookingsByTypeMap,
+    pendingBookingsMap,
+    scheduledBookingsMap,
+    turnBookingsMap,
+    standardBookingsMap,
+    upcomingBookingsMap,
+    urgentTurnsMap,
+    
+    // Parameterized Map getters
     getBookingById,
     bookingsByStatus,
     bookingsByType,
     bookingsByProperty,
     bookingsByOwner,
     bookingsByDateRange,
+    
+    // Array getters (secondary - only when UI needs arrays)
+    bookingsArray,
     pendingBookings,
     scheduledBookings,
     turnBookings,
@@ -142,6 +271,9 @@ const bookingsByDateRange = computed(() => (startDate: string, endDate: string):
     updateBookingStatus,
     assignCleaner,
     fetchBookings,
-    clearAll
+    clearAll,
+    
+    // Cache management
+    invalidateCache
   };
 }); 

@@ -4,8 +4,8 @@
     <router-view />
   </component>
   
-  <!-- PWA Notifications (global) -->
-  <PWANotifications />
+  <!-- PWA Notifications Enhanced (global) -->
+  <PWANotificationsEnhanced />
 </template>
 
 <script setup lang="ts">
@@ -16,7 +16,7 @@ import { useRoute } from 'vue-router'
 import DefaultLayout from '@/layouts/default.vue'
 import AuthLayout from '@/layouts/auth.vue'
 import AdminLayout from '@/layouts/admin.vue'
-import PWANotifications from '@/components/dumb/shared/PWANotifications.vue'
+import PWANotificationsEnhanced from '@/components/dumb/shared/PWANotificationsEnhanced.vue'
 
 // Available layouts
 const layouts = {

@@ -24,6 +24,17 @@
         >
           INACTIVE
         </v-chip>
+        
+        <!-- Offline indicator -->
+        <v-chip
+          v-if="!isOnline"
+          color="warning"
+          size="small"
+          class="ml-2"
+          prepend-icon="mdi-wifi-off"
+        >
+          OFFLINE MODE
+        </v-chip>
       </v-card-title>
       
       <v-divider />
@@ -230,7 +241,8 @@
           :loading="loading"
           @click="handleSubmit"
         >
-          {{ submitButtonText }}
+          <v-icon v-if="!isOnline" class="mr-2">mdi-cloud-sync</v-icon>
+          {{ isOnline ? submitButtonText : `Queue ${props.mode === 'create' ? 'Create' : 'Update'}` }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -240,6 +252,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import type { Property, PropertyFormData, PricingTier } from '@/types/property'
+import { usePWA } from '@/composables/shared/usePWA'
 
 // Props
 interface Props {
@@ -264,6 +277,9 @@ interface Emits {
 }
 
 const emit = defineEmits<Emits>()
+
+// PWA composable for offline sync
+const { isOnline, backgroundSync } = usePWA()
 
 // Reactive data
 const formRef = ref()
@@ -378,6 +394,26 @@ const handleSubmit = async () => {
   
   const { valid } = await formRef.value.validate()
   if (!valid) return
+  
+  // If offline, queue the operation for background sync
+  if (!isOnline.value) {
+    const operation = props.mode === 'create' ? 'create_property' : 'update_property'
+    const data = props.mode === 'edit' && props.property 
+      ? { id: props.property.id, ...form.value }
+      : form.value
+    
+    backgroundSync.queueOperation(
+      operation,
+      data,
+      form.value.owner_id || 'current-user', // TODO: Get from auth
+      'owner'
+    )
+    
+    // Show offline confirmation
+    console.log(`Property ${props.mode} queued for sync when online`)
+    handleClose()
+    return
+  }
   
   emit('submit', { ...form.value })
 }

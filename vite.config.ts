@@ -43,10 +43,23 @@ export default defineConfig({
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 // 24 hours
+              },
+              backgroundSync: {
+                name: 'supabase-api-sync',
+                options: {
+                  maxRetentionTime: 24 * 60 // 24 hours
+                }
               }
             }
           }
-        ]
+        ],
+        // Enable advanced PWA features
+        mode: 'production',
+        skipWaiting: true,
+        clientsClaim: true,
+        // Handle navigation fallback for SPA
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/]
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {

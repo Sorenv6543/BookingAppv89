@@ -4,7 +4,12 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { usePropertyStore } from '@/stores/property'
 import { useBookingStore } from '@/stores/booking'
-import type { Property, Booking, User } from '@/types'
+import { 
+  getUrgentTurns,
+  getUpcomingBookings,
+  getRecentBookings
+} from '@/utils/businessLogic'
+import type { Property, Booking } from '@/types'
 
 export const useOwnerDataStore = defineStore('ownerData', () => {
   // Dependencies
@@ -35,7 +40,34 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
     cacheTimestamp.value = 0
   }
 
-  // Core owner data getters with caching
+  // Core owner data getters with caching (maintaining Map structure for O(1) performance)
+  const ownerPropertiesMap = computed((): Map<string, Property> => {
+    if (!authStore.user?.id) return new Map()
+
+    const filtered = new Map<string, Property>()
+    propertyStore.properties.forEach((property, id) => {
+      if (property.owner_id === authStore.user?.id) {
+        filtered.set(id, property)
+      }
+    })
+
+    return filtered
+  })
+
+  const ownerBookingsMap = computed((): Map<string, Booking> => {
+    if (!authStore.user?.id) return new Map()
+
+    const filtered = new Map<string, Booking>()
+    bookingStore.bookings.forEach((booking, id) => {
+      if (booking.owner_id === authStore.user?.id) {
+        filtered.set(id, booking)
+      }
+    })
+
+    return filtered
+  })
+
+  // Array getters for components that need arrays (cached for performance)
   const ownerProperties = computed((): Property[] => {
     if (!authStore.user?.id) return []
 
@@ -44,9 +76,13 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
       return cachedProperties.value
     }
 
-    // Filter and cache new data
-    const filtered = Array.from(propertyStore.properties.values())
-      .filter(property => property.owner_id === authStore.user?.id)
+    // Filter and cache new data efficiently
+    const filtered: Property[] = []
+    propertyStore.properties.forEach(property => {
+      if (property.owner_id === authStore.user?.id) {
+        filtered.push(property)
+      }
+    })
 
     cachedProperties.value = filtered
     lastOwnerId.value = authStore.user.id
@@ -63,118 +99,145 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
       return cachedBookings.value
     }
 
-    // Filter and cache new data
-    const filtered = Array.from(bookingStore.bookings.values())
-      .filter(booking => booking.owner_id === authStore.user?.id)
+    // Filter and cache new data efficiently
+    const filtered: Booking[] = []
+    bookingStore.bookings.forEach(booking => {
+      if (booking.owner_id === authStore.user?.id) {
+        filtered.push(booking)
+      }
+    })
 
     cachedBookings.value = filtered
     return filtered
   })
 
-  // Derived owner data
+  // Derived owner data using Maps and business logic utilities
+  const activePropertiesMap = computed((): Map<string, Property> => {
+    const activeMap = new Map<string, Property>()
+    ownerPropertiesMap.value.forEach((property, id) => {
+      if (property.active) {
+        activeMap.set(id, property)
+      }
+    })
+    return activeMap
+  })
+
   const activeProperties = computed((): Property[] => {
-    return ownerProperties.value.filter(property => property.active)
+    return Array.from(activePropertiesMap.value.values())
+  })
+
+  // Use business logic utilities for filtering
+  const upcomingBookingsMap = computed((): Map<string, Booking> => {
+    return getUpcomingBookings(ownerBookingsMap.value)
   })
 
   const upcomingBookings = computed((): Booking[] => {
-    const now = new Date()
-    return ownerBookings.value.filter(booking =>
-      new Date(booking.checkin_date) > now &&
-      ['confirmed', 'scheduled', 'pending'].includes(booking.status)
-    )
+    return Array.from(upcomingBookingsMap.value.values())
+  })
+
+  const recentBookingsMap = computed((): Map<string, Booking> => {
+    return getRecentBookings(ownerBookingsMap.value, 30)
   })
 
   const recentBookings = computed((): Booking[] => {
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-    return ownerBookings.value.filter(booking =>
-      new Date(booking.checkout_date) >= thirtyDaysAgo
-    ).sort((a, b) => 
-      new Date(b.checkout_date).getTime() - new Date(a.checkout_date).getTime()
-    )
+    return Array.from(recentBookingsMap.value.values())
+      .sort((a, b) => 
+        new Date(b.checkout_date).getTime() - new Date(a.checkout_date).getTime()
+      )
+  })
+
+  const urgentTurnsMap = computed((): Map<string, Booking> => {
+    return getUrgentTurns(ownerBookingsMap.value)
   })
 
   const urgentTurns = computed((): Booking[] => {
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
-    return ownerBookings.value.filter(booking =>
-      booking.booking_type === 'turn' &&
-      booking.status === 'pending' &&
-      new Date(booking.checkout_date) <= tomorrow
-    )
+    return Array.from(urgentTurnsMap.value.values())
+  })
+
+  const todayBookingsMap = computed((): Map<string, Booking> => {
+    const today = new Date().toISOString().split('T')[0]
+    const todayMap = new Map<string, Booking>()
+    
+    ownerBookingsMap.value.forEach((booking, id) => {
+      if (booking.checkout_date.startsWith(today) ||
+          booking.checkin_date.startsWith(today)) {
+        todayMap.set(id, booking)
+      }
+    })
+    
+    return todayMap
   })
 
   const todayBookings = computed((): Booking[] => {
-    const today = new Date().toISOString().split('T')[0]
-    return ownerBookings.value.filter(booking =>
-      booking.checkout_date.startsWith(today) ||
-      booking.checkin_date.startsWith(today)
-    )
+    return Array.from(todayBookingsMap.value.values())
   })
 
-  // Property-specific helpers
+  // Property-specific helpers using Maps
+  const getPropertyBookingsMap = (propertyId: string): Map<string, Booking> => {
+    const propertyBookings = new Map<string, Booking>()
+    ownerBookingsMap.value.forEach((booking, id) => {
+      if (booking.property_id === propertyId) {
+        propertyBookings.set(id, booking)
+      }
+    })
+    return propertyBookings
+  }
+
   const getPropertyBookings = (propertyId: string): Booking[] => {
-    return ownerBookings.value.filter(booking => 
-      booking.property_id === propertyId
-    )
+    return Array.from(getPropertyBookingsMap(propertyId).values())
   }
 
   const getPropertyStats = (propertyId: string) => {
-    const bookings = getPropertyBookings(propertyId)
+    const bookingsMap = getPropertyBookingsMap(propertyId)
     const thisMonth = new Date()
     thisMonth.setDate(1)
     
-    const thisMonthBookings = bookings.filter(booking =>
-      new Date(booking.checkin_date) >= thisMonth
-    )
+    let thisMonthCount = 0
+    bookingsMap.forEach(booking => {
+      if (new Date(booking.checkin_date) >= thisMonth) {
+        thisMonthCount++
+      }
+    })
 
     return {
-      totalBookings: bookings.length,
-      thisMonthBookings: thisMonthBookings.length,
-      avgNightly: bookings.length > 0 
-        ? bookings.reduce((sum, b) => sum + (b.nightly_rate || 0), 0) / bookings.length
-        : 0,
+      totalBookings: bookingsMap.size,
+      thisMonthBookings: thisMonthCount,
+      avgNightly: 0, // Will be implemented when booking pricing is added
       occupancyRate: calculateOccupancyRate(propertyId)
     }
   }
 
   const calculateOccupancyRate = (propertyId: string): number => {
-    const bookings = getPropertyBookings(propertyId)
-    if (bookings.length === 0) return 0
+    const bookingsMap = getPropertyBookingsMap(propertyId)
+    if (bookingsMap.size === 0) return 0
 
     const now = new Date()
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
     const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
     
-    const bookedDays = bookings
-      .filter(booking => 
-        new Date(booking.checkin_date) >= lastMonth &&
-        new Date(booking.checkout_date) <= thisMonth
-      )
-      .reduce((total, booking) => {
-        const checkin = new Date(booking.checkin_date)
-        const checkout = new Date(booking.checkout_date)
-        return total + Math.ceil((checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60 * 24))
-      }, 0)
+    let bookedDays = 0
+    bookingsMap.forEach(booking => {
+      const checkin = new Date(booking.checkin_date)
+      const checkout = new Date(booking.checkout_date)
+      
+      if (checkin >= lastMonth && checkout <= thisMonth) {
+        bookedDays += Math.ceil((checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60 * 24))
+      }
+    })
 
     const totalDays = Math.ceil((thisMonth.getTime() - lastMonth.getTime()) / (1000 * 60 * 60 * 24))
     return Math.round((bookedDays / totalDays) * 100)
   }
 
-  // Performance metrics
+  // Performance metrics using efficient Map operations
   const stats = computed(() => ({
-    propertiesCount: ownerProperties.value.length,
-    activePropertiesCount: activeProperties.value.length,
-    bookingsCount: ownerBookings.value.length,
-    upcomingBookingsCount: upcomingBookings.value.length,
-    urgentTurnsCount: urgentTurns.value.length,
-    totalRevenue: ownerBookings.value
-      .filter(b => b.status === 'completed')
-      .reduce((sum, b) => sum + (b.total_cost || 0), 0),
-    thisMonthRevenue: ownerBookings.value
-      .filter(b => {
-        const thisMonth = new Date().toISOString().slice(0, 7) // YYYY-MM
-        return b.status === 'completed' && b.checkout_date.startsWith(thisMonth)
-      })
-      .reduce((sum, b) => sum + (b.total_cost || 0), 0)
+    propertiesCount: ownerPropertiesMap.value.size,
+    activePropertiesCount: activePropertiesMap.value.size,
+    bookingsCount: ownerBookingsMap.value.size,
+    upcomingBookingsCount: upcomingBookingsMap.value.size,
+    urgentTurnsCount: urgentTurnsMap.value.size,
+    totalRevenue: 0, // Revenue tracking will be implemented when booking pricing is added
+    thisMonthRevenue: 0 // Revenue tracking will be implemented when booking pricing is added
   }))
 
   // Actions
@@ -191,7 +254,7 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
     if (!authStore.user?.id) return null
     
     try {
-      const property = propertyStore.addProperty({
+      propertyStore.addProperty({
         ...propertyData,
         owner_id: authStore.user.id
       } as Property)
@@ -199,7 +262,11 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
       // Invalidate cache to refresh data
       invalidateCache()
       
-      return property
+      // Return the created property from the store
+      const createdProperty = Array.from(propertyStore.properties.values())
+        .find(p => p.owner_id === authStore.user?.id && p.name === propertyData.name)
+      
+      return createdProperty || null
     } catch (error) {
       console.error('Failed to create owner property:', error)
       return null
@@ -210,7 +277,7 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
     if (!authStore.user?.id) return null
     
     try {
-      const booking = bookingStore.addBooking({
+      bookingStore.addBooking({
         ...bookingData,
         owner_id: authStore.user.id
       } as Booking)
@@ -218,7 +285,11 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
       // Invalidate cache to refresh data
       invalidateCache()
       
-      return booking
+      // Return the created booking from the store
+      const createdBooking = Array.from(bookingStore.bookings.values())
+        .find(b => b.owner_id === authStore.user?.id && b.property_id === bookingData.property_id)
+      
+      return createdBooking || null
     } catch (error) {
       console.error('Failed to create owner booking:', error)
       return null
@@ -242,7 +313,16 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
   })
 
   return {
-    // Core data
+    // Core data - Map references for O(1) performance
+    ownerPropertiesMap,
+    ownerBookingsMap,
+    activePropertiesMap,
+    upcomingBookingsMap,
+    recentBookingsMap,
+    urgentTurnsMap,
+    todayBookingsMap,
+    
+    // Array getters for UI components that need arrays
     ownerProperties,
     ownerBookings,
     activeProperties,
@@ -252,7 +332,8 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
     todayBookings,
     stats,
     
-    // Helpers
+    // Helpers - Map-based
+    getPropertyBookingsMap,
     getPropertyBookings,
     getPropertyStats,
     
@@ -268,134 +349,3 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
   }
 })
 
-// Admin data store for system-wide access
-export const useAdminDataStore = defineStore('adminData', () => {
-  // Dependencies
-  const propertyStore = usePropertyStore()
-  const bookingStore = useBookingStore()
-
-  // Admin sees ALL data - no filtering
-  const allProperties = computed((): Property[] => {
-    return Array.from(propertyStore.properties.values())
-  })
-
-  const allBookings = computed((): Booking[] => {
-    return Array.from(bookingStore.bookings.values())
-  })
-
-  // System-wide metrics
-  const systemMetrics = computed(() => {
-    const properties = allProperties.value
-    const bookings = allBookings.value
-    const now = new Date()
-    
-    return {
-      totalProperties: properties.length,
-      activeProperties: properties.filter(p => p.active).length,
-      totalOwners: new Set(properties.map(p => p.owner_id)).size,
-      totalBookings: bookings.length,
-      upcomingBookings: bookings.filter(b => 
-        new Date(b.checkin_date) > now && ['confirmed', 'scheduled'].includes(b.status)
-      ).length,
-      urgentTurns: bookings.filter(b =>
-        b.booking_type === 'turn' &&
-        b.status === 'pending' &&
-        new Date(b.checkout_date) <= new Date(now.getTime() + 24 * 60 * 60 * 1000)
-      ).length,
-      totalRevenue: bookings
-        .filter(b => b.status === 'completed')
-        .reduce((sum, b) => sum + (b.total_cost || 0), 0),
-      thisMonthRevenue: bookings
-        .filter(b => {
-          const thisMonth = new Date().toISOString().slice(0, 7)
-          return b.status === 'completed' && b.checkout_date.startsWith(thisMonth)
-        })
-        .reduce((sum, b) => sum + (b.total_cost || 0), 0)
-    }
-  })
-
-  // Owner performance analytics
-  const ownerAnalytics = computed(() => {
-    const ownerStats = new Map<string, any>()
-    
-    allProperties.value.forEach(property => {
-      const ownerId = property.owner_id
-      if (!ownerStats.has(ownerId)) {
-        ownerStats.set(ownerId, {
-          ownerId,
-          ownerName: property.owner_name || 'Unknown',
-          properties: [],
-          bookings: [],
-          revenue: 0,
-          avgOccupancy: 0
-        })
-      }
-      ownerStats.get(ownerId).properties.push(property)
-    })
-
-    allBookings.value.forEach(booking => {
-      const ownerId = booking.owner_id
-      if (ownerStats.has(ownerId)) {
-        const stats = ownerStats.get(ownerId)
-        stats.bookings.push(booking)
-        if (booking.status === 'completed') {
-          stats.revenue += booking.total_cost || 0
-        }
-      }
-    })
-
-    return Array.from(ownerStats.values())
-  })
-
-  // Critical alerts for admin
-  const criticalAlerts = computed(() => {
-    const alerts = []
-    const now = new Date()
-    const twentyFourHours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-
-    // Unassigned cleanings
-    const unassignedCleanings = allBookings.value.filter(booking =>
-      !booking.assigned_cleaner_id &&
-      booking.cleaning_scheduled &&
-      new Date(booking.checkout_date) <= twentyFourHours
-    )
-
-    if (unassignedCleanings.length > 0) {
-      alerts.push({
-        type: 'warning',
-        title: 'Unassigned Cleanings',
-        message: `${unassignedCleanings.length} cleanings need cleaner assignment`,
-        count: unassignedCleanings.length,
-        action: 'assign-cleaners'
-      })
-    }
-
-    // Overdue turns
-    const overdueTurns = allBookings.value.filter(booking =>
-      booking.booking_type === 'turn' &&
-      booking.status === 'pending' &&
-      new Date(booking.checkout_date) < now
-    )
-
-    if (overdueTurns.length > 0) {
-      alerts.push({
-        type: 'error',
-        title: 'Overdue Turns',
-        message: `${overdueTurns.length} turns are overdue`,
-        count: overdueTurns.length,
-        action: 'urgent-turns'
-      })
-    }
-
-    return alerts
-  })
-
-  return {
-    // System data
-    allProperties,
-    allBookings,
-    systemMetrics,
-    ownerAnalytics,
-    criticalAlerts
-  }
-}) 
