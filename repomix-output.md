@@ -46,6 +46,7 @@ The content is organized as follows:
 .eslintrc.json
 .gitignore
 .repomix/bundles.json
+Comprehensive Guide to Vue_Vuitify Responsiveness and PWA integration.md
 deployment.config.ts
 dev-dist/sw.js
 dev-dist/sw.js.map
@@ -59,6 +60,7 @@ index.html
 package.json
 project_summary.md
 public/pwa-icon.svg
+pwa-implementation-plan.md
 README.md
 src/__tests__/components/SimpleTest.spec.ts
 src/__tests__/composables/admin/useAdminBookings.spec.ts
@@ -280,6 +282,1751 @@ refer to @context7_techstack_ids.md for usage examples
 {
   "bundles": {}
 }
+````
+
+## File: Comprehensive Guide to Vue_Vuitify Responsiveness and PWA integration.md
+````markdown
+# Comprehensive Guide to Vue, Vuetify Responsiveness and PWA Integration
+
+## 1. Vuetify's Responsive System
+
+### The useDisplay Composable
+
+Vuetify provides a powerful responsive system through the `useDisplay` composable. This composable offers real-time information about the device's viewport, allowing you to create truly responsive applications:
+
+```javascript
+import { useDisplay } from 'vuetify'
+
+// In a setup function
+const { 
+  xs,                // Boolean - Is extra small viewport
+  sm, md, lg, xl,    // Boolean - Is current viewport
+  mobile,            // Boolean - Is mobile breakpoint (configurable)
+  name,              // String - Current breakpoint name
+  height, width,     // Number - Viewport dimensions
+  smAndDown,         // Boolean - Is sm or smaller
+  smAndUp,           // Boolean - Is sm or larger 
+  mdAndDown,         // Boolean - Is md or smaller
+  mdAndUp,           // Boolean - Is md or larger
+  lgAndDown,         // Boolean - Is lg or smaller
+  lgAndUp,           // Boolean - Is lg or larger
+  xlAndDown,         // Boolean - Is xl or smaller
+  xlAndUp            // Boolean - Is xl or larger
+} = useDisplay()
+```
+
+### Vuetify Breakpoints
+
+The breakpoints system in Vuetify follows the Material Design specifications:
+
+| Breakpoint | Device Type | Width Range |
+|------------|-------------|------------|
+| xs | Extra small devices | < 600px |
+| sm | Small devices | 600px - 959px |
+| md | Medium devices | 960px - 1279px |
+| lg | Large devices | 1280px - 1919px |
+| xl | Extra large devices | ≥ 1920px |
+
+These breakpoints are configurable in the Vuetify plugin initialization:
+
+```javascript
+// src/plugins/vuetify.ts
+export default createVuetify({
+  display: {
+    mobileBreakpoint: 'sm', // This determines what's considered "mobile"
+    thresholds: {
+      xs: 0,
+      sm: 600,
+      md: 960,
+      lg: 1280,
+      xl: 1920
+    }
+  }
+})
+```
+
+### Best Practices for Responsive Design in Vuetify
+
+1. **Grid System**:
+   Vuetify's grid system is based on a 12-column layout that's highly responsive:
+
+   ```html
+   <v-row>
+     <v-col cols="12" sm="6" md="4" lg="3">
+       <!-- Full width on xs, half on sm, 1/3 on md, 1/4 on lg and up -->
+     </v-col>
+   </v-row>
+   ```
+
+2. **Responsive Text Classes**:
+   ```html
+   <h1 class="
+     text-h4
+     text-md-h2
+     text-lg-h1
+   ">
+     This text changes size based on viewport
+   </h1>
+   ```
+
+3. **Display Helper Classes**:
+   ```html
+   <!-- Hidden on all screens -->
+   <div class="d-none">...</div>
+   
+   <!-- Visible only on small screens -->
+   <div class="d-none d-sm-flex d-md-none">...</div>
+   ```
+
+4. **Dynamic Props with useDisplay**:
+   ```html
+   <script setup>
+   import { computed } from 'vue'
+   import { useDisplay } from 'vuetify'
+
+   const { mobile } = useDisplay()
+   
+   const cardHeight = computed(() => mobile.value ? 200 : 400)
+   </script>
+
+   <template>
+     <v-card :height="cardHeight">...</v-card>
+   </template>
+   ```
+
+5. **Conditional Rendering**:
+   ```html
+   <template>
+     <div v-if="!$vuetify.display.mdAndDown">Desktop view</div>
+     <div v-else>Mobile view</div>
+   </template>
+   ```
+
+## 2. Building a PWA with Vue 3 and Vite
+
+### Setting Up PWA Support in Vite
+
+The `vite-plugin-pwa` provides robust PWA capabilities for Vue applications:
+
+```bash
+npm install -D vite-plugin-pwa @vite-pwa/assets-generator
+```
+
+### Configure the PWA Plugin
+
+Update your `vite.config.ts` with the following configuration:
+
+```javascript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    vuetify({ autoImport: true }),
+    VitePWA({
+      registerType: 'autoUpdate', // Automatically updates the service worker
+      includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'maskable-icon-512x512.png'],
+      manifest: {
+        name: 'My Vue 3 PWA',
+        short_name: 'VuePWA',
+        description: 'A Vue 3 PWA with Vuetify',
+        theme_color: '#1976d2',
+        background_color: '#ffffff',
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
+        icons: [
+          {
+            src: 'pwa-64x64.png',
+            sizes: '64x64',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: 'maskable-icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          }
+        ]
+      },
+      workbox: {
+        // Cache strategies for different resources
+        runtimeCaching: [
+          {
+            // Cache for CSS, JS, and worker files
+            urlPattern: ({ request }) => 
+              request.destination === 'style' || 
+              request.destination === 'script' || 
+              request.destination === 'worker',
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'static-resources',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
+          },
+          {
+            // Cache for images
+            urlPattern: ({ request }) => request.destination === 'image',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 24 * 60 * 60, // 60 days
+              },
+            },
+          },
+          {
+            // Cache for API calls
+            urlPattern: ({ url }) => url.pathname.startsWith('/api'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 24 * 60 * 60, // 24 hours
+              }
+            }
+          }
+        ],
+      },
+      devOptions: {
+        enabled: true, // Enable during development
+        type: 'module'
+      }
+    })
+  ]
+})
+```
+
+### Creating a PWA Composable
+
+Create a reusable composable for managing PWA functionality:
+
+```typescript
+// src/composables/usePWA.ts
+import { ref, computed, onMounted } from 'vue'
+import { useRegisterSW } from 'virtual:pwa-register/vue'
+
+// Interface for install prompt event
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed'
+    platform: string
+  }>
+  prompt(): Promise<void>
+}
+
+export const usePWA = () => {
+  // PWA Installation
+  const deferredPrompt = ref<BeforeInstallPromptEvent | null>(null)
+  const isPWAInstallable = ref(false)
+  const isPWAInstalled = ref(false)
+  
+  // Network Status
+  const isOnline = ref(navigator.onLine)
+  
+  // Service Worker states from the plugin
+  const {
+    needRefresh, // True if new content is available
+    offlineReady, // True if the app is ready for offline use
+    updateServiceWorker // Function to update the service worker
+  } = useRegisterSW({
+    onRegistered(r) {
+      console.log('Service Worker registered:', r)
+    },
+    onRegisterError(error) {
+      console.error('Service Worker registration error:', error)
+    }
+  })
+
+  // Check if running as PWA
+  const isPWA = computed(() => {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           (window.navigator as any).standalone === true ||
+           document.referrer.includes('android-app://')
+  })
+
+  // Install PWA
+  const installPWA = async () => {
+    if (!deferredPrompt.value) return false
+    
+    try {
+      deferredPrompt.value.prompt()
+      const { outcome } = await deferredPrompt.value.userChoice
+      
+      if (outcome === 'accepted') {
+        isPWAInstalled.value = true
+        console.log('PWA installed successfully')
+      }
+      
+      deferredPrompt.value = null
+      isPWAInstallable.value = false
+      
+      return outcome === 'accepted'
+    } catch (error) {
+      console.error('PWA installation error:', error)
+      return false
+    }
+  }
+
+  // Update PWA
+  const updatePWA = async () => {
+    try {
+      await updateServiceWorker(true)
+    } catch (error) {
+      console.error('PWA update error:', error)
+    }
+  }
+
+  // Setup event listeners
+  onMounted(() => {
+    // Listen for install prompt
+    window.addEventListener('beforeinstallprompt', (e: Event) => {
+      e.preventDefault()
+      deferredPrompt.value = e as BeforeInstallPromptEvent
+      isPWAInstallable.value = true
+      console.log('PWA install prompt ready')
+    })
+
+    // Listen for install event
+    window.addEventListener('appinstalled', () => {
+      isPWAInstalled.value = true
+      isPWAInstallable.value = false
+      deferredPrompt.value = null
+      console.log('PWA installed via browser prompt')
+    })
+
+    // Network status
+    const updateOnlineStatus = () => {
+      isOnline.value = navigator.onLine
+    }
+    
+    window.addEventListener('online', updateOnlineStatus)
+    window.addEventListener('offline', updateOnlineStatus)
+  })
+
+  return {
+    // Installation
+    isPWAInstallable,
+    isPWAInstalled,
+    isPWA,
+    installPWA,
+    
+    // Network
+    isOnline,
+    
+    // Service Worker
+    needRefresh,
+    offlineReady,
+    updatePWA,
+    
+    // Computed states
+    canInstall: computed(() => isPWAInstallable.value && !isPWA.value),
+    showUpdatePrompt: computed(() => needRefresh.value),
+    showOfflineReady: computed(() => offlineReady.value)
+  }
+}
+```
+
+### Creating a PWA-Ready UI Component
+
+Create a component to handle PWA installation and updates:
+
+```vue
+<!-- src/components/PWAHandler.vue -->
+<template>
+  <div>
+    <!-- Install Prompt -->
+    <v-snackbar
+      v-model="showInstallPrompt"
+      timeout="-1"
+      color="primary"
+      location="bottom"
+    >
+      Install this app for offline use
+      <template v-slot:actions>
+        <v-btn variant="text" @click="showInstallPrompt = false">
+          Later
+        </v-btn>
+        <v-btn
+          color="white"
+          variant="elevated"
+          :loading="installing"
+          @click="handleInstall"
+        >
+          Install
+        </v-btn>
+      </template>
+    </v-snackbar>
+
+    <!-- Update Notification -->
+    <v-snackbar
+      v-model="showUpdateSnackbar"
+      timeout="-1"
+      color="info"
+      location="bottom"
+    >
+      New version available
+      <template v-slot:actions>
+        <v-btn
+          color="white"
+          variant="elevated"
+          :loading="updating"
+          @click="handleUpdate"
+        >
+          Update
+        </v-btn>
+      </template>
+    </v-snackbar>
+
+    <!-- Offline Indicator -->
+    <v-snackbar
+      v-model="showOfflineIndicator"
+      timeout="5000"
+      color="warning"
+      location="top"
+    >
+      You're currently offline. Some features may be limited.
+    </v-snackbar>
+
+    <!-- Offline Ready Notification -->
+    <v-snackbar
+      v-model="showOfflineReadyNotice"
+      color="success"
+      timeout="3000"
+      location="bottom"
+    >
+      App is ready for offline use!
+    </v-snackbar>
+  </div>
+</template>
+
+<script setup>
+import { ref, watch } from 'vue'
+import { usePWA } from '@/composables/usePWA'
+
+// PWA state
+const {
+  canInstall,
+  isOnline,
+  showUpdatePrompt,
+  showOfflineReady,
+  installPWA,
+  updatePWA
+} = usePWA()
+
+// Local state
+const showInstallPrompt = ref(false)
+const showUpdateSnackbar = ref(false)
+const showOfflineIndicator = ref(false)
+const showOfflineReadyNotice = ref(false)
+const installing = ref(false)
+const updating = ref(false)
+
+// Methods
+const handleInstall = async () => {
+  installing.value = true
+  try {
+    await installPWA()
+  } catch (error) {
+    console.error('Installation failed:', error)
+  } finally {
+    installing.value = false
+    showInstallPrompt.value = false
+  }
+}
+
+const handleUpdate = async () => {
+  updating.value = true
+  try {
+    await updatePWA()
+  } catch (error) {
+    console.error('Update failed:', error)
+  } finally {
+    updating.value = false
+    showUpdateSnackbar.value = false
+  }
+}
+
+// Watch for changes to show appropriate UI
+watch(canInstall, (value) => {
+  if (value) {
+    // Show install prompt after a delay
+    setTimeout(() => {
+      showInstallPrompt.value = true
+    }, 3000)
+  }
+})
+
+watch(showUpdatePrompt, (value) => {
+  showUpdateSnackbar.value = value
+})
+
+watch(showOfflineReady, (value) => {
+  showOfflineReadyNotice.value = value
+})
+
+watch(isOnline, (newValue, oldValue) => {
+  // Show offline indicator when going offline
+  if (oldValue === true && newValue === false) {
+    showOfflineIndicator.value = true
+  }
+})
+</script>
+```
+
+## 3. Combining Responsive Design and PWA Best Practices
+
+### Optimizing PWA for Different Screen Sizes
+
+When building a PWA with Vuetify, you need to ensure that your app works well across all viewport sizes. Here are some best practices:
+
+#### 1. Use Media Queries for Critical CSS
+
+To avoid layout shifts when loading on mobile devices:
+
+```css
+/* Essential styles for first render */
+@media (max-width: 600px) {
+  .app-header {
+    height: 56px;
+  }
+  
+  .app-content {
+    padding: 16px;
+  }
+}
+
+@media (min-width: 600px) {
+  .app-header {
+    height: 64px;
+  }
+  
+  .app-content {
+    padding: 24px;
+  }
+}
+```
+
+#### 2. Use Vuetify's Built-in Responsive Classes
+
+```html
+<!-- Hidden on mobile, visible on tablet and up -->
+<v-btn class="d-none d-sm-flex">Desktop Action</v-btn>
+
+<!-- Visible on mobile, hidden on tablet and up -->
+<v-btn class="d-flex d-sm-none">Mobile Action</v-btn>
+```
+
+#### 3. Adaptive Layout for Offline Mode
+
+```vue
+<template>
+  <div>
+    <v-app-bar>
+      <v-app-bar-title>My PWA App</v-app-bar-title>
+      <v-spacer></v-spacer>
+      <!-- Show offline indicator when offline -->
+      <v-chip v-if="!isOnline" color="warning" size="small">
+        Offline
+      </v-chip>
+    </v-app-bar>
+    
+    <v-main>
+      <!-- Adapt content based on online status -->
+      <v-container v-if="isOnline">
+        <online-content />
+      </v-container>
+      <v-container v-else>
+        <offline-content />
+      </v-container>
+    </v-main>
+  </div>
+</template>
+
+<script setup>
+import { usePWA } from '@/composables/usePWA'
+import { useDisplay } from 'vuetify'
+
+const { isOnline } = usePWA()
+const { mobile } = useDisplay()
+</script>
+```
+
+### 4. Use Dynamic Imports for a Faster Initial Load
+
+You can use Vue's dynamic imports to reduce the bundle size for mobile devices:
+
+```javascript
+// Instead of importing everything upfront
+const DesktopView = defineAsyncComponent(() => 
+  import('./DesktopView.vue')
+)
+
+const MobileView = defineAsyncComponent(() => 
+  import('./MobileView.vue')
+)
+```
+
+### 5. PWA Splash Screen for Different Device Sizes
+
+Create a splash screen that works well across different device sizes:
+
+```html
+<template>
+  <div 
+    v-if="loading"
+    class="splash-screen"
+    :class="{ 'mobile-splash': mobile }"
+  >
+    <img 
+      :src="mobile ? '/logo-small.png' : '/logo-large.png'"
+      alt="App Logo"
+    />
+    <v-progress-circular indeterminate></v-progress-circular>
+  </div>
+</template>
+
+<style scoped>
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  z-index: 9999;
+}
+
+.mobile-splash img {
+  width: 120px;
+  height: 120px;
+}
+
+.splash-screen:not(.mobile-splash) img {
+  width: 200px;
+  height: 200px;
+}
+</style>
+```
+
+## 4. Advanced PWA Techniques for Vue and Vuetify Apps
+
+### 1. Offline Data Management
+
+Use IndexedDB for offline data storage:
+
+```javascript
+import { openDB } from 'idb'
+
+// Create and connect to the database
+const db = await openDB('my-pwa-db', 1, {
+  upgrade(db) {
+    // Create stores
+    db.createObjectStore('todos', { keyPath: 'id' })
+    db.createObjectStore('settings')
+  }
+})
+
+// Store data
+await db.put('todos', { id: 1, text: 'Learn PWA', completed: false })
+
+// Get data
+const todo = await db.get('todos', 1)
+```
+
+### 2. Periodic Background Sync
+
+For advanced PWA features, you can implement periodic background sync:
+
+```javascript
+// Request permission for background sync
+if ('permissions' in navigator) {
+  const status = await navigator.permissions.query({
+    name: 'periodic-background-sync',
+  })
+  
+  if (status.state === 'granted') {
+    // Register for background sync
+    const registration = await navigator.serviceWorker.ready
+    try {
+      await registration.periodicSync.register('content-sync', {
+        minInterval: 24 * 60 * 60 * 1000, // 1 day
+      })
+    } catch (error) {
+      console.error('Periodic sync registration failed:', error)
+    }
+  }
+}
+```
+
+### 3. Push Notifications with Vuetify
+
+Implement push notifications with a Vuetify UI:
+
+```vue
+<template>
+  <div>
+    <v-btn
+      v-if="!pushEnabled && pushSupported"
+      color="primary"
+      prepend-icon="mdi-bell"
+      @click="requestPushPermission"
+    >
+      Enable Notifications
+    </v-btn>
+    
+    <!-- Push notification settings -->
+    <v-list v-if="pushEnabled">
+      <v-list-subheader>Notification Settings</v-list-subheader>
+      <v-list-item v-for="(setting, i) in notificationSettings" :key="i">
+        <v-list-item-title>{{ setting.title }}</v-list-item-title>
+        <template v-slot:append>
+          <v-switch v-model="setting.enabled"></v-switch>
+        </template>
+      </v-list-item>
+    </v-list>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+
+const pushSupported = ref(false)
+const pushEnabled = ref(false)
+const notificationSettings = ref([
+  { title: 'New messages', enabled: true },
+  { title: 'Updates', enabled: true }
+])
+
+onMounted(() => {
+  pushSupported.value = 'PushManager' in window
+  
+  if (pushSupported.value) {
+    pushEnabled.value = 
+      Notification.permission === 'granted'
+  }
+})
+
+async function requestPushPermission() {
+  try {
+    const permission = await Notification.requestPermission()
+    pushEnabled.value = permission === 'granted'
+    
+    if (pushEnabled.value) {
+      // Subscribe to push service
+      const registration = await navigator.serviceWorker.ready
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: 'YOUR_VAPID_PUBLIC_KEY'
+      })
+      
+      // Send subscription to server
+      await sendSubscriptionToServer(subscription)
+    }
+  } catch (error) {
+    console.error('Error requesting notifications permission:', error)
+  }
+}
+
+async function sendSubscriptionToServer(subscription) {
+  // Your implementation to send the subscription to your server
+}
+</script>
+```
+
+## 5. Testing and Debugging Your PWA
+
+### 1. PWA Testing Tools
+
+Use the following tools to test your PWA:
+
+- Chrome DevTools Application tab
+- Lighthouse (built into Chrome DevTools)
+- [PWA Builder](https://www.pwabuilder.com/) - For analyzing and improving PWAs
+- [Workbox CLI](https://developers.google.com/web/tools/workbox/modules/workbox-cli) - For testing service workers
+
+### 2. PWA Debugging Component
+
+Create a debugging component for your development environment:
+
+```vue
+<!-- src/components/PWADebugger.vue -->
+<template>
+  <v-card v-if="isDev" class="my-4">
+    <v-card-title>
+      PWA Debug Info
+      <v-spacer></v-spacer>
+      <v-btn icon @click="expanded = !expanded">
+        <v-icon>{{ expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+      </v-btn>
+    </v-card-title>
+    
+    <v-expand-transition>
+      <div v-if="expanded">
+        <v-divider></v-divider>
+        <v-card-text>
+          <v-simple-table>
+            <tbody>
+              <tr>
+                <td>PWA Mode:</td>
+                <td>{{ isPWA ? 'Yes' : 'No' }}</td>
+              </tr>
+              <tr>
+                <td>Display Mode:</td>
+                <td>{{ displayMode }}</td>
+              </tr>
+              <tr>
+                <td>Online:</td>
+                <td>
+                  <v-chip :color="isOnline ? 'success' : 'error'">
+                    {{ isOnline ? 'Yes' : 'No' }}
+                  </v-chip>
+                </td>
+              </tr>
+              <tr>
+                <td>Service Worker:</td>
+                <td>
+                  <v-chip :color="serviceWorkerActive ? 'success' : 'warning'">
+                    {{ serviceWorkerActive ? 'Active' : 'Inactive' }}
+                  </v-chip>
+                </td>
+              </tr>
+              <tr>
+                <td>Current Viewport:</td>
+                <td>{{ displayName }} ({{ width }}x{{ height }})</td>
+              </tr>
+            </tbody>
+          </v-simple-table>
+          
+          <div class="d-flex mt-4 gap-2">
+            <v-btn @click="toggleOffline">
+              {{ isOnline ? 'Simulate Offline' : 'Go Online' }}
+            </v-btn>
+            <v-btn @click="clearCache">
+              Clear Cache
+            </v-btn>
+            <v-btn @click="unregisterSW">
+              Unregister SW
+            </v-btn>
+          </div>
+        </v-card-text>
+      </div>
+    </v-expand-transition>
+  </v-card>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { usePWA } from '@/composables/usePWA'
+import { useDisplay } from 'vuetify'
+
+// PWA state
+const { isPWA, isOnline } = usePWA()
+const { name: displayName, width, height } = useDisplay()
+
+// Local state
+const expanded = ref(false)
+const isDev = ref(import.meta.env.DEV)
+const serviceWorkerActive = ref(false)
+
+// Display mode detection
+const displayMode = computed(() => {
+  if (window.matchMedia('(display-mode: standalone)').matches)
+    return 'Standalone'
+  if (window.matchMedia('(display-mode: fullscreen)').matches)
+    return 'Fullscreen'
+  if (window.matchMedia('(display-mode: minimal-ui)').matches)
+    return 'Minimal UI'
+  return 'Browser'
+})
+
+// Methods
+const toggleOffline = () => {
+  if (isOnline.value) {
+    window.dispatchEvent(new Event('offline'))
+  } else {
+    window.dispatchEvent(new Event('online'))
+  }
+}
+
+const clearCache = async () => {
+  try {
+    const cacheKeys = await caches.keys()
+    await Promise.all(cacheKeys.map(key => caches.delete(key)))
+    alert('All caches cleared')
+  } catch (error) {
+    console.error('Failed to clear caches:', error)
+  }
+}
+
+const unregisterSW = async () => {
+  try {
+    const registrations = await navigator.serviceWorker.getRegistrations()
+    await Promise.all(registrations.map(r => r.unregister()))
+    alert('Service Worker unregistered')
+    serviceWorkerActive.value = false
+  } catch (error) {
+    console.error('Failed to unregister service worker:', error)
+  }
+}
+
+// Check service worker status
+onMounted(async () => {
+  serviceWorkerActive.value = 
+    'serviceWorker' in navigator && 
+    !!navigator.serviceWorker.controller
+})
+</script>
+```
+
+## Conclusion
+
+By combining Vuetify's responsive capabilities with PWA features, you can create powerful, offline-capable applications that work seamlessly across all devices. The key steps to success are:
+
+1. **Use Vuetify's responsive system** - Leverage the `useDisplay` composable and responsive classes to create adaptive layouts
+2. **Configure the PWA plugin properly** - Set up appropriate caching strategies and manifest details
+3. **Implement offline capabilities** - Use IndexedDB or other storage methods for offline data management
+4. **Create responsive PWA components** - Design your UI components to work well across all screen sizes
+5. **Test thoroughly** - Verify
+
+```javascript
+import { useDisplay } from 'vuetify'
+
+// In a setup function
+const { 
+  xs,                // Boolean - Is extra small viewport
+  sm, md, lg, xl,    // Boolean - Is current viewport
+  mobile,            // Boolean - Is mobile breakpoint (configurable)
+  name,              // String - Current breakpoint name
+  height, width,     // Number - Viewport dimensions
+  smAndDown,         // Boolean - Is sm or smaller
+  smAndUp,           // Boolean - Is sm or larger 
+  mdAndDown,         // Boolean - Is md or smaller
+  mdAndUp,           // Boolean - Is md or larger
+  lgAndDown,         // Boolean - Is lg or smaller
+  lgAndUp,           // Boolean - Is lg or larger
+  xlAndDown,         // Boolean - Is xl or smaller
+  xlAndUp            // Boolean - Is xl or larger
+} = useDisplay()
+```
+
+```javascript
+// src/plugins/vuetify.ts
+export default createVuetify({
+  display: {
+    mobileBreakpoint: 'sm', // This determines what's considered "mobile"
+    thresholds: {
+      xs: 0,
+      sm: 600,
+      md: 960,
+      lg: 1280,
+      xl: 1920
+    }
+  }
+})
+```
+
+```html
+   <v-row>
+     <v-col cols="12" sm="6" md="4" lg="3">
+       <!-- Full width on xs, half on sm, 1/3 on md, 1/4 on lg and up -->
+     </v-col>
+   </v-row>
+```
+
+```html
+   <h1 class="
+     text-h4
+     text-md-h2
+     text-lg-h1
+   ">
+     This text changes size based on viewport
+   </h1>
+```
+
+```html
+   <!-- Hidden on all screens -->
+   <div class="d-none">...</div>
+   
+   <!-- Visible only on small screens -->
+   <div class="d-none d-sm-flex d-md-none">...</div>
+```
+
+```html
+   <script setup>
+   import { computed } from 'vue'
+   import { useDisplay } from 'vuetify'
+
+   const { mobile } = useDisplay()
+   
+   const cardHeight = computed(() => mobile.value ? 200 : 400)
+   </script>
+
+   <template>
+     <v-card :height="cardHeight">...</v-card>
+   </template>
+```
+
+```html
+   <template>
+     <div v-if="!$vuetify.display.mdAndDown">Desktop view</div>
+     <div v-else>Mobile view</div>
+   </template>
+```
+
+```shellscript
+npm install -D vite-plugin-pwa @vite-pwa/assets-generator
+```
+
+```javascript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vuetify from 'vite-plugin-vuetify'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    vuetify({ autoImport: true }),
+    VitePWA({
+      registerType: 'autoUpdate', // Automatically updates the service worker
+      includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'maskable-icon-512x512.png'],
+      manifest: {
+        name: 'My Vue 3 PWA',
+        short_name: 'VuePWA',
+        description: 'A Vue 3 PWA with Vuetify',
+        theme_color: '#1976d2',
+        background_color: '#ffffff',
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
+        icons: [
+          {
+            src: 'pwa-64x64.png',
+            sizes: '64x64',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: 'maskable-icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          }
+        ]
+      },
+      workbox: {
+        // Cache strategies for different resources
+        runtimeCaching: [
+          {
+            // Cache for CSS, JS, and worker files
+            urlPattern: ({ request }) => 
+              request.destination === 'style' || 
+              request.destination === 'script' || 
+              request.destination === 'worker',
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'static-resources',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
+          },
+          {
+            // Cache for images
+            urlPattern: ({ request }) => request.destination === 'image',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 24 * 60 * 60, // 60 days
+              },
+            },
+          },
+          {
+            // Cache for API calls
+            urlPattern: ({ url }) => url.pathname.startsWith('/api'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 24 * 60 * 60, // 24 hours
+              }
+            }
+          }
+        ],
+      },
+      devOptions: {
+        enabled: true, // Enable during development
+        type: 'module'
+      }
+    })
+  ]
+})
+```
+
+```typescript
+// src/composables/usePWA.ts
+import { ref, computed, onMounted } from 'vue'
+import { useRegisterSW } from 'virtual:pwa-register/vue'
+
+// Interface for install prompt event
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed'
+    platform: string
+  }>
+  prompt(): Promise<void>
+}
+
+export const usePWA = () => {
+  // PWA Installation
+  const deferredPrompt = ref<BeforeInstallPromptEvent | null>(null)
+  const isPWAInstallable = ref(false)
+  const isPWAInstalled = ref(false)
+  
+  // Network Status
+  const isOnline = ref(navigator.onLine)
+  
+  // Service Worker states from the plugin
+  const {
+    needRefresh, // True if new content is available
+    offlineReady, // True if the app is ready for offline use
+    updateServiceWorker // Function to update the service worker
+  } = useRegisterSW({
+    onRegistered(r) {
+      console.log('Service Worker registered:', r)
+    },
+    onRegisterError(error) {
+      console.error('Service Worker registration error:', error)
+    }
+  })
+
+  // Check if running as PWA
+  const isPWA = computed(() => {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           (window.navigator as any).standalone === true ||
+           document.referrer.includes('android-app://')
+  })
+
+  // Install PWA
+  const installPWA = async () => {
+    if (!deferredPrompt.value) return false
+    
+    try {
+      deferredPrompt.value.prompt()
+      const { outcome } = await deferredPrompt.value.userChoice
+      
+      if (outcome === 'accepted') {
+        isPWAInstalled.value = true
+        console.log('PWA installed successfully')
+      }
+      
+      deferredPrompt.value = null
+      isPWAInstallable.value = false
+      
+      return outcome === 'accepted'
+    } catch (error) {
+      console.error('PWA installation error:', error)
+      return false
+    }
+  }
+
+  // Update PWA
+  const updatePWA = async () => {
+    try {
+      await updateServiceWorker(true)
+    } catch (error) {
+      console.error('PWA update error:', error)
+    }
+  }
+
+  // Setup event listeners
+  onMounted(() => {
+    // Listen for install prompt
+    window.addEventListener('beforeinstallprompt', (e: Event) => {
+      e.preventDefault()
+      deferredPrompt.value = e as BeforeInstallPromptEvent
+      isPWAInstallable.value = true
+      console.log('PWA install prompt ready')
+    })
+
+    // Listen for install event
+    window.addEventListener('appinstalled', () => {
+      isPWAInstalled.value = true
+      isPWAInstallable.value = false
+      deferredPrompt.value = null
+      console.log('PWA installed via browser prompt')
+    })
+
+    // Network status
+    const updateOnlineStatus = () => {
+      isOnline.value = navigator.onLine
+    }
+    
+    window.addEventListener('online', updateOnlineStatus)
+    window.addEventListener('offline', updateOnlineStatus)
+  })
+
+  return {
+    // Installation
+    isPWAInstallable,
+    isPWAInstalled,
+    isPWA,
+    installPWA,
+    
+    // Network
+    isOnline,
+    
+    // Service Worker
+    needRefresh,
+    offlineReady,
+    updatePWA,
+    
+    // Computed states
+    canInstall: computed(() => isPWAInstallable.value && !isPWA.value),
+    showUpdatePrompt: computed(() => needRefresh.value),
+    showOfflineReady: computed(() => offlineReady.value)
+  }
+}
+```
+
+```vue
+<!-- src/components/PWAHandler.vue -->
+<template>
+  <div>
+    <!-- Install Prompt -->
+    <v-snackbar
+      v-model="showInstallPrompt"
+      timeout="-1"
+      color="primary"
+      location="bottom"
+    >
+      Install this app for offline use
+      <template v-slot:actions>
+        <v-btn variant="text" @click="showInstallPrompt = false">
+          Later
+        </v-btn>
+        <v-btn
+          color="white"
+          variant="elevated"
+          :loading="installing"
+          @click="handleInstall"
+        >
+          Install
+        </v-btn>
+      </template>
+    </v-snackbar>
+
+    <!-- Update Notification -->
+    <v-snackbar
+      v-model="showUpdateSnackbar"
+      timeout="-1"
+      color="info"
+      location="bottom"
+    >
+      New version available
+      <template v-slot:actions>
+        <v-btn
+          color="white"
+          variant="elevated"
+          :loading="updating"
+          @click="handleUpdate"
+        >
+          Update
+        </v-btn>
+      </template>
+    </v-snackbar>
+
+    <!-- Offline Indicator -->
+    <v-snackbar
+      v-model="showOfflineIndicator"
+      timeout="5000"
+      color="warning"
+      location="top"
+    >
+      You're currently offline. Some features may be limited.
+    </v-snackbar>
+
+    <!-- Offline Ready Notification -->
+    <v-snackbar
+      v-model="showOfflineReadyNotice"
+      color="success"
+      timeout="3000"
+      location="bottom"
+    >
+      App is ready for offline use!
+    </v-snackbar>
+  </div>
+</template>
+
+<script setup>
+import { ref, watch } from 'vue'
+import { usePWA } from '@/composables/usePWA'
+
+// PWA state
+const {
+  canInstall,
+  isOnline,
+  showUpdatePrompt,
+  showOfflineReady,
+  installPWA,
+  updatePWA
+} = usePWA()
+
+// Local state
+const showInstallPrompt = ref(false)
+const showUpdateSnackbar = ref(false)
+const showOfflineIndicator = ref(false)
+const showOfflineReadyNotice = ref(false)
+const installing = ref(false)
+const updating = ref(false)
+
+// Methods
+const handleInstall = async () => {
+  installing.value = true
+  try {
+    await installPWA()
+  } catch (error) {
+    console.error('Installation failed:', error)
+  } finally {
+    installing.value = false
+    showInstallPrompt.value = false
+  }
+}
+
+const handleUpdate = async () => {
+  updating.value = true
+  try {
+    await updatePWA()
+  } catch (error) {
+    console.error('Update failed:', error)
+  } finally {
+    updating.value = false
+    showUpdateSnackbar.value = false
+  }
+}
+
+// Watch for changes to show appropriate UI
+watch(canInstall, (value) => {
+  if (value) {
+    // Show install prompt after a delay
+    setTimeout(() => {
+      showInstallPrompt.value = true
+    }, 3000)
+  }
+})
+
+watch(showUpdatePrompt, (value) => {
+  showUpdateSnackbar.value = value
+})
+
+watch(showOfflineReady, (value) => {
+  showOfflineReadyNotice.value = value
+})
+
+watch(isOnline, (newValue, oldValue) => {
+  // Show offline indicator when going offline
+  if (oldValue === true && newValue === false) {
+    showOfflineIndicator.value = true
+  }
+})
+</script>
+```
+
+```css
+/* Essential styles for first render */
+@media (max-width: 600px) {
+  .app-header {
+    height: 56px;
+  }
+  
+  .app-content {
+    padding: 16px;
+  }
+}
+
+@media (min-width: 600px) {
+  .app-header {
+    height: 64px;
+  }
+  
+  .app-content {
+    padding: 24px;
+  }
+}
+```
+
+```html
+<!-- Hidden on mobile, visible on tablet and up -->
+<v-btn class="d-none d-sm-flex">Desktop Action</v-btn>
+
+<!-- Visible on mobile, hidden on tablet and up -->
+<v-btn class="d-flex d-sm-none">Mobile Action</v-btn>
+```
+
+```vue
+<template>
+  <div>
+    <v-app-bar>
+      <v-app-bar-title>My PWA App</v-app-bar-title>
+      <v-spacer></v-spacer>
+      <!-- Show offline indicator when offline -->
+      <v-chip v-if="!isOnline" color="warning" size="small">
+        Offline
+      </v-chip>
+    </v-app-bar>
+    
+    <v-main>
+      <!-- Adapt content based on online status -->
+      <v-container v-if="isOnline">
+        <online-content />
+      </v-container>
+      <v-container v-else>
+        <offline-content />
+      </v-container>
+    </v-main>
+  </div>
+</template>
+
+<script setup>
+import { usePWA } from '@/composables/usePWA'
+import { useDisplay } from 'vuetify'
+
+const { isOnline } = usePWA()
+const { mobile } = useDisplay()
+</script>
+```
+
+```javascript
+// Instead of importing everything upfront
+const DesktopView = defineAsyncComponent(() => 
+  import('./DesktopView.vue')
+)
+
+const MobileView = defineAsyncComponent(() => 
+  import('./MobileView.vue')
+)
+```
+
+```html
+<template>
+  <div 
+    v-if="loading"
+    class="splash-screen"
+    :class="{ 'mobile-splash': mobile }"
+  >
+    <img 
+      :src="mobile ? '/logo-small.png' : '/logo-large.png'"
+      alt="App Logo"
+    />
+    <v-progress-circular indeterminate></v-progress-circular>
+  </div>
+</template>
+
+<style scoped>
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  z-index: 9999;
+}
+
+.mobile-splash img {
+  width: 120px;
+  height: 120px;
+}
+
+.splash-screen:not(.mobile-splash) img {
+  width: 200px;
+  height: 200px;
+}
+</style>
+```
+
+```javascript
+import { openDB } from 'idb'
+
+// Create and connect to the database
+const db = await openDB('my-pwa-db', 1, {
+  upgrade(db) {
+    // Create stores
+    db.createObjectStore('todos', { keyPath: 'id' })
+    db.createObjectStore('settings')
+  }
+})
+
+// Store data
+await db.put('todos', { id: 1, text: 'Learn PWA', completed: false })
+
+// Get data
+const todo = await db.get('todos', 1)
+```
+
+```javascript
+// Request permission for background sync
+if ('permissions' in navigator) {
+  const status = await navigator.permissions.query({
+    name: 'periodic-background-sync',
+  })
+  
+  if (status.state === 'granted') {
+    // Register for background sync
+    const registration = await navigator.serviceWorker.ready
+    try {
+      await registration.periodicSync.register('content-sync', {
+        minInterval: 24 * 60 * 60 * 1000, // 1 day
+      })
+    } catch (error) {
+      console.error('Periodic sync registration failed:', error)
+    }
+  }
+}
+```
+
+```vue
+<template>
+  <div>
+    <v-btn
+      v-if="!pushEnabled && pushSupported"
+      color="primary"
+      prepend-icon="mdi-bell"
+      @click="requestPushPermission"
+    >
+      Enable Notifications
+    </v-btn>
+    
+    <!-- Push notification settings -->
+    <v-list v-if="pushEnabled">
+      <v-list-subheader>Notification Settings</v-list-subheader>
+      <v-list-item v-for="(setting, i) in notificationSettings" :key="i">
+        <v-list-item-title>{{ setting.title }}</v-list-item-title>
+        <template v-slot:append>
+          <v-switch v-model="setting.enabled"></v-switch>
+        </template>
+      </v-list-item>
+    </v-list>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+
+const pushSupported = ref(false)
+const pushEnabled = ref(false)
+const notificationSettings = ref([
+  { title: 'New messages', enabled: true },
+  { title: 'Updates', enabled: true }
+])
+
+onMounted(() => {
+  pushSupported.value = 'PushManager' in window
+  
+  if (pushSupported.value) {
+    pushEnabled.value = 
+      Notification.permission === 'granted'
+  }
+})
+
+async function requestPushPermission() {
+  try {
+    const permission = await Notification.requestPermission()
+    pushEnabled.value = permission === 'granted'
+    
+    if (pushEnabled.value) {
+      // Subscribe to push service
+      const registration = await navigator.serviceWorker.ready
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: 'YOUR_VAPID_PUBLIC_KEY'
+      })
+      
+      // Send subscription to server
+      await sendSubscriptionToServer(subscription)
+    }
+  } catch (error) {
+    console.error('Error requesting notifications permission:', error)
+  }
+}
+
+async function sendSubscriptionToServer(subscription) {
+  // Your implementation to send the subscription to your server
+}
+</script>
+```
+
+```vue
+<!-- src/components/PWADebugger.vue -->
+<template>
+  <v-card v-if="isDev" class="my-4">
+    <v-card-title>
+      PWA Debug Info
+      <v-spacer></v-spacer>
+      <v-btn icon @click="expanded = !expanded">
+        <v-icon>{{ expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+      </v-btn>
+    </v-card-title>
+    
+    <v-expand-transition>
+      <div v-if="expanded">
+        <v-divider></v-divider>
+        <v-card-text>
+          <v-simple-table>
+            <tbody>
+              <tr>
+                <td>PWA Mode:</td>
+                <td>{{ isPWA ? 'Yes' : 'No' }}</td>
+              </tr>
+              <tr>
+                <td>Display Mode:</td>
+                <td>{{ displayMode }}</td>
+              </tr>
+              <tr>
+                <td>Online:</td>
+                <td>
+                  <v-chip :color="isOnline ? 'success' : 'error'">
+                    {{ isOnline ? 'Yes' : 'No' }}
+                  </v-chip>
+                </td>
+              </tr>
+              <tr>
+                <td>Service Worker:</td>
+                <td>
+                  <v-chip :color="serviceWorkerActive ? 'success' : 'warning'">
+                    {{ serviceWorkerActive ? 'Active' : 'Inactive' }}
+                  </v-chip>
+                </td>
+              </tr>
+              <tr>
+                <td>Current Viewport:</td>
+                <td>{{ displayName }} ({{ width }}x{{ height }})</td>
+              </tr>
+            </tbody>
+          </v-simple-table>
+          
+          <div class="d-flex mt-4 gap-2">
+            <v-btn @click="toggleOffline">
+              {{ isOnline ? 'Simulate Offline' : 'Go Online' }}
+            </v-btn>
+            <v-btn @click="clearCache">
+              Clear Cache
+            </v-btn>
+            <v-btn @click="unregisterSW">
+              Unregister SW
+            </v-btn>
+          </div>
+        </v-card-text>
+      </div>
+    </v-expand-transition>
+  </v-card>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { usePWA } from '@/composables/usePWA'
+import { useDisplay } from 'vuetify'
+
+// PWA state
+const { isPWA, isOnline } = usePWA()
+const { name: displayName, width, height } = useDisplay()
+
+// Local state
+const expanded = ref(false)
+const isDev = ref(import.meta.env.DEV)
+const serviceWorkerActive = ref(false)
+
+// Display mode detection
+const displayMode = computed(() => {
+  if (window.matchMedia('(display-mode: standalone)').matches)
+    return 'Standalone'
+  if (window.matchMedia('(display-mode: fullscreen)').matches)
+    return 'Fullscreen'
+  if (window.matchMedia('(display-mode: minimal-ui)').matches)
+    return 'Minimal UI'
+  return 'Browser'
+})
+
+// Methods
+const toggleOffline = () => {
+  if (isOnline.value) {
+    window.dispatchEvent(new Event('offline'))
+  } else {
+    window.dispatchEvent(new Event('online'))
+  }
+}
+
+const clearCache = async () => {
+  try {
+    const cacheKeys = await caches.keys()
+    await Promise.all(cacheKeys.map(key => caches.delete(key)))
+    alert('All caches cleared')
+  } catch (error) {
+    console.error('Failed to clear caches:', error)
+  }
+}
+
+const unregisterSW = async () => {
+  try {
+    const registrations = await navigator.serviceWorker.getRegistrations()
+    await Promise.all(registrations.map(r => r.unregister()))
+    alert('Service Worker unregistered')
+    serviceWorkerActive.value = false
+  } catch (error) {
+    console.error('Failed to unregister service worker:', error)
+  }
+}
+
+// Check service worker status
+onMounted(async () => {
+  serviceWorkerActive.value = 
+    'serviceWorker' in navigator && 
+    !!navigator.serviceWorker.controller
+})
+</script>
+```
 ````
 
 ## File: deployment.config.ts
@@ -1826,6 +3573,949 @@ export const useOwnerSidebarData = () => {
     <text x="256" y="120" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="#ffffff">CleanSync</text>
   </g>
 </svg>
+````
+
+## File: pwa-implementation-plan.md
+````markdown
+# PWA Implementation Plan for Property Cleaning Scheduler
+
+## Day 1: PWA Plugin Configuration
+
+### 1.1 Install Dependencies
+```bash
+pnpm add -D vite-plugin-pwa @vite-pwa/assets-generator
+```
+
+### 1.2 Update vite.config.ts
+```javascript
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    vuetify({ autoImport: true }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'maskable-icon-512x512.png'],
+      manifest: {
+        name: 'Property Cleaning Scheduler',
+        short_name: 'CleaningPWA',
+        description: 'Multi-tenant scheduling platform for cleaning companies and property owners',
+        theme_color: '#1976d2',
+        background_color: '#ffffff',
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
+        categories: ['business', 'productivity', 'utilities'],
+        icons: [
+          {
+            src: 'pwa-64x64.png',
+            sizes: '64x64',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: 'maskable-icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          }
+        ]
+      },
+      workbox: {
+        // Leverage your existing chunk strategy
+        runtimeCaching: [
+          {
+            // Cache your role-based chunks
+            urlPattern: ({ request, url }) => {
+              const chunkNames = [
+                'admin-components', 'owner-components', 'shared-ui',
+                'admin-logic', 'owner-logic', 'shared-logic'
+              ];
+              return chunkNames.some(chunk => url.pathname.includes(chunk));
+            },
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'role-based-chunks',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
+          },
+          {
+            // Cache API calls with role-specific strategies
+            urlPattern: ({ url }) => url.pathname.startsWith('/api'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 24 * 60 * 60, // 24 hours
+              },
+              networkTimeoutSeconds: 3,
+            }
+          },
+          {
+            // Cache images
+            urlPattern: ({ request }) => request.destination === 'image',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images',
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
+          }
+        ],
+      },
+      devOptions: {
+        enabled: true,
+        type: 'module'
+      }
+    })
+  ]
+})
+```
+
+---
+
+## Day 2: PWA Composable Integration
+
+### 2.1 Create Enhanced PWA Composable
+**File**: `src/composables/shared/usePWA.ts`
+
+```typescript
+import { ref, computed, onMounted } from 'vue'
+import { useRegisterSW } from 'virtual:pwa-register/vue'
+import { useAuthStore } from '@/stores/auth'
+
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed'
+    platform: string
+  }>
+  prompt(): Promise<void>
+}
+
+export const usePWA = () => {
+  const authStore = useAuthStore()
+  
+  // Installation state
+  const deferredPrompt = ref<BeforeInstallPromptEvent | null>(null)
+  const canInstall = ref(false)
+  const isInstalled = ref(false)
+  
+  // Network state
+  const isOnline = ref(navigator.onLine)
+  
+  // Service Worker state from plugin
+  const {
+    needRefresh,
+    offlineReady,
+    updateServiceWorker
+  } = useRegisterSW({
+    onRegistered(r) {
+      console.log('Service Worker registered:', r)
+    },
+    onRegisterError(error) {
+      console.error('Service Worker registration error:', error)
+    }
+  })
+
+  // Computed properties
+  const isPWA = computed(() => {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           (window.navigator as any).standalone === true ||
+           document.referrer.includes('android-app://')
+  })
+
+  const showUpdatePrompt = computed(() => needRefresh.value)
+  const showOfflineReady = computed(() => offlineReady.value)
+
+  // Role-specific install messaging
+  const installMessage = computed(() => {
+    if (authStore.isAdmin) {
+      return {
+        title: 'Install Cleaning Manager',
+        description: 'Get instant access to schedule management and system-wide alerts.'
+      }
+    } else if (authStore.isOwner) {
+      return {
+        title: 'Install My Property Scheduler',
+        description: 'Quick access to your bookings and property management.'
+      }
+    }
+    return {
+      title: 'Install App',
+      description: 'Get quick access to your scheduling platform.'
+    }
+  })
+
+  // Methods
+  const installPWA = async () => {
+    if (!deferredPrompt.value) return false
+    
+    try {
+      deferredPrompt.value.prompt()
+      const { outcome } = await deferredPrompt.value.userChoice
+      
+      if (outcome === 'accepted') {
+        isInstalled.value = true
+        console.log('PWA installed successfully')
+      }
+      
+      deferredPrompt.value = null
+      canInstall.value = false
+      
+      return outcome === 'accepted'
+    } catch (error) {
+      console.error('PWA installation error:', error)
+      return false
+    }
+  }
+
+  const updatePWA = async () => {
+    try {
+      await updateServiceWorker(true)
+    } catch (error) {
+      console.error('PWA update error:', error)
+    }
+  }
+
+  // Setup event listeners
+  onMounted(() => {
+    // Listen for install prompt
+    window.addEventListener('beforeinstallprompt', (e: Event) => {
+      e.preventDefault()
+      deferredPrompt.value = e as BeforeInstallPromptEvent
+      canInstall.value = true
+    })
+
+    // Listen for install completion
+    window.addEventListener('appinstalled', () => {
+      isInstalled.value = true
+      canInstall.value = false
+      deferredPrompt.value = null
+    })
+
+    // Listen for network changes
+    window.addEventListener('online', () => {
+      isOnline.value = true
+    })
+
+    window.addEventListener('offline', () => {
+      isOnline.value = false
+    })
+  })
+
+  return {
+    // State
+    canInstall,
+    isInstalled,
+    isOnline,
+    isPWA,
+    showUpdatePrompt,
+    showOfflineReady,
+    installMessage,
+    
+    // Actions
+    installPWA,
+    updatePWA
+  }
+}
+```
+
+### 2.2 Add PWA State to UI Store
+**File**: `src/stores/ui.ts` (extend existing)
+
+```typescript
+// Add to existing interface
+interface UIState {
+  // ... existing properties
+  pwa: {
+    showInstallPrompt: boolean
+    showUpdateSnackbar: boolean
+    showOfflineIndicator: boolean
+  }
+}
+
+// Add to store actions
+const setPWAPromptVisible = (visible: boolean) => {
+  state.pwa.showInstallPrompt = visible
+}
+
+const setPWAUpdateVisible = (visible: boolean) => {
+  state.pwa.showUpdateSnackbar = visible
+}
+
+const setPWAOfflineIndicator = (visible: boolean) => {
+  state.pwa.showOfflineIndicator = visible
+}
+```
+
+---
+
+## Day 3: UI Component Integration
+
+### 3.1 Enhanced PWA Status Component
+**File**: `src/components/dumb/shared/PWAStatusCard.vue`
+
+```vue
+<template>
+  <v-card
+    v-if="isDev || showPWACard"
+    color="surface-variant"
+    class="mb-4"
+  >
+    <v-card-title class="d-flex align-center gap-2">
+      <v-icon 
+        :color="isPWA ? 'success' : 'primary'"
+        :icon="isPWA ? 'mdi-cellphone-check' : 'mdi-cellphone-arrow-down'"
+      />
+      App Status
+      <v-spacer />
+      <v-btn
+        icon="mdi-chevron-down"
+        variant="text"
+        size="small"
+        @click="expanded = !expanded"
+      />
+    </v-card-title>
+
+    <v-expand-transition>
+      <div v-show="expanded">
+        <v-card-text>
+          <v-simple-table density="compact">
+            <tbody>
+              <tr>
+                <td>Mode:</td>
+                <td>
+                  <v-chip
+                    :color="isPWA ? 'success' : 'primary'"
+                    size="small"
+                  >
+                    {{ displayMode }}
+                  </v-chip>
+                </td>
+              </tr>
+              <tr>
+                <td>Network:</td>
+                <td>
+                  <v-chip
+                    :color="isOnline ? 'success' : 'warning'"
+                    size="small"
+                  >
+                    {{ isOnline ? 'Online' : 'Offline' }}
+                  </v-chip>
+                </td>
+              </tr>
+              <tr>
+                <td>Service Worker:</td>
+                <td>
+                  <v-chip
+                    :color="serviceWorkerActive ? 'success' : 'warning'"
+                    size="small"
+                  >
+                    {{ serviceWorkerActive ? 'Active' : 'Inactive' }}
+                  </v-chip>
+                </td>
+              </tr>
+              <tr>
+                <td>Viewport:</td>
+                <td>{{ displayName }} ({{ width }}x{{ height }})</td>
+              </tr>
+              <tr>
+                <td>Role:</td>
+                <td>
+                  <v-chip
+                    :color="roleColor"
+                    size="small"
+                  >
+                    {{ roleLabel }}
+                  </v-chip>
+                </td>
+              </tr>
+            </tbody>
+          </v-simple-table>
+          
+          <div class="d-flex mt-4 gap-2 flex-wrap">
+            <v-btn
+              v-if="canInstall"
+              @click="handleInstall"
+              :loading="installing"
+              color="primary"
+              size="small"
+            >
+              <v-icon left icon="mdi-download" />
+              Install App
+            </v-btn>
+            
+            <v-btn
+              v-if="showUpdatePrompt"
+              @click="handleUpdate"
+              :loading="updating"
+              color="warning"
+              size="small"
+            >
+              <v-icon left icon="mdi-update" />
+              Update Available
+            </v-btn>
+            
+            <v-btn
+              @click="toggleOffline"
+              variant="outlined"
+              size="small"
+            >
+              {{ isOnline ? 'Simulate Offline' : 'Go Online' }}
+            </v-btn>
+          </div>
+        </v-card-text>
+      </div>
+    </v-expand-transition>
+  </v-card>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { usePWA } from '@/composables/shared/usePWA'
+import { useDisplay } from 'vuetify'
+import { useAuthStore } from '@/stores/auth'
+
+// Composables
+const { 
+  canInstall, 
+  isOnline, 
+  isPWA, 
+  showUpdatePrompt,
+  installPWA, 
+  updatePWA 
+} = usePWA()
+const { name: displayName, width, height } = useDisplay()
+const authStore = useAuthStore()
+
+// Local state
+const expanded = ref(false)
+const installing = ref(false)
+const updating = ref(false)
+const isDev = ref(import.meta.env.DEV)
+const serviceWorkerActive = ref(false)
+
+// Computed
+const showPWACard = computed(() => {
+  return canInstall.value || showUpdatePrompt.value || !isOnline.value
+})
+
+const displayMode = computed(() => {
+  if (window.matchMedia('(display-mode: standalone)').matches)
+    return 'Standalone PWA'
+  if (window.matchMedia('(display-mode: fullscreen)').matches)
+    return 'Fullscreen'
+  if (window.matchMedia('(display-mode: minimal-ui)').matches)
+    return 'Minimal UI'
+  return 'Browser'
+})
+
+const roleColor = computed(() => {
+  if (authStore.isAdmin) return 'error'
+  if (authStore.isOwner) return 'primary'
+  return 'grey'
+})
+
+const roleLabel = computed(() => {
+  if (authStore.isAdmin) return 'Business Admin'
+  if (authStore.isOwner) return 'Property Owner'
+  return 'Guest'
+})
+
+// Methods
+const handleInstall = async () => {
+  installing.value = true
+  try {
+    await installPWA()
+  } finally {
+    installing.value = false
+  }
+}
+
+const handleUpdate = async () => {
+  updating.value = true
+  try {
+    await updatePWA()
+  } finally {
+    updating.value = false
+  }
+}
+
+const toggleOffline = () => {
+  if (isOnline.value) {
+    window.dispatchEvent(new Event('offline'))
+  } else {
+    window.dispatchEvent(new Event('online'))
+  }
+}
+
+onMounted(async () => {
+  serviceWorkerActive.value = 
+    'serviceWorker' in navigator && 
+    !!navigator.serviceWorker.controller
+})
+</script>
+```
+
+### 3.2 Update Existing Sidebars
+Add to `OwnerSidebar.vue` and `AdminSidebar.vue`:
+
+```vue
+<template>
+  <!-- Existing sidebar content -->
+  
+  <!-- Add PWA Status Card -->
+  <PWAStatusCard />
+  
+  <!-- Existing sidebar content -->
+</template>
+
+<script setup>
+// Add import
+import PWAStatusCard from '@/components/dumb/shared/PWAStatusCard.vue'
+</script>
+```
+
+---
+
+## Day 4: Offline Data Strategy
+
+### 4.1 Enhanced Store with Offline Support
+**File**: `src/composables/shared/useOfflineSync.ts`
+
+```typescript
+import { ref, computed, watch } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useBookingStore } from '@/stores/booking'
+import { usePropertyStore } from '@/stores/property'
+
+export const useOfflineSync = () => {
+  const authStore = useAuthStore()
+  const bookingStore = useBookingStore()
+  const propertyStore = usePropertyStore()
+
+  const isOnline = ref(navigator.onLine)
+  const pendingSyncs = ref<Map<string, any>>(new Map())
+  const lastSyncTime = ref<Date | null>(null)
+
+  // Role-specific offline data caching
+  const cacheRoleData = async () => {
+    if (!isOnline.value) return
+
+    try {
+      if (authStore.isOwner) {
+        // Cache owner's personal data only
+        const ownerBookings = Array.from(bookingStore.bookings.values())
+          .filter(booking => booking.owner_id === authStore.currentUser?.id)
+        
+        const ownerProperties = Array.from(propertyStore.properties.values())
+          .filter(property => property.owner_id === authStore.currentUser?.id)
+
+        localStorage.setItem('offline-owner-bookings', JSON.stringify(ownerBookings))
+        localStorage.setItem('offline-owner-properties', JSON.stringify(ownerProperties))
+        
+      } else if (authStore.isAdmin) {
+        // Cache critical system data for admins
+        const urgentTurns = Array.from(bookingStore.bookings.values())
+          .filter(booking => booking.booking_type === 'turn' && booking.priority === 'urgent')
+        
+        const todayBookings = Array.from(bookingStore.bookings.values())
+          .filter(booking => {
+            const today = new Date().toISOString().split('T')[0]
+            return booking.checkout_date === today || booking.checkin_date === today
+          })
+
+        localStorage.setItem('offline-urgent-turns', JSON.stringify(urgentTurns))
+        localStorage.setItem('offline-today-bookings', JSON.stringify(todayBookings))
+      }
+
+      lastSyncTime.value = new Date()
+    } catch (error) {
+      console.error('Failed to cache role data:', error)
+    }
+  }
+
+  // Load offline data when offline
+  const loadOfflineData = () => {
+    if (isOnline.value) return
+
+    try {
+      if (authStore.isOwner) {
+        const cachedBookings = localStorage.getItem('offline-owner-bookings')
+        const cachedProperties = localStorage.getItem('offline-owner-properties')
+        
+        if (cachedBookings) {
+          const bookings = JSON.parse(cachedBookings)
+          // Populate store with cached data
+          bookings.forEach(booking => bookingStore.bookings.set(booking.id, booking))
+        }
+        
+        if (cachedProperties) {
+          const properties = JSON.parse(cachedProperties)
+          properties.forEach(property => propertyStore.properties.set(property.id, property))
+        }
+        
+      } else if (authStore.isAdmin) {
+        const cachedTurns = localStorage.getItem('offline-urgent-turns')
+        const cachedToday = localStorage.getItem('offline-today-bookings')
+        
+        if (cachedTurns) {
+          const turns = JSON.parse(cachedTurns)
+          turns.forEach(turn => bookingStore.bookings.set(turn.id, turn))
+        }
+        
+        if (cachedToday) {
+          const today = JSON.parse(cachedToday)
+          today.forEach(booking => bookingStore.bookings.set(booking.id, booking))
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load offline data:', error)
+    }
+  }
+
+  // Queue operations for sync when back online
+  const queueForSync = (operation: string, data: any) => {
+    if (isOnline.value) {
+      // Execute immediately if online
+      return executeOperation(operation, data)
+    }
+
+    // Queue for later sync
+    const syncId = `${Date.now()}-${Math.random()}`
+    pendingSyncs.value.set(syncId, { operation, data, timestamp: Date.now() })
+    
+    // Store in localStorage for persistence
+    localStorage.setItem('pending-syncs', JSON.stringify(Array.from(pendingSyncs.value.entries())))
+    
+    return Promise.resolve({ queued: true, syncId })
+  }
+
+  // Execute operations
+  const executeOperation = async (operation: string, data: any) => {
+    switch (operation) {
+      case 'create-booking':
+        return bookingStore.createBooking(data)
+      case 'update-booking':
+        return bookingStore.updateBooking(data.id, data)
+      case 'delete-booking':
+        return bookingStore.deleteBooking(data.id)
+      default:
+        throw new Error(`Unknown operation: ${operation}`)
+    }
+  }
+
+  // Sync pending operations when back online
+  const syncPendingOperations = async () => {
+    if (!isOnline.value || pendingSyncs.value.size === 0) return
+
+    const syncsToProcess = Array.from(pendingSyncs.value.entries())
+    const results = []
+
+    for (const [syncId, { operation, data }] of syncsToProcess) {
+      try {
+        const result = await executeOperation(operation, data)
+        results.push({ syncId, success: true, result })
+        pendingSyncs.value.delete(syncId)
+      } catch (error) {
+        results.push({ syncId, success: false, error: error.message })
+        console.error(`Failed to sync operation ${syncId}:`, error)
+      }
+    }
+
+    // Update localStorage
+    localStorage.setItem('pending-syncs', JSON.stringify(Array.from(pendingSyncs.value.entries())))
+    
+    // Refresh cache after sync
+    await cacheRoleData()
+
+    return results
+  }
+
+  // Initialize
+  const initialize = () => {
+    // Load any pending syncs from localStorage
+    try {
+      const storedSyncs = localStorage.getItem('pending-syncs')
+      if (storedSyncs) {
+        const syncsArray = JSON.parse(storedSyncs)
+        pendingSyncs.value = new Map(syncsArray)
+      }
+    } catch (error) {
+      console.error('Failed to load pending syncs:', error)
+    }
+
+    // Load offline data if currently offline
+    if (!isOnline.value) {
+      loadOfflineData()
+    }
+
+    // Watch for online/offline changes
+    window.addEventListener('online', () => {
+      isOnline.value = true
+      syncPendingOperations()
+    })
+
+    window.addEventListener('offline', () => {
+      isOnline.value = false
+    })
+
+    // Cache data periodically when online
+    watch(isOnline, (online) => {
+      if (online) {
+        cacheRoleData()
+      }
+    })
+  }
+
+  return {
+    isOnline,
+    pendingSyncs: computed(() => pendingSyncs.value.size),
+    lastSyncTime,
+    cacheRoleData,
+    queueForSync,
+    syncPendingOperations,
+    initialize
+  }
+}
+```
+
+### 4.2 Update Main App with Offline Support
+**File**: `src/App.vue` (add to existing)
+
+```vue
+<script setup>
+// Existing imports
+import { useOfflineSync } from '@/composables/shared/useOfflineSync'
+
+// Existing setup
+const { initialize } = useOfflineSync()
+
+onMounted(() => {
+  // Existing onMounted code
+  initialize() // Add offline sync initialization
+})
+</script>
+```
+
+---
+
+## Day 5: Testing and Optimization
+
+### 5.1 PWA Tests
+**File**: `src/__tests__/composables/shared/usePWA.test.ts`
+
+```typescript
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { usePWA } from '@/composables/shared/usePWA'
+
+// Mock service worker registration
+const mockUseRegisterSW = vi.fn(() => ({
+  needRefresh: { value: false },
+  offlineReady: { value: false },
+  updateServiceWorker: vi.fn()
+}))
+
+vi.mock('virtual:pwa-register/vue', () => ({
+  useRegisterSW: mockUseRegisterSW
+}))
+
+describe('usePWA', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    // Reset DOM
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation(query => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    })
+  })
+
+  it('should initialize with correct default values', () => {
+    const { canInstall, isInstalled, isOnline, isPWA } = usePWA()
+    
+    expect(canInstall.value).toBe(false)
+    expect(isInstalled.value).toBe(false)
+    expect(isOnline.value).toBe(true) // Assumes navigator.onLine is true in tests
+    expect(isPWA.value).toBe(false)
+  })
+
+  it('should detect PWA mode correctly', () => {
+    // Mock standalone display mode
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation(query => ({
+        matches: query === '(display-mode: standalone)',
+        media: query,
+      })),
+    })
+
+    const { isPWA } = usePWA()
+    expect(isPWA.value).toBe(true)
+  })
+
+  it('should handle install prompt event', async () => {
+    const { canInstall } = usePWA()
+    
+    // Simulate beforeinstallprompt event
+    const mockEvent = {
+      preventDefault: vi.fn(),
+      prompt: vi.fn(),
+      userChoice: Promise.resolve({ outcome: 'accepted' })
+    }
+    
+    window.dispatchEvent(new CustomEvent('beforeinstallprompt', { detail: mockEvent }))
+    
+    // Note: This test would need more setup to properly test the event handling
+    // as the usePWA composable uses onMounted which doesn't run in unit tests
+  })
+})
+```
+
+### 5.2 Performance Optimization Script
+**File**: `scripts/optimize-pwa.js`
+
+```javascript
+#!/usr/bin/env node
+
+/**
+ * PWA Optimization Script
+ * Analyzes and optimizes PWA performance for role-based architecture
+ */
+
+import { promises as fs } from 'fs'
+import path from 'path'
+
+async function analyzeBuildSize() {
+  const distPath = path.resolve('dist')
+  
+  try {
+    const files = await fs.readdir(distPath, { recursive: true })
+    const assetSizes = {}
+    
+    for (const file of files) {
+      if (file.endsWith('.js') || file.endsWith('.css')) {
+        const filePath = path.join(distPath, file)
+        const stats = await fs.stat(filePath)
+        assetSizes[file] = stats.size
+      }
+    }
+    
+    console.log('PWA Bundle Analysis:')
+    console.log('====================')
+    
+    // Sort by size
+    const sortedAssets = Object.entries(assetSizes)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10)
+    
+    sortedAssets.forEach(([file, size]) => {
+      const sizeKB = (size / 1024).toFixed(2)
+      console.log(`${file}: ${sizeKB} KB`)
+    })
+    
+    // Check for role-based chunks
+    const roleChunks = sortedAssets.filter(([file]) => 
+      file.includes('admin') || file.includes('owner') || file.includes('shared')
+    )
+    
+    console.log('\nRole-Based Chunks:')
+    console.log('==================')
+    roleChunks.forEach(([file, size]) => {
+      const sizeKB = (size / 1024).toFixed(2)
+      console.log(`${file}: ${sizeKB} KB`)
+    })
+    
+  } catch (error) {
+    console.error('Error analyzing build:', error)
+  }
+}
+
+async function checkPWAConfig() {
+  try {
+    const manifestPath = path.resolve('dist/manifest.webmanifest')
+    const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'))
+    
+    console.log('\nPWA Manifest Check:')
+    console.log('===================')
+    console.log(`Name: ${manifest.name}`)
+    console.log(`Short Name: ${manifest.short_name}`)
+    console.log(`Icons: ${manifest.icons?.length || 0} defined`)
+    console.log(`Display Mode: ${manifest.display}`)
+    console.log(`Theme Color: ${manifest.theme_color}`)
+    
+    // Check required icons
+    const requiredSizes = ['192x192', '512x512']
+    const availableSizes = manifest.icons?.map(icon => icon.sizes) || []
+    const missingSizes = requiredSizes.filter(size => !availableSizes.includes(size))
+    
+    if (missingSizes.length > 0) {
+      console.log(`⚠️  Missing icon sizes: ${missingSizes.join(', ')}`)
+    } else {
+      console.log('✅ All required icon sizes present')
+    }
+    
+  } catch (error) {
+    console.error('Error checking PWA config:', error)
+  }
+}
+
+// Run analysis
+analyzeBuildSize()
+checkPWAConfig()
+```
+
+### 5.3 Update package.json Scripts
+```json
+{
+  "scripts": {
+    "build:pwa": "vite build && node scripts/optimize-pwa.js",
+    "test:pwa": "vitest run --reporter=verbose src/__tests__/**/*pwa*",
+    "preview:pwa": "vite preview --host"
+  }
+}
+```
+
+---
+
+## Summary
+
+This implementation leverages your existing excellent architecture while adding enterprise-grade PWA capabilities:
+
+✅ **Minimal disruption** to your production-ready codebase
+✅ **Role-based PWA features** that respect your multi-tenant architecture  
+✅ **Optimal caching** using your existing chunk strategy
+✅ **Offline support** that maintains role-based data isolation
+✅ **Enhanced responsive design** building on your Vuetify patterns
+✅ **Comprehensive testing** extending your 100% coverage
+
+**Total Implementation Time**: ~5 days
+**Impact**: Transform your app into a world-class mobile-first PWA while maintaining your architectural excellence!
 ````
 
 ## File: src/__tests__/components/SimpleTest.spec.ts
@@ -7179,16 +9869,6 @@ dist-ssr
 .cache
 .temp
 .tmp
-````
-
-## File: dev-dist/sw.js
-````javascript
-if(!self.define){let e,n={};const s=(s,t)=>(s=new URL(s+".js",t).href,n[s]||new Promise(n=>{if("document"in self){const e=document.createElement("script");e.src=s,e.onload=n,document.head.appendChild(e)}else e=s,importScripts(s),n()}).then(()=>{let e=n[s];if(!e)throw new Error(`Module ${s} didn’t register its module`);return e}));self.define=(t,i)=>{const o=e||("document"in self?document.currentScript.src:"")||location.href;if(n[o])return;let r={};const l=e=>s(e,o),c={module:{uri:o},exports:r,require:l};n[o]=Promise.all(t.map(e=>c[e]||l(e))).then(e=>(i(...e),r))}}define(["./workbox-76a2ce55"],function(e){"use strict";self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"/index.html",revision:"0.0d8077h2sp"}],{}),e.cleanupOutdatedCaches(),e.registerRoute(new e.NavigationRoute(e.createHandlerBoundToURL("/index.html"),{allowlist:[/^\/$/],denylist:[/^\/_/,/\/[^/?]+\.[^/]+$/]})),e.registerRoute(/^https:\/\/.*\.supabase\.co\/.*/i,new e.NetworkFirst({cacheName:"supabase-api",plugins:[new e.ExpirationPlugin({maxEntries:100,maxAgeSeconds:86400}),new e.BackgroundSyncPlugin("supabase-api-sync",{maxRetentionTime:1440})]}),"GET")});
-````
-
-## File: dev-dist/sw.js.map
-````
-{"version":3,"file":"sw.js","sources":["../../Users/soren/AppData/Local/Temp/a91471aeedd704f8c1cf59a28e8f7266/sw.js"],"sourcesContent":["import {registerRoute as workbox_routing_registerRoute} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-routing@7.3.0/node_modules/workbox-routing/registerRoute.mjs';\nimport {ExpirationPlugin as workbox_expiration_ExpirationPlugin} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-expiration@7.3.0/node_modules/workbox-expiration/ExpirationPlugin.mjs';\nimport {BackgroundSyncPlugin as workbox_background_sync_BackgroundSyncPlugin} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-background-sync@7.3.0/node_modules/workbox-background-sync/BackgroundSyncPlugin.mjs';\nimport {NetworkFirst as workbox_strategies_NetworkFirst} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-strategies@7.3.0/node_modules/workbox-strategies/NetworkFirst.mjs';\nimport {clientsClaim as workbox_core_clientsClaim} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-core@7.3.0/node_modules/workbox-core/clientsClaim.mjs';\nimport {precacheAndRoute as workbox_precaching_precacheAndRoute} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-precaching@7.3.0/node_modules/workbox-precaching/precacheAndRoute.mjs';\nimport {cleanupOutdatedCaches as workbox_precaching_cleanupOutdatedCaches} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-precaching@7.3.0/node_modules/workbox-precaching/cleanupOutdatedCaches.mjs';\nimport {NavigationRoute as workbox_routing_NavigationRoute} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-routing@7.3.0/node_modules/workbox-routing/NavigationRoute.mjs';\nimport {createHandlerBoundToURL as workbox_precaching_createHandlerBoundToURL} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-precaching@7.3.0/node_modules/workbox-precaching/createHandlerBoundToURL.mjs';/**\n * Welcome to your Workbox-powered service worker!\n *\n * You'll need to register this file in your web app.\n * See https://goo.gl/nhQhGp\n *\n * The rest of the code is auto-generated. Please don't update this file\n * directly; instead, make changes to your Workbox build configuration\n * and re-run your build process.\n * See https://goo.gl/2aRDsh\n */\n\n\n\n\n\n\n\n\nself.skipWaiting();\n\nworkbox_core_clientsClaim();\n\n\n/**\n * The precacheAndRoute() method efficiently caches and responds to\n * requests for URLs in the manifest.\n * See https://goo.gl/S9QRab\n */\nworkbox_precaching_precacheAndRoute([\n  {\n    \"url\": \"/index.html\",\n    \"revision\": \"0.0d8077h2sp\"\n  }\n], {});\nworkbox_precaching_cleanupOutdatedCaches();\nworkbox_routing_registerRoute(new workbox_routing_NavigationRoute(workbox_precaching_createHandlerBoundToURL(\"/index.html\"), {\n  allowlist: [/^\\/$/],\n  denylist: [/^\\/_/,/\\/[^/?]+\\.[^/]+$/],\n}));\n\n\nworkbox_routing_registerRoute(/^https:\\/\\/.*\\.supabase\\.co\\/.*/i, new workbox_strategies_NetworkFirst({ \"cacheName\":\"supabase-api\", plugins: [new workbox_expiration_ExpirationPlugin({ maxEntries: 100, maxAgeSeconds: 86400 }), new workbox_background_sync_BackgroundSyncPlugin(\"supabase-api-sync\", { maxRetentionTime: 1440 })] }), 'GET');\n\n\n\n\n"],"names":["self","skipWaiting","workbox_core_clientsClaim","workbox_precaching_precacheAndRoute","url","revision","workbox_precaching_cleanupOutdatedCaches","workbox","registerRoute","workbox_routing_NavigationRoute","NavigationRoute","workbox_precaching_createHandlerBoundToURL","allowlist","denylist","workbox_routing_registerRoute","workbox_strategies_NetworkFirst","cacheName","plugins","workbox_expiration_ExpirationPlugin","maxEntries","maxAgeSeconds","workbox_background_sync_BackgroundSyncPlugin","BackgroundSyncPlugin","maxRetentionTime"],"mappings":"inBA2BAA,KAAKC,cAELC,EAAAA,eAQAC,EAAAA,iBAAoC,CAClC,CACEC,IAAO,cACPC,SAAY,iBAEb,CAAE,GACLC,EAAAA,wBAC6BC,EAAAC,cAAC,IAAIC,EAA+BC,gBAACC,0BAA2C,eAAgB,CAC3HC,UAAW,CAAC,QACZC,SAAU,CAAC,OAAO,uBAIpBC,EAAAA,cAA8B,mCAAoC,IAAIC,eAAgC,CAAEC,UAAY,eAAgBC,QAAS,CAAC,IAAIC,mBAAoC,CAAEC,WAAY,IAAKC,cAAe,QAAU,IAAIC,EAA4CC,qBAAC,oBAAqB,CAAEC,iBAAkB,UAAa"}
 ````
 
 ## File: index.html
@@ -22431,6 +25111,16 @@ export function getErrorTitle(category: ErrorCategory, role: UserRole = 'owner')
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/utils/business_logic_store_updates.md"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
+````
+
+## File: dev-dist/sw.js
+````javascript
+if(!self.define){let e,n={};const t=(t,i)=>(t=new URL(t+".js",i).href,n[t]||new Promise(n=>{if("document"in self){const e=document.createElement("script");e.src=t,e.onload=n,document.head.appendChild(e)}else e=t,importScripts(t),n()}).then(()=>{let e=n[t];if(!e)throw new Error(`Module ${t} didn’t register its module`);return e}));self.define=(i,s)=>{const o=e||("document"in self?document.currentScript.src:"")||location.href;if(n[o])return;let r={};const l=e=>t(e,o),c={module:{uri:o},exports:r,require:l};n[o]=Promise.all(i.map(e=>c[e]||l(e))).then(e=>(s(...e),r))}}define(["./workbox-76a2ce55"],function(e){"use strict";self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"/index.html",revision:"0.ai8fkk3bvmg"}],{}),e.cleanupOutdatedCaches(),e.registerRoute(new e.NavigationRoute(e.createHandlerBoundToURL("/index.html"),{allowlist:[/^\/$/],denylist:[/^\/_/,/\/[^/?]+\.[^/]+$/]})),e.registerRoute(/^https:\/\/.*\.supabase\.co\/.*/i,new e.NetworkFirst({cacheName:"supabase-api",plugins:[new e.ExpirationPlugin({maxEntries:100,maxAgeSeconds:86400}),new e.BackgroundSyncPlugin("supabase-api-sync",{maxRetentionTime:1440})]}),"GET")});
+````
+
+## File: dev-dist/sw.js.map
+````
+{"version":3,"file":"sw.js","sources":["../../Users/soren/AppData/Local/Temp/f0ff99aeaaed97a7c88372eaf2425180/sw.js"],"sourcesContent":["import {registerRoute as workbox_routing_registerRoute} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-routing@7.3.0/node_modules/workbox-routing/registerRoute.mjs';\nimport {ExpirationPlugin as workbox_expiration_ExpirationPlugin} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-expiration@7.3.0/node_modules/workbox-expiration/ExpirationPlugin.mjs';\nimport {BackgroundSyncPlugin as workbox_background_sync_BackgroundSyncPlugin} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-background-sync@7.3.0/node_modules/workbox-background-sync/BackgroundSyncPlugin.mjs';\nimport {NetworkFirst as workbox_strategies_NetworkFirst} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-strategies@7.3.0/node_modules/workbox-strategies/NetworkFirst.mjs';\nimport {clientsClaim as workbox_core_clientsClaim} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-core@7.3.0/node_modules/workbox-core/clientsClaim.mjs';\nimport {precacheAndRoute as workbox_precaching_precacheAndRoute} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-precaching@7.3.0/node_modules/workbox-precaching/precacheAndRoute.mjs';\nimport {cleanupOutdatedCaches as workbox_precaching_cleanupOutdatedCaches} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-precaching@7.3.0/node_modules/workbox-precaching/cleanupOutdatedCaches.mjs';\nimport {NavigationRoute as workbox_routing_NavigationRoute} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-routing@7.3.0/node_modules/workbox-routing/NavigationRoute.mjs';\nimport {createHandlerBoundToURL as workbox_precaching_createHandlerBoundToURL} from 'C:/sites/BookingAppv89/node_modules/.pnpm/workbox-precaching@7.3.0/node_modules/workbox-precaching/createHandlerBoundToURL.mjs';/**\n * Welcome to your Workbox-powered service worker!\n *\n * You'll need to register this file in your web app.\n * See https://goo.gl/nhQhGp\n *\n * The rest of the code is auto-generated. Please don't update this file\n * directly; instead, make changes to your Workbox build configuration\n * and re-run your build process.\n * See https://goo.gl/2aRDsh\n */\n\n\n\n\n\n\n\n\nself.skipWaiting();\n\nworkbox_core_clientsClaim();\n\n\n/**\n * The precacheAndRoute() method efficiently caches and responds to\n * requests for URLs in the manifest.\n * See https://goo.gl/S9QRab\n */\nworkbox_precaching_precacheAndRoute([\n  {\n    \"url\": \"/index.html\",\n    \"revision\": \"0.ai8fkk3bvmg\"\n  }\n], {});\nworkbox_precaching_cleanupOutdatedCaches();\nworkbox_routing_registerRoute(new workbox_routing_NavigationRoute(workbox_precaching_createHandlerBoundToURL(\"/index.html\"), {\n  allowlist: [/^\\/$/],\n  denylist: [/^\\/_/,/\\/[^/?]+\\.[^/]+$/],\n}));\n\n\nworkbox_routing_registerRoute(/^https:\\/\\/.*\\.supabase\\.co\\/.*/i, new workbox_strategies_NetworkFirst({ \"cacheName\":\"supabase-api\", plugins: [new workbox_expiration_ExpirationPlugin({ maxEntries: 100, maxAgeSeconds: 86400 }), new workbox_background_sync_BackgroundSyncPlugin(\"supabase-api-sync\", { maxRetentionTime: 1440 })] }), 'GET');\n\n\n\n\n"],"names":["self","skipWaiting","workbox_core_clientsClaim","workbox_precaching_precacheAndRoute","url","revision","workbox_precaching_cleanupOutdatedCaches","workbox","registerRoute","workbox_routing_NavigationRoute","NavigationRoute","workbox_precaching_createHandlerBoundToURL","allowlist","denylist","workbox_routing_registerRoute","workbox_strategies_NetworkFirst","cacheName","plugins","workbox_expiration_ExpirationPlugin","maxEntries","maxAgeSeconds","workbox_background_sync_BackgroundSyncPlugin","BackgroundSyncPlugin","maxRetentionTime"],"mappings":"inBA2BAA,KAAKC,cAELC,EAAAA,eAQAC,EAAAA,iBAAoC,CAClC,CACEC,IAAO,cACPC,SAAY,kBAEb,CAAE,GACLC,EAAAA,wBAC6BC,EAAAC,cAAC,IAAIC,EAA+BC,gBAACC,0BAA2C,eAAgB,CAC3HC,UAAW,CAAC,QACZC,SAAU,CAAC,OAAO,uBAIpBC,EAAAA,cAA8B,mCAAoC,IAAIC,eAAgC,CAAEC,UAAY,eAAgBC,QAAS,CAAC,IAAIC,mBAAoC,CAAEC,WAAY,IAAKC,cAAe,QAAU,IAAIC,EAA4CC,qBAAC,oBAAqB,CAAEC,iBAAkB,UAAa"}
 ````
 
 ## File: eslint.config.js
@@ -41710,6 +44400,7 @@ function getFilter(key: string): FilterValue
     "@types/node": "^20.19.0",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
     "@typescript-eslint/parser": "^8.34.0",
+    "@vite-pwa/assets-generator": "^1.0.0",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vitest/coverage-v8": "^3.2.2",
     "@vue/test-utils": "^2.4.6",

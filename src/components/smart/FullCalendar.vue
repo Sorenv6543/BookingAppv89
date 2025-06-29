@@ -181,9 +181,10 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   slotDuration: '01:00:00',
   snapDuration: '00:30:00',
   
-  // Appearance
-  height: 'auto',
-  aspectRatio: 1.8,
+  // Appearance - Full viewport height
+  height: '100%',
+  aspectRatio: undefined, // Remove aspect ratio constraints for full height
+  expandRows: true, // Make calendar rows expand to fill available height
   eventBackgroundColor: theme.global.current.value.colors.primary,
   eventBorderColor: theme.global.current.value.colors.primary,
   eventTextColor: '#FFFFFF',
@@ -415,6 +416,14 @@ defineExpose({
 .calendar-container {
   height: 100%;
   width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.custom-calendar {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .custom-calendar {

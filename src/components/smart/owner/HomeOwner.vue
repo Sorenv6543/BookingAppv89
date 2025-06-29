@@ -33,13 +33,22 @@ src/components/smart/owner/HomeOwner.vue -
     </div>
 
     <!-- Main Calendar Area - Fills remaining space -->
-    <div class="calendar-column">
+    <div 
+      class="calendar-column calendar-responsive"
+      :class="{
+        'full-viewport-calendar': true,
+        'mobile-layout': mobile,
+        'tablet-layout': tablet,
+        'desktop-layout': desktop,
+        'sidebar-closed': !sidebarOpen
+      }"
+    >
       <!-- Owner Calendar Header - Fixed to top of calendar area -->
       <v-card
         flat
         class="calendar-header-card"
       >
-        <v-card-text class="pa-3">
+        <v-card-text class="pa-0">
           <div class="d-flex align-center">
             <!-- Mobile menu button -->
             <v-btn
@@ -70,14 +79,14 @@ src/components/smart/owner/HomeOwner.vue -
               class="mr-4"
               @click="handleNext"
             />
-            <div class="text-h6 mr-4">
+            <div class="text-h6 mr-4 calendar-header-date">
               {{ formattedDate }}
             </div>
                
             <v-spacer />
                
             <!-- Owner Quick Actions -->
-            <v-btn
+            <!-- <v-btn
               v-if="$vuetify.display.smAndUp"
               color="primary"
               variant="outlined"
@@ -86,15 +95,15 @@ src/components/smart/owner/HomeOwner.vue -
               @click="handleCreateProperty"
             >
               Add Property
-            </v-btn>
-            <v-btn
+            </v-btn> -->
+            <!-- <v-btn
               color="primary"
               prepend-icon="mdi-calendar-plus"
               class="mr-4"
               @click="handleCreateBooking"
             >
               Add Booking
-            </v-btn>
+            </v-btn> -->
                
             <!-- Calendar View Toggle -->
             <v-btn-toggle
@@ -180,6 +189,17 @@ src/components/smart/owner/HomeOwner.vue -
       />
     </div>
   </div>
+
+  <!-- Mobile Floating Action Button for Sidebar Toggle - Outside main container -->
+  <v-fab
+    v-if="$vuetify.display.mdAndDown"
+    icon="mdi-plus"
+    size="large"
+    color="primary"
+    class="mobile-sidebar-fab"
+    :class="{ 'fab-shifted': sidebarOpen }"
+    @click="toggleSidebar"
+  />
 </template>
 
 <script setup lang="ts">
@@ -220,7 +240,7 @@ const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
-const { xs } = useDisplay();
+const { xs, sm, md, lg, xl, mobile, tablet, desktop } = useDisplay();
 
 // ============================================================================
 // COMPOSABLES - BUSINESS LOGIC
@@ -1162,20 +1182,105 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   flex: 1; /* Take remaining space after sidebar */
 }
 
-/* Calendar Header - Fixed height */
+/* Full viewport calendar layout */
+.calendar-column.full-viewport-calendar {
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.calendar-column.full-viewport-calendar.mobile-layout {
+  position: fixed !important;
+  top: 56px; /* Mobile app bar height */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1;
+  height: calc(100vh - 56px) !important;
+}
+
+.calendar-column.full-viewport-calendar.tablet-layout {
+  position: fixed !important;
+  top: 64px; /* Tablet app bar height */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1;
+  height: calc(100vh - 64px) !important;
+}
+
+.calendar-column.full-viewport-calendar.desktop-layout.sidebar-closed {
+  position: fixed !important;
+  top: 64px; /* Desktop app bar height */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1;
+  width: 100vw !important;
+  height: calc(100vh - 64px) !important;
+}
+
+/* When sidebar is open on desktop, use normal flex behavior */
+.calendar-column.full-viewport-calendar.desktop-layout:not(.sidebar-closed) {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  margin-left: 0;
+}
+
+/* Calendar Header - Fixed height, no padding */
 .calendar-header-card {
   flex-shrink: 0;
   border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
   background: rgb(var(--v-theme-surface));
   z-index: 1;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-/* Calendar Content - Flexible height */
+/* Calendar Content - Flexible height, no padding */
 .calendar-content {
   flex: 1;
   min-height: 0; /* Allow shrinking */
   position: relative;
   overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Full viewport calendar content */
+.full-viewport-calendar .calendar-content {
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+.full-viewport-calendar.mobile-layout .calendar-content {
+  height: calc(100vh - 56px - 10vh) !important; /* Full height minus app bar minus header */
+  position: absolute !important;
+  top: 10vh !important; /* Below the header */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+.full-viewport-calendar.tablet-layout .calendar-content {
+  height: calc(100vh - 64px - 15vh) !important; /* Full height minus app bar minus header */
+  position: absolute !important;
+  top: 15vh !important; /* Below the header */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+.full-viewport-calendar.desktop-layout .calendar-content {
+  height: calc(100vh - 64px - 10vh) !important; /* Full height minus app bar minus header */
+  position: absolute !important;
+  top: 10vh !important; /* Below the header */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
 }
 
 /* =================================================================== */
@@ -1312,6 +1417,47 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   /* Allow clicking backdrop to close sidebar */
   .home-owner-container:has(.sidebar-visible)::before {
     cursor: pointer;
+  }
+}
+
+/* =================================================================== */
+/* MOBILE FLOATING ACTION BUTTON */
+/* =================================================================== */
+
+.mobile-sidebar-fab {
+  position: fixed !important;
+  bottom: 40px !important;
+  right: 16px !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  z-index: 1006 !important;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  /* Ensure it's always in viewport corner */
+  margin: 0 !important;
+  /* Override any Vuetify positioning */
+  inset: auto 16px 40px auto !important;
+}
+
+.mobile-sidebar-fab.fab-shifted {
+  transform: translateX(-10px) !important;
+  opacity: 0.9;
+}
+
+/* Responsive positioning for different mobile sizes */
+@media (max-width: 480px) {
+  .mobile-sidebar-fab {
+    bottom: 36px !important;
+    right: 14px !important;
+    inset: auto 14px 36px auto !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .mobile-sidebar-fab {
+    bottom: 32px !important;
+    right: 12px !important;
+    inset: auto 12px 32px auto !important;
   }
 }
 </style> 

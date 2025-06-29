@@ -11,13 +11,17 @@
     "build:production": "set NODE_ENV=production && vite build",
     "build:owner-only": "set ROLE_BUILD=owner && vite build",
     "build:admin-only": "set ROLE_BUILD=admin && vite build",
+    "build:pwa": "vite build && node scripts/optimize-pwa.js",
     "preview": "vite preview",
     "preview:production": "vite preview --mode production",
+    "preview:pwa": "vite preview --host",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "analyze:bundle": "pnpx vite-bundle-analyzer dist"
+    "test:pwa": "vitest run --reporter=verbose src/__tests__/**/*pwa*",
+    "analyze:bundle": "pnpx vite-bundle-analyzer dist",
+    "analyze:pwa": "node scripts/optimize-pwa.js"
   },
   "keywords": [],
   "author": "",

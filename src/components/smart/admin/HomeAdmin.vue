@@ -58,7 +58,14 @@
         cols="12" 
         lg="8" 
         xl="9" 
-        class="calendar-column"
+        class="calendar-column calendar-responsive"
+        :class="{
+          'full-viewport-calendar': true,
+          'mobile-layout': mobile,
+          'tablet-layout': tablet,
+          'desktop-layout': desktop,
+          'sidebar-closed': !sidebarOpen
+        }"
       >
         <div class="calendar-header">
           <!-- Admin-focused Calendar Controls -->
@@ -82,12 +89,12 @@
               class="mr-4"
               @click="handleNext"
             />
-            <div class="text-h6">
+            <div class="text-h6 calendar-header-date">
               {{ formattedDate }}
             </div>
             
             <!-- System-wide Metrics -->
-            <div class="ml-4 text-caption text-medium-emphasis">
+            <div class="ml-4 text-caption text-medium-emphasis hide-on-small-mobile">
               {{ systemMetricsText }}
             </div>
             
@@ -98,7 +105,7 @@
               color="warning"
               variant="outlined"
               prepend-icon="mdi-account-hard-hat"
-              class="mr-2"
+              class="mr-2 hide-on-small-mobile"
               @click="handleAssignCleaners"
             >
               Assign Cleaners
@@ -107,7 +114,7 @@
               color="info"
               variant="outlined"
               prepend-icon="mdi-chart-line"
-              class="mr-2"
+              class="mr-2 hide-on-small-mobile"
               @click="handleGenerateReports"
             >
               Reports
@@ -196,6 +203,17 @@
     <!-- ReportsModal -->
     <!-- SystemManagementModal -->
   </div>
+
+  <!-- Mobile Floating Action Button for Sidebar Toggle - Outside main container -->
+  <v-fab
+    v-if="$vuetify.display.mdAndDown"
+    icon="mdi-plus"
+    size="large"
+    color="primary"
+    class="mobile-sidebar-fab"
+    :class="{ 'fab-shifted': sidebarOpen }"
+    @click="sidebarOpen = !sidebarOpen"
+  />
 </template>
 
 <script setup lang="ts">
@@ -237,7 +255,7 @@ const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
-const { xs } = useDisplay();
+const { xs, sm, md, lg, xl, mobile, tablet, desktop } = useDisplay();
 
 // ============================================================================
 // COMPOSABLES - BUSINESS LOGIC
@@ -1072,12 +1090,100 @@ onUnmounted(() => {
   padding-left: 0 !important;
 }
 
+/* Full viewport calendar layout */
+.calendar-column.full-viewport-calendar {
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.calendar-column.full-viewport-calendar.mobile-layout {
+  position: fixed !important;
+  top: 56px; /* Mobile app bar height */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1;
+  height: calc(100vh - 56px) !important;
+}
+
+.calendar-column.full-viewport-calendar.tablet-layout {
+  position: fixed !important;
+  top: 64px; /* Tablet app bar height */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1;
+  height: calc(100vh - 64px) !important;
+}
+
+.calendar-column.full-viewport-calendar.desktop-layout.sidebar-closed {
+  position: fixed !important;
+  top: 64px; /* Desktop app bar height */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1;
+  width: 100vw !important;
+  height: calc(100vh - 64px) !important;
+}
+
+/* When sidebar is open on desktop, use normal flex behavior */
+.calendar-column.full-viewport-calendar.desktop-layout:not(.sidebar-closed) {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  margin-left: 0;
+}
+
 .calendar-header {
-  padding: 16px;
+  padding: 0 !important;
   border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   background-color: rgb(var(--v-theme-surface));
   flex-shrink: 0;
   height: 80px;
+}
+
+/* Full viewport calendar content */
+.full-viewport-calendar .calendar-header {
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+.full-viewport-calendar .admin-calendar-container {
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+.full-viewport-calendar.mobile-layout .admin-calendar-container {
+  height: calc(100vh - 56px - 10vh) !important; /* Full height minus app bar minus header */
+  position: absolute !important;
+  top: 10vh !important; /* Below the header */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+.full-viewport-calendar.tablet-layout .admin-calendar-container {
+  height: calc(100vh - 64px - 15vh) !important; /* Full height minus app bar minus header */
+  position: absolute !important;
+  top: 15vh !important; /* Below the header */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+.full-viewport-calendar.desktop-layout .admin-calendar-container {
+  height: calc(100vh - 64px - 10vh) !important; /* Full height minus app bar minus header */
+  position: absolute !important;
+  top: 10vh !important; /* Below the header */
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
 }
 
 /* Admin-specific styling */
@@ -1153,5 +1259,46 @@ onUnmounted(() => {
   --admin-secondary: rgb(var(--v-theme-secondary));
   --admin-warning: rgb(var(--v-theme-warning));
   --admin-info: rgb(var(--v-theme-info));
+}
+
+/* =================================================================== */
+/* MOBILE FLOATING ACTION BUTTON */
+/* =================================================================== */
+
+.mobile-sidebar-fab {
+  position: fixed !important;
+  bottom: 40px !important;
+  right: 16px !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  z-index: 1006 !important;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  /* Ensure it's always in viewport corner */
+  margin: 0 !important;
+  /* Override any Vuetify positioning */
+  inset: auto 16px 40px auto !important;
+}
+
+.mobile-sidebar-fab.fab-shifted {
+  transform: translateX(-10px) !important;
+  opacity: 0.9;
+}
+
+/* Responsive positioning for different mobile sizes */
+@media (max-width: 480px) {
+  .mobile-sidebar-fab {
+    bottom: 36px !important;
+    right: 14px !important;
+    inset: auto 14px 36px auto !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .mobile-sidebar-fab {
+    bottom: 32px !important;
+    right: 12px !important;
+    inset: auto 12px 32px auto !important;
+  }
 }
 </style> 

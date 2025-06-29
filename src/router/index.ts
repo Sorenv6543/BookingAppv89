@@ -157,6 +157,15 @@ const router = createRouter({
         layout: 'default'
       }
     },
+    {
+      path: '/demos/responsive-layout',
+      name: 'responsive-layout-demo',
+      component: () => import('@/dev/demos/ResponsiveLayoutDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
+
     // {
     //   path: '/demos/home-admin',
     //   name: 'home-admin-demo',

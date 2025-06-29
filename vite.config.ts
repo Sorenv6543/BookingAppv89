@@ -33,7 +33,7 @@ vueDevTools({
 }),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'maskable-icon-512x512.png'],
+      includeAssets: ['pwa-icon.svg'],
         manifest: {
           name: 'Property Cleaning Scheduler',
           short_name: 'CleanSync',
@@ -48,24 +48,24 @@ vueDevTools({
           orientation: 'portrait', 
           icons: [
             {
-              src: 'pwa-64x64.png',
-              sizes: '64x64',
-              type: 'image/png'
-            },  
+              src: 'pwa-icon.svg',
+              sizes: 'any',
+              type: 'image/svg+xml'
+            },
             {
-              src: 'pwa-192x192.png',
+              src: 'pwa-icon.svg',
               sizes: '192x192',
-              type: 'image/png'
+              type: 'image/svg+xml'
             },
             {
-              src: 'pwa-512x512.png',
+              src: 'pwa-icon.svg',
               sizes: '512x512',
-              type: 'image/png'
+              type: 'image/svg+xml'
             },
             {
-              src: 'maskable-icon-512x512.png',
+              src: 'pwa-icon.svg',
               sizes: '512x512',
-              type: 'image/png',
+              type: 'image/svg+xml',
               purpose: 'maskable'
             }
           ]
@@ -75,7 +75,7 @@ vueDevTools({
         runtimeCaching: [
           {
             // Cache your role-based chunks
-            urlPattern: ({ request, url }) => {
+            urlPattern: ({ url }) => {
               const chunkNames = [
                 'admin-components', 'owner-components', 'shared-ui',
                 'admin-logic', 'owner-logic', 'shared-logic'

@@ -180,6 +180,8 @@ defineExpose({
   position: relative;
   display: flex;
   flex-direction: column;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .owner-calendar-card {
@@ -188,12 +190,17 @@ defineExpose({
   flex-direction: column;
   overflow: hidden;
   min-height: 0;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .owner-calendar {
   flex: 1;
   min-height: 0;
   position: relative;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* ================================================================ */

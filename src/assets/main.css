@@ -1,4 +1,6 @@
 /* Main CSS file */
+@import '../styles/responsive.scss';
+
 :root {
   --primary-color: #1976D2;
   --secondary-color: #424242;
@@ -14,8 +16,24 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll on mobile */
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 599px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* PWA viewport handling */
+@supports (height: 100dvh) {
+  .v-application {
+    min-height: 100dvh;
+  }
 } 

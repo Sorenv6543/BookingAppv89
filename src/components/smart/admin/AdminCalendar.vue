@@ -169,8 +169,8 @@
         v-else
         ref="calendarRef"
         :options="adminCalendarOptions"
-        class="admin-calendar"
-        :style="{ height: fullCalendarHeight }"
+          class="admin-calendar"
+  :style="{ height: fullCalendarHeight, width: '100%' }"
       />
     </v-card>
 
@@ -568,6 +568,7 @@ const adminCalendarOptions = computed<CalendarOptions>(() => {
   // Appearance - admin-focused
   height: '100%',
   aspectRatio: undefined, // Let height control sizing
+  expandRows: true, // Make calendar rows expand to fill available height
   
   // Custom styling based on theme
   themeSystem: 'standard',
@@ -1073,6 +1074,15 @@ onBeforeUnmount(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.admin-calendar {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .admin-calendar {
