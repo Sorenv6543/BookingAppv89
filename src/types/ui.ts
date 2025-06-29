@@ -261,7 +261,7 @@ export interface ValidationError {
   field: string;
   message: string;
   code?: string;
-  value?: any;
+  value?: unknown;
 }
 
 /**
@@ -285,7 +285,7 @@ export interface ApiError {
   statusText?: string;
   code?: string;
   message: string;
-  details?: any;
+  details?: unknown;
   endpoint?: string;
   method?: string;
   timestamp: string;
@@ -299,7 +299,7 @@ export interface RetryConfig {
   baseDelay: number;
   maxDelay: number;
   exponentialBackoff: boolean;
-  retryCondition?: (error: any) => boolean;
+  retryCondition?: (error: unknown) => boolean;
 }
 
 // ===== ACCESSIBILITY TYPES =====

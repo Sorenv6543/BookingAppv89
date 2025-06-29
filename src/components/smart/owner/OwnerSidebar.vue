@@ -1,7 +1,9 @@
 <template>
   <v-navigation-drawer
     class="owner-sidebar"
-    permanent
+    :width="380"
+    :permanent="true"
+   
     :elevation="0"
     color="tertiary"
   >                                   
@@ -550,7 +552,7 @@ onMounted(async () => {
 .quick-actions .v-card-text {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 0px;
 }
 
 /* Custom scrollbar for better UX */

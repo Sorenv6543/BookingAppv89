@@ -13,7 +13,7 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
 }
 
-export const usePWA = (): any => {
+export const usePWA = () => {
   // PWA Installation
   const deferredPrompt = ref<BeforeInstallPromptEvent | null>(null)
   const isPWAInstallable = ref(false)
@@ -28,10 +28,10 @@ export const usePWA = (): any => {
     offlineReady,
     updateServiceWorker
   } = useRegisterSW({
-    onRegistered(r: any) {
+    onRegistered(r: ServiceWorkerRegistration | undefined) {
       console.log('Service Worker registered:', r)
     },
-    onRegisterError(error: any) {
+    onRegisterError(error: unknown) {
       console.error('Service Worker registration error:', error)
     }
   })
@@ -39,7 +39,7 @@ export const usePWA = (): any => {
   // Check if running as PWA
   const isPWA = computed(() => {
     return window.matchMedia('(display-mode: standalone)').matches ||
-           (window.navigator as any).standalone ||
+           (window.navigator as { standalone?: boolean }).standalone ||
            document.referrer.includes('android-app://')
   })
 

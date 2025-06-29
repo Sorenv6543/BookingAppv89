@@ -24,12 +24,13 @@ export default defineConfig({
             configFile: 'src/styles/variables.scss'
           }
     }),   
-    vueDevTools({
-      componentInspector: {
-        enabled: true,
-        launchEditor: 'code',
-      }
-    }),
+vueDevTools({
+  componentInspector: {
+    enabled: true,
+    toggleComboKey: 'alt-shift',
+    launchEditor: 'code',
+  }
+}),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
@@ -123,7 +124,7 @@ export default defineConfig({
     __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
     // Ensure Vue feature flags are properly set
     __VUE_OPTIONS_API__: JSON.stringify(true),
-    __VUE_PROD_DEVTOOLS__: JSON.stringify(false)
+    __VUE_PROD_DEVTOOLS__: JSON.stringify(true)
   },
     // CSS and SCSS sourcemap configuration
     css: {

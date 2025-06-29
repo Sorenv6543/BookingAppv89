@@ -1,5 +1,4 @@
-import { ref, computed } from 'vue'
-import { usePWA } from './usePWA'
+import { ref, computed, onMounted } from 'vue'
 import type { Booking, BookingFormData } from '@/types/booking'
 import type { Property, PropertyFormData } from '@/types/property'
 
@@ -15,7 +14,7 @@ export type SyncOperation =
 export interface SyncQueueItem {
   id: string
   operation: SyncOperation
-  data: any
+  data: unknown
   timestamp: number
   retryCount: number
   maxRetries: number
@@ -31,7 +30,6 @@ export interface SyncResult {
 
 const SYNC_QUEUE_KEY = 'pwa-sync-queue'
 const MAX_RETRIES = 3
-const RETRY_DELAY = 1000 // Start with 1 second
 
 export const useBackgroundSync = () => {
   // State
@@ -39,8 +37,8 @@ export const useBackgroundSync = () => {
   const isProcessing = ref(false)
   const lastSyncTime = ref<Date | null>(null)
   
-  // PWA composable for online status
-  const { isOnline } = usePWA()
+  // Online status management
+  const isOnline = ref(navigator.onLine)
 
   // Computed
   const queueLength = computed(() => syncQueue.value.length)
@@ -73,7 +71,7 @@ export const useBackgroundSync = () => {
   // Add operation to sync queue
   const queueOperation = (
     operation: SyncOperation,
-    data: any,
+    data: unknown,
     userId: string,
     userRole: string
   ): string => {
@@ -161,19 +159,19 @@ export const useBackgroundSync = () => {
           await createBookingSync(item.data as BookingFormData)
           break
         case 'update_booking':
-          await updateBookingSync(item.data.id, item.data as Partial<Booking>)
+          await updateBookingSync((item.data as { id: string }).id, item.data as Partial<Booking>)
           break
         case 'create_property':
           await createPropertySync(item.data as PropertyFormData)
           break
         case 'update_property':
-          await updatePropertySync(item.data.id, item.data as Partial<Property>)
+          await updatePropertySync((item.data as { id: string }).id, item.data as Partial<Property>)
           break
         case 'delete_booking':
-          await deleteBookingSync(item.data.id)
+          await deleteBookingSync((item.data as { id: string }).id)
           break
         case 'delete_property':
-          await deletePropertySync(item.data.id)
+          await deletePropertySync((item.data as { id: string }).id)
           break
         default:
           throw new Error(`Unknown sync operation: ${item.operation}`)
@@ -227,7 +225,8 @@ export const useBackgroundSync = () => {
   }
 
   // Mock API call for development
-  const mockApiCall = async (url: string, method: string, data?: any): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const mockApiCall = async (url: string, method: string, data?: unknown): Promise<void> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // Simulate 90% success rate
@@ -290,6 +289,16 @@ export const useBackgroundSync = () => {
 
   // Initialize
   loadQueue()
+
+  // Setup online status listeners
+  onMounted(() => {
+    const updateOnlineStatus = () => {
+      isOnline.value = navigator.onLine
+    }
+    
+    window.addEventListener('online', updateOnlineStatus)
+    window.addEventListener('offline', updateOnlineStatus)
+  })
 
   // Auto-process when coming online
   const startAutoSync = () => {

@@ -279,27 +279,27 @@ const appName = computed(() => {
 })
 
 const showNotificationPrompt = computed(() => {
-  return pushNotifications.canRequestPermission.value && 
+  return pushNotifications?.canRequestPermission?.value && 
          !hideNotificationPrompt.value &&
-         !pushNotifications.hasPermission.value
+         !pushNotifications?.hasPermission?.value
 })
 
 const notificationPromptMessage = computed(() => {
-  if (userRole.value === 'owner') {
+  if (userRole?.value === 'owner') {
     return 'Get instant alerts for urgent turn cleanings and booking confirmations.'
   }
   return 'Receive system alerts for urgent turns and business-critical notifications.'
 })
 
 const installPromptMessage = computed(() => {
-  if (userRole.value === 'owner') {
+  if (userRole?.value === 'owner') {
     return 'Get faster access and work offline for property management.'
   }
   return 'Enhanced mobile oversight with offline capabilities for business management.'
 })
 
 const offlineMessage = computed(() => {
-  const pendingCount = backgroundSync.queueLength.value
+  const pendingCount = backgroundSync?.queueLength?.value || 0
   if (pendingCount > 0) {
     return `${pendingCount} operations will sync when connection returns.`
   }
@@ -307,15 +307,19 @@ const offlineMessage = computed(() => {
 })
 
 const hasPendingSync = computed(() => 
-  backgroundSync.hasPendingOperations.value && backgroundSync.canProcess.value
+  backgroundSync?.hasPendingOperations?.value && backgroundSync?.canProcess?.value
 )
 
-const isProcessingSync = computed(() => backgroundSync.isProcessing.value)
+const isProcessingSync = computed(() => backgroundSync?.isProcessing?.value || false)
 
-const syncStatus = computed(() => backgroundSync.getQueueStatus())
+const syncStatus = computed(() => backgroundSync?.getQueueStatus?.() || { operations: {}, total: 0 })
 
 const syncStatusMessage = computed(() => {
   const status = syncStatus.value
+  if (!status || !status.operations) {
+    return 'Syncing changes...'
+  }
+  
   const operations = Object.entries(status.operations)
     .map(([op, count]) => `${count} ${op.replace('_', ' ')}`)
     .join(', ')
@@ -366,7 +370,7 @@ const handleUpdate = async () => {
 const requestNotifications = async () => {
   requestingPermission.value = true
   try {
-    const granted = await pushNotifications.requestPermission()
+    const granted = await pushNotifications?.requestPermission?.()
     if (granted) {
       showNotificationSuccess.value = true
       hideNotificationPrompt.value = true
@@ -380,7 +384,9 @@ const requestNotifications = async () => {
 
 const retrySync = async () => {
   try {
-    await backgroundSync.retryFailedOperations()
+    if (backgroundSync?.retryFailedOperations) {
+      await backgroundSync.retryFailedOperations()
+    }
   } catch (error) {
     console.error('Sync retry failed:', error)
   }
@@ -393,7 +399,7 @@ watch(showOfflineReady, (newValue) => {
   }
 })
 
-watch(() => backgroundSync.queueLength.value, (newLength, oldLength) => {
+watch(() => backgroundSync?.queueLength?.value || 0, (newLength, oldLength) => {
   // Show success when queue becomes empty (operations completed)
   if (oldLength > 0 && newLength === 0 && isOnline.value) {
     showSyncSuccess.value = true

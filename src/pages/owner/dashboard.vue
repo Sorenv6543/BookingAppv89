@@ -14,8 +14,5 @@ defineOptions({
 </script>
 
 <style scoped>
-.owner-dashboard {
-  height: 100%;
-  width: 100%;
-}
+
 </style> 

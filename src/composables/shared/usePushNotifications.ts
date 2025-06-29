@@ -14,7 +14,7 @@ export interface PushNotificationPayload {
   type: NotificationType
   title: string
   body: string
-  data?: Record<string, any>
+  data?: Record<string, unknown>
   tag?: string
   requireInteraction?: boolean
   actions?: NotificationAction[]
@@ -26,15 +26,26 @@ export interface NotificationAction {
   icon?: string
 }
 
+export interface NotificationData extends Record<string, unknown> {
+  propertyName?: string
+  bookingId?: string
+  date?: string
+  time?: string
+  count?: number
+  message?: string
+}
+
 export const usePushNotifications = () => {
   // State
   const isSupported = ref('Notification' in window && 'serviceWorker' in navigator)
-  const permission = ref<NotificationPermission>('default')
+  const permission = ref<'default' | 'granted' | 'denied'>('default')
   const subscriptionActive = ref(false)
   const vapidPublicKey = ref<string>('') // Will be set from env or server
 
   // Auth composable for role-based notifications
-  const { currentUser, userRole } = useAuth()
+  const { user } = useAuth()
+  const currentUser = computed(() => user.value)
+  const userRole = computed(() => user.value?.role)
 
   // Check initial permission status
   if (isSupported.value) {
@@ -96,6 +107,7 @@ export const usePushNotifications = () => {
         // Create new subscription
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
+          // @ts-expect-error - Browser API accepts Uint8Array despite strict TypeScript definitions
           applicationServerKey: urlBase64ToUint8Array(vapidPublicKey.value)
         })
       }
@@ -145,7 +157,7 @@ export const usePushNotifications = () => {
       return
     }
 
-    const options: NotificationOptions = {
+    const options = {
       body: payload.body,
       data: payload.data,
       tag: payload.tag,
@@ -159,7 +171,7 @@ export const usePushNotifications = () => {
   }
 
   // Role-specific notification helpers
-  const sendOwnerNotification = (type: NotificationType, data: any) => {
+  const sendOwnerNotification = (type: NotificationType, data: NotificationData) => {
     if (userRole.value !== 'owner') return
 
     const notifications = {
@@ -202,7 +214,7 @@ export const usePushNotifications = () => {
     }
   }
 
-  const sendAdminNotification = (type: NotificationType, data: any) => {
+  const sendAdminNotification = (type: NotificationType, data: NotificationData) => {
     if (userRole.value !== 'admin') return
 
     const notifications = {
@@ -218,7 +230,7 @@ export const usePushNotifications = () => {
       },
       system_alert: {
         title: 'System Alert',
-        body: data.message,
+        body: data.message || 'Admin attention required for system operations.',
         tag: 'system-alert',
         requireInteraction: true,
         actions: [
