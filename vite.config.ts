@@ -33,68 +33,105 @@ vueDevTools({
 }),
     VitePWA({
       registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'maskable-icon-512x512.png'],
+        manifest: {
+          name: 'Property Cleaning Scheduler',
+          short_name: 'CleanSync',
+          description: 'Professional property cleaning management for owners and administrators',
+          theme_color: '#1976d2',
+          background_color: '#ffffff',
+          display: 'standalone',
+          scope: '/',
+          start_url: '/',
+          categories: ['productivity', 'cleaning', 'property management'],
+          lang: 'en-US',
+          orientation: 'portrait', 
+          icons: [
+            {
+              src: 'pwa-64x64.png',
+              sizes: '64x64',
+              type: 'image/png'
+            },  
+            {
+              src: 'pwa-192x192.png',
+              sizes: '192x192',
+              type: 'image/png'
+            },
+            {
+              src: 'pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png'
+            },
+            {
+              src: 'maskable-icon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
+            }
+          ]
+        },  
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            // Cache your role-based chunks
+            urlPattern: ({ request, url }) => {
+              const chunkNames = [
+                'admin-components', 'owner-components', 'shared-ui',
+                'admin-logic', 'owner-logic', 'shared-logic'
+              ];
+              return chunkNames.some(chunk => url.pathname.includes(chunk));
+            },
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'role-based-chunks',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
+          },
+          {
+            // Cache API calls with role-specific strategies
+            urlPattern: ({ url }) => url.pathname.startsWith('/api'),
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'supabase-api',
+              cacheName: 'api-cache',
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 // 24 hours
+                maxAgeSeconds: 24 * 60 * 60, // 24 hours
               },
-              backgroundSync: {
-                name: 'supabase-api-sync',
-                options: {
-                  maxRetentionTime: 24 * 60 // 24 hours
-                }
-              }
+              networkTimeoutSeconds: 3,
             }
+          },
+          {
+            // Cache images
+            urlPattern: ({ request }) => request.destination === 'image',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images',
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
           }
         ],
-        // Enable advanced PWA features
-        mode: 'production',
-        skipWaiting: true,
-        clientsClaim: true,
-        // Handle navigation fallback for SPA
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/]
-      },
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
-      manifest: {
-        name: 'Property Cleaning Scheduler',
-        short_name: 'CleanSync',
-        description: 'Professional property cleaning management for owners and administrators',
-        theme_color: '#1976d2',
-        background_color: '#ffffff',
-        display: 'standalone',
-        scope: '/',
-        start_url: '/',
-        icons: [
-          {
-            src: 'pwa-icon.svg',
-            sizes: '192x192',
-            type: 'image/svg+xml'
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+        clientsClaim: true,
+        skipWaiting: true,
           },
-          {
-            src: 'pwa-icon.svg', 
-            sizes: '512x512',
-            type: 'image/svg+xml'
-          },
-          {
-            src: 'pwa-icon.svg',
-            sizes: '512x512', 
-            type: 'image/svg+xml',
-            purpose: 'any maskable'
-          }
-        ]
-      },
       devOptions: {
-        enabled: true
-      }
-    })
+        enabled: true,
+        type: 'module'
+      },
+      // Enable advanced PWA features
+      mode: 'production',
+      // Handle navigation fallback for SPA
+    }),
+
+
 
   ],    
 
