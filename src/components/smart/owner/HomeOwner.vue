@@ -38,8 +38,8 @@ src/components/smart/owner/HomeOwner.vue -
       :class="{
         'full-viewport-calendar': true,
         'mobile-layout': mobile,
-        'tablet-layout': tablet,
-        'desktop-layout': desktop,
+        'tablet-layout': md,
+        'desktop-layout': lg,
         'sidebar-closed': !sidebarOpen
       }"
     >
@@ -240,7 +240,7 @@ const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
-const { xs, sm, md, lg, xl, mobile, tablet, desktop } = useDisplay();
+const { xs, md, lg, mobile } = useDisplay();
 
 // ============================================================================
 // COMPOSABLES - BUSINESS LOGIC
@@ -768,7 +768,7 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   }
 };
 
-const handleEventResize = async (resizeInfo: { event: any; revert: () => void }): Promise<void> => {
+const handleEventResize = async (resizeInfo: { event: { extendedProps: { booking: Booking }; startStr: string; endStr: string }; revert: () => void }): Promise<void> => {
   const booking = resizeInfo.event.extendedProps.booking as Booking;
   
   // Verify owner can modify this booking
@@ -1257,9 +1257,9 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 }
 
 .full-viewport-calendar.mobile-layout .calendar-content {
-  height: calc(100vh - 56px - 10vh) !important; /* Full height minus app bar minus header */
+  height: calc(100vh - 56px - 60px) !important; /* Full height minus app bar minus header card height */
   position: absolute !important;
-  top: 10vh !important; /* Below the header */
+  top: 60px !important; /* Directly below the header card */
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;

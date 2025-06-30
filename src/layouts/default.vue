@@ -1,8 +1,9 @@
 <!-- layouts/default.vue -->
 <template>
   <v-app>
-    <!-- App Bar -->
+    <!-- App Bar - Hidden on mobile for owner interface -->
     <v-app-bar
+      v-show="!$vuetify.display.mobile"
       app
       color="surface"
       elevation="1"

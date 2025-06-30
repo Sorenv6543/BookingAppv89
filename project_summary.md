@@ -425,40 +425,75 @@ export const getSystemTurnAlerts = (
 ## 🔄 Role-Based Component Communication
 
 ### **Property Owner Interface Flow**
-```
-graph TB
-    subgraph "Owner Interface"
-        OS[OwnerSidebar<br/>Smart Component] --> UOS[useOwnerSidebar<br/>Composable]
-        HO[HomeOwner<br/>Orchestrator] --> UOD[useOwnerDashboard<br/>Composable]
-        OC[OwnerCalendar<br/>Smart Component] --> UOC[useOwnerCalendar<br/>Composable]
-    end
-    
-    subgraph "Admin Interface"  
-        AS[AdminSidebar<br/>Smart Component] --> UAS[useAdminSidebar<br/>Composable]
-        HA[HomeAdmin<br/>Orchestrator] --> UAD[useAdminDashboard<br/>Composable]
-        AC[AdminCalendar<br/>Smart Component] --> UAC[useAdminCalendar<br/>Composable]
-    end
-    
-    subgraph "Composables Layer"
-        UOS --> ODS[ownerData.ts<br/>Role Store]
-        UOD --> ODS
-        UOC --> ODS
-        UAS --> ADS[adminData.ts<br/>Role Store]
-        UAD --> ADS
-        UAC --> ADS
-    end
-    
-    subgraph "Base Stores"
-        ODS --> PS[property.ts<br/>Base Store]
-        ODS --> BS[booking.ts<br/>Base Store]
-        ADS --> PS
-        ADS --> BS
-    end
-    
-    subgraph "Data Layer"
-        PS --> PM[properties Map]
-        BS --> BM[bookings Map]
-    end
+
+```plantuml
+@startuml Role-Based Component Communication Architecture
+
+package "Owner Interface" as OwnerUI {
+  component [OwnerSidebar\nSmart Component] as OS
+  component [HomeOwner\nOrchestrator] as HO  
+  component [OwnerCalendar\nSmart Component] as OC
+}
+
+package "Admin Interface" as AdminUI {
+  component [AdminSidebar\nSmart Component] as AS
+  component [HomeAdmin\nOrchestrator] as HA
+  component [AdminCalendar\nSmart Component] as AC
+}
+
+package "Composables Layer" as ComposablesLayer {
+  component [useOwnerSidebar\nComposable] as UOS
+  component [useOwnerDashboard\nComposable] as UOD
+  component [useOwnerCalendar\nComposable] as UOC
+  component [useAdminSidebar\nComposable] as UAS
+  component [useAdminDashboard\nComposable] as UAD
+  component [useAdminCalendar\nComposable] as UAC
+}
+
+package "Role Stores" as RoleStores {
+  component [ownerData.ts\nRole Store] as ODS
+  component [adminData.ts\nRole Store] as ADS
+}
+
+package "Base Stores" as BaseStores {
+  component [property.ts\nBase Store] as PS
+  component [booking.ts\nBase Store] as BS
+}
+
+package "Data Layer" as DataLayer {
+  database [properties Map] as PM
+  database [bookings Map] as BM
+}
+
+' Owner Interface Dependencies
+OS --> UOS
+HO --> UOD
+OC --> UOC
+
+' Admin Interface Dependencies  
+AS --> UAS
+HA --> UAD
+AC --> UAC
+
+' Composables to Role Stores
+UOS --> ODS
+UOD --> ODS
+UOC --> ODS
+UAS --> ADS
+UAD --> ADS
+UAC --> ADS
+
+' Role Stores to Base Stores
+ODS --> PS
+ODS --> BS
+ADS --> PS
+ADS --> BS
+
+' Base Stores to Data Layer
+PS --> PM
+BS --> BM
+
+@enduml
 ```
 
 ---

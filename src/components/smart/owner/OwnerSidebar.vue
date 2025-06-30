@@ -106,8 +106,17 @@
         class="mb-1"
         @click="navigateTo('/owner/dashboard')"
       />
-
       <!-- My Properties -->
+      <v-list-item
+        prepend-icon="mdi-view-dashboard"
+        title="My Properties"
+        :active="currentRoute === 'owner-properties'"
+        rounded="lg"
+        class="mb-1"
+        @click="navigateTo('/owner/properties')"
+      />
+
+      <!-- Add Property -->
       <v-list-group
         value="properties"
         class="mb-1"
@@ -116,7 +125,7 @@
           <v-list-item
             v-bind="activatorProps"
             prepend-icon="mdi-home-group"
-            title="My Properties"
+            title="Add Property"
             rounded="lg"
           >
             <template #append="{ isActive }">
@@ -130,7 +139,7 @@
           title="Add Property"
           class="ml-4"
           rounded="lg"
-          @click="showAddPropertyDialog = true"
+          @click="emit('createProperty')"
         />
         
         <v-list-item
@@ -206,7 +215,30 @@
           />
         </template>
       </v-list-item>
-
+      <!-- Theme -->
+      <v-list-item
+        prepend-icon="mdi-palette"
+        title="Theme"
+        rounded="lg"
+      >
+        <template #append>
+          <ThemePicker />
+        </template>
+      </v-list-item>
+      <!-- Logout -->
+      <v-list-item
+        prepend-icon="mdi-logout"
+        title="Logout"
+        rounded="lg"
+        @click="logout"
+      >
+        <template #append>
+          <v-btn
+            icon="mdi-logout"
+            variant="text"
+          />
+        </template>
+      </v-list-item>
       <!-- Settings -->
       <v-list-item
         prepend-icon="mdi-cog"
@@ -230,7 +262,7 @@
             text="Add Booking"
             variant="elevated"
             class="mb-2"
-            @click="showAddBookingDialog = true"
+            @click="emit('createBooking')"
           />
           <v-btn
             block
@@ -238,7 +270,7 @@
             prepend-icon="mdi-home-plus"
             text="Add Property"
             variant="outlined"
-            @click="showAddPropertyDialog = true"
+            @click="emit('createProperty')"
           />
         </div>
       </v-expand-transition>
@@ -253,98 +285,21 @@
           color="primary"
           variant="elevated"
           class="mb-2"
-          @click="showAddBookingDialog = true"
+          @click="emit('createBooking')"
         />
         <v-btn
           icon="mdi-home-plus"
           color="secondary"
           variant="outlined"
-          @click="showAddPropertyDialog = true"
+          @click="emit('createProperty')"
         />
       </div>
     </template>
   </v-navigation-drawer>
 
-  <!-- Enhanced Property Dialog -->
-  <v-dialog 
-    v-model="showAddPropertyDialog" 
-    max-width="600"
-    persistent
-    :fullscreen="isMobile"
-  >
-    <v-card>
-      <v-card-title class="d-flex align-center">
-        <v-icon
-          icon="mdi-home-plus"
-          class="mr-3"
-        />
-        Add New Property
-        <v-spacer />
-        <v-btn
-          icon="mdi-close"
-          variant="text"
-          @click="showAddPropertyDialog = false"
-        />
-      </v-card-title>
-      <v-card-text>
-        <!-- Simple form for now - will be replaced with OwnerPropertyForm -->
-        <v-alert
-          type="info"
-          variant="tonal"
-          class="mb-4"
-        >
-          Property creation form will be implemented here
-        </v-alert>
-        <v-btn
-          color="primary"
-          @click="createSampleProperty"
-        >
-          Create Sample Property
-        </v-btn>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
 
-  <!-- Enhanced Booking Dialog -->
-  <v-dialog 
-    v-model="showAddBookingDialog" 
-    max-width="800"
-    persistent
-    :fullscreen="isMobile"
-  >
-    <v-card>
-      <v-card-title class="d-flex align-center">
-        <v-icon
-          icon="mdi-calendar-plus"
-          class="mr-3"
-        />
-        Schedule New Cleaning
-        <v-spacer />
-        <v-btn
-          icon="mdi-close"
-          variant="text"
-          @click="showAddBookingDialog = false"
-        />
-      </v-card-title>
-      <v-card-text>
-        <!-- Simple form for now - will be replaced with OwnerBookingForm -->
-        <v-alert
-          type="info"
-          variant="tonal"
-          class="mb-4"
-        >
-          Booking creation form will be implemented here
-        </v-alert>
-        <v-btn 
-          color="primary" 
-          :disabled="ownerData.ownerProperties.length === 0"
-          @click="createSampleBooking"
-        >
-          Create Sample Booking
-        </v-btn>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+
+
 
   <!-- Enhanced Turn Alerts Dialog -->
   <v-dialog 
@@ -415,6 +370,7 @@ import { useUIStore } from '@/stores/ui';
 import { useAuthStore } from '@/stores/auth';
 import { useOwnerDataStore } from '@/stores/ownerData';
 import type { Property } from '@/types';
+import ThemePicker from '@/components/dumb/shared/ThemePicker.vue';
 
 // Define emits
 interface Emits {
@@ -439,8 +395,6 @@ const ownerDataStore = useOwnerDataStore();
 
 // Enhanced state
 const isRail = ref(false);
-const showAddPropertyDialog = ref(false);
-const showAddBookingDialog = ref(false);
 const showTurnAlerts = ref(false);
 
 // Get owner data from store
@@ -488,50 +442,18 @@ const getPropertyName = (propertyId: string): string => {
   return property?.name || 'Unknown Property';
 };
 
-// Sample data creation methods
-const createSampleProperty = async () => {
+// Logout function
+const logout = () => {
   try {
-    const sampleProperty = {
-      name: `Sample Property ${Date.now()}`,
-      address: '123 Sample Street',
-      property_type: 'house' as const,
-      bedrooms: 2,
-      bathrooms: 2,
-      cleaning_duration: 120,
-      pricing_tier: 'standard' as const,
-      active: true
-    };
-    
-    await ownerDataStore.createOwnerProperty(sampleProperty);
-    showAddPropertyDialog.value = false;
+    // Clear auth state and navigate to login
+    router.push('/auth/login');
+    console.log('User logged out');
   } catch (error) {
-    console.error('Error creating sample property:', error);
+    console.error('Error logging out:', error);
   }
 };
 
-const createSampleBooking = async () => {
-  try {
-    if (ownerData.value.ownerProperties.length === 0) {
-      console.error('No properties available for booking');
-      return;
-    }
 
-    const property = ownerData.value.ownerProperties[0];
-    const sampleBooking = {
-      property_id: property.id,
-      booking_type: 'standard' as const,
-      checkout_date: new Date().toISOString().split('T')[0],
-      cleaner_id: null,
-      status: 'scheduled' as const,
-      special_instructions: 'Sample booking created from sidebar'
-    };
-    
-    await ownerDataStore.createOwnerBooking(sampleBooking);
-    showAddBookingDialog.value = false;
-  } catch (error) {
-    console.error('Error creating sample booking:', error);
-  }
-};
 
 // Initialize owner data on mount
 onMounted(async () => {
