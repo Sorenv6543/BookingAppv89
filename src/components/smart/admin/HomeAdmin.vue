@@ -241,7 +241,7 @@ import { useProperties } from '@/composables/shared/useProperties';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 // Types
-import type { Booking, Property, BookingFormData, PropertyFormData, CalendarView } from '@/types';
+import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Import event logger for component communication
@@ -255,7 +255,11 @@ const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
-const { xs, sm, md, lg, xl, mobile, tablet, desktop } = useDisplay();
+const { xs, sm, md, lg, xl, mobile } = useDisplay();
+
+// Create computed properties for missing display breakpoints
+const tablet = computed(() => sm.value || md.value);
+const desktop = computed(() => lg.value || xl.value || (!mobile.value && !tablet.value));
 
 // ============================================================================
 // COMPOSABLES - BUSINESS LOGIC
@@ -1013,10 +1017,6 @@ const handleConfirmDialogClose = (): void => {
 // ============================================================================
 // UI HELPERS
 // ============================================================================
-
-const toggleSidebar = (): void => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
 
 // ============================================================================
 // LIFECYCLE HOOKS

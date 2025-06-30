@@ -6,10 +6,10 @@
     >
       <v-col
         cols="12"
-        sm="8"
-        md="6"
-        lg="4"
-        xl="3"
+        sm="12"
+        md="12"
+        lg="12"
+        xl="12"
       >
         <v-card
           elevation="8"
@@ -76,6 +76,7 @@
               v-model="email"
               label="Email"
               type="email"
+              autocomplete="email"
               prepend-inner-icon="mdi-email"
               variant="outlined"
               :rules="emailRules"
@@ -88,6 +89,7 @@
               v-model="password"
               label="Password"
               :type="showPassword ? 'text' : 'password'"
+              autocomplete="current-password"
               prepend-inner-icon="mdi-lock"
               :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               variant="outlined"

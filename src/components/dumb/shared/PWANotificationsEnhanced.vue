@@ -258,7 +258,7 @@ const {
   backgroundSync
 } = usePWA()
 
-const { userRole } = useAuth()
+const { user } = useAuth()
 
 // Local state
 const hideInstallPrompt = ref(false)
@@ -273,8 +273,8 @@ const showSyncSuccess = ref(false)
 
 // Computed properties
 const appName = computed(() => {
-  if (userRole.value === 'owner') return 'CleanSync'
-  if (userRole.value === 'admin') return 'CleanSync Pro'
+  if (user.value?.role === 'owner') return 'CleanSync'
+  if (user.value?.role === 'admin') return 'CleanSync Pro'
   return 'CleanSync'
 })
 
@@ -285,14 +285,14 @@ const showNotificationPrompt = computed(() => {
 })
 
 const notificationPromptMessage = computed(() => {
-  if (userRole?.value === 'owner') {
+  if (user.value?.role === 'owner') {
     return 'Get instant alerts for urgent turn cleanings and booking confirmations.'
   }
   return 'Receive system alerts for urgent turns and business-critical notifications.'
 })
 
 const installPromptMessage = computed(() => {
-  if (userRole?.value === 'owner') {
+  if (user.value?.role === 'owner') {
     return 'Get faster access and work offline for property management.'
   }
   return 'Enhanced mobile oversight with offline capabilities for business management.'

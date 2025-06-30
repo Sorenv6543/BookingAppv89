@@ -36,7 +36,7 @@
                 </v-icon>
                 <div>
                   <div class="text-h6">
-                    {{ ownerBookings.length }}
+                    {{ ownerBookingsArray.length }}
                   </div>
                   <div class="text-caption text-medium-emphasis">
                     Total Bookings
@@ -171,7 +171,7 @@
         <v-col cols="12">
           <v-card>
             <v-card-title>
-              Bookings ({{ ownerBookings.length }})
+              Bookings ({{ ownerBookingsArray.length }})
             </v-card-title>
             
             <v-data-table
@@ -245,7 +245,7 @@
 
             <!-- Empty State -->
             <div
-              v-if="ownerBookings.length === 0"
+              v-if="ownerBookingsArray.length === 0"
               class="text-center py-8"
             >
               <v-icon
@@ -278,7 +278,7 @@
 
 <script setup lang="ts">
 import { onMounted, computed, ref } from 'vue';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 import { useUIStore } from '@/stores/ui';
 import type { Booking } from '@/types';
@@ -312,8 +312,12 @@ const selectedType = ref<string | null>(null);
 const loading = ref(false);
 
 // Computed
+const ownerBookingsArray = computed(() => 
+  Array.from(ownerBookings.value.values())
+);
+
 const turnBookings = computed(() => 
-  ownerBookings.value.filter(b => b.booking_type === 'turn')
+  ownerBookingsArray.value.filter(b => b.booking_type === 'turn')
 );
 
 const propertyOptions = computed(() => [
@@ -336,7 +340,7 @@ const typeOptions = [
 ];
 
 const bookingItems = computed(() => {
-  let filtered = Array.from(ownerBookings.value.values());
+  let filtered = ownerBookingsArray.value;
 
   if (selectedProperty.value) {
     filtered = filtered.filter(b => b.property_id === selectedProperty.value);

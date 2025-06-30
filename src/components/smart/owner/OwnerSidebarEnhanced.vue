@@ -260,6 +260,7 @@ Enhanced with Vuetify best practices for great UX
       </v-card-title>
       <v-card-text>
         <OwnerPropertyForm
+          :model-value="showAddPropertyDialog"
           mode="create"
           @save="handlePropertySave"
           @cancel="showAddPropertyDialog = false"
@@ -288,6 +289,7 @@ Enhanced with Vuetify best practices for great UX
       </v-card-title>
       <v-card-text>
         <OwnerBookingForm
+          :model-value="showAddBookingDialog"
           :properties="ownerProperties"
           mode="create"
           @save="handleBookingSave"
@@ -320,7 +322,7 @@ Enhanced with Vuetify best practices for great UX
       </v-card-title>
       <v-card-text>
         <TurnAlertsPanel
-          :turns="urgentTurns"
+          :bookings="urgentTurns"
           role="owner"
           @close="showTurnAlerts = false"
         />

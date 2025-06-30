@@ -81,10 +81,15 @@ describe('User Store', () => {
       active: true
     });
 
-    // User should only see their own properties
-    expect(store.userProperties).toHaveLength(1);
-    expect(store.userProperties[0].owner_id).toBe('owner1');
-    expect(store.userActiveProperties).toHaveLength(1);
+    // User should only see their own properties (owner gets Map, admin gets Array)
+    if (Array.isArray(store.userProperties)) {
+      expect(store.userProperties.length).toBe(1);
+      expect(store.userProperties[0].owner_id).toBe('owner1');
+    } else {
+      expect(store.userProperties.size).toBe(1);
+      expect(Array.from(store.userProperties.values())[0].owner_id).toBe('owner1');
+    }
+    expect(store.userActiveProperties.size).toBe(1);
   });
 
   it('should provide all properties for admin', () => {
@@ -171,9 +176,14 @@ describe('User Store', () => {
       status: 'scheduled'
     });
 
-    // User should only see their own bookings
-    expect(store.userBookings).toHaveLength(1);
-    expect(store.userBookings[0].owner_id).toBe('owner1');
+    // User should only see their own bookings (owner gets Map, admin gets Array)
+    if (Array.isArray(store.userBookings)) {
+      expect(store.userBookings.length).toBe(1);
+      expect(store.userBookings[0].owner_id).toBe('owner1');
+    } else {
+      expect(store.userBookings.size).toBe(1);
+      expect(Array.from(store.userBookings.values())[0].owner_id).toBe('owner1');
+    }
   });
 
   it('should manage favorite properties', () => {
@@ -206,16 +216,16 @@ describe('User Store', () => {
     });
 
     // Initially no favorites
-    expect(store.favoriteProperties).toHaveLength(0);
+    expect(store.favoriteProperties.size).toBe(0);
 
     // Add to favorites
     store.toggleFavoriteProperty('prop1');
-    expect(store.favoriteProperties).toHaveLength(1);
-    expect(store.favoriteProperties[0].id).toBe('prop1');
+    expect(store.favoriteProperties.size).toBe(1);
+    expect(Array.from(store.favoriteProperties.values())[0].id).toBe('prop1');
 
     // Remove from favorites
     store.toggleFavoriteProperty('prop1');
-    expect(store.favoriteProperties).toHaveLength(0);
+    expect(store.favoriteProperties.size).toBe(0);
   });
 
   it('should check permissions correctly', () => {

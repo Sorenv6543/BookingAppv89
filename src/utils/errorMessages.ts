@@ -408,7 +408,7 @@ export function getLoadingMessage(
   role: UserRole = 'owner'
 ): string {
   const messages = LOADING_MESSAGES[role === 'admin' ? 'admin' : 'owner'];
-  return messages[operation] || (role === 'admin' ? 'Processing system operation...' : 'Loading...');
+  return messages[operation as keyof typeof messages] || (role === 'admin' ? 'Processing system operation...' : 'Loading...');
 }
 
 /**
@@ -420,7 +420,7 @@ export function getSuccessMessage(
   context: Record<string, any> = {}
 ): string {
   const messages = SUCCESS_MESSAGES[role === 'admin' ? 'admin' : 'owner'];
-  let message = messages[action];
+  let message = messages[action as keyof typeof messages];
   
   if (!message) {
     return role === 'admin' 

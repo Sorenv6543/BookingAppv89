@@ -8,6 +8,7 @@
           id="name"
           v-model="name"
           type="text"
+          autocomplete="name"
           required
         >
       </div>
@@ -17,6 +18,7 @@
           id="email"
           v-model="email"
           type="email"
+          autocomplete="email"
           required
         >
       </div>
@@ -26,6 +28,7 @@
           id="password"
           v-model="password"
           type="password"
+          autocomplete="new-password"
           required
         >
       </div>

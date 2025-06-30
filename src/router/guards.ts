@@ -90,7 +90,7 @@ function showNavigationError(error: NavigationError) {
  */
 export async function authGuard(
   to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) {
   const authStore = useAuthStore()
@@ -165,7 +165,7 @@ export async function authGuard(
  */
 export function loadingGuard(
   to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) {
   const uiStore = useUIStore()
@@ -200,7 +200,7 @@ export function afterNavigationGuard(
  */
 export function developmentGuard(
   to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) {
   // Temporarily disable verbose navigation logging to reduce console noise

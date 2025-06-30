@@ -4,7 +4,7 @@ import { useAdminBookings } from '@/composables/admin/useAdminBookings';
 import { useBookingStore } from '@/stores/booking';
 import { useAuthStore } from '@/stores/auth';
 import type { User, Booking } from '@/types';
-import { setAdminUser, addAdminBookings } from '../utils/test-utils';
+import { setAdminUser, addAdminBookings } from '../../utils/test-utils';
 
 describe('useAdminBookings (Role-Based)', () => {
   beforeEach(() => {
@@ -168,8 +168,8 @@ describe('useAdminBookings (Role-Based)', () => {
 
     // Should create booking with specified owner
     expect(result).toBeDefined();
-    expect(result.owner_id).toBe('owner1');
-    expect(result.property_id).toBe('prop1');
+    expect(result?.owner_id).toBe('owner1');
+    expect(result?.property_id).toBe('prop1');
 
     // Admin should have management permissions for any booking
     expect(canManageAnyBooking()).toBe(true);

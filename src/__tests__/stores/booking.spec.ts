@@ -103,8 +103,8 @@ describe('Booking Store', () => {
     });
     
     expect(store.bookings.size).toBe(2);
-    expect(store.bookingsByStatus('pending').length).toBe(1);
-    expect(store.bookingsByStatus('scheduled').length).toBe(1);
+    expect(store.bookingsByStatus('pending').size).toBe(1);
+    expect(store.bookingsByStatus('scheduled').size).toBe(1);
     expect(store.pendingBookings.length).toBe(1);
     expect(store.scheduledBookings.length).toBe(1);
   });
@@ -133,8 +133,8 @@ describe('Booking Store', () => {
     });
     
     expect(store.bookings.size).toBe(2);
-    expect(store.bookingsByType('standard').length).toBe(1);
-    expect(store.bookingsByType('turn').length).toBe(1);
+    expect(store.bookingsByType('standard').size).toBe(1);
+    expect(store.bookingsByType('turn').size).toBe(1);
     expect(store.standardBookings.length).toBe(1);
     expect(store.turnBookings.length).toBe(1);
   });
@@ -162,9 +162,9 @@ describe('Booking Store', () => {
       status: 'pending'
     });
     
-    expect(store.bookingsByProperty('prop1').length).toBe(1);
-    expect(store.bookingsByProperty('prop2').length).toBe(1);
-    expect(store.bookingsByProperty('prop3').length).toBe(0);
+    expect(store.bookingsByProperty('prop1').size).toBe(1);
+    expect(store.bookingsByProperty('prop2').size).toBe(1);
+    expect(store.bookingsByProperty('prop3').size).toBe(0);
   });
   
   it('should filter bookings by date range', () => {
@@ -190,10 +190,10 @@ describe('Booking Store', () => {
       status: 'pending'
     });
     
-    expect(store.bookingsByDateRange('2023-06-01', '2023-06-05').length).toBe(1);
-    expect(store.bookingsByDateRange('2023-06-09', '2023-06-13').length).toBe(1);
-    expect(store.bookingsByDateRange('2023-06-05', '2023-06-09').length).toBe(0);
-    expect(store.bookingsByDateRange('2023-05-31', '2023-06-13').length).toBe(2);
+    expect(store.bookingsByDateRange('2023-06-01', '2023-06-05').size).toBe(1);
+    expect(store.bookingsByDateRange('2023-06-09', '2023-06-13').size).toBe(1);
+    expect(store.bookingsByDateRange('2023-06-05', '2023-06-09').size).toBe(0);
+    expect(store.bookingsByDateRange('2023-05-31', '2023-06-13').size).toBe(2);
   });
   
   it('should update booking status', () => {

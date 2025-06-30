@@ -199,12 +199,12 @@ describe('UI Store', () => {
     
     // Update only part of the filter
     store.updateFilter({
-      status: ['pending', 'scheduled']
+      status: 'pending'
     });
     
     expect(store.filterState.bookingType).toBe('standard');
     expect(store.filterState.propertyId).toBe('prop1');
-    expect(store.filterState.status).toEqual(['pending', 'scheduled']);
+    expect(store.filterState.status).toBe('pending');
     
     // Reset filters
     store.resetFilters();

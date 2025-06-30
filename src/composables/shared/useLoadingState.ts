@@ -5,7 +5,6 @@
 
 import { ref, computed, onBeforeUnmount } from 'vue';
 import { useUIStore } from '@/stores/ui';
-import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/user';
 import type { 
   LoadingOperation, 

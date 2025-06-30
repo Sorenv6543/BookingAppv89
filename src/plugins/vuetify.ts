@@ -14,17 +14,17 @@ const lightTheme: ThemeDefinition = {
   dark: false,
   colors: {
     primary: '#2196F3', // Blue - For main actions and navigation
-    secondary: '#fdfcfc', // Blue Grey - For secondary actions and info
+    secondary: '#7d7ff1', // Blue Grey - For secondary actions and info
     accent: '#045ecc', // Green - For highlighting completed states
-    error: '#F44336', // Red - For urgent turn bookings and errors
+    error: '#80b3ec', // Red - For urgent turn bookings and errors
     info: '#03A9F4', // Light Blue - For informational elements
     success: '#4CAF50', // Green - For success indicators
     warning: '#FF9800', // Orange - For high-priority bookings
-    background: '#ffffff', // Soft Blue - App background
-    surface: '#fcfcff', // Very Light Grey - Cards and surfaces
+    background: '#fde1e1', // Soft Blue - App background
+    surface: '#ffffff', // Very Light #e6bfbf - Cards and surfaces
     'on-background': '#1C1B1F',
     'on-surface': '#1C1B1F',
-    'surface-variant': '#D1E3F8', // Subtle card contrast
+    'surface-variant': '#69acfa', // Subtle card contrast
     'on-surface-variant': '#49454F',
     'turn-urgent': '#F44336', // Red for urgent turn bookings
     'turn-standard': '#FF9800', // Orange for standard turn bookings
@@ -38,17 +38,17 @@ const darkTheme: ThemeDefinition = {
     primary: '#42A5F5', // Lighter Blue - More visible in dark mode
     secondary: '#78909C', // Lighter Blue Grey
     accent: '#66BB6A', // Lighter Green
-    error: '#EF5350', // Lighter Red for better visibility
+    error: '#2eacb1', // Lighter Red for better visibility
     info: '#29B6F6', // Lighter Light Blue
     success: '#66BB6A', // Lighter Green
-    warning: '#FFA726', // Lighter Orange
+    warning: '#ffc164', // Lighter Orange
     background: '#121212', // Dark Grey - App background
     surface: '#1E1E1E', // Slightly lighter dark grey - Cards and surfaces
     'on-background': '#E6E1E5',
     'on-surface': '#E6E1E5',
     'surface-variant': '#2D2D2D',
     'on-surface-variant': '#CAC4D0',
-    'turn-urgent': '#EF5350', // Lighter Red for urgent turn bookings
+    'turn-urgent': '#bcffae', // Lighter Red for urgent turn bookings
     'turn-standard': '#FFA726', // Lighter Orange for standard turn bookings
     'booking-standard': '#42A5F5', // Lighter Blue for standard bookings
   }
@@ -60,17 +60,17 @@ const greenTheme: ThemeDefinition = {
     primary: '#4CAF50', // Green
     secondary: '#8BC34A', // Light Green
     accent: '#00BCD4', // Cyan
-    error: '#F44336', // Red
+    error: '#d8c5c4', // #979191
     info: '#2196F3', // Blue
     success: '#4CAF50', // Green
-    warning: '#FF9800', // Orange
+    warning: '#2697f3', // #1e8ae2
     background: '#ffffff', // Light Grey Blue
-    surface: '#ff5e5e', // White
+    surface: '#899ae6', // #82a0f1
     'on-background': '#1C1B1F',
     'on-surface': '#1C1B1F',
-    'surface-variant': '#EEEEEE',
+    'surface-variant': '#90d4fc',
     'on-surface-variant': '#49454F',
-    'turn-urgent': '#F44336', // Red
+    'turn-urgent': '#1572ec', // Red
     'turn-standard': '#FF9800', // Orange
     'booking-standard': '#4CAF50', // Green
   }
@@ -83,10 +83,10 @@ const darkGreenTheme: ThemeDefinition = {
     primary: '#66BB6A', // Lighter Green
     secondary: '#9CCC65', // Lighter Light Green
     accent: '#26C6DA', // Lighter Cyan
-    error: '#EF5350', // Lighter Red
+    error: '#41e4ae', // Lighter Red
     info: '#29B6F6', // Lighter Blue
     success: '#66BB6A', // Lighter Green
-    warning: '#FFA726', // Lighter Orange
+    warning: '#b37e2f', // Lighter Orange
     background: '#121212', // Dark Grey
     surface: '#1E1E1E', // Slightly lighter dark grey
     'on-background': '#E6E1E5',
@@ -110,11 +110,11 @@ const purpleTheme: ThemeDefinition = {
     info: '#2196F3', // Blue
     success: '#4CAF50', // Green
     warning: '#FF9800', // Orange
-    background: '#F5F7FA', // Light Grey Blue
-    surface: '#FFFFFF', // White
+    background: '#4d8ef0', // Light #812323 Blue
+    surface: '#f16767', // #e93f3f
     'on-background': '#1C1B1F',
     'on-surface': '#1C1B1F',
-    'surface-variant': '#EEEEEE',
+    'surface-variant': '#ff2b2b',
     'on-surface-variant': '#49454F',
     'turn-urgent': '#F44336', // Red
     'turn-standard': '#FF9800', // Orange
@@ -129,10 +129,10 @@ const darkPurpleTheme: ThemeDefinition = {
     primary: '#AB47BC', // Lighter Purple
     secondary: '#7E57C2', // Lighter Deep Purple
     accent: '#5C6BC0', // Lighter Indigo
-    error: '#EF5350', // Lighter Red
+    error: '#7a50ef', // Lighter Red
     info: '#29B6F6', // Lighter Blue
     success: '#66BB6A', // Lighter Green
-    warning: '#FFA726', // Lighter Orange
+    warning: '#d19e51', // Lighter Orange
     background: '#121212', // Dark Grey
     surface: '#1E1E1E', // Slightly lighter dark grey
     'on-background': '#E6E1E5',
@@ -195,7 +195,7 @@ const darkOrangeTheme: ThemeDefinition = {
 const tealTheme: ThemeDefinition = {
   dark: false,
   colors: {
-    primary: '#009688', // Teal
+    primary: '#e61352', // Teal
     secondary: '#f6f6f6', // Cyan
     accent: '#4CAF50', // Green
     error: '#F44336', // Red

@@ -6,7 +6,7 @@
 import { computed } from 'vue';
 import { useErrorHandler } from '@/composables/shared/useErrorHandler';
 import { useAuthStore } from '@/stores/auth';
-import type { ErrorHandlingOptions, BusinessImpact } from '@/types/ui';
+import type { BusinessImpact } from '@/types/ui';
 import { useLoadingState } from '@/composables/shared/useLoadingState';
 import { useUIStore } from '@/stores/ui';
 import type { ErrorContext } from '@/types';

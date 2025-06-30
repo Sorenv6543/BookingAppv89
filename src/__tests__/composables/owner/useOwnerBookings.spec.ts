@@ -4,7 +4,7 @@ import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useBookingStore } from '@/stores/booking';
 import { useAuthStore } from '@/stores/auth';
 import type { User, Booking } from '@/types';
-import { setOwnerUser, addOwnerBookings } from '../utils/test-utils';
+import { setOwnerUser, addOwnerBookings } from '../../utils/test-utils';
 
 describe('useOwnerBookings (Role-Based)', () => {
   beforeEach(() => {
@@ -107,8 +107,8 @@ describe('useOwnerBookings (Role-Based)', () => {
 
     // Should automatically set owner_id and return booking
     expect(result).toBeDefined();
-    expect(result.owner_id).toBe('owner1');
-    expect(result.property_id).toBe('prop1');
+    expect(result?.owner_id).toBe('owner1');
+    expect(result?.property_id).toBe('prop1');
   });
 
   it('should enforce owner-only data access', () => {

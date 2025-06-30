@@ -140,7 +140,7 @@
 import { onMounted } from 'vue';
 import PropertyCard from '@/components/dumb/shared/PropertyCard.vue';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
 import { useUIStore } from '@/stores/ui';
 import type { Property } from '@/types';
 

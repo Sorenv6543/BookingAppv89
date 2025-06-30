@@ -86,8 +86,8 @@ export function setAdminUser(authStore: { user: User | null }, id = 'admin1') {
 export function addOwnerBookings(bookingStore: { addBooking: (b: Booking) => void }, ownerId: string, count: number) {
   for (let i = 1; i <= count; i++) {
     bookingStore.addBooking({
-      id: `booking${i}`,
-      property_id: `prop${i}`,
+      id: `${ownerId}-booking${i}`, // Make IDs unique per owner
+      property_id: `${ownerId}-prop${i}`,
       owner_id: ownerId,
       checkout_date: '2023-06-01T11:00:00Z',
       checkin_date: '2023-06-03T15:00:00Z',

@@ -36,8 +36,7 @@ export function useAdminCalendarState() {
   const showOverdueOnly = ref<boolean>(false);
   const calendarViewMode = ref<'standard' | 'cleaner' | 'owner' | 'priority'>('standard');
   
-  // Get current admin user ID
-  const currentAdminId = computed(() => authStore.user?.id);
+
   
   // COMPUTED PROPERTIES - Admin system-wide data access (NO filtering)
   
@@ -232,7 +231,7 @@ export function useAdminCalendarState() {
     }
     
     // Open admin booking management modal with enhanced options
-    uiStore.openModal('adminBookingModal', {
+    uiStore.openModal('adminBookingModal', 'edit', {
       booking,
       mode: 'admin-edit',
       availableActions: [

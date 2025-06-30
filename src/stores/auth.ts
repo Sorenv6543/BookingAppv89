@@ -16,21 +16,25 @@ import {
   getRoleSpecificSuccessMessage,
   clearAllRoleSpecificState 
 } from '@/utils/authHelpers';
+import { useSupabaseAuth } from '@/composables/supabase/useSupabaseAuth';
 
 /**
  * Auth store for the Property Cleaning Scheduler
  * Manages user authentication state with role-based multi-tenant architecture
  */
 export const useAuthStore = defineStore('auth', () => {
-  // State
-  const user = ref<User | null>(null);
-  const token = ref<string | null>(null);
-  const loading = ref<boolean>(false);
-  const error = ref<string | null>(null);
+  // Initialize Supabase auth
+  const supabaseAuth = useSupabaseAuth();
+  
+  // State - sync with Supabase auth
+  const user = computed(() => supabaseAuth.user.value);
+  const token = ref<string | null>(null); // Keep for compatibility
+  const loading = computed(() => supabaseAuth.loading.value);
+  const error = computed(() => supabaseAuth.error.value);
   const tempViewMode = ref<{ role: UserRole; ownerId?: string } | null>(null);
   
   // Computed properties
-  const isAuthenticated = computed(() => !!user.value && !!token.value);
+  const isAuthenticated = computed(() => supabaseAuth.isAuthenticated.value);
   
   // Role-specific computed properties for role-based routing
   const isOwner = computed(() => {
@@ -63,95 +67,65 @@ export const useAuthStore = defineStore('auth', () => {
   // Actions
   
   /**
-   * Login with email and password
+   * Login with email and password using Supabase
    * Returns success boolean for component-level navigation handling
    */
   async function login(email: string, password: string): Promise<boolean> {
-    loading.value = true;
-    error.value = null;
-    
     try {
-      // Simple mock validation - don't use the useAuth composable
-      if (!email || !password) {
-        throw new Error('Email and password are required');
-      }
+      console.log('🔍 [AuthStore] Login attempt:', { email });
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+      const success = await supabaseAuth.signIn(email, password);
       
-      // Get user data directly
-      const userData = getUserFromEmail(email);
-      console.log('🔍 [AuthStore] Login attempt:', { 
-        email, 
-        userData: userData ? { id: userData.id, role: userData.role, name: userData.name } : null 
-      });
-      
-      if (userData) {
-        user.value = userData;
-        token.value = 'mock-jwt-token'; // Mock token for development
-        
+      if (success) {
         console.log('✅ [AuthStore] User authenticated:', { 
-          id: user.value.id, 
-          role: user.value.role, 
-          name: user.value.name,
+          id: user.value?.id, 
+          role: user.value?.role, 
+          name: user.value?.name,
           isAuthenticated: isAuthenticated.value
         });
         
         // Clear any previous temp view mode
         tempViewMode.value = null;
+        token.value = 'supabase-session'; // Set token for compatibility
         
-        // Small delay to ensure reactivity propagates
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        console.log('✅ [AuthStore] Auth state after delay:', {
-          isAuthenticated: isAuthenticated.value,
-          userId: user.value?.id,
-          userRole: user.value?.role
-        });
-        
-        loading.value = false;
         return true;
-      } else {
-        throw new Error('Invalid credentials');
       }
+      
+      return false;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Login failed';
-      loading.value = false;
+      console.error('Login error:', err);
       return false;
     }
   }
   
   /**
-   * Logout current user and clear all role-specific state
+   * Logout current user using Supabase and clear all role-specific state
    * Returns success boolean for component-level navigation handling
    */
   async function logout(): Promise<boolean> {
-    loading.value = true;
-    error.value = null;
-    
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
+      const success = await supabaseAuth.signOut();
       
-      // Clear auth state
-      user.value = null;
-      token.value = null;
-      tempViewMode.value = null;
+      if (success) {
+        // Clear local state
+        token.value = null;
+        tempViewMode.value = null;
+        
+        // Clear all role-specific cached state
+        clearAllRoleSpecificState();
+        
+        return true;
+      }
       
-      // Clear all role-specific cached state
-      clearAllRoleSpecificState();
-      
-      loading.value = false;
-      return true;
+      return false;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Logout failed';
-      loading.value = false;
+      console.error('Logout error:', err);
       return false;
     }
   }
   
   /**
-   * Register a new user with role selection
+   * Register a new user with role selection using Supabase
    * Returns success boolean for component-level navigation handling
    */
   async function register(userData: {
@@ -161,31 +135,40 @@ export const useAuthStore = defineStore('auth', () => {
     role: UserRole;
     company_name?: string;
   }): Promise<boolean> {
-    loading.value = true;
-    error.value = null;
-    
     try {
-      // Validate required fields
-      if (!userData.email || !userData.password || !userData.name || !userData.role) {
-        throw new Error('All fields are required');
+      console.log('🔍 [AuthStore] Registration attempt:', { 
+        email: userData.email, 
+        role: userData.role,
+        name: userData.name
+      });
+      
+      const success = await supabaseAuth.signUp(
+        userData.email, 
+        userData.password, 
+        {
+          name: userData.name,
+          role: userData.role,
+          company_name: userData.company_name
+        }
+      );
+      
+      if (success) {
+        console.log('✅ [AuthStore] User registered:', { 
+          id: user.value?.id, 
+          role: user.value?.role, 
+          name: user.value?.name
+        });
+        
+        // Clear any previous temp view mode
+        tempViewMode.value = null;
+        token.value = 'supabase-session'; // Set token for compatibility
+        
+        return true;
       }
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Set user data after successful registration
-      const newUser = createUserFromRegistration(userData);
-      user.value = newUser;
-      token.value = 'mock-jwt-token'; // Mock token for development
-      
-      // Clear any previous temp view mode
-      tempViewMode.value = null;
-      
-      loading.value = false;
-      return true;
+      return false;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Registration failed';
-      loading.value = false;
+      console.error('Registration error:', err);
       return false;
     }
   }
@@ -229,7 +212,8 @@ export const useAuthStore = defineStore('auth', () => {
    * Clear error state
    */
   function clearError() {
-    error.value = null;
+    // Supabase auth handles error clearing automatically
+    // This function is kept for API compatibility
   }
   
   /**
@@ -239,119 +223,7 @@ export const useAuthStore = defineStore('auth', () => {
     return getRoleSpecificSuccessMessage(action, user.value?.role);
   }
   
-  // Helper functions
-  
-  /**
-   * Get user data from email (mock implementation)
-   */
-  function getUserFromEmail(email: string): User | null {
-    // This uses the same mock users from the auth composable
-    const mockUsers: User[] = [
-      {
-        id: 'owner-1',
-        email: 'owner@example.com',
-        name: 'Property Owner',
-        role: 'owner',
-        company_name: 'Luxury Rentals Inc.',
-        settings: {
-          notifications: true,
-          timezone: 'America/New_York',
-          theme: 'light' as const,
-          language: 'en'
-        },
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      } as PropertyOwner,
-      {
-        id: 'admin-1',
-        email: 'admin@example.com',
-        name: 'Admin User',
-        role: 'admin',
-        access_level: 'full' as const,
-        settings: {
-          notifications: true,
-          timezone: 'America/New_York',
-          theme: 'dark' as const,
-          language: 'en'
-        },
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      } as Admin,
-      {
-        id: 'cleaner-1',
-        email: 'cleaner@example.com',
-        name: 'Cleaning Staff',
-        role: 'cleaner',
-        skills: ['deep clean', 'carpet cleaning', 'window washing'],
-        max_daily_bookings: 3,
-        location: {
-          lat: 40.7128,
-          lng: -74.0060
-        },
-        settings: {
-          notifications: true,
-          timezone: 'America/New_York',
-          theme: 'light' as const,
-          language: 'en'
-        },
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      } as Cleaner
-    ];
-    
-    return mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase()) || null;
-  }
-  
-  /**
-   * Create user object from registration data
-   */
-  function createUserFromRegistration(userData: {
-    email: string;
-    password: string;
-    name: string;
-    role: UserRole;
-    company_name?: string;
-  }): User {
-    const baseUser = {
-      id: `${userData.role}-${Date.now()}`,
-      email: userData.email,
-      name: userData.name,
-      role: userData.role,
-      settings: {
-        notifications: true,
-        timezone: 'America/New_York',
-        theme: 'light' as const,
-        language: 'en'
-      },
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-    
-    // Add role-specific properties
-    if (userData.role === 'owner') {
-      return {
-        ...baseUser,
-        role: 'owner' as const,
-        company_name: userData.company_name || ''
-      } as PropertyOwner;
-    } else if (userData.role === 'admin') {
-      return {
-        ...baseUser,
-        role: 'admin' as const,
-        access_level: 'limited' as const // New admins start with limited access
-      } as Admin;
-    } else if (userData.role === 'cleaner') {
-      return {
-        ...baseUser,
-        role: 'cleaner' as const,
-        skills: [],
-        max_daily_bookings: 3,
-        location: { lat: 0, lng: 0 }
-      } as Cleaner;
-    }
-    
-    return baseUser as User;
-  }
+  // Note: Mock helper functions removed - now using real Supabase authentication
   
   return {
     // State

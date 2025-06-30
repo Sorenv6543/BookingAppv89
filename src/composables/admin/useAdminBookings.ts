@@ -3,7 +3,7 @@ import { useBookings } from '@/composables/shared/useBookings';
 import { useAuthStore } from '@/stores/auth';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
-import type { Booking, BookingFormData, BookingStatus, BookingType } from '@/types';
+import type { Booking, BookingStatus, BookingType } from '@/types';
 
 /**
  * Admin-specific booking composable

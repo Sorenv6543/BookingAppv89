@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/user';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
-import type { User, Cleaner, UserRole } from '@/types';
+import type { Cleaner } from '@/types';
 
 /**
  * Admin-only cleaner management composable

@@ -141,10 +141,10 @@ describe('Property Store', () => {
     });
     
     expect(store.properties.size).toBe(3);
-    expect(store.propertiesByPricingTier('basic').length).toBe(1);
-    expect(store.propertiesByPricingTier('premium').length).toBe(1);
-    expect(store.propertiesByPricingTier('luxury').length).toBe(1);
-    expect(store.propertiesByPricingTier('basic')[0].name).toBe('Basic Property');
+    expect(store.propertiesByPricingTier('basic').size).toBe(1);
+    expect(store.propertiesByPricingTier('premium').size).toBe(1);
+    expect(store.propertiesByPricingTier('luxury').size).toBe(1);
+    expect(Array.from(store.propertiesByPricingTier('basic').values())[0].name).toBe('Basic Property');
   });
   
   it('should filter properties by owner', () => {
@@ -180,9 +180,9 @@ describe('Property Store', () => {
       active: true
     });
     
-    expect(store.propertiesByOwner('owner1').length).toBe(2);
-    expect(store.propertiesByOwner('owner2').length).toBe(1);
-    expect(store.propertiesByOwner('owner3').length).toBe(0);
+    expect(store.propertiesByOwner('owner1').size).toBe(2);
+    expect(store.propertiesByOwner('owner2').size).toBe(1);
+    expect(store.propertiesByOwner('owner3').size).toBe(0);
   });
   
   it('should clear all properties', () => {
