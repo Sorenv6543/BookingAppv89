@@ -152,7 +152,7 @@ const AuthPrompt = {
         const success = await authStore.login('admin@example.com', 'password')
         if (success) {
           // Let route guards handle navigation
-          const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+          const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role)
           await router.push(defaultRoute)
         }
       } catch (error) {
@@ -165,7 +165,7 @@ const AuthPrompt = {
         const success = await authStore.login('owner@example.com', 'password')
         if (success) {
           // Let route guards handle navigation
-          const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+          const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role)
           await router.push(defaultRoute)
         }
       } catch (error) {
@@ -199,7 +199,7 @@ onMounted(async () => {
     
     // If user is authenticated, redirect to their dashboard
     if (authStore.isAuthenticated) {
-      const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+      const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role)
       if (defaultRoute !== '/' && router.currentRoute.value.path === '/') {
         await router.push(defaultRoute)
       }

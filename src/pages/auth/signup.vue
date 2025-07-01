@@ -351,7 +351,7 @@ async function handleRegister() {
     if (success) {
       // Show success message
       successMessage.value = authStore.getSuccessMessage('register')
-      
+
       // Navigate to role-appropriate dashboard
       const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
       

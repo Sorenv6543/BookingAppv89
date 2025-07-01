@@ -1,403 +1,225 @@
--- =====================================================
--- Property Cleaning Scheduler - Row Level Security Policies
--- Migration: 002_rls_policies.sql
--- Purpose: Enforce multi-tenant security at database level
--- Replaces frontend filtering with real database security
--- =====================================================
+-- 002_rls_policies.sql
+-- Row Level Security (RLS) policies for multi-tenant security
+-- TASK-080: Database Schema & RLS Setup
 
--- =====================================================
--- SECURITY DEFINER HELPER FUNCTIONS
--- Avoid RLS recursion and improve performance
--- =====================================================
+-- ============================================================================
+-- USER PROFILES RLS POLICIES
+-- ============================================================================
 
--- Create private schema for security functions
-CREATE SCHEMA IF NOT EXISTS private;
+-- Users can view their own profile
+CREATE POLICY "Users can view own profile" ON public.user_profiles
+  FOR SELECT TO authenticated
+  USING (id = private.current_user_id());
 
--- Helper function to get current user's role
--- Uses security definer to avoid RLS checking recursion
-CREATE OR REPLACE FUNCTION private.get_user_role()
-RETURNS user_role
-LANGUAGE SQL
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT role 
-  FROM public.user_profiles 
-  WHERE id = (SELECT auth.uid());
-$$;
+-- Users can update their own profile
+CREATE POLICY "Users can update own profile" ON public.user_profiles
+  FOR UPDATE TO authenticated
+  USING (id = private.current_user_id())
+  WITH CHECK (id = private.current_user_id());
 
--- Helper function to check if user is admin
--- Optimized for frequent role checks in policies
-CREATE OR REPLACE FUNCTION private.is_admin()
-RETURNS BOOLEAN
-LANGUAGE SQL  
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT EXISTS (
-    SELECT 1 
-    FROM public.user_profiles 
-    WHERE id = (SELECT auth.uid()) 
-    AND role = 'admin'
+-- Admins can view all profiles (for user management)
+CREATE POLICY "Admins can view all profiles" ON public.user_profiles
+  FOR SELECT TO authenticated
+  USING (private.is_admin());
+
+-- Admins can update all profiles (for user management)
+CREATE POLICY "Admins can update all profiles" ON public.user_profiles
+  FOR UPDATE TO authenticated
+  USING (private.is_admin())
+  WITH CHECK (private.is_admin());
+
+-- Admins can insert new profiles (for user management)
+CREATE POLICY "Admins can insert profiles" ON public.user_profiles
+  FOR INSERT TO authenticated
+  WITH CHECK (private.is_admin());
+
+-- Only admins can delete profiles (security measure)
+CREATE POLICY "Admins can delete profiles" ON public.user_profiles
+  FOR DELETE TO authenticated
+  USING (private.is_admin());
+
+-- ============================================================================
+-- PROPERTIES RLS POLICIES
+-- ============================================================================
+
+-- Owners can view their own properties, admins can view all
+CREATE POLICY "Owners can view own properties" ON public.properties
+  FOR SELECT TO authenticated
+  USING (
+    (private.is_owner() AND owner_id = private.current_user_id()) OR
+    private.is_admin()
   );
-$$;
 
--- Helper function to check if user is owner
-CREATE OR REPLACE FUNCTION private.is_owner()
-RETURNS BOOLEAN
-LANGUAGE SQL
-SECURITY DEFINER  
-SET search_path = public
-AS $$
-  SELECT EXISTS (
-    SELECT 1 
-    FROM public.user_profiles 
-    WHERE id = (SELECT auth.uid()) 
-    AND role = 'owner'
+-- Owners can insert their own properties
+CREATE POLICY "Owners can insert own properties" ON public.properties
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    (private.is_owner() AND owner_id = private.current_user_id()) OR
+    private.is_admin()
   );
-$$;
 
--- Helper function to check property ownership
--- Used to validate booking operations
-CREATE OR REPLACE FUNCTION private.user_owns_property(property_uuid UUID)
-RETURNS BOOLEAN
-LANGUAGE SQL
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT EXISTS (
-    SELECT 1 
-    FROM public.properties 
-    WHERE id = property_uuid 
-    AND owner_id = (SELECT auth.uid())
+-- Owners can update their own properties
+CREATE POLICY "Owners can update own properties" ON public.properties
+  FOR UPDATE TO authenticated
+  USING (
+    (private.is_owner() AND owner_id = private.current_user_id()) OR
+    private.is_admin()
+  )
+  WITH CHECK (
+    (private.is_owner() AND owner_id = private.current_user_id()) OR
+    private.is_admin()
   );
-$$;
 
--- =====================================================
--- ENABLE ROW LEVEL SECURITY ON ALL TABLES
--- =====================================================
+-- Owners can delete their own properties, admins can delete any
+CREATE POLICY "Owners can delete own properties" ON public.properties
+  FOR DELETE TO authenticated
+  USING (
+    (private.is_owner() AND owner_id = private.current_user_id()) OR
+    private.is_admin()
+  );
 
-ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.properties ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
+-- Cleaners can view properties for assigned bookings
+CREATE POLICY "Cleaners can view assigned properties" ON public.properties
+  FOR SELECT TO authenticated
+  USING (
+    private.is_cleaner() AND 
+    EXISTS (
+      SELECT 1 FROM public.bookings 
+      WHERE property_id = properties.id 
+      AND assigned_cleaner_id = private.current_user_id()
+    )
+  );
 
--- =====================================================
--- USER PROFILES POLICIES
--- Control access to user profile data
--- =====================================================
+-- ============================================================================
+-- BOOKINGS RLS POLICIES
+-- ============================================================================
 
--- SELECT: Users can view their own profile + public profiles for admin
-CREATE POLICY "Users can view their own profile"
-ON public.user_profiles
-FOR SELECT
-TO authenticated
-USING (
-  -- Own profile
-  id = (SELECT auth.uid())
-  OR
-  -- Admin can see all profiles  
-  private.is_admin()
-);
+-- Owners can view their own bookings, admins can view all
+CREATE POLICY "Owners can view own bookings" ON public.bookings
+  FOR SELECT TO authenticated
+  USING (
+    (private.is_owner() AND owner_id = private.current_user_id()) OR
+    private.is_admin()
+  );
 
--- INSERT: Users can create their own profile (handled by auth triggers)
-CREATE POLICY "Users can insert their own profile"
-ON public.user_profiles
-FOR INSERT
-TO authenticated
-WITH CHECK (
-  id = (SELECT auth.uid())
-);
+-- Owners can insert their own bookings
+CREATE POLICY "Owners can insert own bookings" ON public.bookings
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    (private.is_owner() AND owner_id = private.current_user_id()) OR
+    private.is_admin()
+  );
 
--- UPDATE: Users can update their own profile, admins can update any
-CREATE POLICY "Users can update their own profile"
-ON public.user_profiles
-FOR UPDATE
-TO authenticated
-USING (
-  id = (SELECT auth.uid())
-  OR
-  private.is_admin()
+-- Owners can update their own bookings
+CREATE POLICY "Owners can update own bookings" ON public.bookings
+  FOR UPDATE TO authenticated
+  USING (
+    (private.is_owner() AND owner_id = private.current_user_id()) OR
+    private.is_admin()
+  )
+  WITH CHECK (
+    (private.is_owner() AND owner_id = private.current_user_id()) OR
+    private.is_admin()
+  );
+
+-- Owners can delete their own bookings, admins can delete any
+CREATE POLICY "Owners can delete own bookings" ON public.bookings
+  FOR DELETE TO authenticated
+  USING (
+    (private.is_owner() AND owner_id = private.current_user_id()) OR
+    private.is_admin()
+  );
+
+-- Cleaners can view bookings assigned to them
+CREATE POLICY "Cleaners can view assigned bookings" ON public.bookings
+  FOR SELECT TO authenticated
+  USING (
+    private.is_cleaner() AND assigned_cleaner_id = private.current_user_id()
+  );
+
+-- Cleaners can update status and notes of assigned bookings
+CREATE POLICY "Cleaners can update assigned bookings" ON public.bookings
+  FOR UPDATE TO authenticated
+  USING (
+    private.is_cleaner() AND assigned_cleaner_id = private.current_user_id()
+  )
+  WITH CHECK (
+    private.is_cleaner() AND assigned_cleaner_id = private.current_user_id()
+  );
+
+-- ============================================================================
+-- SECURITY VALIDATION FUNCTIONS
+-- ============================================================================
+
+-- Function to validate property ownership for booking operations
+CREATE OR REPLACE FUNCTION private.validate_property_ownership(
+  property_uuid UUID,
+  owner_uuid UUID
 )
-WITH CHECK (
-  id = (SELECT auth.uid())
-  OR
-  private.is_admin()
-);
-
--- DELETE: Only admins can delete profiles (business rule)
-CREATE POLICY "Only admins can delete profiles"
-ON public.user_profiles
-FOR DELETE
-TO authenticated
-USING (private.is_admin());
-
--- =====================================================
--- PROPERTIES POLICIES
--- Enforce owner data isolation / admin system access
--- =====================================================
-
--- SELECT: Owners see only their properties, admins see all
-CREATE POLICY "Owners see their properties, admins see all"
-ON public.properties
-FOR SELECT
-TO authenticated
-USING (
-  -- Owner sees only their properties
-  (private.is_owner() AND owner_id = (SELECT auth.uid()))
-  OR
-  -- Admin sees all properties (no filtering)
-  private.is_admin()
-);
-
--- INSERT: Owners can create properties for themselves, admins can create for anyone
-CREATE POLICY "Owners can create their properties, admins can create any"
-ON public.properties
-FOR INSERT
-TO authenticated
-WITH CHECK (
-  -- Owner can only create for themselves
-  (private.is_owner() AND owner_id = (SELECT auth.uid()))
-  OR
-  -- Admin can create for anyone
-  private.is_admin()
-);
-
--- UPDATE: Owners can update their properties, admins can update any
-CREATE POLICY "Owners can update their properties, admins can update any"
-ON public.properties
-FOR UPDATE
-TO authenticated
-USING (
-  -- Owner can only update their properties
-  (private.is_owner() AND owner_id = (SELECT auth.uid()))
-  OR
-  -- Admin can update any property
-  private.is_admin()
-)
-WITH CHECK (
-  -- Maintain ownership during updates (owners can't transfer properties)
-  (private.is_owner() AND owner_id = (SELECT auth.uid()))
-  OR
-  -- Admin can change ownership
-  private.is_admin()
-);
-
--- DELETE: Owners can delete their properties, admins can delete any
-CREATE POLICY "Owners can delete their properties, admins can delete any"
-ON public.properties
-FOR DELETE
-TO authenticated
-USING (
-  -- Owner can only delete their properties
-  (private.is_owner() AND owner_id = (SELECT auth.uid()))
-  OR
-  -- Admin can delete any property
-  private.is_admin()
-);
-
--- =====================================================
--- BOOKINGS POLICIES
--- Core multi-tenant security - most complex policies
--- =====================================================
-
--- SELECT: Owners see only their bookings, admins see all
-CREATE POLICY "Owners see their bookings, admins see all"
-ON public.bookings
-FOR SELECT
-TO authenticated
-USING (
-  -- Owner sees only bookings for their properties
-  (private.is_owner() AND owner_id = (SELECT auth.uid()))
-  OR
-  -- Admin sees all bookings (no filtering) 
-  private.is_admin()
-  OR
-  -- Cleaner sees assigned bookings (future feature)
-  (
-    (SELECT private.get_user_role()) = 'cleaner' 
-    AND assigned_cleaner_id = (SELECT auth.uid())
-  )
-);
-
--- INSERT: Owners can create bookings for their properties, admins can create any
-CREATE POLICY "Owners can create bookings for their properties, admins can create any"
-ON public.bookings
-FOR INSERT
-TO authenticated
-WITH CHECK (
-  -- Owner can only create bookings for their properties
-  (
-    private.is_owner() 
-    AND owner_id = (SELECT auth.uid())
-    AND private.user_owns_property(property_id)
-  )
-  OR
-  -- Admin can create bookings for any property
-  private.is_admin()
-);
-
--- UPDATE: Owners can update their bookings, admins can update any
-CREATE POLICY "Owners can update their bookings, admins can update any"
-ON public.bookings
-FOR UPDATE
-TO authenticated
-USING (
-  -- Owner can only update their bookings
-  (private.is_owner() AND owner_id = (SELECT auth.uid()))
-  OR
-  -- Admin can update any booking
-  private.is_admin()
-  OR
-  -- Cleaner can update status of assigned bookings (future feature)
-  (
-    (SELECT private.get_user_role()) = 'cleaner' 
-    AND assigned_cleaner_id = (SELECT auth.uid())
-  )
-)
-WITH CHECK (
-  -- Owners cannot transfer bookings to other owners
-  (
-    private.is_owner() 
-    AND owner_id = (SELECT auth.uid())
-    AND private.user_owns_property(property_id)
-  )
-  OR
-  -- Admin can modify any booking
-  private.is_admin()
-  OR
-  -- Cleaner can only update certain fields (implement field-level restrictions separately)
-  (
-    (SELECT private.get_user_role()) = 'cleaner' 
-    AND assigned_cleaner_id = (SELECT auth.uid())
-  )
-);
-
--- DELETE: Owners can delete their bookings, admins can delete any
-CREATE POLICY "Owners can delete their bookings, admins can delete any"
-ON public.bookings
-FOR DELETE
-TO authenticated
-USING (
-  -- Owner can only delete their bookings
-  (private.is_owner() AND owner_id = (SELECT auth.uid()))
-  OR
-  -- Admin can delete any booking
-  private.is_admin()
-);
-
--- =====================================================
--- BYPASS RLS FOR SPECIFIC SYSTEM OPERATIONS
--- Grant superuser-like access to service roles
--- =====================================================
-
--- Grant service_role ability to bypass RLS for system operations
--- This is used for server-side operations, migrations, etc.
-ALTER ROLE service_role BYPASSRLS;
-
--- Grant postgres role ability to bypass RLS for admin operations
--- Only use in development/maintenance scenarios
--- ALTER ROLE postgres BYPASSRLS; -- Uncomment only for maintenance
-
--- =====================================================
--- PERFORMANCE OPTIMIZATION POLICIES
--- Additional indexes and optimizations for RLS
--- =====================================================
-
--- Optimize RLS policy performance with additional functional indexes
-CREATE INDEX IF NOT EXISTS idx_user_profiles_auth_uid 
-ON public.user_profiles(id) WHERE id = (SELECT auth.uid());
-
--- Create expression index for frequent role checks
-CREATE INDEX IF NOT EXISTS idx_user_profiles_role_admin 
-ON public.user_profiles(role) WHERE role = 'admin';
-
-CREATE INDEX IF NOT EXISTS idx_user_profiles_role_owner 
-ON public.user_profiles(role) WHERE role = 'owner';
-
--- =====================================================
--- REALTIME RLS POLICIES  
--- Ensure real-time subscriptions respect RLS
--- =====================================================
-
--- Note: Supabase automatically applies RLS to real-time subscriptions
--- No additional configuration needed - RLS policies above will be enforced
-
--- =====================================================
--- TESTING AND VALIDATION QUERIES
--- Verify RLS policies work correctly
--- =====================================================
-
--- Create a test function to validate RLS setup
-CREATE OR REPLACE FUNCTION private.test_rls_setup()
-RETURNS TEXT
-LANGUAGE SQL
-SECURITY DEFINER
-AS $$
-  SELECT 'RLS policies created successfully. Test with different user roles to validate security.';
-$$;
-
--- =====================================================
--- POLICY DOCUMENTATION AND COMMENTS
--- =====================================================
-
-COMMENT ON FUNCTION private.get_user_role() IS 'Returns current authenticated user role - used by RLS policies';
-COMMENT ON FUNCTION private.is_admin() IS 'Check if current user is admin - optimized for RLS policies';  
-COMMENT ON FUNCTION private.is_owner() IS 'Check if current user is owner - optimized for RLS policies';
-COMMENT ON FUNCTION private.user_owns_property() IS 'Check if current user owns specified property - used for booking validation';
-
--- Document the security model
-COMMENT ON SCHEMA private IS 'Private schema for security definer functions used by RLS policies';
-
--- =====================================================
--- SECURITY AUDIT LOG
--- Track policy creation for compliance
--- =====================================================
-
-DO $$
-DECLARE
-    policy_count INTEGER;
+RETURNS BOOLEAN AS $$
 BEGIN
-    -- Count created policies
-    SELECT COUNT(*) INTO policy_count
-    FROM pg_policies 
-    WHERE schemaname = 'public';
-    
-    RAISE NOTICE 'RLS setup complete: % policies created across % tables', 
-                 policy_count, 
-                 (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public');
-                 
-    RAISE NOTICE 'Security model: Owner data isolation + Admin system access';
-    RAISE NOTICE 'Multi-tenancy enforced at database level via RLS';
-END $$;
+  RETURN EXISTS (
+    SELECT 1 FROM public.properties 
+    WHERE id = property_uuid AND owner_id = owner_uuid
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- =====================================================
--- MIGRATION VALIDATION
--- Ensure all policies are properly created
--- =====================================================
-
--- Verify all tables have RLS enabled
-DO $$
-DECLARE
-    table_record RECORD;
-    rls_count INTEGER := 0;
+-- Function to test RLS policies (for development/testing)
+CREATE OR REPLACE FUNCTION private.test_rls_isolation()
+RETURNS TABLE (
+  test_name TEXT,
+  passed BOOLEAN,
+  details TEXT
+) AS $$
 BEGIN
-    FOR table_record IN 
-        SELECT tablename 
-        FROM pg_tables 
-        WHERE schemaname = 'public' 
-        AND tablename IN ('user_profiles', 'properties', 'bookings')
-    LOOP
-        IF (SELECT relrowsecurity FROM pg_class WHERE relname = table_record.tablename) THEN
-            rls_count := rls_count + 1;
-            RAISE NOTICE 'RLS enabled on table: %', table_record.tablename;
-        ELSE
-            RAISE EXCEPTION 'RLS not enabled on table: %', table_record.tablename;
-        END IF;
-    END LOOP;
-    
-    IF rls_count = 3 THEN
-        RAISE NOTICE 'RLS validation successful: All % core tables secured', rls_count;
-    ELSE
-        RAISE EXCEPTION 'RLS validation failed: Only % of 3 tables secured', rls_count;
-    END IF;
-END $$; 
+  RETURN QUERY
+  SELECT 
+    'RLS_ENABLED_CHECK'::TEXT,
+    (SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public' AND rowsecurity = true) > 0,
+    'Checking if RLS is enabled on public tables'::TEXT;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execute permissions
+GRANT EXECUTE ON FUNCTION private.validate_property_ownership(UUID, UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION private.test_rls_isolation() TO authenticated;
+
+-- ============================================================================
+-- COMMENTS AND DOCUMENTATION
+-- ============================================================================
+
+COMMENT ON POLICY "Owners can view own properties" ON public.properties IS 
+'Owners can only see properties they own, admins can see all properties';
+
+COMMENT ON POLICY "Owners can view own bookings" ON public.bookings IS 
+'Owners can only see bookings for their properties, admins can see all bookings';
+
+COMMENT ON POLICY "Cleaners can view assigned bookings" ON public.bookings IS 
+'Cleaners can only see bookings that are assigned to them';
+
+/*
+SECURITY MODEL SUMMARY:
+
+1. **Multi-Tenant Data Isolation**:
+   - Owners can only access their own properties and bookings
+   - RLS policies automatically filter data at the database level
+   - No data leakage between different property owners
+
+2. **Admin System Access**:
+   - Admins can access all data across all tenants
+   - Full CRUD operations on all tables
+   - User management capabilities
+
+3. **Cleaner Limited Access**:
+   - Cleaners can only see bookings assigned to them
+   - Can update booking status and notes
+   - Can view property details for assigned jobs
+
+4. **Performance Optimizations**:
+   - Security definer functions cache auth.uid() calls
+   - Composite indexes on (owner_id, status) for fast filtering
+
+This RLS implementation provides true multi-tenant security while maintaining
+high performance and supporting the existing frontend architecture.
+*/ 

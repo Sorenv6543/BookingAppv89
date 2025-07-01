@@ -9,28 +9,43 @@
 export type UserRole = 'owner' | 'admin' | 'cleaner';
 
 /**
- * User settings interface
- * Contains customizable user preferences
+ * Base User interface
+ * Core data model for all users - matches database schema
+ */
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole; // Database column is 'role'
+  company_name?: string; // for property owners
+  
+  // User settings (flattened from database)
+  notifications_enabled: boolean;
+  timezone: string;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  
+  // Admin-specific fields
+  access_level?: string;
+  
+  // Cleaner-specific fields
+  skills?: string[];
+  max_daily_bookings?: number;
+  location_lat?: number;
+  location_lng?: number;
+  
+  created_at?: string;
+  updated_at?: string;
+}
+
+/**
+ * Legacy UserSettings interface for backward compatibility
  */
 export interface UserSettings {
   notifications: boolean;
   timezone: string;
   theme: 'light' | 'dark' | 'system';
   language: string;
-}
-
-/**
- * Base User interface
- * Core data model for all users
- */
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  settings: UserSettings;
-  created_at?: string;
-  updated_at?: string;
 }
 
 /**
@@ -59,10 +74,8 @@ export interface Cleaner extends User {
   role: 'cleaner';
   skills: string[];
   max_daily_bookings: number;
-  location?: {
-    lat: number;
-    lng: number;
-  };
+  location_lat?: number;
+  location_lng?: number;
 }
 
 /**

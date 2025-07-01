@@ -50,6 +50,7 @@
     "ngrx-uml": "^1.0.2",
     "pinia": "^2.1.7",
     "prettier": "^3.5.3",
+    "supabase": "^2.30.4",
     "uml": "^1.0.0",
     "uuid": "^11.1.0",
     "vite-plugin-vue-devtools": "^7.7.6",

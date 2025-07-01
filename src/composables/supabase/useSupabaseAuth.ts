@@ -283,7 +283,7 @@ export function useSupabaseAuth() {
       admin: ['*'] // All permissions
     };
     
-    const userPermissions = permissions[user.value.role] || [];
+    const userPermissions = permissions[user.value.role as keyof typeof permissions] || [];
     return userPermissions.includes(permission) || userPermissions.includes('*');
   }
   

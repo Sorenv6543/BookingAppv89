@@ -16,7 +16,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/pages/auth/login.vue'),
+      component: () => import('@/pages/index.vue'),
       meta: {
         layout: 'default'
       }
