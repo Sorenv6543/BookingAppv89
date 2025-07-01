@@ -10,7 +10,7 @@
 
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { User, UserRole, PropertyOwner, Admin, Cleaner } from '@/types';
+import type { UserRole } from '@/types';
 import { 
   getDefaultRouteForRole, 
   getRoleSpecificSuccessMessage,
@@ -179,7 +179,6 @@ export const useAuthStore = defineStore('auth', () => {
    */
   function switchToOwnerView(ownerId?: string): boolean {
     if (user.value?.role !== 'admin') {
-      error.value = 'Only admin users can switch views';
       return false;
     }
     
@@ -192,7 +191,6 @@ export const useAuthStore = defineStore('auth', () => {
    */
   function switchToAdminView(): boolean {
     if (user.value?.role !== 'admin') {
-      error.value = 'Only admin users can switch views';
       return false;
     }
     

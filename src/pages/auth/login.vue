@@ -128,7 +128,7 @@
             </v-chip>
           </div>
           
-          <v-row class="mb-4">
+          <!-- <v-row class="mb-4">
             <v-col cols="6">
               <v-btn
                 color="secondary"
@@ -165,7 +165,7 @@
                 Admin Demo
               </v-btn>
             </v-col>
-          </v-row>
+          </v-row> -->
           
           <!-- Footer Links -->
           <v-divider class="my-4" />
@@ -255,28 +255,28 @@ async function handleLogin() {
 /**
  * Quick login as owner demo
  */
-async function loginAsOwner() {
-  try {
-    email.value = 'owner@example.com'
-    password.value = 'password'
-    await handleLogin()
-  } catch (error) {
-    console.error('Owner demo login failed:', error)
-  }
-}
+// async function loginAsOwner() {
+//   try {
+//     email.value = 'owner@example.com'
+//     password.value = 'password'
+//     await handleLogin()
+//   } catch (error) {
+//     console.error('Owner demo login failed:', error)
+//   }
+// }
 
-/**
- * Quick login as admin demo
- */
-async function loginAsAdmin() {
-  try {
-    email.value = 'admin@example.com'
-    password.value = 'password'
-    await handleLogin()
-  } catch (error) {
-    console.error('Admin demo login failed:', error)
-  }
-}
+// /**
+//  * Quick login as admin demo
+//  */
+// async function loginAsAdmin() {
+//   try {
+//     email.value = 'admin@example.com'
+//     password.value = 'password'
+//     await handleLogin()
+//   } catch (error) {
+//     console.error('Admin demo login failed:', error)
+//   }
+// }
 
 /**
  * Navigate to registration page
