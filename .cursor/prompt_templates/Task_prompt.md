@@ -10,7 +10,7 @@
 3. Integrate: Ensure implementation fits the broader project architecture and Map collection patterns
 
 
-## Key Patterns to Follow:
+<!-- ## Key Patterns to Follow:
 - 
 - Follow the HomeAdmin.vue and OwnerAdmin.vue central orchestrator pattern
 - Maintain turn vs standard booking distinction in all business logic
@@ -22,6 +22,6 @@
 - [ ] Follows established naming conventions
 - [ ] Integrates with existing stores/composables
 - [ ] Includes basic error handling
-- [ ] Updates any dependent interfaces/types
+- [ ] Updates any dependent interfaces/types -->
 
 
