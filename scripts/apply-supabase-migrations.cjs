@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Apply Supabase Migrations for TASK-080
+ * Apply Supabase Migrations for TASK-080b
  * Database Schema & RLS Setup
  * 
  * This script helps apply the migration files created for multi-tenant security
@@ -10,7 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🚀 TASK-080: Supabase Migration Setup');
+console.log('🚀 TASK-080b : Supabase Migration Setup');
 console.log('=====================================\n');
 
 // Check if migration files exist

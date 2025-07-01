@@ -1,15 +1,13 @@
-> Read @project_summary.md to understand the context of the project. look at the task.md for what has been done and what stil needs to be fone
-> Examine @repomix-output.md, look at existing patterns, implementations and state flow to understand the current context of the project
+> Read @project_summary.md to fully understand the project then look at the task.md for what has been done and what stil needs to be done
+> Use @repomix-output.md for a reference to the current codebase
 
 ## For this Task..
 
-1. Plan: While using sequential thinking to break down the problem and plan implementation, look for the relevant keywords within the scope
-of the task so context 7 can search for the correct combination of tech documentation.   
-refer to @context7_techstack_ids.md for usage examples
+1. Plan: use sequential thinking to break complex to make them easierer to understand. Use the context7 resolve-library-id tool to find the most relevant documentation, examples or patterns for our task, use get-library-docs to then retrieve them. 
 
-1. Implement: the task within the context of the codebase and patterns from @project_summary.md
+2. Implement: carryout the task with the over-all context and use results of context7 and @project_summary.md to assist 
 
-2. Integrate: Ensure implementation fits the broader project architecture and Map collection patterns
+3. Integrate: Ensure implementation fits the broader project architecture and Map collection patterns
 
 
 ## Key Patterns to Follow:
