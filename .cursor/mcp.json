@@ -1,0 +1,91 @@
+{
+    "mcpServers": {
+      "sequential-thinking": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "mcp-server-sequential-thinking"
+        ]
+      },
+      "context7": {
+        "url": "https://mcp.context7.com/mcp"
+      },
+          "supabase": {
+            "command": "cmd",
+            "args": [
+              "/c",
+              "npx",
+              "-y",
+              "@supabase/mcp-server-supabase@latest",
+              "--project-ref=yplrudursbvzcdaroqly"
+            ],
+            "env": {
+              "SUPABASE_ACCESS_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwbHJ1ZHVyc2J2emNkYXJvcWx5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MTI3MjI1MCwiZXhwIjoyMDY2ODQ4MjUwfQ.qGW1QVeL5k7VC2X5FeTbFAf8x1-2CqcgJWVRvlte1CE"
+            }
+          },
+      
+      "Filesystem MCP Server": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@cyanheads/filesystem-mcp-server",
+          "--key",
+          "4e23fbb3-c8fd-4d74-9602-e8e75f09cf15"
+        ],
+        "env": {}
+      },
+      "Memory Bank": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@aakarsh-sasi/memory-bank-mcp",
+          "--key",
+          "4e23fbb3-c8fd-4d74-9602-e8e75f09cf15"
+        ],
+        "env": {}
+      },
+      "exa": {
+        "command": "cmd",
+        "args": [
+          "/c",
+          "npx",
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "exa",
+          "--key",
+          "4e23fbb3-c8fd-4d74-9602-e8e75f09cf15"
+        ]
+      },
+      "Terminal Controller": {
+        "type": "stdio",
+        "command": "npx",
+        "args": [
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@GongRzhe/terminal-controller-mcp",
+          "--key",
+          "4e23fbb3-c8fd-4d74-9602-e8e75f09cf15"
+        ],
+        "env": {}
+      },
+      "terminal-controller-mcp": {
+        "command": "cmd",
+        "args": [
+          "/c",
+          "npx",
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@GongRzhe/terminal-controller-mcp",
+          "--key",
+          "4e23fbb3-c8fd-4d74-9602-e8e75f09cf15"
+        ]
+      }
+    }
+  }
