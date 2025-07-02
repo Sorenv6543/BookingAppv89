@@ -290,6 +290,7 @@ const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const successMessage = ref('')
 const registerForm = ref()
+const propertyId = ref('')
 
 // Dialog states
 const showTerms = ref(false)
@@ -346,7 +347,9 @@ async function handleRegister() {
       password: password.value,
       name: name.value,
       role: selectedRole.value,
-      company_name: selectedRole.value === 'owner' ? companyName.value : undefined
+      company_name: companyName.value,
+      
+
     }
     
     const success = await authStore.register(userData)
