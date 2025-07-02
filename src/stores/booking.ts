@@ -7,6 +7,7 @@ import {
   getUrgentTurns, 
   getUpcomingBookings
 } from '@/utils/businessLogic';
+import { supabase } from '@/plugins/supabase';
 
 // Uses Map collections for efficient booking access and management
 export const useBookingStore = defineStore('booking', () => {
@@ -180,11 +181,24 @@ export const useBookingStore = defineStore('booking', () => {
   // ACTIONS - EVENTS/BOOKINGCRUD - ADD - UPDATE - REMOVE - UPDATE STATUS - ASSIGN CLEANER - FETCH - CLEAR ALL
   // addBooking - updateBooking - removeBooking - updateBookingStatus - assignCleaner - fetchBookings - clearAll
 
-  function addBooking(booking: Booking) {
-    bookings.value.set(booking.id, booking);
-    invalidateCache(); // Invalidate cache when data changes
-  }
+  // function addBooking(booking: Booking) {
+  //   bookings.value.set(booking.id, booking);
+  //   invalidateCache(); // Invalidate cache when data changes
+  // }
+  // Example: src/stores/booking.ts - Add these methods
+async function addBooking(booking: Booking) {
+  // Optimistic update
+  bookings.value.set(booking.id, booking);
   
+  try {
+    const { error } = await supabase.from('bookings').insert(booking);
+    if (error) throw error;
+  } catch (err) {
+    // Rollback on error
+    bookings.value.delete(booking.id);
+    throw err;
+  }
+}
   function updateBooking(id: string, updates: Partial<Booking>) {
     const existing = bookings.value.get(id);
     if (existing) {

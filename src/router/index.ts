@@ -16,15 +16,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/pages/index.vue'),
-      meta: {
-        layout: 'default'
-      }
-    },
-    {
-      path: '/auth/signup ',
-      name: 'signup',
-      component: () => import('@/pages/auth/signup.vue'),
+      component: () => import('@/pages/auth/login.vue'),
       meta: {
         layout: 'default'
       }
@@ -34,7 +26,7 @@ const router = createRouter({
       name: 'register',
       component: () => import('@/pages/auth/register.vue'),
       meta: {
-        layout: 'default'
+        layout: 'auth'
       }
     },
     // Owner-specific routes
@@ -315,14 +307,8 @@ const router = createRouter({
         layout: 'auth'
       }
     },
-    {
-      path: '/auth/register',
-      name: 'register',
-      component: () => import('@/pages/auth/register.vue'),
-      meta: {
-        layout: 'auth'
-      }
-    },
+
+
     // Catch-all route for 404
     {
       path: '/:pathMatch(.*)*',

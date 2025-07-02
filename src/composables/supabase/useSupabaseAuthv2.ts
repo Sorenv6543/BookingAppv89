@@ -60,7 +60,7 @@ export function useSupabaseAuth() {
         id: data.id,
         email: session.value?.user?.email || '',
         name: data.name,
-        role: data.role as UserRole,
+        user_role: data.role as UserRole,
         company_name: data.company_name,
         created_at: data.created_at,
         updated_at: data.updated_at
@@ -271,7 +271,7 @@ export function useSupabaseAuth() {
   async function getAllUsers(): Promise<User[]> {
     try {
       // Only admins can access this
-      if (user.value?.role !== 'admin') {
+      if (user.value?.user_role !== 'admin') {
         throw new Error('Unauthorized: Admin access required');
       }
 
@@ -302,7 +302,7 @@ export function useSupabaseAuth() {
   async function updateUserRole(userId: string, newRole: UserRole): Promise<boolean> {
     try {
       // Only admins can update user roles
-      if (user.value?.role !== 'admin') {
+      if (user.value?.user_role !== 'admin') {
         throw new Error('Unauthorized: Admin access required');
       }
 

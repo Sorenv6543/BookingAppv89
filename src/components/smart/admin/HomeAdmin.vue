@@ -217,6 +217,10 @@
 </template>
 
 <script setup lang="ts">
+import { useRealtimeSync } from '@/composables/supabase/useRealtimeSync';
+useRealtimeSync()
+
+// Real-time sync will auto-initialize when user is authenticated
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDisplay } from 'vuetify';
 

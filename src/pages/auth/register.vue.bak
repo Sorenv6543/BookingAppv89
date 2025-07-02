@@ -6,10 +6,10 @@
     >
       <v-col
         cols="12"
-        sm="10"
-        md="8"
-        lg="6"
-        xl="4"
+        sm="12"
+        md="12"
+        lg="12"
+        xl="12"
       >
         <v-card
           elevation="8"

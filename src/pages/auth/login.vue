@@ -233,7 +233,7 @@ async function handleLogin() {
       successMessage.value = authStore.getSuccessMessage('login')
       
       // Navigate to role-appropriate dashboard
-      const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role)
+      const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
       
       // Small delay to show success message, then navigate
       setTimeout(async () => {
@@ -282,7 +282,7 @@ async function loginAsAdmin() {
  * Navigate to registration page
  */
 function goToRegister() {
-  router.push('/auth/signup')
+  router.push('/auth/register')
 }
 
 // Clear any existing errors when component mounts

@@ -203,6 +203,10 @@ src/components/smart/owner/HomeOwner.vue -
 </template>
 
 <script setup lang="ts">
+import { useRealtimeSync } from '@/composables/supabase/useRealtimeSync';
+
+
+// Real-time sync will auto-initialize when user is authenticated
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDisplay } from 'vuetify';
 
@@ -236,6 +240,8 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 // ============================================================================
 // STORE CONNECTIONS & STATE
 // ============================================================================
+
+useRealtimeSync(); // Just call it for side effects
 const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();

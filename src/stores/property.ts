@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { Property, PropertyMap, PricingTier } from '@/types';
+import supabase from '@/plugins/supabase';
 
 /**
  * Property store for the Property Cleaning Scheduler
@@ -131,12 +132,25 @@ export const usePropertyStore = defineStore('property', () => {
     return count > 0 ? total / count : 0;
   });
   
-  // Actions
-  function addProperty(property: Property) {
-    properties.value.set(property.id, property);
-    invalidateCache(); // Invalidate cache when data changes
-  }
+  // // Actions
+  // function addProperty(property: Property) {
+  //   properties.value.set(property.id, property);
+  //   invalidateCache(); // Invalidate cache when data changes
+  // }
+  // Example: src/stores/booking.ts - Add these methods
+async function addProperty(property: Property) {
+  // Optimistic update
+  properties.value.set(property.id, property);
   
+  try {
+    const { error } = await supabase.from('properties').insert(property);
+    if (error) throw error;
+  } catch (err) {
+    // Rollback on error
+    properties.value.delete(property.id);
+    throw err;
+  }
+}
   function updateProperty(id: string, updates: Partial<Property>) {
     const existing = properties.value.get(id);
     if (existing) {
