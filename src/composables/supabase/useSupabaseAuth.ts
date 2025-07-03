@@ -1,7 +1,7 @@
 // src/composables/supabase/useSupabaseAuth.ts - Enhanced Production Version
 import { ref, computed, onMounted } from 'vue';
 import { supabase } from '@/plugins/supabase';
-import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 import type { User, UserRole } from '@/types';
 
 export function useSupabaseAuth() {
@@ -10,11 +10,20 @@ export function useSupabaseAuth() {
   const loading = ref(false);
   const error = ref<string | null>(null);
 
-  const isAuthenticated = computed(() => !!session.value && !!user.value);
+  const isAuthenticated = computed(() => {
+    const authenticated = !!session.value && !!user.value;
+    debugLog('isAuthenticated check:', { 
+      session: !!session.value, 
+      user: !!user.value, 
+      authenticated,
+      userRole: user.value?.role 
+    });
+    return authenticated;
+  });
   const currentUserId = computed(() => session.value?.user?.id);
   
-  // Debug helpers (only in development)
-  const debugAuth = import.meta.env.VITE_DEBUG_AUTH === 'true';
+  // Debug helpers (always enabled for troubleshooting)
+  const debugAuth = true; // Temporarily enable for debugging
   const debugLog = (message: string, data?: any) => {
     if (debugAuth) {
       console.log(`[Auth Debug] ${message}`, data);
@@ -22,23 +31,30 @@ export function useSupabaseAuth() {
   };
 
   // Initialize auth listener
-  onMounted(() => {
+  if (typeof window !== 'undefined') {
+    // Only initialize in browser context
     initializeAuthListener();
     checkAuth();
-  });
+  }
 
   function initializeAuthListener() {
     supabase.auth.onAuthStateChange(async (event, newSession) => {
-      console.log('Auth state changed:', event, newSession?.user?.id);
+      debugLog('Auth state changed:', { event, userId: newSession?.user?.id });
       
       session.value = newSession;
       
       if (event === 'SIGNED_IN' && newSession) {
         await loadUserProfile(newSession.user.id);
+        debugLog('User signed in and profile loaded:', { 
+          email: newSession.user.email, 
+          sessionExists: !!newSession,
+          userExists: !!user.value 
+        });
       } else if (event === 'SIGNED_OUT') {
         user.value = null;
         session.value = null;
         error.value = null;
+        debugLog('User signed out');
       }
     });
   }
@@ -58,10 +74,14 @@ export function useSupabaseAuth() {
 
       user.value = {
         id: data.id,
-        email: session.value?.user?.email || '',
+        email: session.value?.user?.email || data.email || '',
         name: data.name,
         role: data.role as UserRole,
         company_name: data.company_name,
+        notifications_enabled: data.notifications_enabled,
+        timezone: data.timezone,
+        theme: data.theme,
+        language: data.language,
         created_at: data.created_at,
         updated_at: data.updated_at
       };
@@ -85,7 +105,10 @@ export function useSupabaseAuth() {
         throw signInError;
       }
 
-      if (data.user) {
+      if (data.user && data.session) {
+        // Ensure session is set first
+        session.value = data.session;
+        // Then load user profile
         await loadUserProfile(data.user.id);
         return true;
       }
@@ -130,8 +153,9 @@ export function useSupabaseAuth() {
       }
 
       if (data.user) {
-        // Create user profile in database
-        await createUserProfile(data.user.id, userData);
+        // Profile creation is now handled by database trigger
+        // No need to manually create profile here
+        console.log('✅ User registered successfully:', data.user.email);
         return true;
       }
 
@@ -142,33 +166,6 @@ export function useSupabaseAuth() {
       return false;
     } finally {
       loading.value = false;
-    }
-  }
-
-  async function createUserProfile(userId: string, userData: {
-    name: string;
-    role?: UserRole;
-    company_name?: string;
-  }): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .insert({
-          id: userId,
-          name: userData.name,
-          role: userData.role || 'owner',
-          company_name: userData.company_name,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
-
-      if (error) {
-        console.error('Failed to create user profile:', error);
-        throw error;
-      }
-    } catch (err) {
-      console.error('Error creating user profile:', err);
-      throw err;
     }
   }
 
@@ -253,10 +250,12 @@ export function useSupabaseAuth() {
 
   async function checkAuth(): Promise<boolean> {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
       
-      if (session) {
-        await loadUserProfile(session.user.id);
+      if (currentSession && currentSession.user) {
+        // Set the session and load profile
+        session.value = currentSession;
+        await loadUserProfile(currentSession.user.id);
         return true;
       }
       
@@ -288,8 +287,12 @@ export function useSupabaseAuth() {
         id: profile.id,
         email: profile.email || '',
         name: profile.name,
-        user_role: profile.role as UserRole,
+        role: profile.role as UserRole,
         company_name: profile.company_name,
+        notifications_enabled: profile.notifications_enabled,
+        timezone: profile.timezone,
+        theme: profile.theme,
+        language: profile.language,
         created_at: profile.created_at,
         updated_at: profile.updated_at
       }));

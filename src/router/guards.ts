@@ -96,11 +96,23 @@ export async function authGuard(
   const authStore = useAuthStore()
   
   try {
+    // CRITICAL: Wait for auth state to be initialized
+    await authStore.initialize()
+    
+    console.log('🛡️ Auth guard check:', {
+      route: to.path,
+      authenticated: authStore.isAuthenticated,
+      userRole: authStore.user?.role,
+      requiresAuth: to.meta.requiresAuth,
+      requiredRole: to.meta.role
+    });
+    
     // Check if route is public (no auth required)
     if (isPublicRoute(to)) {
       // If user is authenticated and trying to access auth pages, redirect to their dashboard
       if (authStore.isAuthenticated && to.path.startsWith('/auth/')) {
         const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+        console.log('✅ Authenticated user accessing auth page, redirecting to:', defaultRoute);
         return next(defaultRoute)
       }
       return next()
@@ -108,6 +120,7 @@ export async function authGuard(
     
     // For protected routes, check authentication
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+      console.log('❌ Route requires auth but user not authenticated, redirecting to login');
       const error: NavigationError = {
         type: 'auth',
         message: 'You must be logged in to access this page.',
@@ -125,6 +138,12 @@ export async function authGuard(
       const userRole = authStore.user?.role || 'unknown'
       const requiredRole = to.meta.role
       
+      console.log('❌ Role permission denied:', {
+        userRole,
+        requiredRole,
+        hasPermission: hasRolePermission(authStore.user?.role, to.meta.role)
+      });
+      
       const error: NavigationError = {
         type: 'role',
         message: `Access denied. This page requires ${requiredRole} privileges, but you are logged in as ${userRole}.`,
@@ -140,10 +159,12 @@ export async function authGuard(
     // Handle root route - redirect based on user role
     if (to.path === '/' && authStore.isAuthenticated) {
       const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
+      console.log('✅ Root route redirect to:', defaultRoute);
       return next(defaultRoute)
     }
     
     // All checks passed, allow navigation
+    console.log('✅ Auth guard passed, proceeding to route:', to.path);
     next()
     
   } catch (error) {
