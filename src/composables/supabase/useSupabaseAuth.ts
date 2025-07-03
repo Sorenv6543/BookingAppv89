@@ -1,5 +1,5 @@
 // src/composables/supabase/useSupabaseAuth.ts - Enhanced Production Version
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { supabase } from '@/plugins/supabase';
 import type { Session } from '@supabase/supabase-js';
 import type { User, UserRole } from '@/types';
@@ -22,9 +22,9 @@ export function useSupabaseAuth() {
   });
   const currentUserId = computed(() => session.value?.user?.id);
   
-  // Debug helpers (always enabled for troubleshooting)
-  const debugAuth = true; // Temporarily enable for debugging
-  const debugLog = (message: string, data?: any) => {
+  // Debug helpers (conditionally enabled)
+  const debugAuth = false; // Set to true for debugging
+  const debugLog = (message: string, data?: unknown) => {
     if (debugAuth) {
       console.log(`[Auth Debug] ${message}`, data);
     }

@@ -1,9 +1,8 @@
 // src/stores/auth.ts - Enhanced with Supabase Integration
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { UserRole } from '@/types';
+import type { User, UserRole } from '@/types';
 import {
-    getDefaultRouteForRole,
   getRoleSpecificSuccessMessage,
   clearAllRoleSpecificState
 } from '@/utils/authHelpers';
@@ -154,13 +153,13 @@ export const useAuthStore = defineStore('auth', () => {
     company_name?: string;
     notifications_enabled?: boolean;
     timezone?: string;
-    theme?: string;
+    theme?: 'light' | 'dark' | 'system';
   }): Promise<boolean> {
     try {
       loading.value = true;
       error.value = null;
       
-      const success = await updateProfile(updates);
+      const success = await updateProfile(updates as Partial<User>);
       
       if (success) {
         console.log('✅ Profile updated successfully');
