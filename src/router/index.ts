@@ -8,7 +8,7 @@
 // ✅ Applies navigation guards
 
 import { createRouter, createWebHistory } from 'vue-router'
-import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from '@/router/guards'
+// import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from '@/router/guards'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -322,9 +322,9 @@ const router = createRouter({
 })
 
 // Apply navigation guards
-router.beforeEach(developmentGuard)
-router.beforeEach(loadingGuard)
-router.beforeEach(authGuard)
-router.afterEach(afterNavigationGuard)
+// router.beforeEach(developmentGuard)
+// router.beforeEach(loadingGuard)
+// router.beforeEach(authGuard)
+// router.afterEach(afterNavigationGuard)
 
 export default router 
