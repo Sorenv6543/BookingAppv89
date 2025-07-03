@@ -1,7 +1,7 @@
 // src/stores/auth.ts - Fixed Version with Proper Loading Management
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { UserRole } from '@/types';
+import type { UserRole, User } from '@/types';
 import {
   getRoleSpecificSuccessMessage,
   clearAllRoleSpecificState
@@ -23,7 +23,6 @@ export const useAuthStore = defineStore('auth', () => {
     session,
     loading: supabaseLoading,
     error: supabaseError,
-    initializing,
     isAuthenticated: supabaseIsAuthenticated,
     signIn,
     signUp,
@@ -43,17 +42,16 @@ export const useAuthStore = defineStore('auth', () => {
   const user = computed(() => supabaseUser.value);
   const isAuthenticated = computed(() => {
     const authenticated = supabaseIsAuthenticated.value;
-    console.log('[Auth Store] isAuthenticated:', authenticated, { user: !!user.value, initializing: initializing.value });
+    console.log('[Auth Store] isAuthenticated:', authenticated, { user: !!user.value });
     return authenticated;
   });
   
   // Combined loading state - true if either Supabase or store operations are loading
   const loading = computed(() => {
-    const isLoading = storeLoading.value || supabaseLoading.value || initializing.value;
+    const isLoading = storeLoading.value || supabaseLoading.value;
     console.log('[Auth Store] loading state:', { 
       storeLoading: storeLoading.value, 
       supabaseLoading: supabaseLoading.value, 
-      initializing: initializing.value,
       combined: isLoading 
     });
     return isLoading;
@@ -69,7 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
   // Clear errors helper
   function clearError() {
     storeError.value = null;
-    // Note: supabaseError is computed from composable, can't set directly
+    // supabaseError.value = null;
   }
 
   // Authentication methods
@@ -192,7 +190,7 @@ export const useAuthStore = defineStore('auth', () => {
       storeLoading.value = true;
       storeError.value = null;
       
-      const success = await updateProfile(updates);
+      const success = await updateProfile(updates as Partial<User>);
       
       if (success) {
         console.log('✅ [Auth Store] Profile updated successfully');
@@ -304,7 +302,7 @@ export const useAuthStore = defineStore('auth', () => {
     session,
     loading,
     error,
-    initializing,
+    
     
     // Computed
     isAuthenticated,

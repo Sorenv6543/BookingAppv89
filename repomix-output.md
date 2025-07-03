@@ -749,35 +749,6 @@ After completing all tests, you should have:
 **Your platform is now ready for production deployment with 30-40 property owners!** 🚀
 ````
 
-## File: prompt.md
-````markdown
-> Use the @project_summary.md to fully understand the project then look Use @repomix-output.md for a reference to the current codebase. Use task.md look at what has been done and what still needs to be done
-> 
-
-## For this Task..
-
-1. Plan: use sequential thinking to break down task to make them easier to understand. Use the context7 resolve-library-id tool to find the most relevant documentation,examples or patterns for the task, then use get-library-docs to then retrieve them. 
-
-2. Implement: use results of context7 and @project_summary.md to assist in the current task
-
-3. Integrate: Ensure implementation fits the broader project architecture and patterns
-
-
-## Key Patterns to Follow:
-- 
-- Follow the HomeAdmin.vue and OwnerAdmin.vue central orchestrator pattern
-- Maintain turn vs standard booking distinction in all business logic
-- Reference existing composables and stores for consistency
-- Implement proper TypeScript typing and error handling
-
-## Before Marking Complete:
-- [ ] TypeScript compiles without errors
-- [ ] Follows established naming conventions
-- [ ] Integrates with existing stores/composables
-- [ ] Includes basic error handling
-- [ ] Updates any dependent interfaces/types
-````
-
 ## File: public/pwa-icon.svg
 ````
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
@@ -6112,6 +6083,35 @@ export function useOfflineSync() {
 }
 ````
 
+## File: prompt.md
+````markdown
+> Use the @project_summary.md to fully understand the project then look Use @repomix-output.md for a reference to the current codebase. Use task.md look at what has been done and what still needs to be done
+> 
+
+## For this Task..
+
+1. Plan: use sequential thinking to break down task to make them easier to understand. Use the context7 resolve-library-id tool to find the most relevant documentation,examples or patterns for the task, then use get-library-docs to then retrieve them. 
+
+2. Implement: use results of context7 and @project_summary.md to assist in the current task
+
+3. Integrate: Ensure implementation fits the broader project architecture and patterns
+
+
+## Key Patterns to Follow:
+- 
+- Follow the HomeAdmin.vue and OwnerAdmin.vue central orchestrator pattern
+- Maintain turn vs standard booking distinction in all business logic
+- Reference existing composables and stores for consistency
+- Implement proper TypeScript typing and error handling
+
+## Before Marking Complete:
+- [ ] TypeScript compiles without errors
+- [ ] Follows established naming conventions
+- [ ] Integrates with existing stores/composables
+- [ ] Includes basic error handling
+- [ ] Updates any dependent interfaces/types
+````
+
 ## File: src/assets/main.css
 ````css
 :root {
@@ -9777,28 +9777,6 @@ const setVapidKey = (key: string) =>
 ````vue
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-      elevation="1"
-      height="64"
-    >
-      <v-toolbar-title>
-        Property Cleaning Scheduler
-      </v-toolbar-title>
-      <v-spacer />
-      <v-btn
-        variant="text"
-        color="white"
-        href="mailto:support@example.com"
-      >
-        <v-icon start>
-          mdi-help-circle
-        </v-icon>
-        Help
-      </v-btn>
-    </v-app-bar>
     <v-main class="auth-main">
       <v-container
         fluid
@@ -9814,9 +9792,9 @@ const setVapidKey = (key: string) =>
           <v-col
             cols="12"
             sm="8"
-            md="6"
+            md="5"
             lg="4"
-            xl="3"
+            xl="4"
             class="pa-4"
           >
             <router-view />
@@ -9850,8 +9828,8 @@ const setVapidKey = (key: string) =>
   </script>
 <style scoped>
   .auth-main {
-    background: linear-gradient(135deg,
-      rgb(var(--v-theme-primary)) 0%,
+    background: radial-gradient(circle,
+      rgb(var(--v-theme-primary-lighten-5)) 1%,
       rgb(var(--v-theme-primary-darken-2)) 100%
     );
     min-height: 100vh;
@@ -9866,9 +9844,9 @@ const setVapidKey = (key: string) =>
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
   .v-footer {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgb(202, 41, 41);
     backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(209, 207, 207, 0.2);
   }
   </style>
 ````
@@ -17221,43 +17199,6 @@ const updatePWA = async () =>
 const updateOnlineStatus = () =>
 ````
 
-## File: src/composables/supabase/useSupabaseAuth.ts
-````typescript
-import { ref, computed, onMounted } from 'vue';
-import { supabase } from '@/plugins/supabase';
-import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
-import type { User, UserRole } from '@/types';
-export function useSupabaseAuth()
-⋮----
-const debugLog = (message: string, data?: any) =>
-⋮----
-function initializeAuthListener()
-async function loadUserProfile(userId: string): Promise<void>
-async function signIn(email: string, password: string): Promise<boolean>
-async function signUp(
-    email: string,
-    password: string,
-    userData: {
-      name: string;
-      role: UserRole;
-      company_name?: string;
-    }
-): Promise<boolean>
-async function createUserProfile(userId: string, userData: {
-    name: string;
-    role: UserRole;
-    company_name?: string;
-}): Promise<void>
-async function signOut(): Promise<boolean>
-async function updateProfile(updates: Partial<User>): Promise<boolean>
-async function resetPassword(email: string): Promise<boolean>
-async function checkAuth(): Promise<boolean>
-async function getAllUsers(): Promise<User[]>
-async function updateUserRole(userId: string, newRole: UserRole): Promise<boolean>
-⋮----
-// Only admins can update user roles
-````
-
 ## File: src/pages/admin/cleaners/index.vue
 ````vue
 <template>
@@ -20847,6 +20788,38 @@ const setFilter = (newFilter: EventFilter) =>
 const clearFilter = () =>
 ````
 
+## File: src/composables/supabase/useSupabaseAuth.ts
+````typescript
+import { ref, computed, onMounted } from 'vue';
+import { supabase } from '@/plugins/supabase';
+import type { Session } from '@supabase/supabase-js';
+import type { User, UserRole } from '@/types';
+export function useSupabaseAuth()
+⋮----
+const debugLog = (message: string, data?: any) =>
+⋮----
+function initializeAuthListener()
+async function loadUserProfile(userId: string): Promise<void>
+async function signIn(email: string, password: string): Promise<boolean>
+async function signUp(
+    email: string,
+    password: string,
+    userData: {
+      name: string;
+      role?: UserRole;
+      company_name?: string;
+    }
+): Promise<boolean>
+async function signOut(): Promise<boolean>
+async function updateProfile(updates: Partial<User>): Promise<boolean>
+async function resetPassword(email: string): Promise<boolean>
+async function checkAuth(): Promise<boolean>
+async function getAllUsers(): Promise<User[]>
+async function updateUserRole(userId: string, newRole: UserRole): Promise<boolean>
+⋮----
+// Only admins can update user roles
+````
+
 ## File: src/main.ts
 ````typescript
 import { createApp } from 'vue'
@@ -21062,37 +21035,6 @@ onMounted(async () => {
   height: 100%;
 }
 </style>
-````
-
-## File: src/router/guards.ts
-````typescript
-import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useUIStore } from '@/stores/ui'
-import type { UserRole } from '@/types/user'
-import type { NavigationError } from '@/types/router'
-function hasRolePermission(userRole: UserRole | undefined, requiredRole: UserRole | undefined): boolean
-function getDefaultRouteForRole(userRole: UserRole | undefined): string
-function isPublicRoute(to: RouteLocationNormalized): boolean
-function showNavigationError(error: NavigationError)
-export async function authGuard(
-  to: RouteLocationNormalized,
-  _from: RouteLocationNormalized,
-  next: NavigationGuardNext
-)
-export function loadingGuard(
-  to: RouteLocationNormalized,
-  _from: RouteLocationNormalized,
-  next: NavigationGuardNext
-)
-export function afterNavigationGuard(
-  to: RouteLocationNormalized
-)
-export function developmentGuard(
-  to: RouteLocationNormalized,
-  _from: RouteLocationNormalized,
-  next: NavigationGuardNext
-)
 ````
 
 ## File: src/stores/property.ts
@@ -21656,6 +21598,11 @@ import { aliases, mdi } from 'vuetify/iconsets/mdi';
 import type { ThemeDefinition } from 'vuetify';
 ````
 
+## File: src/router/guards.ts
+````typescript
+
+````
+
 ## File: src/stores/booking.ts
 ````typescript
 import { defineStore } from 'pinia';
@@ -21739,10 +21686,10 @@ export function isProperty(obj: unknown): obj is Property
     >
       <v-col
         cols="12"
-        sm="10"
-        md="8"
-        lg="6"
-        xl="4"
+        sm="12"
+        md="12"
+        lg="12"
+        xl="12"
       >
         <v-card
           elevation="8"
@@ -26671,16 +26618,6 @@ onMounted(async () => {
           >
             {{ successMessage }}
           </v-alert>
-          <v-alert
-            type="info"
-            variant="tonal"
-            class="mb-4"
-          >
-            <div class="text-body-2">
-              <strong>Development Mode:</strong><br>
-              Use the demo accounts below or enter any email/password.
-            </div>
-          </v-alert>
           <v-form
             ref="loginForm"
             @submit.prevent="handleLogin"
@@ -26725,54 +26662,6 @@ onMounted(async () => {
               Sign In
             </v-btn>
           </v-form>
-          <v-divider class="my-4" />
-          <div class="text-center mb-3">
-            <v-chip
-              color="info"
-              variant="tonal"
-              size="small"
-            >
-              Demo Accounts
-            </v-chip>
-          </div>
-          <v-row class="mb-4">
-            <v-col cols="6">
-              <v-btn
-                color="secondary"
-                variant="outlined"
-                size="small"
-                block
-                :loading="authStore.loading"
-                @click="loginAsOwner"
-              >
-                <v-icon
-                  class="mr-1"
-                  size="small"
-                >
-                  mdi-home-account
-                </v-icon>
-                Owner Demo
-              </v-btn>
-            </v-col>
-            <v-col cols="6">
-              <v-btn
-                color="secondary"
-                variant="outlined"
-                size="small"
-                block
-                :loading="authStore.loading"
-                @click="loginAsAdmin"
-              >
-                <v-icon
-                  class="mr-1"
-                  size="small"
-                >
-                  mdi-shield-account
-                </v-icon>
-                Admin Demo
-              </v-btn>
-            </v-col>
-          </v-row>
           <v-divider class="my-4" />
           <div class="text-center">
             <p class="text-body-2 mb-2">
@@ -26864,12 +26753,15 @@ authStore.clearError()
 </script>
 <style scoped>
 .fill-height {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 110vh;
+  border-radius: 10px;
+  background: radial-gradient(circle, #a1b1f5 0%, #f2f0f5 100%);
 }
 .v-card {
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(40px);
   background: rgba(255, 255, 255, 0.95);
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .v-btn {
   text-transform: none;
@@ -27019,7 +26911,7 @@ const AuthPrompt = {
       try {
         const success = await authStore.login('admin@example.com', 'password')
         if (success) {
-          const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role)
+          const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
           await router.push(defaultRoute)
         }
       } catch (error) {
@@ -27030,7 +26922,7 @@ const AuthPrompt = {
       try {
         const success = await authStore.login('owner@example.com', 'password')
         if (success) {
-          const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role)
+          const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
           await router.push(defaultRoute)
         }
       } catch (error) {
@@ -27057,7 +26949,7 @@ onMounted(async () => {
       await authStore.checkAuth()
     }
     if (authStore.isAuthenticated) {
-      const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role)
+      const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
       if (defaultRoute !== '/' && router.currentRoute.value.path === '/') {
         await router.push(defaultRoute)
       }
@@ -27150,7 +27042,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { UserRole } from '@/types';
 import {
-  getDefaultRouteForRole,
+    getDefaultRouteForRole,
   getRoleSpecificSuccessMessage,
   clearAllRoleSpecificState
 } from '@/utils/authHelpers';
@@ -29409,7 +29301,6 @@ import { VitePWA } from 'vite-plugin-pwa'
 ## File: src/router/index.ts
 ````typescript
 import { createRouter, createWebHistory } from 'vue-router'
-import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from '@/router/guards'
 ````
 
 ## File: tasks.md

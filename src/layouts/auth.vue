@@ -2,7 +2,7 @@
 <template>
   <v-app>
     <!-- Simple app bar for auth pages -->
-    <v-app-bar
+    <!-- <v-app-bar
       app
       color="primary"
       dark
@@ -10,13 +10,13 @@
       height="64"
     >
       <v-toolbar-title>
-        Property Cleaning Scheduler
+        Claro Scheduler
       </v-toolbar-title>
         
-      <v-spacer />
+      <v-spacer /> -->
         
       <!-- Optional help or contact link -->
-      <v-btn
+      <!-- <v-btn
         variant="text"
         color="white"
         href="mailto:support@example.com"
@@ -25,8 +25,8 @@
           mdi-help-circle
         </v-icon>
         Help
-      </v-btn>
-    </v-app-bar>
+      </v-btn> -->
+    <!-- </v-app-bar> -->
   
     <!-- Main content area for auth forms -->
     <v-main class="auth-main">
@@ -44,9 +44,9 @@
           <v-col 
             cols="12" 
             sm="8" 
-            md="6" 
+            md="5" 
             lg="4" 
-            xl="3"
+            xl="4"
             class="pa-4"
           >
             <!-- Auth forms will be rendered here -->
@@ -84,8 +84,8 @@
   
   <style scoped>
   .auth-main {
-    background: linear-gradient(135deg, 
-      rgb(var(--v-theme-primary)) 0%, 
+    background: radial-gradient(circle, 
+      rgb(var(--v-theme-primary-lighten-5)) 1%,
       rgb(var(--v-theme-primary-darken-2)) 100%
     );
     min-height: 100vh;
@@ -106,8 +106,8 @@
   
   /* Footer styling */
   .v-footer {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgb(202, 41, 41);
     backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(209, 207, 207, 0.2);
   }
   </style>
