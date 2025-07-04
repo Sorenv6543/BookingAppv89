@@ -40,14 +40,20 @@ if (import.meta.env.VITE_DEBUG_AUTH === 'true') {
   });
 }
 
-// Test connection on startup
-supabase.from('user_profiles').select('count', { count: 'exact', head: true })
-  .then(({ count, error }) => {
+// Safe connection test - check auth service instead of protected tables
+supabase.auth.getSession()
+  .then(({ data, error }) => {
     if (error) {
       console.error('❌ Supabase connection failed:', error);
     } else {
-      console.log('✅ Supabase connected successfully. Users in database:', count || 0);
+      console.log('✅ Supabase connected successfully. Auth service operational.');
+      if (data.session) {
+        console.log('🔐 Existing session found for user:', data.session.user.id);
+      }
     }
+  })
+  .catch((error) => {
+    console.error('❌ Supabase connection failed:', error);
   });
 
 export default supabase;

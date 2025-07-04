@@ -132,25 +132,48 @@ export const usePropertyStore = defineStore('property', () => {
     return count > 0 ? total / count : 0;
   });
   
-  // // Actions
-  // function addProperty(property: Property) {
-  //   properties.value.set(property.id, property);
-  //   invalidateCache(); // Invalidate cache when data changes
-  // }
-  // Example: src/stores/booking.ts - Add these methods
-async function addProperty(property: Property) {
-  // Optimistic update
-  properties.value.set(property.id, property);
+  // --- Supabase RLS Policy ---
+  // Owners can insert/select their own properties. See supabase/migrations/002_rls_policies.sql for details.
   
-  try {
-    const { error } = await supabase.from('properties').insert(property);
-    if (error) throw error;
-  } catch (err) {
-    // Rollback on error
-    properties.value.delete(property.id);
-    throw err;
+  // Actions
+  async function fetchProperties() {
+    loading.value = true;
+    error.value = null;
+    
+    try {
+      const { data, error: supaError } = await supabase.from('properties').select('*');
+      if (supaError) throw supaError;
+      properties.value.clear();
+      if (data) {
+        for (const prop of data) {
+          properties.value.set(prop.id, prop);
+        }
+      }
+    } catch (err: any) {
+      error.value = err.message || 'Failed to fetch properties.';
+      console.error('fetchProperties error:', err);
+    } finally {
+      loading.value = false;
+      invalidateCache(); // Invalidate cache after fetch
+    }
   }
-}
+  
+  async function addProperty(property: Property) {
+    // Optimistic update
+    properties.value.set(property.id, property);
+    error.value = null;
+    
+    try {
+      const { error: supaError } = await supabase.from('properties').insert([property]);
+      if (supaError) throw supaError;
+    } catch (err: any) {
+      properties.value.delete(property.id);
+      error.value = err.message || 'Failed to add property.';
+      console.error('addProperty error:', err);
+      throw err;
+    }
+  }
+  
   function updateProperty(id: string, updates: Partial<Property>) {
     const existing = properties.value.get(id);
     if (existing) {
@@ -166,24 +189,6 @@ async function addProperty(property: Property) {
   function removeProperty(id: string) {
     properties.value.delete(id);
     invalidateCache(); // Invalidate cache when data changes
-  }
-  
-  async function fetchProperties() {
-    loading.value = true;
-    error.value = null;
-    
-    try {
-      // In a real app, this would be a Supabase or API call
-      // For now, we'll simulate a successful response
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Fetch simulation complete
-      loading.value = false;
-      invalidateCache(); // Invalidate cache after fetch
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error fetching properties';
-      loading.value = false;
-    }
   }
   
   function setPropertyActiveStatus(id: string, active: boolean) {
@@ -219,10 +224,10 @@ async function addProperty(property: Property) {
     averageCleaningDuration,
     
     // Actions
+    fetchProperties,
     addProperty,
     updateProperty,
     removeProperty,
-    fetchProperties,
     setPropertyActiveStatus,
     clearAll,
     

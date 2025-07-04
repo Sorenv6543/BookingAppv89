@@ -1,5 +1,24 @@
 import { beforeAll, afterAll, vi } from 'vitest'
 
+// Global Supabase mock for all tests
+vi.mock('@/plugins/supabase', () => {
+  const supabase = {
+    from: vi.fn(() => ({
+      select: vi.fn().mockResolvedValue({ data: [], error: null }),
+      insert: vi.fn().mockResolvedValue({ data: null, error: null }),
+      update: vi.fn().mockResolvedValue({ data: null, error: null }),
+      delete: vi.fn().mockResolvedValue({ data: null, error: null }),
+    })),
+    auth: {
+      onAuthStateChange: vi.fn(), // Mock auth listener
+    },
+  };
+  return {
+    supabase,
+    default: supabase, // Provide default export
+  };
+});
+
 // Mock CSS imports
 vi.mock('vuetify/styles', () => ({}))
 vi.mock('@mdi/font/css/materialdesignicons.css', () => ({}))

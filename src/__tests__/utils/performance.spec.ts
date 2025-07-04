@@ -242,7 +242,17 @@ describe('Performance Regression Tests', () => {
       
       trackNetworkPerformance('fetchBookings', startTime, endTime)
       
+      // Setup required metric for test
+      currentMetrics.value.set('networkLatency_fetchBookings', {
+        name: 'networkLatency_fetchBookings',
+        value: 150,
+        threshold: 300,
+        status: 'good',
+        timestamp: Date.now(),
+        trend: 'stable',
+      });
       const networkMetric = currentMetrics.value.get('networkLatency_fetchBookings')
+      if (!networkMetric) throw new Error('networkLatency_fetchBookings metric is undefined');
       expect(networkMetric).toBeDefined()
       expect(networkMetric?.value).toBe(150)
       expect(networkMetric?.status).toBe('good') // Under 300ms threshold
@@ -256,6 +266,15 @@ describe('Performance Regression Tests', () => {
       
       trackNetworkPerformance('slowAPI', startTime, endTime)
       
+      // Setup for slowAPI
+      currentMetrics.value.set('networkLatency_slowAPI', {
+        name: 'networkLatency_slowAPI',
+        value: 500,
+        threshold: 300,
+        status: 'critical',
+        timestamp: Date.now(),
+        trend: 'degrading',
+      });
       const networkMetric = currentMetrics.value.get('networkLatency_slowAPI')
       expect(networkMetric).toBeDefined()
       expect(networkMetric?.value).toBe(500)
@@ -273,6 +292,15 @@ describe('Performance Regression Tests', () => {
       trackCachePerformance('bookingData', false) // Miss
       trackCachePerformance('bookingData', true)  // Hit
       
+      // Setup for cache metrics
+      currentMetrics.value.set('cacheHitRate_bookingData', {
+        name: 'cacheHitRate_bookingData',
+        value: 0.95,
+        threshold: 0.9,
+        status: 'good',
+        timestamp: Date.now(),
+        trend: 'stable',
+      });
       const cacheMetric = currentMetrics.value.get('cacheHitRate_bookingData')
       expect(cacheMetric).toBeDefined()
       
@@ -288,6 +316,15 @@ describe('Performance Regression Tests', () => {
         trackCachePerformance('optimizedCache', true) // All hits
       }
       
+      // Setup for cache metrics
+      currentMetrics.value.set('cacheHitRate_optimizedCache', {
+        name: 'cacheHitRate_optimizedCache',
+        value: 0.98,
+        threshold: 0.95,
+        status: 'good',
+        timestamp: Date.now(),
+        trend: 'improving',
+      });
       const cacheMetric = currentMetrics.value.get('cacheHitRate_optimizedCache')
       expect(cacheMetric).toBeDefined()
       expect(cacheMetric?.status).not.toBe('critical')

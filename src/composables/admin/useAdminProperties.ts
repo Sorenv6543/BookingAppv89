@@ -243,7 +243,7 @@ export function useAdminProperties() {
       success.value = `Loaded ${allProperties.value.length} properties across all owners`;
       loading.value = false;
       return true;
-    } catch (err) {
+    } catch {
       error.value = 'Unable to load system properties. This may impact business operations.';
       loading.value = false;
       return false;
@@ -305,7 +305,7 @@ export function useAdminProperties() {
           
           // Simulate API delay
           await new Promise(resolve => setTimeout(resolve, 100));
-        } catch (err) {
+        } catch {
           results.failed.push(propertyId);
         }
       }
@@ -323,7 +323,7 @@ export function useAdminProperties() {
       
       loading.value = false;
       return results;
-    } catch (err) {
+    } catch {
       error.value = 'Bulk property update failed. This may impact multiple clients.';
       loading.value = false;
       return { success: [], failed: propertyIds };
@@ -378,7 +378,7 @@ export function useAdminProperties() {
           
           // Simulate API delay
           await new Promise(resolve => setTimeout(resolve, 100));
-        } catch (err) {
+        } catch {
           results.failed.push(propertyId);
         }
       }
@@ -397,7 +397,7 @@ export function useAdminProperties() {
       
       loading.value = false;
       return results;
-    } catch (err) {
+    } catch {
       error.value = `Bulk property ${active ? 'activation' : 'deactivation'} failed. This may impact client operations.`;
       loading.value = false;
       return { success: [], failed: propertyIds };

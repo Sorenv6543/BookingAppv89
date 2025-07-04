@@ -17,7 +17,7 @@ export async function authGuard(
   console.log('🛡️ Auth guard check:', {
     route: to.path,
     authenticated: authStore.isAuthenticated,
-    userRole: authStore.user?.user_role,
+    userRole: authStore.user?.role,
     requiresAuth: to.meta.requiresAuth,
     requiredRole: to.meta.role
   });
@@ -31,14 +31,14 @@ export async function authGuard(
   
   // Check role-based access
   const requiredRole = to.meta.role as UserRole;
-  if (requiredRole && authStore.user?.user_role !== requiredRole) {
+  if (requiredRole && authStore.user?.role !== requiredRole) {
     console.log('❌ User role mismatch:', {
       required: requiredRole,
-      actual: authStore.user?.user_role
+      actual: authStore.user?.role
     });
     
     // Redirect to appropriate dashboard for user's role
-    const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role);
+    const defaultRoute = getDefaultRouteForRole(authStore.user?.role);
     next(defaultRoute);
     return;
   }
@@ -46,7 +46,7 @@ export async function authGuard(
   // Special handling for admin routes
   if (to.path.startsWith('/admin') && !authStore.isAdmin) {
     console.log('❌ Admin route access denied for non-admin user');
-    const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role);
+    const defaultRoute = getDefaultRouteForRole(authStore.user?.role);
     next(defaultRoute);
     return;
   }
@@ -54,7 +54,7 @@ export async function authGuard(
   // Special handling for owner routes
   if (to.path.startsWith('/owner') && !authStore.isOwner) {
     console.log('❌ Owner route access denied for non-owner user');
-    const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role);
+    const defaultRoute = getDefaultRouteForRole(authStore.user?.role);
     next(defaultRoute);
     return;
   }
@@ -62,7 +62,7 @@ export async function authGuard(
   // Redirect authenticated users away from auth pages
   if (to.path.startsWith('/auth') && authStore.isAuthenticated) {
     console.log('✅ Authenticated user accessing auth page, redirecting to dashboard');
-    const defaultRoute = getDefaultRouteForRole(authStore.user?.user_role);
+    const defaultRoute = getDefaultRouteForRole(authStore.user?.role);
     next(defaultRoute);
     return;
   }

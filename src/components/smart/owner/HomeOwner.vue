@@ -395,13 +395,10 @@ const ownerPropertiesMap = computed(() => {
   return map;
 });
 
-// ADDING BACK COMPLEX COMPUTED PROPERTIES ONE BY ONE TO FIND THE CULPRIT
-
 // Owner's bookings only - TESTING THIS FIRST
 let ownerBookingsMapCallCount = 0;
 const ownerBookingsMap = computed(() => {
   ownerBookingsMapCallCount++;
-  console.log(`🔍 [HomeOwner] ownerBookingsMap computed (call #${ownerBookingsMapCallCount})`);
   
   if (ownerBookingsMapCallCount > 20) {
     console.error('❌ [HomeOwner] Infinite loop detected in ownerBookingsMap computed!');
@@ -414,13 +411,16 @@ const ownerBookingsMap = computed(() => {
   }
 
   // Filter bookings by owner_id
-  bookingStore.bookingsArray
-    .filter(booking => booking.owner_id === currentOwnerId.value)
-    .forEach(booking => {
-      if (booking && booking.id) {
-        map.set(booking.id, booking);
-      }
-    });
+  const ownerBookings = bookingStore.bookingsArray
+    .filter(booking => booking.owner_id === currentOwnerId.value);
+    
+  console.log(`🔍 [HomeOwner] Loaded ${ownerBookings.length} bookings for owner ${currentOwnerId.value}`);
+    
+  ownerBookings.forEach(booking => {
+    if (booking && booking.id) {
+      map.set(booking.id, booking);
+    }
+  });
   
   return map;
 });
@@ -508,6 +508,7 @@ const ownerFilteredBookings = computed(() => {
   }
 
   let bookings = Array.from(ownerBookingsMap.value.values());
+  console.log(`🔍 [HomeOwner] Starting with ${bookings.length} owner bookings`);
   
   // Apply property filter if selected (within owner's properties)
   if (selectedPropertyFilter.value) {
@@ -515,15 +516,29 @@ const ownerFilteredBookings = computed(() => {
       booking.property_id === selectedPropertyFilter.value &&
       ownerPropertiesMap.value.has(booking.property_id)
     );
+    console.log(`🔍 [HomeOwner] After property filter: ${bookings.length} bookings`);
   }
   
   // Apply calendar state filters
   bookings = filterBookings(bookings);
+  console.log(`🔍 [HomeOwner] After calendar state filters: ${bookings.length} bookings`);
   
   // Convert to Map for components that expect Map format
   const map = new Map<string, Booking>();
   bookings.forEach(booking => {
     map.set(booking.id, booking);
+  });
+  
+  console.log(`🔍 [HomeOwner] Final filtered bookings map:`, {
+    size: map.size,
+    bookingIds: Array.from(map.keys()),
+    bookings: Array.from(map.values()).map(b => ({
+      id: b.id,
+      property_id: b.property_id,
+      checkout_date: b.checkout_date,
+      checkin_date: b.checkin_date,
+      booking_type: b.booking_type
+    }))
   });
   
   return map;
@@ -879,11 +894,21 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     if (eventModalMode.value === 'create') {
       await createBooking(bookingData as BookingFormData);
     } else if (eventModalData.value) {
+      // Fix: eventModalData.value contains { booking } not the booking directly
+      const booking = (eventModalData.value as any)?.booking || eventModalData.value;
+      
+      console.log('🔍 [HomeOwner] Editing booking:', { 
+        bookingId: booking?.id,
+        isInOwnerMap: booking?.id ? ownerBookingsMap.value.has(booking.id) : false,
+        ownerMapSize: ownerBookingsMap.value.size
+      });
+      
       // Verify owner can update this booking
-      if (!ownerBookingsMap.value.has(eventModalData.value.id)) {
+      if (!booking?.id || !ownerBookingsMap.value.has(booking.id)) {
+        console.error('🚨 [HomeOwner] Booking ownership check failed - booking not found in owner map');
         throw new Error('Cannot update booking not owned by current user');
       }
-      await updateBooking(eventModalData.value.id, bookingData as Partial<BookingFormData>);
+      await updateBooking(booking.id, bookingData as Partial<BookingFormData>);
     }
     uiStore.closeModal('eventModal');
   } catch (error) {
@@ -1007,35 +1032,52 @@ watch(isOwnerAuthenticated, (newValue) => {
 
 onMounted(async () => {
   console.log('🚀 [HomeOwner] Component mounted successfully!');
-  
   // Wait for auth to be properly initialized
   if (authStore.loading) {
     console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
-    // Wait for auth loading to complete
     const maxWait = 5000; // 5 seconds max
     const startTime = Date.now();
-    
     while (authStore.loading && (Date.now() - startTime) < maxWait) {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
-  
   console.log('🔍 [HomeOwner] Auth state after waiting:', {
     isAuthenticated: authStore.isAuthenticated,
     user: authStore.user,
     loading: authStore.loading,
     isOwnerAuthenticated: isOwnerAuthenticated.value
   });
-  
-  // Load owner's data only if properly authenticated
   if (isOwnerAuthenticated.value) {
     console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
     try {
       await Promise.all([
+        propertyStore.fetchProperties(),
         fetchAllProperties(),
         fetchAllBookings()
       ]);
       console.log('✅ [HomeOwner] Owner data loaded successfully');
+      
+      // Debug data after loading
+      console.log('🔍 [HomeOwner] Data state after loading:', {
+        propertiesInStore: propertyStore.propertiesArray.length,
+        bookingsInStore: bookingStore.bookingsArray.length,
+        ownerProperties: ownerPropertiesMap.value.size,
+        ownerBookings: ownerBookingsMap.value.size,
+        filteredBookings: ownerFilteredBookings.value.size
+      });
+      
+      // Debug booking data specifically
+      console.log('🔍 [HomeOwner] Bookings data:', {
+        allBookings: bookingStore.bookingsArray.map(b => ({
+          id: b.id,
+          owner_id: b.owner_id,
+          property_id: b.property_id,
+          checkout_date: b.checkout_date,
+          checkin_date: b.checkin_date
+        })),
+        currentUserId: currentOwnerId.value
+      });
+      
     } catch (error) {
       console.error('❌ [HomeOwner] Failed to load your data:', error);
     }
@@ -1065,12 +1107,12 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
     to: newValue,
     user: authStore.user
   });
-  
   if (newValue && !oldValue) {
     // User became authenticated - load data
     console.log('✅ [HomeOwner] User became authenticated, loading data...');
     try {
       await Promise.all([
+        propertyStore.fetchProperties(),
         fetchAllProperties(),
         fetchAllBookings()
       ]);

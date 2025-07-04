@@ -1,7 +1,7 @@
 // src/composables/supabase/useSupabaseAuth.ts - Enhanced Production Version
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { supabase } from '@/plugins/supabase';
-import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 import type { User, UserRole } from '@/types';
 
 export function useSupabaseAuth() {
@@ -9,42 +9,78 @@ export function useSupabaseAuth() {
   const session = ref<Session | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const initializing = ref(true);
 
-  const isAuthenticated = computed(() => !!session.value && !!user.value);
-  const currentUserId = computed(() => session.value?.user?.id);
+  const isAuthenticated = computed(() => {
+    const authenticated = !!session.value && !!user.value;
+    console.log('[Auth Debug] isAuthenticated check:', { 
+      session: !!session.value, 
+      user: !!user.value, 
+      authenticated,
+      userRole: user.value?.role 
+    });
+    return authenticated;
+  });
   
-  // Debug helpers (only in development)
-  const debugAuth = import.meta.env.VITE_DEBUG_AUTH === 'true';
-  const debugLog = (message: string, data?: any) => {
+  // Debug helpers (conditionally enabled)
+  const debugAuth = false; // Set to true for debugging
+  const debugLog = (message: string, data?: unknown) => {
     if (debugAuth) {
       console.log(`[Auth Debug] ${message}`, data);
     }
   };
 
-  // Initialize auth listener
-  onMounted(() => {
-    initializeAuthListener();
-    checkAuth();
-  });
+  // Initialize auth listener immediately with better error handling
+  initializeAuthListener();
 
   function initializeAuthListener() {
-    supabase.auth.onAuthStateChange(async (event, newSession) => {
-      console.log('Auth state changed:', event, newSession?.user?.id);
-      
-      session.value = newSession;
-      
-      if (event === 'SIGNED_IN' && newSession) {
-        await loadUserProfile(newSession.user.id);
-      } else if (event === 'SIGNED_OUT') {
-        user.value = null;
-        session.value = null;
-        error.value = null;
-      }
-    });
+    try {
+      supabase.auth.onAuthStateChange(async (event, newSession) => {
+        console.log('[Auth Debug] Auth state changed:', { event, userId: newSession?.user?.id });
+        
+        try {
+          if (event === 'INITIAL_SESSION') {
+            session.value = newSession;
+            if (newSession) {
+              await loadUserProfile(newSession.user.id);
+            }
+            // CRITICAL: Always set initializing to false for INITIAL_SESSION
+            console.log('🚀 Setting initializing to false after INITIAL_SESSION');
+            initializing.value = false;
+          } else if (event === 'SIGNED_IN' && newSession) {
+            session.value = newSession;
+            await loadUserProfile(newSession.user.id);
+            console.log('✅ User signed in successfully:', { 
+              email: newSession.user.email, 
+              userRole: user.value?.role 
+            });
+          } else if (event === 'SIGNED_OUT') {
+            user.value = null;
+            session.value = null;
+            error.value = null;
+            console.log('✅ User signed out');
+          }
+        } catch (err) {
+          console.error('Auth state change error:', err);
+          error.value = err instanceof Error ? err.message : 'Authentication error';
+          // CRITICAL: Always set initializing to false even on errors
+          if (event === 'INITIAL_SESSION') {
+            console.log('🚀 Setting initializing to false after INITIAL_SESSION error');
+            initializing.value = false;
+          }
+        }
+      });
+    } catch (err) {
+      console.error('❌ Failed to initialize auth listener:', err);
+      // Fallback: set initializing to false if listener setup fails
+      initializing.value = false;
+    }
   }
 
   async function loadUserProfile(userId: string): Promise<void> {
     try {
+      console.log('🔍 Loading user profile for:', userId);
+      
       const { data, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
@@ -56,18 +92,26 @@ export function useSupabaseAuth() {
         throw profileError;
       }
 
-      user.value = {
-        id: data.id,
-        email: session.value?.user?.email || '',
-        name: data.name,
-        role: data.role as UserRole,
-        company_name: data.company_name,
-        created_at: data.created_at,
-        updated_at: data.updated_at
-      };
+      if (data) {
+        user.value = {
+          id: data.id,
+          email: session.value?.user?.email || data.email || '',
+          name: data.name,
+          role: data.role as UserRole,
+          company_name: data.company_name,
+          notifications_enabled: data.notifications_enabled ?? true,
+          timezone: data.timezone || 'America/New_York',
+          theme: data.theme || 'light',
+          language: data.language || 'en',
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        };
+        console.log('✅ User profile loaded:', { email: user.value.email, role: user.value.role });
+      }
     } catch (err) {
       console.error('Error loading user profile:', err);
       error.value = err instanceof Error ? err.message : 'Failed to load user profile';
+      throw err;
     }
   }
 
@@ -75,6 +119,7 @@ export function useSupabaseAuth() {
     try {
       loading.value = true;
       error.value = null;
+      console.log('🔐 Attempting sign in for:', email);
 
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -85,18 +130,22 @@ export function useSupabaseAuth() {
         throw signInError;
       }
 
-      if (data.user) {
-        await loadUserProfile(data.user.id);
+      if (data.user && data.session) {
+        // Auth state change handler will take care of loading profile
+        console.log('✅ Sign in successful, waiting for profile load...');
         return true;
       }
 
       return false;
     } catch (err) {
-      console.error('Sign in error:', err);
+      console.error('❌ Sign in error:', err);
       error.value = err instanceof Error ? err.message : 'Sign in failed';
       return false;
     } finally {
-      loading.value = false;
+      // CRITICAL: Always set loading to false, with a small delay to ensure state updates
+      setTimeout(() => {
+        loading.value = false;
+      }, 100);
     }
   }
 
@@ -112,6 +161,7 @@ export function useSupabaseAuth() {
     try {
       loading.value = true;
       error.value = null;
+      console.log('📝 Registering new user:', email, 'as', userData.role || 'owner');
 
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -130,45 +180,28 @@ export function useSupabaseAuth() {
       }
 
       if (data.user) {
-        // Create user profile in database
-        await createUserProfile(data.user.id, userData);
-        return true;
+        console.log('✅ User registered successfully:', data.user.email);
+        
+        // If user is immediately confirmed, the auth state change will handle profile loading
+        // If not confirmed, they'll need to verify email first
+        if (data.user.email_confirmed_at) {
+          return true;
+        } else {
+          console.log('📧 Email verification required');
+          return true; // Still successful registration
+        }
       }
 
       return false;
     } catch (err) {
-      console.error('Sign up error:', err);
+      console.error('❌ Sign up error:', err);
       error.value = err instanceof Error ? err.message : 'Sign up failed';
       return false;
     } finally {
-      loading.value = false;
-    }
-  }
-
-  async function createUserProfile(userId: string, userData: {
-    name: string;
-    role?: UserRole;
-    company_name?: string;
-  }): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .insert({
-          id: userId,
-          name: userData.name,
-          role: userData.role || 'owner',
-          company_name: userData.company_name,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
-
-      if (error) {
-        console.error('Failed to create user profile:', error);
-        throw error;
-      }
-    } catch (err) {
-      console.error('Error creating user profile:', err);
-      throw err;
+      // CRITICAL: Always set loading to false
+      setTimeout(() => {
+        loading.value = false;
+      }, 100);
     }
   }
 
@@ -183,15 +216,16 @@ export function useSupabaseAuth() {
         throw signOutError;
       }
 
-      user.value = null;
-      session.value = null;
+      // Auth state change handler will clear user state
       return true;
     } catch (err) {
-      console.error('Sign out error:', err);
+      console.error('❌ Sign out error:', err);
       error.value = err instanceof Error ? err.message : 'Sign out failed';
       return false;
     } finally {
-      loading.value = false;
+      setTimeout(() => {
+        loading.value = false;
+      }, 100);
     }
   }
 
@@ -220,7 +254,7 @@ export function useSupabaseAuth() {
       await loadUserProfile(currentUserId.value);
       return true;
     } catch (err) {
-      console.error('Update profile error:', err);
+      console.error('❌ Update profile error:', err);
       error.value = err instanceof Error ? err.message : 'Profile update failed';
       return false;
     } finally {
@@ -243,7 +277,7 @@ export function useSupabaseAuth() {
 
       return true;
     } catch (err) {
-      console.error('Password reset error:', err);
+      console.error('❌ Password reset error:', err);
       error.value = err instanceof Error ? err.message : 'Password reset failed';
       return false;
     } finally {
@@ -251,62 +285,50 @@ export function useSupabaseAuth() {
     }
   }
 
-  async function checkAuth(): Promise<boolean> {
+  async function checkAuth(): Promise<void> {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      console.log('🔍 Checking current auth state...');
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
       
-      if (session) {
-        await loadUserProfile(session.user.id);
-        return true;
+      if (currentSession) {
+        session.value = currentSession;
+        if (!user.value) {
+          await loadUserProfile(currentSession.user.id);
+        }
+        console.log('✅ Auth check complete - user authenticated');
+      } else {
+        console.log('ℹ️ Auth check complete - no active session');
       }
-      
-      return false;
     } catch (err) {
-      console.error('Auth check error:', err);
-      return false;
+      console.error('❌ Auth check error:', err);
+      error.value = err instanceof Error ? err.message : 'Auth check failed';
+    } finally {
+      initializing.value = false;
     }
   }
 
   // Admin functions
   async function getAllUsers(): Promise<User[]> {
     try {
-      // Only admins can access this
-      if (user.value?.role !== 'admin') {
-        throw new Error('Unauthorized: Admin access required');
-      }
-
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('user_profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        throw error;
+      if (fetchError) {
+        throw fetchError;
       }
 
-      return data.map(profile => ({
-        id: profile.id,
-        email: profile.email || '',
-        name: profile.name,
-        user_role: profile.role as UserRole,
-        company_name: profile.company_name,
-        created_at: profile.created_at,
-        updated_at: profile.updated_at
-      }));
+      return data || [];
     } catch (err) {
-      console.error('Failed to fetch users:', err);
+      console.error('❌ Failed to fetch users:', err);
       throw err;
     }
   }
 
   async function updateUserRole(userId: string, newRole: UserRole): Promise<boolean> {
     try {
-      // Only admins can update user roles
-      if (user.value?.role !== 'admin') {
-        throw new Error('Unauthorized: Admin access required');
-      }
-
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('user_profiles')
         .update({ 
           role: newRole,
@@ -314,39 +336,60 @@ export function useSupabaseAuth() {
         })
         .eq('id', userId);
 
-      if (error) {
-        throw error;
+      if (updateError) {
+        throw updateError;
       }
 
       return true;
     } catch (err) {
-      console.error('Failed to update user role:', err);
-      throw err;
+      console.error('❌ Failed to update user role:', err);
+      return false;
     }
   }
 
+  // Initialize on creation - don't wait for onMounted
+  setTimeout(() => {
+    checkAuth();
+  }, 100);
+
+  // Aggressive timeout to prevent infinite loading
+  setTimeout(() => {
+    if (initializing.value) {
+      console.warn('⚠️ Auth initialization timeout - forcing completion');
+      initializing.value = false;
+      error.value = 'Authentication initialization timed out. Please check your connection.';
+    }
+  }, 5000); // 5 seconds timeout
+
+  // Backup timeout in case Supabase is completely unresponsive
+  setTimeout(() => {
+    if (initializing.value) {
+      console.error('🚨 Emergency timeout - forcing auth initialization to complete');
+      initializing.value = false;
+    }
+  }, 2000); // 2 second emergency timeout
+
   return {
     // State
-    user: computed(() => user.value),
-    session: computed(() => session.value),
-    loading: computed(() => loading.value),
-    error: computed(() => error.value),
+    user,
+    session,
+    loading,
+    error,
+    initializing,
+    
+    // Computed
     isAuthenticated,
     currentUserId,
-
-    // Auth methods
+    
+    // Methods
     signIn,
     signUp,
     signOut,
     updateProfile,
     resetPassword,
     checkAuth,
-
-    // Admin methods
     getAllUsers,
     updateUserRole,
-
-    // Utils
     loadUserProfile
   };
 }

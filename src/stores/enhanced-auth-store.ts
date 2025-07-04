@@ -42,9 +42,9 @@ export const useAuthStore = defineStore('auth', () => {
   // Computed properties
   const user = computed(() => supabaseUser.value);
   const isAuthenticated = computed(() => supabaseIsAuthenticated.value);
-  const isAdmin = computed(() => user.value?.user_role === 'admin');
-  const isOwner = computed(() => user.value?.user_role === 'owner');
-  const isCleaner = computed(() => user.value?.user_role === 'cleaner');
+  const isAdmin = computed(() => user.value?.role === 'admin');
+  const isOwner = computed(() => user.value?.role === 'owner');
+  const isCleaner = computed(() => user.value?.role === 'cleaner');
 
   // Authentication methods
   async function login(email: string, password: string): Promise<boolean> {
@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
       const success = await signIn(email, password);
       
       if (success) {
-        console.log('✅ Login successful for role:', user.value?.user_role);
+        console.log('✅ Login successful for role:', user.value?.role);
         return true;
       }
       
@@ -249,7 +249,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function getSuccessMessage(action: 'login' | 'logout' | 'register'): string {
-    return getRoleSpecificSuccessMessage(action, user.value?.user_role);
+    return getRoleSpecificSuccessMessage(action, user.value?.role);
   }
 
   // Initialize auth state
@@ -258,7 +258,7 @@ export const useAuthStore = defineStore('auth', () => {
       console.log('🚀 Initializing auth store...');
       await checkAuth();
       if (user.value) {
-        console.log('✅ User authenticated:', user.value.email, 'as', user.value.user_role);
+        console.log('✅ User authenticated:', user.value.email, 'as', user.value.role);
       }
     } catch (err) {
       console.error('❌ Auth initialization error:', err);

@@ -38,9 +38,10 @@
             variant="tonal"
             class="mb-4"
             closable
-            @click:close="authStore.clearError"
+            @click:close="authStore.clearError()"
           >
             {{ authStore.error }}
+          </v-alert>
           </v-alert>
           
           <!-- Success Alert -->
@@ -290,7 +291,6 @@ const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const successMessage = ref('')
 const registerForm = ref()
-const propertyId = ref('')
 
 // Dialog states
 const showTerms = ref(false)

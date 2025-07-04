@@ -229,14 +229,35 @@ async function addBooking(booking: Booking) {
     error.value = null;
     
     try {
-      // In a real app, this would be a Supabase or API call
-      // For now, we'll simulate a successful response
-      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log('🔍 [BookingStore] Fetching bookings from Supabase...');
       
-      // Fetch simulation complete
+      // Fetch bookings from Supabase
+      const { data, error: fetchError } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('checkout_date', { ascending: true });
+      
+      if (fetchError) {
+        console.error('❌ [BookingStore] Supabase error:', fetchError);
+        throw fetchError;
+      }
+      
+      console.log(`✅ [BookingStore] Fetched ${data?.length || 0} bookings from Supabase:`, data);
+      
+      // Clear existing bookings and add fetched ones
+      bookings.value.clear();
+      
+      if (data && data.length > 0) {
+        data.forEach(booking => {
+          bookings.value.set(booking.id, booking);
+        });
+        console.log(`✅ [BookingStore] Added ${data.length} bookings to store`);
+      }
+      
       loading.value = false;
       invalidateCache(); // Invalidate cache after fetch
     } catch (err) {
+      console.error('❌ [BookingStore] Error fetching bookings:', err);
       error.value = err instanceof Error ? err.message : 'Unknown error fetching bookings';
       loading.value = false;
     }
