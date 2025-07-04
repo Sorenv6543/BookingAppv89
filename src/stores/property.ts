@@ -166,6 +166,7 @@ export const usePropertyStore = defineStore('property', () => {
     try {
       const { error: supaError } = await supabase.from('properties').insert([property]);
       if (supaError) throw supaError;
+      invalidateCache(); // Invalidate cache after successful insert
     } catch (err: any) {
       properties.value.delete(property.id);
       error.value = err.message || 'Failed to add property.';
@@ -174,21 +175,69 @@ export const usePropertyStore = defineStore('property', () => {
     }
   }
   
-  function updateProperty(id: string, updates: Partial<Property>) {
+  async function updateProperty(id: string, updates: Partial<Property>) {
     const existing = properties.value.get(id);
-    if (existing) {
-      properties.value.set(id, { 
-        ...existing, 
-        ...updates, 
-        updated_at: new Date().toISOString() 
-      });
-      invalidateCache(); // Invalidate cache when data changes
+    if (!existing) {
+      error.value = 'Property not found';
+      throw new Error('Property not found');
+    }
+
+    // Optimistic update
+    const updated = { 
+      ...existing, 
+      ...updates, 
+      updated_at: new Date().toISOString() 
+    };
+    properties.value.set(id, updated);
+    error.value = null;
+    
+    try {
+      const { error: supaError } = await supabase
+        .from('properties')
+        .update(updates)
+        .eq('id', id);
+      
+      if (supaError) throw supaError;
+      invalidateCache(); // Invalidate cache after successful update
+    } catch (err: any) {
+      // Rollback on error
+      properties.value.set(id, existing);
+      error.value = err.message || 'Failed to update property.';
+      console.error('updateProperty error:', err);
+      throw err;
     }
   }
   
-  function removeProperty(id: string) {
-    properties.value.delete(id);
-    invalidateCache(); // Invalidate cache when data changes
+  async function removeProperty(id: string) {
+    const existing = properties.value.get(id);
+    if (!existing) {
+      error.value = 'Property not found';
+      throw new Error('Property not found');
+    }
+
+    // Optimistic update (soft delete by setting active = false)
+    const deactivated = { ...existing, active: false, updated_at: new Date().toISOString() };
+    properties.value.set(id, deactivated);
+    error.value = null;
+    
+    try {
+      const { error: supaError } = await supabase
+        .from('properties')
+        .update({ active: false, updated_at: new Date().toISOString() })
+        .eq('id', id);
+      
+      if (supaError) throw supaError;
+      
+      // Remove from local state after successful soft delete
+      properties.value.delete(id);
+      invalidateCache(); // Invalidate cache after successful delete
+    } catch (err: any) {
+      // Rollback on error
+      properties.value.set(id, existing);
+      error.value = err.message || 'Failed to remove property.';
+      console.error('removeProperty error:', err);
+      throw err;
+    }
   }
   
   function setPropertyActiveStatus(id: string, active: boolean) {

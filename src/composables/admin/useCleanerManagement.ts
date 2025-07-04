@@ -75,9 +75,7 @@ export interface CleanerWorkload {
 export function useCleanerManagement() {
   // Get stores
   const authStore = useAuthStore();
-  const userStore = useUserStore();
   const bookingStore = useBookingStore();
-  const propertyStore = usePropertyStore();
   
   // Admin-specific state
   const loading = ref<boolean>(false);

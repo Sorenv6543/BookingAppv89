@@ -123,7 +123,7 @@ export function useProperties() {
       
       // Check if property has bookings
       const propertyBookings = bookingStore.bookingsByProperty(id);
-      if (propertyBookings.length > 0) {
+      if (propertyBookings.size > 0) {
         throw new Error('Cannot delete property with existing bookings');
       }
       
@@ -161,7 +161,7 @@ export function useProperties() {
       // If deactivating, check for upcoming bookings
       if (!active) {
         const now = new Date();
-        const upcomingBookings = bookingStore.bookingsByProperty(id).filter(booking => {
+        const upcomingBookings = Array.from(bookingStore.bookingsByProperty(id).values()).filter(booking => {
           const checkinDate = new Date(booking.checkin_date);
           return checkinDate > now && ['pending', 'scheduled'].includes(booking.status);
         });
@@ -197,7 +197,8 @@ export function useProperties() {
     }
     
     // Get all bookings for this property
-    const propertyBookings = bookingStore.bookingsByProperty(id);
+    const propertyBookingsMap = bookingStore.bookingsByProperty(id);
+    const propertyBookings = Array.from(propertyBookingsMap.values());
     
     // Calculate utilization rate (booked days / total days)
     const totalDays = 30; // Assuming last 30 days

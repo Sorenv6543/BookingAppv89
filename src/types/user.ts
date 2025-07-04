@@ -9,8 +9,18 @@
 export type UserRole = 'owner' | 'admin' | 'cleaner';
 
 /**
+ * User settings interface (nested structure)
+ */
+export interface UserSettings {
+  notifications: boolean;
+  timezone: string;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+}
+
+/**
  * Base User interface
- * Core data model for all users - matches database schema
+ * Core data model for all users - supports both flattened and nested settings
  */
 export interface User {
   id: string;
@@ -19,11 +29,14 @@ export interface User {
   role: UserRole; // Database column is 'role'
   company_name?: string; // for property owners
   
-  // User settings (flattened from database)
+  // Flattened settings (primary - matches database schema)
   notifications_enabled: boolean;
   timezone: string;
   theme: 'light' | 'dark' | 'system';
   language: string;
+  
+  // Nested settings (for backward compatibility)
+  settings?: UserSettings;
   
   // Admin-specific fields
   access_level?: string;
@@ -39,22 +52,18 @@ export interface User {
 }
 
 /**
- * Legacy UserSettings interface for backward compatibility
- */
-export interface UserSettings {
-  notifications: boolean;
-  timezone: string;
-  theme: 'light' | 'dark' | 'system';
-  language: string;
-}
-
-/**
  * Property Owner user
  * Has properties that need cleaning
  */
 export interface PropertyOwner extends User {
   role: 'owner';
   company_name?: string;
+  // Ensure settings compatibility
+  notifications_enabled: boolean;
+  timezone: string;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  settings?: UserSettings;
 }
 
 /**
@@ -64,6 +73,12 @@ export interface PropertyOwner extends User {
 export interface Admin extends User {
   role: 'admin';
   access_level: 'full' | 'limited';
+  // Ensure settings compatibility
+  notifications_enabled: boolean;
+  timezone: string;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  settings?: UserSettings;
 }
 
 /**
@@ -76,6 +91,13 @@ export interface Cleaner extends User {
   max_daily_bookings: number;
   location_lat?: number;
   location_lng?: number;
+  // Ensure settings compatibility and location support
+  notifications_enabled: boolean;
+  timezone: string;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  settings?: UserSettings;
+  location?: { lat: number; lng: number; }; // For useCleanerManagement compatibility
 }
 
 /**

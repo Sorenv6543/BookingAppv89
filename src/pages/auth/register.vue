@@ -42,7 +42,6 @@
           >
             {{ authStore.error }}
           </v-alert>
-          </v-alert>
           
           <!-- Success Alert -->
           <v-alert
@@ -336,27 +335,21 @@ const termsRules = [
  */
 async function handleRegister() {
   // Validate form
-  //push to register page
-  router.push('/auth/register')
   const { valid } = await registerForm.value.validate()
   if (!valid) return
   
   try {
     const userData = {
-      email: email.value,
-      password: password.value,
       name: name.value,
       role: selectedRole.value,
-      company_name: companyName.value,
-      
-
+      company_name: companyName.value
     }
     
-    const success = await authStore.register(userData)
+    const success = await authStore.register(email.value, password.value, userData)
     
     if (success) {
       // Show success message
-      successMessage.value = authStore.getSuccessMessage('register')
+      successMessage.value = 'Registration successful! Redirecting to your dashboard...'
 
       // Navigate to role-appropriate dashboard
       const defaultRoute = getDefaultRouteForRole(authStore.user?.role)

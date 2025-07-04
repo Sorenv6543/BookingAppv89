@@ -58,6 +58,11 @@ export const useAuthStore = defineStore('auth', () => {
   const error = computed(() => composable?.error.value ?? fallbackError.value);
   const initializing = computed(() => composable?.initializing.value ?? fallbackInitializing.value);
   const isAuthenticated = computed(() => !!session.value && !!user.value);
+  
+  // Role-based computed properties
+  const isAdmin = computed(() => user.value?.role === 'admin');
+  const isOwner = computed(() => user.value?.role === 'owner');
+  const isCleaner = computed(() => user.value?.role === 'cleaner');
 
   // ... rest of the store logic ...
 
@@ -81,6 +86,9 @@ export const useAuthStore = defineStore('auth', () => {
     error,
     initializing,
     isAuthenticated,
+    isAdmin,
+    isOwner,
+    isCleaner,
     $reset,
     // ... other computed and methods ...
     login: signIn,

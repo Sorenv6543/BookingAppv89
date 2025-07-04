@@ -21,14 +21,8 @@ export function useSupabaseAuth() {
     });
     return authenticated;
   });
-  
-  // Debug helpers (conditionally enabled)
-  const debugAuth = false; // Set to true for debugging
-  const debugLog = (message: string, data?: unknown) => {
-    if (debugAuth) {
-      console.log(`[Auth Debug] ${message}`, data);
-    }
-  };
+
+  const currentUserId = computed(() => session.value?.user?.id || null);
 
   // Initialize auth listener immediately with better error handling
   initializeAuthListener();

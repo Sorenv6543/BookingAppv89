@@ -6,7 +6,7 @@
 // ✅ Navigation validation helpers
 // ✅ State cleanup utilities
 
-import type { UserRole } from '@/types'
+import type { UserRole, User, UserSettings, PropertyOwner, Admin, Cleaner } from '@/types'
 
 export function getDefaultRouteForRole(userRole: UserRole | undefined): string {
   switch (userRole) {
@@ -213,4 +213,126 @@ export function getRoleSpecificSuccessMessage(action: 'login' | 'logout' | 'regi
     default:
       return 'Operation completed successfully!'
   }
+}
+
+/**
+ * Authentication Helper Functions
+ * Utilities for working with user authentication and profile data
+ */
+
+/**
+ * Creates a User object with both flattened and nested settings
+ * Ensures compatibility with both old and new patterns
+ */
+export function createUserWithSettings(userData: Partial<User> & {
+  settings?: UserSettings;
+}): User {
+  const baseUser: User = {
+    id: userData.id || '',
+    email: userData.email || '',
+    name: userData.name || '',
+    role: userData.role || 'owner',
+    
+    // Flattened settings (primary)
+    notifications_enabled: userData.settings?.notifications ?? userData.notifications_enabled ?? true,
+    timezone: userData.settings?.timezone ?? userData.timezone ?? 'UTC',
+    theme: userData.settings?.theme ?? userData.theme ?? 'light',
+    language: userData.settings?.language ?? userData.language ?? 'en',
+    
+    // Nested settings (for backward compatibility)
+    settings: userData.settings ? {
+      notifications: userData.settings.notifications,
+      timezone: userData.settings.timezone,
+      theme: userData.settings.theme,
+      language: userData.settings.language,
+    } : {
+      notifications: userData.notifications_enabled ?? true,
+      timezone: userData.timezone ?? 'UTC',
+      theme: userData.theme ?? 'light',
+      language: userData.language ?? 'en',
+    },
+    
+    // Optional fields
+    company_name: userData.company_name,
+    access_level: userData.access_level,
+    skills: userData.skills,
+    max_daily_bookings: userData.max_daily_bookings,
+    location_lat: userData.location_lat,
+    location_lng: userData.location_lng,
+    created_at: userData.created_at,
+    updated_at: userData.updated_at,
+  };
+
+  return baseUser;
+}
+
+/**
+ * Creates a PropertyOwner with proper type compatibility
+ */
+export function createPropertyOwner(ownerData: Partial<PropertyOwner> & {
+  settings?: UserSettings;
+}): PropertyOwner {
+  const baseUser = createUserWithSettings(ownerData);
+  return {
+    ...baseUser,
+    role: 'owner',
+    company_name: ownerData.company_name,
+  } as PropertyOwner;
+}
+
+/**
+ * Creates an Admin with proper type compatibility
+ */
+export function createAdmin(adminData: Partial<Admin> & {
+  settings?: UserSettings;
+}): Admin {
+  const baseUser = createUserWithSettings(adminData);
+  return {
+    ...baseUser,
+    role: 'admin',
+    access_level: adminData.access_level || 'limited',
+  } as Admin;
+}
+
+/**
+ * Creates a Cleaner with proper type compatibility
+ */
+export function createCleaner(cleanerData: Partial<Cleaner> & {
+  settings?: UserSettings;
+  location?: { lat: number; lng: number; };
+}): Cleaner {
+  const baseUser = createUserWithSettings(cleanerData);
+  return {
+    ...baseUser,
+    role: 'cleaner',
+    skills: cleanerData.skills || [],
+    max_daily_bookings: cleanerData.max_daily_bookings || 3,
+    location_lat: cleanerData.location?.lat ?? cleanerData.location_lat,
+    location_lng: cleanerData.location?.lng ?? cleanerData.location_lng,
+    location: cleanerData.location, // For backward compatibility
+  } as Cleaner;
+}
+
+/**
+ * Converts nested settings to flattened format
+ */
+export function flattenUserSettings(settings: UserSettings): Partial<User> {
+  return {
+    notifications_enabled: settings.notifications,
+    timezone: settings.timezone,
+    theme: settings.theme,
+    language: settings.language,
+  };
+}
+
+/**
+ * Converts flattened settings to nested format
+ */
+export function nestUserSettings(user: User): UserSettings {
+  return {
+    notifications: user.notifications_enabled,
+    timezone: user.timezone,
+    theme: user.theme,
+    language: user.language,
+  };
 } 

@@ -276,7 +276,7 @@ export const calculateSystemMetrics = (
 ) => {
   const now = new Date()
   const twentyFourHours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-  const thisMonth = new Date().toISOString().slice(0, 7)
+  // const thisMonth = new Date().toISOString().slice(0, 7) // Reserved for future metrics
   
   let totalProperties = 0
   let activeProperties = 0

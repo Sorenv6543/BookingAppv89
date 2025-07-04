@@ -1050,10 +1050,10 @@ onMounted(async () => {
   if (isOwnerAuthenticated.value) {
     console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
     try {
+      // Fetch data using store methods directly for better performance
       await Promise.all([
         propertyStore.fetchProperties(),
-        fetchAllProperties(),
-        fetchAllBookings()
+        bookingStore.fetchBookings()
       ]);
       console.log('✅ [HomeOwner] Owner data loaded successfully');
       
@@ -1113,8 +1113,7 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
     try {
       await Promise.all([
         propertyStore.fetchProperties(),
-        fetchAllProperties(),
-        fetchAllBookings()
+        bookingStore.fetchBookings()
       ]);
       console.log('✅ [HomeOwner] Data loaded after auth change');
     } catch (error) {

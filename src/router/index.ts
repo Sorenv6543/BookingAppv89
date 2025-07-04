@@ -8,27 +8,27 @@
 // ✅ Applies navigation guards
 
 import { createRouter, createWebHistory } from 'vue-router'
-// import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from '@/router/guards'
+import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from '@/router/guards'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
+      name: 'home',
+      component: () => import('@/pages/index.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
+    {
+      path: '/auth/login',
       name: 'login',
       component: () => import('@/pages/auth/login.vue'),
       meta: {
         layout: 'auth'
       }
     },
-{
-    path :'/auth/login',
-    name :'login',
-    component :() => import('@/pages/auth/login.vue'),
-    meta :{
-      layout :'auth'
-    }
-},
 
     {
       path: '/auth/register',
@@ -312,9 +312,9 @@ const router = createRouter({
 })
 
 // Apply navigation guards
-// router.beforeEach(developmentGuard)
-// router.beforeEach(loadingGuard)
-// router.beforeEach(authGuard)
-// router.afterEach(afterNavigationGuard)
+router.beforeEach(developmentGuard)
+router.beforeEach(loadingGuard)
+router.beforeEach(authGuard)
+router.afterEach(afterNavigationGuard)
 
 export default router 

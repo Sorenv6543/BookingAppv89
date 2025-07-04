@@ -206,7 +206,8 @@ function quickLogin(userEmail: string) {
 
 function forceStopLoading() {
   console.warn('🔧 Force stopping loading state');
-  authStore.loading = false;
+  // Note: loading state will clear automatically when login completes
+  authStore.clearError(); // Clear any errors that might be blocking
   
   // If user seems authenticated, navigate anyway
   if (authStore.isAuthenticated) {

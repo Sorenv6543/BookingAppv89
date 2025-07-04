@@ -129,7 +129,7 @@ export function useOwnerCalendarState() {
   /**
    * Handle date selection for creating new owner booking
    */
-  function handleOwnerDateSelect(selectInfo: any) {
+  function handleOwnerDateSelect(_selectInfo: any) {
     if (!currentUserId.value) {
       ownerError.value = 'Please log in to create bookings';
       return;

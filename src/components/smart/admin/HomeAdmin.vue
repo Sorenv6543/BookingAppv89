@@ -480,6 +480,66 @@ const systemMetricsText = computed(() => {
 });
 
 // ============================================================================
+// DATA LOADING ON MOUNT  
+// ============================================================================
+
+// Fetch data when component mounts
+onMounted(async () => {
+  console.log('🚀 [HomeAdmin] Component mounted, starting data fetch...');
+  
+  if (!isAdminAuthenticated.value) {
+    console.log('⚠️ [HomeAdmin] User not authenticated as admin, skipping data fetch');
+    return;
+  }
+
+  try {
+    // Fetch both properties and bookings in parallel for better performance
+    await Promise.all([
+      propertyStore.fetchProperties(),
+      bookingStore.fetchBookings()
+    ]);
+    
+    console.log('✅ [HomeAdmin] Admin data fetch completed successfully');
+    console.log('🔍 [HomeAdmin] Data state after loading:', {
+      propertiesInStore: propertyStore.propertiesArray.length,
+      bookingsInStore: bookingStore.bookingsArray.length,
+      allProperties: allPropertiesMap.value.size,
+      allBookings: allBookingsMap.value.size,
+      systemTurns: systemTodayTurns.value.size,
+      upcomingCleanings: systemUpcomingCleanings.value.size
+    });
+  } catch (error) {
+    console.error('❌ [HomeAdmin] Error fetching admin data on mount:', error);
+    // Error is already handled by the stores and displayed in UI
+  }
+});
+
+// Watch for authentication changes
+watch(isAdminAuthenticated, async (newValue, oldValue) => {
+  console.log('🔄 [HomeAdmin] isAdminAuthenticated changed:', { 
+    from: oldValue, 
+    to: newValue,
+    user: authStore.user
+  });
+  if (newValue && !oldValue) {
+    // User became authenticated as admin - load data
+    console.log('✅ [HomeAdmin] User became authenticated as admin, loading data...');
+    try {
+      await Promise.all([
+        propertyStore.fetchProperties(),
+        bookingStore.fetchBookings()
+      ]);
+      console.log('✅ [HomeAdmin] Admin data loaded after auth change');
+    } catch (error) {
+      console.error('❌ [HomeAdmin] Failed to load admin data after auth change:', error);
+    }
+  } else if (!newValue && oldValue) {
+    // User became unauthenticated - could clear data if needed
+    console.log('⚠️ [HomeAdmin] User lost admin authentication');
+  }
+});
+
+// ============================================================================
 // UI STATE - MODAL MANAGEMENT
 // ============================================================================
 

@@ -7,7 +7,7 @@ import {
   getUrgentTurns, 
   getUpcomingBookings
 } from '@/utils/businessLogic';
-import { supabase } from '@/plugins/supabase';
+import supabase from '@/plugins/supabase';
 
 // Uses Map collections for efficient booking access and management
 export const useBookingStore = defineStore('booking', () => {
@@ -189,31 +189,80 @@ export const useBookingStore = defineStore('booking', () => {
 async function addBooking(booking: Booking) {
   // Optimistic update
   bookings.value.set(booking.id, booking);
+  error.value = null;
   
   try {
-    const { error } = await supabase.from('bookings').insert(booking);
-    if (error) throw error;
-  } catch (err) {
+    const { error: supaError } = await supabase.from('bookings').insert(booking);
+    if (supaError) throw supaError;
+    invalidateCache(); // Invalidate cache after successful insert
+  } catch (err: any) {
     // Rollback on error
     bookings.value.delete(booking.id);
+    error.value = err.message || 'Failed to add booking.';
+    console.error('addBooking error:', err);
     throw err;
   }
 }
-  function updateBooking(id: string, updates: Partial<Booking>) {
+  
+  async function updateBooking(id: string, updates: Partial<Booking>) {
     const existing = bookings.value.get(id);
-    if (existing) {
-      bookings.value.set(id, { 
-        ...existing, 
-        ...updates, 
-        updated_at: new Date().toISOString() 
-      });
-      invalidateCache(); // Invalidate cache when data changes
+    if (!existing) {
+      error.value = 'Booking not found';
+      throw new Error('Booking not found');
+    }
+
+    // Optimistic update
+    const updated = { 
+      ...existing, 
+      ...updates, 
+      updated_at: new Date().toISOString() 
+    };
+    bookings.value.set(id, updated);
+    error.value = null;
+    
+    try {
+      const { error: supaError } = await supabase
+        .from('bookings')
+        .update(updates)
+        .eq('id', id);
+      
+      if (supaError) throw supaError;
+      invalidateCache(); // Invalidate cache after successful update
+    } catch (err: any) {
+      // Rollback on error
+      bookings.value.set(id, existing);
+      error.value = err.message || 'Failed to update booking.';
+      console.error('updateBooking error:', err);
+      throw err;
     }
   }
   
-  function removeBooking(id: string) {
+  async function removeBooking(id: string) {
+    const existing = bookings.value.get(id);
+    if (!existing) {
+      error.value = 'Booking not found';
+      throw new Error('Booking not found');
+    }
+
+    // Optimistic update
     bookings.value.delete(id);
-    invalidateCache(); // Invalidate cache when data changes
+    error.value = null;
+    
+    try {
+      const { error: supaError } = await supabase
+        .from('bookings')
+        .delete()
+        .eq('id', id);
+      
+      if (supaError) throw supaError;
+      invalidateCache(); // Invalidate cache after successful delete
+    } catch (err: any) {
+      // Rollback on error
+      bookings.value.set(id, existing);
+      error.value = err.message || 'Failed to remove booking.';
+      console.error('removeBooking error:', err);
+      throw err;
+    }
   }
   
   function updateBookingStatus(id: string, status: BookingStatus) {

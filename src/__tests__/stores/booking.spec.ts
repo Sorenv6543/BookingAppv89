@@ -17,7 +17,7 @@ describe('Booking Store', () => {
     expect(store.error).toBeNull();
   });
 
-  it('should add bookings to the Map', () => {
+  it('should add bookings to the Map', async () => {
     const store = useBookingStore();
     const booking: Booking = {
       id: 'booking1',
@@ -29,13 +29,13 @@ describe('Booking Store', () => {
       status: 'pending'
     };
 
-    store.addBooking(booking);
+    await store.addBooking(booking);
     expect(store.bookings.size).toBe(1);
     expect(store.bookings.get('booking1')).toEqual(booking);
     expect(store.bookingsArray.length).toBe(1);
   });
 
-  it('should update bookings in the Map', () => {
+  it('should update bookings in the Map', async () => {
     const store = useBookingStore();
     const booking: Booking = {
       id: 'booking1',
@@ -47,8 +47,8 @@ describe('Booking Store', () => {
       status: 'pending'
     };
 
-    store.addBooking(booking);
-    store.updateBooking('booking1', { 
+    await store.addBooking(booking);
+    await store.updateBooking('booking1', { 
       status: 'scheduled',
       notes: 'Updated booking'
     });
@@ -59,7 +59,7 @@ describe('Booking Store', () => {
     expect(updated?.updated_at).toBeDefined();
   });
 
-  it('should remove bookings from the Map', () => {
+  it('should remove bookings from the Map', async () => {
     const store = useBookingStore();
     const booking: Booking = {
       id: 'booking1',
@@ -71,10 +71,10 @@ describe('Booking Store', () => {
       status: 'pending'
     };
 
-    store.addBooking(booking);
+    await store.addBooking(booking);
     expect(store.bookings.size).toBe(1);
     
-    store.removeBooking('booking1');
+    await store.removeBooking('booking1');
     expect(store.bookings.size).toBe(0);
     expect(store.bookings.get('booking1')).toBeUndefined();
   });
@@ -196,7 +196,7 @@ describe('Booking Store', () => {
     expect(store.bookingsByDateRange('2023-05-31', '2023-06-13').size).toBe(2);
   });
   
-  it('should update booking status', () => {
+  it('should update booking status', async () => {
     const store = useBookingStore();
     const booking: Booking = {
       id: 'booking1',
@@ -208,14 +208,14 @@ describe('Booking Store', () => {
       status: 'pending'
     };
 
-    store.addBooking(booking);
-    store.updateBookingStatus('booking1', 'scheduled');
+    await store.addBooking(booking);
+    await store.updateBookingStatus('booking1', 'scheduled');
     
     const updated = store.bookings.get('booking1');
     expect(updated?.status).toBe('scheduled');
   });
   
-  it('should assign cleaner to booking', () => {
+  it('should assign cleaner to booking', async () => {
     const store = useBookingStore();
     const booking: Booking = {
       id: 'booking1',
@@ -227,8 +227,8 @@ describe('Booking Store', () => {
       status: 'pending'
     };
 
-    store.addBooking(booking);
-    store.assignCleaner('booking1', 'cleaner1');
+    await store.addBooking(booking);
+    await store.assignCleaner('booking1', 'cleaner1');
     
     const updated = store.bookings.get('booking1');
     expect(updated?.assigned_cleaner_id).toBe('cleaner1');

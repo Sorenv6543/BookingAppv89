@@ -133,6 +133,21 @@ export interface ErrorContext {
   timestamp: string;
   sessionId?: string;
   requestId?: string;
+  
+  // Additional properties used by error handlers
+  affectedResources?: string[];
+  data?: Record<string, unknown>;
+  businessImpact?: BusinessImpact;
+  notificationId?: string;
+  
+  // Context properties for specific error types
+  bookingIds?: string[];
+  cleanerIds?: string[];
+  affectedBookings?: string[];
+  affectedTables?: string[];
+  affectedFeatures?: string[];
+  propertyId?: string;
+  bookingId?: string;
 }
 
 /**
@@ -146,6 +161,10 @@ export interface ErrorHandlingOptions {
   logToConsole?: boolean;
   reportToService?: boolean;
   escalate?: boolean;
+  
+  // Additional options used by error handlers
+  retryable?: boolean;
+  businessImpact?: BusinessImpact;
 }
 
 /**
@@ -299,6 +318,7 @@ export interface RetryConfig {
   baseDelay: number;
   maxDelay: number;
   exponentialBackoff: boolean;
+  backoffFactor?: number;
   retryCondition?: (error: unknown) => boolean;
 }
 

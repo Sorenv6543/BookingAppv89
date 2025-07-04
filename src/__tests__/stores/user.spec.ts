@@ -4,6 +4,7 @@ import { useUserStore } from '@/stores/user';
 import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
 import type { User } from '@/types';
+import { createUserWithSettings } from '@/utils/authHelpers';
 
 describe('User Store', () => {
   beforeEach(() => {
@@ -22,7 +23,7 @@ describe('User Store', () => {
 
   it('should set and authenticate user', () => {
     const store = useUserStore();
-    const user: User = {
+    const user = createUserWithSettings({
       id: 'user1',
       email: 'test@example.com',
       name: 'Test User',
@@ -33,7 +34,7 @@ describe('User Store', () => {
         theme: 'light',
         language: 'en'
       }
-    };
+    });
 
     store.setUser(user);
     expect(store.currentUser).toEqual(user);
@@ -46,7 +47,7 @@ describe('User Store', () => {
     const propertyStore = usePropertyStore();
     
     // Set up user
-    const user: User = {
+    const user = createUserWithSettings({
       id: 'owner1',
       email: 'owner@example.com',
       name: 'Property Owner',
@@ -57,7 +58,7 @@ describe('User Store', () => {
         theme: 'light',
         language: 'en'
       }
-    };
+    });
     store.setUser(user);
 
     // Add properties
@@ -97,7 +98,7 @@ describe('User Store', () => {
     const propertyStore = usePropertyStore();
     
     // Set up admin user
-    const adminUser: User = {
+    const adminUser = createUserWithSettings({
       id: 'admin1',
       email: 'admin@example.com',
       name: 'Admin User',
@@ -108,7 +109,7 @@ describe('User Store', () => {
         theme: 'light',
         language: 'en'
       }
-    };
+    });
     store.setUser(adminUser);
 
     // Add properties from different owners
@@ -141,7 +142,7 @@ describe('User Store', () => {
     const bookingStore = useBookingStore();
     
     // Set up user
-    const user: User = {
+    const user = createUserWithSettings({
       id: 'owner1',
       email: 'owner@example.com',
       name: 'Property Owner',
@@ -152,7 +153,7 @@ describe('User Store', () => {
         theme: 'light',
         language: 'en'
       }
-    };
+    });
     store.setUser(user);
 
     // Add bookings
@@ -310,5 +311,23 @@ describe('User Store', () => {
     expect(store.currentUser).toBeNull();
     expect(store.viewPreferences.favoriteProperties.size).toBe(0);
     expect(store.viewPreferences.recentlyViewedProperties).toHaveLength(0);
+  });
+
+  it('should add a user to the store', () => {
+    const store = useUserStore();
+    const user = createUserWithSettings({
+      id: 'test-user-1',
+      email: 'test@example.com',
+      name: 'Test User',
+      role: 'owner' as const,
+      settings: {
+        notifications: true,
+        timezone: 'UTC',
+        theme: 'light' as const,
+        language: 'en'
+      }
+    });
+
+    store.addUser(user);
   });
 }); 
