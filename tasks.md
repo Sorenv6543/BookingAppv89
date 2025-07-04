@@ -16,6 +16,21 @@
 - **Estimated**: 2-4 hours
 - Assigned to: Cursor
 
+### **TASK-064**: Supabase Property Persistence Fixes
+- **Status: Not Started**
+- **Priority**: Critical (data integrity)
+- **Requirements**:
+  - Update `fetchProperties` in property store to load from Supabase, not just simulate fetch
+  - Ensure `fetchProperties` is called on component mount (e.g., in HomeOwner.vue)
+  - Add error logging and UI error display to `addProperty` for failed inserts
+  - Check Supabase RLS policies for the `properties` table to ensure owners can insert/select their own properties
+- **Deliverables**:
+  - Persistent property data for owners (survives reload)
+  - Error handling for property add failures
+  - Verified RLS configuration for owner property access
+- **Estimated**: 1-2 hours
+- Assigned to: Cursor
+
 ### **TASK-056**: Component API Documentation
 - **Status: ✅ COMPLETE** (**Major Success!**)
 - **Priority**: High (for future maintenance)

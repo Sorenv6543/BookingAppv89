@@ -6,10 +6,10 @@
     >
       <v-col
         cols="12"
-        sm="12"
-        md="12"
-        lg="12"
-        xl="12"
+        sm="10"
+        md="8"
+        lg="6"
+        xl="4"
       >
         <v-card
           elevation="8"
@@ -290,7 +290,6 @@ const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const successMessage = ref('')
 const registerForm = ref()
-const propertyId = ref('')
 
 // Dialog states
 const showTerms = ref(false)
