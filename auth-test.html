@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+</head>
+<body>
+    <h1>Quick Auth Test</h1>
+    <div id="status">Testing connection...</div>
+    <br>
+    <button onclick="testLogin()">Test Login (jimrey@gmail.com)</button>
+    <br><br>
+    <div id="result"></div>
+
+    <script>
+        const supabaseUrl = 'https://yplrudursbvzcdaroqly.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwbHJ1ZHVyc2J2emNkYXJvcWx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyNzIyNTAsImV4cCI6MjA2Njg0ODI1MH0.D3NN6SPNG_fJ4ys_2Ju9t_9X12P18nWLyzF_nteHIuQ';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Test connection
+        supabase.from('user_profiles').select('count', { count: 'exact', head: true })
+            .then(({ data, error }) => {
+                if (error) {
+                    document.getElementById('status').innerHTML = '❌ Connection failed: ' + error.message;
+                } else {
+                    document.getElementById('status').innerHTML = '✅ Supabase connected successfully';
+                }
+            });
+
+        async function testLogin() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing login...';
+            
+            try {
+                // Test with your actual credentials from the logs
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: 'jimrey@gmail.com',
+                    password: 'your-password' // You'll need to use your actual password
+                });
+                
+                if (error) {
+                    result.innerHTML = '❌ Login failed: ' + error.message;
+                } else {
+                    result.innerHTML = '✅ Login successful! User ID: ' + data.user.id;
+                    
+                    // Test profile loading
+                    const { data: profile, error: profileError } = await supabase
+                        .from('user_profiles')
+                        .select('*')
+                        .eq('id', data.user.id)
+                        .single();
+                    
+                    if (profileError) {
+                        result.innerHTML += '<br>❌ Profile load failed: ' + profileError.message;
+                    } else {
+                        result.innerHTML += '<br>✅ Profile loaded: ' + profile.name + ' (' + profile.role + ')';
+                    }
+                }
+            } catch (err) {
+                result.innerHTML = '❌ Error: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
