@@ -14,6 +14,8 @@ describe('useAdminBookings (Role-Based)', () => {
   it('should show all bookings for admin', () => {
     const bookingStore = useBookingStore();
     const authStore = useAuthStore();
+    expect(authStore).toBeDefined();
+    if (!authStore) throw new Error('authStore is null or undefined');
     setAdminUser(authStore, 'admin1');
     addAdminBookings(bookingStore, 3);
     const { allBookings } = useAdminBookings();
@@ -37,7 +39,7 @@ describe('useAdminBookings (Role-Based)', () => {
         language: 'en'
       }
     };
-    userStore.user = adminUser;
+    setAdminUser(userStore, 'admin1');
 
     // Add bookings from different owners
     const owner1Booking: Booking = {
@@ -88,7 +90,7 @@ describe('useAdminBookings (Role-Based)', () => {
         language: 'en'
       }
     };
-    userStore.user = adminUser;
+    setAdminUser(userStore, 'admin1');
 
     // Add turn bookings from multiple owners
     const turnBooking1: Booking = {
@@ -150,7 +152,7 @@ describe('useAdminBookings (Role-Based)', () => {
         language: 'en'
       }
     };
-    userStore.user = adminUser;
+    setAdminUser(userStore, 'admin1');
 
     const { createBookingForOwner, canManageAnyBooking } = useAdminBookings();
 
@@ -192,7 +194,7 @@ describe('useAdminBookings (Role-Based)', () => {
         language: 'en'
       }
     };
-    userStore.user = adminUser;
+    setAdminUser(userStore, 'admin1');
 
     // Add bookings with different statuses from multiple owners
     const bookings: Booking[] = [
@@ -236,7 +238,7 @@ describe('useAdminBookings (Role-Based)', () => {
         language: 'en'
       }
     };
-    userStore.user = adminUser;
+    setAdminUser(userStore, 'admin1');
 
     // Add unassigned bookings from different owners
     const booking1: Booking = {
@@ -289,7 +291,7 @@ describe('useAdminBookings (Role-Based)', () => {
         language: 'en'
       }
     };
-    userStore.user = adminUser;
+    setAdminUser(userStore, 'admin1');
 
     const today = new Date().toISOString().split('T')[0];
     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -354,7 +356,7 @@ describe('useAdminBookings (Role-Based)', () => {
         language: 'en'
       }
     };
-    userStore.user = adminUser;
+    setAdminUser(userStore, 'admin1');
 
     const { 
       canEditAnyBooking, 

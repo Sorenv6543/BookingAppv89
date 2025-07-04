@@ -52,35 +52,78 @@
 //   addAdminBookings(bookingStore, 5)
 
 import type { User, Booking } from '@/types';
+import { ref, isRef, isComputed } from 'vue';
 
-export function setOwnerUser(authStore: { user: User | null }, id = 'owner1') {
-  authStore.user = {
-    id,
-    email: `${id}@example.com`,
-    name: 'Property Owner',
-    role: 'owner',
-    settings: {
-      notifications: true,
-      timezone: 'America/New_York',
-      theme: 'light',
-      language: 'en',
-    },
-  };
+export function setOwnerUser(authStore: any, id = 'owner1') {
+  if ('supabaseUser' in authStore && typeof authStore.$patch === 'function') {
+    authStore.$patch({
+      supabaseUser: {
+        id,
+        email: `${id}@example.com`,
+        name: 'Property Owner',
+        role: 'owner',
+        settings: {
+          notifications: true,
+          timezone: 'America/New_York',
+          theme: 'light',
+          language: 'en',
+        },
+      }
+    });
+    return;
+  }
+  if (authStore.user && isRef(authStore.user)) {
+    authStore.user.value = {
+      id,
+      email: `${id}@example.com`,
+      name: 'Property Owner',
+      role: 'owner',
+      settings: {
+        notifications: true,
+        timezone: 'America/New_York',
+        theme: 'light',
+        language: 'en',
+      },
+    };
+    return;
+  }
+  throw new Error('[setOwnerUser] Could not set user: no supabaseUser or user ref found on store.');
 }
 
-export function setAdminUser(authStore: { user: User | null }, id = 'admin1') {
-  authStore.user = {
-    id,
-    email: `${id}@example.com`,
-    name: 'Business Admin',
-    role: 'admin',
-    settings: {
-      notifications: true,
-      timezone: 'America/New_York',
-      theme: 'light',
-      language: 'en',
-    },
-  };
+export function setAdminUser(authStore: any, id = 'admin1') {
+  if ('supabaseUser' in authStore && typeof authStore.$patch === 'function') {
+    authStore.$patch({
+      supabaseUser: {
+        id,
+        email: `${id}@example.com`,
+        name: 'Business Admin',
+        role: 'admin',
+        settings: {
+          notifications: true,
+          timezone: 'America/New_York',
+          theme: 'light',
+          language: 'en',
+        },
+      }
+    });
+    return;
+  }
+  if (authStore.user && isRef(authStore.user)) {
+    authStore.user.value = {
+      id,
+      email: `${id}@example.com`,
+      name: 'Business Admin',
+      role: 'admin',
+      settings: {
+        notifications: true,
+        timezone: 'America/New_York',
+        theme: 'light',
+        language: 'en',
+      },
+    };
+    return;
+  }
+  throw new Error('[setAdminUser] Could not set user: no supabaseUser or user ref found on store.');
 }
 
 export function addOwnerBookings(bookingStore: { addBooking: (b: Booking) => void }, ownerId: string, count: number) {

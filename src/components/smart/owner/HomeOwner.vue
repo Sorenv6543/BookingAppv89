@@ -1007,31 +1007,26 @@ watch(isOwnerAuthenticated, (newValue) => {
 
 onMounted(async () => {
   console.log('🚀 [HomeOwner] Component mounted successfully!');
-  
   // Wait for auth to be properly initialized
   if (authStore.loading) {
     console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
-    // Wait for auth loading to complete
     const maxWait = 5000; // 5 seconds max
     const startTime = Date.now();
-    
     while (authStore.loading && (Date.now() - startTime) < maxWait) {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
-  
   console.log('🔍 [HomeOwner] Auth state after waiting:', {
     isAuthenticated: authStore.isAuthenticated,
     user: authStore.user,
     loading: authStore.loading,
     isOwnerAuthenticated: isOwnerAuthenticated.value
   });
-  
-  // Load owner's data only if properly authenticated
   if (isOwnerAuthenticated.value) {
     console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
     try {
       await Promise.all([
+        propertyStore.fetchProperties(),
         fetchAllProperties(),
         fetchAllBookings()
       ]);
@@ -1065,12 +1060,12 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
     to: newValue,
     user: authStore.user
   });
-  
   if (newValue && !oldValue) {
     // User became authenticated - load data
     console.log('✅ [HomeOwner] User became authenticated, loading data...');
     try {
       await Promise.all([
+        propertyStore.fetchProperties(),
         fetchAllProperties(),
         fetchAllBookings()
       ]);

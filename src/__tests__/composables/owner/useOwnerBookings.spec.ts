@@ -14,6 +14,8 @@ describe('useOwnerBookings (Role-Based)', () => {
   it('should filter bookings to only show owner data', () => {
     const bookingStore = useBookingStore();
     const authStore = useAuthStore();
+    expect(authStore).toBeDefined();
+    if (!authStore) throw new Error('authStore is null or undefined');
     setOwnerUser(authStore, 'owner1');
     addOwnerBookings(bookingStore, 'owner1', 1);
     // Add a booking for another owner
@@ -28,19 +30,7 @@ describe('useOwnerBookings (Role-Based)', () => {
     const authStore = useAuthStore();
     
     // Set up owner user
-    const ownerUser: User = {
-      id: 'owner1',
-      email: 'owner@example.com',
-      name: 'Property Owner',
-      role: 'owner',
-      settings: {
-        notifications: true,
-        timezone: 'America/New_York',
-        theme: 'light',
-        language: 'en'
-      }
-    };
-    authStore.user = ownerUser;
+    setOwnerUser(authStore, 'owner1');
 
     // Add turn and standard bookings
     const turnBooking: Booking = {
@@ -79,19 +69,7 @@ describe('useOwnerBookings (Role-Based)', () => {
     const authStore = useAuthStore();
     
     // Set up owner user
-    const ownerUser: User = {
-      id: 'owner1',
-      email: 'owner@example.com',
-      name: 'Property Owner',
-      role: 'owner',
-      settings: {
-        notifications: true,
-        timezone: 'America/New_York',
-        theme: 'light',
-        language: 'en'
-      }
-    };
-    authStore.user = ownerUser;
+    setOwnerUser(authStore, 'owner1');
 
     const { createOwnerBooking } = useOwnerBookings();
 
@@ -116,19 +94,7 @@ describe('useOwnerBookings (Role-Based)', () => {
     const authStore = useAuthStore();
     
     // Set up owner user
-    const ownerUser: User = {
-      id: 'owner1',
-      email: 'owner@example.com',
-      name: 'Property Owner',
-      role: 'owner',
-      settings: {
-        notifications: true,
-        timezone: 'America/New_York',
-        theme: 'light',
-        language: 'en'
-      }
-    };
-    authStore.user = ownerUser;
+    setOwnerUser(authStore, 'owner1');
 
     // Add multiple bookings from different owners
     for (let i = 1; i <= 10; i++) {
@@ -157,19 +123,7 @@ describe('useOwnerBookings (Role-Based)', () => {
     const authStore = useAuthStore();
     
     // Set up owner user
-    const ownerUser: User = {
-      id: 'owner1',
-      email: 'owner@example.com',
-      name: 'Property Owner',
-      role: 'owner',
-      settings: {
-        notifications: true,
-        timezone: 'America/New_York',
-        theme: 'light',
-        language: 'en'
-      }
-    };
-    authStore.user = ownerUser;
+    setOwnerUser(authStore, 'owner1');
 
     const today = new Date().toISOString().split('T')[0];
     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -211,19 +165,7 @@ describe('useOwnerBookings (Role-Based)', () => {
     const authStore = useAuthStore();
     
     // Set up owner user
-    const ownerUser: User = {
-      id: 'owner1',
-      email: 'owner@example.com',
-      name: 'Property Owner',
-      role: 'owner',
-      settings: {
-        notifications: true,
-        timezone: 'America/New_York',
-        theme: 'light',
-        language: 'en'
-      }
-    };
-    authStore.user = ownerUser;
+    setOwnerUser(authStore, 'owner1');
 
     // Add bookings - owner's booking and other owner's booking
     const ownerBooking: Booking = {
