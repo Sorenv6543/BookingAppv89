@@ -341,6 +341,79 @@ export function useSupabaseAuth() {
     }
   }
 
+  async function deleteUser(userId: string): Promise<boolean> {
+    try {
+      // Delete from user_profiles first (will cascade to other tables via foreign keys)
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .delete()
+        .eq('id', userId);
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      // Delete from auth.users using admin API
+      const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+
+      if (authError) {
+        console.warn('⚠️ Failed to delete auth user, but profile deleted:', authError);
+        // Don't throw here since profile deletion succeeded
+      }
+
+      return true;
+    } catch (err) {
+      console.error('❌ Failed to delete user:', err);
+      return false;
+    }
+  }
+
+  async function createAdminUser(userData: {
+    email: string;
+    password: string;
+    name: string;
+    access_level?: string;
+  }): Promise<boolean> {
+    try {
+      // Create auth user using admin API
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: userData.email,
+        password: userData.password,
+        email_confirm: true, // Auto-confirm for admin-created users
+        user_metadata: {
+          name: userData.name,
+          role: 'admin'
+        }
+      });
+
+      if (authError || !authData.user) {
+        throw authError || new Error('Failed to create auth user');
+      }
+
+      // Create user profile
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: authData.user.id,
+          email: userData.email,
+          name: userData.name,
+          role: 'admin' as UserRole,
+          access_level: userData.access_level || 'full'
+        });
+
+      if (profileError) {
+        // Try to clean up auth user if profile creation fails
+        await supabase.auth.admin.deleteUser(authData.user.id);
+        throw profileError;
+      }
+
+      return true;
+    } catch (err) {
+      console.error('❌ Failed to create admin user:', err);
+      return false;
+    }
+  }
+
   // Initialize on creation - don't wait for onMounted
   setTimeout(() => {
     checkAuth();
@@ -384,6 +457,8 @@ export function useSupabaseAuth() {
     checkAuth,
     getAllUsers,
     updateUserRole,
+    deleteUser,
+    createAdminUser,
     loadUserProfile
   };
 }

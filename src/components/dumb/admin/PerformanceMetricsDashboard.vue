@@ -1,11 +1,16 @@
 <template>
-  <v-container fluid class="performance-dashboard">
+  <v-container
+    fluid
+    class="performance-dashboard"
+  >
     <!-- Performance Overview Header -->
     <v-row class="mb-4">
       <v-col cols="12">
         <div class="d-flex align-center justify-space-between">
           <div>
-            <h2 class="text-h4 mb-2">System Performance Dashboard</h2>
+            <h2 class="text-h4 mb-2">
+              System Performance Dashboard
+            </h2>
             <p class="text-subtitle-1 text-medium-emphasis">
               Real-time monitoring of role-based architecture performance
             </p>
@@ -16,7 +21,9 @@
               variant="elevated"
               size="large"
             >
-              <v-icon start>mdi-speedometer</v-icon>
+              <v-icon start>
+                mdi-speedometer
+              </v-icon>
               {{ performanceScore }}% Health
             </v-chip>
             <v-btn
@@ -32,12 +39,15 @@
     </v-row>
 
     <!-- Performance Alerts -->
-    <v-row v-if="performanceAlerts.length > 0" class="mb-4">
+    <v-row
+      v-if="performanceAlerts.length > 0"
+      class="mb-4"
+    >
       <v-col cols="12">
         <v-alert
           v-for="alert in performanceAlerts"
           :key="alert.metric"
-          :type="alert.level"
+          :type="alert.level === 'critical' ? 'error' : alert.level"
           variant="tonal"
           closable
           class="mb-2"
@@ -45,8 +55,15 @@
           <template #title>
             <strong>{{ alert.message }}</strong>
           </template>
-          <p class="mb-2">{{ alert.suggestion }}</p>
-          <v-chip size="small" variant="outlined">{{ alert.metric }}</v-chip>
+          <p class="mb-2">
+            {{ alert.suggestion }}
+          </p>
+          <v-chip
+            size="small"
+            variant="outlined"
+          >
+            {{ alert.metric }}
+          </v-chip>
         </v-alert>
       </v-col>
     </v-row>
@@ -54,13 +71,21 @@
     <!-- Key Metrics Cards -->
     <v-row class="mb-6">
       <!-- Performance Score -->
-      <v-col cols="12" md="3">
+      <v-col
+        cols="12"
+        md="3"
+      >
         <v-card class="metric-card">
           <v-card-text>
             <div class="d-flex align-center justify-space-between">
               <div>
-                <p class="text-caption text-medium-emphasis mb-1">Overall Performance</p>
-                <h3 class="text-h3" :class="getScoreColor(performanceScore)">
+                <p class="text-caption text-medium-emphasis mb-1">
+                  Overall Performance
+                </p>
+                <h3
+                  class="text-h3"
+                  :class="getScoreColor(performanceScore)"
+                >
                   {{ performanceScore }}%
                 </h3>
               </div>
@@ -83,13 +108,20 @@
       </v-col>
 
       <!-- Reactive Subscriptions -->
-      <v-col cols="12" md="3">
+      <v-col
+        cols="12"
+        md="3"
+      >
         <v-card class="metric-card">
           <v-card-text>
             <div class="d-flex align-center justify-space-between">
               <div>
-                <p class="text-caption text-medium-emphasis mb-1">Reactive Subscriptions</p>
-                <h3 class="text-h4">{{ currentSubscriptions }}</h3>
+                <p class="text-caption text-medium-emphasis mb-1">
+                  Reactive Subscriptions
+                </p>
+                <h3 class="text-h4">
+                  {{ currentSubscriptions }}
+                </h3>
                 <p class="text-caption">
                   <span :class="subscriptionEfficiencyColor">
                     {{ subscriptionReduction }}% reduction
@@ -98,7 +130,12 @@
                   Target: ≤{{ PERFORMANCE_THRESHOLDS.maxSubscriptions }}
                 </p>
               </div>
-              <v-icon size="40" color="primary">mdi-connection</v-icon>
+              <v-icon
+                size="40"
+                color="primary"
+              >
+                mdi-connection
+              </v-icon>
             </div>
             <div class="d-flex align-center mt-2">
               <v-icon
@@ -114,13 +151,20 @@
       </v-col>
 
       <!-- Memory Usage -->
-      <v-col cols="12" md="3">
+      <v-col
+        cols="12"
+        md="3"
+      >
         <v-card class="metric-card">
           <v-card-text>
             <div class="d-flex align-center justify-space-between">
               <div>
-                <p class="text-caption text-medium-emphasis mb-1">Memory Usage</p>
-                <h3 class="text-h4">{{ currentMemory.toFixed(1) }}MB</h3>
+                <p class="text-caption text-medium-emphasis mb-1">
+                  Memory Usage
+                </p>
+                <h3 class="text-h4">
+                  {{ currentMemory.toFixed(1) }}MB
+                </h3>
                 <p class="text-caption">
                   <span :class="memoryStatusColor">
                     {{ memoryStatus }}
@@ -129,7 +173,12 @@
                   Target: ≤{{ PERFORMANCE_THRESHOLDS.maxMemoryUsage }}MB
                 </p>
               </div>
-              <v-icon size="40" color="info">mdi-memory</v-icon>
+              <v-icon
+                size="40"
+                color="info"
+              >
+                mdi-memory
+              </v-icon>
             </div>
             <div class="d-flex align-center mt-2">
               <v-icon
@@ -145,13 +194,20 @@
       </v-col>
 
       <!-- Bundle Load Time -->
-      <v-col cols="12" md="3">
+      <v-col
+        cols="12"
+        md="3"
+      >
         <v-card class="metric-card">
           <v-card-text>
             <div class="d-flex align-center justify-space-between">
               <div>
-                <p class="text-caption text-medium-emphasis mb-1">Bundle Load Time</p>
-                <h3 class="text-h4">{{ bundleLoadTime.toFixed(2) }}s</h3>
+                <p class="text-caption text-medium-emphasis mb-1">
+                  Bundle Load Time
+                </p>
+                <h3 class="text-h4">
+                  {{ bundleLoadTime.toFixed(2) }}s
+                </h3>
                 <p class="text-caption">
                   <span :class="bundleStatusColor">
                     {{ bundleStatus }}
@@ -160,7 +216,12 @@
                   Target: ≤{{ (PERFORMANCE_THRESHOLDS.maxBundleLoadTime / 1000).toFixed(1) }}s
                 </p>
               </div>
-              <v-icon size="40" color="warning">mdi-package-variant</v-icon>
+              <v-icon
+                size="40"
+                color="warning"
+              >
+                mdi-package-variant
+              </v-icon>
             </div>
           </v-card-text>
         </v-card>
@@ -172,16 +233,26 @@
       <v-col cols="12">
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2">mdi-account-group</v-icon>
+            <v-icon class="mr-2">
+              mdi-account-group
+            </v-icon>
             Role-Based Performance Analysis
           </v-card-title>
           <v-card-text>
             <v-row>
               <!-- Owner Performance -->
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <div class="role-performance-section">
                   <h4 class="text-h6 mb-3 d-flex align-center">
-                    <v-icon color="success" class="mr-2">mdi-home-account</v-icon>
+                    <v-icon
+                      color="success"
+                      class="mr-2"
+                    >
+                      mdi-home-account
+                    </v-icon>
                     Owner Interface
                   </h4>
                   <div class="performance-metrics">
@@ -211,10 +282,18 @@
               </v-col>
 
               <!-- Admin Performance -->
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <div class="role-performance-section">
                   <h4 class="text-h6 mb-3 d-flex align-center">
-                    <v-icon color="primary" class="mr-2">mdi-shield-account</v-icon>
+                    <v-icon
+                      color="primary"
+                      class="mr-2"
+                    >
+                      mdi-shield-account
+                    </v-icon>
                     Admin Interface
                   </h4>
                   <div class="performance-metrics">
@@ -244,10 +323,18 @@
               </v-col>
 
               <!-- Shared Components -->
-              <v-col cols="12" md="4">
+              <v-col
+                cols="12"
+                md="4"
+              >
                 <div class="role-performance-section">
                   <h4 class="text-h6 mb-3 d-flex align-center">
-                    <v-icon color="info" class="mr-2">mdi-share-variant</v-icon>
+                    <v-icon
+                      color="info"
+                      class="mr-2"
+                    >
+                      mdi-share-variant
+                    </v-icon>
                     Shared Components
                   </h4>
                   <div class="performance-metrics">
@@ -265,7 +352,10 @@
                     </div>
                     <div class="metric-item">
                       <span class="metric-label">Impact:</span>
-                      <v-chip size="small" color="success">
+                      <v-chip
+                        size="small"
+                        color="success"
+                      >
                         High
                       </v-chip>
                     </div>
@@ -280,10 +370,15 @@
 
     <!-- Performance Trends Chart -->
     <v-row class="mb-6">
-      <v-col cols="12" lg="8">
+      <v-col
+        cols="12"
+        lg="8"
+      >
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2">mdi-chart-line</v-icon>
+            <v-icon class="mr-2">
+              mdi-chart-line
+            </v-icon>
             Performance Trends (Last {{ performanceHistory.length }} measurements)
           </v-card-title>
           <v-card-text>
@@ -293,15 +388,15 @@
                 <div class="chart-header">
                   <div class="chart-legend">
                     <div class="legend-item">
-                      <div class="legend-color subscriptions"></div>
+                      <div class="legend-color subscriptions" />
                       <span>Subscriptions</span>
                     </div>
                     <div class="legend-item">
-                      <div class="legend-color memory"></div>
+                      <div class="legend-color memory" />
                       <span>Memory (MB)</span>
                     </div>
                     <div class="legend-item">
-                      <div class="legend-color network"></div>
+                      <div class="legend-color network" />
                       <span>Network (ms)</span>
                     </div>
                   </div>
@@ -318,17 +413,17 @@
                       class="bar subscriptions"
                       :style="{ height: `${(snapshot.totalSubscriptions / 60) * 100}%` }"
                       :title="`Subscriptions: ${snapshot.totalSubscriptions}`"
-                    ></div>
+                    />
                     <div 
                       class="bar memory"
                       :style="{ height: `${(snapshot.memoryUsage / 150) * 100}%` }"
                       :title="`Memory: ${snapshot.memoryUsage.toFixed(1)}MB`"
-                    ></div>
+                    />
                     <div 
                       class="bar network"
                       :style="{ height: `${(snapshot.networkEfficiency / 500) * 100}%` }"
                       :title="`Network: ${snapshot.networkEfficiency.toFixed(0)}ms`"
-                    ></div>
+                    />
                   </div>
                 </div>
               </div>
@@ -338,10 +433,15 @@
       </v-col>
 
       <!-- Component Performance Details -->
-      <v-col cols="12" lg="4">
+      <v-col
+        cols="12"
+        lg="4"
+      >
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2">mdi-view-dashboard</v-icon>
+            <v-icon class="mr-2">
+              mdi-view-dashboard
+            </v-icon>
             Component Performance
           </v-card-title>
           <v-card-text>
@@ -386,7 +486,9 @@
       <v-col cols="12">
         <v-card>
           <v-card-title>
-            <v-icon class="mr-2">mdi-target</v-icon>
+            <v-icon class="mr-2">
+              mdi-target
+            </v-icon>
             Performance Baseline Achievement
           </v-card-title>
           <v-card-text>
@@ -394,7 +496,9 @@
               <div class="baseline-item">
                 <div class="baseline-label">
                   <h4>Subscription Reduction</h4>
-                  <p class="text-caption">Target: 67% reduction from 120 to ≤40</p>
+                  <p class="text-caption">
+                    Target: 67% reduction from 120 to ≤40
+                  </p>
                 </div>
                 <div class="baseline-value">
                   <v-progress-circular
@@ -411,7 +515,9 @@
               <div class="baseline-item">
                 <div class="baseline-label">
                   <h4>Memory Optimization</h4>
-                  <p class="text-caption">Target: 60% reduction in overhead</p>
+                  <p class="text-caption">
+                    Target: 60% reduction in overhead
+                  </p>
                 </div>
                 <div class="baseline-value">
                   <v-progress-circular
@@ -428,7 +534,9 @@
               <div class="baseline-item">
                 <div class="baseline-label">
                   <h4>Build Performance</h4>
-                  <p class="text-caption">Target: ≤20s build time</p>
+                  <p class="text-caption">
+                    Target: ≤20s build time
+                  </p>
                 </div>
                 <div class="baseline-value">
                   <v-progress-circular
@@ -445,7 +553,9 @@
               <div class="baseline-item">
                 <div class="baseline-label">
                   <h4>Role Architecture</h4>
-                  <p class="text-caption">Multi-tenant data isolation</p>
+                  <p class="text-caption">
+                    Multi-tenant data isolation
+                  </p>
                 </div>
                 <div class="baseline-value">
                   <v-progress-circular
@@ -467,17 +577,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { usePerformanceMonitor } from '@/composables/shared/usePerformanceMonitor'
 
-// Props
-interface Props {
-  refreshInterval?: number // Optional refresh interval in seconds
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  refreshInterval: 5
-})
+type TrendType = 'improving' | 'degrading' | 'stable';
 
 // Performance monitoring
 const {
@@ -524,8 +627,15 @@ const memoryReduction = computed(() => {
 
 const buildTime = computed(() => 17.47) // Current achievement
 
-const subscriptionTrend = computed(() => performanceTrends.value.subscriptions || 'stable')
-const memoryTrend = computed(() => performanceTrends.value.memory || 'stable')
+const subscriptionTrend = computed<TrendType>(() => {
+  const trend = performanceTrends.value.subscriptions
+  return (trend || 'stable') as TrendType
+})
+
+const memoryTrend = computed<TrendType>(() => {
+  const trend = performanceTrends.value.memory
+  return (trend || 'stable') as TrendType
+})
 
 const roleDistribution = computed(() => {
   if (performanceHistory.value.length === 0) {
@@ -584,11 +694,14 @@ function getScoreColor(score: number): string {
   return 'text-error'
 }
 
-function getTrendIcon(trend: string): string {
+function getTrendIcon(trend: TrendType): string {
   switch (trend) {
-    case 'improving': return 'mdi-trending-up'
-    case 'degrading': return 'mdi-trending-down'
-    default: return 'mdi-trending-neutral'
+    case 'improving':
+      return 'mdi-trending-up'
+    case 'degrading':
+      return 'mdi-trending-down'
+    default:
+      return 'mdi-trending-neutral'
   }
 }
 

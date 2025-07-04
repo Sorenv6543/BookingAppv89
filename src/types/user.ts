@@ -44,11 +44,13 @@ export interface User {
   // Cleaner-specific fields
   skills?: string[];
   max_daily_bookings?: number;
+  location?: { lat: number; lng: number; };
   location_lat?: number;
   location_lng?: number;
   
   created_at?: string;
   updated_at?: string;
+  last_sign_in_at?: string;
 }
 
 /**
@@ -97,7 +99,7 @@ export interface Cleaner extends User {
   theme: 'light' | 'dark' | 'system';
   language: string;
   settings?: UserSettings;
-  location?: { lat: number; lng: number; }; // For useCleanerManagement compatibility
+  City?: string;// For useCleanerManagement compatibility
 }
 
 /**

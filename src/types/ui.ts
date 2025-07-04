@@ -333,3 +333,8 @@ export interface AccessibilityOptions {
   highContrast?: boolean;
   reducedMotion?: boolean;
 }
+
+/**
+ * Generic error-like type for error handling
+ */
+export type ErrorLike = Error | { message: string } | string | unknown;

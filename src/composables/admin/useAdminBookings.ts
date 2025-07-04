@@ -3,7 +3,9 @@ import { useBookings } from '@/composables/shared/useBookings';
 import { useAuthStore } from '@/stores/auth';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
-import type { Booking, BookingStatus, BookingType } from '@/types';
+import { useUserStore } from '@/stores/user';
+import { usePerformanceMonitor } from '@/composables/shared/usePerformanceMonitor';
+import type { Booking, BookingStatus, BookingType, BookingFormData } from '@/types';
 
 /**
  * Admin-specific booking composable
@@ -22,6 +24,8 @@ export function useAdminBookings() {
   const authStore = useAuthStore();
   const bookingStore = useBookingStore();
   const propertyStore = usePropertyStore();
+  const userStore = useUserStore();
+  const { measureRolePerformance, trackCachePerformance } = usePerformanceMonitor();
   
   // Admin-specific state
   const loading = ref<boolean>(false);
@@ -37,15 +41,24 @@ export function useAdminBookings() {
    * Get ALL bookings across all owners (no filtering)
    * This is the key difference from owner version
    */
-  const allBookings = computed(() => {
-    return Array.from(bookingStore.bookings.values());
+  const allBookings = computed((): Booking[] => {
+    return measureRolePerformance('admin', 'fetch-all-bookings', () => {
+      // Track cache performance for admin data access
+      const bookings = Array.from(bookingStore.bookings.values());
+      trackCachePerformance('admin-all-bookings', bookings.length > 0);
+      return bookings;
+    });
   });
   
   /**
    * Get ALL properties across all owners (no filtering)
    */
   const allProperties = computed(() => {
-    return Array.from(propertyStore.properties.values());
+    return measureRolePerformance('admin', 'fetch-all-properties', () => {
+      const properties = Array.from(propertyStore.properties.values());
+      trackCachePerformance('admin-all-properties', properties.length > 0);
+      return properties;
+    });
   });
   
   /**
@@ -82,20 +95,22 @@ export function useAdminBookings() {
   /**
    * Get bookings grouped by status (system-wide)
    */
-  const bookingsByStatus = computed(() => {
-    const statusGroups: Record<BookingStatus, Booking[]> = {
-      pending: [],
-      scheduled: [],
-      in_progress: [],
-      completed: [],
-      cancelled: []
-    };
-    
-    allBookings.value.forEach(booking => {
-      statusGroups[booking.status].push(booking);
+  const systemBookingsByStatus = computed(() => {
+    return measureRolePerformance('admin', 'filter-system-bookings-by-status', () => {
+      const statusGroups: Record<BookingStatus, Booking[]> = {
+        'pending': [],
+        'confirmed': [],
+        'in_progress': [],
+        'completed': [],
+        'cancelled': []
+      };
+      
+      allBookings.value.forEach(booking => {
+        statusGroups[booking.status].push(booking);
+      });
+      
+      return statusGroups;
     });
-    
-    return statusGroups;
   });
   
   /**
@@ -144,8 +159,8 @@ export function useAdminBookings() {
     const turns = systemTurns.value.length;
     const urgentTurns = systemTodayTurns.value.length;
     const unassigned = unassignedBookings.value.length;
-    const completed = bookingsByStatus.value.completed.length;
-    const pending = bookingsByStatus.value.pending.length;
+    const completed = systemBookingsByStatus.value.completed.length;
+    const pending = systemBookingsByStatus.value.pending.length;
     
     return {
       total,
@@ -176,31 +191,41 @@ export function useAdminBookings() {
     return allBookings.value.filter(booking => booking.status === status);
   }
 
-  async function createBookingForOwner(formData: Partial<Booking>) {
-    if (!currentAdminId.value) return null;
-    const booking: Booking = {
-      id: 'admin-created-' + Math.random().toString(36).slice(2),
-      property_id: formData.property_id || '',
-      owner_id: formData.owner_id || '',
-      checkout_date: formData.checkout_date || '',
-      checkin_date: formData.checkin_date || '',
-      booking_type: formData.booking_type || 'standard',
-      status: formData.status || 'pending',
-    };
-    try {
-      bookingStore.addBooking(booking);
-    } catch {}
-    return booking;
-  }
+  // Performance-monitored admin actions
+  const createBooking = async (bookingData: BookingFormData): Promise<Booking | null> => {
+    return measureRolePerformance('admin', 'create-booking', async () => {
+      const result = await bookingStore.addBooking(bookingData);
+      trackCachePerformance('admin-create-booking', !!result);
+      return result;
+    });
+  };
 
-  function assignCleanerToBooking(bookingId: string, cleanerId: string): boolean {
-    try {
-      bookingStore.assignCleaner(bookingId, cleanerId);
-      return true;
-    } catch {
-      return false;
-    }
-  }
+  const updateBooking = async (id: string, updates: Partial<Booking>): Promise<boolean> => {
+    return measureRolePerformance('admin', 'update-booking', async () => {
+      const result = await bookingStore.updateBooking(id, updates);
+      trackCachePerformance('admin-update-booking', result);
+      return result;
+    });
+  };
+
+  const deleteBooking = async (id: string): Promise<boolean> => {
+    return measureRolePerformance('admin', 'delete-booking', async () => {
+      const result = await bookingStore.deleteBooking(id);
+      trackCachePerformance('admin-delete-booking', result);
+      return result;
+    });
+  };
+
+  // Role-specific performance metrics
+  const getAdminPerformanceMetrics = computed(() => {
+    return {
+      totalBookingsProcessed: allBookings.value.length,
+      totalPropertiesManaged: allProperties.value.length,
+      systemLoad: allBookings.value.length > 100 ? 'high' : 
+                 allBookings.value.length > 50 ? 'medium' : 'low',
+      dataProcessingEfficiency: allBookings.value.length > 0 ? 'optimal' : 'idle'
+    };
+  });
 
   // Permission functions expected by tests
   function canManageAnyBooking(): boolean {
@@ -587,7 +612,7 @@ export function useAdminBookings() {
     systemTurns,
     systemTodayTurns,
     unassignedBookings,
-    bookingsByStatus,
+    systemBookingsByStatus,
     bookingsByOwner,
     bookingsByCleaner,
     systemMetrics,
@@ -608,9 +633,9 @@ export function useAdminBookings() {
     filterBookings,
     
     // Expose base composable functions for admin use
-    createBooking: baseBookings.createBooking,
-    updateBooking: baseBookings.updateBooking,
-    deleteBooking: baseBookings.deleteBooking,
+    createBooking,
+    updateBooking,
+    deleteBooking,
     calculateBookingPriority: baseBookings.calculateBookingPriority,
     calculateCleaningWindow: baseBookings.calculateCleaningWindow,
     
@@ -620,8 +645,12 @@ export function useAdminBookings() {
     todayUrgentTurns,
     businessMetrics,
     getBookingsByStatus,
-    createBookingForOwner,
-    assignCleanerToBooking,
+    getAdminPerformanceMetrics,
+    
+    // Store actions (direct access)
+    fetchAllProperties: propertyStore.fetchProperties,
+    
+    // Permission functions
     canManageAnyBooking,
     canEditAnyBooking,
     canDeleteAnyBooking,

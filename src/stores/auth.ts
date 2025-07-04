@@ -31,6 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
   let checkAuth: () => Promise<void> = async () => {};
   let getAllUsers: () => Promise<User[]> = async () => [];
   let updateUserRole: (userId: string, newRole: UserRole) => Promise<boolean> = async () => true;
+  let deleteUser: (userId: string) => Promise<boolean> = async () => true;
 
   let unsubscribe: (() => void) | null = null;
 
@@ -49,6 +50,7 @@ export const useAuthStore = defineStore('auth', () => {
     checkAuth = composable.checkAuth;
     getAllUsers = composable.getAllUsers;
     updateUserRole = composable.updateUserRole;
+    deleteUser = composable.deleteUser;
   }
 
   // --- Reactive computed state that uses composable or fallback ---
@@ -98,6 +100,7 @@ export const useAuthStore = defineStore('auth', () => {
     requestPasswordReset: resetPassword,
     fetchAllUsers: getAllUsers,
     changeUserRole: updateUserRole,
+    deleteUser: deleteUser,
     clearError: () => { 
       fallbackError.value = null;
       // Also clear composable error if available

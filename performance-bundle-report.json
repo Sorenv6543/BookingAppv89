@@ -1,0 +1,41 @@
+{
+  "timestamp": "2025-07-04T13:25:49.971Z",
+  "bundleAnalysis": {
+    "totalSize": 2156.7,
+    "chunkCount": 18,
+    "roleBasedChunks": 9,
+    "chunks": {
+      "admin-components-[hash].js": 169.2,
+      "owner-components-[hash].js": 59.1,
+      "shared-ui-[hash].js": 84.3,
+      "admin-logic-[hash].js": 54.2,
+      "owner-logic-[hash].js": 19.4,
+      "shared-logic-[hash].js": 33.1,
+      "vuetify-[hash].js": 874.5,
+      "vue-core-[hash].js": 683.2,
+      "calendar-[hash].js": 581.3,
+      "vendor-[hash].js": 297.8
+    }
+  },
+  "roleBasedAnalysis": {
+    "adminTotal": 223.39999999999998,
+    "ownerTotal": 78.5,
+    "sharedTotal": 117.4,
+    "efficiency": "optimal",
+    "roleIsolation": 95,
+    "loadingPerformance": {
+      "ownerFirstLoad": "1.2s",
+      "adminFirstLoad": "2.1s"
+    }
+  },
+  "performanceScore": 85,
+  "regressionDetected": false,
+  "recommendations": [
+    {
+      "type": "optimization",
+      "severity": "high",
+      "message": "Owner chunks larger than optimal",
+      "suggestion": "Optimize owner interface for mobile performance"
+    }
+  ]
+}

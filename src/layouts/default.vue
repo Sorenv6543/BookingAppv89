@@ -2,7 +2,7 @@
 <template>
   <v-app>
     <!-- App Bar - Hidden on mobile for owner interface -->
-    <v-app-bar
+    <!-- <v-app-bar
       v-show="!$vuetify.display.mobile"
       app
       color="surface"
@@ -19,10 +19,9 @@
   
       <v-spacer />
   
-      <!-- Theme Picker -->
+      
       <ThemePicker />
   
-      <!-- User Menu -->
       <v-menu
         location="bottom end"
         offset="5"
@@ -57,7 +56,7 @@
           />
         </v-list>
       </v-menu>
-    </v-app-bar>
+    </v-app-bar> -->
   
     <!-- Main Content Area -->
     <v-main class="owner-main">
@@ -77,19 +76,13 @@
 </template>
   
   <script setup lang="ts">
-  import { ref } from 'vue'
-  import ThemePicker from '@/components/dumb/shared/ThemePicker.vue'
+  
+ 
   
   // Sidebar state (for future implementation)
-  const sidebarOpen = ref(false)
+
   
-  // Toggle sidebar function
-  const toggleSidebar = () => {
-    sidebarOpen.value = !sidebarOpen.value
-    // Note: This layout doesn't currently have a sidebar,
-    // but the toggle function is needed for the nav icon
-    console.log('Sidebar toggle clicked')
-  }
+
   </script>
   
   <style>

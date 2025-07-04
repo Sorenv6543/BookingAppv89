@@ -28,7 +28,7 @@ export function useAdminErrorHandler() {
    * Handle system-wide property errors for admins
    */
   async function handleSystemPropertyError(
-    error: any,
+    error: unknown,
     operation: 'create' | 'update' | 'delete' | 'fetch' | 'bulk_update',
     context: { propertyIds?: string[], affectedBookings?: number, affectedCleaners?: number } = {}
   ): Promise<string> {
@@ -67,7 +67,7 @@ export function useAdminErrorHandler() {
    * Handle booking management errors for admins
    */
   async function handleBookingManagementError(
-    error: any,
+    error: unknown,
     operation: 'create' | 'update' | 'delete' | 'assign_cleaner' | 'bulk_update',
     context: { 
       bookingIds?: string[], 
@@ -110,7 +110,7 @@ export function useAdminErrorHandler() {
    * Handle cleaner management errors for admins
    */
   async function handleCleanerManagementError(
-    error: any,
+    error: unknown,
     operation: 'assign' | 'unassign' | 'schedule' | 'update_availability',
     context: { 
       cleanerIds?: string[], 
@@ -153,7 +153,7 @@ export function useAdminErrorHandler() {
    * Handle data integrity errors for admins
    */
   async function handleDataIntegrityError(
-    error: any,
+    error: unknown,
     operation: 'validation' | 'sync' | 'backup' | 'restore',
     context: { 
       affectedTables?: string[], 
@@ -190,7 +190,7 @@ export function useAdminErrorHandler() {
    * Handle integration errors (external APIs, services)
    */
   async function handleIntegrationError(
-    error: any,
+    error: unknown,
     service: string,
     operation: string,
     context: { 
@@ -230,7 +230,7 @@ export function useAdminErrorHandler() {
    * Handle security-related errors for admins
    */
   async function handleSecurityError(
-    error: any,
+    error: unknown,
     operation: 'authentication' | 'authorization' | 'audit' | 'breach_detection',
     context: { 
       userId?: string,
@@ -268,7 +268,7 @@ export function useAdminErrorHandler() {
    * Handle performance-related errors for admins
    */
   async function handlePerformanceError(
-    error: any,
+    error: unknown,
     operation: string,
     context: { 
       responseTime?: number,
@@ -462,9 +462,9 @@ export function useAdminErrorHandler() {
   
   return {
     // State from shared error handler
-    hasErrors: errorHandler.hasErrors,
-    criticalErrors: errorHandler.criticalErrors,
-    currentUserRole: errorHandler.currentUserRole,
+    hasErrors: useErrorHandler().hasErrors,
+    criticalErrors: useErrorHandler().criticalErrors,
+    currentUserRole: useAuthStore().user?.role,
     isAdmin,
     
     // Admin-specific error handlers

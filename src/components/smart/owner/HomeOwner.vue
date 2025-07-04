@@ -45,7 +45,7 @@ src/components/smart/owner/HomeOwner.vue -
     >
       <!-- Owner Calendar Header - Fixed to top of calendar area -->
       <v-card
-        flat
+       
         class="calendar-header-card"
       >
         <v-card-text class="pa-0">
@@ -108,9 +108,10 @@ src/components/smart/owner/HomeOwner.vue -
             <!-- Calendar View Toggle -->
             <v-btn-toggle
               v-model="currentView"
+             
               mandatory
               density="compact"
-              class="ml-2"
+              class="ml-2 calendar-view-toggle"
             >
               <v-btn
                 value="dayGridMonth"
@@ -1138,11 +1139,11 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
  */
 .home-owner-container {
   position: fixed;
-  top: 64px; /* Below app-bar */
+  top: 34px; /* Below app-bar */
   left: 0; /* True left edge of viewport */
   right: 0; /* True right edge of viewport */
   bottom: 0;
-  height: calc(100vh - 64px); /* Account for app-bar height */
+  height: calc(100vh - 0px); /* Account for app-bar height */
   width: 100vw; /* Full viewport width */
   overflow: hidden;
   display: flex; /* Flexbox for sidebar + calendar layout */
@@ -1156,9 +1157,9 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 /* =================================================================== */
 
 .sidebar-column {
-  width: 320px; /* Fixed width sidebar */
-  min-width: 320px; /* Prevent shrinking */
-  height: 100%;
+  width: 100vw; /* Fixed width sidebar */
+  min-width: 100vw; /* Prevent shrinking */
+  height: 100vh;
   overflow-y: auto;
   border-right: 1px solid rgb(var(--v-theme-on-surface), 0.12);
   background: rgb(var(--v-theme-surface));
@@ -1174,9 +1175,9 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
     top: 0; /* Relative to parent container */
     left: 0;
     z-index: 1005;
-    width: 300px;
-    min-width: 300px;
-    height: 100%; /* Full height of parent container */
+    width: 100vw;
+    min-width: 100vw;
+    height: 100vh; /* Full height of parent container */
     transform: translateX(-100%);
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
   }
@@ -1238,7 +1239,7 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 
 .calendar-column.full-viewport-calendar.mobile-layout {
   position: fixed !important;
-  top: 56px; /* Mobile app bar height */
+  top: 32px; /* Mobile app bar height */
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
@@ -1248,23 +1249,23 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 
 .calendar-column.full-viewport-calendar.tablet-layout {
   position: fixed !important;
-  top: 64px; /* Tablet app bar height */
+  top: 32px; /* Tablet app bar height */
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
   z-index: 1;
-  height: calc(100vh - 64px) !important;
+  height: calc(100vh - 32px) !important;
 }
 
 .calendar-column.full-viewport-calendar.desktop-layout.sidebar-closed {
   position: fixed !important;
-  top: 64px; /* Desktop app bar height */
+  top: 32px; /* Desktop app bar height */
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
   z-index: 1;
   width: 100vw !important;
-  height: calc(100vh - 64px) !important;
+  height: calc(100vh - 32px) !important;
 }
 
 /* When sidebar is open on desktop, use normal flex behavior */
@@ -1304,16 +1305,16 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 }
 
 .full-viewport-calendar.mobile-layout .calendar-content {
-  height: calc(100vh - 56px - 60px) !important; /* Full height minus app bar minus header card height */
+  height: calc(100vh - 32px - 15vh) !important; /* Full height minus app bar minus header card height */
   position: absolute !important;
-  top: 60px !important; /* Directly below the header card */
+  top: 32px !important; /* Directly below the header card */
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
 }
 
 .full-viewport-calendar.tablet-layout .calendar-content {
-  height: calc(100vh - 64px - 15vh) !important; /* Full height minus app bar minus header */
+  height: calc(100vh - 32px - 15vh) !important; /* Full height minus app bar minus header */
   position: absolute !important;
   top: 15vh !important; /* Below the header */
   left: 0 !important;
@@ -1322,9 +1323,9 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 }
 
 .full-viewport-calendar.desktop-layout .calendar-content {
-  height: calc(100vh - 64px - 10vh) !important; /* Full height minus app bar minus header */
+  height: calc(100vh - 32px - 10vh) !important; /* Full height minus app bar minus header */
   position: absolute !important;
-  top: 10vh !important; /* Below the header */
+  top: 0vh !important; /* Below the header */
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
@@ -1337,8 +1338,8 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 /* Small screens (mobile) */
 @media (max-width: 599px) {
   .home-owner-container {
-    top: 56px; /* Smaller mobile app-bar */
-    height: calc(100vh - 56px);
+    top: 0px; /* Smaller mobile app-bar */
+    height: calc(100vh - 0px);
   }
   
   .sidebar-column {
@@ -1358,7 +1359,7 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 @media (min-width: 960px) {
   .home-owner-container {
     top: 64px; /* Standard app-bar height */
-    height: calc(100vh - 64px);
+    height: calc(100vh - 0px);
   }
   
   .calendar-column {

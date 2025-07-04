@@ -12,32 +12,51 @@ import type {
   ErrorHandlingOptions, 
   ErrorCategory, 
   UserRole,
-  BusinessImpact,
   ErrorRecoveryAction,
   ApiError,
-  RetryConfig
+  RetryConfig,
+  ErrorLike
 } from '@/types/ui';
 import { 
   getErrorMessage, 
-  getGenericErrorMessage, 
   getBusinessImpactMessage,
-  getErrorCategory,
   getRetryMessage,
-  getErrorTitle,
   inferErrorCategory,
   assessBusinessImpact,
   extractErrorCode
 } from '@/utils/errorMessages';
 
-/**
- * Default retry configuration
- */
-const DEFAULT_RETRY_CONFIG: RetryConfig = {
+// Add NodeJS types reference
+/// <reference types="node" />
+
+interface ExtendedRetryConfig extends RetryConfig {
+  retryableStatuses: number[];
+  exponentialBackoff: boolean;
+}
+
+const defaultRetryConfig: ExtendedRetryConfig = {
   maxAttempts: 3,
   baseDelay: 1000,
   maxDelay: 10000,
   backoffFactor: 2,
-  retryableStatuses: [408, 429, 500, 502, 503, 504]
+  retryableStatuses: [408, 429, 500, 502, 503, 504],
+  exponentialBackoff: true
+};
+
+interface ApiErrorResponse {
+  status?: number;
+  statusText?: string;
+  data?: {
+    message?: string;
+    [key: string]: unknown;
+  };
+}
+
+type ApiErrorLike = ErrorLike & {
+  response?: ApiErrorResponse;
+  status?: number;
+  statusText?: string;
+  message?: string;
 };
 
 /**
@@ -50,7 +69,7 @@ export function useErrorHandler() {
   // State
   const errors = ref<Map<string, ErrorInfo>>(new Map());
   const retryAttempts = ref<Map<string, number>>(new Map());
-  const retryTimers = ref<Map<string, NodeJS.Timeout>>(new Map());
+  const retryTimers = ref<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const isRetrying = ref<Map<string, boolean>>(new Map());
   
   // Computed
@@ -71,7 +90,7 @@ export function useErrorHandler() {
    * Handle an error with role-based messaging
    */
   async function handleError(
-    error: any,
+    error: ErrorLike,
     context: Partial<ErrorContext> = {},
     options: Partial<ErrorHandlingOptions> = {}
   ): Promise<string> {
@@ -113,13 +132,16 @@ export function useErrorHandler() {
    * Parse error into structured ErrorInfo
    */
   function parseError(
-    error: any,
+    error: ErrorLike,
     context: Partial<ErrorContext> = {},
     options: Partial<ErrorHandlingOptions> = {}
   ): ErrorInfo {
     const errorCode = extractErrorCode(error);
-    const errorMessage = error?.message || error?.toString() || 'Unknown error';
-    const category = inferErrorCategory(errorCode, errorMessage);
+    const errorMessage = error instanceof Error ? error.message : 
+      typeof error === 'string' ? error :
+      typeof error === 'object' && error && 'message' in error ? String(error.message) :
+      'Unknown error';
+    const category = inferErrorCategory(errorCode, String(errorMessage));
     
     const fullContext: ErrorContext = {
       userId: userStore.currentUser?.id,
@@ -165,76 +187,6 @@ export function useErrorHandler() {
       context: fullContext,
       options: fullOptions
     };
-  }
-  
-  /**
-   * Get user-appropriate error message
-   */
-  function getUserMessage(
-    category: ErrorCategory,
-    message: string,
-    role: UserRole,
-    context: ErrorContext
-  ): string {
-    // Try to get specific error message
-    const errorType = inferErrorType(message);
-    if (errorType) {
-      return getErrorMessage(category, errorType, role, context.data);
-    }
-    
-    // Fall back to generic message
-    return getGenericErrorMessage(role);
-  }
-  
-  /**
-   * Get admin-specific error message with technical details
-   */
-  function getAdminMessage(category: ErrorCategory, message: string, context: ErrorContext): string {
-    return getErrorMessage(category, inferErrorType(message) || 'unexpected_error', 'admin', {
-      ...context.data,
-      component: context.component,
-      operation: context.operation,
-      timestamp: context.timestamp
-    });
-  }
-  
-  /**
-   * Infer error type from message
-   */
-  function inferErrorType(message: string): string | null {
-    const lowerMessage = message.toLowerCase();
-    
-    // Validation errors
-    if (lowerMessage.includes('required') || lowerMessage.includes('missing')) return 'required_field';
-    if (lowerMessage.includes('invalid date')) return 'invalid_date';
-    if (lowerMessage.includes('checkout') && lowerMessage.includes('checkin')) return 'date_order';
-    if (lowerMessage.includes('email')) return 'invalid_email';
-    if (lowerMessage.includes('password')) return 'password_weak';
-    
-    // Network errors
-    if (lowerMessage.includes('network') || lowerMessage.includes('connection')) return 'connection_failed';
-    if (lowerMessage.includes('timeout')) return 'timeout';
-    if (lowerMessage.includes('server error')) return 'server_error';
-    if (lowerMessage.includes('not found')) return 'not_found';
-    if (lowerMessage.includes('rate limit')) return 'rate_limit';
-    
-    // Business logic errors
-    if (lowerMessage.includes('conflict')) return 'booking_conflict';
-    if (lowerMessage.includes('unavailable')) return 'property_unavailable';
-    if (lowerMessage.includes('cleaner')) return 'cleaner_unavailable';
-    if (lowerMessage.includes('turn')) return 'invalid_turn';
-    
-    // Authentication errors
-    if (lowerMessage.includes('login') || lowerMessage.includes('credentials')) return 'login_failed';
-    if (lowerMessage.includes('session') || lowerMessage.includes('expired')) return 'session_expired';
-    if (lowerMessage.includes('locked')) return 'account_locked';
-    
-    // Permission errors
-    if (lowerMessage.includes('permission') || lowerMessage.includes('access')) return 'access_denied';
-    if (lowerMessage.includes('forbidden')) return 'resource_forbidden';
-    if (lowerMessage.includes('not allowed')) return 'action_not_allowed';
-    
-    return null;
   }
   
   /**
@@ -291,8 +243,8 @@ export function useErrorHandler() {
       });
     }
     
-    // Add notification to UI store
-    const notificationId = uiStore.addNotification('error', title, message, !isAdmin);
+    // Add notification to UI store with null coalescing for message
+    const notificationId = uiStore.addNotification('error', title, message ?? 'Unknown error', !isAdmin);
     
     // Store notification ID for potential cleanup
     errorInfo.context.notificationId = notificationId;
@@ -314,9 +266,9 @@ export function useErrorHandler() {
   async function attemptRetry(
     errorId: string,
     errorInfo: ErrorInfo,
-    retryConfig: Partial<RetryConfig> = {}
+    retryConfig: Partial<ExtendedRetryConfig> = {}
   ): Promise<boolean> {
-         const config = { ...defaultRetryConfig, ...retryConfig };
+    const config = { ...defaultRetryConfig, ...retryConfig };
     const currentAttempts = retryAttempts.value.get(errorId) || 0;
     
     if (currentAttempts >= config.maxAttempts) {
@@ -435,7 +387,7 @@ export function useErrorHandler() {
       uiStore.addNotification(
         'warning', 
         'Retry Limit Reached', 
-        getRetryMessage(errorInfo.context.userRole, currentAttempts, maxAttempts)
+        getRetryMessageSafe(errorInfo.context.userRole, currentAttempts, maxAttempts)
       );
       return;
     }
@@ -446,33 +398,11 @@ export function useErrorHandler() {
     uiStore.addNotification(
       'info',
       'Retrying',
-      getRetryMessage(errorInfo.context.userRole, currentAttempts + 1, maxAttempts)
+      getRetryMessageSafe(errorInfo.context.userRole, currentAttempts + 1, maxAttempts)
     );
     
     // TODO: Implement actual retry logic based on operation
     // This would typically involve calling the original operation again
-  }
-  
-  /**
-   * Schedule automatic retry
-   */
-  function scheduleRetry(errorId: string, errorInfo: ErrorInfo): void {
-    const attempts = retryAttempts.value.get(errorId) || 0;
-    const maxAttempts = errorInfo.options.maxRetries || 3;
-    
-    if (attempts >= maxAttempts) return;
-    
-    const delay = Math.min(
-      errorInfo.options.retryDelay || 1000 * Math.pow(2, attempts),
-      10000 // Max 10 seconds
-    );
-    
-    const timer = setTimeout(() => {
-      retryOperation(errorInfo);
-      retryTimers.value.delete(errorId);
-    }, delay);
-    
-    retryTimers.value.set(errorId, timer);
   }
   
   /**
@@ -515,10 +445,17 @@ export function useErrorHandler() {
   }
   
   /**
+   * Get retry message with type guard for user role
+   */
+  function getRetryMessageSafe(role: UserRole | undefined, attempt: number, max: number): string {
+    return getRetryMessage(role ?? 'owner', attempt, max);
+  }
+  
+  /**
    * Handle API errors specifically
    */
   async function handleApiError(
-    error: any,
+    error: ApiErrorLike,
     endpoint?: string,
     method?: string,
     context: Partial<ErrorContext> = {}
@@ -549,11 +486,16 @@ export function useErrorHandler() {
    * Handle validation errors
    */
   async function handleValidationError(
-    validationErrors: any[],
+    validationErrors: ErrorLike[],
     context: Partial<ErrorContext> = {}
   ): Promise<string> {
     const errorMessage = validationErrors
-      .map(err => err.message || err.toString())
+      .map(err => {
+        if (err instanceof Error) return err.message;
+        if (typeof err === 'string') return err;
+        if (typeof err === 'object' && err && 'message' in err) return err.message;
+        return String(err);
+      })
       .join(', ');
     
     return handleError(
