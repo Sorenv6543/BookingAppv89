@@ -1,5 +1,5 @@
 // src/composables/supabase/useSupabaseAuth.ts - Fixed Version
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { supabase } from '@/plugins/supabase';
 import type { Session } from '@supabase/supabase-js';
 import type { User, UserRole } from '@/types';
@@ -24,42 +24,51 @@ export function useSupabaseAuth() {
   
   const currentUserId = computed(() => session.value?.user?.id);
 
-  // Initialize auth listener immediately
+  // Initialize auth listener immediately with better error handling
   initializeAuthListener();
 
   function initializeAuthListener() {
-    supabase.auth.onAuthStateChange(async (event, newSession) => {
-      console.log('[Auth Debug] Auth state changed:', { event, userId: newSession?.user?.id });
-      
-      try {
-        if (event === 'INITIAL_SESSION') {
-          session.value = newSession;
-          if (newSession) {
+    try {
+      supabase.auth.onAuthStateChange(async (event, newSession) => {
+        console.log('[Auth Debug] Auth state changed:', { event, userId: newSession?.user?.id });
+        
+        try {
+          if (event === 'INITIAL_SESSION') {
+            session.value = newSession;
+            if (newSession) {
+              await loadUserProfile(newSession.user.id);
+            }
+            // CRITICAL: Always set initializing to false for INITIAL_SESSION
+            console.log('🚀 Setting initializing to false after INITIAL_SESSION');
+            initializing.value = false;
+          } else if (event === 'SIGNED_IN' && newSession) {
+            session.value = newSession;
             await loadUserProfile(newSession.user.id);
+            console.log('✅ User signed in successfully:', { 
+              email: newSession.user.email, 
+              userRole: user.value?.role 
+            });
+          } else if (event === 'SIGNED_OUT') {
+            user.value = null;
+            session.value = null;
+            error.value = null;
+            console.log('✅ User signed out');
           }
-          initializing.value = false;
-        } else if (event === 'SIGNED_IN' && newSession) {
-          session.value = newSession;
-          await loadUserProfile(newSession.user.id);
-          console.log('✅ User signed in successfully:', { 
-            email: newSession.user.email, 
-            userRole: user.value?.role 
-          });
-        } else if (event === 'SIGNED_OUT') {
-          user.value = null;
-          session.value = null;
-          error.value = null;
-          console.log('✅ User signed out');
+        } catch (err) {
+          console.error('Auth state change error:', err);
+          error.value = err instanceof Error ? err.message : 'Authentication error';
+          // CRITICAL: Always set initializing to false even on errors
+          if (event === 'INITIAL_SESSION') {
+            console.log('🚀 Setting initializing to false after INITIAL_SESSION error');
+            initializing.value = false;
+          }
         }
-      } catch (err) {
-        console.error('Auth state change error:', err);
-        error.value = err instanceof Error ? err.message : 'Authentication error';
-        // Don't let errors prevent initialization from completing
-        if (event === 'INITIAL_SESSION') {
-          initializing.value = false;
-        }
-      }
-    });
+      });
+    } catch (err) {
+      console.error('❌ Failed to initialize auth listener:', err);
+      // Fallback: set initializing to false if listener setup fails
+      initializing.value = false;
+    }
   }
 
   async function loadUserProfile(userId: string): Promise<void> {
@@ -332,10 +341,27 @@ export function useSupabaseAuth() {
     }
   }
 
-  // Initialize on creation
-  onMounted(() => {
+  // Initialize on creation - don't wait for onMounted
+  setTimeout(() => {
     checkAuth();
-  });
+  }, 100);
+
+  // Aggressive timeout to prevent infinite loading
+  setTimeout(() => {
+    if (initializing.value) {
+      console.warn('⚠️ Auth initialization timeout - forcing completion');
+      initializing.value = false;
+      error.value = 'Authentication initialization timed out. Please check your connection.';
+    }
+  }, 5000); // 5 seconds timeout
+
+  // Backup timeout in case Supabase is completely unresponsive
+  setTimeout(() => {
+    if (initializing.value) {
+      console.error('🚨 Emergency timeout - forcing auth initialization to complete');
+      initializing.value = false;
+    }
+  }, 2000); // 2 second emergency timeout
 
   return {
     // State

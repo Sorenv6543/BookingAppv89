@@ -47,7 +47,9 @@ const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
 
 // Convert bookings Map to FullCalendar events
 const calendarEvents = computed(() => {
-  return Array.from(props.bookings.values()).map(booking => {
+  const bookingsArray = Array.from(props.bookings.values());
+   
+  const events = bookingsArray.map(booking => {
     const property = props.properties.get(booking.property_id);
     const isTurn = booking.booking_type === 'turn';
     const isUrgent = booking.priority === 'urgent';
@@ -79,6 +81,8 @@ const calendarEvents = computed(() => {
       ].filter(Boolean)
     };
   });
+   
+  return events;
 });
 
 // Enhanced dynamic color system based on booking priority instead of status
@@ -375,7 +379,20 @@ watch(() => theme.global.current.value.dark, () => {
 });
 
 // Watch for changes in props from Home
-watch(() => props.bookings, (newBookings) => {
+watch(() => props.bookings, (newBookings, oldBookings) => {
+  console.log('🔍 [FullCalendar] Bookings prop changed:', {
+    newSize: newBookings.size,
+    oldSize: oldBookings?.size || 0,
+    newBookingIds: Array.from(newBookings.keys()),
+    newBookings: Array.from(newBookings.values()).map(b => ({
+      id: b.id,
+      property_id: b.property_id,
+      owner_id: b.owner_id,
+      checkout_date: b.checkout_date,
+      checkin_date: b.checkin_date
+    }))
+  });
+  
   // Log receiving updated bookings from Home
   eventLogger.logEvent(
     'Home',
@@ -386,7 +403,7 @@ watch(() => props.bookings, (newBookings) => {
   );
   
   // FullCalendar will automatically update with the new events
-}, { deep: true });
+}, { deep: true, immediate: true });
 
 // Add new handler function after the other event handlers
 const handleLoading = (isLoading: boolean): void => {

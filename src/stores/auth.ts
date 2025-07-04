@@ -1,42 +1,46 @@
 // src/stores/auth.ts - Fixed Version with Proper Loading Management
 import { defineStore } from 'pinia';
-import { ref, computed, Ref } from 'vue';
-import type { UserRole, User } from '@/types';
+import { ref, computed } from 'vue';
+import type { User, UserRole } from '@/types';
+import type { Session } from '@supabase/supabase-js';
 import { useSupabaseAuth } from '@/composables/supabase/useSupabaseAuth';
 
-interface RegisterData {
-  email: string;
-  password: string;
-  name: string;
-  role: UserRole;
-  company_name?: string;
-}
-
 export const useAuthStore = defineStore('auth', () => {
-  // Top-level refs for all state
-  const supabaseUser = ref<User | null>(null);
-  const session = ref<any>(null);
-  const supabaseLoading = ref(false);
-  const supabaseError = ref<string | null>(null);
-  const initializing = ref(false);
-  const supabaseIsAuthenticated = ref(false);
-  let signIn: any = async () => true;
-  let signUp: any = async () => true;
-  let supabaseSignOut: any = async () => true;
-  let updateProfile: any = async () => true;
-  let resetPassword: any = async () => true;
-  let checkAuth: any = async () => true;
-  let getAllUsers: any = async () => [];
-  let updateUserRole: any = async () => true;
+  // --- Initial state ---
+  const initialState = {
+    session: null as Session | null,
+    user: null as User | null,
+    loading: false,
+    error: null as string | null,
+    initializing: true,
+    isAuthenticated: false,
+  };
 
-  if (import.meta.env.MODE !== 'test') {
-    const composable = useSupabaseAuth();
-    supabaseUser.value = composable.user.value;
-    session.value = composable.session.value;
-    supabaseLoading.value = composable.loading.value;
-    supabaseError.value = composable.error.value;
-    initializing.value = composable.initializing.value;
-    supabaseIsAuthenticated.value = composable.isAuthenticated.value;
+  // --- State refs for fallback/test mode ---
+  const fallbackSession = ref<Session | null>(initialState.session);
+  const fallbackUser = ref<User | null>(initialState.user);
+  const fallbackLoading = ref(initialState.loading);
+  const fallbackError = ref<string | null>(initialState.error);
+  const fallbackInitializing = ref(initialState.initializing);
+
+  let signIn: (email: string, password: string) => Promise<boolean> = async () => true;
+  let signUp: (email: string, password: string, userData: { name: string; role?: UserRole; company_name?: string }) => Promise<boolean> = async () => true;
+  let supabaseSignOut: () => Promise<boolean> = async () => true;
+  let updateProfile: (updates: Partial<User>) => Promise<boolean> = async () => true;
+  let resetPassword: (email: string) => Promise<boolean> = async () => true;
+  let checkAuth: () => Promise<void> = async () => {};
+  let getAllUsers: () => Promise<User[]> = async () => [];
+  let updateUserRole: (userId: string, newRole: UserRole) => Promise<boolean> = async () => true;
+
+  let unsubscribe: (() => void) | null = null;
+
+  // Define composable at module scope
+  let composable: ReturnType<typeof useSupabaseAuth> | null = null;
+
+  // Initialize once, outside test mode
+  if (import.meta.env.MODE !== 'test' && !unsubscribe) {
+    composable = useSupabaseAuth();
+    
     signIn = composable.signIn;
     signUp = composable.signUp;
     supabaseSignOut = composable.signOut;
@@ -47,18 +51,37 @@ export const useAuthStore = defineStore('auth', () => {
     updateUserRole = composable.updateUserRole;
   }
 
-  // Computed user always references supabaseUser
-  const user = computed(() => supabaseUser.value);
+  // --- Reactive computed state that uses composable or fallback ---
+  const session = computed(() => composable?.session.value ?? fallbackSession.value);
+  const user = computed(() => composable?.user.value ?? fallbackUser.value);
+  const loading = computed(() => composable?.loading.value ?? fallbackLoading.value);
+  const error = computed(() => composable?.error.value ?? fallbackError.value);
+  const initializing = computed(() => composable?.initializing.value ?? fallbackInitializing.value);
+  const isAuthenticated = computed(() => !!session.value && !!user.value);
 
   // ... rest of the store logic ...
 
+  // --- $reset implementation ---
+  function $reset() {
+    // Reset fallback values (used in test mode)
+    fallbackSession.value = initialState.session;
+    fallbackUser.value = initialState.user;
+    fallbackLoading.value = initialState.loading;
+    fallbackError.value = initialState.error;
+    fallbackInitializing.value = initialState.initializing;
+  }
+
+  // Keep this if you need to use loadUserProfile elsewhere
+  const loadUserProfile = composable?.loadUserProfile;
+
   return {
-    user,
     session,
-    loading: supabaseLoading,
-    error: supabaseError,
+    user,
+    loading,
+    error,
     initializing,
-    isAuthenticated: supabaseIsAuthenticated,
+    isAuthenticated,
+    $reset,
     // ... other computed and methods ...
     login: signIn,
     logout: supabaseSignOut,
@@ -67,12 +90,19 @@ export const useAuthStore = defineStore('auth', () => {
     requestPasswordReset: resetPassword,
     fetchAllUsers: getAllUsers,
     changeUserRole: updateUserRole,
-    clearError: () => { supabaseError.value = null; },
+    clearError: () => { 
+      fallbackError.value = null;
+      // Also clear composable error if available
+      if (composable?.error) {
+        composable.error.value = null;
+      }
+    },
     getSuccessMessage: () => null,
-    initialize: async () => {},
+    initialize: async (): Promise<void> => {},
     checkAuth,
     updateProfile,
-    // Expose supabaseUser for test utilities only
-    ...(import.meta.env.MODE === 'test' ? { supabaseUser } : {})
+    loadUserProfile,
+    // Expose supabaseUser for test utilities only if needed
+    // ...(import.meta.env.MODE === 'test' ? { supabaseUser } : {})
   };
 });

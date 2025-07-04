@@ -217,7 +217,7 @@ async function handleLogin() {
     clearTimeout(loginTimeout);
     
     if (success) {
-      successMessage.value = authStore.getSuccessMessage('login')
+      successMessage.value = authStore.getSuccessMessage() ?? ''
       const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
       
       // Navigate immediately
@@ -236,7 +236,7 @@ function quickLogin(userEmail: string) {
 
 function forceStopLoading() {
   console.warn('🔧 Force stopping loading state');
-  authStore.storeLoading = false;
+  authStore.loading = false;
   
   // If user seems authenticated, navigate anyway
   if (authStore.isAuthenticated) {
@@ -266,7 +266,7 @@ async function testSupabaseConnection() {
     }
   } catch (error) {
     console.error('❌ Connection test failed:', error);
-    alert('❌ Connection test failed: ' + error.message);
+    alert('❌ Connection test failed: ' + (error instanceof Error ? error.message : String(error)));
   }
 }
 
