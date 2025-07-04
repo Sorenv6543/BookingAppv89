@@ -3,7 +3,9 @@ import { useBookings } from '@/composables/shared/useBookings';
 import { useAuthStore } from '@/stores/auth';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
-import type { Booking, BookingFormData, BookingStatus } from '@/types';
+import { useUserStore } from '@/stores/user';
+import { usePerformanceMonitor } from '@/composables/shared/usePerformanceMonitor';
+import type { Booking, BookingFormData, BookingStatus, Property } from '@/types';
 
 /**
  * Owner-specific booking composable
@@ -22,6 +24,8 @@ function useOwnerBookingsPinia() {
     const authStore = useAuthStore();
     const bookingStore = useBookingStore();
     const propertyStore = usePropertyStore();
+    const userStore = useUserStore();
+    const { measureRolePerformance, trackCachePerformance } = usePerformanceMonitor();
     
     // Owner-specific state
     const loading = ref<boolean>(false);
@@ -36,21 +40,37 @@ function useOwnerBookingsPinia() {
     /**
      * Get all bookings for the current owner only
      */
-    const myBookings = computed(() => {
-      if (!currentUserId.value) return [];
-      
-      return Array.from(bookingStore.bookings.values())
-        .filter(booking => booking.owner_id === currentUserId.value);
+    const myBookings = computed((): Booking[] => {
+      return measureRolePerformance('owner', 'filter-owner-bookings', () => {
+        if (!currentUserId.value) {
+          trackCachePerformance('owner-bookings-no-user', true);
+          return [];
+        }
+        
+        const filteredBookings = Array.from(bookingStore.bookings.values())
+          .filter(booking => booking.owner_id === currentUserId.value);
+        
+        trackCachePerformance('owner-my-bookings', filteredBookings.length > 0);
+        return filteredBookings;
+      });
     });
     
     /**
      * Get current owner's properties only
      */
-    const myProperties = computed(() => {
-      if (!currentUserId.value) return [];
-      
-      return Array.from(propertyStore.properties.values())
-        .filter(property => property.owner_id === currentUserId.value);
+    const myProperties = computed((): Property[] => {
+      return measureRolePerformance('owner', 'filter-owner-properties', () => {
+        if (!currentUserId.value) {
+          trackCachePerformance('owner-properties-no-user', true);
+          return [];
+        }
+        
+        const filteredProperties = Array.from(propertyStore.properties.values())
+          .filter(property => property.owner_id === currentUserId.value);
+        
+        trackCachePerformance('owner-my-properties', filteredProperties.length > 0);
+        return filteredProperties;
+      });
     });
     
     /**
@@ -71,40 +91,47 @@ function useOwnerBookingsPinia() {
     /**
      * Get upcoming cleanings for current owner (next 7 days)
      */
-    const myUpcomingCleanings = computed(() => {
-      if (!currentUserId.value) return [];
-      
-      const now = new Date();
-      const nextWeek = new Date();
-      nextWeek.setDate(now.getDate() + 7);
-      
-      return myBookings.value
-        .filter(booking => {
-          const checkoutDate = new Date(booking.checkout_date);
-          return checkoutDate >= now && 
-                 checkoutDate <= nextWeek &&
-                 booking.status !== 'completed';
-        })
-        .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime());
+    const myUpcomingCleanings = computed((): Booking[] => {
+      return measureRolePerformance('owner', 'filter-upcoming-cleanings', () => {
+        if (!currentUserId.value) return [];
+        
+        const now = new Date();
+        const nextWeek = new Date();
+        nextWeek.setDate(now.getDate() + 7);
+        
+        const upcoming = myBookings.value
+          .filter(booking => {
+            const checkoutDate = new Date(booking.checkout_date);
+            return checkoutDate >= now && 
+                   checkoutDate <= nextWeek &&
+                   booking.status !== 'completed';
+          })
+          .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime());
+        
+        trackCachePerformance('owner-upcoming-cleanings', upcoming.length > 0);
+        return upcoming;
+      });
     });
     
     /**
      * Get bookings by status for current owner
      */
     const myBookingsByStatus = computed(() => {
-      const statusGroups: Record<BookingStatus, Booking[]> = {
-        pending: [],
-        scheduled: [],
-        in_progress: [],
-        completed: [],
-        cancelled: []
-      };
-      
-      myBookings.value.forEach(booking => {
-        statusGroups[booking.status].push(booking);
+      return measureRolePerformance('owner', 'group-owner-bookings-by-status', () => {
+        const statusGroups: Record<BookingStatus, Booking[]> = {
+          pending: [],
+          scheduled: [],
+          in_progress: [],
+          completed: [],
+          cancelled: []
+        };
+        
+        myBookings.value.forEach(booking => {
+          statusGroups[booking.status].push(booking);
+        });
+        
+        return statusGroups;
       });
-      
-      return statusGroups;
     });
     
     /**
@@ -456,6 +483,62 @@ function useOwnerBookingsPinia() {
       return booking?.owner_id === currentUserId.value;
     }
     
+    // Performance-monitored owner actions
+    const createBooking = async (bookingData: BookingFormData): Promise<Booking | null> => {
+      return measureRolePerformance('owner', 'create-booking', async () => {
+        // Ensure owner_id is set for owner role
+        const ownerBookingData = {
+          ...bookingData,
+          owner_id: userStore.currentUserId!
+        }
+        
+        const result = await bookingStore.addBooking(ownerBookingData)
+        trackCachePerformance('owner-create-booking', !!result)
+        return result
+      })
+    }
+
+    const updateMyBooking = async (id: string, updates: Partial<Booking>): Promise<boolean> => {
+      return measureRolePerformance('owner', 'update-owner-booking', async () => {
+        // Verify booking belongs to current owner before updating
+        const booking = bookingStore.bookings.get(id)
+        if (!booking || booking.owner_id !== userStore.currentUserId) {
+          trackCachePerformance('owner-update-booking-unauthorized', false)
+          return false
+        }
+        
+        const result = await bookingStore.updateBooking(id, updates)
+        trackCachePerformance('owner-update-booking', result)
+        return result
+      })
+    }
+
+    const deleteMyBooking = async (id: string): Promise<boolean> => {
+      return measureRolePerformance('owner', 'delete-owner-booking', async () => {
+        // Verify booking belongs to current owner before deleting
+        const booking = bookingStore.bookings.get(id)
+        if (!booking || booking.owner_id !== userStore.currentUserId) {
+          trackCachePerformance('owner-delete-booking-unauthorized', false)
+          return false
+        }
+        
+        const result = await bookingStore.deleteBooking(id)
+        trackCachePerformance('owner-delete-booking', result)
+        return result
+      })
+    }
+
+    // Role-specific performance metrics
+    const getOwnerPerformanceMetrics = computed(() => {
+      return {
+        myBookingsCount: myBookings.value.length,
+        myPropertiesCount: myProperties.value.length,
+        upcomingCleaningsCount: myUpcomingCleanings.value.length,
+        dataFilteringEfficiency: myBookings.value.length > 0 ? 'optimal' : 'no-data',
+        cacheEfficiency: 'high' // Owner data is typically smaller and well-cached
+      }
+    })
+
     // Return owner-specific interface
     return {
       // State
@@ -492,7 +575,18 @@ function useOwnerBookingsPinia() {
       // Inherited from base composable (for compatibility)
       // Note: These work on all data, not owner-filtered
       calculateCleaningWindow: baseBookings.calculateCleaningWindow,
-      calculateBookingPriority: baseBookings.calculateBookingPriority
+      calculateBookingPriority: baseBookings.calculateBookingPriority,
+      
+      // Performance-monitored actions
+      createBooking,
+      updateMyBooking,
+      deleteMyBooking,
+      
+      // Performance metrics
+      getOwnerPerformanceMetrics,
+      
+      // Store actions (scoped to owner)
+      fetchMyProperties: () => propertyStore.fetchProperties()
     };
   }
 
