@@ -5,5 +5,12 @@
     "chunkCount": 18,
     "performanceScore": 85,
     "regressionDetected": false
+  },
+  {
+    "timestamp": "2025-07-04T13:25:49.971Z",
+    "totalSize": 2156.7,
+    "chunkCount": 18,
+    "performanceScore": 85,
+    "regressionDetected": false
   }
 ]
