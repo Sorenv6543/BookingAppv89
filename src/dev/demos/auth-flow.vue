@@ -32,9 +32,8 @@
             <div v-if="authStore.isAuthenticated">
               <strong>User:</strong> {{ authStore.user?.name }} ({{ authStore.user?.email }})<br>
               <strong>Role:</strong> {{ authStore.user?.role }}<br>
-              <strong>Current View:</strong> {{ authStore.currentRole }}<br>
-              <strong>Default Route:</strong> {{ authStore.defaultRoute }}<br>
-              <strong>Temp View Mode:</strong> {{ authStore.tempViewMode ? 'Yes' : 'No' }}
+              <strong>Is Admin:</strong> {{ authStore.isAdmin ? 'Yes' : 'No' }}<br>
+              <strong>Is Owner:</strong> {{ authStore.isOwner ? 'Yes' : 'No' }}
             </div>
             <div v-else>
               <strong>Status:</strong> Not authenticated
@@ -144,7 +143,7 @@
             </v-card>
           </div>
           
-          <!-- Admin Role Switching -->
+          <!-- Admin Features -->
           <div
             v-if="authStore.isAdmin"
             class="mb-6"
@@ -154,17 +153,12 @@
               class="pa-4"
             >
               <v-card-title class="text-h6 mb-4">
-                Admin Role Switching
+                Admin Features
               </v-card-title>
               
-              <AdminRoleSwitcher
-                :is-in-owner-view="authStore.tempViewMode?.role === 'owner'"
-                @switch-to-admin="handleSwitchToAdmin"
-                @switch-to-owner="handleSwitchToOwner"
-                @view-owner-properties="showMessage('Viewing owner properties')"
-                @view-owner-bookings="showMessage('Viewing owner bookings')"
-                @open-support-tools="showMessage('Opening support tools')"
-              />
+              <v-alert type="info" variant="tonal">
+                Admin users have access to system-wide management features
+              </v-alert>
             </v-card>
           </div>
           
@@ -187,12 +181,12 @@
                     color="info"
                     block
                     :disabled="!authStore.isAuthenticated"
-                    @click="navigateToDefault"
+                    @click="navigateToHome"
                   >
                     <v-icon class="mr-2">
                       mdi-home
                     </v-icon>
-                    Go to Default Route
+                    Go to Home
                   </v-btn>
                 </v-col>
                 <v-col
@@ -304,7 +298,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import AdminRoleSwitcher from '@/components/dumb/admin/AdminRoleSwitcher.vue'
 import { 
   getDefaultRouteForRole, 
   getRoleDisplayName 
@@ -319,52 +312,57 @@ const successMessage = ref('')
 
 // Authentication actions
 async function loginAsOwner() {
-  const success = await authStore.login('owner@example.com', 'password')
-  if (success) {
-    successMessage.value = authStore.getSuccessMessage('login')
+  try {
+    const success = await authStore.login('owner@example.com', 'password')
+    if (success) {
+      successMessage.value = 'Successfully logged in as Owner'
+    }
+  } catch (error) {
+    console.error('Login failed:', error)
   }
 }
 
 async function loginAsAdmin() {
-  const success = await authStore.login('admin@example.com', 'password')
-  if (success) {
-    successMessage.value = authStore.getSuccessMessage('login')
+  try {
+    const success = await authStore.login('admin@example.com', 'password')
+    if (success) {
+      successMessage.value = 'Successfully logged in as Admin'
+    }
+  } catch (error) {
+    console.error('Login failed:', error)
   }
 }
 
 async function loginAsCleaner() {
-  const success = await authStore.login('cleaner@example.com', 'password')
-  if (success) {
-    successMessage.value = authStore.getSuccessMessage('login')
+  try {
+    const success = await authStore.login('cleaner@example.com', 'password')
+    if (success) {
+      successMessage.value = 'Successfully logged in as Cleaner'
+    }
+  } catch (error) {
+    console.error('Login failed:', error)
   }
 }
 
 async function handleLogout() {
-  const success = await authStore.logout()
-  if (success) {
-    successMessage.value = authStore.getSuccessMessage('logout')
-  }
-}
-
-// Role switching actions
-function handleSwitchToAdmin() {
-  const success = authStore.switchToAdminView()
-  if (success) {
-    successMessage.value = 'Switched to admin view'
-  }
-}
-
-function handleSwitchToOwner() {
-  const success = authStore.switchToOwnerView()
-  if (success) {
-    successMessage.value = 'Switched to owner view'
+  try {
+    const success = await authStore.logout()
+    if (success) {
+      successMessage.value = 'Successfully logged out'
+    }
+  } catch (error) {
+    console.error('Logout failed:', error)
   }
 }
 
 // Navigation actions
-function navigateToDefault() {
-  if (authStore.defaultRoute) {
-    router.push(authStore.defaultRoute)
+function navigateToHome() {
+  const role = authStore.user?.role
+  if (role) {
+    const defaultRoute = getDefaultRouteForRole(role)
+    router.push(defaultRoute)
+  } else {
+    router.push('/')
   }
 }
 
@@ -373,12 +371,7 @@ function goToLogin() {
 }
 
 function goToSignup() {
-  router.push('/auth/signup')
-}
-
-// Utility functions
-function showMessage(message: string) {
-  successMessage.value = message
+  router.push('/auth/register')
 }
 
 // Clear any existing errors when component mounts

@@ -158,7 +158,7 @@
             <v-icon class="mr-2">
               mdi-calendar-check
             </v-icon>
-            My Bookings ({{ myBookings.length }})
+            My Bookings ({{ myBookings.size }})
             <v-spacer />
             <v-btn
               color="primary"
@@ -174,7 +174,7 @@
           
           <v-card-text>
             <div
-              v-if="myBookings.length === 0"
+              v-if="myBookings.size === 0"
               class="text-center text-medium-emphasis py-8"
             >
               <v-icon
@@ -194,7 +194,7 @@
             <v-data-table
               v-else
               :headers="bookingHeaders"
-              :items="myBookings"
+              :items="Array.from(myBookings.values())"
               :items-per-page="10"
               class="elevation-1"
             >
@@ -272,7 +272,7 @@
           </v-card-title>
           <v-card-text>
             <div
-              v-if="myUpcomingCleanings.length === 0"
+              v-if="myUpcomingCleanings.size === 0"
               class="text-center text-medium-emphasis"
             >
               No upcoming cleanings in the next 7 days
@@ -364,7 +364,7 @@
                   block
                   color="secondary"
                   :loading="loading"
-                  :disabled="!currentUserId || myBookings.length === 0"
+                  :disabled="!currentUserId || myBookings.size === 0"
                   @click="testUpdateBooking"
                 >
                   Test Update First Booking
@@ -379,7 +379,7 @@
                   block
                   color="warning"
                   :loading="loading"
-                  :disabled="!currentUserId || myBookings.length === 0"
+                  :disabled="!currentUserId || myBookings.size === 0"
                   @click="testStatusChange"
                 >
                   Test Status Change
@@ -526,13 +526,14 @@ function getPriorityColor(priority: string): string {
 
 // Test functions
 async function testCreateBooking() {
-  if (!currentUserId.value || myProperties.value.length === 0) {
+  const propertiesArray = Array.from(myProperties.value.values());
+  if (!currentUserId.value || propertiesArray.length === 0) {
     error.value = 'No properties available for testing';
     return;
   }
   
   const testBookingData: BookingFormData = {
-    property_id: myProperties.value[0].id,
+    property_id: propertiesArray[0].id,
     checkout_date: new Date().toISOString(),
     checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
     booking_type: 'standard',
@@ -546,9 +547,10 @@ async function testCreateBooking() {
 }
 
 async function testUpdateBooking() {
-  if (myBookings.value.length === 0) return;
+  const bookingsArray = Array.from(myBookings.value.values());
+  if (bookingsArray.length === 0) return;
   
-  const firstBooking = myBookings.value[0];
+  const firstBooking = bookingsArray[0];
   const updates: Partial<BookingFormData> = {
     notes: `Updated at ${new Date().toLocaleTimeString()}`,
     guest_count: (firstBooking.guest_count || 1) + 1

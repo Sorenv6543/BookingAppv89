@@ -192,7 +192,7 @@ describe('User Store', () => {
     const propertyStore = usePropertyStore();
     
     // Set up user and property
-    const user: User = {
+    const user = createUserWithSettings({
       id: 'owner1',
       email: 'owner@example.com',
       name: 'Property Owner',
@@ -203,7 +203,7 @@ describe('User Store', () => {
         theme: 'light',
         language: 'en'
       }
-    };
+    });
     store.setUser(user);
 
     propertyStore.addProperty({
@@ -233,7 +233,7 @@ describe('User Store', () => {
     const store = useUserStore();
     
     // Test owner permissions
-    const ownerUser: User = {
+    const ownerUser = createUserWithSettings({
       id: 'owner1',
       email: 'owner@example.com',
       name: 'Property Owner',
@@ -244,7 +244,7 @@ describe('User Store', () => {
         theme: 'light',
         language: 'en'
       }
-    };
+    });
     store.setUser(ownerUser);
 
     // Owner can view anything
@@ -258,7 +258,7 @@ describe('User Store', () => {
     expect(store.hasPermission('delete', 'booking', 'other_owner')).toBe(false);
 
     // Test admin permissions
-    const adminUser: User = {
+    const adminUser = createUserWithSettings({
       id: 'admin1',
       email: 'admin@example.com',
       name: 'Admin User',
@@ -269,7 +269,7 @@ describe('User Store', () => {
         theme: 'light',
         language: 'en'
       }
-    };
+    });
     store.setUser(adminUser);
 
     // Admin can do everything
@@ -282,7 +282,7 @@ describe('User Store', () => {
     const store = useUserStore();
     
     // Set up user with preferences
-    const user: User = {
+    const user = createUserWithSettings({
       id: 'user1',
       email: 'test@example.com',
       name: 'Test User',
@@ -293,7 +293,7 @@ describe('User Store', () => {
         theme: 'light',
         language: 'en'
       }
-    };
+    });
     store.setUser(user);
     store.toggleFavoriteProperty('prop1');
     store.addRecentlyViewedProperty('prop2');
@@ -313,21 +313,5 @@ describe('User Store', () => {
     expect(store.viewPreferences.recentlyViewedProperties).toHaveLength(0);
   });
 
-  it('should add a user to the store', () => {
-    const store = useUserStore();
-    const user = createUserWithSettings({
-      id: 'test-user-1',
-      email: 'test@example.com',
-      name: 'Test User',
-      role: 'owner' as const,
-      settings: {
-        notifications: true,
-        timezone: 'UTC',
-        theme: 'light' as const,
-        language: 'en'
-      }
-    });
 
-    store.addUser(user);
-  });
 }); 

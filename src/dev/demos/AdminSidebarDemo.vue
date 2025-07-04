@@ -180,6 +180,7 @@
 import { ref, computed, onMounted } from 'vue';
 import AdminSidebar from '@components/smart/admin/AdminSidebar.vue';
 import type { Booking, Property, User, Cleaner } from '@/types';
+import { createUserWithSettings, createCleaner } from '@/utils/authHelpers';
 
 // Demo state
 const loading = ref(false);
@@ -188,7 +189,7 @@ const eventLog = ref<Array<{ timestamp: string; action: string; details: string 
 // Generate comprehensive demo data across multiple property owners
 // Create demo users map
 const demoUsers = ref(new Map<string, User>());
-demoUsers.value.set('owner-1', {
+demoUsers.value.set('owner-1', createUserWithSettings({
   id: 'owner-1',
   email: 'sarah.johnson@email.com',
   name: 'Sarah Johnson',
@@ -201,8 +202,8 @@ demoUsers.value.set('owner-1', {
   },
   created_at: '2024-01-15T10:00:00Z',
   updated_at: '2024-01-15T10:00:00Z'
-});
-demoUsers.value.set('owner-2', {
+}));
+demoUsers.value.set('owner-2', createUserWithSettings({
   id: 'owner-2',
   email: 'mike.chen@email.com',
   name: 'Mike Chen',
@@ -215,8 +216,8 @@ demoUsers.value.set('owner-2', {
   },
   created_at: '2024-01-20T14:30:00Z',
   updated_at: '2024-01-20T14:30:00Z'
-});
-demoUsers.value.set('owner-3', {
+}));
+demoUsers.value.set('owner-3', createUserWithSettings({
   id: 'owner-3',
   email: 'lisa.rodriguez@email.com',
   name: 'Lisa Rodriguez',
@@ -229,8 +230,8 @@ demoUsers.value.set('owner-3', {
   },
   created_at: '2024-02-01T09:15:00Z',
   updated_at: '2024-02-01T09:15:00Z'
-});
-demoUsers.value.set('owner-4', {
+}));
+demoUsers.value.set('owner-4', createUserWithSettings({
   id: 'owner-4',
   email: 'david.kim@email.com',
   name: 'David Kim',
@@ -243,11 +244,11 @@ demoUsers.value.set('owner-4', {
   },
   created_at: '2024-02-10T16:45:00Z',
   updated_at: '2024-02-10T16:45:00Z'
-});
+}));
 
 // Create demo cleaners map
 const demoCleaners = ref(new Map<string, Cleaner>());
-demoCleaners.value.set('cleaner-1', {
+demoCleaners.value.set('cleaner-1', createCleaner({
   id: 'cleaner-1',
   email: 'maria.garcia@cleaningco.com',
   name: 'Maria Garcia',
@@ -262,8 +263,8 @@ demoCleaners.value.set('cleaner-1', {
   max_daily_bookings: 4,
   created_at: '2024-01-10T08:00:00Z',
   updated_at: '2024-01-10T08:00:00Z'
-});
-demoCleaners.value.set('cleaner-2', {
+}));
+demoCleaners.value.set('cleaner-2', createCleaner({
   id: 'cleaner-2',
   email: 'james.wilson@cleaningco.com',
   name: 'James Wilson',
@@ -278,8 +279,8 @@ demoCleaners.value.set('cleaner-2', {
   max_daily_bookings: 5,
   created_at: '2024-01-12T08:00:00Z',
   updated_at: '2024-01-12T08:00:00Z'
-});
-demoCleaners.value.set('cleaner-3', {
+}));
+demoCleaners.value.set('cleaner-3', createCleaner({
   id: 'cleaner-3',
   email: 'anna.petrov@cleaningco.com',
   name: 'Anna Petrov',
@@ -294,8 +295,8 @@ demoCleaners.value.set('cleaner-3', {
   max_daily_bookings: 3,
   created_at: '2024-01-15T08:00:00Z',
   updated_at: '2024-01-15T08:00:00Z'
-});
-demoCleaners.value.set('cleaner-4', {
+}));
+demoCleaners.value.set('cleaner-4', createCleaner({
   id: 'cleaner-4',
   email: 'carlos.mendez@cleaningco.com',
   name: 'Carlos Mendez',
@@ -310,7 +311,7 @@ demoCleaners.value.set('cleaner-4', {
   max_daily_bookings: 4,
   created_at: '2024-01-18T08:00:00Z',
   updated_at: '2024-01-18T08:00:00Z'
-});
+}));
 
 const demoProperties = ref(new Map<string, Property>([
   // Sarah Johnson's properties

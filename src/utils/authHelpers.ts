@@ -295,22 +295,42 @@ export function createAdmin(adminData: Partial<Admin> & {
 }
 
 /**
- * Creates a Cleaner with proper type compatibility
+ * Creates a Cleaner object with both flattened and nested settings
+ * Ensures compatibility with Cleaner interface requirements
  */
 export function createCleaner(cleanerData: Partial<Cleaner> & {
   settings?: UserSettings;
-  location?: { lat: number; lng: number; };
 }): Cleaner {
-  const baseUser = createUserWithSettings(cleanerData);
-  return {
-    ...baseUser,
+  const baseCleaner: Cleaner = {
+    id: cleanerData.id || '',
+    email: cleanerData.email || '',
+    name: cleanerData.name || '',
     role: 'cleaner',
-    skills: cleanerData.skills || [],
-    max_daily_bookings: cleanerData.max_daily_bookings || 3,
-    location_lat: cleanerData.location?.lat ?? cleanerData.location_lat,
-    location_lng: cleanerData.location?.lng ?? cleanerData.location_lng,
-    location: cleanerData.location, // For backward compatibility
-  } as Cleaner;
+    
+    // Flattened settings (primary)
+    notifications_enabled: cleanerData.settings?.notifications ?? cleanerData.notifications_enabled ?? true,
+    timezone: cleanerData.settings?.timezone ?? cleanerData.timezone ?? 'UTC',
+    theme: cleanerData.settings?.theme ?? cleanerData.theme ?? 'light',
+    language: cleanerData.settings?.language ?? cleanerData.language ?? 'en',
+    
+    // Nested settings (for compatibility)
+    settings: {
+      notifications: cleanerData.settings?.notifications ?? cleanerData.notifications_enabled ?? true,
+      timezone: cleanerData.settings?.timezone ?? cleanerData.timezone ?? 'UTC',
+      theme: cleanerData.settings?.theme ?? cleanerData.theme ?? 'light',
+      language: cleanerData.settings?.language ?? cleanerData.language ?? 'en'
+    },
+    
+    // Cleaner-specific properties
+    skills: cleanerData.skills ?? [],
+    max_daily_bookings: cleanerData.max_daily_bookings ?? 5,
+    
+    // Timestamps
+    created_at: cleanerData.created_at ?? new Date().toISOString(),
+    updated_at: cleanerData.updated_at ?? new Date().toISOString()
+  };
+
+  return baseCleaner;
 }
 
 /**

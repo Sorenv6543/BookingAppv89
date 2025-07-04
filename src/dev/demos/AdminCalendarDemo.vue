@@ -279,6 +279,7 @@ import { ref, computed, onMounted } from 'vue';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 import AdminCalendar from '@components/smart/admin/AdminCalendar.vue';
 import type { Booking, Property, User, Cleaner } from '@/types';
+import { createUserWithSettings } from '@/utils/authHelpers';
 
 // Demo state
 const loading = ref(false);
@@ -305,7 +306,7 @@ const initializeDemoData = (): void => {
   // Demo Users (Property Owners + Cleaners + Admin)
   const users: User[] = [
     // Property Owners
-    {
+    createUserWithSettings({
       id: 'owner-1',
       email: 'sarah.johnson@email.com',
       name: 'Sarah Johnson',
@@ -318,8 +319,8 @@ const initializeDemoData = (): void => {
       },
       created_at: '2024-01-15T10:00:00Z',
       updated_at: '2024-01-15T10:00:00Z'
-    },
-    {
+    }),
+    createUserWithSettings({
       id: 'owner-2',
       email: 'mike.chen@email.com',
       name: 'Mike Chen',
@@ -332,8 +333,8 @@ const initializeDemoData = (): void => {
       },
       created_at: '2024-01-20T14:30:00Z',
       updated_at: '2024-01-20T14:30:00Z'
-    },
-    {
+    }),
+    createUserWithSettings({
       id: 'owner-3',
       email: 'lisa.rodriguez@email.com',
       name: 'Lisa Rodriguez',
@@ -346,9 +347,9 @@ const initializeDemoData = (): void => {
       },
       created_at: '2024-02-01T09:15:00Z',
       updated_at: '2024-02-01T09:15:00Z'
-    },
+    }),
     // Admin User
-    {
+    createUserWithSettings({
       id: 'admin-1',
       email: 'admin@cleaningco.com',
       name: 'Admin User',
@@ -361,7 +362,7 @@ const initializeDemoData = (): void => {
       },
       created_at: '2024-01-01T08:00:00Z',
       updated_at: '2024-01-01T08:00:00Z'
-    }
+    })
   ];
 
   // Demo Cleaners (with Cleaner interface properties)
@@ -371,6 +372,10 @@ const initializeDemoData = (): void => {
       email: 'maria.garcia@cleaningco.com',
       name: 'Maria Garcia',
       role: 'cleaner',
+      notifications_enabled: true,
+      timezone: 'America/New_York',
+      theme: 'light',
+      language: 'en',
       settings: { 
         theme: 'light', 
         notifications: true,
@@ -387,6 +392,10 @@ const initializeDemoData = (): void => {
       email: 'james.wilson@cleaningco.com',
       name: 'James Wilson',
       role: 'cleaner',
+      notifications_enabled: true,
+      timezone: 'America/New_York',
+      theme: 'light',
+      language: 'en',
       settings: { 
         theme: 'light', 
         notifications: true,
@@ -403,6 +412,10 @@ const initializeDemoData = (): void => {
       email: 'anna.petrov@cleaningco.com',
       name: 'Anna Petrov',
       role: 'cleaner',
+      notifications_enabled: true,
+      timezone: 'America/New_York',
+      theme: 'dark',
+      language: 'en',
       settings: { 
         theme: 'dark', 
         notifications: true,
