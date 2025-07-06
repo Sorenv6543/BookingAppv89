@@ -181,7 +181,7 @@
               item-key="id"
               class="elevation-0"
             >
-              <template #item.property_name="{ item }">
+              <template #[`item.property_name`]="{ item }">
                 <div class="d-flex align-center">
                   <v-icon
                     class="mr-2"
@@ -193,7 +193,7 @@
                 </div>
               </template>
 
-              <template #item.booking_type="{ item }">
+              <template #[`item.booking_type`]="{ item }">
                 <v-chip
                   :color="item.booking_type === 'turn' ? 'warning' : 'primary'"
                   size="small"
@@ -203,7 +203,7 @@
                 </v-chip>
               </template>
 
-              <template #item.status="{ item }">
+              <template #[`item.status`]="{ item }">
                 <v-chip
                   :color="getStatusColor(item.status)"
                   size="small"
@@ -213,7 +213,7 @@
                 </v-chip>
               </template>
 
-              <template #item.dates="{ item }">
+              <template #[`item.dates`]="{ item }">
                 <div>
                   <div class="text-body-2">
                     <strong>Out:</strong> {{ formatDate(item.checkout_date) }}
@@ -224,7 +224,7 @@
                 </div>
               </template>
 
-              <template #item.actions="{ item }">
+              <template #[`item.actions`]="{ item }">
                 <div class="d-flex gap-1">
                   <v-btn
                     icon="mdi-pencil"
@@ -281,7 +281,7 @@ import { onMounted, computed, ref } from 'vue';
 import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 import { useUIStore } from '@/stores/ui';
-import type { Booking } from '@/types';
+import type { Booking, ModalData } from '@/types';
 
 // Meta information for this page
 defineOptions({
@@ -401,7 +401,7 @@ const handleCreateBooking = (): void => {
 };
 
 const handleEditBooking = (booking: Booking): void => {
-  uiStore.openModal('eventModal', 'edit', booking as any);
+  uiStore.openModal('eventModal', 'edit', {booking: booking as unknown as ModalData});
 };
 
 const handleDeleteBooking = async (booking: Booking): Promise<void> => {
@@ -410,7 +410,8 @@ const handleDeleteBooking = async (booking: Booking): Promise<void> => {
     try {
       await deleteMyBooking(booking.id);
       uiStore.addNotification('success', 'Success', 'Booking deleted successfully');
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Error deleting booking:', error);
       uiStore.addNotification('error', 'Error', 'Failed to delete booking');
     }
   }

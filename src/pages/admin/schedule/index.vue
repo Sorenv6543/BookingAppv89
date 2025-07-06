@@ -45,9 +45,9 @@
               :bookings="bookingStore.bookings"
               :properties="propertyStore.properties"
               :users="new Map()"
-              @event-click="handleEventClick"
-              @date-select="handleDateSelect"
-              @event-drop="handleEventDrop"
+              @click="handleEventClick"
+              @select="handleDateSelect"
+              @drop="handleEventDrop"
             />
           </v-col>
         </v-row>
@@ -82,7 +82,7 @@ import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue'
 import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue'
 import BookingForm from '@/components/dumb/BookingForm.vue'
 import CleanerAssignmentModal from '@/components/dumb/admin/CleanerAssignmentModal.vue'
-import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase';/useAdminBookings'
+import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase';
 import { useCleanerManagement } from '@/composables/admin/useCleanerManagement'
 import { useUIStore } from '@/stores/ui'
 import { useBookingStore } from '@/stores/booking'

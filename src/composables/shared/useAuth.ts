@@ -218,7 +218,7 @@ export function useAuth() {
           settings,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
-        } as Cleaner;
+        } as unknown as Cleaner;
       } else {
         throw new Error('Invalid user role');
       }
@@ -260,6 +260,10 @@ export function useAuth() {
       const updatedUser = {
         ...userStore.user,
         settings: {
+          notifications: true,
+          timezone: 'America/New_York',
+          theme: 'light' as const,
+          language: 'en',
           ...userStore.user.settings,
           ...settings
         },

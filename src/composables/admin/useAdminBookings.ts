@@ -99,7 +99,7 @@ export function useAdminBookings() {
     return measureRolePerformance('admin', 'filter-system-bookings-by-status', () => {
       const statusGroups: Record<BookingStatus, Booking[]> = {
         'pending': [],
-        'confirmed': [],
+        'scheduled': [],
         'in_progress': [],
         'completed': [],
         'cancelled': []

@@ -234,29 +234,25 @@ import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue'
 
 // State management
 import { useUserStore } from '@/stores/user';
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
 import { useUIStore } from '@/stores/ui';
 import { useAuthStore } from '@/stores/auth';
 
 // Business logic composables
-import { useBookings } from '@/composables/shared/useBookings';
-import { useProperties } from '@/composables/shared/useProperties';
+import { useAdminBookings } from '@/composables/admin/useAdminBookings';
+import { useAdminProperties } from '@/composables/admin/useAdminProperties';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 // Types
-import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
+import type { Booking, Property, BookingFormData, PropertyFormData, User } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Import event logger for component communication
-import eventLogger from '@/composables/shared/useComponentEventLogger';
+
 
 // ============================================================================
 // STORE CONNECTIONS & STATE
 // ============================================================================
 const userStore = useUserStore();
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
 const { xs, sm, md, lg, xl, mobile } = useDisplay();
@@ -266,23 +262,27 @@ const tablet = computed(() => sm.value || md.value);
 const desktop = computed(() => lg.value || xl.value || (!mobile.value && !tablet.value));
 
 // ============================================================================
-// COMPOSABLES - BUSINESS LOGIC
+// COMPOSABLES - ADMIN BUSINESS LOGIC
 // ============================================================================
 const { 
-  loading: bookingsLoading, 
-  createBooking, 
-  updateBooking, 
-  deleteBooking,
-  fetchAllBookings
-} = useBookings();
+  allBookings,
+  allProperties,
+  systemTodayTurns,
+  systemUpcomingCleanings,
+  systemMetrics,
+  loading: adminLoading,
+  fetchAllBookings,
+  fetchAllProperties,
+  createBooking,
+  updateBooking,
+  deleteBooking
+} = useAdminBookings();
 
 const { 
-  loading: propertiesLoading, 
   createProperty,
   updateProperty,
-  deleteProperty,
-  fetchAllProperties
-} = useProperties();
+  deleteProperty
+} = useAdminProperties();
 
 const {
   currentView,
@@ -325,8 +325,7 @@ const isAdminAuthenticated = computed(() => {
 // ============================================================================
 
 const loading = computed(() => 
-  bookingsLoading.value || 
-  propertiesLoading.value || 
+  adminLoading.value || 
   uiStore.isLoading('bookings') || 
   uiStore.isLoading('properties')
 );
@@ -348,11 +347,11 @@ const allPropertiesMap = computed(() => {
   }
 
   // Admin sees ALL properties across ALL owners
-  if (propertyStore.properties instanceof Map) {
-    return propertyStore.properties;
+  if (allProperties.value instanceof Map) {
+    return allProperties.value;
   } else {
     const map = new Map<string, Property>();
-    propertyStore.propertiesArray.forEach(property => {
+    allProperties.value.forEach(property => {
       if (property && property.id) {
         map.set(property.id, property);
       }
@@ -363,7 +362,7 @@ const allPropertiesMap = computed(() => {
 
 // ALL users (no filtering for admin)
 const allUsersMap = computed(() => {
-  const map = new Map<string, any>();
+  const map = new Map<string, User>();
   
   if (!isAdminAuthenticated.value) {
     return map;
@@ -378,77 +377,9 @@ const allUsersMap = computed(() => {
   return map;
 });
 
-// ALL bookings (no owner filtering for admin)
-const allBookingsMap = computed(() => {
-  if (!isAdminAuthenticated.value) {
-    return new Map<string, Booking>();
-  }
-
-  // Admin sees ALL bookings across ALL owners
-  const map = new Map<string, Booking>();
-  bookingStore.bookingsArray.forEach(booking => {
-    if (booking && booking.id) {
-      map.set(booking.id, booking);
-    }
-  });
-  
-  return map;
-});
-
-// System-wide today's turn bookings (all owners)
-const systemTodayTurns = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  
-  const turns = new Map<string, Booking>();
-  
-  if (!isAdminAuthenticated.value) {
-    return turns;
-  }
-
-  // Admin sees ALL turn bookings for today across ALL owners
-  Array.from(allBookingsMap.value.values()).forEach(booking => {
-    if (
-      booking.booking_type === 'turn' &&
-      new Date(booking.checkout_date) >= today &&
-      new Date(booking.checkout_date) < tomorrow
-    ) {
-      turns.set(booking.id, booking);
-    }
-  });
-  
-  return turns;
-});
-
-// System-wide upcoming cleanings (all owners)
-const systemUpcomingCleanings = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const inOneWeek = new Date(today);
-  inOneWeek.setDate(inOneWeek.getDate() + 7);
-  
-  const cleanings = new Map<string, Booking>();
-  
-  if (!isAdminAuthenticated.value) {
-    return cleanings;
-  }
-
-  // Admin sees ALL upcoming cleanings across ALL owners
-  Array.from(allBookingsMap.value.values()).forEach(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
-    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
-      cleanings.set(booking.id, booking);
-    }
-  });
-  
-  return cleanings;
-});
-
 // Admin's filtered bookings (all data with filters applied)
 const adminFilteredBookings = computed(() => {
-  let bookings = Array.from(allBookingsMap.value.values());
+  let bookings = Array.from(allBookings.value);
   
   // Apply property filter if selected (can be any property)
   if (selectedPropertyFilter.value) {
@@ -472,11 +403,17 @@ const adminFilteredBookings = computed(() => {
 // System-wide metrics for admin header
 const systemMetricsText = computed(() => {
   const totalProperties = allPropertiesMap.value.size;
-  const totalBookings = allBookingsMap.value.size;
-  const urgentTurns = systemTodayTurns.value.size;
-  const upcomingCleanings = systemUpcomingCleanings.value.size;
+  const totalBookings = allBookings.value.length;
+  const urgentTurns = systemTodayTurns.value.length;
+  const upcomingCount = allBookings.value.filter(booking => {
+    const checkoutDate = new Date(booking.checkout_date);
+    const today = new Date();
+    const inOneWeek = new Date(today);
+    inOneWeek.setDate(inOneWeek.getDate() + 7);
+    return checkoutDate >= today && checkoutDate <= inOneWeek;
+  }).length;
   
-  return `${totalProperties} properties • ${totalBookings} bookings • ${urgentTurns} urgent turns • ${upcomingCleanings} upcoming`;
+  return `${totalProperties} properties • ${totalBookings} bookings • ${urgentTurns} urgent turns • ${upcomingCount} upcoming`;
 });
 
 // ============================================================================
@@ -495,18 +432,18 @@ onMounted(async () => {
   try {
     // Fetch both properties and bookings in parallel for better performance
     await Promise.all([
-      propertyStore.fetchProperties(),
-      bookingStore.fetchBookings()
+      fetchAllBookings(),
+      fetchAllProperties()
     ]);
     
     console.log('✅ [HomeAdmin] Admin data fetch completed successfully');
     console.log('🔍 [HomeAdmin] Data state after loading:', {
-      propertiesInStore: propertyStore.propertiesArray.length,
-      bookingsInStore: bookingStore.bookingsArray.length,
+      propertiesInStore: allProperties.value.length,
+      bookingsInStore: allBookings.value.length,
       allProperties: allPropertiesMap.value.size,
-      allBookings: allBookingsMap.value.size,
-      systemTurns: systemTodayTurns.value.size,
-      upcomingCleanings: systemUpcomingCleanings.value.size
+      allBookings: allBookings.value.length,
+      systemTurns: systemTodayTurns.value.length,
+      upcomingCleanings: systemUpcomingCleanings.value.length
     });
   } catch (error) {
     console.error('❌ [HomeAdmin] Error fetching admin data on mount:', error);
@@ -526,8 +463,8 @@ watch(isAdminAuthenticated, async (newValue, oldValue) => {
     console.log('✅ [HomeAdmin] User became authenticated as admin, loading data...');
     try {
       await Promise.all([
-        propertyStore.fetchProperties(),
-        bookingStore.fetchBookings()
+        fetchAllBookings(),
+        fetchAllProperties()
       ]);
       console.log('✅ [HomeAdmin] Admin data loaded after auth change');
     } catch (error) {
@@ -551,7 +488,7 @@ const eventModalMode = computed((): 'create' | 'edit' | undefined => {
   return (mode === 'create' || mode === 'edit') ? mode : undefined;
 });
 const eventModalData = computed((): Booking | undefined => {
-  const modalData = uiStore.getModalData('event') as any;
+  const modalData = uiStore.getModalData('event') as { booking?: Booking };
   return modalData?.booking || undefined;
 });
 
@@ -563,7 +500,7 @@ const propertyModalMode = computed((): 'create' | 'edit' | undefined => {
   return (mode === 'create' || mode === 'edit') ? mode : undefined;
 });
 const propertyModalData = computed((): Property | undefined => {
-  const modalData = uiStore.getModalData('property') as any;
+  const modalData = uiStore.getModalData('property') as { property?: Property };
   return modalData?.property || undefined;
 });
 
@@ -606,7 +543,7 @@ const handleNavigateToBooking = (bookingId: string): void => {
     );
 
     // Open booking modal for editing
-    const booking = allBookingsMap.value.get(bookingId);
+    const booking = allBookings.value.find(b => b.id === bookingId);
     if (booking) {
       uiStore.openModal('event', 'edit', {
         booking: booking
@@ -807,13 +744,23 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
 
 const handleEventClick = (clickInfo: EventClickArg): void => {
   try {
+    eventLogger.logEvent(
+      'AdminCalendar',
+      'HomeAdmin',
+      'eventClick',
+      clickInfo.event.id,
+      'receive'
+    );
+
     const bookingId = clickInfo.event.id;
-    const booking = allBookingsMap.value.get(bookingId);
+    const booking = allBookings.value.find(b => b.id === bookingId);
     
     if (booking) {
       uiStore.openModal('event', 'edit', {
         booking: booking
       });
+    } else {
+      console.warn(`Booking with ID ${bookingId} not found`);
     }
   } catch (error) {
     console.error('Error handling event click:', error);
@@ -822,43 +769,54 @@ const handleEventClick = (clickInfo: EventClickArg): void => {
 
 const handleEventDrop = (dropInfo: EventDropArg): void => {
   try {
+    eventLogger.logEvent(
+      'AdminCalendar',
+      'HomeAdmin',
+      'eventDrop',
+      dropInfo.event.id,
+      'receive'
+    );
+
     const bookingId = dropInfo.event.id;
-    const booking = allBookingsMap.value.get(bookingId);
+    const booking = allBookings.value.find(b => b.id === bookingId);
     
     if (booking) {
-      const updatedBooking: Partial<BookingFormData> = {
-        ...booking,
+      // Update booking with new dates
+      updateBooking(booking.id, {
         checkout_date: dropInfo.event.startStr,
         checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
-      };
-      
-      updateBooking(bookingId, updatedBooking);
+      });
+    } else {
+      console.warn(`Booking with ID ${bookingId} not found`);
     }
   } catch (error) {
     console.error('Error handling event drop:', error);
-    // Revert the event
-    dropInfo.revert();
   }
 };
 
 const handleEventResize = (resizeInfo: any): void => {
   try {
+    eventLogger.logEvent(
+      'AdminCalendar',
+      'HomeAdmin',
+      'eventResize',
+      resizeInfo.event.id,
+      'receive'
+    );
+
     const bookingId = resizeInfo.event.id;
-    const booking = allBookingsMap.value.get(bookingId);
+    const booking = allBookings.value.find(b => b.id === bookingId);
     
     if (booking) {
-      const updatedBooking: Partial<BookingFormData> = {
-        ...booking,
-        checkout_date: resizeInfo.event.startStr,
-        checkin_date: resizeInfo.event.endStr || resizeInfo.event.startStr
-      };
-      
-      updateBooking(bookingId, updatedBooking);
+      // Update booking with new end date
+      updateBooking(booking.id, {
+        checkin_date: resizeInfo.event.endStr || resizeInfo.event.end?.toISOString()
+      });
+    } else {
+      console.warn(`Booking with ID ${bookingId} not found`);
     }
   } catch (error) {
     console.error('Error handling event resize:', error);
-    // Revert the event
-    resizeInfo.revert();
   }
 };
 
@@ -947,38 +905,48 @@ const handleEventModalClose = (): void => {
 
 const handleEventModalSave = async (bookingData: BookingFormData): Promise<void> => {
   try {
-    if (eventModalMode.value === 'create') {
-      await createBooking(bookingData);
-    } else if (eventModalMode.value === 'edit') {
-      // Get the booking ID from modal data since BookingFormData doesn't include id
-      const modalData = uiStore.getModalData('event') as any;
-      const bookingId = modalData?.booking?.id;
-      if (bookingId) {
-        await updateBooking(bookingId, bookingData);
+    const mode = eventModalMode.value;
+    const isEditing = mode === 'edit';
+    
+    if (isEditing) {
+      const booking = eventModalData.value;
+      if (booking) {
+        await updateBooking(booking.id, bookingData);
       }
+    } else {
+      await createBooking(bookingData);
     }
     
+    // Close modal after successful save
     uiStore.closeModal('event');
   } catch (error) {
     console.error('Error saving booking:', error);
-    // TODO: Show admin-specific error notification
+    // Error handling is done by the composable
   }
 };
 
-const handleEventModalDelete = (bookingId: string): void => {
+const handleEventModalDelete = async (bookingId: string): Promise<void> => {
   try {
-    // Show confirmation dialog for admin
+    const booking = allBookings.value.find(b => b.id === bookingId);
+    if (!booking) {
+      console.warn(`Booking with ID ${bookingId} not found`);
+      return;
+    }
+    
+    // Admin can delete any booking - show confirmation with business impact
+    const property = allPropertiesMap.value.get(booking.property_id);
+    const propertyName = property?.name || 'Unknown Property';
+    
     uiStore.openConfirmDialog('confirm', {
       title: 'Delete Booking',
-      message: 'Are you sure you want to delete this booking? This action cannot be undone and will affect the property owner.',
+      message: `Are you sure you want to delete this booking for ${propertyName}? This action cannot be undone and may affect business operations.`,
       confirmText: 'Delete',
       cancelText: 'Cancel',
       dangerous: true,
       data: {
-        onConfirm: () => {
-          deleteBooking(bookingId);
+        onConfirm: async () => {
+          await deleteBooking(bookingId);
           uiStore.closeModal('event');
-          uiStore.closeConfirmDialog('confirm');
         }
       }
     });
@@ -1001,7 +969,7 @@ const handlePropertyModalSave = async (propertyData: PropertyFormData): Promise<
       await createProperty(propertyData);
     } else if (propertyModalMode.value === 'edit') {
       // Get the property ID from modal data since PropertyFormData doesn't include id
-      const modalData = uiStore.getModalData('property') as any;
+      const modalData = uiStore.getModalData('property') as { property?: Property };
       const propertyId = modalData?.property?.id;
       if (propertyId) {
         await updateProperty(propertyId, propertyData);
@@ -1019,8 +987,7 @@ const handlePropertyModalDelete = (propertyId: string): void => {
   try {
     // Show confirmation dialog for admin with business impact warning
     const property = allPropertiesMap.value.get(propertyId);
-    const relatedBookings = Array.from(allBookingsMap.value.values())
-      .filter(booking => booking.property_id === propertyId);
+    const relatedBookings = allBookings.value.filter(booking => booking.property_id === propertyId);
     
     uiStore.openConfirmDialog('confirm', {
       title: 'Delete Property',
