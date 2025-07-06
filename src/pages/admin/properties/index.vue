@@ -326,8 +326,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useAdminProperties } from '@/composables/admin/useAdminProperties'
-import { useAdminBookings } from '@/composables/admin/useAdminBookings'
+import { useAdminProperties } from '@/composables/admin/useAdminProperties-supabase'
+import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase'
 import type { Property, PricingTier } from '@/types/property'
 
 // Composables

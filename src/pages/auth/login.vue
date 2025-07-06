@@ -112,7 +112,7 @@
                   variant="outlined"
                   color="primary"
                   :loading="authStore.loading"
-                  @click="quickLogin('jimrey@gmail.com')"
+                  @click="quickLogin('')"
                 >
                   Your Account
                 </v-btn>
@@ -157,7 +157,7 @@ import { getDefaultRouteForRole } from '@/utils/authHelpers'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const email = ref('jimrey@gmail.com') // Pre-filled with your email
+const email = ref('') // Pre-filled with your email
 const password = ref('')
 const showPassword = ref(false)
 const successMessage = ref('')

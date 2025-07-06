@@ -503,7 +503,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useOwnerCalendarState } from '@/composables/owner/useOwnerCalendarState';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
 import { useAuthStore } from '@/stores/auth';
 import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
