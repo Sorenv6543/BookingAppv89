@@ -172,7 +172,20 @@ export function useOwnerBookings() {
       }
       
       // Create booking (owner_id automatically assigned by Supabase composable)
-      const bookingId = await supabaseBookings.createBooking(formData);
+      const bookingFormData: BookingFormData = {
+        property_id: formData.property_id || '',
+        checkout_date: formData.checkout_date || '',
+        checkin_date: formData.checkin_date || '',
+        booking_type: formData.booking_type || 'standard',
+        status: formData.status || 'pending',
+        guest_count: formData.guest_count,
+        notes: formData.notes,
+        priority: formData.priority || 'normal',
+        assigned_cleaner_id: formData.assigned_cleaner_id,
+        owner_id: currentUserId.value!
+      };
+      
+      const bookingId = await supabaseBookings.createBooking(bookingFormData);
       
       if (bookingId) {
         success.value = 'Your booking has been created successfully';
@@ -383,7 +396,8 @@ export function useOwnerBookings() {
       guest_count: formData.guest_count,
       notes: formData.notes,
       priority: formData.priority || 'normal',
-      assigned_cleaner_id: formData.assigned_cleaner_id
+      assigned_cleaner_id: formData.assigned_cleaner_id,
+      owner_id: currentUserId.value!
     };
     
     const bookingId = await createMyBooking(bookingFormData);

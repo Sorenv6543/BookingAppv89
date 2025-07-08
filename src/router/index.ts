@@ -7,8 +7,8 @@
 // ✅ Declares role requirements via meta.role
 // ✅ Applies navigation guards
 
-import PWANotificationsEnhanced from '@/components/dumb/shared/PWANotificationsEnhanced.vue'
-import OwnerPropertyCreationDemo from '@/dev/demos/OwnerPropertyCreationDemo.vue'
+
+
 import { createRouter, createWebHistory } from 'vue-router'
 // import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from '@/router/guards'
 

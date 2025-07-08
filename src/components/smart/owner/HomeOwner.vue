@@ -86,7 +86,7 @@ src/components/smart/owner/HomeOwner.vue -
             <v-spacer />
                
             <!-- Owner Quick Actions -->
-            <!-- <v-btn
+            <v-btn
               v-if="$vuetify.display.smAndUp"
               color="primary"
               variant="outlined"
@@ -95,15 +95,15 @@ src/components/smart/owner/HomeOwner.vue -
               @click="handleCreateProperty"
             >
               Add Property
-            </v-btn> -->
-            <!-- <v-btn
+            </v-btn>
+            <v-btn
               color="primary"
               prepend-icon="mdi-calendar-plus"
               class="mr-4"
               @click="handleCreateBooking"
             >
               Add Booking
-            </v-btn> -->
+            </v-btn>
                
             <!-- Calendar View Toggle -->
             <v-btn-toggle
@@ -141,10 +141,10 @@ src/components/smart/owner/HomeOwner.vue -
         <OwnerCalendar
           ref="calendarRef"
           :bookings="ownerFilteredBookings"
-          :properties="ownerPropertiesMap"
           :loading="loading"
           :current-view="currentView"
           :current-date="currentDate"
+          :properties="ownerPropertiesMap"
           @date-select="handleDateSelect"
           @event-click="handleEventClick"
           @event-drop="handleEventDrop"
@@ -204,7 +204,7 @@ src/components/smart/owner/HomeOwner.vue -
 </template>
 
 <script setup lang="ts">
-import { useRealtimeSync } from '@/composables/supabase/useRealtimeSync';
+//import { useRealtimeSync } from '@/composables/supabase/useRealtimeSync';
 
 
 // Real-time sync will auto-initialize when user is authenticated
@@ -225,11 +225,10 @@ import { useUIStore } from '@/stores/ui';
 
 import { useAuthStore } from '@/stores/auth';
 
-// Business logic composables
-import { useBookings } from '@/composables/shared/useBookings';
-import { useProperties } from '@/composables/shared/useProperties';
+  // Business logic composables
 import { useCalendarState } from '@/composables/shared/useCalendarState';
-
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 // Types
 import type { Booking, Property, BookingFormData, PropertyFormData,  } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
@@ -242,7 +241,7 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 // STORE CONNECTIONS & STATE
 // ============================================================================
 
-useRealtimeSync(); // Just call it for side effects
+//useRealtimeSync(); // Just call it for side effects
 const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
@@ -254,19 +253,17 @@ const { xs, md, lg, mobile } = useDisplay();
 // ============================================================================
 const { 
   loading: bookingsLoading, 
-  createBooking, 
-  updateBooking, 
-  deleteBooking,
-  fetchAllBookings
-} = useBookings();
+  createMyBooking, 
+  updateMyBooking,
+  deleteMyBooking
+} = useOwnerBookings();
 
 const { 
   loading: propertiesLoading, 
-  createProperty,
-  updateProperty,
-  deleteProperty,
-  fetchAllProperties
-} = useProperties();
+  createMyProperty,
+  updateMyProperty,
+  deleteMyProperty,
+} = useOwnerProperties();
 
 const {
   currentView,
@@ -780,7 +777,7 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   }
   
   try {
-    await updateBooking(booking.id, {
+    await updateMyBooking(booking.id, {
       checkout_date: dropInfo.event.startStr,
       checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
     });
@@ -801,7 +798,7 @@ const handleEventResize = async (resizeInfo: { event: { extendedProps: { booking
   }
   
   try {
-    await updateBooking(booking.id, {
+    await updateMyBooking(booking.id, {
       checkout_date: resizeInfo.event.startStr,
       checkin_date: resizeInfo.event.endStr
     });
@@ -870,7 +867,7 @@ const handleUpdateBooking = (data: { id: string; start: string; end: string }): 
     return;
   }
   
-  updateBooking(data.id, {
+  updateMyBooking(data.id, {
     checkout_date: data.start,
     checkin_date: data.end
   });
@@ -893,7 +890,7 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     };
     
     if (eventModalMode.value === 'create') {
-      await createBooking(bookingData as BookingFormData);
+      await createMyBooking(bookingData as BookingFormData);
     } else if (eventModalData.value) {
       // Fix: eventModalData.value contains { booking } not the booking directly
       const booking = (eventModalData.value as any)?.booking || eventModalData.value;
@@ -909,7 +906,7 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
         console.error('🚨 [HomeOwner] Booking ownership check failed - booking not found in owner map');
         throw new Error('Cannot update booking not owned by current user');
       }
-      await updateBooking(booking.id, bookingData as Partial<BookingFormData>);
+      await updateMyBooking(booking.id, bookingData as Partial<BookingFormData>);
     }
     uiStore.closeModal('eventModal');
   } catch (error) {
@@ -947,13 +944,13 @@ const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> =>
     };
     
     if (propertyModalMode.value === 'create') {
-      await createProperty(propertyData as PropertyFormData);
+      await createMyProperty(propertyData as PropertyFormData);
     } else if (propertyModalData.value) {
       // Verify owner can update this property
       if (!ownerPropertiesMap.value.has(propertyModalData.value.id)) {
         throw new Error('Cannot update property not owned by current user');
       }
-      await updateProperty(propertyModalData.value.id, propertyData as Partial<PropertyFormData>);
+      await updateMyProperty(propertyModalData.value.id, propertyData as Partial<PropertyFormData>);
     }
     uiStore.closeModal('propertyModal');
   } catch (error) {
@@ -987,14 +984,14 @@ const handleConfirmDialogConfirm = async (): Promise<void> => {
   
   if (data?.type === 'booking' && data?.id) {
     try {
-      await deleteBooking(data.id as string);
+      await deleteMyBooking(data.id as string);
       uiStore.closeModal('eventModal');
     } catch (error) {
       console.error('Failed to delete your booking:', error);
     }
   } else if (data?.type === 'property' && data?.id) {
     try {
-      await deleteProperty(data.id as string    );
+      await deleteMyProperty(data.id as string    );
       uiStore.closeModal('propertyModal');
     } catch (error) {
       console.error('Failed to delete your property:', error);
@@ -1060,8 +1057,8 @@ onMounted(async () => {
       
       // Debug data after loading
       console.log('🔍 [HomeOwner] Data state after loading:', {
-        propertiesInStore: propertyStore.propertiesArray.length,
-        bookingsInStore: bookingStore.bookingsArray.length,
+        allProperties: propertyStore.propertiesArray.length,
+        allBookings: bookingStore.bookingsArray.length,
         ownerProperties: ownerPropertiesMap.value.size,
         ownerBookings: ownerBookingsMap.value.size,
         filteredBookings: ownerFilteredBookings.value.size

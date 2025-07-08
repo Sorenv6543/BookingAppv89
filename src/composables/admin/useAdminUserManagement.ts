@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import type { Ref } from 'vue'
 import type { User, UserRole } from '@/types/user'
 import { supabase } from '@/plugins/supabase' // adjust import if needed
@@ -158,12 +158,14 @@ async function bulkChangeRoles(userIds: string[], newRole: UserRole): Promise<bo
   }
 }
 
-async function resetUserPassword(email: string): Promise<boolean> {
+async function resetUserPassword(userId: string, newPassword: string): Promise<boolean> {
   loading.value = true
   error.value = null
   try {
     // Supabase admin API does not send password reset emails directly; must use client API
-    const { error: resetError } = await supabase.auth.api.resetPasswordForEmail(email)
+    const { error: resetError } = await supabase.auth.admin.updateUserById(userId, {
+      password: newPassword
+    })
     if (resetError) {
       throw resetError
     }

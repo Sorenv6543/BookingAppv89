@@ -3,7 +3,6 @@ import { useBookings } from '@/composables/shared/useBookings';
 import { useAuthStore } from '@/stores/auth';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
-import { useUserStore } from '@/stores/user';
 import { usePerformanceMonitor } from '@/composables/shared/usePerformanceMonitor';
 import type { Booking, BookingFormData, BookingStatus, Property } from '@/types';
 
@@ -24,7 +23,6 @@ function useOwnerBookingsPinia() {
     const authStore = useAuthStore();
     const bookingStore = useBookingStore();
     const propertyStore = usePropertyStore();
-    const userStore = useUserStore();
     const { measureRolePerformance, trackCachePerformance } = usePerformanceMonitor();
     
     // Owner-specific state
@@ -487,43 +485,8 @@ function useOwnerBookingsPinia() {
     const createBooking = async (bookingData: BookingFormData): Promise<Booking | null> => {
       return measureRolePerformance('owner', 'create-booking', async () => {
         // Ensure owner_id is set for owner role
-        const ownerBookingData = {
-          ...bookingData,
-          owner_id: userStore.currentUserId!
-        }
-        
-        const result = await bookingStore.addBooking(ownerBookingData)
-        trackCachePerformance('owner-create-booking', !!result)
-        return result
-      })
-    }
-
-    const updateMyBooking = async (id: string, updates: Partial<Booking>): Promise<boolean> => {
-      return measureRolePerformance('owner', 'update-owner-booking', async () => {
-        // Verify booking belongs to current owner before updating
-        const booking = bookingStore.bookings.get(id)
-        if (!booking || booking.owner_id !== userStore.currentUserId) {
-          trackCachePerformance('owner-update-booking-unauthorized', false)
-          return false
-        }
-        
-        const result = await bookingStore.updateBooking(id, updates)
-        trackCachePerformance('owner-update-booking', result)
-        return result
-      })
-    }
-
-    const deleteMyBooking = async (id: string): Promise<boolean> => {
-      return measureRolePerformance('owner', 'delete-owner-booking', async () => {
-        // Verify booking belongs to current owner before deleting
-        const booking = bookingStore.bookings.get(id)
-        if (!booking || booking.owner_id !== userStore.currentUserId) {
-          trackCachePerformance('owner-delete-booking-unauthorized', false)
-          return false
-        }
-        
-        const result = await bookingStore.deleteBooking(id)
-        trackCachePerformance('owner-delete-booking', result)
+        const result = await bookingStore.addBooking(bookingData as Booking)
+        trackCachePerformance('owner-create-booking', result !== null)
         return result
       })
     }
@@ -579,8 +542,6 @@ function useOwnerBookingsPinia() {
       
       // Performance-monitored actions
       createBooking,
-      updateMyBooking,
-      deleteMyBooking,
       
       // Performance metrics
       getOwnerPerformanceMetrics,

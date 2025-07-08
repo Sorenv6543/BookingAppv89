@@ -1,8 +1,8 @@
 import { ref, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { useUserStore } from '@/stores/user';
+// import { useUserStore } from '@/stores/user';
 import { useBookingStore } from '@/stores/booking';
-import { usePropertyStore } from '@/stores/property';
+// import { usePropertyStore } from '@/stores/property';
 import type { Cleaner } from '@/types';
 
 /**
@@ -108,6 +108,10 @@ export function useCleanerManagement() {
           theme: 'light',
           language: 'en'
         },
+        notifications_enabled: true,
+        timezone: 'America/New_York',
+        theme: 'light',
+        language: 'en',
         created_at: '2024-01-15T08:00:00Z',
         updated_at: '2024-01-20T10:30:00Z'
       },
@@ -125,6 +129,10 @@ export function useCleanerManagement() {
           theme: 'dark',
           language: 'en'
         },
+        notifications_enabled: true,
+        timezone: 'America/New_York',
+        theme: 'dark',
+        language: 'en',
         created_at: '2024-01-10T09:00:00Z',
         updated_at: '2024-01-22T14:15:00Z'
       },
@@ -142,6 +150,10 @@ export function useCleanerManagement() {
           theme: 'light',
           language: 'es'
         },
+        notifications_enabled: true,
+        timezone: 'America/New_York',
+        theme: 'light',
+        language: 'es',
         created_at: '2024-01-08T07:30:00Z',
         updated_at: '2024-01-21T16:45:00Z'
       },
@@ -159,6 +171,10 @@ export function useCleanerManagement() {
           theme: 'system',
           language: 'en'
         },
+        notifications_enabled: true,
+        timezone: 'America/New_York',
+        theme: 'system',
+        language: 'en',
         created_at: '2024-01-12T10:00:00Z',
         updated_at: '2024-01-19T11:20:00Z'
       },
@@ -176,6 +192,10 @@ export function useCleanerManagement() {
           theme: 'light',
           language: 'ru'
         },
+        notifications_enabled: true,
+        timezone: 'America/New_York',
+        theme: 'light',
+        language: 'ru',
         created_at: '2024-01-05T08:45:00Z',
         updated_at: '2024-01-23T09:30:00Z'
       }
@@ -787,7 +807,7 @@ export function useCleanerManagement() {
    */
   function getSystemCleanerAnalytics() {
     const metrics = systemCleanerMetrics.value;
-    const workloads = cleanerWorkloads.value;
+    // const workloads = cleanerWorkloads.value;
     
     // Performance distribution
     const performanceDistribution = {

@@ -3,7 +3,7 @@ import { useProperties } from '@/composables/shared/useProperties';
 import { useAuthStore } from '@/stores/auth';
 import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
-import type { Property, PropertyFormData, PricingTier } from '@/types';
+import type { Property, PropertyFormData, PricingTier, Booking } from '@/types';
 
 /**
  * Owner-specific property composable
@@ -260,7 +260,7 @@ export function useOwnerProperties() {
       
       // Check if property has bookings
       const propertyBookings = bookingStore.bookingsByProperty(id);
-      if (propertyBookings.length > 0) {
+      if (propertyBookings.size > 0) {
         throw new Error('Cannot delete property with existing bookings. Please cancel or complete all bookings first.');
       }
       
@@ -308,7 +308,7 @@ export function useOwnerProperties() {
       // If deactivating, check for upcoming bookings
       if (!active) {
         const now = new Date();
-        const upcomingBookings = bookingStore.bookingsByProperty(id).filter(booking => {
+        const upcomingBookings = Array.from(bookingStore.bookingsByProperty(id).values()).filter((booking: Booking) => {
           const checkinDate = new Date(booking.checkin_date);
           return checkinDate > now && ['pending', 'scheduled'].includes(booking.status);
         });

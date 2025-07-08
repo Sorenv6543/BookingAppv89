@@ -9,18 +9,26 @@
 -->
 <template>
   <div class="home-admin-container">
-    <v-row
-      no-gutters
-      class="fill-height flex-nowrap"
-      style="height: 100vh;"
+    <!-- Owner Sidebar - Fixed to left edge -->
+    <div 
+      class="sidebar-column"
+      :class="{ 
+        'sidebar-hidden': !sidebarOpen && $vuetify.display.mdAndDown,
+        'sidebar-visible': sidebarOpen || $vuetify.display.lgAndUp 
+      }"
     >
-      <!-- Sidebar Column -->
-      <v-col 
-        cols="12" 
-        lg="4" 
-        xl="3" 
-        class="sidebar-column"
-      >
+      <!-- <AdminSidebar
+        :today-turns="systemTodayTurns"
+        :upcoming-cleanings="systemUpcomingCleanings"
+        :properties="allPropertiesMap"
+        :loading="loading"
+        @navigate-to-booking="handleNavigateToBooking"
+        @navigate-to-date="handleNavigateToDate"
+        @filter-by-property="handleFilterByProperty"
+        @create-booking="handleCreateBooking"
+        @create-property="handleCreateProperty"
+      />
+    </div> -->
         <!-- Mobile Menu Toggle -->
         <v-app-bar
           v-if="$vuetify.display.mdAndDown"
@@ -42,7 +50,7 @@
           v-model="sidebarOpen"
           :rail="railMode"
           :today-turns="systemTodayTurns"
-          :upcoming-cleanings="systemUpcomingCleanings"
+         
           :properties="allPropertiesMap"
           :loading="loading"
           @navigate-to-booking="handleNavigateToBooking"
@@ -51,100 +59,54 @@
           @create-booking="handleCreateBooking"
           @create-property="handleCreateProperty"
         />
-      </v-col>
-
-      <!-- Main Calendar Column -->
-      <v-col 
-        cols="12" 
-        lg="8" 
-        xl="9" 
-        class="calendar-column calendar-responsive"
-        :class="{
-          'full-viewport-calendar': true,
-          'mobile-layout': mobile,
-          'tablet-layout': tablet,
-          'desktop-layout': desktop,
-          'sidebar-closed': !sidebarOpen
-        }"
-      >
-        <div class="calendar-header">
-          <!-- Admin-focused Calendar Controls -->
-          <div class="d-flex align-center">
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              class="mr-2"
-              @click="handlePrevious"
-            />
-            <v-btn 
-              variant="outlined" 
-              class="mr-2" 
-              @click="handleGoToday"
-            >
-              Today
-            </v-btn>
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              class="mr-4"
-              @click="handleNext"
-            />
-            <div class="text-h6 calendar-header-date">
-              {{ formattedDate }}
-            </div>
-            
-            <!-- System-wide Metrics -->
-            <div class="ml-4 text-caption text-medium-emphasis hide-on-small-mobile">
-              {{ systemMetricsText }}
-            </div>
-            
-            <v-spacer />
-            
-            <!-- Admin Quick Actions -->
-            <v-btn
-              color="warning"
-              variant="outlined"
-              prepend-icon="mdi-account-hard-hat"
-              class="mr-2 hide-on-small-mobile"
-              @click="handleAssignCleaners"
-            >
-              Assign Cleaners
-            </v-btn>
-            <v-btn
-              color="info"
-              variant="outlined"
-              prepend-icon="mdi-chart-line"
-              class="mr-2 hide-on-small-mobile"
-              @click="handleGenerateReports"
-            >
-              Reports
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-cog"
-              class="mr-4"
-              @click="handleManageSystem"
-            >
-              Manage System
-            </v-btn>
-            
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              class="ml-4"
-            >
-              <v-btn value="dayGridMonth">
-                Month
-              </v-btn>
-              <v-btn value="timeGridWeek">
-                Week
-              </v-btn>
-              <v-btn value="timeGridDay">
-                Day
-              </v-btn>
-            </v-btn-toggle>
+    </div>
+  </div>
+  <div class="calendar-column calendar-responsive"
+  :class="{
+    'full-viewport-calendar': true,
+    'mobile-layout': mobile,
+    'tablet-layout': md,
+    'desktop-layout': lg,
+    'sidebar-closed': !sidebarOpen
+  }">
+    <!-- Owner Calendar Header - Fixed to top of calendar area -->
+      <div class="calendar-header">     
+       <div class="pa-0">
+        <div class="d-flex align-center">
+          <!-- Mobile menu button -->
+          <v-btn
+            v-if="$vuetify.display.mdAndDown"
+            icon="mdi-menu"
+            variant="text"
+            class="mr-4"
+            @click="sidebarOpen = !sidebarOpen"
+          />  
+             
+          <!-- Calendar Navigation -->
+          <v-btn
+            icon="mdi-arrow-left"
+            variant="text"
+            class="mr-2"
+            @click="handlePrevious"
+          />
+          <v-btn 
+            variant="outlined" 
+            class="mr-2" 
+            @click="handleGoToday"
+          >
+            Today
+          </v-btn>
+          <v-btn
+            icon="mdi-arrow-right"
+            variant="text"
+            class="mr-4"
+            @click="handleNext"
+          />
+          <div class="text-h6 mr-4 calendar-header-date">
+            {{ formattedDate }}
           </div>
-        </div>
+             
+          <v-spacer />
 
         <!-- TODO: Replace with AdminCalendar.vue when TASK-039H is complete -->
         <AdminCalendar 
@@ -164,9 +126,9 @@
           @create-booking="handleCreateBookingFromCalendar"
           @update-booking="handleUpdateBooking"
         />
-      </v-col>
-    </v-row>
-
+        </div>
+    </div>
+  </div>
     <!-- Admin-focused Modals -->
     <BookingForm
       :open="eventModalOpen"
@@ -255,21 +217,23 @@ import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/c
 const userStore = useUserStore();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
-const { xs, sm, md, lg, xl, mobile } = useDisplay();
+const { xs,  md, lg, mobile } = useDisplay();
 
 // Create computed properties for missing display breakpoints
-const tablet = computed(() => sm.value || md.value);
-const desktop = computed(() => lg.value || xl.value || (!mobile.value && !tablet.value));
+// const tablet = computed(() => sm.value || md.value);
+// const desktop = computed(() => lg.value || xl.value || (!mobile.value && !tablet.value));
 
-// ============================================================================
+// Import event logger for component communication
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+
 // COMPOSABLES - ADMIN BUSINESS LOGIC
 // ============================================================================
 const { 
   allBookings,
   allProperties,
   systemTodayTurns,
-  systemUpcomingCleanings,
-  systemMetrics,
+  // systemUpcomingCleanings,
+  // systemMetrics,
   loading: adminLoading,
   fetchAllBookings,
   fetchAllProperties,
@@ -351,7 +315,7 @@ const allPropertiesMap = computed(() => {
     return allProperties.value;
   } else {
     const map = new Map<string, Property>();
-    allProperties.value.forEach(property => {
+    allProperties.value.forEach((property: Property) => {
       if (property && property.id) {
         map.set(property.id, property);
       }
@@ -401,20 +365,20 @@ const adminFilteredBookings = computed(() => {
 });
 
 // System-wide metrics for admin header
-const systemMetricsText = computed(() => {
-  const totalProperties = allPropertiesMap.value.size;
-  const totalBookings = allBookings.value.length;
-  const urgentTurns = systemTodayTurns.value.length;
-  const upcomingCount = allBookings.value.filter(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
-    const today = new Date();
-    const inOneWeek = new Date(today);
-    inOneWeek.setDate(inOneWeek.getDate() + 7);
-    return checkoutDate >= today && checkoutDate <= inOneWeek;
-  }).length;
+// const systemMetricsText = computed(() => {
+//   const totalProperties = allPropertiesMap.value.size;
+//   const totalBookings = allBookings.value.length;
+//   const urgentTurns = systemTodayTurns.value.length;
+//   const upcomingCount = allBookings.value.filter(booking => {
+//     const checkoutDate = new Date(booking.checkout_date);
+//     const today = new Date();
+//     const inOneWeek = new Date(today);
+//     inOneWeek.setDate(inOneWeek.getDate() + 7);
+//     return checkoutDate >= today && checkoutDate <= inOneWeek;
+//   }).length;
   
-  return `${totalProperties} properties • ${totalBookings} bookings • ${urgentTurns} urgent turns • ${upcomingCount} upcoming`;
-});
+//   return `${totalProperties} properties • ${totalBookings} bookings • ${urgentTurns} urgent turns • ${upcomingCount} upcoming`;
+// });
 
 // ============================================================================
 // DATA LOADING ON MOUNT  
@@ -443,7 +407,7 @@ onMounted(async () => {
       allProperties: allPropertiesMap.value.size,
       allBookings: allBookings.value.length,
       systemTurns: systemTodayTurns.value.length,
-      upcomingCleanings: systemUpcomingCleanings.value.length
+     
     });
   } catch (error) {
     console.error('❌ [HomeAdmin] Error fetching admin data on mount:', error);
@@ -602,59 +566,59 @@ const handleFilterByProperty = (propertyId: string | null): void => {
 // EVENT HANDLERS - ADMIN-SPECIFIC ACTIONS
 // ============================================================================
 
-const handleAssignCleaners = (): void => {
-  try {
-    eventLogger.logEvent(
-      'HomeAdmin',
-      'HomeAdmin',
-      'assignCleaners',
-      null,
-      'emit'
-    );
+// const handleAssignCleaners = (): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'HomeAdmin',
+//       'HomeAdmin',
+//       'assignCleaners',
+//       null,
+//       'emit'
+//     );
 
-    // TODO: Open cleaner assignment modal when TASK-039Q is complete
-    console.log('Admin: Assign Cleaners clicked');
-    // uiStore.openModal('cleanerAssignment', { bookings: unassignedBookings });
-  } catch (error) {
-    console.error('Error opening cleaner assignment:', error);
-  }
-};
+//     // TODO: Open cleaner assignment modal when TASK-039Q is complete
+//     console.log('Admin: Assign Cleaners clicked');
+//     // uiStore.openModal('cleanerAssignment', { bookings: unassignedBookings });
+//   } catch (error) {
+//     console.error('Error opening cleaner assignment:', error);
+//   }
+// };
 
-const handleGenerateReports = (): void => {
-  try {
-    eventLogger.logEvent(
-      'HomeAdmin',
-      'HomeAdmin',
-      'generateReports',
-      null,
-      'emit'
-    );
+// const handleGenerateReports = (): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'HomeAdmin',
+//       'HomeAdmin',
+//       'generateReports',
+//       null,
+//       'emit'
+//     );
 
-    // TODO: Open reports modal or navigate to reports page
-    console.log('Admin: Generate Reports clicked');
-    // uiStore.openModal('reports', { dateRange: currentWeek });
-  } catch (error) {
-    console.error('Error opening reports:', error);
-  }
-};
+//     // TODO: Open reports modal or navigate to reports page
+//     console.log('Admin: Generate Reports clicked');
+//     // uiStore.openModal('reports', { dateRange: currentWeek });
+//   } catch (error) {
+//     console.error('Error opening reports:', error);
+//   }
+// };
 
-const handleManageSystem = (): void => {
-  try {
-    eventLogger.logEvent(
-      'HomeAdmin',
-      'HomeAdmin',
-      'manageSystem',
-      null,
-      'emit'
-    );
+// const handleManageSystem = (): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'HomeAdmin',
+//       'HomeAdmin',
+//       'manageSystem',
+//       null,
+//       'emit'
+//     );
 
-    // TODO: Open system management modal or navigate to admin settings
-    console.log('Admin: Manage System clicked');
-    // uiStore.openModal('systemManagement', {});
-  } catch (error) {
-    console.error('Error opening system management:', error);
-  }
-};
+//     // TODO: Open system management modal or navigate to admin settings
+//     console.log('Admin: Manage System clicked');
+//     // uiStore.openModal('systemManagement', {});
+//   } catch (error) {
+//     console.error('Error opening system management:', error);
+//   }
+// };
 
 // ============================================================================
 // EVENT HANDLERS - CRUD OPERATIONS
