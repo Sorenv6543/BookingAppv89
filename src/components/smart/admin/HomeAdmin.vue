@@ -17,18 +17,7 @@
         'sidebar-visible': sidebarOpen || $vuetify.display.lgAndUp 
       }"
     >
-      <!-- <AdminSidebar
-        :today-turns="systemTodayTurns"
-        :upcoming-cleanings="systemUpcomingCleanings"
-        :properties="allPropertiesMap"
-        :loading="loading"
-        @navigate-to-booking="handleNavigateToBooking"
-        @navigate-to-date="handleNavigateToDate"
-        @filter-by-property="handleFilterByProperty"
-        @create-booking="handleCreateBooking"
-        @create-property="handleCreateProperty"
-      />
-    </div> -->
+
         <!-- Mobile Menu Toggle -->
         <v-app-bar
           v-if="$vuetify.display.mdAndDown"
@@ -45,20 +34,7 @@
           </v-app-bar-title>
         </v-app-bar>
 
-        <!-- Proper Navigation Drawer Implementation -->
-        <AdminSidebar
-          v-model="sidebarOpen"
-          :rail="railMode"
-          :today-turns="systemTodayTurns"
-         
-          :properties="allPropertiesMap"
-          :loading="loading"
-          @navigate-to-booking="handleNavigateToBooking"
-          @navigate-to-date="handleNavigateToDate"
-          @filter-by-property="handleFilterByProperty"
-          @create-booking="handleCreateBooking"
-          @create-property="handleCreateProperty"
-        />
+
     </div>
   </div>
   <div class="calendar-column calendar-responsive"

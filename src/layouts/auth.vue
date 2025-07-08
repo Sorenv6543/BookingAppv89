@@ -44,9 +44,9 @@
           <v-col 
             cols="12" 
             sm="8" 
-            md="5" 
-            lg="4" 
-            xl="4"
+            md="8" 
+            lg="12" 
+            xl="12"
             class="pa-4"
           >
             <!-- Auth forms will be rendered here -->

@@ -1,3 +1,4 @@
+<!-- layouts/admin.vue -->
 <template>
   <v-app>
     <!-- Admin App Bar -->
@@ -120,6 +121,16 @@
     <v-main class="admin-main">
       <router-view />
     </v-main>
+
+        <!-- Global Notification Area -->
+        <div id="notification-area">
+          <!-- Global notifications will be mounted here -->
+        </div>
+      
+        <!-- Global Modal Area -->
+        <div id="modal-area">
+          <!-- Global modals will be mounted here -->
+        </div>
   </v-app>
 </template>
 
