@@ -3,7 +3,8 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { UserRole } from '@/types';
 import {
-  getDefaultRouteForRole,
+  validateRouteAccess,
+  enhanceUserProfileData,
   getRoleSpecificSuccessMessage,
   clearAllRoleSpecificState
 } from '@/utils/authHelpers';

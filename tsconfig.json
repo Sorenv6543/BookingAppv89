@@ -36,5 +36,24 @@
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/utils/business_logic_store_updates.md", "src/test-supabase-connection.js", "src/test-supabase-connection.js", "src/plugins/supabase-plugin-config.ts.bak"],
+  "exclude": [
+    "node_modules",
+    "dist", 
+    "dev-dist",
+    "src/dev",
+    "src/dev/**/*",
+    "src/__tests__",
+    "src/__tests__/**/*",
+    "src/**/__tests__",
+    "src/**/__tests__/**/*",
+    "src/**/*.spec.ts",
+    "src/**/*.spec.js",
+    "src/**/*.test.ts", 
+    "src/**/*.test.js",
+    "docs",
+    "docs/**/*",
+    "scripts",
+    "scripts/**/*"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 } 

@@ -111,7 +111,7 @@ export function usePerformanceMonitor() {
   } {
     let measurementStart = 0
     let subscriptionCount = 0
-    let recomputeCount = 0
+    // let recomputeCount = 0 // Removed - not used
 
     return {
       startMeasurement: () => {
@@ -154,6 +154,16 @@ export function usePerformanceMonitor() {
         const existing = componentPerformance.value.get(componentName)
         if (existing) {
           existing.memoryUsage = bytes
+        } else {
+          // Create component entry if it doesn't exist
+          componentPerformance.value.set(componentName, {
+            componentName,
+            renderTime: 0,
+            subscriptionCount: 0,
+            memoryUsage: bytes,
+            recomputeCount: 0,
+            lastUpdate: Date.now()
+          })
         }
       }
     }
@@ -482,6 +492,7 @@ export function usePerformanceMonitor() {
     trackNetworkPerformance,
     trackCachePerformance,
     createPerformanceSnapshot,
+    updateMetric, // ✅ Added missing export
     
     // Computed insights
     performanceScore,

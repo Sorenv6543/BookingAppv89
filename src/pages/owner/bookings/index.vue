@@ -278,7 +278,7 @@
 
 <script setup lang="ts">
 import { onMounted, computed, ref } from 'vue';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 import { useUIStore } from '@/stores/ui';
 import type { Booking, ModalData } from '@/types';

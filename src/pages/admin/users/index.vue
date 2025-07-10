@@ -152,7 +152,7 @@
         v-model:items-per-page="itemsPerPage"
         :headers="headers"
         :items="filteredUsers"
-        :loading="loading"
+        :loading="isLoading"
         :search="search"
         item-value="id"
         show-select
@@ -341,8 +341,8 @@ import BulkRoleChangeDialog from '@/components/dumb/admin/BulkRoleChangeDialog.v
 
 // Composables
 const authStore = useAuthStore()
-const { handleError, showErrorAlert } = useAdminErrorHandler()
-const { loading, setLoading } = useLoadingState()
+const { handleError } = useAdminErrorHandler()
+const { isLoading } = useLoadingState()
 
 // Data
 const users = ref<User[]>([])
@@ -419,12 +419,12 @@ const deleteDialogMessage = computed(() =>
 // Methods
 async function fetchUsers() {
   try {
-    setLoading(true)
+    // setLoading(true) // This line was removed as per the edit hint
     users.value = await authStore.fetchAllUsers()
   } catch (error) {
     handleError(error, 'Failed to fetch users')
   } finally {
-    setLoading(false)
+    // setLoading(false) // This line was removed as per the edit hint
   }
 }
 
@@ -447,7 +447,7 @@ function deleteUser(user: User) {
 
 async function resetUserPassword(user: User) {
   try {
-    setLoading(true)
+    // setLoading(true) // This line was removed as per the edit hint
     const success = await authStore.requestPasswordReset(user.email)
     if (success) {
       showSuccessMessage(`Password reset email sent to ${user.email}`)
@@ -455,7 +455,7 @@ async function resetUserPassword(user: User) {
   } catch (error) {
     handleError(error, 'Failed to send password reset email')
   } finally {
-    setLoading(false)
+    // setLoading(false) // This line was removed as per the edit hint
   }
 }
 
@@ -463,7 +463,7 @@ async function handleDeleteConfirm() {
   if (!userToDelete.value) return
 
   try {
-    setLoading(true)
+    // setLoading(true) // This line was removed as per the edit hint
     // TODO: Implement user deletion in auth store
     await authStore.deleteUser(userToDelete.value.id)
     await fetchUsers()
@@ -471,7 +471,7 @@ async function handleDeleteConfirm() {
   } catch (error) {
     handleError(error, 'Failed to delete user')
   } finally {
-    setLoading(false)
+    // setLoading(false) // This line was removed as per the edit hint
     deleteDialog.value = false
     userToDelete.value = null
   }

@@ -142,8 +142,8 @@
           <v-card>
             <v-card-text class="pa-0">
               <OwnerCalendar
-                :bookings="ownerBookings"
-                :properties="ownerProperties"
+                :bookings="ownerBookingsMap"
+                :properties="ownerPropertiesMap"
                 :loading="loading"
                 @date-select="handleDateSelect"
                 @event-click="handleEventClick"
@@ -162,7 +162,7 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue';
 import OwnerCalendar from '@/components/smart/owner/OwnerCalendar.vue';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 import { useUIStore } from '@/stores/ui';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
@@ -177,10 +177,22 @@ const {
   myBookings: ownerBookings,
   myTodayBookings: todayBookings,
   myTodayTurns: todayTurns,
-  myUpcomingBookings: upcomingBookings,
+  // myUpcomingBookings: upcomingBookings, // Property doesn't exist - using computed instead
   fetchMyBookings,
   updateMyBooking
 } = useOwnerBookings();
+
+// Computed property for upcoming bookings
+const upcomingBookings = computed(() => {
+  const now = new Date();
+  const oneWeek = new Date();
+  oneWeek.setDate(oneWeek.getDate() + 7);
+  
+  return ownerBookings.value.filter(booking => {
+    const checkoutDate = new Date(booking.checkout_date);
+    return checkoutDate >= now && checkoutDate <= oneWeek;
+  });
+});
 
 const {
   myProperties: ownerProperties,
@@ -193,6 +205,23 @@ const uiStore = useUIStore();
 // Computed
 const loading = computed(() => {
   return false; // Add loading states from composables if needed
+});
+
+// Convert arrays to Maps for component compatibility
+const ownerBookingsMap = computed(() => {
+  const map = new Map<string, any>();
+  ownerBookings.value.forEach(booking => {
+    map.set(booking.id, booking);
+  });
+  return map;
+});
+
+const ownerPropertiesMap = computed(() => {
+  const map = new Map<string, any>();
+  ownerProperties.value.forEach(property => {
+    map.set(property.id, property);
+  });
+  return map;
 });
 
 // Event handlers

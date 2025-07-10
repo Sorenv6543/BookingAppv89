@@ -154,15 +154,6 @@ export function getBusinessImpactMessage(impact: BusinessImpact): string {
 }
 
 /**
- * Replace placeholders in message template
- */
-function replacePlaceholders(message: string, context: Record<string, any>): string {
-  return message.replace(/\{(\w+)\}/g, (match, key) => {
-    return context[key]?.toString() || match;
-  });
-}
-
-/**
  * Get retry message based on role and error type
  */
 export function getRetryMessage(role: UserRole, attempt: number, maxAttempts: number): string {

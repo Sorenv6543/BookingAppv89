@@ -294,7 +294,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase';/useAdminBookings';
+import { useAdminBookings } from '@/composables/admin/useAdminBookings';
 import type { BookingStatus, BookingType } from '@/types';
 
 // Use the admin bookings composable

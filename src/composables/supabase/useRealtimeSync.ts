@@ -47,7 +47,7 @@ export function useRealtimeSync() {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'bookings' },
         (payload) => {
-          debugLog('Booking change received:', payload.eventType, payload);
+          debugLog('Booking change received: ' + payload.eventType, payload);
           handleBookingChange(payload);
         }
       )
@@ -63,7 +63,7 @@ export function useRealtimeSync() {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'properties' },
         (payload) => {
-          debugLog('Property change received:', payload.eventType, payload);
+          debugLog('Property change received: ' + payload.eventType, payload);
           handlePropertyChange(payload);
         }
       )
@@ -284,7 +284,7 @@ export function useRealtimeSync() {
         await operation.execute();
         debugLog('Synced operation:', operation.id);
       } catch (error) {
-        debugLog('Failed to sync operation:', operation.id, error);
+        debugLog('Failed to sync operation: ' + operation.id, error);
         // Re-add failed operation
         pendingOperations.value.push(operation);
       }
