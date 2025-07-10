@@ -330,7 +330,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import PropertyCard from '@/components/dumb/shared/PropertyCard.vue';
 import EnhancedToast, { type ToastNotification, type ToastAction } from '@/components/dumb/shared/EnhancedToast.vue';
 import SkeletonLoader from '@/components/dumb/shared/SkeletonLoader.vue';
@@ -356,7 +356,7 @@ const sampleProperties = ref<Property[]>([
     address: '456 Oak Avenue, Arts District',
     pricing_tier: 'standard',
     cleaning_duration: 90,
-    special_instructions: null,
+    special_instructions: undefined,
     active: true,
     owner_id: 'owner2'
   },
@@ -408,12 +408,12 @@ const selectedSkeletonVariant = ref<'wave' | 'pulse' | 'shimmer' | 'static'>('sh
 const skeletonAnimated = ref(true);
 
 const skeletonTypes = [
-  { type: 'card', label: 'Property Card', showProgress: false },
-  { type: 'list-item', label: 'List Item', showProgress: false },
-  { type: 'dashboard-widget', label: 'Dashboard Widget', showProgress: true },
-  { type: 'calendar-event', label: 'Calendar Event', showProgress: false },
-  { type: 'form-field', label: 'Form Field', showProgress: false },
-  { type: 'nav-menu', label: 'Navigation Menu', showProgress: false }
+  { type: 'card' as const, label: 'Property Card', showProgress: false },
+  { type: 'list-item' as const, label: 'List Item', showProgress: false },
+  { type: 'dashboard-widget' as const, label: 'Dashboard Widget', showProgress: true },
+  { type: 'calendar-event' as const, label: 'Calendar Event', showProgress: false },
+  { type: 'form-field' as const, label: 'Form Field', showProgress: false },
+  { type: 'nav-menu' as const, label: 'Navigation Menu', showProgress: false }
 ];
 
 // Quick Actions FAB
@@ -628,12 +628,12 @@ const updatePerformanceMetrics = () => {
 let performanceInterval: number;
 
 onMounted(() => {
-  performanceInterval = setInterval(updatePerformanceMetrics, 2000);
+  performanceInterval = window.setInterval(updatePerformanceMetrics, 2000);
 });
 
 onUnmounted(() => {
   if (performanceInterval) {
-    clearInterval(performanceInterval);
+    window.clearInterval(performanceInterval);
   }
 });
 </script>

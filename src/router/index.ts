@@ -148,16 +148,14 @@ const router = createRouter({
         
       }
     },
-
-    // Demo routes - now in src/dev/demos/
-    // {
-    //   path: '/demos',
-    //   name: 'demos-index',
-    //   component: () => import('@/pages/demos/index.vue'),
-    //   meta: {
-    
-    //   }
-    // },
+      // Demo routes - now in src/dev/demos/
+      // {
+      //   path: '/demos/uiux-enhancements',
+      //   name: 'uiux-enhancements-demo',
+      //   component: () => import('@/dev/demos/UIUXEnhancementsDemo.vue'),
+      //   meta: {  
+      //   }
+      // },
     // {
     //   path: '/demos/pwa',
     //   name: 'pwa-demo',
