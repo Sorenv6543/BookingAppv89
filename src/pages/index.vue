@@ -1,4 +1,4 @@
-<!--
+<!-- 
  🎭 ROOT LANDING PAGE
  src/pages/index.vue - 🏠 HOME PAGE ROUTER
  

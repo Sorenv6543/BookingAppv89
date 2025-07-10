@@ -31,6 +31,7 @@ interface Emits {
   (e: 'dateSelect', selectInfo: DateSelectArg): void;
   (e: 'eventClick', clickInfo: EventClickArg): void;
   (e: 'eventDrop', dropInfo: EventDropArg): void;
+  (e: 'eventResize', resizeInfo: any): void;
   (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
   (e: 'updateBooking', data: { id: string; start: string; end: string }): void;
 }
@@ -282,11 +283,7 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
   );
   
   emit('eventDrop', dropInfo);
-  emit('updateBooking', {
-    id: booking.id,
-    start: dropInfo.event.startStr,
-    end: dropInfo.event.endStr || dropInfo.event.startStr
-  });
+  // Removed duplicate updateBooking emit to prevent infinite loops
 };
 
 const handleEventResize = (resizeInfo: any): void => {
@@ -305,11 +302,8 @@ const handleEventResize = (resizeInfo: any): void => {
     'emit'
   );
   
-  emit('updateBooking', {
-    id: booking.id,
-    start: resizeInfo.event.startStr,
-    end: resizeInfo.event.endStr
-  });
+  emit('eventResize', resizeInfo);
+  // Removed duplicate updateBooking emit to prevent infinite loops
 };
 
 // Custom event rendering
@@ -403,7 +397,7 @@ watch(() => props.bookings, (newBookings, oldBookings) => {
   );
   
   // FullCalendar will automatically update with the new events
-}, { deep: true, immediate: true });
+}, { immediate: true }); // Removed deep: true to prevent excessive re-runs
 
 // Add new handler function after the other event handlers
 const handleLoading = (isLoading: boolean): void => {

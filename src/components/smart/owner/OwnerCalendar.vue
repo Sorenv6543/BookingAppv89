@@ -17,7 +17,6 @@
         @event-drop="handleEventDrop"
         @event-resize="handleEventResize"
         @create-booking="handleCreateBooking"
-        @update-booking="handleUpdateBooking"
       />
     </v-card>
   </div>
@@ -45,7 +44,6 @@ interface Emits {
   (e: 'eventDrop', dropInfo: EventDropArg): void;
   (e: 'eventResize', resizeInfo: any): void;
   (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
-  (e: 'updateBooking', data: { id: string; start: string; end: string }): void;
   (e: 'viewChange', view: string): void;
   (e: 'dateChange', date: Date): void;
 }
@@ -96,10 +94,7 @@ const handleCreateBooking = (data: { start: string; end: string; propertyId?: st
   emit('createBooking', data);
 };
 
-const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
-  console.log('📝 [OwnerCalendar] Update booking:', data);
-  emit('updateBooking', data);
-};
+// Removed handleUpdateBooking - now handled through eventDrop/eventResize events
 
 // ===== PROGRAMMATIC CALENDAR METHODS =====
 

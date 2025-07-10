@@ -51,13 +51,7 @@ src/components/smart/owner/HomeOwner.vue -
         <v-card-text class="pa-0">
           <div class="d-flex align-center">
             <!-- Mobile menu button -->
-            <v-btn
-              v-if="$vuetify.display.mdAndDown"
-              icon="mdi-menu"
-              variant="text"
-              class="mr-4"
-              @click="toggleSidebar"
-            />
+        
                
             <!-- Calendar Navigation -->
             <v-btn
@@ -85,53 +79,21 @@ src/components/smart/owner/HomeOwner.vue -
                
             <v-spacer />
                
-            <!-- Owner Quick Actions -->
-            <v-btn
-              v-if="$vuetify.display.smAndUp"
-              color="primary"
-              variant="outlined"
-              prepend-icon="mdi-plus"
-              class="mr-2"
-              @click="handleCreateProperty"
-            >
-              Add Property
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-calendar-plus"
-              class="mr-4"
-              @click="handleCreateBooking"
-            >
-              Add Booking
-            </v-btn>
-               
-            <!-- Calendar View Toggle -->
-            <v-btn-toggle
-              v-model="currentView"
+
+            <v-col class="d-flex" cols="4" sm="3">
+              <v-select
+                :items="['Month', 'Week', 'Day']"
+                label="Month"
              
-              mandatory
-              density="compact"
-              class="ml-2 calendar-view-toggle"
-            >
-              <v-btn
-                value="dayGridMonth"
-                size="small"
-              >
-                Month
-              </v-btn>
-              <v-btn
-                value="timeGridWeek"
-                size="small"
-              >
-                Week
-              </v-btn>
-              <v-btn
-                value="timeGridDay"
-                size="small"
-              >
-                Day
-              </v-btn>
-            </v-btn-toggle>
+                solo
+                density="compact"
+                variant="solo"
+                class="mr-2 calendar-view"
+                @change="setCalendarView"
+              ></v-select>
+            </v-col>
+            <!-- Calendar View Toggle -->
+                  
           </div>
         </v-card-text>
       </v-card>
@@ -208,7 +170,7 @@ src/components/smart/owner/HomeOwner.vue -
 
 
 // Real-time sync will auto-initialize when user is authenticated
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { useDisplay } from 'vuetify';
 
 // Owner-specific components
@@ -224,9 +186,9 @@ import { useBookingStore } from '@/stores/booking';
 import { useUIStore } from '@/stores/ui';
 
 import { useAuthStore } from '@/stores/auth';
-
-  // Business logic composables
 import { useCalendarState } from '@/composables/shared/useCalendarState';
+  // Business logic composables
+
 import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 // Types
@@ -290,42 +252,16 @@ const selectedPropertyFilter = ref<string | null>(null);
 // ============================================================================
 
 // Get current owner's user ID with debugging
-let currentOwnerIdCallCount = 0;
 const currentOwnerId = computed(() => {
-  currentOwnerIdCallCount++;
   const userId = authStore.user?.id;
-  console.log(`🔍 [HomeOwner] currentOwnerId computed (call #${currentOwnerIdCallCount}):`, {
-    user: authStore.user,
-    userId,
-    isAuthenticated: authStore.isAuthenticated,
-    userRole: authStore.user?.role
-  });
-  
-  if (currentOwnerIdCallCount > 10) {
-    console.error('❌ [HomeOwner] Infinite loop detected in currentOwnerId computed!');
-  }
-  
   return userId;
 });
 
 // Check if user is authenticated and is an owner
-let isOwnerAuthenticatedCallCount = 0;
 const isOwnerAuthenticated = computed(() => {
-  isOwnerAuthenticatedCallCount++;
   const authenticated = !!(authStore.isAuthenticated && 
          authStore.user?.role === 'owner' && 
          currentOwnerId.value);
-  
-  console.log(`🔍 [HomeOwner] isOwnerAuthenticated computed (call #${isOwnerAuthenticatedCallCount}):`, {
-    isAuthenticated: authStore.isAuthenticated,
-    userRole: authStore.user?.role,
-    currentOwnerId: currentOwnerId.value,
-    result: authenticated
-  });
-  
-  if (isOwnerAuthenticatedCallCount > 10) {
-    console.error('❌ [HomeOwner] Infinite loop detected in isOwnerAuthenticated computed!');
-  }
   
   return authenticated;
 });
@@ -334,19 +270,14 @@ const isOwnerAuthenticated = computed(() => {
 // COMPUTED STATE - OWNER-FILTERED DATA
 // ============================================================================
 
-let loadingCallCount = 0;
+// Fix the infinite loop by using a more stable loading computed
 const loading = computed(() => {
-  loadingCallCount++;
-  const result = bookingsLoading.value || 
+  // Use a simple OR operation without excessive call counting
+  // The call counting was useful for debugging but caused performance issues
+  return bookingsLoading.value || 
     propertiesLoading.value || 
     uiStore.isLoading('bookings') || 
     uiStore.isLoading('properties');
-  
-  if (loadingCallCount > 20) {
-    console.error(`❌ [HomeOwner] Infinite loop detected in loading computed! (call #${loadingCallCount})`);
-  }
-  
-  return result;
 });
 
 const formattedDate = computed(() => {
@@ -359,15 +290,9 @@ const formattedDate = computed(() => {
   return currentDate.value.toLocaleDateString('en-US', options);
 });
 
-// Owner's properties only
-let ownerPropertiesMapCallCount = 0;
+// Owner's properties only - stabilized to prevent loops
 const ownerPropertiesMap = computed(() => {
-  ownerPropertiesMapCallCount++;
   const map = new Map<string, Property>();
-  
-  if (ownerPropertiesMapCallCount > 20) {
-    console.error(`❌ [HomeOwner] Infinite loop detected in ownerPropertiesMap computed! (call #${ownerPropertiesMapCallCount})`);
-  }
   
   if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
     return map;
@@ -393,49 +318,33 @@ const ownerPropertiesMap = computed(() => {
   return map;
 });
 
-// Owner's bookings only - TESTING THIS FIRST
-let ownerBookingsMapCallCount = 0;
+// Owner's bookings only - stabilized with better error handling
 const ownerBookingsMap = computed(() => {
-  ownerBookingsMapCallCount++;
-  
-  if (ownerBookingsMapCallCount > 20) {
-    console.error('❌ [HomeOwner] Infinite loop detected in ownerBookingsMap computed!');
-    return new Map<string, Booking>();
-  }
   const map = new Map<string, Booking>();
   
   if (!isOwnerAuthenticated.value || !currentOwnerId.value) {
     return map;
   }
 
-  // Filter bookings by owner_id
-  const ownerBookings = bookingStore.bookingsArray
-    .filter(booking => booking.owner_id === currentOwnerId.value);
-    
-  console.log(`🔍 [HomeOwner] Loaded ${ownerBookings.length} bookings for owner ${currentOwnerId.value}`);
-    
-  ownerBookings.forEach(booking => {
-    if (booking && booking.id) {
-      map.set(booking.id, booking);
-    }
-  });
+  try {
+    // Filter bookings by owner_id
+    const ownerBookings = bookingStore.bookingsArray
+      .filter(booking => booking.owner_id === currentOwnerId.value);
+      
+    ownerBookings.forEach(booking => {
+      if (booking && booking.id) {
+        map.set(booking.id, booking);
+      }
+    });
+  } catch (error) {
+    console.error('❌ [HomeOwner] Error filtering owner bookings:', error);
+  }
   
   return map;
 });
 
-// ADDING BACK DEPENDENT COMPUTED PROPERTIES WITH DEBUGGING
-
-// Owner's today's turn bookings - TESTING THIS NEXT
-let ownerTodayTurnsCallCount = 0;
+// Owner's today's turn bookings - stabilized
 const ownerTodayTurns = computed(() => {
-  ownerTodayTurnsCallCount++;
-  console.log(`🔍 [HomeOwner] ownerTodayTurns computed (call #${ownerTodayTurnsCallCount})`);
-  
-  if (ownerTodayTurnsCallCount > 20) {
-    console.error('❌ [HomeOwner] Infinite loop detected in ownerTodayTurns computed!');
-    return new Map<string, Booking>();
-  }
-
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
@@ -447,31 +356,26 @@ const ownerTodayTurns = computed(() => {
     return turns;
   }
 
-  // Filter owner's bookings for today's turns
-  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
-    if (
-      booking.booking_type === 'turn' &&
-      new Date(booking.checkout_date) >= today &&
-      new Date(booking.checkout_date) < tomorrow
-    ) {
-      turns.set(booking.id, booking);
-    }
-  });
+  try {
+    // Filter owner's bookings for today's turns
+    Array.from(ownerBookingsMap.value.values()).forEach(booking => {
+      if (
+        booking.booking_type === 'turn' &&
+        new Date(booking.checkout_date) >= today &&
+        new Date(booking.checkout_date) < tomorrow
+      ) {
+        turns.set(booking.id, booking);
+      }
+    });
+  } catch (error) {
+    console.error('❌ [HomeOwner] Error filtering today turns:', error);
+  }
   
   return turns;
 });
 
-// Owner's upcoming cleanings - TESTING THIS NEXT
-let ownerUpcomingCleaningsCallCount = 0;
+// Owner's upcoming cleanings - stabilized
 const ownerUpcomingCleanings = computed(() => {
-  ownerUpcomingCleaningsCallCount++;
-  console.log(`🔍 [HomeOwner] ownerUpcomingCleanings computed (call #${ownerUpcomingCleaningsCallCount})`);
-  
-  if (ownerUpcomingCleaningsCallCount > 20) {
-    console.error('❌ [HomeOwner] Infinite loop detected in ownerUpcomingCleanings computed!');
-    return new Map<string, Booking>();
-  }
-
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const inOneWeek = new Date(today);
@@ -483,61 +387,46 @@ const ownerUpcomingCleanings = computed(() => {
     return cleanings;
   }
 
-  // Filter owner's bookings for upcoming cleanings
-  Array.from(ownerBookingsMap.value.values()).forEach(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
-    if (checkoutDate >= today && checkoutDate <= inOneWeek) {
-      cleanings.set(booking.id, booking);
-    }
-  });
+  try {
+    // Filter owner's bookings for upcoming cleanings
+    Array.from(ownerBookingsMap.value.values()).forEach(booking => {
+      const checkoutDate = new Date(booking.checkout_date);
+      if (checkoutDate >= today && checkoutDate <= inOneWeek) {
+        cleanings.set(booking.id, booking);
+      }
+    });
+  } catch (error) {
+    console.error('❌ [HomeOwner] Error filtering upcoming cleanings:', error);
+  }
   
   return cleanings;
 });
 
-// Owner's filtered bookings - TESTING THE MOST COMPLEX ONE
-let ownerFilteredBookingsCallCount = 0;
+// Owner's filtered bookings - stabilized with better error handling
 const ownerFilteredBookings = computed(() => {
-  ownerFilteredBookingsCallCount++;
-  console.log(`🔍 [HomeOwner] ownerFilteredBookings computed (call #${ownerFilteredBookingsCallCount})`);
-  
-  if (ownerFilteredBookingsCallCount > 20) {
-    console.error('❌ [HomeOwner] Infinite loop detected in ownerFilteredBookings computed!');
-    return new Map<string, Booking>();
-  }
-
-  let bookings = Array.from(ownerBookingsMap.value.values());
-  console.log(`🔍 [HomeOwner] Starting with ${bookings.length} owner bookings`);
-  
-  // Apply property filter if selected (within owner's properties)
-  if (selectedPropertyFilter.value) {
-    bookings = bookings.filter(booking => 
-      booking.property_id === selectedPropertyFilter.value &&
-      ownerPropertiesMap.value.has(booking.property_id)
-    );
-    console.log(`🔍 [HomeOwner] After property filter: ${bookings.length} bookings`);
-  }
-  
-  // Apply calendar state filters
-  bookings = filterBookings(bookings);
-  console.log(`🔍 [HomeOwner] After calendar state filters: ${bookings.length} bookings`);
-  
-  // Convert to Map for components that expect Map format
   const map = new Map<string, Booking>();
-  bookings.forEach(booking => {
-    map.set(booking.id, booking);
-  });
   
-  console.log(`🔍 [HomeOwner] Final filtered bookings map:`, {
-    size: map.size,
-    bookingIds: Array.from(map.keys()),
-    bookings: Array.from(map.values()).map(b => ({
-      id: b.id,
-      property_id: b.property_id,
-      checkout_date: b.checkout_date,
-      checkin_date: b.checkin_date,
-      booking_type: b.booking_type
-    }))
-  });
+  try {
+    let bookings = Array.from(ownerBookingsMap.value.values());
+    
+    // Apply property filter if selected (within owner's properties)
+    if (selectedPropertyFilter.value) {
+      bookings = bookings.filter(booking => 
+        booking.property_id === selectedPropertyFilter.value &&
+        ownerPropertiesMap.value.has(booking.property_id)
+      );
+    }
+    
+    // Apply calendar state filters
+    bookings = filterBookings(bookings);
+    
+    // Convert to Map for components that expect Map format
+    bookings.forEach(booking => {
+      map.set(booking.id, booking);
+    });
+  } catch (error) {
+    console.error('❌ [HomeOwner] Error filtering bookings:', error);
+  }
   
   return map;
 });
@@ -776,11 +665,30 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     return;
   }
   
+  // Prevent multiple simultaneous updates
+  if (bookingsLoading.value) {
+    console.warn('Update already in progress');
+    dropInfo.revert();
+    return;
+  }
+  
   try {
-    await updateMyBooking(booking.id, {
+    // Use nextTick to batch reactive updates
+    await nextTick();
+    
+    const result = await updateMyBooking(booking.id, {
       checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr,
+      owner_id: booking.owner_id,
     });
+    
+    if (!result) {
+      throw new Error('Update failed');
+    }
+    
+    // Additional nextTick to ensure DOM updates complete
+    await nextTick();
+    
   } catch (error) {
     console.error('Failed to update your booking:', error);
     dropInfo.revert();
@@ -797,11 +705,30 @@ const handleEventResize = async (resizeInfo: { event: { extendedProps: { booking
     return;
   }
   
+  // Prevent multiple simultaneous updates
+  if (bookingsLoading.value) {
+    console.warn('Resize update already in progress');
+    resizeInfo.revert();
+    return;
+  }
+  
   try {
-    await updateMyBooking(booking.id, {
+    // Use nextTick to batch reactive updates
+    await nextTick();
+    
+    const result = await updateMyBooking(booking.id, {
       checkout_date: resizeInfo.event.startStr,
-      checkin_date: resizeInfo.event.endStr
+      checkin_date: resizeInfo.event.endStr,
+      owner_id: booking.owner_id,
     });
+    
+    if (!result) {
+      throw new Error('Resize update failed');
+    }
+    
+    // Additional nextTick to ensure DOM updates complete
+    await nextTick();
+    
   } catch (error) {
     console.error('Failed to update your booking:', error);
     resizeInfo.revert();
@@ -869,7 +796,8 @@ const handleUpdateBooking = (data: { id: string; start: string; end: string }): 
   
   updateMyBooking(data.id, {
     checkout_date: data.start,
-    checkin_date: data.end
+    checkin_date: data.end,
+    owner_id: currentOwnerId.value,
   });
 };
 

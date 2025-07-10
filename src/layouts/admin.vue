@@ -118,7 +118,9 @@
     </v-app-bar>
 
     <!-- Main Content Area -->
-    <v-main class="admin-main">
+    <v-main 
+    app
+    class="admin-main">
       <router-view />
     </v-main>
 
@@ -131,6 +133,7 @@
         <div id="modal-area">
           <!-- Global modals will be mounted here -->
         </div>
+      
   </v-app>
 </template>
 
@@ -149,7 +152,7 @@ const logout = async () => {
 
 <style scoped>
 .admin-app-bar {
-  border-bottom: 2px solid rgb(var(--v-theme-primary)) !important;
+  border-bottom: 1px solid rgb(var(--v-theme-primary)) !important;
 }
 
 .admin-badge {
@@ -161,7 +164,9 @@ const logout = async () => {
 }
 
 .admin-main {
-  background: rgb(var(--v-theme-background)) !important;
+  height: 100%;
+  background-color: rgb(238, 238, 238);
+
 }
 
 /* Admin-specific button styling */
@@ -174,7 +179,7 @@ const logout = async () => {
 }
 
 .v-btn--variant-text.router-link-active {
-  background: rgba(var(--v-theme-primary), 0.12) !important;
+  background: rgba(var(--v-theme-primary), 452) !important;
   color: rgb(var(--v-theme-primary)) !important;
 }
 

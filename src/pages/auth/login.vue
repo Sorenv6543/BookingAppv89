@@ -141,6 +141,15 @@
               >
                 Create Account
               </v-btn>
+              <v-divider class="my-4" />
+              <v-btn
+                color="primary"
+                variant="text"
+                :disabled="authStore.loading"
+                @click="goToDemos"
+              >
+                Demos
+              </v-btn>
             </div>
           </v-form>
         </v-card>
@@ -239,6 +248,10 @@ async function testSupabaseConnection() {
     console.error('❌ Connection test failed:', error);
     alert('❌ Connection test failed: ' + (error instanceof Error ? error.message : String(error)));
   }
+}
+
+function goToDemos() {
+  router.push('/demos')
 }
 
 function goToRegister() {

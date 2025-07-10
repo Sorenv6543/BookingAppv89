@@ -7,6 +7,7 @@ import { useBookings } from '@/composables/shared/useBookings';
 import FullCalendar from '@/components/smart/FullCalendar.vue';
 import type { PropertyFormData, BookingFormData } from '@/types';
 
+
 // Stores and composables
 const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
@@ -54,12 +55,13 @@ const testPropertyId = ref<string | null>(null);
 const testBookingId = ref<string | null>(null);
 const testProperty = reactive<PropertyFormData>({
   name: 'Test Property',
+  owner_id: 'test-owner-123',
   address: '123 Test Lane, Testville, TS 12345',
   cleaning_duration: 60,
   pricing_tier: 'basic',
   special_instructions: 'This is a test property for CRUD testing',
   active: true,
-  owner_id: 'test-owner-123',
+
 });
 
 const testBooking = reactive<BookingFormData>({
@@ -75,7 +77,7 @@ const testBooking = reactive<BookingFormData>({
 
 const testBookingStandard = reactive<BookingFormData>({
   property_id: '',
-  owner_id: 'test-owner-123',
+    owner_id: 'test-owner-123',
   checkout_date: new Date().toISOString().split('T')[0],
   checkin_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 days later
   booking_type: 'standard',

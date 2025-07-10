@@ -1,3 +1,4 @@
+<!-- src/pages/auth/register.vue - Complete working version -->
 <template>
   <v-container class="fill-height">
     <v-row

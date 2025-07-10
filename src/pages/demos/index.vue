@@ -5,7 +5,14 @@ const router = useRouter()
 
 const demos = [
   { title: 'PWA Demo', route: '/demos/pwa', icon: 'mdi-application', description: 'Test PWA functionality' },
-  { title: 'Owner Calendar', route: '/demos/owner-calendar', icon: 'mdi-calendar', description: 'Owner calendar demo' }
+  { title: 'Owner Calendar', route: '/demos/owner-calendar', icon: 'mdi-calendar', description: 'Owner calendar demo' },
+  { title: 'Owner Data Store', route: '/demos/owner-data-store', icon: 'mdi-database', description: 'Owner data store demo' },
+  { title: 'Admin Data Store', route: '/demos/admin-data-store', icon: 'mdi-database', description: 'Admin data store demo' },
+  { title: 'Admin Calendar', route: '/demos/admin-calendar', icon: 'mdi-calendar', description: 'Admin calendar demo' },
+  { title: 'Admin Reports', route: '/demos/admin-reports', icon: 'mdi-chart-bar', description: 'Admin reports demo' },
+  { title: 'Admin Settings', route: '/demos/admin-settings', icon: 'mdi-cog', description: 'Admin settings demo' },
+  { title: 'Admin Users', route: '/demos/admin-users', icon: 'mdi-account', description: 'Admin users demo' },
+  { title: 'Admin Bookings', route: '/demos/admin-bookings', icon: 'mdi-calendar-check', description: 'Admin bookings demo' }
 ]
 
 const navigateToDemo = (route: string) => {

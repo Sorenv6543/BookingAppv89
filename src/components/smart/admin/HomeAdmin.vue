@@ -164,7 +164,6 @@ import { useDisplay } from 'vuetify';
 
 // Admin components (using generic components for now)
 
-import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
 import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
 import BookingForm from '@/components/dumb/BookingForm.vue';
 import PropertyModal from '@/components/dumb/PropertyModal.vue';
@@ -1029,7 +1028,7 @@ onUnmounted(() => {
   position: relative;
   background-color: rgb(var(--v-theme-surface));
   padding-right: 0 !important;
-  height: 100vh;
+  height: 100;
 }
 
 .sidebar-container {

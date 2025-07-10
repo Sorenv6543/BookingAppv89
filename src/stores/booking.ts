@@ -211,12 +211,19 @@ async function addBooking(booking: Booking) {
       throw new Error('Booking not found');
     }
 
-    // Optimistic update
+    console.log('🔍 [BookingStore] Updating booking:', { id, updates, existingOwner: existing.owner_id });
+
+    // Create updated booking object
     const updated = { 
       ...existing, 
       ...updates, 
       updated_at: new Date().toISOString() 
     };
+    
+    // Store original state for potential rollback
+    const originalMap = new Map(bookings.value);
+    
+    // Optimistic update
     bookings.value.set(id, updated);
     error.value = null;
     
@@ -226,13 +233,24 @@ async function addBooking(booking: Booking) {
         .update(updates)
         .eq('id', id);
       
-      if (supaError) throw supaError;
+      if (supaError) {
+        console.error('❌ [BookingStore] Supabase update error:', supaError);
+        throw supaError;
+      }
+      
+      console.log('✅ [BookingStore] Successfully updated booking in Supabase');
       invalidateCache(); // Invalidate cache after successful update
     } catch (err: any) {
-      // Rollback on error
-      bookings.value.set(id, existing);
+      console.error('❌ [BookingStore] Update failed, rolling back:', err);
+      
+      // Complete rollback - restore entire map to prevent corruption
+      bookings.value.clear();
+      originalMap.forEach((booking, key) => {
+        bookings.value.set(key, booking);
+      });
+      
       error.value = err.message || 'Failed to update booking.';
-      console.error('updateBooking error:', err);
+      invalidateCache(); // Invalidate cache after rollback
       throw err;
     }
   }

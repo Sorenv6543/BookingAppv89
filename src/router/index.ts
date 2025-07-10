@@ -12,26 +12,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 // import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from '@/router/guards'
 
+// 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+
+    // Auth routes - only accessible to unauthenticated users
     {
       path: '/',
       name: 'home',
-      component: () => import('@/pages/index.vue'),
+      component: () => import('@/pages/auth/login.vue'),
       meta: {
         layout: 'default'
       }
     },
-    {
-      path: '/auth/login',
-      name: 'login',
-      component: () => import('@/pages/auth/login.vue'),
-      meta: {
-        layout: 'auth'
-      }
-    },
-
     {
       path: '/auth/register',
       name: 'register',
@@ -40,14 +34,15 @@ const router = createRouter({
         layout: 'auth'
       }
     },
-    // Owner-specific routes
+
+    // Owner routes - only accessible to owner users
     {
       path: '/owner/dashboard',
       name: 'owner-dashboard',
       component: () => import('@/pages/owner/dashboard.vue'),
       meta: {
         layout: 'default',
-        requiresAuth: true,
+       
         role: 'owner'
       }
     },
@@ -57,7 +52,7 @@ const router = createRouter({
       component: () => import('@/pages/owner/properties/index.vue'),
       meta: {
         layout: 'default',
-        requiresAuth: true,
+       
         role: 'owner'
       }
     },
@@ -67,7 +62,7 @@ const router = createRouter({
       component: () => import('@/pages/owner/calendar.vue'),
       meta: {
         layout: 'default',
-        requiresAuth: true,
+       
         role: 'owner'
       }
     },
@@ -77,18 +72,20 @@ const router = createRouter({
       component: () => import('@/pages/owner/bookings/index.vue'),
       meta: {
         layout: 'default',
-        requiresAuth: true,
+        
         role: 'owner'
       }
     },
-    // Legacy routes (redirect to owner-specific routes)
 
+    // Admin routes - only accessible to admin users
     {
       path: '/admin',
       name: 'admin',
       component: () => import('@/pages/admin/index.vue'),
       meta: {
-        layout: 'admin'
+        layout: 'admin',
+        
+        role: 'admin'
       }
     },
     {
@@ -97,7 +94,7 @@ const router = createRouter({
       component: () => import('@/pages/admin/schedule/index.vue'),
       meta: {
         layout: 'admin',
-        requiresAuth: true,
+        
         role: 'admin'
       }
     },
@@ -107,7 +104,7 @@ const router = createRouter({
       component: () => import('@/pages/admin/cleaners/index.vue'),
       meta: {
         layout: 'admin',
-        requiresAuth: true,
+        
         role: 'admin'
       }
     },
@@ -117,7 +114,7 @@ const router = createRouter({
       component: () => import('@/pages/admin/properties/index.vue'),
       meta: {
         layout: 'admin',
-        requiresAuth: true,
+        
         role: 'admin'
       }
     },
@@ -127,7 +124,7 @@ const router = createRouter({
       component: () => import('@/pages/admin/bookings/index.vue'),
       meta: {
         layout: 'admin',
-        requiresAuth: true,
+        
         role: 'admin'
       }
     },
@@ -137,17 +134,18 @@ const router = createRouter({
       component: () => import('@/pages/admin/reports/index.vue'),
       meta: {
         layout: 'admin',
-        requiresAuth: true,
+        
         role: 'admin'
       }
     },
+    
     // Testing routes
     {
       path: '/testing/crud',
       name: 'crud-testing',
       component: () => import('@/pages/crud-testing.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
 
@@ -155,9 +153,9 @@ const router = createRouter({
     {
       path: '/demos',
       name: 'demos-index',
-      component: () => import('@/dev/demos/index.vue'),
+      component: () => import('@/pages/demos/index.vue'),
       meta: {
-        layout: 'default'
+    
       }
     },
     {
@@ -165,7 +163,7 @@ const router = createRouter({
       name: 'pwa-demo',
       component: () => import('@/dev/demos/PWADemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -173,7 +171,7 @@ const router = createRouter({
       name: 'owner-data-store-demo',
       component: () => import('@/dev/demos/OwnerDataStoreDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -181,7 +179,7 @@ const router = createRouter({
       name: 'admin-data-store-demo',
       component: () => import('@/dev/demos/AdminDataStoreDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -189,7 +187,7 @@ const router = createRouter({
       name: 'owner-data-store-demo',
       component: () => import('@/dev/demos/OwnerDataStoreDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -197,7 +195,7 @@ const router = createRouter({
       name: 'admin-user-management-demo',
       component: () => import('@/dev/demos/AdminUserManagementDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -205,7 +203,7 @@ const router = createRouter({
       name: 'responsive-layout-demo',
       component: () => import('@/dev/demos/ResponsiveLayoutDemo.vue'),
       meta: {
-        layout: 'default'
+
       }
     },
 
@@ -214,7 +212,7 @@ const router = createRouter({
       name: 'home-admin-demo',
       component: () => import('@/dev/demos/HomeAdminDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
 
@@ -223,7 +221,7 @@ const router = createRouter({
       name: 'turn-alerts-demo',
       component: () => import('@/dev/demos/TurnAlertsDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
 
@@ -232,7 +230,7 @@ const router = createRouter({
       name: 'property-card-demo',
       component: () => import('@/dev/demos/PropertyCardDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -240,7 +238,7 @@ const router = createRouter({
       name: 'use-admin-bookings-demo',
       component: () => import('@/dev/demos/UseAdminBookingsDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
 
@@ -265,7 +263,7 @@ const router = createRouter({
       name: 'use-owner-bookings-demo',
       component: () => import('@/dev/demos/UseOwnerBookingsDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -273,7 +271,7 @@ const router = createRouter({
       name: 'use-owner-properties-demo',
       component: () => import('@/dev/demos/UseOwnerPropertiesDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -281,7 +279,7 @@ const router = createRouter({
       name: 'use-owner-calendar-state-demo',
       component: () => import('@/dev/demos/UseOwnerCalendarStateDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -289,7 +287,7 @@ const router = createRouter({
       name: 'use-admin-properties-demo',
       component: () => import('@/dev/demos/UseAdminPropertiesDemo.vue'),
       meta: {
-        layout: 'default'
+
       }
     },
     {
@@ -297,7 +295,7 @@ const router = createRouter({
       name: 'use-admin-calendar-state-demo',
       component: () => import('@/dev/demos/UseAdminCalendarStateDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -305,7 +303,7 @@ const router = createRouter({
       name: 'owner-property-creation-demo',
       component: () => import('@/dev/demos/OwnerPropertyCreationDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -313,7 +311,7 @@ const router = createRouter({
       name: 'pwa-demo',
       component: () => import('@/dev/demos/PWADemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
     {
@@ -321,7 +319,7 @@ const router = createRouter({
       name: 'pwa-notifications-demo',
       component: () => import('@/components/dumb/shared/PWANotificationsEnhanced.vue'),
       meta: {
-        layout: 'default',
+        
         public: true,
         demo: true,
         title: 'PWANotificationsEnhanced Demo'
@@ -333,7 +331,7 @@ const router = createRouter({
       name: 'admin-sidebar-width-test',
       component: () => import('@/dev/demos/admin-sidebar-width-test.vue'),
       meta: {
-        layout: 'default',
+        
         public: true,
         demo: true,
         title: 'Admin Sidebar Width Test'
@@ -346,7 +344,7 @@ const router = createRouter({
       name: 'turn-alerts-demo',
       component: () => import('@/dev/demos/TurnAlertsDemo.vue'),
       meta: {
-        layout: 'default'
+        
       }
     },
 
