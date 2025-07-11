@@ -3,20 +3,28 @@
     v-model="sidebarOpen"
     :top="0"
     class="owner-sidebar"
-    :width="280"
-    elevation="0"
+    :width="SIDEBAR_WIDTH"
+    elevation="4"
     color="white"
     :temporary="props.temporary"
     location="left"
+    floating
    
   >
       <div 
-  v-show="sidebarOpen || !mobile"
+  v-show="showBrandOverlay"
   class="claro-brand-overlay"
 >
   <div class="claro-brand-section">
     <div class="claro-brand-icon">
-      <v-icon color="white" size="24">mdi-calendar</v-icon>
+      <v-btn
+        icon
+        color="primary"
+        elevation="7"
+        size="large"
+      >
+        <v-icon color="white" size="24">mdi-calendar</v-icon>
+      </v-btn>
     </div>
     <div class="claro-brand-info">
       <div class="claro-brand-title">Claro</div>
@@ -98,6 +106,11 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 
+// Constants for consistent sizing
+const SIDEBAR_WIDTH = 280;
+const BRAND_HEIGHT_DESKTOP = 180;
+const BRAND_HEIGHT_MOBILE = 80;
+
 // Define props
 interface Props {
   modelValue: boolean;
@@ -123,13 +136,20 @@ const emit = defineEmits<Emits>();
 
 // Composables
 const router = useRouter();
-const { xs, md, lg, mobile, sm } = useDisplay();
+const { mobile } = useDisplay();
 
 // v-model support
 const sidebarOpen = computed({
   get: () => props.modelValue,
   set: (value: boolean) => emit('update:modelValue', value)
 });
+
+// Improved brand overlay display logic
+const showBrandOverlay = computed(() => {
+  // Always show on desktop, show on mobile only when sidebar is open
+  return !mobile.value || sidebarOpen.value;
+});
+
 // Navigation helper
 const navigateTo = (path: string) => {
   router.push(path);
@@ -144,37 +164,18 @@ const navigateTo = (path: string) => {
 
 }
 
-/* Target all Vuetify navigation drawer elements */
-:deep(.v-navigation-drawer) {
-  
-}
 
-:deep(.v-navigation-drawer__scrim) {
- 
-}
-
-:deep(.v-navigation-drawer__content) {
-
-}
-
-.owner-sidebar-drawer {
-
-}
-
-.owner-sidebar :deep(.v-navigation-drawer__content) {
- 
-}
 
 /* Sidebar Content Spacing */
 .sidebar-content-spacing {
-  margin-top: 100px; /* Push content below brand overlay */
+  margin-top: v-bind('BRAND_HEIGHT_DESKTOP + "px"'); /* Push content below brand overlay */
 }
 
 /* Section Headers */
 .section-header {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1976d2;
+  color: rgb(var(--v-theme-primary));
   padding: 16px 20px 8px 20px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -192,7 +193,7 @@ const navigateTo = (path: string) => {
 .nav-item {
   margin-bottom: 4px;
   border-radius: 8px !important;
-  color: #374151 !important;
+  color: rgb(var(--v-theme-success)) !important;
   font-weight: 500 !important;
 }
 
@@ -201,7 +202,7 @@ const navigateTo = (path: string) => {
 }
 
 .nav-item.active-nav-item {
-  background: #1976d2 !important;
+  background: rgb(var(--v-theme-primary)) !important;
   color: white !important;
 }
 
@@ -225,7 +226,7 @@ const navigateTo = (path: string) => {
 .action-item {
   margin-bottom: 4px;
   border-radius: 8px !important;
-  color: #374151 !important;
+  color: rgb(var(--v-theme-success)) !important;
   font-weight: 500 !important;
 }
 
@@ -235,28 +236,28 @@ const navigateTo = (path: string) => {
 
 /* Icon styling */
 :deep(.v-list-item__prepend .v-icon) {
-  color: #6b7280;
+  color: rgb(var(--v-theme-info));
   opacity: 1;
 }
 
 .nav-item:hover :deep(.v-list-item__prepend .v-icon) {
-  color: #374151;
+  color: rgb(var(--v-theme-success));
 }
 
 .action-item:hover :deep(.v-list-item__prepend .v-icon) {
-  color: #374151;
+  color: rgb(var(--v-theme-success));
 }
 
 /* List item title styling */
 :deep(.v-list-item-title) {
-  font-size: 0.875rem !important;
+  font-size: 0.95rem !important;
   font-weight: 500 !important;
 }
 
 /* Responsive adjustments */
 @media (max-width: 959px) {
   .sidebar-content-spacing {
-    margin-top: 80px; /* Smaller spacing on mobile */
+    margin-top: v-bind('BRAND_HEIGHT_MOBILE + "px"'); /* Smaller spacing on mobile */
   }
 }
 /* ================================================================ */
@@ -267,14 +268,14 @@ const navigateTo = (path: string) => {
   position: fixed;
   top: 0;
   left: 0;
-  width: 280px;
-  height: 100px;
-  background: #1976d2;
-
+  width: v-bind('SIDEBAR_WIDTH + "px"');
+  height: v-bind('BRAND_HEIGHT_DESKTOP + "px"');
+ 
+  background-color: rgb(var(--v-theme-secondary));
   display: flex;
   align-items: center;
   padding: 0 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .claro-brand-section {
@@ -286,12 +287,12 @@ const navigateTo = (path: string) => {
 .claro-brand-icon {
   width: 48px;
   height: 48px;
-  background: #1976d2;
+  background-color: rgb(var(--v-theme-primary));
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
 }
 
 .claro-brand-info {
@@ -299,22 +300,22 @@ const navigateTo = (path: string) => {
 }
 
 .claro-brand-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: white;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: rgb(var(--v-theme-primary));
   line-height: 1.2;
 }
 
 .claro-brand-subtitle {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  color: rgb(var(--v-theme-info));
   line-height: 1.2;
 }
 
 /* Responsive Brand Overlay */
 @media (max-width: 959px) {
   .claro-brand-overlay {
-    height: 80px; /* Smaller on mobile */
+    height: v-bind('BRAND_HEIGHT_MOBILE + "px"'); /* Smaller on mobile */
   }
   
   .claro-brand-icon {
@@ -348,10 +349,11 @@ const navigateTo = (path: string) => {
 }
 
 .v-overlay--contained .v-overlay__scrim {
+  background-color: rgba(0, 0, 0, 0.9);
  
 }
 
 .v-overlay__scrim {
-
+  background-color: rgba(0, 0, 0, 0.9);
 }
 </style> 

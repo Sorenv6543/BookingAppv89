@@ -27,7 +27,7 @@ src/components/smart/owner/HomeOwner.vue -
         color="black"
         @click="toggleSidebar"
       />
-      
+      <!--logo-->
       <v-app-bar-title class="app-title">
         <div class="brand-container">
           <div class="brand-icon">
@@ -36,16 +36,24 @@ src/components/smart/owner/HomeOwner.vue -
           <span class="brand-text">Claro</span>
         </div>
       </v-app-bar-title>
+      <!--logo-->
     </v-app-bar>
 
     <!-- Owner Sidebar -->
     <OwnerSidebar
-      :tq
-      :order="1"
       v-model="sidebarOpen"
-      temporary
+      :temporary="mobile"
+      scrim="true"
+      scrim-color="scrimColor"   
+      scrim-opacity="0.9"
+      scrim-blur-amount="20"
+      scrim-blur-radius="20"
+     
+
+
       @create-booking="handleCreateBooking"
       @create-property="handleCreateProperty"
+      v-bind:style="{ height: '100vh' }"
     />
 
     <!-- Main Calendar Area -->
@@ -303,6 +311,7 @@ const calendarRef = ref<InstanceType<typeof OwnerCalendar> | null>(null);
 const sidebarOpen = ref(!xs.value);
 const selectedPropertyFilter = ref<string | null>(null);
 const speedDialOpen = ref(false);
+const scrimColor = ref('rgba(0, 0, 0, 0.9)');
 
 // ============================================================================
 // OWNER-SPECIFIC DATA ACCESS
@@ -1347,7 +1356,7 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   right: 88px; /* Leave space for FAB on the right */
   bottom: 88px; /* Leave space for FAB at the bottom */
   background: rgba(255, 255, 255, 0.86); /* White with 86% opacity */
-  z-index: 2500; /* Below speed dial (2000) but above content */
+  z-index: 1500; /* Below speed dial (2000) but above content */
   pointer-events: auto; /* Allow clicks to close */
 }
 
