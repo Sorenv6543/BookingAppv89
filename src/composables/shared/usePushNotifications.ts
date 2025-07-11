@@ -107,7 +107,7 @@ export const usePushNotifications = () => {
         // Create new subscription
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          // @ts-expect-error - Browser API accepts Uint8Array despite strict TypeScript definitions
+          // Browser API accepts Uint8Array despite strict TypeScript definitions
           applicationServerKey: urlBase64ToUint8Array(vapidPublicKey.value)
         })
       }

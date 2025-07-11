@@ -333,8 +333,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase'
-import { useAdminProperties } from '@/composables/admin/useAdminProperties-supabase'
+import { useAdminBookings } from '@/composables/admin/useAdminBookings'
+import { useAdminProperties } from '@/composables/admin/useAdminProperties'
 import { useCleanerManagement } from '@/composables/admin/useCleanerManagement'
 import type { Booking } from '@/types/booking'
 

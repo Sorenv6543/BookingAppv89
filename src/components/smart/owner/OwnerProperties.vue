@@ -144,7 +144,7 @@ import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue'
 
 // ✅ SAME COMPOSABLES AS HomeOwner.vue - SINGLE SOURCE OF TRUTH MAINTAINED
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties'
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase'
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import type { Property, PropertyFormData } from '@/types'
@@ -160,13 +160,13 @@ const authStore = useAuthStore()
 
 // ✅ SAME BUSINESS LOGIC AS HomeOwner - NO DUPLICATION
 const { 
-  myProperties,              // ✅ SAME filtered data
+  myProperties,              // ✅ SAME data
   myActiveProperties,        // ✅ SAME filtered data
   fetchMyProperties,         // ✅ SAME operations
   createMyProperty,          // ✅ SAME operations
   updateMyProperty,          // ✅ SAME operations
-  deleteMyProperty,          // ✅ SAME operations
-  loading: propertiesLoading // ✅ SAME loading state
+  deleteMyProperty           // ✅ SAME operations
+  // loading removed since not used
 } = useOwnerProperties()
 
 const {

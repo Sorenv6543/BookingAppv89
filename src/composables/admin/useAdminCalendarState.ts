@@ -1,6 +1,5 @@
 import { ref, computed } from 'vue';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
-import { useAuthStore } from '@/stores/auth';
 import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
 import { useUIStore } from '@/stores/ui';
@@ -19,7 +18,6 @@ import type { Booking, BookingStatus, BookingType } from '@/types';
 export function useAdminCalendarState() {
   // Get shared functionality and stores
   const baseCalendarState = useCalendarState();
-  const authStore = useAuthStore();
   const bookingStore = useBookingStore();
   const propertyStore = usePropertyStore();
   const uiStore = useUIStore();

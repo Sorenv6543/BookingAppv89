@@ -231,9 +231,7 @@ const {
   goToDate,
   goToToday,
   next,
-  prev,
-  clearPropertyFilters,
-  togglePropertyFilter
+  prev
 } = useCalendarState();
 
 // ============================================================================
@@ -244,10 +242,10 @@ const sidebarOpen = ref(!xs.value);
 const selectedPropertyFilter = ref<string | null>(null);
 
 // Navigation drawer responsive behavior
-const railMode = computed(() => {
-  // Use rail mode on desktop when there's limited space
-  return !xs.value && !sidebarOpen.value;
-});
+// const railMode = computed(() => {
+//   // Use rail mode on desktop when there's limited space
+//   return !xs.value && !sidebarOpen.value;
+// });
 
 // ============================================================================
 // ADMIN-SPECIFIC DATA ACCESS
@@ -470,72 +468,72 @@ const confirmDialogDangerous = computed((): boolean => {
 // EVENT HANDLERS - NAVIGATION
 // ============================================================================
 
-const handleNavigateToBooking = (bookingId: string): void => {
-  try {
-    // Log receiving event from AdminSidebar (or generic Sidebar)
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'navigateToBooking',
-      bookingId,
-      'receive'
-    );
+// const handleNavigateToBooking = (bookingId: string): void => {
+//   try {
+//     // Log receiving event from AdminSidebar (or generic Sidebar)
+//     eventLogger.logEvent(
+//       'Sidebar',
+//       'HomeAdmin',
+//       'navigateToBooking',
+//       bookingId,
+//       'receive'
+//     );
 
-    // Open booking modal for editing
-    const booking = allBookings.value.find(b => b.id === bookingId);
-    if (booking) {
-      uiStore.openModal('event', 'edit', {
-        booking: booking
-      });
-    } else {
-      console.warn(`Booking with ID ${bookingId} not found`);
-    }
-  } catch (error) {
-    console.error('Error navigating to booking:', error);
-    // TODO: Show admin-specific error notification
-  }
-};
+//     // Open booking modal for editing
+//     const booking = allBookings.value.find(b => b.id === bookingId);
+//     if (booking) {
+//       uiStore.openModal('event', 'edit', {
+//         booking: booking
+//       });
+//     } else {
+//       console.warn(`Booking with ID ${bookingId} not found`);
+//     }
+//   } catch (error) {
+//     console.error('Error navigating to booking:', error);
+//     // TODO: Show admin-specific error notification
+//   }
+// };
 
-const handleNavigateToDate = (date: Date): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'navigateToDate',
-      date,
-      'receive'
-    );
+// const handleNavigateToDate = (date: Date): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'Sidebar',
+//       'HomeAdmin',
+//       'navigateToDate',
+//       date,
+//       'receive'
+//     );
 
-    goToDate(date);
-  } catch (error) {
-    console.error('Error navigating to date:', error);
-    // TODO: Show admin-specific error notification
-  }
-};
+//     goToDate(date);
+//   } catch (error) {
+//     console.error('Error navigating to date:', error);
+//     // TODO: Show admin-specific error notification
+//   }
+// };
 
-const handleFilterByProperty = (propertyId: string | null): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'filterByProperty',
-      propertyId,
-      'receive'
-    );
+// const handleFilterByProperty = (propertyId: string | null): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'Sidebar',
+//       'HomeAdmin',
+//       'filterByProperty',
+//       propertyId,
+//       'receive'
+//     );
 
-    selectedPropertyFilter.value = propertyId;
+//     selectedPropertyFilter.value = propertyId;
     
-    // Admin can filter by any property (not just their own)
-    if (propertyId) {
-      togglePropertyFilter(propertyId);
-    } else {
-      clearPropertyFilters();
-    }
-  } catch (error) {
-    console.error('Error filtering by property:', error);
-    // TODO: Show admin-specific error notification
-  }
-};
+//     // Admin can filter by any property (not just their own)
+//     if (propertyId) {
+//       togglePropertyFilter(propertyId);
+//     } else {
+//       clearPropertyFilters();
+//     }
+//   } catch (error) {
+//     console.error('Error filtering by property:', error);
+//     // TODO: Show admin-specific error notification
+//   }
+// };
 
 // ============================================================================
 // EVENT HANDLERS - ADMIN-SPECIFIC ACTIONS
@@ -599,43 +597,43 @@ const handleFilterByProperty = (propertyId: string | null): void => {
 // EVENT HANDLERS - CRUD OPERATIONS
 // ============================================================================
 
-const handleCreateBooking = (): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'createBooking',
-      null,
-      'receive'
-    );
+// const handleCreateBooking = (): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'Sidebar',
+//       'HomeAdmin',
+//       'createBooking',
+//       null,
+//       'receive'
+//     );
 
-    // Admin can create bookings for any property
-    uiStore.openModal('event', 'create', {
-      booking: null
-    });
-  } catch (error) {
-    console.error('Error creating booking:', error);
-  }
-};
+//     // Admin can create bookings for any property
+//     uiStore.openModal('event', 'create', {
+//       booking: null
+//     });
+//   } catch (error) {
+//     console.error('Error creating booking:', error);
+//   }
+// };
 
-const handleCreateProperty = (): void => {
-  try {
-    eventLogger.logEvent(
-      'Sidebar',
-      'HomeAdmin',
-      'createProperty',
-      null,
-      'receive'
-    );
+// const handleCreateProperty = (): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'Sidebar',
+//       'HomeAdmin',
+//       'createProperty',
+//       null,
+//       'receive'
+//     );
 
-    // Admin can create properties for any owner
-    uiStore.openModal('property', 'create', {
-      property: null
-    });
-  } catch (error) {
-    console.error('Error creating property:', error);
-  }
-};
+//     // Admin can create properties for any owner
+//     uiStore.openModal('property', 'create', {
+//       property: null
+//     });
+//   } catch (error) {
+//     console.error('Error creating property:', error);
+//   }
+// };
 
 const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
   try {

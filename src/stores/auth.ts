@@ -113,7 +113,13 @@ export const useAuthStore = defineStore('auth', () => {
     checkAuth,
     updateProfile,
     loadUserProfile,
-    // Expose supabaseUser for test utilities only if needed
-    // ...(import.meta.env.MODE === 'test' ? { supabaseUser } : {})
+    // Expose fallback refs for test utilities
+    ...(import.meta.env.MODE === 'test' ? { 
+      fallbackUser,
+      fallbackSession, 
+      fallbackLoading,
+      fallbackError,
+      fallbackInitializing
+    } : {})
   };
 });
