@@ -1,376 +1,113 @@
 <template>
   <v-navigation-drawer
+    v-model="sidebarOpen"
+    :top="0"
     class="owner-sidebar"
-    :width="380"
-    :permanent="true"
+    :width="280"
+    elevation="0"
+    color="white"
+    :temporary="props.temporary"
+    location="left"
    
-    :elevation="0"
-    color="tertiary"
-  >                                   
-    <!-- User Profile Section -->
-    <v-list-item
-      :prepend-avatar="`https://ui-avatars.com/api/?name=${encodeURIComponent(authStore.user?.name || 'Owner')}&background=6366f1&color=fff`"
-      :title="authStore.user?.name || 'Property Owner'"
-      :subtitle="authStore.user?.email"
-      class="owner-profile ma-2"
-      rounded="lg"
-      color="primary"
-      variant="tonal"
-    >
-      <template #append>
-        <v-btn
-          variant="text"
-          :icon="isRail ? 'mdi-chevron-right' : 'mdi-chevron-left'"
-          size="small"
-          @click="toggleRail"
-        />
-      </template>
-    </v-list-item>
-
-    <v-divider class="mx-4" />
-
-    <!-- Owner Quick Stats -->
-    <v-expand-transition>
-      <v-card
-        v-if="!isRail"
-        variant="flat"
-        class="mx-2 my-3"
-        color="surface-bright"
-      >
-        <v-card-subtitle class="text-caption text-medium-emphasis pb-2">
-          Quick Stats
-        </v-card-subtitle>
-        <v-card-text class="pt-0">
-          <v-row dense>
-            <v-col
-              cols="4"
-              class="text-center"
-            >
-              <v-avatar
-                color="primary"
-                size="40"
-              >
-                <span class="text-h6">{{ ownerData.stats.propertiesCount }}</span>
-              </v-avatar>
-              <div class="text-caption mt-1">
-                Properties
-              </div>
-            </v-col>
-            <v-col
-              cols="4"
-              class="text-center"
-            >
-              <v-avatar
-                color="success"
-                size="40"
-              >
-                <span class="text-h6">{{ ownerData.stats.upcomingBookingsCount }}</span>
-              </v-avatar>
-              <div class="text-caption mt-1">
-                Upcoming
-              </div>
-            </v-col>
-            <v-col
-              cols="4"
-              class="text-center"
-            >
-              <v-avatar 
-                :color="ownerData.stats.urgentTurnsCount > 0 ? 'warning' : 'surface'" 
-                size="40"
-              >
-                <span class="text-h6">{{ ownerData.stats.urgentTurnsCount }}</span>
-              </v-avatar>
-              <div class="text-caption mt-1">
-                Urgent
-              </div>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-expand-transition>
-
-    <v-divider class="mx-4" />
-
-    <!-- Owner Navigation -->
-    <v-list
-      density="compact"
-      nav
-      class="px-2"
-    >
-      <!-- Dashboard -->
-      <v-list-item
-        prepend-icon="mdi-view-dashboard"
-        title="Dashboard"
-        :active="currentRoute === 'owner-dashboard'"
-        rounded="lg"
-        class="mb-1"
-        @click="navigateTo('/owner/dashboard')"
-      />
-      <!-- My Properties -->
-      <v-list-item
-        prepend-icon="mdi-view-dashboard"
-        title="My Properties"
-        :active="currentRoute === 'owner-properties'"
-        rounded="lg"
-        class="mb-1"
-        @click="navigateTo('/owner/properties')"
-      />
-
-      <!-- Add Property -->
-      <v-list-group
-        value="properties"
-        class="mb-1"
-      >
-        <template #activator="{ props: activatorProps }">
-          <v-list-item
-            v-bind="activatorProps"
-            prepend-icon="mdi-home-group"
-            title="Add Property"
-            rounded="lg"
-          >
-            <template #append="{ isActive }">
-              <v-icon :icon="isActive ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
-            </template>
-          </v-list-item>
-        </template>
-
+  >
+      <div 
+  v-show="sidebarOpen || !mobile"
+  class="claro-brand-overlay"
+>
+  <div class="claro-brand-section">
+    <div class="claro-brand-icon">
+      <v-icon color="white" size="24">mdi-calendar</v-icon>
+    </div>
+    <div class="claro-brand-info">
+      <div class="claro-brand-title">Claro</div>
+      <div class="claro-brand-subtitle">Schedule App</div>
+    </div>
+  </div>
+</div>
+    <!-- Navigation Section -->
+    <div class="nav-section sidebar-content-spacing">
+      <div class="section-header">Navigation</div>
+      
+      <v-list class="nav-list" density="compact">
         <v-list-item
-          prepend-icon="mdi-plus-circle"
-          title="Add Property"
-          class="ml-4"
-          rounded="lg"
-          @click="emit('createProperty')"
+          class="nav-item"
+          prepend-icon="mdi-home"
+          title="Home"
+          @click="navigateTo('/owner/dashboard')"
         />
         
         <v-list-item
-          v-for="property in ownerData.ownerProperties"
-          :key="property.id"
-          :prepend-icon="property.active ? 'mdi-home' : 'mdi-home-off'"
-          :title="property.name"
-          :subtitle="getPropertySubtitle(property)"
-          class="ml-4"
-          rounded="lg"
-          @click="filterByProperty(property.id)"
+          class="nav-item active-nav-item"
+          prepend-icon="mdi-calendar"
+          title="Calendar"
+          @click="navigateTo('/owner/calendar')"
         >
           <template #append>
-            <v-chip
-              v-if="getPropertyBookingsCount(property.id) > 0"
-              size="x-small"
-              color="primary"
-              variant="tonal"
-            >
-              {{ getPropertyBookingsCount(property.id) }}
-            </v-chip>
+            <v-icon size="16" color="white">mdi-chevron-right</v-icon>
           </template>
         </v-list-item>
-      </v-list-group>
+        
+        <v-list-item
+          class="nav-item"
+          prepend-icon="mdi-calendar-check"
+          title="Schedule"
+          @click="navigateTo('/owner/bookings')"
+        />
+        
+        <v-list-item
+          class="nav-item"
+          prepend-icon="mdi-clock"
+          title="Recent"
+          @click="navigateTo('/owner/recent')"
+        />
+      </v-list>
+    </div>
 
-      <!-- My Bookings -->
-      <v-list-item
-        prepend-icon="mdi-calendar-check"
-        title="My Bookings"
-        :active="currentRoute === 'owner-bookings'"
-        rounded="lg"
-        class="mb-1"
-        @click="navigateTo('/owner/bookings')"
-      >
-        <template #append>
-          <v-chip
-            v-if="ownerData.ownerBookings.length > 0"
-            size="x-small"
-            color="primary"
-            variant="tonal"
-          >
-            {{ ownerData.ownerBookings.length }}
-          </v-chip>
-        </template>
-      </v-list-item>
-
-      <!-- Calendar View -->
-      <v-list-item
-        prepend-icon="mdi-calendar"
-        title="Calendar"
-        :active="currentRoute === 'owner-calendar'"
-        rounded="lg"
-        class="mb-1"
-        @click="navigateTo('/owner/calendar')"
-      />
-
-      <v-divider class="my-3" />
-
-      <!-- Turn Alerts (Owner-specific) -->
-      <v-list-item
-        :prepend-icon="ownerData.urgentTurns.length > 0 ? 'mdi-alert-circle' : 'mdi-check-circle'"
-        :title="`Turn Alerts (${ownerData.urgentTurns.length})`"
-        :class="{ 'text-warning': ownerData.urgentTurns.length > 0, 'text-success': ownerData.urgentTurns.length === 0 }"
-        rounded="lg"
-        class="mb-1"
-        @click="showTurnAlerts = true"
-      >
-        <template #append>
-          <v-badge
-            v-if="ownerData.urgentTurns.length > 0"
-            :content="ownerData.urgentTurns.length"
-            color="warning"
-          />
-        </template>
-      </v-list-item>
-      <!-- Theme -->
-      <v-list-item
-        prepend-icon="mdi-palette"
-        title="Theme"
-        rounded="lg"
-      >
-        <template #append>
-          <ThemePicker />
-        </template>
-      </v-list-item>
-      <!-- Logout -->
-      <v-list-item
-        prepend-icon="mdi-logout"
-        title="Logout"
-        rounded="lg"
-        @click="logout"
-      >
-        <template #append>
-          <v-btn
-            icon="mdi-logout"
-            variant="text"
-          />
-        </template>
-      </v-list-item>
-      <!-- Settings -->
-      <v-list-item
-        prepend-icon="mdi-cog"
-        title="Settings"
-        rounded="lg"
-        @click="navigateTo('/owner/settings')"
-      />
-    </v-list>
-
-    <!-- Owner Quick Actions -->
-    <template #append>
-      <v-expand-transition>
-        <div
-          v-if="!isRail"
-          class="pa-3"
-        >
-          <v-btn
-            block
-            color="primary"
-            prepend-icon="mdi-plus"
-            text="Add Booking"
-            variant="elevated"
-            class="mb-2"
-            @click="emit('createBooking')"
-          />
-          <v-btn
-            block
-            color="secondary"
-            prepend-icon="mdi-home-plus"
-            text="Add Property"
-            variant="outlined"
-            @click="emit('createProperty')"
-          />
-        </div>
-      </v-expand-transition>
+    <!-- Quick Actions Section -->
+    <div class="actions-section">
+      <div class="section-header">Quick Actions</div>
       
-      <!-- Rail mode quick actions -->
-      <div
-        v-if="isRail"
-        class="d-flex flex-column pa-2"
-      >
-        <v-btn
-          icon="mdi-plus"
-          color="primary"
-          variant="elevated"
-          class="mb-2"
+      <v-list class="actions-list" density="compact">
+        <v-list-item
+          class="action-item"
+          prepend-icon="mdi-plus"
+          title="New Event"
           @click="emit('createBooking')"
         />
-        <v-btn
-          icon="mdi-home-plus"
-          color="secondary"
-          variant="outlined"
-          @click="emit('createProperty')"
+        
+        <v-list-item
+          class="action-item"
+          prepend-icon="mdi-cog"
+          title="Settings"
+          @click="navigateTo('/owner/settings')"
         />
-      </div>
-    </template>
+        
+        <v-list-item
+          class="action-item"
+          prepend-icon="mdi-account"
+          title="Profile"
+          @click="navigateTo('/owner/profile')"
+        />
+      </v-list>
+    </div>
   </v-navigation-drawer>
-
-
-
-
-
-  <!-- Enhanced Turn Alerts Dialog -->
-  <v-dialog 
-    v-model="showTurnAlerts" 
-    max-width="500"
-    :fullscreen="isMobile"
-  >
-    <v-card>
-      <v-card-title class="d-flex align-center">
-        <v-icon 
-          :icon="ownerData.urgentTurns.length > 0 ? 'mdi-alert-circle' : 'mdi-check-circle'"
-          :color="ownerData.urgentTurns.length > 0 ? 'warning' : 'success'"
-          class="mr-3"
-        />
-        Turn Alerts
-        <v-spacer />
-        <v-btn
-          icon="mdi-close"
-          variant="text"
-          @click="showTurnAlerts = false"
-        />
-      </v-card-title>
-      <v-card-text>
-        <div v-if="ownerData.urgentTurns.length > 0">
-          <v-list>
-            <v-list-item
-              v-for="turn in ownerData.urgentTurns"
-              :key="turn.id"
-            >
-              <template #prepend>
-                <v-avatar
-                  color="warning"
-                  size="40"
-                >
-                  <v-icon>mdi-alert</v-icon>
-                </v-avatar>
-              </template>
-              <v-list-item-title>
-                {{ getPropertyName(turn.property_id) }}
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                Checkout: {{ new Date(turn.checkout_date).toLocaleDateString() }}
-              </v-list-item-subtitle>
-            </v-list-item>
-          </v-list>
-        </div>
-        <v-alert
-          v-else
-          type="success"
-          variant="tonal"
-        >
-          <v-icon
-            icon="mdi-check-circle"
-            class="mr-2"
-          />
-          No urgent turns! All your properties are under control.
-        </v-alert>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
-import { useRouter, useRoute } from 'vue-router';
-import { useUIStore } from '@/stores/ui';
-import { useAuthStore } from '@/stores/auth';
-import { useOwnerDataStore } from '@/stores/ownerData';
-import type { Property } from '@/types';
-import ThemePicker from '@/components/dumb/shared/ThemePicker.vue';
+
+// Define props
+interface Props {
+  modelValue: boolean;
+  temporary?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: false,
+  temporary: false
+});
 
 // Define emits
 interface Emits {
@@ -379,135 +116,242 @@ interface Emits {
   (e: 'filterByProperty', propertyId: string | null): void;
   (e: 'createBooking'): void;
   (e: 'createProperty'): void;
+  (e: 'update:modelValue', value: boolean): void;
 }
 
 const emit = defineEmits<Emits>();
 
 // Composables
 const router = useRouter();
-const route = useRoute();
-const { mobile } = useDisplay();
+const { xs, md, lg, mobile, sm } = useDisplay();
 
-// Store connections
-const uiStore = useUIStore();
-const authStore = useAuthStore();
-const ownerDataStore = useOwnerDataStore();
-
-// Enhanced state
-const isRail = ref(false);
-const showTurnAlerts = ref(false);
-
-// Get owner data from store
-const ownerData = computed(() => ownerDataStore);
-
-// Responsive design
-const isMobile = computed(() => mobile.value);
-
-// Current route detection
-const currentRoute = computed(() => route.name as string);
-
-// Navigation methods
-const navigateTo = (path: string) => {
-  try {
-    router.push(path);
-  } catch (error) {
-    console.error('Navigation error:', error);
-  }
-};
-
-const toggleRail = () => {
-  isRail.value = !isRail.value;
-};
-
-// Property and booking methods
-const filterByProperty = (propertyId: string) => {
-  try {
-    uiStore.setPropertyFilter(propertyId);
-    emit('filterByProperty', propertyId);
-  } catch (error) {
-    console.error('Error filtering by property:', error);
-  }
-};
-
-const getPropertySubtitle = (property: Property): string => {
-  return property.address || 'No address';
-};
-
-const getPropertyBookingsCount = (propertyId: string): number => {
-  return ownerData.value.ownerBookings.filter(b => b.property_id === propertyId).length;
-};
-
-const getPropertyName = (propertyId: string): string => {
-  const property = ownerData.value.ownerProperties.find(p => p.id === propertyId);
-  return property?.name || 'Unknown Property';
-};
-
-// Logout function
-const logout = () => {
-  try {
-    // Clear auth state and navigate to login
-    router.push('/auth/login');
-    console.log('User logged out');
-  } catch (error) {
-    console.error('Error logging out:', error);
-  }
-};
-
-
-
-// Initialize owner data on mount
-onMounted(async () => {
-  try {
-    await ownerDataStore.refreshOwnerData();
-  } catch (error) {
-    console.error('Error initializing owner data:', error);
-  }
+// v-model support
+const sidebarOpen = computed({
+  get: () => props.modelValue,
+  set: (value: boolean) => emit('update:modelValue', value)
 });
+// Navigation helper
+const navigateTo = (path: string) => {
+  router.push(path);
+};
 </script>
 
 <style scoped>
+/* Navigation Drawer Z-Index Override */
 .owner-sidebar {
-  height: 100%;
-  overflow-y: auto;
+  top:0px !important;
+  background: #f8f9fa !important;
+
 }
 
-.quick-actions .v-card-text {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0px;
+/* Target all Vuetify navigation drawer elements */
+:deep(.v-navigation-drawer) {
+  
 }
 
-/* Custom scrollbar for better UX */
-::-webkit-scrollbar {
-  width: 8px;
+:deep(.v-navigation-drawer__scrim) {
+ 
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+:deep(.v-navigation-drawer__content) {
+
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+.owner-sidebar-drawer {
+
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+.owner-sidebar :deep(.v-navigation-drawer__content) {
+ 
 }
 
-/* Mobile optimizations */
-@media (max-width: 960px) {
-  .owner-sidebar {
-    width: 100% !important;
+/* Sidebar Content Spacing */
+.sidebar-content-spacing {
+  margin-top: 100px; /* Push content below brand overlay */
+}
+
+/* Section Headers */
+.section-header {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1976d2;
+  padding: 16px 20px 8px 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Navigation Section */
+.nav-section {
+  margin-bottom: 16px;
+}
+
+.nav-list {
+  padding: 0 12px;
+}
+
+.nav-item {
+  margin-bottom: 4px;
+  border-radius: 8px !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+.nav-item:hover {
+  background: #f3f4f6 !important;
+}
+
+.nav-item.active-nav-item {
+  background: #1976d2 !important;
+  color: white !important;
+}
+
+.nav-item.active-nav-item :deep(.v-list-item__prepend .v-icon) {
+  color: white !important;
+}
+
+.nav-item.active-nav-item :deep(.v-list-item-title) {
+  color: white !important;
+}
+
+/* Quick Actions Section */
+.actions-section {
+  margin-top: 16px;
+}
+
+.actions-list {
+  padding: 0 12px;
+}
+
+.action-item {
+  margin-bottom: 4px;
+  border-radius: 8px !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+.action-item:hover {
+  background: #f3f4f6 !important;
+}
+
+/* Icon styling */
+:deep(.v-list-item__prepend .v-icon) {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.nav-item:hover :deep(.v-list-item__prepend .v-icon) {
+  color: #374151;
+}
+
+.action-item:hover :deep(.v-list-item__prepend .v-icon) {
+  color: #374151;
+}
+
+/* List item title styling */
+:deep(.v-list-item-title) {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 959px) {
+  .sidebar-content-spacing {
+    margin-top: 80px; /* Smaller spacing on mobile */
   }
 }
+/* ================================================================ */
+/* CLARO BRAND OVERLAY - OVER APP BAR */
+/* ================================================================ */
 
-/* Owner-specific styling */
-.property-filter .v-card-title {
-  color: rgb(var(--v-theme-primary));
+.claro-brand-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100px;
+  background: #1976d2;
+
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.quick-actions .v-card-title {
-  color: rgb(var(--v-theme-secondary));
+.claro-brand-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.claro-brand-icon {
+  width: 48px;
+  height: 48px;
+  background: #1976d2;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.claro-brand-info {
+  flex: 1;
+}
+
+.claro-brand-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  line-height: 1.2;
+}
+
+.claro-brand-subtitle {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.2;
+}
+
+/* Responsive Brand Overlay */
+@media (max-width: 959px) {
+  .claro-brand-overlay {
+    height: 80px; /* Smaller on mobile */
+  }
+  
+  .claro-brand-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .claro-brand-title {
+    font-size: 1.1rem !important;
+  }
+  
+  .claro-brand-subtitle {
+    font-size: 0.8rem !important;
+  }
+}
+</style> 
+
+<!-- Unscoped styles for z-index overrides -->
+<style>
+/* Global z-index overrides for navigation drawer */
+.v-navigation-drawer.owner-sidebar {
+  
+}
+
+.v-navigation-drawer--temporary {
+
+}
+
+.v-navigation-drawer--temporary .v-navigation-drawer__content {
+
+}
+
+.v-overlay--contained .v-overlay__scrim {
+ 
+}
+
+.v-overlay__scrim {
+
 }
 </style> 

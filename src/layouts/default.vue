@@ -58,9 +58,11 @@
       </v-menu>
     </v-app-bar> -->
   
-    <!-- Main Content Area -->
-    <v-main class="owner-main">
-      <router-view />
+    <!-- Main Content Area - Full Height for Mobile Calendar -->
+    <v-main class="main-content-area">
+      <div class="viewport-container">
+        <router-view />
+      </div>
     </v-main>
   
     <!-- Global Notification Area -->
@@ -105,10 +107,33 @@
     border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12) !important;
   }
   
-  /* Main content area */
-  .owner-main {
+  /* Main content area - Full height support */
+  .v-main {
     background: rgb(var(--v-theme-background)) !important;
     color: rgb(var(--v-theme-on-background)) !important;
+    padding: 0 !important;
+  }
+
+  /* Override Vuetify's default v-main__wrap padding */
+  .v-main__wrap {
+    padding: 0 !important;
+  }
+
+  /* Mobile viewport support for calendar */
+  .main-content-area {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+  }
+
+  .viewport-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
   }
   
   /* List items in navigation */

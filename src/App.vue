@@ -58,8 +58,7 @@ html, body {
 
 /* Custom scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {
@@ -70,10 +69,6 @@ html, body {
 ::-webkit-scrollbar-thumb {
   background: rgba(var(--v-theme-on-surface-variant), 0.5);
   border-radius: 8px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--v-theme-primary));
 }
 
 /* Loading and transition classes */

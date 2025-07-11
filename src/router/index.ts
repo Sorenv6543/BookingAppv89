@@ -41,7 +41,7 @@ const router = createRouter({
       name: 'owner-dashboard',
       component: () => import('@/pages/owner/dashboard.vue'),
       meta: {
-        layout: 'default',
+        layout: 'owner',
        
         role: 'owner'
       }
@@ -51,7 +51,7 @@ const router = createRouter({
       name: 'owner-properties',
       component: () => import('@/pages/owner/properties/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'owner',
        
         role: 'owner'
       }
@@ -61,7 +61,7 @@ const router = createRouter({
       name: 'owner-calendar',
       component: () => import('@/pages/owner/calendar.vue'),
       meta: {
-        layout: 'default',
+        layout: 'owner',
        
         role: 'owner'
       }
@@ -71,7 +71,7 @@ const router = createRouter({
       name: 'owner-bookings',
       component: () => import('@/pages/owner/bookings/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'owner',
         
         role: 'owner'
       }

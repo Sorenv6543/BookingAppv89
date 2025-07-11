@@ -1,24 +1,18 @@
 <template>
   <div class="owner-calendar-container">
     <!-- Owner Calendar: Shows only owner's bookings across their properties -->
-    <v-card
-      :style="{ height: calendarCardHeight }"
-      class="owner-calendar-card"
-    >
-      <FullCalendar
-        ref="calendarRef"
-        :bookings="props.bookings"
-        :properties="props.properties"
-        :loading="props.loading"
-        class="owner-calendar"
-        :style="{ height: fullCalendarHeight }"
-        @date-select="handleDateSelect"
-        @event-click="handleEventClick"
-        @event-drop="handleEventDrop"
-        @event-resize="handleEventResize"
-        @create-booking="handleCreateBooking"
-      />
-    </v-card>
+    <FullCalendar
+      ref="calendarRef"
+      :bookings="props.bookings"
+      :properties="props.properties"
+      :loading="props.loading"
+      class="owner-calendar"
+      @date-select="handleDateSelect"
+      @event-click="handleEventClick"
+      @event-drop="handleEventDrop"
+      @event-resize="handleEventResize"
+      @create-booking="handleCreateBooking"
+    />
   </div>
 </template>
 
@@ -60,12 +54,7 @@ const emit = defineEmits<Emits>();
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
 
 // ===== COMPUTED PROPERTIES (SAFE - NO CIRCULAR DEPENDENCIES) =====
-
-// Calendar card height (account for app-bar and header - no reactive dependencies)
-const calendarCardHeight = computed(() => 'calc(100vh - 64px - 80px)');
-
-// Full calendar height (fills available space - no reactive dependencies)
-const fullCalendarHeight = computed(() => '100%');
+// Removed height computed properties - using CSS flexbox instead
 
 // ===== EVENT HANDLERS (SAFE - SIMPLE EMIT PATTERNS) =====
 
@@ -166,7 +155,7 @@ defineExpose({
 
 <style scoped>
 /* ================================================================ */
-/* OWNER CALENDAR - FITS PARENT CONTAINER */
+/* MOBILE-FIRST CALENDAR CONTAINER */
 /* ================================================================ */
 
 .owner-calendar-container {
@@ -175,27 +164,15 @@ defineExpose({
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.owner-calendar-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
-  min-height: 0;
-  padding: 0 !important;
-  margin: 0 !important;
 }
 
 .owner-calendar {
   flex: 1;
   min-height: 0;
+  width: 100%;
+  height: 100%;
   position: relative;
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
 }
 
 /* ================================================================ */

@@ -20,7 +20,7 @@ const lightTheme: ThemeDefinition = {
     info: '#03A9F4', // Light Blue - For informational elements
     success: '#4CAF50', // Green - For success indicators
     warning: '#FF9800', // Orange - For high-priority bookings
-    background: '#fde1e1', // Soft Blue - App background
+    background: '#ffffff', // Clean white - App background
     surface: '#ffffff', // Very Light #e6bfbf - Cards and surfaces
     'on-background': '#1C1B1F',
     'on-surface': '#1C1B1F',
