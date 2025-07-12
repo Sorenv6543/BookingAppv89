@@ -429,12 +429,18 @@ defineExpose({
   width: 100%;
   margin: 0 !important;
   padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .custom-calendar {
   width: 100% !important;
+  height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
+  flex: 1;
+  min-height: 0;
 }
 
 .custom-calendar {
@@ -489,5 +495,32 @@ defineExpose({
   font-size: 0.75em;
   opacity: 0.9;
   margin-top: 1px;
+}
+
+/* Mobile viewport specific fixes */
+@media (max-width: 959px) {
+  .calendar-container {
+    position: relative;
+    height: 100% !important;
+  }
+  
+  .custom-calendar {
+    position: relative;
+    height: 100% !important;
+  }
+  
+  /* Ensure FullCalendar takes full available space on mobile */
+  :deep(.fc) {
+    height: 100% !important;
+  }
+  
+  :deep(.fc-view-harness) {
+    height: 100% !important;
+  }
+  
+  :deep(.fc-scroller) {
+    height: 100% !important;
+    overflow-y: auto !important;
+  }
 }
 </style> 
