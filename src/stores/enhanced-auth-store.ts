@@ -3,8 +3,6 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { UserRole } from '@/types';
 import {
-  validateRouteAccess,
-  enhanceUserProfileData,
   getRoleSpecificSuccessMessage,
   clearAllRoleSpecificState
 } from '@/utils/authHelpers';
@@ -155,7 +153,7 @@ export const useAuthStore = defineStore('auth', () => {
     company_name?: string;
     notifications_enabled?: boolean;
     timezone?: string;
-    theme?: string;
+    theme?: 'light' | 'dark' | 'system';
   }): Promise<boolean> {
     try {
       loading.value = true;

@@ -4,7 +4,7 @@ import 'vue-router'
 declare module 'vue-router' {
   interface RouteMeta {
     // Layout to use for this route
-    layout?: 'default' | 'admin' | 'auth'
+    layout?: 'default' | 'admin' | 'auth' | 'owner'
     
     // Whether this route requires authentication
     requiresAuth?: boolean
