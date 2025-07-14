@@ -225,30 +225,7 @@ function forceStopLoading() {
   }
 }
 
-async function testSupabaseConnection() {
-  try {
-    console.log('🔍 Testing Supabase connection...');
-    
-    // Test direct connection (this would normally be in your supabase plugin)
-    const response = await fetch('https://yplrudursbvzcdaroqly.supabase.co/rest/v1/user_profiles?select=count', {
-      method: 'HEAD',
-      headers: {
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwbHJ1ZHVyc2J2emNkYXJvcWx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyNzIyNTAsImV4cCI6MjA2Njg0ODI1MH0.D3NN6SPNG_fJ4ys_2Ju9t_9X12P18nWLyzF_nteHIuQ'
-      }
-    });
-    
-    if (response.ok) {
-      console.log('✅ Supabase connection successful');
-      alert('✅ Supabase connection successful');
-    } else {
-      console.error('❌ Supabase connection failed:', response.status);
-      alert('❌ Supabase connection failed: ' + response.status);
-    }
-  } catch (error) {
-    console.error('❌ Connection test failed:', error);
-    alert('❌ Connection test failed: ' + (error instanceof Error ? error.message : String(error)));
-  }
-}
+
 
 function goToDemos() {
   router.push('/demos')

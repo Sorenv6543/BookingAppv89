@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp:*)",
+      "mcp__desktop-commander__read_file",
+      "mcp__desktop-commander__search_code",
+      "mcp__desktop-commander__list_directory"
+    ],
+    "deny": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase",
+    "sequential-thinking",
+    "context7",
+    "desktop-commander"
+  ]
+}
