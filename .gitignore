@@ -42,6 +42,11 @@ dist-ssr
 .temp
 .tmp
 
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
 
 
 

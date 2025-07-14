@@ -41,6 +41,15 @@
         "@wonderwhy-er/desktop-commander"
       ],
       "env": {}
+    },
+    "puppeteer": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": [
+        "dlx",
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "env": {}
     }
   }
 }

@@ -30,7 +30,13 @@
     "perf:imports": "node scripts/optimize-pwa.js imports",
     "perf:regression": "vitest run src/__tests__/utils/performance-regression.spec.ts",
     "perf:analysis": "npm run perf:bundle && npm run perf:regression",
-    "perf:report": "npm run perf:analysis && echo 'Performance analysis complete. See performance-bundle-report.json for details.'"
+    "perf:report": "npm run perf:analysis && echo 'Performance analysis complete. See performance-bundle-report.json for details.'",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:mobile": "playwright test --project=\"Mobile Chrome\"",
+    "test:e2e:report": "playwright show-report"
   },
   "keywords": [],
   "author": "",
@@ -61,6 +67,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
+    "@playwright/test": "^1.54.1",
     "@testing-library/vue": "^8.1.0",
     "@types/node": "^20.19.0",
     "@typescript-eslint/eslint-plugin": "^8.34.0",

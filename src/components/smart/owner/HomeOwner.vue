@@ -1176,6 +1176,10 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   flex-shrink: 0;
   border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
   background: rgb(var(--v-theme-surface));
+  /* Fixed height for consistent layout calculations */
+  height: 60px;
+  min-height: 60px;
+  max-height: 60px;
 }
 
 .calendar-content {
@@ -1183,6 +1187,8 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   min-height: 0;
   overflow: hidden;
   position: relative;
+  /* Mobile-specific height management */
+  height: calc(100% - 60px); /* Subtract header card height */
 }
 
 /* Clean Calendar Header Layout */
@@ -1218,15 +1224,20 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 /* RESPONSIVE MOBILE-FIRST ENHANCEMENTS */
 /* ================================================================ */
 
-/* Mobile viewport stretching */
+/* Mobile viewport stretching with safe area support */
 @media (max-width: 959px) {
   .home-owner-layout {
     height: 100vh !important;
+    /* Support for devices with notches/safe areas */
+    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
   }
   
   .calendar-main-container {
-    height: calc(100vh - 56px) !important;
-    margin-top: 56px !important;
+    /* Account for app bar + safe area top */
+    height: calc(100vh - 56px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    margin-top: calc(56px + env(safe-area-inset-top)) !important;
+    /* Prevent content from being hidden behind navigation bars */
+    padding-bottom: env(safe-area-inset-bottom);
   }
   
   .calendar-header-card .v-card-text {

@@ -236,19 +236,44 @@ defineExpose({
 /* Mobile portrait - Optimize for owner's mobile usage */
 @media (max-width: 599px) {
   .owner-calendar-container {
-    /* Height managed by parent container */
+    /* Ensure proper height calculation for mobile */
+    height: 100% !important;
     font-size: 0.875rem;
+    /* Prevent content from being cut off */
+    overflow: hidden;
+  }
+  
+  .owner-calendar {
+    /* Force full height utilization on mobile */
+    height: 100% !important;
+    width: 100% !important;
   }
   
   /* Smaller event text for mobile */
   :deep(.fc-event-title) {
-    font-size: 0.75rem;
-    line-height: 1.2;
+    font-size: 0.7rem;
+    line-height: 1.1;
+    /* Ensure text doesn't overflow on small screens */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   
   /* Compact day cells */
   :deep(.fc-daygrid-day-number) {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    padding: 2px;
+  }
+  
+  /* Mobile-optimized day cell heights */
+  :deep(.fc-daygrid-day-frame) {
+    min-height: 35px;
+  }
+  
+  /* Improve touch targets on mobile */
+  :deep(.fc-event) {
+    min-height: 20px;
+    padding: 1px 2px;
   }
 }
 
@@ -256,10 +281,22 @@ defineExpose({
 @media (min-width: 600px) and (max-width: 1279px) {
   .owner-calendar-container {
     font-size: 0.9rem;
+    height: 100% !important;
+  }
+  
+  .owner-calendar {
+    height: 100% !important;
+    width: 100% !important;
   }
   
   :deep(.fc-event-title) {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    line-height: 1.2;
+  }
+  
+  /* Tablet-optimized day cell heights */
+  :deep(.fc-daygrid-day-frame) {
+    min-height: 45px;
   }
 }
 

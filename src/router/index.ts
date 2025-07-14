@@ -148,6 +148,24 @@ const router = createRouter({
         
       }
     },
+    
+    // Demo routes - required for E2E testing
+    {
+      path: '/demos',
+      name: 'demos-index',
+      component: () => import('@/pages/demos/index.vue'),
+      meta: {
+        
+      }
+    },
+    {
+      path: '/demos/owner-calendar',
+      name: 'owner-calendar-demo',
+      component: () => import('@/dev/demos/OwnerCalendarDemo.vue'),
+      meta: {
+        layout: 'default'
+      }
+    },
       // Demo routes - now in src/dev/demos/
       // {
       //   path: '/demos/uiux-enhancements',

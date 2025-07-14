@@ -5,6 +5,18 @@
       :options="calendarOptions"
       class="custom-calendar"
     />
+    
+    <!-- Owner Day View Bottom Sheet -->
+    <OwnerDayViewBottomSheet
+      v-model:visible="dayViewVisible"
+      :date="selectedDate"
+      :bookings="selectedDayBookings"
+      :properties="properties"
+      @view-booking="handleViewBooking"
+      @edit-booking="handleEditBooking"
+      @complete-booking="handleCompleteBooking"
+      @add-booking="handleAddBookingFromDayView"
+    />
   </div>
 </template>
 
@@ -14,9 +26,12 @@ import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg } from
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue';
 import { useTheme } from 'vuetify';
 import type { Booking, Property } from '@/types';
+import { getMobileCalendarOptions, handleViewportResize } from '@/utils/mobileViewport';
+import OwnerDayViewBottomSheet from '@/components/dumb/owner/OwnerDayViewBottomSheet.vue';
+import { useAuthStore } from '@/stores/auth';
 
 // Import event logger for component communication
 import eventLogger from '@/composables/shared/useComponentEventLogger';
@@ -45,6 +60,14 @@ const emit = defineEmits<Emits>();
 // Theme integration
 const theme = useTheme();
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+
+// Auth store for owner filtering
+const authStore = useAuthStore();
+
+// Day view bottom sheet state
+const dayViewVisible = ref(false);
+const selectedDate = ref<Date | null>(null);
+const selectedDayBookings = ref<Booking[]>([]);
 
 // Convert bookings Map to FullCalendar events
 const calendarEvents = computed(() => {
@@ -157,6 +180,10 @@ const getEventTextColor = (booking: Booking): string => {
   return '#FFFFFF';
 };
 
+// Mobile viewport height management
+const mobileOptions = ref(getMobileCalendarOptions());
+let cleanupViewportListener: (() => void) | null = null;
+
 // Calendar configuration
 const calendarOptions = computed<CalendarOptions>(() => ({
   plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -166,9 +193,9 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   headerToolbar: false,
   
   
-  // Event settings
+  // Event settings - mobile optimized
   events: calendarEvents.value,
-  eventDisplay: 'block',
+  eventDisplay: mobileOptions.value.eventDisplay,
   eventOverlap: false,
   eventResizableFromStart: true,
   
@@ -186,8 +213,8 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   slotDuration: '01:00:00',
   snapDuration: '00:30:00',
   
-  // Appearance - Full viewport height
-  height: '100%',
+  // Use mobile-optimized height calculation
+  height: mobileOptions.value.height,
   aspectRatio: undefined, // Remove aspect ratio constraints for full height
   expandRows: true, // Make calendar rows expand to fill available height
   eventBackgroundColor: theme.global.current.value.colors.primary,
@@ -220,9 +247,9 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   // Weekend styling
   weekends: true,
   
-  // Month view specific
-  dayMaxEvents: 3,
-  moreLinkClick: 'popover',
+  // Month view specific - mobile optimized
+  dayMaxEvents: mobileOptions.value.dayMaxEvents,
+  moreLinkClick: handleMoreLinkClick,
   
   // Week/day view specific
   allDaySlot: false,
@@ -399,6 +426,116 @@ watch(() => props.bookings, (newBookings, oldBookings) => {
   // FullCalendar will automatically update with the new events
 }, { immediate: true }); // Removed deep: true to prevent excessive re-runs
 
+// Custom more link click handler for day view bottom sheet
+const handleMoreLinkClick = (moreLinkInfo: any): void => {
+  const clickedDate = moreLinkInfo.date;
+  const currentUserId = authStore.user?.id;
+  
+  // Filter bookings for the clicked date AND current owner only
+  const dayBookings = Array.from(props.bookings.values()).filter(booking => {
+    const bookingDate = new Date(booking.checkout_date);
+    const clickedDateStr = clickedDate.toDateString();
+    const bookingDateStr = bookingDate.toDateString();
+    
+    // Date match AND owner match (for role-based filtering)
+    const dateMatches = bookingDateStr === clickedDateStr;
+    const ownerMatches = !currentUserId || booking.owner_id === currentUserId;
+    
+    return dateMatches && ownerMatches;
+  });
+  
+  // Set state and open bottom sheet
+  selectedDate.value = clickedDate;
+  selectedDayBookings.value = dayBookings;
+  dayViewVisible.value = true;
+  
+  // Log the more link click event
+  eventLogger.logEvent(
+    'FullCalendar',
+    'OwnerDayViewBottomSheet',
+    'moreLinkClick',
+    { 
+      date: clickedDate.toISOString(), 
+      bookingCount: dayBookings.length,
+      userId: currentUserId,
+      roleFiltered: !!currentUserId
+    },
+    'emit'
+  );
+  
+  console.log('📅 [FullCalendar] More link clicked for date:', clickedDate, 'with', dayBookings.length, 'owner bookings');
+};
+
+// Day view bottom sheet event handlers
+const handleViewBooking = (booking: Booking): void => {
+  // Close the bottom sheet first
+  dayViewVisible.value = false;
+  
+  // Find the FullCalendar event and trigger click
+  const calendarApi = calendarRef.value?.getApi();
+  if (calendarApi) {
+    const event = calendarApi.getEventById(booking.id);
+    if (event) {
+      // Simulate event click
+      const clickInfo = {
+        event: event,
+        jsEvent: new MouseEvent('click'),
+        view: calendarApi.view
+      };
+      handleEventClick(clickInfo as EventClickArg);
+    }
+  }
+  
+  console.log('👁️ [FullCalendar] View booking from day view:', booking.id);
+};
+
+const handleEditBooking = (booking: Booking): void => {
+  // Close the bottom sheet and emit edit event
+  dayViewVisible.value = false;
+  
+  // Emit edit event (can be handled by parent)
+  emit('eventClick', {
+    event: {
+      id: booking.id,
+      extendedProps: { booking, isEdit: true }
+    }
+  } as any);
+  
+  console.log('✏️ [FullCalendar] Edit booking from day view:', booking.id);
+};
+
+const handleCompleteBooking = (booking: Booking): void => {
+  // Update booking status and emit event
+  const updatedBooking = { ...booking, status: 'completed' as const };
+  
+  emit('updateBooking', {
+    id: booking.id,
+    start: booking.checkout_date,
+    end: booking.checkin_date
+  });
+  
+  console.log('✅ [FullCalendar] Complete booking from day view:', booking.id);
+};
+
+const handleAddBookingFromDayView = (date: Date): void => {
+  // Close the bottom sheet
+  dayViewVisible.value = false;
+  
+  // Create date strings for the selected date
+  const startStr = date.toISOString().split('T')[0];
+  const endDate = new Date(date);
+  endDate.setDate(endDate.getDate() + 1);
+  const endStr = endDate.toISOString().split('T')[0];
+  
+  // Emit create booking event
+  emit('createBooking', {
+    start: startStr,
+    end: endStr
+  });
+  
+  console.log('➕ [FullCalendar] Add booking from day view for date:', startStr);
+};
+
 // Add new handler function after the other event handlers
 const handleLoading = (isLoading: boolean): void => {
   // You can emit an event or handle loading state changes here
@@ -413,6 +550,21 @@ const handleLoading = (isLoading: boolean): void => {
     'emit'
   );
 };
+
+// Lifecycle hooks for mobile viewport management
+onMounted(() => {
+  // Set up viewport resize listener for mobile
+  cleanupViewportListener = handleViewportResize(() => {
+    mobileOptions.value = getMobileCalendarOptions();
+  });
+});
+
+onUnmounted(() => {
+  // Clean up viewport listener
+  if (cleanupViewportListener) {
+    cleanupViewportListener();
+  }
+});
 
 // Expose methods to parent
 defineExpose({
@@ -497,30 +649,54 @@ defineExpose({
   margin-top: 1px;
 }
 
-/* Mobile viewport specific fixes */
+/* Mobile viewport specific fixes with proper height calculations */
 @media (max-width: 959px) {
   .calendar-container {
     position: relative;
-    height: 100% !important;
+    /* Use calculated height instead of 100% */
+    height: calc(100vh - 56px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px) !important;
+    min-height: 400px; /* Minimum height for very small screens */
+    max-height: calc(100vh - 100px); /* Maximum height to prevent overflow */
   }
   
   .custom-calendar {
     position: relative;
     height: 100% !important;
+    width: 100% !important;
   }
   
   /* Ensure FullCalendar takes full available space on mobile */
   :deep(.fc) {
     height: 100% !important;
+    width: 100% !important;
   }
   
   :deep(.fc-view-harness) {
     height: 100% !important;
+    width: 100% !important;
   }
   
   :deep(.fc-scroller) {
     height: 100% !important;
     overflow-y: auto !important;
+    /* Smooth scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fix for mobile browser address bar height changes */
+  :deep(.fc-daygrid-body) {
+    min-height: 300px; /* Ensure minimum content height */
+  }
+  
+  /* Prevent horizontal scrolling on mobile */
+  :deep(.fc-daygrid-day-frame) {
+    min-height: 40px;
+  }
+  
+  /* Mobile-optimized event spacing */
+  :deep(.fc-event) {
+    margin: 1px 0;
+    font-size: 0.75rem;
   }
 }
 </style> 
