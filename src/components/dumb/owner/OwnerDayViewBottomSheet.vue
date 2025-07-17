@@ -133,13 +133,23 @@
           <div v-if="bookings.length === 0" class="empty-state">
             <v-icon size="64" color="grey-lighten-1">mdi-calendar-blank</v-icon>
             <h4 class="empty-title">No bookings for this day</h4>
-            <p class="empty-subtitle">Tap the calendar to add a new booking</p>
+            <p class="empty-subtitle">Get started by adding your first booking</p>
+            <v-btn
+              variant="elevated"
+              color="primary"
+              prepend-icon="mdi-plus"
+              @click="addBooking"
+              class="empty-state-btn"
+              size="large"
+            >
+              Add Booking for {{ formattedDate }}
+            </v-btn>
           </div>
         </div>
       </v-card-text>
 
-      <!-- Footer Actions -->
-      <v-card-actions class="day-view-footer">
+      <!-- Footer Actions - Only show when there are existing bookings -->
+      <v-card-actions v-if="bookings.length > 0" class="day-view-footer">
         <v-btn
           variant="elevated"
           color="primary"
@@ -148,7 +158,7 @@
           class="add-booking-btn"
           block
         >
-          Add Booking for {{ formattedDate }}
+          Add Another Booking
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -489,7 +499,13 @@ watch(internalVisible, async (newVisible) => {
 
 .empty-subtitle {
   color: rgb(var(--v-theme-on-surface-variant));
-  margin: 0;
+  margin: 0 0 24px;
+}
+
+.empty-state-btn {
+  border-radius: 12px;
+  font-weight: 600;
+  margin-top: 8px;
 }
 
 .day-view-footer {

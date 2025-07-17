@@ -17,8 +17,9 @@ test.describe('Multi-Booking Day View', () => {
       await page.waitForSelector('text=Owner Calendar', { timeout: 10000 });
       await page.click('text=Owner Calendar');
       
-      // Wait for calendar demo to load
-      await page.waitForTimeout(2000);
+      // Wait for calendar component to fully load (check for FullCalendar root)
+      await page.waitForSelector('.fc', { timeout: 15000 });
+      await page.waitForTimeout(3000); // Additional wait for calendar to render
     }
   });
 

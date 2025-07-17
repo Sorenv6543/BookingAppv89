@@ -233,9 +233,12 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   // Loading state
   loading: handleLoading,
   
+  // Calendar lifecycle
+  didMount: handleCalendarMount,
+  viewDidMount: handleViewMount,
+  
   // Custom rendering
   eventContent: renderEventContent,
-  dayCellContent: renderDayCell,
   
   // Business hours (optional)
   businessHours: {
@@ -249,7 +252,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   
   // Month view specific - mobile optimized
   dayMaxEvents: mobileOptions.value.dayMaxEvents,
-  moreLinkClick: handleMoreLinkClick,
+  moreLinkClick: false, // Disable default popover completely
   
   // Week/day view specific
   allDaySlot: false,
@@ -354,26 +357,6 @@ const renderEventContent = (eventInfo: any) => {
   };
 };
 
-// Custom day cell rendering
-const renderDayCell = (dayInfo: any) => {
-  const dayBookings = Array.from(props.bookings.values())
-    .filter(booking => {
-      const checkoutDate = new Date(booking.checkout_date).toDateString();
-      const dayDate = dayInfo.date.toDateString();
-      return checkoutDate === dayDate;
-    });
-  
-  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
-  
-  return {
-    html: `
-      <div class="fc-daygrid-day-number">
-        ${dayInfo.dayNumberText}
-        ${turnCount > 0 ? `<span class="turn-indicator">${turnCount}</span>` : ''}
-      </div>
-    `
-  };
-};
 
 // Programmatic calendar methods
 const goToDate = (date: string | Date): void => {
@@ -424,47 +407,12 @@ watch(() => props.bookings, (newBookings, oldBookings) => {
   );
   
   // FullCalendar will automatically update with the new events
+  // Reattach more link listeners after events update
+  setTimeout(() => {
+    attachMoreLinkListeners();
+  }, 200);
 }, { immediate: true }); // Removed deep: true to prevent excessive re-runs
 
-// Custom more link click handler for day view bottom sheet
-const handleMoreLinkClick = (moreLinkInfo: any): void => {
-  const clickedDate = moreLinkInfo.date;
-  const currentUserId = authStore.user?.id;
-  
-  // Filter bookings for the clicked date AND current owner only
-  const dayBookings = Array.from(props.bookings.values()).filter(booking => {
-    const bookingDate = new Date(booking.checkout_date);
-    const clickedDateStr = clickedDate.toDateString();
-    const bookingDateStr = bookingDate.toDateString();
-    
-    // Date match AND owner match (for role-based filtering)
-    const dateMatches = bookingDateStr === clickedDateStr;
-    const ownerMatches = !currentUserId || booking.owner_id === currentUserId;
-    
-    return dateMatches && ownerMatches;
-  });
-  
-  // Set state and open bottom sheet
-  selectedDate.value = clickedDate;
-  selectedDayBookings.value = dayBookings;
-  dayViewVisible.value = true;
-  
-  // Log the more link click event
-  eventLogger.logEvent(
-    'FullCalendar',
-    'OwnerDayViewBottomSheet',
-    'moreLinkClick',
-    { 
-      date: clickedDate.toISOString(), 
-      bookingCount: dayBookings.length,
-      userId: currentUserId,
-      roleFiltered: !!currentUserId
-    },
-    'emit'
-  );
-  
-  console.log('📅 [FullCalendar] More link clicked for date:', clickedDate, 'with', dayBookings.length, 'owner bookings');
-};
 
 // Day view bottom sheet event handlers
 const handleViewBooking = (booking: Booking): void => {
@@ -551,6 +499,85 @@ const handleLoading = (isLoading: boolean): void => {
   );
 };
 
+// Calendar mount handlers to manually attach more link listeners
+const handleCalendarMount = (): void => {
+  attachMoreLinkListeners();
+};
+
+const handleViewMount = (): void => {
+  // Reattach listeners when view changes (month/week/day)
+  setTimeout(() => {
+    attachMoreLinkListeners();
+  }, 100);
+};
+
+// Manually attach click listeners to more links
+const attachMoreLinkListeners = (): void => {
+  if (!calendarRef.value) return;
+  
+  const calendarEl = calendarRef.value.$el || calendarRef.value.getApi().el;
+  if (!calendarEl) return;
+  
+  // Find all "+N more" links
+  const moreLinks = calendarEl.querySelectorAll('.fc-more-link');
+  
+  moreLinks.forEach((link: Element) => {
+    // Remove existing listeners to prevent duplicates
+    link.removeEventListener('click', handleManualMoreLinkClick as any);
+    
+    // Add our custom click handler
+    link.addEventListener('click', handleManualMoreLinkClick as any);
+  });
+  
+  console.log('📎 [FullCalendar] Attached listeners to', moreLinks.length, 'more links');
+};
+
+// Manual more link click handler
+const handleManualMoreLinkClick = (event: Event): void => {
+  event.preventDefault();
+  event.stopPropagation();
+  
+  const linkElement = event.currentTarget as HTMLElement;
+  
+  // Find the day cell that contains this more link
+  const dayCell = linkElement.closest('.fc-daygrid-day') as HTMLElement;
+  if (!dayCell) return;
+  
+  // Get the date from the day cell
+  const dateAttr = dayCell.getAttribute('data-date');
+  if (!dateAttr) return;
+  
+  const clickedDate = new Date(dateAttr);
+  const currentUserId = authStore.user?.id;
+  
+  // Filter bookings for this date (same logic as before)
+  const clickedDateStr = clickedDate.toDateString();
+  const dayBookings: Booking[] = [];
+  
+  Array.from(props.bookings.values()).forEach(booking => {
+    const checkoutDate = new Date(booking.checkout_date);
+    const checkinDate = new Date(booking.checkin_date);
+    
+    // Check if the clicked date falls within the booking period
+    const bookingStartsOnDate = checkoutDate.toDateString() === clickedDateStr;
+    const bookingSpansDate = clickedDate >= checkoutDate && clickedDate < checkinDate;
+    
+    const dateMatches = bookingStartsOnDate || bookingSpansDate;
+    const ownerMatches = !currentUserId || booking.owner_id === currentUserId;
+    
+    if (dateMatches && ownerMatches) {
+      dayBookings.push(booking);
+    }
+  });
+  
+  // Set state and open bottom sheet
+  selectedDate.value = clickedDate;
+  selectedDayBookings.value = dayBookings;
+  dayViewVisible.value = true;
+  
+  console.log('📅 [FullCalendar] Manual more link clicked for date:', clickedDate, 'with', dayBookings.length, 'owner bookings');
+};
+
 // Lifecycle hooks for mobile viewport management
 onMounted(() => {
   // Set up viewport resize listener for mobile
@@ -627,16 +654,6 @@ defineExpose({
   text-decoration: line-through;
 }
 
-/* Turn indicator in day cells */
-.turn-indicator {
-  background: rgb(var(--v-theme-error));
-  color: white;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 10px;
-  margin-left: 4px;
-  font-weight: bold;
-}
 
 /* Custom event content */
 .fc-event-content-wrapper {
