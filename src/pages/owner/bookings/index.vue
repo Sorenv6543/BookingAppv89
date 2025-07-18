@@ -4,9 +4,14 @@
       <v-row>
         <v-col cols="12">
           <div class="d-flex justify-space-between align-center mb-4">
-            <h1 class="text-h4">
-              My Bookings
-            </h1>
+            <div class="d-flex align-center">
+              <v-btn
+                icon="mdi-arrow-left"
+                variant="text"
+                @click="$router.go(-1)"
+              />
+              <h1 class="text-h4 ml-4">My Bookings</h1>
+            </div>
             <v-btn
               color="primary"
               prepend-icon="mdi-plus"
@@ -18,150 +23,78 @@
         </v-col>
       </v-row>
 
-      <!-- Booking Stats -->
-      <v-row class="mb-4">
-        <v-col
-          cols="12"
-          sm="6"
-          md="3"
-        >
-          <v-card>
-            <v-card-text>
-              <div class="d-flex align-center">
-                <v-icon
-                  color="primary"
-                  class="mr-2"
-                >
-                  mdi-calendar-check
-                </v-icon>
-                <div>
-                  <div class="text-h6">
-                    {{ ownerBookingsArray.length }}
-                  </div>
-                  <div class="text-caption text-medium-emphasis">
-                    Total Bookings
-                  </div>
-                </div>
-              </div>
+      <!-- Booking Stats - Compact -->
+      <v-row class="mb-2 compact-stats-row">
+        <v-col cols="6" md="3" class="pa-1">
+          <v-card class="compact-stat-card stat-card-primary" elevation="1">
+            <v-card-text class="pa-2 text-center">
+              <div class="stat-number">{{ ownerBookingsArray.length }}</div>
+              <div class="stat-label">Total</div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-          md="3"
-        >
-          <v-card>
-            <v-card-text>
-              <div class="d-flex align-center">
-                <v-icon
-                  color="warning"
-                  class="mr-2"
-                >
-                  mdi-clock-fast
-                </v-icon>
-                <div>
-                  <div class="text-h6">
-                    {{ turnBookings.length }}
-                  </div>
-                  <div class="text-caption text-medium-emphasis">
-                    Turn Bookings
-                  </div>
-                </div>
-              </div>
+        <v-col cols="6" md="3" class="pa-1">
+          <v-card class="compact-stat-card stat-card-warning" elevation="1">
+            <v-card-text class="pa-2 text-center">
+              <div class="stat-number">{{ turnBookings.length }}</div>
+              <div class="stat-label">Turns</div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-          md="3"
-        >
-          <v-card>
-            <v-card-text>
-              <div class="d-flex align-center">
-                <v-icon
-                  color="success"
-                  class="mr-2"
-                >
-                  mdi-calendar-today
-                </v-icon>
-                <div>
-                  <div class="text-h6">
-                    {{ todayBookings.length }}
-                  </div>
-                  <div class="text-caption text-medium-emphasis">
-                    Today
-                  </div>
-                </div>
-              </div>
+        <v-col cols="6" md="3" class="pa-1">
+          <v-card class="compact-stat-card stat-card-success" elevation="1">
+            <v-card-text class="pa-2 text-center">
+              <div class="stat-number">{{ todayBookings.length }}</div>
+              <div class="stat-label">Today</div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-          md="3"
-        >
-          <v-card>
-            <v-card-text>
-              <div class="d-flex align-center">
-                <v-icon
-                  color="info"
-                  class="mr-2"
-                >
-                  mdi-calendar-week
-                </v-icon>
-                <div>
-                  <div class="text-h6">
-                    {{ upcomingBookings.length }}
-                  </div>
-                  <div class="text-caption text-medium-emphasis">
-                    This Week
-                  </div>
-                </div>
-              </div>
+        <v-col cols="6" md="3" class="pa-1">
+          <v-card class="compact-stat-card stat-card-info" elevation="1">
+            <v-card-text class="pa-2 text-center">
+              <div class="stat-number">{{ upcomingBookings.length }}</div>
+              <div class="stat-label">This Week</div>
             </v-card-text>
           </v-card>
         </v-col>
       </v-row>
 
-      <!-- Filters -->
-      <v-row class="mb-4">
-        <v-col
-          cols="12"
-          md="4"
-        >
+      <!-- Filters - Compact -->
+      <v-row class="mb-2 compact-filters-row">
+        <v-col cols="12" md="4" class="pa-1">
           <v-select
             v-model="selectedProperty"
             :items="propertyOptions"
-            label="Filter by Property"
+            label="Property"
             clearable
+            density="compact"
+            variant="outlined"
             prepend-inner-icon="mdi-home"
+            hide-details
           />
         </v-col>
-        <v-col
-          cols="12"
-          md="4"
-        >
+        <v-col cols="6" md="4" class="pa-1">
           <v-select
             v-model="selectedStatus"
             :items="statusOptions"
-            label="Filter by Status"
+            label="Status"
             clearable
+            density="compact"
+            variant="outlined"
             prepend-inner-icon="mdi-filter"
+            hide-details
           />
         </v-col>
-        <v-col
-          cols="12"
-          md="4"
-        >
+        <v-col cols="6" md="4" class="pa-1">
           <v-select
             v-model="selectedType"
             :items="typeOptions"
-            label="Filter by Type"
+            label="Type"
             clearable
+            density="compact"
+            variant="outlined"
             prepend-inner-icon="mdi-tag"
+            hide-details
           />
         </v-col>
       </v-row>
@@ -439,5 +372,87 @@ onMounted(async () => {
 
 .gap-1 {
   gap: 0.25rem;
+}
+
+/* Compact stats row */
+.compact-stats-row {
+  max-height: 50px;
+}
+
+.compact-stat-card {
+  min-height: auto !important;
+  height: 50px !important;
+  cursor: default;
+}
+
+.compact-stat-card .v-card-text {
+  padding: 6px !important;
+}
+
+.stat-number {
+  font-size: 1.1rem !important;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 1px;
+}
+
+.stat-label {
+  font-size: 0.65rem !important;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+/* Stat card color themes */
+.stat-card-primary {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-left: 3px solid rgb(var(--v-theme-primary));
+}
+
+.stat-card-primary .stat-number {
+  color: rgb(var(--v-theme-primary));
+}
+
+.stat-card-success {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+  border-left: 3px solid rgb(var(--v-theme-success));
+}
+
+.stat-card-success .stat-number {
+  color: rgb(var(--v-theme-success));
+}
+
+.stat-card-info {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-left: 3px solid rgb(var(--v-theme-secondary));
+}
+
+.stat-card-info .stat-number {
+  color: rgb(var(--v-theme-secondary));
+}
+
+.stat-card-warning {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%);
+  border-left: 3px solid rgb(var(--v-theme-warning));
+}
+
+.stat-card-warning .stat-number {
+  color: rgb(var(--v-theme-warning));
+}
+
+/* Compact filters row */
+.compact-filters-row {
+  max-height: 56px;
+}
+
+.compact-filters-row .v-select {
+  font-size: 0.9rem;
+}
+
+.compact-filters-row .v-field {
+  font-size: 0.9rem;
+}
+
+.compact-filters-row .v-field__input {
+  min-height: 40px;
 }
 </style> 

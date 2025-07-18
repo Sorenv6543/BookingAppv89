@@ -20,12 +20,20 @@
       "Bash(mkdir:*)",
       "Bash(pnpm test:e2e:mobile:*)",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "Bash(npm run test:performance:*)"
     ],
     "deny": []
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
+    "supabase",
+    "sequential-thinking",
+    "context7",
+    "desktop-commander",
+    "puppeteer"
+  ],
+  "disabledMcpjsonServers": [
     "supabase",
     "sequential-thinking",
     "context7",

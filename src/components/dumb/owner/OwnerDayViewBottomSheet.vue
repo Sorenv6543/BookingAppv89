@@ -50,7 +50,8 @@
             <div class="booking-header">
               <div class="property-info">
                 <h4 class="property-name">
-                  {{ getPropertyName(booking.property_id) }}
+                  <v-icon size="small" class="property-icon">mdi-home</v-icon>
+                  {{ getPropertyName(booking.property_id || '') }}
                   <v-chip
                     v-if="booking.booking_type === 'turn'"
                     size="x-small"
@@ -62,16 +63,16 @@
                   </v-chip>
                 </h4>
                 <p class="booking-times">
-                  {{ formatBookingTime(booking.checkout_date) }} → {{ formatBookingTime(booking.checkin_date) }}
+                  {{ formatBookingTime(booking.checkout_date || '') }} → {{ formatBookingTime(booking.checkin_date || '') }}
                 </p>
               </div>
               <div class="priority-indicator">
                 <v-chip
-                  :color="getPriorityColor(booking.priority)"
+                  :color="getPriorityColor(booking.priority || 'normal')"
                   size="small"
                   variant="elevated"
                 >
-                  {{ booking.priority.toUpperCase() }}
+                  {{ (booking.priority || 'normal').toUpperCase() }}
                 </v-chip>
               </div>
             </div>
@@ -84,7 +85,7 @@
               </div>
               <div class="detail-row">
                 <v-icon size="small" class="detail-icon">mdi-circle-medium</v-icon>
-                <span class="status-text">{{ booking.status.replace('_', ' ').toUpperCase() }}</span>
+                <span class="status-text">{{ (booking.status || 'pending').replace('_', ' ').toUpperCase() }}</span>
               </div>
               <div v-if="booking.notes" class="detail-row notes-row">
                 <v-icon size="small" class="detail-icon">mdi-note-text</v-icon>
@@ -214,12 +215,17 @@ const formattedDate = computed(() => {
 
 // Helper functions
 const getPropertyName = (propertyId: string): string => {
+  if (!propertyId) return 'Unknown Property';
   const property = props.properties.get(propertyId);
   return property?.name || 'Unknown Property';
 };
 
 const formatBookingTime = (dateString: string): string => {
+  if (!dateString) return 'N/A';
+  
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Invalid Date';
+  
   return date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric'
@@ -315,7 +321,7 @@ watch(internalVisible, async (newVisible) => {
 
 .day-view-card {
   border-radius: 20px 20px 0 0 !important;
-  max-height: 80vh;
+  max-height: 65vh;
   overflow: hidden;
 }
 
@@ -375,15 +381,17 @@ watch(internalVisible, async (newVisible) => {
 .booking-item {
   padding: 16px;
   border-radius: 12px;
-  background: rgb(var(--v-theme-surface));
+  background: #fafafa;
   border: 1px solid rgb(var(--v-theme-outline-variant));
-  margin-bottom: 12px;
+  margin-bottom: 20px;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .booking-item:hover {
   background: rgb(var(--v-theme-surface-bright));
   border-color: rgb(var(--v-theme-primary));
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .booking-turn {
@@ -417,6 +425,10 @@ watch(internalVisible, async (newVisible) => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.property-icon {
+  color: rgb(var(--v-theme-primary));
 }
 
 .turn-chip {
@@ -533,7 +545,7 @@ watch(internalVisible, async (newVisible) => {
 /* Mobile-specific optimizations */
 @media (max-width: 599px) {
   .day-view-card {
-    max-height: 85vh;
+    max-height: 70vh;
   }
   
   .date-title {
@@ -542,7 +554,7 @@ watch(internalVisible, async (newVisible) => {
   
   .booking-item {
     padding: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
   }
   
   .property-name {

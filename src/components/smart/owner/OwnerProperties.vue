@@ -29,44 +29,36 @@ src/components/smart/owner/OwnerProperties.vue -
       </v-row>
 
       <!-- Property Stats (Using SAME composables as HomeOwner) -->
-      <v-row class="mb-4">
-        <v-col cols="12" sm="6" md="3">
-          <v-card>
-            <v-card-text>
-              <div class="text-h6">{{ myProperties.length }}</div>
-              <div class="text-caption text-medium-emphasis">
-                Total Properties
-              </div>
+      <v-row class="mb-2 compact-stats-row">
+        <v-col cols="6" sm="3" class="pa-1">
+          <v-card class="compact-stat-card stat-card-primary" elevation="1">
+            <v-card-text class="pa-2 text-center">
+              <div class="stat-number">{{ myProperties.length }}</div>
+              <div class="stat-label">Total Properties</div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-card>
-            <v-card-text>
-              <div class="text-h6">{{ myActiveProperties.length }}</div>
-              <div class="text-caption text-medium-emphasis">
-                Active Properties
-              </div>
+        <v-col cols="6" sm="3" class="pa-1">
+          <v-card class="compact-stat-card stat-card-success" elevation="1">
+            <v-card-text class="pa-2 text-center">
+              <div class="stat-number">{{ myActiveProperties.length }}</div>
+              <div class="stat-label">Active Properties</div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-card>
-            <v-card-text>
-              <div class="text-h6">{{ myBookings.length }}</div>
-              <div class="text-caption text-medium-emphasis">
-                Total Bookings
-              </div>
+        <v-col cols="6" sm="3" class="pa-1">
+          <v-card class="compact-stat-card stat-card-info" elevation="1">
+            <v-card-text class="pa-2 text-center">
+              <div class="stat-number">{{ myBookings.length }}</div>
+              <div class="stat-label">Total Bookings</div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-card>
-            <v-card-text>
-              <div class="text-h6">{{ myTodayTurns.length }}</div>
-              <div class="text-caption text-medium-emphasis">
-                Today's Turns
-              </div>
+        <v-col cols="6" sm="3" class="pa-1">
+          <v-card class="compact-stat-card stat-card-warning" elevation="1">
+            <v-card-text class="pa-2 text-center">
+              <div class="stat-number">{{ myTodayTurns.length }}</div>
+              <div class="stat-label">Today's Turns</div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -75,18 +67,68 @@ src/components/smart/owner/OwnerProperties.vue -
       <!-- Property List -->
       <v-row>
         <v-col
-          v-for="property in myProperties"
+          v-for="(property, index) in myProperties"
           :key="property.id"
           cols="12"
           sm="6"
           md="4"
           lg="3"
+          class="pa-2"
         >
-          <PropertyCard
-            :property="property"
-            @edit="handleEditProperty"
-            @delete="handleDeleteProperty"
-          />
+          <v-card 
+            class="compact-property-card" 
+            :class="getPropertyCardClass(index)"
+            elevation="2"
+            @click="viewProperty(property)"
+          >
+            <v-card-text class="pa-3">
+              <div class="d-flex align-center justify-space-between mb-2">
+                <v-icon :color="getPropertyIconColor(index)" size="20">
+                  {{ getPropertyIcon(property.property_type) }}
+                </v-icon>
+                <v-menu>
+                  <template #activator="{ props }">
+                    <v-btn
+                      v-bind="props"
+                      icon="mdi-dots-vertical"
+                      size="small"
+                      variant="text"
+                      @click.stop
+                    />
+                  </template>
+                  <v-list density="compact">
+                    <v-list-item @click="editProperty(property)">
+                      <v-list-item-title>Edit</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="viewProperty(property)">
+                      <v-list-item-title>View</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="handleDeleteProperty(property.id)">
+                      <v-list-item-title>Delete</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div>
+              
+              <div class="property-name mb-1">{{ property.name }}</div>
+              <div class="property-address mb-2">{{ property.address }}</div>
+              
+              <div class="property-details">
+                <span class="detail-item">
+                  <v-icon size="12" class="mr-1">mdi-bed</v-icon>
+                  {{ property.bedrooms || 0 }}
+                </span>
+                <span class="detail-item">
+                  <v-icon size="12" class="mr-1">mdi-shower</v-icon>
+                  {{ property.bathrooms || 0 }}
+                </span>
+                <span class="detail-item">
+                  <v-icon size="12" class="mr-1">mdi-home</v-icon>
+                  {{ property.property_type || 'N/A' }}
+                </span>
+              </div>
+            </v-card-text>
+          </v-card>
         </v-col>
       </v-row>
 
@@ -138,7 +180,7 @@ src/components/smart/owner/OwnerProperties.vue -
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import PropertyCard from '@/components/dumb/shared/PropertyCard.vue'
+import { useRouter } from 'vue-router'
 import PropertyModal from '@/components/dumb/PropertyModal.vue'
 import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue'
 
@@ -157,6 +199,7 @@ defineOptions({
 // ✅ SAME STORE CONNECTIONS AS HomeOwner
 const uiStore = useUIStore()
 const authStore = useAuthStore()
+const router = useRouter()
 
 // ✅ SAME BUSINESS LOGIC AS HomeOwner - NO DUPLICATION
 const { 
@@ -218,6 +261,38 @@ const confirmDialogData = computed(() => {
 })
 
 // ============================================================================
+// HELPER FUNCTIONS - STYLING AND ICONS
+// ============================================================================
+
+// Property card styling based on index
+const getPropertyCardClass = (index: number): string => {
+  const classes = [
+    'property-card-blue',
+    'property-card-green', 
+    'property-card-purple',
+    'property-card-orange'
+  ]
+  return classes[index % classes.length]
+}
+
+// Property icon color based on index
+const getPropertyIconColor = (index: number): string => {
+  const colors = ['primary', 'success', 'secondary', 'warning']
+  return colors[index % colors.length]
+}
+
+// Property type icon mapping
+const getPropertyIcon = (propertyType?: string): string => {
+  switch (propertyType) {
+    case 'house': return 'mdi-home'
+    case 'apartment': return 'mdi-apartment'
+    case 'condo': return 'mdi-office-building'
+    case 'townhouse': return 'mdi-home-group'
+    default: return 'mdi-home-outline'
+  }
+}
+
+// ============================================================================
 // EVENT HANDLERS - SAME ORCHESTRATION PATTERN AS HomeOwner
 // ============================================================================
 
@@ -250,6 +325,15 @@ const handleDeleteProperty = async (propertyId: string): Promise<void> => {
     dangerous: true,
     data: { type: 'property', id: propertyId }
   })
+}
+
+// Navigation functions
+const editProperty = (property: Property): void => {
+  router.push(`/owner/properties/${property.id}/edit`)
+}
+
+const viewProperty = (property: Property): void => {
+  router.push(`/owner/properties/${property.id}`)
 }
 
 // ============================================================================
@@ -351,6 +435,157 @@ onMounted(async () => {
 
 .v-card {
   height: 100%;
+}
+
+/* Compact stat cards */
+.compact-stats-row {
+  max-height: 60px;
+}
+
+.compact-stat-card {
+  min-height: auto !important;
+  height: 60px !important;
+  cursor: default;
+}
+
+.compact-stat-card .v-card-text {
+  padding: 8px !important;
+}
+
+.stat-number {
+  font-size: 1.25rem !important;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  font-size: 0.7rem !important;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+/* Stat card color themes */
+.stat-card-primary {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-left: 4px solid rgb(var(--v-theme-primary));
+}
+
+.stat-card-primary .stat-number {
+  color: rgb(var(--v-theme-primary));
+}
+
+.stat-card-success {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+  border-left: 4px solid rgb(var(--v-theme-success));
+}
+
+.stat-card-success .stat-number {
+  color: rgb(var(--v-theme-success));
+}
+
+.stat-card-info {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-left: 4px solid rgb(var(--v-theme-secondary));
+}
+
+.stat-card-info .stat-number {
+  color: rgb(var(--v-theme-secondary));
+}
+
+.stat-card-warning {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%);
+  border-left: 4px solid rgb(var(--v-theme-warning));
+}
+
+.stat-card-warning .stat-number {
+  color: rgb(var(--v-theme-warning));
+}
+
+/* Compact property cards */
+.compact-property-card {
+  min-height: auto !important;
+  height: 140px !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 12px !important;
+}
+
+.compact-property-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.property-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgb(var(--v-theme-on-surface));
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.property-address {
+  font-size: 0.75rem;
+  color: rgb(var(--v-theme-on-surface-variant));
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.property-details {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.7rem;
+  color: rgb(var(--v-theme-on-surface-variant));
+  background: rgba(var(--v-theme-surface-variant), 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Property card color themes */
+.property-card-blue {
+  background: linear-gradient(135deg, #e3f2fd 0%, #e1f5fe 100%);
+  border-left: 4px solid #2196f3;
+}
+
+.property-card-blue .property-name {
+  color: #1976d2;
+}
+
+.property-card-green {
+  background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
+  border-left: 4px solid #4caf50;
+}
+
+.property-card-green .property-name {
+  color: #388e3c;
+}
+
+.property-card-purple {
+  background: linear-gradient(135deg, #f3e5f5 0%, #fce4ec 100%);
+  border-left: 4px solid #9c27b0;
+}
+
+.property-card-purple .property-name {
+  color: #7b1fa2;
+}
+
+.property-card-orange {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-left: 4px solid #ff9800;
+}
+
+.property-card-orange .property-name {
+  color: #f57c00;
 }
 
 /* ✅ SAME THEME VARIABLES AS HomeOwner */
