@@ -1,0 +1,6 @@
+{
+  "command": "pnom dev",
+  "serverUrl": "http://localhost:3000/owner/dashboard",
+  "authenticateProxy": false,
+  "commitMode": "commits"
+}

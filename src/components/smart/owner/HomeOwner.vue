@@ -269,7 +269,7 @@ const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
-const { xs, md, lg, mobile, sm } = useDisplay();
+const { xs, mobile } = useDisplay();
 
 // ============================================================================
 // COMPOSABLES - BUSINESS LOGIC
@@ -294,11 +294,8 @@ const {
   filterBookings,
   setCalendarView,
   goToDate,
-  goToToday,
   next,
-  prev,
-  clearPropertyFilters,
-  togglePropertyFilter
+  prev
 } = useCalendarState();
 
 // ============================================================================
@@ -308,7 +305,6 @@ const calendarRef = ref<InstanceType<typeof OwnerCalendar> | null>(null);
 const sidebarOpen = ref(false);
 const selectedPropertyFilter = ref<string | null>(null);
 const speedDialOpen = ref(false);
-const scrimColor = ref('rgba(0, 0, 0, 0.9)');
 
 // ============================================================================
 // OWNER-SPECIFIC DATA ACCESS
@@ -341,13 +337,6 @@ const loading = computed(() => {
     propertiesLoading.value || 
     uiStore.isLoading('bookings') || 
     uiStore.isLoading('properties');
-});
-
-const formattedDate = computed(() => {
-  const options: Intl.DateTimeFormatOptions = { 
-    month: 'long'
-  };
-  return currentDate.value.toLocaleDateString('en-US', options);
 });
 
 const formattedMonthYear = computed(() => {
@@ -409,65 +398,6 @@ const ownerBookingsMap = computed(() => {
   }
   
   return map;
-});
-
-// Owner's today's turn bookings - stabilized
-const ownerTodayTurns = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  
-  const turns = new Map<string, Booking>();
-  
-  if (!isOwnerAuthenticated.value) {
-    return turns;
-  }
-
-  try {
-    // Filter owner's bookings for today's turns
-    Array.from(ownerBookingsMap.value.values()).forEach(booking => {
-      if (
-        booking.booking_type === 'turn' &&
-        new Date(booking.checkout_date) >= today &&
-        new Date(booking.checkout_date) < tomorrow
-      ) {
-        turns.set(booking.id, booking);
-      }
-    });
-  } catch (error) {
-    console.error('❌ [HomeOwner] Error filtering today turns:', error);
-  }
-  
-  return turns;
-});
-
-// Owner's upcoming cleanings - stabilized
-const ownerUpcomingCleanings = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const inOneWeek = new Date(today);
-  inOneWeek.setDate(inOneWeek.getDate() + 7);
-  
-  const cleanings = new Map<string, Booking>();
-  
-  if (!isOwnerAuthenticated.value) {
-    return cleanings;
-  }
-
-  try {
-    // Filter owner's bookings for upcoming cleanings
-    Array.from(ownerBookingsMap.value.values()).forEach(booking => {
-      const checkoutDate = new Date(booking.checkout_date);
-      if (checkoutDate >= today && checkoutDate <= inOneWeek) {
-        cleanings.set(booking.id, booking);
-      }
-    });
-  } catch (error) {
-    console.error('❌ [HomeOwner] Error filtering upcoming cleanings:', error);
-  }
-  
-  return cleanings;
 });
 
 // Owner's filtered bookings - stabilized with better error handling
@@ -556,98 +486,6 @@ const confirmDialogData = computed(() => {
 // OWNER-SPECIFIC EVENT HANDLERS
 // ============================================================================
 
-const handleNavigateToBooking = (bookingId: string): void => {
-      // Log receiving event from OwnerSidebar
-    eventLogger.logEvent(
-      'OwnerSidebar', 
-    'HomeOwner', 
-    'navigateToBooking', 
-    bookingId, 
-    'receive'
-  );
-  
-  // Only navigate to owner's bookings
-  const booking = ownerBookingsMap.value.get(bookingId);
-  if (booking) {
-    const bookingDate = new Date(booking.checkout_date);
-    handleNavigateToDate(bookingDate);
-    
-    // Highlight the booking
-    setTimeout(() => {
-      const calendarApi = calendarRef.value?.getApi?.();
-      if (calendarApi) {
-        const event = calendarApi.getEventById(bookingId);
-        if (event) {
-          event.setProp('classNames', [...event.classNames, 'highlighted']);
-          setTimeout(() => {
-            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
-          }, 3000);
-        }
-      }
-    }, 100);
-  } else {
-    // Owner-friendly error message
-    console.warn('Booking not found in your properties');
-  }
-};
-
-const handleNavigateToDate = (date: Date): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'navigateToDate', 
-    date, 
-    'receive'
-  );
-  
-  goToDate(date);
-  
-  eventLogger.logEvent(
-    'HomeOwner', 
-    'FullCalendar', 
-    'goToDate', 
-    date, 
-    'emit'
-  );
-  
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(date);
-  }
-};
-
-const handleFilterByProperty = (propertyId: string | null): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'filterByProperty', 
-    propertyId, 
-    'receive'
-  );
-  
-  // Only allow filtering by owner's properties
-  if (propertyId && !ownerPropertiesMap.value.has(propertyId)) {
-    console.warn('Cannot filter by property not owned by current user');
-    return;
-  }
-  
-  selectedPropertyFilter.value = propertyId;
-  if (propertyId) {
-    togglePropertyFilter(propertyId);
-  } else {
-    clearPropertyFilters();
-  }
-  uiStore.setPropertyFilter(propertyId);
-  
-  eventLogger.logEvent(
-    'HomeOwner', 
-    'FullCalendar', 
-    'filteredBookingsUpdate', 
-    { propertyId, count: ownerFilteredBookings.value.size }, 
-    'emit'
-  );
-};
-
 const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
       eventLogger.logEvent(
       'OwnerSidebar',
@@ -691,7 +529,7 @@ const handleEditProperty = (property: Property): void => {
     property,
     'receive'
   );
-  uiStore.openModal('propertyModal', 'edit', property);
+  uiStore.openModal('propertyModal', 'edit', property as Record<string, unknown>);
 };
 
 const handleViewProperty = (property: Property): void => {
@@ -702,7 +540,7 @@ const handleViewProperty = (property: Property): void => {
     property,
     'receive'
   );
-  uiStore.openModal('propertyModal', 'view', property);
+  uiStore.openModal('propertyModal', 'view', property as Record<string, unknown>);
 };
 
 const handleCreateTurn = (): void => {
@@ -872,14 +710,6 @@ const handleNext = (): void => {
   }
 };
 
-
-const handleViewChange = (view: string): void => {
-  // Map display strings to FullCalendar view types
-  const calendarView = view === 'Week' ? 'timeGridWeek' : 
-                      view === 'Day' ? 'timeGridDay' : 
-                      'dayGridMonth';
-  setCalendarView(calendarView);
-};
 
 const handleCalendarViewChange = (view: string): void => {
   // Map CalendarView to FullCalendar view type
