@@ -97,11 +97,26 @@
           <div class="skeleton-widget-value" />
         </div>
         <div class="skeleton-widget-chart">
-          <div class="skeleton-chart-bar" style="height: 60%" />
-          <div class="skeleton-chart-bar" style="height: 80%" />
-          <div class="skeleton-chart-bar" style="height: 40%" />
-          <div class="skeleton-chart-bar" style="height: 90%" />
-          <div class="skeleton-chart-bar" style="height: 70%" />
+          <div
+            class="skeleton-chart-bar"
+            style="height: 60%"
+          />
+          <div
+            class="skeleton-chart-bar"
+            style="height: 80%"
+          />
+          <div
+            class="skeleton-chart-bar"
+            style="height: 40%"
+          />
+          <div
+            class="skeleton-chart-bar"
+            style="height: 90%"
+          />
+          <div
+            class="skeleton-chart-bar"
+            style="height: 70%"
+          />
         </div>
       </div>
     </template>

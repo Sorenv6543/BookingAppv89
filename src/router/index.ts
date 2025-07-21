@@ -10,7 +10,6 @@
 
 
 import { createRouter, createWebHistory } from 'vue-router' 
-import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from '@/router/guards'
 
 // 
 const router = createRouter({
@@ -23,7 +22,7 @@ const router = createRouter({
       name: 'home',
       component: () => import('@/pages/auth/login.vue'),
       meta: {
-        layout: 'default'
+        layout: 'auth'
       }
     },
     {
@@ -41,8 +40,7 @@ const router = createRouter({
       name: 'owner-dashboard',
       component: () => import('@/pages/owner/dashboard.vue'),
       meta: {
-        layout: 'owner',
-       
+        layout: 'owner', 
         role: 'owner'
       }
     },
@@ -56,12 +54,41 @@ const router = createRouter({
       }
     },
     {
-      path: '/owner/properties/create',
-      name: 'owner-properties-create',
-      component: () => import('@/pages/owner/properties/create.vue'),
+      path: '/owner/dashboard',
+      name: 'owner-dashboard',
+      component: () => import('@/pages/owner/dashboard.vue'),
       meta: {
         layout: 'owner',
         role: 'owner'
+      }
+    },
+
+    // Admin routes - only accessible to admin users
+    {
+      path: '/admin',
+      name: 'admin-dashboard',
+      component: () => import('@/pages/admin/dashboard.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/properties',
+      name: 'admin-properties',
+      component: () => import('@/components/smart/admin/AdminProperties.vue'),
+      meta: {
+        layout: 'default',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/properties/:id',
+      name: 'admin-properties-view',
+      component: () => import('@/pages/admin/properties/view.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
       }
     },
     {
@@ -74,12 +101,30 @@ const router = createRouter({
       }
     },
     {
+      path: '/admin/properties/:id/edit',
+      name: 'admin-properties-edit',
+      component: () => import('@/pages/admin/properties/edit.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
       path: '/owner/properties/:id/edit',
       name: 'owner-properties-edit',
       component: () => import('@/pages/owner/properties/edit.vue'),
       meta: {
         layout: 'owner',
         role: 'owner'
+      }
+    },
+    {
+      path: '/admin/bookings',
+      name: 'admin-bookings',
+      component: () => import('@/pages/admin/bookings/index.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
       }
     },
     {
@@ -115,11 +160,10 @@ const router = createRouter({
     // Admin routes - only accessible to admin users
     {
       path: '/admin',
-      name: 'admin',
-      component: () => import('@/pages/admin/index.vue'),
+      name: 'admin-dashboard',
+      component: () => import('@/pages/admin/dashboard.vue'),
       meta: {
         layout: 'admin',
-
         role: 'admin'
       }
     },
@@ -174,6 +218,69 @@ const router = createRouter({
       }
     },
     {
+      path: '/admin/profile',
+      name: 'admin-profile',
+      component: () => import('@/pages/admin/profile.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/settings',
+      name: 'admin-settings',
+      component: () => import('@/pages/admin/settings.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/owners',
+      name: 'admin-owners',
+      component: () => import('@/pages/admin/owners/index.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/cleaners',
+      name: 'admin-cleaners',
+      component: () => import('@/pages/admin/cleaners/index.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/users',
+      name: 'admin-users',
+      component: () => import('@/pages/admin/users/index.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/users/:id',
+      name: 'admin-users-view',
+      component: () => import('@/pages/admin/users/view.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/users/:id/edit',
+      name: 'admin-users-edit',
+      component: () => import('@/pages/admin/users/edit.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
       path: '/demos/owner-calendar',
       name: 'owner-calendar-demo',
       component: () => import('@/dev/demos/OwnerCalendarDemo.vue'),
@@ -185,10 +292,10 @@ const router = createRouter({
   ]
 })
 
-// Apply navigation guards
-router.beforeEach(developmentGuard)
-router.beforeEach(loadingGuard)
-router.beforeEach(authGuard)
-router.afterEach(afterNavigationGuard)
+// // Apply navigation guards
+// router.beforeEach(developmentGuard)
+// router.beforeEach(loadingGuard)
+// router.beforeEach(authGuard)
+// router.afterEach(afterNavigationGuard)
 
 export default router 

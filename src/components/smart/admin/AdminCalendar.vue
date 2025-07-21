@@ -169,8 +169,8 @@
         v-else
         ref="calendarRef"
         :options="adminCalendarOptions"
-          class="admin-calendar"
-  :style="{ height: fullCalendarHeight, width: '100%' }"
+        class="admin-calendar"
+        :style="{ height: fullCalendarHeight, width: '100%' }"
       />
     </v-card>
 

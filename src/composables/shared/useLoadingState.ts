@@ -76,8 +76,8 @@ export function useLoadingState() {
       id: operationId,
       type,
       message: options.message || getLoadingMessage(
-        options.role || currentUserRole.value, 
-        operationId
+        operationId,
+        options.role || currentUserRole.value
       ),
       progress: 0,
       cancellable: options.cancellable || false,
@@ -385,8 +385,8 @@ export function useComponentLoadingState(componentName: string) {
     return loadingState.startLoading(operationId, 'component', {
       ...options,
       message: options.message || getLoadingMessage(
-        options.role || loadingState.currentUserRole.value,
-        operation
+        operation,
+        options.role || loadingState.currentUserRole.value
       )
     });
   };

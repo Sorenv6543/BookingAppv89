@@ -202,7 +202,11 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   
   // View settings
   initialView: 'dayGridMonth',
-  headerToolbar: false,
+  headerToolbar: {
+    left: '',
+    center: '',
+    right: ''
+  },
   
   
   // Event settings - mobile optimized
@@ -475,7 +479,8 @@ const handleViewBooking = (booking: Booking): void => {
       const clickInfo = {
         event: event,
         jsEvent: new MouseEvent('click'),
-        view: calendarApi.view
+        view: calendarApi.view,
+        el: document.createElement('div') // Provide a dummy element
       };
       handleEventClick(clickInfo as EventClickArg);
     }
@@ -501,7 +506,7 @@ const handleEditBooking = (booking: Booking): void => {
 
 const handleCompleteBooking = (booking: Booking): void => {
   // Update booking status and emit event
-  const updatedBooking = { ...booking, status: 'completed' as const };
+  const _updatedBooking = { ...booking, status: 'completed' as const };
   
   emit('updateBooking', {
     id: booking.id,
@@ -682,9 +687,6 @@ const handleManualMoreLinkClick = (event: Event): void => {
   dayViewVisible.value = true;
   
   console.log('📅 [FullCalendar] Manual more link clicked for date:', clickedDate.toDateString(), 'with', dayBookings.length, 'owner bookings');
-  
-  // Return false to prevent any further event handling
-  return false;
 };
 
 // Lifecycle hooks for mobile viewport management

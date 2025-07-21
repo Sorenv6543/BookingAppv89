@@ -12,189 +12,226 @@
     <!-- Main Content Wrapper -->
     <div class="sidebar-content-wrapper">
       <div 
-  v-show="showBrandOverlay"
-  class="claro-brand-overlay"
->
-  <div class="claro-brand-section">
-    <div class="claro-brand-icon">
-      <v-btn
-        icon
-        color="primary"
-        elevation="8"
-        size="x-large"
-        class="prominent-icon"
+        v-show="showBrandOverlay"
+        class="claro-brand-overlay"
       >
-        <v-icon color="white" size="32">mdi-calendar</v-icon>
-      </v-btn>
-    </div>
-    <div class="claro-brand-info">
-      <div class="claro-brand-title">Claro</div>
-      <div class="claro-brand-subtitle">Property Scheduling</div>
-    </div>
-  </div>
-</div>
-    <!-- Navigation Section -->
-    <div class="nav-section sidebar-content-spacing">
-      <div class="section-header">Navigation</div>
-      
-      <v-list class="nav-list" density="compact">
-        <v-list-item
-          class="nav-item"
-          prepend-icon="mdi-home"
-          title="Home"
-          @click="navigateTo('/owner/dashboard')"
-        />
-        
-        <v-list-item
-          class="nav-item active-nav-item"
-          prepend-icon="mdi-calendar"
-          title="Calendar"
-          @click="navigateTo('/owner/calendar')"
-        >
-          <template #append>
-            <v-icon size="16" color="white">mdi-chevron-right</v-icon>
-          </template>
-        </v-list-item>
-        
-        <v-list-item
-          class="nav-item"
-          prepend-icon="mdi-calendar-check"
-          title="Schedule"
-          @click="navigateTo('/owner/bookings')"
-        />
-        
-        <v-list-item
-          class="nav-item"
-          prepend-icon="mdi-home-group"
-          title="Properties"
-          @click="navigateTo('/owner/properties')"
-        />
-        
-        <v-list-item
-          class="nav-item"
-          prepend-icon="mdi-clock"
-          title="Recent"
-          @click="navigateTo('/owner/recent')"
-        />
-      </v-list>
-    </div>
-
-    <!-- Properties Section -->
-    <div class="properties-section">
-      <div class="section-header">
-        <span>Properties</span>
-        <v-btn
-          icon="mdi-plus"
-          size="small"
-          variant="text"
-          color="primary"
-          @click="navigateTo('/owner/properties/create')"
-        />
-      </div>
-      
-      <v-list class="properties-list" density="compact">
-        <v-list-item
-          v-for="property in properties"
-          :key="property.id"
-          class="property-item compact-property-item"
-          :class="{ selected: selectedPropertyId === property.id }"
-          @click="selectProperty(property)"
-        >
-          <template #prepend>
-            <v-icon 
-              :color="selectedPropertyId === property.id ? 'primary' : 'info'"
-              size="16"
+        <div class="claro-brand-section">
+          <div class="claro-brand-icon">
+            <v-btn
+              icon
+              color="primary"
+              elevation="8"
+              size="x-large"
+              class="prominent-icon"
             >
-              mdi-home
-            </v-icon>
-          </template>
-          
-          <div class="property-content">
-            <div class="property-title">
-              {{ property.name }}
+              <v-icon
+                color="white"
+                size="32"
+              >
+                mdi-calendar
+              </v-icon>
+            </v-btn>
+          </div>
+          <div class="claro-brand-info">
+            <div class="claro-brand-title">
+              Claro
             </div>
-            <div class="property-subtitle">
-              {{ property.address }}
+            <div class="claro-brand-subtitle">
+              Property Scheduling
             </div>
           </div>
-          
-          <template #append>
-            <v-menu>
-              <template #activator="{ props }">
-                <v-btn
-                  v-bind="props"
-                  icon="mdi-dots-vertical"
-                  size="x-small"
-                  variant="text"
-                  @click.stop
-                />
-              </template>
-              
-              <v-list density="compact">
-                <v-list-item
-                  prepend-icon="mdi-pencil"
-                  title="Edit"
-                  @click="editProperty(property)"
-                />
-                <v-list-item
-                  prepend-icon="mdi-eye"
-                  title="View Details"
-                  @click="viewProperty(property)"
-                />
-                <v-divider />
-                <v-list-item
-                  prepend-icon="mdi-delete"
-                  title="Delete"
-                  @click="deleteProperty(property)"
-                />
-              </v-list>
-            </v-menu>
-          </template>
-        </v-list-item>
-        
-        <!-- No Properties State -->
-        <div v-if="properties.length === 0" class="no-properties">
-          <v-icon color="grey" size="48">mdi-home-plus</v-icon>
-          <p class="text-body-2 text-grey mt-2">No properties yet</p>
-          <v-btn
-            size="small"
-            color="primary"
-            variant="outlined"
-            @click="navigateTo('/owner/properties/create')"
-          >
-            Add Property
-          </v-btn>
         </div>
-      </v-list>
-    </div>
-
-    <!-- Quick Actions Section -->
-    <div class="actions-section">
-      <div class="section-header">Quick Actions</div>
+      </div>
+      <!-- Navigation Section -->
+      <div class="nav-section sidebar-content-spacing">
+        <div class="section-header">
+          Navigation
+        </div>
       
-      <v-list class="actions-list" density="compact">
-        <v-list-item
-          class="action-item"
-          prepend-icon="mdi-plus"
-          title="New Event"
-          @click="emit('createBooking')"
-        />
+        <v-list
+          class="nav-list"
+          density="compact"
+        >
+          <v-list-item
+            class="nav-item"
+            prepend-icon="mdi-home"
+            title="Home"
+            @click="navigateTo('/owner/dashboard')"
+          />
         
-        <v-list-item
-          class="action-item"
-          prepend-icon="mdi-cog"
-          title="Settings"
-          @click="navigateTo('/owner/settings')"
-        />
+          <v-list-item
+            class="nav-item active-nav-item"
+            prepend-icon="mdi-calendar"
+            title="Calendar"
+            @click="navigateTo('/owner/calendar')"
+          >
+            <template #append>
+              <v-icon
+                size="16"
+                color="white"
+              >
+                mdi-chevron-right
+              </v-icon>
+            </template>
+          </v-list-item>
         
-        <v-list-item
-          class="action-item"
-          prepend-icon="mdi-account"
-          title="Profile"
-          @click="navigateTo('/owner/profile')"
-        />
-      </v-list>
-    </div>
+          <v-list-item
+            class="nav-item"
+            prepend-icon="mdi-calendar-check"
+            title="Schedule"
+            @click="navigateTo('/owner/bookings')"
+          />
+        
+          <v-list-item
+            class="nav-item"
+            prepend-icon="mdi-home-group"
+            title="Properties"
+            @click="navigateTo('/owner/properties')"
+          />
+        
+          <v-list-item
+            class="nav-item"
+            prepend-icon="mdi-clock"
+            title="Recent"
+            @click="navigateTo('/owner/recent')"
+          />
+        </v-list>
+      </div>
+
+      <!-- Properties Section -->
+      <div class="properties-section">
+        <div class="section-header">
+          <span>Properties</span>
+          <v-btn
+            icon="mdi-plus"
+            size="small"
+            variant="text"
+            color="primary"
+            @click="navigateTo('/owner/properties/create')"
+          />
+        </div>
+      
+        <v-list
+          class="properties-list"
+          density="compact"
+        >
+          <v-list-item
+            v-for="property in properties"
+            :key="property.id"
+            class="property-item compact-property-item"
+            :class="{ selected: selectedPropertyId === property.id }"
+            @click="selectProperty(property)"
+          >
+            <template #prepend>
+              <v-icon 
+                :color="selectedPropertyId === property.id ? 'primary' : 'info'"
+                size="16"
+              >
+                mdi-home
+              </v-icon>
+            </template>
+          
+            <div class="property-content">
+              <div class="property-title">
+                {{ property.name }}
+              </div>
+              <div class="property-subtitle">
+                {{ property.address }}
+              </div>
+            </div>
+          
+            <template #append>
+              <v-menu>
+                <template #activator="{ props }">
+                  <v-btn
+                    v-bind="props"
+                    icon="mdi-dots-vertical"
+                    size="x-small"
+                    variant="text"
+                    @click.stop
+                  />
+                </template>
+              
+                <v-list density="compact">
+                  <v-list-item
+                    prepend-icon="mdi-pencil"
+                    title="Edit"
+                    @click="editProperty(property)"
+                  />
+                  <v-list-item
+                    prepend-icon="mdi-eye"
+                    title="View Details"
+                    @click="viewProperty(property)"
+                  />
+                  <v-divider />
+                  <v-list-item
+                    prepend-icon="mdi-delete"
+                    title="Delete"
+                    @click="deleteProperty(property)"
+                  />
+                </v-list>
+              </v-menu>
+            </template>
+          </v-list-item>
+        
+          <!-- No Properties State -->
+          <div
+            v-if="properties.length === 0"
+            class="no-properties"
+          >
+            <v-icon
+              color="grey"
+              size="48"
+            >
+              mdi-home-plus
+            </v-icon>
+            <p class="text-body-2 text-grey mt-2">
+              No properties yet
+            </p>
+            <v-btn
+              size="small"
+              color="primary"
+              variant="outlined"
+              @click="navigateTo('/owner/properties/create')"
+            >
+              Add Property
+            </v-btn>
+          </div>
+        </v-list>
+      </div>
+
+      <!-- Quick Actions Section -->
+      <div class="actions-section">
+        <div class="section-header">
+          Quick Actions
+        </div>
+      
+        <v-list
+          class="actions-list"
+          density="compact"
+        >
+          <v-list-item
+            class="action-item"
+            prepend-icon="mdi-plus"
+            title="New Event"
+            @click="emit('createBooking')"
+          />
+        
+          <v-list-item
+            class="action-item"
+            prepend-icon="mdi-cog"
+            title="Settings"
+            @click="navigateTo('/owner/settings')"
+          />
+        
+          <v-list-item
+            class="action-item"
+            prepend-icon="mdi-account"
+            title="Profile"
+            @click="navigateTo('/owner/profile')"
+          />
+        </v-list>
+      </div>
     </div>
 
     <!-- User Info Section at Bottom -->
@@ -206,16 +243,25 @@
           size="32"
           class="user-avatar"
         >
-          <v-icon color="white" size="18">mdi-account</v-icon>
+          <v-icon
+            color="white"
+            size="18"
+          >
+            mdi-account
+          </v-icon>
         </v-avatar>
         
         <div class="user-details">
-          <div class="user-name">{{ authStore.user?.name || 'User' }}</div>
-          <div class="user-email">{{ authStore.user?.email || 'No email' }}</div>
+          <div class="user-name">
+            {{ authStore.user?.name || 'User' }}
+          </div>
+          <div class="user-email">
+            {{ authStore.user?.email || 'No email' }}
+          </div>
         </div>
         
         <v-menu offset-y>
-          <template v-slot:activator="{ props }">
+          <template #activator="{ props }">
             <v-btn
               v-bind="props"
               icon
@@ -223,7 +269,9 @@
               variant="text"
               class="user-menu-btn"
             >
-              <v-icon size="16">mdi-dots-vertical</v-icon>
+              <v-icon size="16">
+                mdi-dots-vertical
+              </v-icon>
             </v-btn>
           </template>
           

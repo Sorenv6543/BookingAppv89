@@ -2,7 +2,26 @@
 <template>
   <v-app>
     <div class="admin-layout-container">
-      <router-view />
+      <!-- Admin Sidebar -->
+      <AdminSidebar
+        v-model="sidebarOpen"
+        :bookings="mockBookings"
+        :properties="mockProperties"
+        :total-properties="mockProperties.length"
+        :active-cleanings-today="5"
+        :urgent-turns-count="3"
+        :loading="false"
+        current-view="dashboard"
+        :current-date="new Date()"
+      />
+      
+      <!-- Main Content -->
+      <div
+        class="admin-main-content"
+        :class="{ 'sidebar-open': !mobile && sidebarOpen }"
+      >
+        <router-view />
+      </div>
     </div>
   </v-app>
 </template>
@@ -127,23 +146,75 @@
   
 
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useDisplay } from 'vuetify';
+import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
 
+// Composables
+const { mobile } = useDisplay();
+
+// State
+const sidebarOpen = ref(true);
+
+// Mock data - TODO: Replace with actual data from stores/composables
+const mockBookings = ref([
+  {
+    id: '1',
+    property_id: '1',
+    booking_type: 'turn',
+    status: 'pending',
+    checkout_date: '2024-01-15',
+    checkin_date: '2024-01-16'
+  }
+]);
+
+const mockProperties = ref([
+  {
+    id: '1',
+    name: 'Sunset Villa',
+    address: '123 Beach Road'
+  },
+  {
+    id: '2', 
+    name: 'Mountain Lodge',
+    address: '456 Pine Street'
+  }
+]);
 </script>
 
 
 
 <style>
-/* Minimal layout styles - don't interfere with HomeOwner's layout */
+/* Admin layout styles */
 .admin-layout-container {
   height: 100vh;
   width: 100vw;
   position: relative;
   overflow: hidden;
+  display: flex;
 }
 
 /* Reset any Vuetify v-main styles that could interfere */
 .v-application .admin-layout-container {
   padding: 0 !important;
   margin: 0 !important;
+}
+
+.admin-main-content {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  transition: margin-left 0.3s ease;
+}
+
+.admin-main-content.sidebar-open {
+  margin-left: 280px; /* SIDEBAR_WIDTH */
+}
+
+/* Responsive adjustments */
+@media (max-width: 959px) {
+  .admin-main-content.sidebar-open {
+    margin-left: 0;
+  }
 }
 </style>

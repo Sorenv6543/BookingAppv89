@@ -12,10 +12,15 @@
           <v-card-text>
             <v-row>
               <!-- PWA Status -->
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-card variant="outlined">
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2">mdi-application</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-application
+                    </v-icon>
                     PWA Status
                   </v-card-title>
                   <v-card-text>
@@ -73,10 +78,15 @@
               </v-col>
               
               <!-- PWA Actions -->
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-card variant="outlined">
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2">mdi-cog</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-cog
+                    </v-icon>
                     PWA Actions
                   </v-card-title>
                   <v-card-text>
@@ -89,7 +99,9 @@
                       :loading="installing"
                       @click="handleInstall"
                     >
-                      <v-icon class="mr-2">mdi-download</v-icon>
+                      <v-icon class="mr-2">
+                        mdi-download
+                      </v-icon>
                       Install App
                     </v-btn>
                     
@@ -102,7 +114,9 @@
                       :loading="updating"
                       @click="handleUpdate"
                     >
-                      <v-icon class="mr-2">mdi-update</v-icon>
+                      <v-icon class="mr-2">
+                        mdi-update
+                      </v-icon>
                       Update App
                     </v-btn>
                     
@@ -114,7 +128,9 @@
                       :loading="requestingNotifications"
                       @click="testNotifications"
                     >
-                      <v-icon class="mr-2">mdi-bell</v-icon>
+                      <v-icon class="mr-2">
+                        mdi-bell
+                      </v-icon>
                       Test Notifications
                     </v-btn>
                     
@@ -125,7 +141,9 @@
                       class="mb-3"
                       @click="toggleOfflineMode"
                     >
-                      <v-icon class="mr-2">mdi-wifi-off</v-icon>
+                      <v-icon class="mr-2">
+                        mdi-wifi-off
+                      </v-icon>
                       {{ isOnline ? 'Go Offline' : 'Go Online' }}
                     </v-btn>
                     
@@ -135,7 +153,9 @@
                       block
                       @click="refreshPage"
                     >
-                      <v-icon class="mr-2">mdi-refresh</v-icon>
+                      <v-icon class="mr-2">
+                        mdi-refresh
+                      </v-icon>
                       Refresh Page
                     </v-btn>
                   </v-card-text>
@@ -145,10 +165,15 @@
 
             <!-- Phase 2: Push Notifications & Background Sync -->
             <v-row class="mt-4">
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-card variant="outlined">
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2">mdi-bell</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-bell
+                    </v-icon>
                     Push Notifications
                   </v-card-title>
                   <v-card-text>
@@ -230,10 +255,15 @@
                 </v-card>
               </v-col>
               
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-card variant="outlined">
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2">mdi-sync</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-sync
+                    </v-icon>
                     Background Sync
                   </v-card-title>
                   <v-card-text>
@@ -265,7 +295,10 @@
                       <v-list-item>
                         <v-list-item-title>Last Sync</v-list-item-title>
                         <template #append>
-                          <v-chip size="small" color="grey">
+                          <v-chip
+                            size="small"
+                            color="grey"
+                          >
                             {{ formatLastSync(backgroundSync.lastSyncTime.value) }}
                           </v-chip>
                         </template>
@@ -316,13 +349,18 @@
               <v-col cols="12">
                 <v-card variant="outlined">
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2">mdi-test-tube</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-test-tube
+                    </v-icon>
                     PWA Features Test
                   </v-card-title>
                   <v-card-text>
                     <v-row>
                       <!-- Offline Storage Test -->
-                      <v-col cols="12" md="6">
+                      <v-col
+                        cols="12"
+                        md="6"
+                      >
                         <v-text-field
                           v-model="testData"
                           label="Test Data"
@@ -347,7 +385,10 @@
                       </v-col>
                       
                       <!-- Network Test -->
-                      <v-col cols="12" md="6">
+                      <v-col
+                        cols="12"
+                        md="6"
+                      >
                         <v-text-field
                           v-model="apiResponse"
                           label="API Response"
@@ -376,7 +417,9 @@
               <v-col cols="12">
                 <v-card variant="outlined">
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2">mdi-information</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-information
+                    </v-icon>
                     PWA Information
                   </v-card-title>
                   <v-card-text>

@@ -50,7 +50,10 @@ src/components/smart/owner/HomeOwner.vue -
     />
 
     <!-- Main Calendar Area -->
-    <div class="calendar-main-container" :class="{ 'sidebar-open': sidebarOpen && !mobile }">
+    <div
+      class="calendar-main-container"
+      :class="{ 'sidebar-open': sidebarOpen && !mobile }"
+    >
       <div class="calendar-layout">
         <!-- Calendar Header - Fixed height -->
         <v-card
@@ -74,7 +77,9 @@ src/components/smart/owner/HomeOwner.vue -
               
               <!-- Centered Month Display -->
               <div class="month-display-prominent">
-                <div class="month-title">{{ formattedMonthYear }}</div>
+                <div class="month-title">
+                  {{ formattedMonthYear }}
+                </div>
               </div>
               
               <!-- Right Navigation Arrow -->

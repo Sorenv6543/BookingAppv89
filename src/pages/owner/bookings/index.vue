@@ -10,7 +10,9 @@
                 variant="text"
                 @click="$router.go(-1)"
               />
-              <h1 class="text-h4 ml-4">My Bookings</h1>
+              <h1 class="text-h4 ml-4">
+                My Bookings
+              </h1>
             </div>
             <v-btn
               color="primary"
@@ -25,35 +27,79 @@
 
       <!-- Booking Stats - Compact -->
       <v-row class="mb-2 compact-stats-row">
-        <v-col cols="6" md="3" class="pa-1">
-          <v-card class="compact-stat-card stat-card-primary" elevation="1">
+        <v-col
+          cols="6"
+          md="3"
+          class="pa-1"
+        >
+          <v-card
+            class="compact-stat-card stat-card-primary"
+            elevation="1"
+          >
             <v-card-text class="pa-2 text-center">
-              <div class="stat-number">{{ ownerBookingsArray.length }}</div>
-              <div class="stat-label">Total</div>
+              <div class="stat-number">
+                {{ ownerBookingsArray.length }}
+              </div>
+              <div class="stat-label">
+                Total
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="6" md="3" class="pa-1">
-          <v-card class="compact-stat-card stat-card-warning" elevation="1">
+        <v-col
+          cols="6"
+          md="3"
+          class="pa-1"
+        >
+          <v-card
+            class="compact-stat-card stat-card-warning"
+            elevation="1"
+          >
             <v-card-text class="pa-2 text-center">
-              <div class="stat-number">{{ turnBookings.length }}</div>
-              <div class="stat-label">Turns</div>
+              <div class="stat-number">
+                {{ turnBookings.length }}
+              </div>
+              <div class="stat-label">
+                Turns
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="6" md="3" class="pa-1">
-          <v-card class="compact-stat-card stat-card-success" elevation="1">
+        <v-col
+          cols="6"
+          md="3"
+          class="pa-1"
+        >
+          <v-card
+            class="compact-stat-card stat-card-success"
+            elevation="1"
+          >
             <v-card-text class="pa-2 text-center">
-              <div class="stat-number">{{ todayBookings.length }}</div>
-              <div class="stat-label">Today</div>
+              <div class="stat-number">
+                {{ todayBookings.length }}
+              </div>
+              <div class="stat-label">
+                Today
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="6" md="3" class="pa-1">
-          <v-card class="compact-stat-card stat-card-info" elevation="1">
+        <v-col
+          cols="6"
+          md="3"
+          class="pa-1"
+        >
+          <v-card
+            class="compact-stat-card stat-card-info"
+            elevation="1"
+          >
             <v-card-text class="pa-2 text-center">
-              <div class="stat-number">{{ upcomingBookings.length }}</div>
-              <div class="stat-label">This Week</div>
+              <div class="stat-number">
+                {{ upcomingBookings.length }}
+              </div>
+              <div class="stat-label">
+                This Week
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -61,7 +107,11 @@
 
       <!-- Filters - Compact -->
       <v-row class="mb-2 compact-filters-row">
-        <v-col cols="12" md="4" class="pa-1">
+        <v-col
+          cols="12"
+          md="4"
+          class="pa-1"
+        >
           <v-select
             v-model="selectedProperty"
             :items="propertyOptions"
@@ -73,7 +123,11 @@
             hide-details
           />
         </v-col>
-        <v-col cols="6" md="4" class="pa-1">
+        <v-col
+          cols="6"
+          md="4"
+          class="pa-1"
+        >
           <v-select
             v-model="selectedStatus"
             :items="statusOptions"
@@ -85,7 +139,11 @@
             hide-details
           />
         </v-col>
-        <v-col cols="6" md="4" class="pa-1">
+        <v-col
+          cols="6"
+          md="4"
+          class="pa-1"
+        >
           <v-select
             v-model="selectedType"
             :items="typeOptions"

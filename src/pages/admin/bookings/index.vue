@@ -111,81 +111,248 @@
       <v-container fluid>
         <!-- Bookings Table -->
         <v-card>
-          <v-card-text class="pa-0">
-            <div
-              v-if="filteredBookings.length === 0"
-              class="text-center py-8"
-            >
-              <v-icon
-                size="64"
-                color="grey-lighten-1"
+          <v-card-title class="d-flex justify-space-between align-center">
+            <span>All Bookings ({{ filteredBookings.length }})</span>
+            <div class="d-flex align-center gap-2">
+              <v-select
+                v-model="itemsPerPage"
+                :items="[10, 25, 50, 100]"
+                label="Items per page"
+                variant="outlined"
+                density="compact"
+                style="width: 140px;"
+              />
+              <v-btn-toggle
+                v-model="tableView"
+                variant="outlined"
+                density="compact"
               >
-                mdi-calendar-search
-              </v-icon>
-              <p class="text-h6 text-medium-emphasis mt-4">
-                No bookings found
-              </p>
-              <p class="text-body-2 text-medium-emphasis">
-                Try adjusting your filters or create a new booking
-              </p>
+                <v-btn
+                  value="table"
+                  icon="mdi-table"
+                />
+                <v-btn
+                  value="cards"
+                  icon="mdi-view-grid"
+                />
+              </v-btn-toggle>
             </div>
-            
-            <div
-              v-else
-              class="bookings-list"
+          </v-card-title>
+          
+          <div
+            v-if="filteredBookings.length === 0"
+            class="text-center py-8"
+          >
+            <v-icon
+              size="64"
+              color="grey-lighten-1"
             >
-              <div
-                v-for="booking in filteredBookings"
-                :key="booking.id"
-                class="booking-item"
-                @click="openBookingDetails(booking)"
+              mdi-calendar-search
+            </v-icon>
+            <p class="text-h6 text-medium-emphasis mt-4">
+              No bookings found
+            </p>
+            <p class="text-body-2 text-medium-emphasis">
+              Try adjusting your filters or create a new booking
+            </p>
+          </div>
+
+          <!-- Table View -->
+          <v-data-table
+            v-else-if="tableView === 'table'"
+            :headers="tableHeaders"
+            :items="paginatedBookings"
+            :items-per-page="itemsPerPage"
+            :sort-by="sortBy"
+            :search="searchQuery"
+            hide-default-footer
+            class="bookings-table"
+            @click:row="openBookingDetails"
+          >
+            <template #item.status="{ item }">
+              <v-chip
+                :color="getStatusColor(item.status)"
+                size="small"
+                variant="flat"
               >
-                <div class="booking-main">
-                  <div class="booking-info">
-                    <div class="d-flex align-center gap-2 mb-1">
-                      <v-chip
-                        :color="getStatusColor(booking.status)"
-                        size="small"
-                        variant="flat"
-                      >
-                        {{ booking.status }}
-                      </v-chip>
-                      <v-chip
-                        :color="booking.booking_type === 'turn' ? 'warning' : 'primary'"
-                        size="small"
-                        variant="outlined"
-                      >
-                        {{ booking.booking_type === 'turn' ? 'Turn' : 'Standard' }}
-                      </v-chip>
-                      <span
-                        v-if="booking.booking_type === 'turn'"
-                        class="text-warning text-caption font-weight-bold"
-                      >
-                        URGENT
-                      </span>
-                    </div>
-                    
-                    <h3 class="text-h6 font-weight-medium mb-1">
-                      {{ getPropertyName(booking.property_id) }}
-                    </h3>
-                    
-                    <div class="text-body-2 text-medium-emphasis mb-2">
-                      <v-icon
-                        size="16"
-                        class="mr-1"
-                      >
-                        mdi-calendar
-                      </v-icon>
-                      {{ formatDate(booking.checkout_date) }}
-                      <v-icon
-                        size="16"
-                        class="ml-3 mr-1"
-                      >
-                        mdi-arrow-right
-                      </v-icon>
-                      {{ formatDate(booking.checkin_date) }}
-                    </div>
-                    
+                {{ item.status }}
+              </v-chip>
+            </template>
+
+            <template #item.booking_type="{ item }">
+              <div class="d-flex align-center gap-1">
+                <v-chip
+                  :color="item.booking_type === 'turn' ? 'warning' : 'primary'"
+                  size="small"
+                  variant="outlined"
+                >
+                  {{ item.booking_type === 'turn' ? 'Turn' : 'Standard' }}
+                </v-chip>
+                <v-chip
+                  v-if="item.priority && item.priority !== 'normal'"
+                  :color="getPriorityColor(item.priority)"
+                  size="x-small"
+                  variant="flat"
+                >
+                  {{ item.priority }}
+                </v-chip>
+              </div>
+            </template>
+
+            <template #item.property="{ item }">
+              <div class="text-body-2">
+                <div class="font-weight-medium">
+                  {{ getPropertyName(item.property_id) }}
+                </div>
+                <div class="text-caption text-medium-emphasis">
+                  {{ getPropertyAddress(item.property_id) }}
+                </div>
+              </div>
+            </template>
+
+            <template #item.dates="{ item }">
+              <div class="text-body-2">
+                <div>{{ formatDate(item.checkout_date) }}</div>
+                <div class="text-caption text-medium-emphasis">
+                  → {{ formatDate(item.checkin_date) }}
+                </div>
+              </div>
+            </template>
+
+            <template #item.cleaner="{ item }">
+              <div
+                v-if="item.assigned_cleaner_id"
+                class="text-body-2"
+              >
+                {{ getCleanerName(item.assigned_cleaner_id) }}
+              </div>
+              <v-chip
+                v-else
+                color="warning"
+                size="small"
+                variant="outlined"
+              >
+                Unassigned
+              </v-chip>
+            </template>
+
+            <template #item.guest_count="{ item }">
+              <div class="d-flex align-center">
+                <v-icon
+                  size="16"
+                  class="mr-1"
+                >
+                  mdi-account-group
+                </v-icon>
+                {{ item.guest_count || '—' }}
+              </div>
+            </template>
+
+            <template #item.created_at="{ item }">
+              <span class="text-body-2">{{ formatDateTime(item.created_at) }}</span>
+            </template>
+
+            <template #item.actions="{ item }">
+              <div class="d-flex align-center gap-1">
+                <v-btn
+                  v-if="!item.assigned_cleaner_id"
+                  color="primary"
+                  size="small"
+                  variant="outlined"
+                  @click.stop="assignCleaner(item)"
+                >
+                  Assign
+                </v-btn>
+                
+                <v-menu>
+                  <template #activator="{ props }">
+                    <v-btn
+                      icon="mdi-dots-vertical"
+                      size="small"
+                      variant="text"
+                      v-bind="props"
+                      @click.stop
+                    />
+                  </template>
+                  <v-list>
+                    <v-list-item @click="editBooking(item)">
+                      <v-list-item-title>Edit</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="duplicateBooking(item)">
+                      <v-list-item-title>Duplicate</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item
+                      class="text-error"
+                      @click="cancelBooking(item)"
+                    >
+                      <v-list-item-title>Cancel</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div>
+            </template>
+          </v-data-table>
+
+          <!-- Card View (Original) -->
+          <div
+            v-else
+            class="bookings-list pa-4"
+          >
+            <div
+              v-for="booking in paginatedBookings"
+              :key="booking.id"
+              class="booking-item"
+              @click="openBookingDetails(booking)"
+            >
+              <div class="booking-main">
+                <div class="booking-info">
+                  <div class="d-flex align-center gap-2 mb-1">
+                    <v-chip
+                      :color="getStatusColor(booking.status)"
+                      size="small"
+                      variant="flat"
+                    >
+                      {{ booking.status }}
+                    </v-chip>
+                    <v-chip
+                      :color="booking.booking_type === 'turn' ? 'warning' : 'primary'"
+                      size="small"
+                      variant="outlined"
+                    >
+                      {{ booking.booking_type === 'turn' ? 'Turn' : 'Standard' }}
+                    </v-chip>
+                    <v-chip
+                      v-if="booking.priority && booking.priority !== 'normal'"
+                      :color="getPriorityColor(booking.priority)"
+                      size="small"
+                      variant="flat"
+                    >
+                      {{ booking.priority }}
+                    </v-chip>
+                  </div>
+                  
+                  <h3 class="text-h6 font-weight-medium mb-1">
+                    {{ getPropertyName(booking.property_id) }}
+                  </h3>
+                  
+                  <div class="text-body-2 text-medium-emphasis mb-2">
+                    <v-icon
+                      size="16"
+                      class="mr-1"
+                    >
+                      mdi-calendar
+                    </v-icon>
+                    {{ formatDate(booking.checkout_date) }}
+                    <v-icon
+                      size="16"
+                      class="ml-3 mr-1"
+                    >
+                      mdi-arrow-right
+                    </v-icon>
+                    {{ formatDate(booking.checkin_date) }}
+                  </div>
+                  
+                  <div class="d-flex align-center gap-4 mb-2">
                     <div
                       v-if="booking.assigned_cleaner_id"
                       class="text-body-2"
@@ -210,49 +377,80 @@
                       </v-icon>
                       No cleaner assigned
                     </div>
+                    
+                    <div
+                      v-if="booking.guest_count"
+                      class="text-body-2"
+                    >
+                      <v-icon
+                        size="16"
+                        class="mr-1"
+                      >
+                        mdi-account-group
+                      </v-icon>
+                      {{ booking.guest_count }} guests
+                    </div>
                   </div>
                   
-                  <div class="booking-actions">
-                    <v-btn
-                      v-if="!booking.assigned_cleaner_id"
-                      color="primary"
-                      size="small"
-                      variant="outlined"
-                      @click.stop="assignCleaner(booking)"
-                    >
-                      Assign Cleaner
-                    </v-btn>
-                    
-                    <v-menu>
-                      <template #activator="{ props }">
-                        <v-btn
-                          icon="mdi-dots-vertical"
-                          size="small"
-                          variant="text"
-                          v-bind="props"
-                          @click.stop
-                        />
-                      </template>
-                      <v-list>
-                        <v-list-item @click="editBooking(booking)">
-                          <v-list-item-title>Edit</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item @click="duplicateBooking(booking)">
-                          <v-list-item-title>Duplicate</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item
-                          class="text-error"
-                          @click="cancelBooking(booking)"
-                        >
-                          <v-list-item-title>Cancel</v-list-item-title>
-                        </v-list-item>
-                      </v-list>
-                    </v-menu>
+                  <div class="text-caption text-medium-emphasis">
+                    Created: {{ formatDateTime(booking.created_at) }}
                   </div>
+                </div>
+                
+                <div class="booking-actions">
+                  <v-btn
+                    v-if="!booking.assigned_cleaner_id"
+                    color="primary"
+                    size="small"
+                    variant="outlined"
+                    @click.stop="assignCleaner(booking)"
+                  >
+                    Assign Cleaner
+                  </v-btn>
+                  
+                  <v-menu>
+                    <template #activator="{ props }">
+                      <v-btn
+                        icon="mdi-dots-vertical"
+                        size="small"
+                        variant="text"
+                        v-bind="props"
+                        @click.stop
+                      />
+                    </template>
+                    <v-list>
+                      <v-list-item @click="editBooking(booking)">
+                        <v-list-item-title>Edit</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item @click="duplicateBooking(booking)">
+                        <v-list-item-title>Duplicate</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item
+                        class="text-error"
+                        @click="cancelBooking(booking)"
+                      >
+                        <v-list-item-title>Cancel</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </div>
               </div>
             </div>
-          </v-card-text>
+          </div>
+
+          <!-- Pagination -->
+          <v-card-actions v-if="filteredBookings.length > 0">
+            <v-pagination
+              v-model="currentPage"
+              :length="Math.ceil(filteredBookings.length / itemsPerPage)"
+              :total-visible="7"
+            />
+            <v-spacer />
+            <span class="text-body-2 text-medium-emphasis">
+              {{ ((currentPage - 1) * itemsPerPage) + 1 }}-{{ Math.min(currentPage * itemsPerPage, filteredBookings.length) }}
+              of {{ filteredBookings.length }} bookings
+            </span>
+          </v-card-actions>
         </v-card>
       </v-container>
     </div>
@@ -351,6 +549,12 @@ const propertyFilter = ref('')
 const dateFrom = ref('')
 const dateTo = ref('')
 
+// Table state
+const tableView = ref('table')
+const itemsPerPage = ref(25)
+const currentPage = ref(1)
+const sortBy = ref([{ key: 'created_at', order: 'desc' }])
+
 // Dialog state
 const showBookingDialog = ref(false)
 const showCleanerDialog = ref(false)
@@ -372,6 +576,18 @@ const typeOptions = [
   { title: 'Turn', value: 'turn' }
 ]
 
+// Table headers
+const tableHeaders = [
+  { title: 'Status', key: 'status', sortable: true, width: '120px' },
+  { title: 'Type', key: 'booking_type', sortable: true, width: '140px' },
+  { title: 'Property', key: 'property', sortable: false, width: '200px' },
+  { title: 'Dates', key: 'dates', sortable: true, width: '150px' },
+  { title: 'Cleaner', key: 'cleaner', sortable: false, width: '140px' },
+  { title: 'Guests', key: 'guest_count', sortable: true, width: '80px' },
+  { title: 'Created', key: 'created_at', sortable: true, width: '120px' },
+  { title: 'Actions', key: 'actions', sortable: false, width: '120px', align: 'end' }
+]
+
 // Computed properties
 const propertyOptions = computed(() => {
   return allProperties.value.map(property => ({
@@ -385,6 +601,12 @@ const cleanerOptions = computed(() => {
     id: cleaner.id,
     name: cleaner.name
   }))
+})
+
+const paginatedBookings = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return filteredBookings.value.slice(start, end)
 })
 
 const filteredBookings = computed(() => {
@@ -444,6 +666,11 @@ const getCleanerName = (cleanerId: string): string => {
   return cleaner?.name || 'Unknown Cleaner'
 }
 
+const getPropertyAddress = (propertyId: string): string => {
+  const property = allProperties.value.find(p => p.id === propertyId)
+  return property?.address || 'Unknown Address'
+}
+
 const getStatusColor = (status: string): string => {
   const colors: Record<string, string> = {
     pending: 'warning',
@@ -455,6 +682,16 @@ const getStatusColor = (status: string): string => {
   return colors[status] || 'grey'
 }
 
+const getPriorityColor = (priority: string): string => {
+  const colors: Record<string, string> = {
+    low: 'grey',
+    normal: 'primary',
+    high: 'orange',
+    urgent: 'error'
+  }
+  return colors[priority] || 'primary'
+}
+
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString)
   return date.toLocaleDateString('en-US', {
@@ -462,6 +699,16 @@ const formatDate = (dateString: string): string => {
     year: 'numeric',
     month: 'short',
     day: 'numeric'
+  })
+}
+
+const formatDateTime = (dateString: string): string => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
   })
 }
 
@@ -563,8 +810,20 @@ const cancelBooking = async (booking: Booking) => {
 }
 
 .bookings-list {
-  max-height: calc(100vh - 300px);
+  max-height: calc(100vh - 400px);
   overflow-y: auto;
+}
+
+.bookings-table {
+  max-height: calc(100vh - 400px);
+}
+
+.bookings-table .v-data-table__tbody tr {
+  cursor: pointer;
+}
+
+.bookings-table .v-data-table__tbody tr:hover {
+  background: rgb(var(--v-theme-surface-variant));
 }
 
 .booking-item {

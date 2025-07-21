@@ -375,13 +375,13 @@ export function getErrorMessage(
   const messages = role === 'admin' ? ADMIN_MESSAGES : OWNER_MESSAGES;
   const categoryMessages = messages[category];
   
-  if (!categoryMessages || !categoryMessages[code]) {
+  if (!categoryMessages || !(code in categoryMessages)) {
     return role === 'admin' 
       ? `Unknown error (${category}:${code}). Context: ${JSON.stringify(context)}. Investigation required.`
       : 'An unexpected error occurred. Please try again.';
   }
   
-  let message = categoryMessages[code];
+  let message = (categoryMessages as Record<string, string>)[code];
   
   // Replace placeholders with context values
   Object.entries(context).forEach(([key, value]) => {

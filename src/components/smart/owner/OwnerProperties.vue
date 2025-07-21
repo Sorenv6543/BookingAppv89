@@ -16,7 +16,9 @@ src/components/smart/owner/OwnerProperties.vue -
       <v-row>
         <v-col cols="12">
           <div class="d-flex justify-space-between align-center mb-4">
-            <h1 class="text-h4">My Properties</h1>
+            <h1 class="text-h4">
+              My Properties
+            </h1>
             <v-btn
               color="primary"
               prepend-icon="mdi-plus"
@@ -30,35 +32,79 @@ src/components/smart/owner/OwnerProperties.vue -
 
       <!-- Property Stats (Using SAME composables as HomeOwner) -->
       <v-row class="mb-2 compact-stats-row">
-        <v-col cols="6" sm="3" class="pa-1">
-          <v-card class="compact-stat-card stat-card-primary" elevation="1">
+        <v-col
+          cols="6"
+          sm="3"
+          class="pa-1"
+        >
+          <v-card
+            class="compact-stat-card stat-card-primary"
+            elevation="1"
+          >
             <v-card-text class="pa-2 text-center">
-              <div class="stat-number">{{ myProperties.length }}</div>
-              <div class="stat-label">Total Properties</div>
+              <div class="stat-number">
+                {{ myProperties.length }}
+              </div>
+              <div class="stat-label">
+                Total Properties
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="6" sm="3" class="pa-1">
-          <v-card class="compact-stat-card stat-card-success" elevation="1">
+        <v-col
+          cols="6"
+          sm="3"
+          class="pa-1"
+        >
+          <v-card
+            class="compact-stat-card stat-card-success"
+            elevation="1"
+          >
             <v-card-text class="pa-2 text-center">
-              <div class="stat-number">{{ myActiveProperties.length }}</div>
-              <div class="stat-label">Active Properties</div>
+              <div class="stat-number">
+                {{ myActiveProperties.length }}
+              </div>
+              <div class="stat-label">
+                Active Properties
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="6" sm="3" class="pa-1">
-          <v-card class="compact-stat-card stat-card-info" elevation="1">
+        <v-col
+          cols="6"
+          sm="3"
+          class="pa-1"
+        >
+          <v-card
+            class="compact-stat-card stat-card-info"
+            elevation="1"
+          >
             <v-card-text class="pa-2 text-center">
-              <div class="stat-number">{{ myBookings.length }}</div>
-              <div class="stat-label">Total Bookings</div>
+              <div class="stat-number">
+                {{ myBookings.length }}
+              </div>
+              <div class="stat-label">
+                Total Bookings
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="6" sm="3" class="pa-1">
-          <v-card class="compact-stat-card stat-card-warning" elevation="1">
+        <v-col
+          cols="6"
+          sm="3"
+          class="pa-1"
+        >
+          <v-card
+            class="compact-stat-card stat-card-warning"
+            elevation="1"
+          >
             <v-card-text class="pa-2 text-center">
-              <div class="stat-number">{{ myTodayTurns.length }}</div>
-              <div class="stat-label">Today's Turns</div>
+              <div class="stat-number">
+                {{ myTodayTurns.length }}
+              </div>
+              <div class="stat-label">
+                Today's Turns
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -83,7 +129,10 @@ src/components/smart/owner/OwnerProperties.vue -
           >
             <v-card-text class="pa-3">
               <div class="d-flex align-center justify-space-between mb-2">
-                <v-icon :color="getPropertyIconColor(index)" size="20">
+                <v-icon
+                  :color="getPropertyIconColor(index)"
+                  size="20"
+                >
                   {{ getPropertyIcon(property.property_type) }}
                 </v-icon>
                 <v-menu>
@@ -110,20 +159,33 @@ src/components/smart/owner/OwnerProperties.vue -
                 </v-menu>
               </div>
               
-              <div class="property-name mb-1">{{ property.name }}</div>
-              <div class="property-address mb-2">{{ property.address }}</div>
+              <div class="property-name mb-1">
+                {{ property.name }}
+              </div>
+              <div class="property-address mb-2">
+                {{ property.address }}
+              </div>
               
               <div class="property-details">
                 <span class="detail-item">
-                  <v-icon size="12" class="mr-1">mdi-bed</v-icon>
+                  <v-icon
+                    size="12"
+                    class="mr-1"
+                  >mdi-bed</v-icon>
                   {{ property.bedrooms || 0 }}
                 </span>
                 <span class="detail-item">
-                  <v-icon size="12" class="mr-1">mdi-shower</v-icon>
+                  <v-icon
+                    size="12"
+                    class="mr-1"
+                  >mdi-shower</v-icon>
                   {{ property.bathrooms || 0 }}
                 </span>
                 <span class="detail-item">
-                  <v-icon size="12" class="mr-1">mdi-home</v-icon>
+                  <v-icon
+                    size="12"
+                    class="mr-1"
+                  >mdi-home</v-icon>
                   {{ property.property_type || 'N/A' }}
                 </span>
               </div>
@@ -134,11 +196,20 @@ src/components/smart/owner/OwnerProperties.vue -
 
       <!-- Empty State -->
       <v-row v-if="myProperties.length === 0">
-        <v-col cols="12" class="text-center py-8">
-          <v-icon size="64" color="grey-lighten-1" class="mb-4">
+        <v-col
+          cols="12"
+          class="text-center py-8"
+        >
+          <v-icon
+            size="64"
+            color="grey-lighten-1"
+            class="mb-4"
+          >
             mdi-home-outline
           </v-icon>
-          <h3 class="text-h6 mb-2">No Properties Yet</h3>
+          <h3 class="text-h6 mb-2">
+            No Properties Yet
+          </h3>
           <p class="text-body-2 text-medium-emphasis mb-4">
             Add your first property to start managing bookings and cleanings.
           </p>

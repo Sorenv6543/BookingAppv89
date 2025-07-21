@@ -43,11 +43,15 @@ const navigateToDemo = (route: string) => {
                 <v-card
                   variant="outlined"
                   hover
-                  @click="navigateToDemo(demo.route)"
                   class="cursor-pointer"
+                  @click="navigateToDemo(demo.route)"
                 >
                   <v-card-title class="text-center">
-                    <v-icon size="48" :icon="demo.icon" class="mb-2" />
+                    <v-icon
+                      size="48"
+                      :icon="demo.icon"
+                      class="mb-2"
+                    />
                     <div>{{ demo.title }}</div>
                   </v-card-title>
                   <v-card-text class="text-center">

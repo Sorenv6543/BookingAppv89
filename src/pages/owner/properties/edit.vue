@@ -9,16 +9,26 @@
               variant="text"
               @click="$router.go(-1)"
             />
-            <h1 class="text-h4 ml-4">Edit Property</h1>
+            <h1 class="text-h4 ml-4">
+              Edit Property
+            </h1>
           </div>
         </v-col>
       </v-row>
 
       <v-row v-if="property">
-        <v-col cols="12" md="8">
+        <v-col
+          cols="12"
+          md="8"
+        >
           <v-card>
             <v-card-title>
-              <v-icon color="primary" class="mr-2">mdi-home-edit</v-icon>
+              <v-icon
+                color="primary"
+                class="mr-2"
+              >
+                mdi-home-edit
+              </v-icon>
               {{ property.name }}
             </v-card-title>
             
@@ -34,10 +44,18 @@
           </v-card>
         </v-col>
         
-        <v-col cols="12" md="4">
+        <v-col
+          cols="12"
+          md="4"
+        >
           <v-card>
             <v-card-title>
-              <v-icon color="info" class="mr-2">mdi-information</v-icon>
+              <v-icon
+                color="info"
+                class="mr-2"
+              >
+                mdi-information
+              </v-icon>
               Property Info
             </v-card-title>
             <v-card-text>
@@ -52,7 +70,12 @@
 
           <v-card class="mt-4">
             <v-card-title>
-              <v-icon color="warning" class="mr-2">mdi-alert</v-icon>
+              <v-icon
+                color="warning"
+                class="mr-2"
+              >
+                mdi-alert
+              </v-icon>
               Danger Zone
             </v-card-title>
             <v-card-text>
@@ -76,8 +99,13 @@
         <v-col cols="12">
           <v-card>
             <v-card-text class="text-center">
-              <v-progress-circular indeterminate color="primary" />
-              <div class="mt-4">Loading property...</div>
+              <v-progress-circular
+                indeterminate
+                color="primary"
+              />
+              <div class="mt-4">
+                Loading property...
+              </div>
             </v-card-text>
           </v-card>
         </v-col>

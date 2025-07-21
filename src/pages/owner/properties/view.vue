@@ -10,9 +10,14 @@
                 variant="text"
                 @click="$router.go(-1)"
               />
-              <h1 class="text-h4 ml-4">{{ property?.name || 'Property Details' }}</h1>
+              <h1 class="text-h4 ml-4">
+                {{ property?.name || 'Property Details' }}
+              </h1>
             </div>
-            <div v-if="property" class="d-flex gap-2">
+            <div
+              v-if="property"
+              class="d-flex gap-2"
+            >
               <v-btn
                 color="primary"
                 prepend-icon="mdi-pencil"
@@ -33,23 +38,37 @@
       </v-row>
 
       <v-row v-if="property">
-        <v-col cols="12" md="8">
+        <v-col
+          cols="12"
+          md="8"
+        >
           <!-- Property Details Card -->
           <v-card class="mb-4">
             <v-card-title>
-              <v-icon color="primary" class="mr-2">mdi-home</v-icon>
+              <v-icon
+                color="primary"
+                class="mr-2"
+              >
+                mdi-home
+              </v-icon>
               Property Information
             </v-card-title>
             
             <v-card-text>
               <v-row>
-                <v-col cols="12" sm="6">
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
                   <div class="property-detail">
                     <strong>Name:</strong>
                     <div>{{ property.name }}</div>
                   </div>
                 </v-col>
-                <v-col cols="12" sm="6">
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
                   <div class="property-detail">
                     <strong>Type:</strong>
                     <div>{{ property.property_type || 'Not specified' }}</div>
@@ -61,13 +80,19 @@
                     <div>{{ property.address }}</div>
                   </div>
                 </v-col>
-                <v-col cols="12" sm="6">
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
                   <div class="property-detail">
                     <strong>Bedrooms:</strong>
                     <div>{{ property.bedrooms || 'Not specified' }}</div>
                   </div>
                 </v-col>
-                <v-col cols="12" sm="6">
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
                   <div class="property-detail">
                     <strong>Bathrooms:</strong>
                     <div>{{ property.bathrooms || 'Not specified' }}</div>
@@ -80,13 +105,26 @@
           <!-- Recent Bookings -->
           <v-card>
             <v-card-title>
-              <v-icon color="info" class="mr-2">mdi-calendar-multiple</v-icon>
+              <v-icon
+                color="info"
+                class="mr-2"
+              >
+                mdi-calendar-multiple
+              </v-icon>
               Recent Bookings
             </v-card-title>
             
             <v-card-text>
-              <div v-if="recentBookings.length === 0" class="text-center py-8">
-                <v-icon color="grey" size="48">mdi-calendar-outline</v-icon>
+              <div
+                v-if="recentBookings.length === 0"
+                class="text-center py-8"
+              >
+                <v-icon
+                  color="grey"
+                  size="48"
+                >
+                  mdi-calendar-outline
+                </v-icon>
                 <div class="text-body-1 text-medium-emphasis mt-2">
                   No bookings yet
                 </div>
@@ -127,25 +165,45 @@
           </v-card>
         </v-col>
         
-        <v-col cols="12" md="4">
+        <v-col
+          cols="12"
+          md="4"
+        >
           <!-- Property Stats -->
           <v-card class="mb-4">
             <v-card-title>
-              <v-icon color="success" class="mr-2">mdi-chart-line</v-icon>
+              <v-icon
+                color="success"
+                class="mr-2"
+              >
+                mdi-chart-line
+              </v-icon>
               Statistics
             </v-card-title>
             <v-card-text>
               <div class="stat-item">
-                <div class="stat-value">{{ totalBookings }}</div>
-                <div class="stat-label">Total Bookings</div>
+                <div class="stat-value">
+                  {{ totalBookings }}
+                </div>
+                <div class="stat-label">
+                  Total Bookings
+                </div>
               </div>
               <div class="stat-item">
-                <div class="stat-value">{{ upcomingBookings }}</div>
-                <div class="stat-label">Upcoming Bookings</div>
+                <div class="stat-value">
+                  {{ upcomingBookings }}
+                </div>
+                <div class="stat-label">
+                  Upcoming Bookings
+                </div>
               </div>
               <div class="stat-item">
-                <div class="stat-value">Active</div>
-                <div class="stat-label">Status</div>
+                <div class="stat-value">
+                  Active
+                </div>
+                <div class="stat-label">
+                  Status
+                </div>
               </div>
             </v-card-text>
           </v-card>
@@ -153,7 +211,12 @@
           <!-- Property Info -->
           <v-card>
             <v-card-title>
-              <v-icon color="info" class="mr-2">mdi-information</v-icon>
+              <v-icon
+                color="info"
+                class="mr-2"
+              >
+                mdi-information
+              </v-icon>
               Details
             </v-card-title>
             <v-card-text>
@@ -171,8 +234,13 @@
         <v-col cols="12">
           <v-card>
             <v-card-text class="text-center">
-              <v-progress-circular indeterminate color="primary" />
-              <div class="mt-4">Loading property...</div>
+              <v-progress-circular
+                indeterminate
+                color="primary"
+              />
+              <div class="mt-4">
+                Loading property...
+              </div>
             </v-card-text>
           </v-card>
         </v-col>

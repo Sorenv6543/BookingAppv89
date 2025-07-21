@@ -15,8 +15,8 @@
         
       <v-spacer /> -->
         
-      <!-- Optional help or contact link -->
-      <!-- <v-btn
+    <!-- Optional help or contact link -->
+    <!-- <v-btn
         variant="text"
         color="white"
         href="mailto:support@example.com"

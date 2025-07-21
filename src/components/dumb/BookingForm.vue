@@ -65,8 +65,8 @@
                   :error-messages="errors.get('checkout_date')"
                   hint="When guests leave"
                   persistent-hint
-                  @update:model-value="updateBookingType"
                   prepend-inner-icon="mdi-calendar-remove"
+                  @update:model-value="updateBookingType"
                 />
               </v-col>
               
@@ -85,8 +85,8 @@
                   :error-messages="errors.get('checkin_date')"
                   hint="When new guests arrive"
                   persistent-hint
-                  @update:model-value="updateBookingType"
                   prepend-inner-icon="mdi-calendar-plus"
+                  @update:model-value="updateBookingType"
                 />
               </v-col>
             </v-row>

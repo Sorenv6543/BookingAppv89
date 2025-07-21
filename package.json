@@ -15,7 +15,7 @@
     "preview": "vite preview",
     "preview:production": "vite preview --mode production",
     "preview:pwa": "vite preview --host",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "lint": "eslint . --fix",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",

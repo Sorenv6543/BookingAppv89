@@ -34,6 +34,8 @@ export interface Booking {
   assigned_cleaner_id?: string;
   created_at?: string;
   updated_at?: string;
+  // Add index signature to allow conversion to Record<string, unknown>
+  [key: string]: unknown;
 }
 
 /**
@@ -52,8 +54,12 @@ export interface BookingWithMetadata extends Booking {
 
 /**
  * Form data for creating/editing bookings
+ * Includes optional start/end properties for FullCalendar integration
  */
-export type BookingFormData = Omit<Booking, 'id' | 'created_at' | 'updated_at'>;
+export type BookingFormData = Omit<Booking, 'id' | 'created_at' | 'updated_at'> & {
+  start?: string;
+  end?: string;
+};
 
 /**
  * Map type for booking collections

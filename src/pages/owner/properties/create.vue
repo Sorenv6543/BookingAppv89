@@ -9,16 +9,26 @@
               variant="text"
               @click="$router.go(-1)"
             />
-            <h1 class="text-h4 ml-4">Create New Property</h1>
+            <h1 class="text-h4 ml-4">
+              Create New Property
+            </h1>
           </div>
         </v-col>
       </v-row>
 
       <v-row>
-        <v-col cols="12" md="8">
+        <v-col
+          cols="12"
+          md="8"
+        >
           <v-card>
             <v-card-title>
-              <v-icon color="primary" class="mr-2">mdi-home-plus</v-icon>
+              <v-icon
+                color="primary"
+                class="mr-2"
+              >
+                mdi-home-plus
+              </v-icon>
               Property Details
             </v-card-title>
             
@@ -33,10 +43,18 @@
           </v-card>
         </v-col>
         
-        <v-col cols="12" md="4">
+        <v-col
+          cols="12"
+          md="4"
+        >
           <v-card>
             <v-card-title>
-              <v-icon color="info" class="mr-2">mdi-information</v-icon>
+              <v-icon
+                color="info"
+                class="mr-2"
+              >
+                mdi-information
+              </v-icon>
               Tips
             </v-card-title>
             <v-card-text>

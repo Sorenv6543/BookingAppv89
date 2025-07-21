@@ -1,104 +1,89 @@
 <template>
   <div class="admin-layout-container">
     <AdminSidebar
+      v-model="isSidebarOpen"
+      :bookings="bookings"
+      :properties="properties"
       :total-properties="totalProperties"
       :active-cleanings-today="activeCleaningsToday"
       :urgent-turns-count="urgentTurnsCount"
-      :total-bookings="totalBookings"
-      :total-revenue="totalRevenue"
-      :bookings="bookings"
       :loading="loading"
       :current-view="currentView"
       :current-date="currentDate"
-      :properties="properties"
+      @navigate-to-booking="handleNavigateToBooking"
+      @navigate-to-date="handleNavigateToDate"
+      @filter-by-property="handleFilterByProperty"
+      @create-booking="handleCreateBooking"
+      @create-property="handleCreateProperty"
+      @assign-cleaner="handleAssignCleaner"
+      @generate-reports="handleGenerateReports"
+      @manage-system="handleManageSystem"
+      @emergency-response="handleEmergencyResponse"
     />
-
-    <AdminCalendar
-      :bookings="bookings"
-      :loading="loading"
-      :current-view="currentView"
-      :current-date="currentDate"
-      :properties="properties"
-    />  
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Booking, Property } from '@/types/booking';
-
-import AdminSidebar from './AdminSidebar.vue';
 import { useRouter } from 'vue-router';
+import AdminSidebar from './AdminSidebar.vue';
+import type { Booking, Property } from '@/types';
 
-
-
-
-// Initialize router and store
+// Composables
 const router = useRouter();
-const store = useStore();
-
-// Define props
-const props = defineProps<{
-    bookings: Booking[];
-    loading: boolean;
-    currentView: string;
-    currentDate: Date;
-    properties: Property[];
-}>();
 
 // Initialize state
 const totalProperties = ref(0);
 const activeCleaningsToday = ref(0);
 const urgentTurnsCount = ref(0);
-const totalBookings = ref(0);
-const totalRevenue = ref(0);
 
-// Handle create booking
+const currentView = ref('month');
+const currentDate = ref(new Date());
+const isSidebarOpen = ref(true);
+
+const bookings = ref<Booking[]>([]);
+const properties = ref<Property[]>([]);
+const loading = ref<boolean>(false);
+
+// Event handlers
+const handleNavigateToBooking = (bookingId: string) => {
+  router.push(`/admin/bookings/${bookingId}`);
+};
+
+const handleNavigateToDate = (date: Date) => {
+  // Navigate to calendar view with specific date
+  router.push(`/admin/calendar?date=${date.toISOString().split('T')[0]}`);
+};
+
+const handleFilterByProperty = (propertyId: string | null) => {
+  console.log('Filter by property:', propertyId);
+  // TODO: Implement property filtering
+};
+
 const handleCreateBooking = () => {
+  router.push('/admin/bookings/create');
+};
 
-// Handle create property
 const handleCreateProperty = () => {
   router.push('/admin/properties/create');
 };
 
-// Handle create user
-const handleCreateUser = () => {
-  router.push('/admin/users/create');
+const handleAssignCleaner = (data: { bookingId: string, cleanerId?: string }) => {
+  console.log('Assign cleaner:', data);
+  // TODO: Implement cleaner assignment
 };
 
-// Handle create turn
-const handleCreateTurn = () => {
-  router.push('/admin/turns/create');
+const handleGenerateReports = () => {
+  router.push('/admin/reports');
 };
 
-// Handle create notification
-const handleCreateNotification = () => {
-  router.push('/admin/notifications/create');
-};  
-
-// Handle create message
-const handleCreateMessage = () => {
-  router.push('/admin/messages/create');
+const handleManageSystem = () => {
+  router.push('/admin/settings');
 };
 
-// Handle create support
-const handleCreateSupport = () => {
-  router.push('/admin/supports/create');
-};
-
-// Handle create settings
-const handleCreateSettings = () => {
-  router.push('/admin/settings/create');
-};
-
-// Handle create profile
-const handleCreateProfile = () => {
-  router.push('/admin/profiles/create');
-};
-
-// Handle create notifications
-const handleCreateNotifications = () => {
-  router.push('/admin/notifications/create');
+const handleEmergencyResponse = () => {
+  console.log('Emergency response triggered');
+  // TODO: Implement emergency response
 };
 </script>
 
