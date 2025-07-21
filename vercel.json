@@ -8,22 +8,22 @@
       }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/owner/(.*)",
-      "dest": "/index.html"
+      "source": "/owner/(.*)",
+      "destination": "/index.html"
     },
     {
-      "src": "/admin/(.*)",
-      "dest": "/index.html"
+      "source": "/admin/(.*)",
+      "destination": "/index.html"
     },
     {
-      "src": "/auth/(.*)",
-      "dest": "/index.html"
+      "source": "/auth/(.*)",
+      "destination": "/index.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
