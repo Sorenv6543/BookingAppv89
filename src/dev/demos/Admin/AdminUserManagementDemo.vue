@@ -347,10 +347,10 @@ const {
   users,
   loading,
   fetchAllUsers,
-  createUser,
-  updateUser,
+  createUser: _createUser,
+  updateUser: _updateUser,
   deleteUser: deleteUserApi,
-  bulkChangeRoles,
+  bulkChangeRoles: _bulkChangeRoles,
   resetUserPassword: resetUserPasswordApi
 } = useAdminUserManagement()
 

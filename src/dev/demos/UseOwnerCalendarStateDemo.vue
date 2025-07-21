@@ -510,7 +510,7 @@ import { useBookingStore } from '@/stores/booking';
 
 // Get composables and stores
 const ownerCalendarState = useOwnerCalendarState();
-const ownerBookings = useOwnerBookings();
+const _ownerBookings = useOwnerBookings();
 const authStore = useAuthStore();
 const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
@@ -524,10 +524,10 @@ const {
   ownerCalendarTitle,
   
   // Functions
-  getOwnerCalendarEvents,
+  getOwnerCalendarEvents: _getOwnerCalendarEvents,
   handleOwnerDateSelect,
   handleOwnerEventClick,
-  getOwnerTurnAlerts,
+  getOwnerTurnAlerts: _getOwnerTurnAlerts,
   filterByOwnerProperty,
   clearOwnerPropertyFilters,
   validateOwnerBookingAccess,
@@ -535,7 +535,7 @@ const {
   
   // State
   ownerError,
-  ownerLoading,
+  ownerLoading: _ownerLoading,
   ownerSuccess,
   
   // Base calendar state

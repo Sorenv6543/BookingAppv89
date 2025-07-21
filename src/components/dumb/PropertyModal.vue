@@ -321,22 +321,22 @@ async function validate(): Promise<boolean> {
   if (!valid) return false;
   
   // Additional validation
-  if (!form.name || form.name.trim() === '') {
+  if (!form.name || String(form.name).trim() === '') {
     errors.value.set('name', 'Property name cannot be empty');
     return false;
   }
   
-  if (!form.address || form.address.trim() === '') {
+  if (!form.address || String(form.address).trim() === '') {
     errors.value.set('address', 'Property address cannot be empty');
     return false;
   }
   
-  if (!form.cleaning_duration || form.cleaning_duration <= 0) {
+  if (!form.cleaning_duration || Number(form.cleaning_duration) <= 0) {
     errors.value.set('cleaning_duration', 'Cleaning duration must be greater than 0');
     return false;
   }
   
-  if (!form.pricing_tier || !['basic', 'premium', 'luxury'].includes(form.pricing_tier)) {
+  if (!form.pricing_tier || !['basic', 'premium', 'luxury'].includes(String(form.pricing_tier))) {
     errors.value.set('pricing_tier', 'Invalid pricing tier');
     return false;
   }

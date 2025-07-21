@@ -195,10 +195,10 @@ async function addBooking(booking: Booking) {
     const { error: supaError } = await supabase.from('bookings').insert(booking);
     if (supaError) throw supaError;
     invalidateCache(); // Invalidate cache after successful insert
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Rollback on error
     bookings.value.delete(booking.id);
-    error.value = err.message || 'Failed to add booking.';
+    error.value = err instanceof Error ? err.message : 'Failed to add booking.';
     console.error('addBooking error:', err);
     throw err;
   }
@@ -240,7 +240,7 @@ async function addBooking(booking: Booking) {
       
       console.log('✅ [BookingStore] Successfully updated booking in Supabase');
       invalidateCache(); // Invalidate cache after successful update
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [BookingStore] Update failed, rolling back:', err);
       
       // Complete rollback - restore entire map to prevent corruption
@@ -249,7 +249,7 @@ async function addBooking(booking: Booking) {
         bookings.value.set(key, booking);
       });
       
-      error.value = err.message || 'Failed to update booking.';
+      error.value = err instanceof Error ? err.message : 'Failed to update booking.';
       invalidateCache(); // Invalidate cache after rollback
       throw err;
     }
@@ -274,10 +274,10 @@ async function addBooking(booking: Booking) {
       
       if (supaError) throw supaError;
       invalidateCache(); // Invalidate cache after successful delete
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Rollback on error
       bookings.value.set(id, existing);
-      error.value = err.message || 'Failed to remove booking.';
+      error.value = err instanceof Error ? err.message : 'Failed to remove booking.';
       console.error('removeBooking error:', err);
       throw err;
     }

@@ -31,12 +31,12 @@ export function useProperties() {
       }
       
       // Validate cleaning duration
-      if (!formData.cleaning_duration || formData.cleaning_duration < 30) {
+      if (!formData.cleaning_duration || (formData.cleaning_duration as number) < 30) {
         throw new Error('Cleaning duration must be at least 30 minutes');
       }
       
       // Validate pricing tier
-      if (!['basic', 'premium', 'luxury'].includes(formData.pricing_tier)) {
+      if (!['basic', 'premium', 'luxury'].includes(formData.pricing_tier as string)) {
         throw new Error('Invalid pricing tier');
       }
       
@@ -44,10 +44,10 @@ export function useProperties() {
       const newProperty: Property = {
         id: uuidv4(),
         ...formData,
-        active: formData.active !== undefined ? formData.active : true,
+        active: formData.active !== undefined ? (formData.active as boolean) : true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      };
+      } as Property;
       
       // Add to store
       propertyStore.addProperty(newProperty);
@@ -81,12 +81,12 @@ export function useProperties() {
       }
       
       // Validate cleaning duration if changed
-      if (updates.cleaning_duration !== undefined && updates.cleaning_duration < 30) {
+      if (updates.cleaning_duration !== undefined && updates.cleaning_duration !== null && (updates.cleaning_duration as number) < 30) {
         throw new Error('Cleaning duration must be at least 30 minutes');
       }
       
       // Validate pricing tier if changed
-      if (updates.pricing_tier && !['basic', 'premium', 'luxury'].includes(updates.pricing_tier)) {
+      if (updates.pricing_tier && !['basic', 'premium', 'luxury'].includes(updates.pricing_tier as string)) {
         throw new Error('Invalid pricing tier');
       }
       

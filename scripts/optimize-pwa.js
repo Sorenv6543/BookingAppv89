@@ -152,7 +152,7 @@ async function trackPerformanceRegression(currentSnapshot) {
     try {
       const historyData = await fs.readFile(PERFORMANCE_HISTORY_FILE, 'utf8')
       history = JSON.parse(historyData)
-    } catch (error) {
+    } catch (_error) {
       // File doesn't exist yet, start fresh
       console.log('📝 Creating new performance history file...')
     }
@@ -278,7 +278,7 @@ async function analyzeServiceWorkerPerformance() {
     try {
       swStats = await fs.stat(swPath)
       swContent = await fs.readFile(swPath, 'utf8')
-    } catch (error) {
+    } catch (_error) {
       // Try alternative path
       const altSwPath = path.resolve('dist/sw.js')
       swStats = await fs.stat(altSwPath)
@@ -382,7 +382,7 @@ async function analyzeImportPaths() {
           }
         }
       })
-    } catch (error) {
+    } catch (_error) {
       // Ignore files that can't be read
     }
   }
@@ -426,7 +426,7 @@ async function findSourceFiles() {
           sourceFiles.push(fullPath)
         }
       }
-    } catch (error) {
+    } catch (_error) {
       // Ignore directories that can't be read
     }
   }
@@ -449,7 +449,7 @@ async function performanceRegressionTest() {
     }
     
     const current = history[history.length - 1]
-    const baseline = history[0] // First recorded measurement
+    const _baseline = history[0] // First recorded measurement
     const previous = history[history.length - 2]
     
     const tests = [

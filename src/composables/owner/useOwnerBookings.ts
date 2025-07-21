@@ -198,7 +198,7 @@ function useOwnerBookingsPinia() {
       
       try {
         // Validate that the property belongs to the current owner
-        const property = propertyStore.getPropertyById(formData.property_id);
+        const property = propertyStore.getPropertyById(formData.property_id as string);
         if (!property) {
           throw new Error('Property not found');
         }
@@ -256,7 +256,7 @@ function useOwnerBookingsPinia() {
         
         // If property is being changed, validate ownership
         if (updates.property_id && updates.property_id !== booking.property_id) {
-          const property = propertyStore.getPropertyById(updates.property_id);
+          const property = propertyStore.getPropertyById(updates.property_id as string);
           if (!property) {
             throw new Error('Property not found');
           }

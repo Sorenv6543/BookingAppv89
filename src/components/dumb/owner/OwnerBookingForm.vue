@@ -264,7 +264,10 @@ const showSameDayAlert = computed(() => {
 
 const showDateError = computed(() => {
   if (!form.value.checkout_date || !form.value.checkin_date) return false
-  return new Date(form.value.checkin_date) < new Date(form.value.checkout_date)
+  const checkinDate = new Date(String(form.value.checkin_date || ''))
+  const checkoutDate = new Date(String(form.value.checkout_date || ''))
+  if (isNaN(checkinDate.getTime()) || isNaN(checkoutDate.getTime())) return false
+  return checkinDate < checkoutDate
 })
 
 // Validation rules
@@ -287,8 +290,11 @@ const updateBookingType = () => {
   if (!autoDetectType.value) return
   
   if (form.value.checkout_date && form.value.checkin_date) {
-    const checkoutDate = new Date(form.value.checkout_date)
-    const checkinDate = new Date(form.value.checkin_date)
+    const checkoutDate = new Date(String(form.value.checkout_date || ''))
+    const checkinDate = new Date(String(form.value.checkin_date || ''))
+    
+    // Check if dates are valid
+    if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) return
     
     // Same day = turn booking
     if (checkoutDate.toDateString() === checkinDate.toDateString()) {

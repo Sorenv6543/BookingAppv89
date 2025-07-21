@@ -3,7 +3,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import { useUserStore } from '@/stores/user';
 import { usePropertyStore } from '@/stores/property';
 import { useBookingStore } from '@/stores/booking';
-import type { User } from '@/types';
+// import type { User } from '@/types';
 import { createUserWithSettings } from '@/utils/authHelpers';
 
 describe('User Store', () => {

@@ -305,7 +305,7 @@ async function handleRetry(): Promise<void> {
     setTimeout(() => {
       isRetrying.value = false;
     }, 2000);
-  } catch (error) {
+  } catch (_error) {
     isRetrying.value = false;
   }
 }

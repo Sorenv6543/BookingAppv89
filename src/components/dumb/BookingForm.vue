@@ -311,8 +311,8 @@ const propertiesArray = computed((): Property[] => {
 const isTurnBooking = computed((): boolean => {
   if (!form.checkout_date || !form.checkin_date) return false;
   
-  const checkoutDate = new Date(form.checkout_date);
-  const checkinDate = new Date(form.checkin_date);
+  const checkoutDate = new Date(form.checkout_date as string);
+  const checkinDate = new Date(form.checkin_date as string);
   
   if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {
     return false;
@@ -373,8 +373,8 @@ function updateBookingType(): void {
   if (!autoDetectType.value) return;
   if (!form.checkout_date || !form.checkin_date) return;
   
-  const checkoutDate = new Date(form.checkout_date);
-  const checkinDate = new Date(form.checkin_date);
+  const checkoutDate = new Date(form.checkout_date as string);
+  const checkinDate = new Date(form.checkin_date as string);
   
   if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {
     return;
@@ -429,10 +429,10 @@ function resetForm(): void {
     
     // Format dates if they exist
     if (formData.checkout_date) {
-      formData.checkout_date = formatDateForInput(formData.checkout_date);
+      formData.checkout_date = formatDateForInput(String(formData.checkout_date));
     }
     if (formData.checkin_date) {
-      formData.checkin_date = formatDateForInput(formData.checkin_date);
+      formData.checkin_date = formatDateForInput(String(formData.checkin_date));
     }
     
     Object.assign(form, formData);
@@ -449,8 +449,8 @@ async function validate(): Promise<boolean> {
   if (!valid) return false;
   
   // Additional validation
-  const checkoutDate = new Date(form.checkout_date || '');
-  const checkinDate = new Date(form.checkin_date || '');
+  const checkoutDate = new Date(String(form.checkout_date || ''));
+  const checkinDate = new Date(String(form.checkin_date || ''));
   
   // Check if dates are valid
   if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {

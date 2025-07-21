@@ -375,13 +375,6 @@ const handleCreateProperty = (): void => {
   uiStore.openModal('propertyModal', 'create', propertyData)
 }
 
-const handleEditProperty = (propertyId: string): void => {
-  // ✅ SAME logic as HomeOwner - finds in filtered owner data
-  const property = myProperties.value.find(p => p.id === propertyId)
-  if (property) {
-    uiStore.openModal('propertyModal', 'edit', property)
-  }
-}
 
 const handleDeleteProperty = async (propertyId: string): Promise<void> => {
   // ✅ SAME logic as HomeOwner - operates on owner's data only

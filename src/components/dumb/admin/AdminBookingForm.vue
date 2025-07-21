@@ -31,11 +31,11 @@
         </v-chip>
         <v-spacer />
         <v-chip
-          :color="getStatusColor(form.status)"
+          :color="getStatusColor((form.status as string) || 'pending')"
           variant="tonal"
           size="small"
         >
-          {{ form.status?.toUpperCase() }}
+          {{ ((form.status as string) || 'pending').toUpperCase() }}
         </v-chip>
       </v-card-title>
       
@@ -542,7 +542,7 @@ const priorityOptions = [
 
 const showDateError = computed(() => {
   if (!form.value.checkout_date || !form.value.checkin_date) return false
-  return new Date(form.value.checkin_date) < new Date(form.value.checkout_date)
+  return new Date(form.value.checkin_date as string) < new Date(form.value.checkout_date as string)
 })
 
 const showBusinessImpactAlert = computed(() => {
@@ -591,8 +591,8 @@ const dateRules = [
 const updateBookingType = () => {
   if (!form.value.checkout_date || !form.value.checkin_date) return
   
-  const checkoutDate = new Date(form.value.checkout_date).toDateString()
-  const checkinDate = new Date(form.value.checkin_date).toDateString()
+  const checkoutDate = new Date(form.value.checkout_date as string).toDateString()
+  const checkinDate = new Date(form.value.checkin_date as string).toDateString()
   
   if (checkoutDate === checkinDate) {
     form.value.booking_type = 'turn'

@@ -3,7 +3,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useBookingStore } from '@/stores/booking';
 import { useAuthStore } from '@/stores/auth';
-import type { User, Booking } from '@/types';
+import type { Booking } from '@/types';
 import { setOwnerUser, addOwnerBookings } from '../../utils/test-utils';
 
 describe('useOwnerBookings (Role-Based)', () => {

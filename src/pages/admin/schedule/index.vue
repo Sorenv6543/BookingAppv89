@@ -2,7 +2,7 @@
 <template>
   <div class="admin-schedule-page">
     <!-- Page Header -->
-    <div class="page-header">
+    <!-- <div class="page-header">
       <v-container fluid>
         <v-row align="center">
           <v-col>
@@ -24,34 +24,32 @@
           </v-col>
         </v-row>
       </v-container>
-    </div>
+    </div> -->
 
     <!-- Main Content -->
     <div class="page-content">
-      <v-container fluid class="pa-0" style="height: 100%;">
+     
         <v-row no-gutters class="fill-height">
-          <!-- Sidebar -->
-          <v-col cols="12" md="3" class="sidebar-col">
-            <AdminSidebar 
-              @property-selected="handlePropertySelected"
-              @turn-alert-clicked="handleTurnAlertClicked"
-              @quick-action="handleQuickAction"
-            />
-          </v-col>
-          
-          <!-- Calendar -->
-          <v-col cols="12" md="9" class="calendar-col">
+          <!-- Calendar (Full Width) -->
+          <v-col cols="12" md="12" class="calendar-col">
             <AdminCalendar
               :bookings="bookingStore.bookings"
               :properties="propertyStore.properties"
-              :users="new Map()"
-              @click="handleEventClick"
-              @select="handleDateSelect"
-              @drop="handleEventDrop"
+              :users="usersMap"
+              :loading="loading"
+              @date-select="handleDateSelect"
+              @event-click="handleEventClick"
+              @event-drop="handleEventDrop"
+              @create-booking="handleCreateBooking"
+              @update-booking="handleUpdateBooking"
+              @assign-cleaner="handleAssignCleaner"
+              @update-booking-status="handleUpdateBookingStatus"
+              @view-change="handleViewChange"
+              @date-change="handleDateChange"
             />
           </v-col>
         </v-row>
-      </v-container>
+     
     </div>
 
     <!-- Modals -->
@@ -76,90 +74,111 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue'
+import { ref, computed, onMounted } from 'vue'
+// import { useRouter } from 'vue-router'
 import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue'
 import BookingForm from '@/components/dumb/BookingForm.vue'
 import CleanerAssignmentModal from '@/components/dumb/admin/CleanerAssignmentModal.vue'
 import { useAdminBookings } from '@/composables/admin/useAdminBookings';
 import { useCleanerManagement } from '@/composables/admin/useCleanerManagement'
+import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement'
 import { useUIStore } from '@/stores/ui'
 import { useBookingStore } from '@/stores/booking'
 import { usePropertyStore } from '@/stores/property'
+import { useUserStore } from '@/stores/user'
 import type { Booking, BookingFormData } from '@/types/booking'
+import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core'
 
 // Stores and composables
 const uiStore = useUIStore()
 const bookingStore = useBookingStore()
 const propertyStore = usePropertyStore()
-const router = useRouter()
+const userStore = useUserStore()
+const { users: allUsers, fetchAllUsers } = useAdminUserManagement()
+// const router = useRouter()
 const { createBooking: createBookingFn, updateBooking } = useAdminBookings()
 const { assignCleanerToBooking } = useCleanerManagement()
 
 // Reactive state
-const selectedPropertyId = ref<string | null>(null)
+// const selectedPropertyId = ref<string | null>(null)
 const selectedBooking = ref<Booking | null>(null)
 const selectedDate = ref<string | null>(null)
 const isEditMode = ref(false)
+const loading = ref(false)
+const currentView = ref('dayGridMonth')
+const currentDate = ref(new Date())
 
-// Event handlers
-const handlePropertySelected = (propertyId: string | null) => {
-  selectedPropertyId.value = propertyId
-}
+// Create users Map for AdminCalendar
+const usersMap = computed(() => {
+  const map = new Map()
+  allUsers.value.forEach(user => {
+    map.set(user.id, user)
+  })
+  return map
+})
 
-const handleTurnAlertClicked = (booking: Booking) => {
+// // Event handlers
+// const handlePropertySelected = (propertyId: string | null) => {
+//   selectedPropertyId.value = propertyId
+// }
+
+// const handleTurnAlertClicked = (booking: Booking) => {
+//   selectedBooking.value = booking
+//   isEditMode.value = true
+//   uiStore.openModal('event')
+// }
+
+// const handleQuickAction = (action: string) => {
+//   switch (action) {
+//     case 'assign-cleaners':
+//       // Navigate to cleaner assignment view
+//       router.push('/admin/cleaners')
+//       break
+//     case 'generate-report':
+//       // Navigate to reports
+//       router.push('/admin/reports')
+//       break
+//     case 'manage-schedule':
+//       // Already on schedule page - could show help or settings
+//       break
+//   }
+// }
+
+// Updated event handlers for new AdminCalendar
+const handleEventClick = (clickInfo: EventClickArg) => {
+  const booking = clickInfo.event.extendedProps.booking as Booking
   selectedBooking.value = booking
   isEditMode.value = true
   uiStore.openModal('event')
 }
 
-const handleQuickAction = (action: string) => {
-  switch (action) {
-    case 'assign-cleaners':
-      // Navigate to cleaner assignment view
-      router.push('/admin/cleaners')
-      break
-    case 'generate-report':
-      // Navigate to reports
-      router.push('/admin/reports')
-      break
-    case 'manage-schedule':
-      // Already on schedule page - could show help or settings
-      break
-  }
-}
-
-const handleEventClick = (booking: Booking) => {
-  selectedBooking.value = booking
-  isEditMode.value = true
-  uiStore.openModal('event')
-}
-
-const handleDateSelect = (date: string) => {
-  // Create new booking for selected date
-  selectedDate.value = date
+const handleDateSelect = (selectInfo: DateSelectArg) => {
+  // Create new booking for selected date range
+  selectedDate.value = selectInfo.startStr
   selectedBooking.value = null
   isEditMode.value = false
   uiStore.openModal('event')
 }
 
-const handleEventDrop = async (booking: Booking, newDate: string) => {
+const handleEventDrop = async (dropInfo: EventDropArg) => {
+  const booking = dropInfo.event.extendedProps.booking as Booking
   try {
     await updateBooking(booking.id, {
-      ...booking,
-      checkout_date: newDate
+      checkout_date: dropInfo.event.startStr,
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
     })
   } catch (error) {
     console.error('Failed to update booking:', error)
+    // Revert the drop if update fails
+    dropInfo.revert()
   }
 }
 
-const createBooking = () => {
-  selectedBooking.value = null
-  isEditMode.value = false
-  uiStore.openModal('event')
-}
+// const createBooking = () => {
+//   selectedBooking.value = null
+//   isEditMode.value = false
+//   uiStore.openModal('event')
+// }
 
 const handleBookingSave = async (bookingData: Partial<Booking>) => {
   try {
@@ -197,6 +216,72 @@ const closeCleanerAssignmentModal = () => {
   uiStore.closeModal('cleanerAssignment')
   selectedBooking.value = null
 }
+
+// New handlers for integrated AdminCalendar
+const handleCreateBooking = async (data: { start: string; end: string; propertyId?: string }) => {
+  selectedDate.value = data.start
+  selectedBooking.value = null
+  isEditMode.value = false
+  uiStore.openModal('event')
+}
+
+const handleUpdateBooking = async (data: { id: string; updates: Partial<Booking> }) => {
+  try {
+    loading.value = true
+    await updateBooking(data.id, data.updates)
+  } catch (error) {
+    console.error('Failed to update booking:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleAssignCleaner = async (data: { bookingId: string; cleanerId: string; notes?: string }) => {
+  try {
+    loading.value = true
+    await assignCleanerToBooking(data.cleanerId, data.bookingId)
+  } catch (error) {
+    console.error('Failed to assign cleaner:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleUpdateBookingStatus = async (data: { bookingId: string; status: Booking['status'] }) => {
+  try {
+    loading.value = true
+    await updateBooking(data.bookingId, { status: data.status })
+  } catch (error) {
+    console.error('Failed to update booking status:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleViewChange = (view: string) => {
+  currentView.value = view
+}
+
+const handleDateChange = (date: Date) => {
+  currentDate.value = date
+}
+
+// Initialize data on mount
+onMounted(async () => {
+  // Fetch all data so admin can see all owner bookings
+  loading.value = true
+  try {
+    await Promise.all([
+      fetchAllUsers(),
+      bookingStore.fetchBookings(),
+      propertyStore.fetchProperties()
+    ])
+  } catch (error) {
+    console.error('Failed to fetch data:', error)
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <style scoped>

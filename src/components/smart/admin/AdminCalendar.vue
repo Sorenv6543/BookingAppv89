@@ -475,14 +475,15 @@ const adminCalendarEvents = computed(() => {
   });
 });
 
-// Admin-specific event title formatting
+// Simplified event title formatting - showing only check-in/check-out dates like owner calendar
 const getAdminEventTitle = (booking: Booking, property?: Property, owner?: User, cleaner?: User): string => {
-  const isTurn = booking.booking_type === 'turn';
+  const checkoutDate = new Date(booking.checkout_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const checkinDate = new Date(booking.checkin_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const propertyName = property?.name || 'Unknown Property';
-  const ownerName = owner?.name || 'Unknown Owner';
-  const cleanerName = cleaner?.name || 'Unassigned';
+  const isTurn = booking.booking_type === 'turn';
   
-  return `${isTurn ? '🔥 ' : ''}${propertyName} (${ownerName}) → ${cleanerName}`;
+  // Simple format: Property Name - Checkout → Checkin
+  return `${isTurn ? '🔥 ' : ''}${propertyName} - ${checkoutDate} → ${checkinDate}`;
 };
 
 // Admin-specific color system based on assignment status and booking type
@@ -1259,7 +1260,20 @@ onBeforeUnmount(() => {
   }
   
   .admin-event-title {
-    font-size: 0.8em;
+    font-size: 0.75em;
+  }
+  
+  .admin-event-dates {
+    font-size: 0.7em;
+  }
+  
+  .admin-event-owner-small {
+    font-size: 0.65em;
+  }
+  
+  .admin-turn-badge {
+    font-size: 0.55em;
+    padding: 0px 2px;
   }
 }
 </style> 

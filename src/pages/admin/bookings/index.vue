@@ -169,7 +169,7 @@
             class="bookings-table"
             @click:row="openBookingDetails"
           >
-            <template #item.status="{ item }">
+            <template #[`item.status`]="{ item }">
               <v-chip
                 :color="getStatusColor(item.status)"
                 size="small"
@@ -179,7 +179,7 @@
               </v-chip>
             </template>
 
-            <template #item.booking_type="{ item }">
+            <template #[`item.booking_type`]="{ item }">
               <div class="d-flex align-center gap-1">
                 <v-chip
                   :color="item.booking_type === 'turn' ? 'warning' : 'primary'"
@@ -199,7 +199,7 @@
               </div>
             </template>
 
-            <template #item.property="{ item }">
+            <template #[`item.property`]="{ item }">
               <div class="text-body-2">
                 <div class="font-weight-medium">
                   {{ getPropertyName(item.property_id) }}
@@ -210,7 +210,7 @@
               </div>
             </template>
 
-            <template #item.dates="{ item }">
+            <template #[`item.dates`]="{ item }">
               <div class="text-body-2">
                 <div>{{ formatDate(item.checkout_date) }}</div>
                 <div class="text-caption text-medium-emphasis">
@@ -219,7 +219,7 @@
               </div>
             </template>
 
-            <template #item.cleaner="{ item }">
+            <template #[`item.cleaner`]="{ item }">
               <div
                 v-if="item.assigned_cleaner_id"
                 class="text-body-2"
@@ -236,7 +236,7 @@
               </v-chip>
             </template>
 
-            <template #item.guest_count="{ item }">
+            <template #[`item.guest_count`]="{ item }">
               <div class="d-flex align-center">
                 <v-icon
                   size="16"
@@ -248,11 +248,11 @@
               </div>
             </template>
 
-            <template #item.created_at="{ item }">
-              <span class="text-body-2">{{ formatDateTime(item.created_at) }}</span>
+            <template #[`item.created_at`]="{ item }">
+              <span class="text-body-2">{{ formatDateTime(item.created_at!) }}</span>
             </template>
 
-            <template #item.actions="{ item }">
+            <template #[`item.actions`]="{ item }">
               <div class="d-flex align-center gap-1">
                 <v-btn
                   v-if="!item.assigned_cleaner_id"
@@ -393,7 +393,7 @@
                   </div>
                   
                   <div class="text-caption text-medium-emphasis">
-                    Created: {{ formatDateTime(booking.created_at) }}
+                    Created: {{ formatDateTime(booking.created_at!) }}
                   </div>
                 </div>
                 
@@ -553,7 +553,7 @@ const dateTo = ref('')
 const tableView = ref('table')
 const itemsPerPage = ref(25)
 const currentPage = ref(1)
-const sortBy = ref([{ key: 'created_at', order: 'desc' }])
+const sortBy = ref([{ key: 'created_at', order: 'desc' as const }])
 
 // Dialog state
 const showBookingDialog = ref(false)
@@ -585,8 +585,8 @@ const tableHeaders = [
   { title: 'Cleaner', key: 'cleaner', sortable: false, width: '140px' },
   { title: 'Guests', key: 'guest_count', sortable: true, width: '80px' },
   { title: 'Created', key: 'created_at', sortable: true, width: '120px' },
-  { title: 'Actions', key: 'actions', sortable: false, width: '120px', align: 'end' }
-]
+  { title: 'Actions', key: 'actions', sortable: false, width: '120px', align: 'end' as const }
+] as const
 
 // Computed properties
 const propertyOptions = computed(() => {

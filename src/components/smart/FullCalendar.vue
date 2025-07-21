@@ -265,7 +265,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   
   // Month view specific - mobile optimized
   dayMaxEvents: mobileOptions.value.dayMaxEvents,
-  moreLinkClick: false, // Disable default popover completely
+  moreLinkClick: 'popover', // Show popover for more events
   
   // Week/day view specific
   allDaySlot: false,
@@ -506,7 +506,6 @@ const handleEditBooking = (booking: Booking): void => {
 
 const handleCompleteBooking = (booking: Booking): void => {
   // Update booking status and emit event
-  const _updatedBooking = { ...booking, status: 'completed' as const };
   
   emit('updateBooking', {
     id: booking.id,

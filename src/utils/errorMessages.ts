@@ -370,7 +370,7 @@ export function getErrorMessage(
   category: ErrorCategory,
   code: string,
   role: UserRole = 'owner',
-  context: Record<string, any> = {}
+  context: Record<string, unknown> = {}
 ): string {
   const messages = role === 'admin' ? ADMIN_MESSAGES : OWNER_MESSAGES;
   const categoryMessages = messages[category];
@@ -408,7 +408,7 @@ export function getLoadingMessage(
 export function getSuccessMessage(
   action: string,
   role: UserRole = 'owner',
-  context: Record<string, any> = {}
+  context: Record<string, unknown> = {}
 ): string {
   const messages = SUCCESS_MESSAGES[role === 'admin' ? 'admin' : 'owner'];
   let message = messages[action as keyof typeof messages];
@@ -459,18 +459,22 @@ export function inferErrorCategory(code?: string, message?: string): ErrorCatego
  */
 export function assessBusinessImpact(
   category: ErrorCategory,
-  context: Record<string, any> = {}
+  context: Record<string, unknown> = {}
 ): BusinessImpact {
   // Critical: System-wide outages, data loss
   if (category === 'system' && context.systemWide) return 'critical';
   if (context.dataLoss || context.securityBreach) return 'critical';
   
   // High: Multiple users/properties affected
-  if (context.affectedUsers > 10 || context.affectedProperties > 5) return 'high';
+  const affectedUsers = typeof context.affectedUsers === 'number' ? context.affectedUsers : 0;
+  const affectedProperties = typeof context.affectedProperties === 'number' ? context.affectedProperties : 0;
+  if (affectedUsers > 10 || affectedProperties > 5) return 'high';
   if (category === 'authentication' && context.multipleUsers) return 'high';
   
   // Medium: Single property or multiple bookings affected
-  if (context.affectedBookings > 3 || context.revenueImpact > 500) return 'medium';
+  const affectedBookings = typeof context.affectedBookings === 'number' ? context.affectedBookings : 0;
+  const revenueImpact = typeof context.revenueImpact === 'number' ? context.revenueImpact : 0;
+  if (affectedBookings > 3 || revenueImpact > 500) return 'medium';
   if (category === 'business_logic') return 'medium';
   
   // Low: Individual user affected
@@ -480,11 +484,20 @@ export function assessBusinessImpact(
 /**
  * Get error code from various error types
  */
-export function extractErrorCode(error: any): string | undefined {
+export function extractErrorCode(error: unknown): string | undefined {
   if (typeof error === 'string') return undefined;
-  if (error?.code) return error.code;
-  if (error?.response?.data?.code) return error.response.data.code;
-  if (error?.status) return `HTTP_${error.status}`;
+  if (error && typeof error === 'object') {
+    const errorObj = error as Record<string, unknown>;
+    if (typeof errorObj.code === 'string') return errorObj.code;
+    if (errorObj.response && typeof errorObj.response === 'object') {
+      const responseObj = errorObj.response as Record<string, unknown>;
+      if (responseObj.data && typeof responseObj.data === 'object') {
+        const dataObj = responseObj.data as Record<string, unknown>;
+        if (typeof dataObj.code === 'string') return dataObj.code;
+      }
+    }
+    if (typeof errorObj.status === 'number') return `HTTP_${errorObj.status}`;
+  }
   return undefined;
 }
 

@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest'
-import { ref, computed, nextTick } from 'vue'
+import { nextTick } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { usePerformanceMonitor } from '@/composables/shared/usePerformanceMonitor'
 
@@ -221,12 +221,12 @@ describe('Performance Regression Tests', () => {
       enableMonitoring()
       
       // Create initial snapshot
-      const snapshot1 = createPerformanceSnapshot()
+      const _snapshot1 = createPerformanceSnapshot()
       
       await new Promise(resolve => setTimeout(resolve, 100))
       
       // Create second snapshot with different values
-      const snapshot2 = createPerformanceSnapshot()
+      const _snapshot2 = createPerformanceSnapshot()
       
       // Trends should be calculated
       expect(typeof performanceTrends.value).toBe('object')
@@ -461,7 +461,7 @@ describe('Performance Regression Tests', () => {
       enableMonitoring()
       
       // Mock route change
-      const mockRouter = {
+      const _mockRouter = {
         currentRoute: {
           value: { path: '/admin/dashboard' }
         }

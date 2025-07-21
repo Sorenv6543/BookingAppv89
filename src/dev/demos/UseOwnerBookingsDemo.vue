@@ -198,11 +198,11 @@
               :items-per-page="10"
               class="elevation-1"
             >
-              <template #item.property_id="{ item }">
+              <template #[`item.property_id`]="{ item }">
                 {{ getPropertyName(item.property_id) }}
               </template>
               
-              <template #item.booking_type="{ item }">
+              <template #[`item.booking_type`]="{ item }">
                 <v-chip
                   :color="item.booking_type === 'turn' ? 'error' : 'primary'"
                   size="small"
@@ -212,7 +212,7 @@
                 </v-chip>
               </template>
               
-              <template #item.status="{ item }">
+              <template #[`item.status`]="{ item }">
                 <v-chip
                   :color="getStatusColor(item.status)"
                   size="small"
@@ -221,7 +221,7 @@
                 </v-chip>
               </template>
               
-              <template #item.priority="{ item }">
+              <template #[`item.priority`]="{ item }">
                 <v-chip
                   :color="getPriorityColor(calculateMyBookingPriority(item))"
                   size="small"
@@ -231,15 +231,15 @@
                 </v-chip>
               </template>
               
-              <template #item.checkout_date="{ item }">
+              <template #[`item.checkout_date`]="{ item }">
                 {{ formatDate(item.checkout_date) }}
               </template>
               
-              <template #item.checkin_date="{ item }">
+              <template #[`item.checkin_date`]="{ item }">
                 {{ formatDate(item.checkin_date) }}
               </template>
               
-              <template #item.actions="{ item }">
+              <template #[`item.actions`]="{ item }">
                 <v-btn
                   icon="mdi-pencil"
                   size="small"

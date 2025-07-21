@@ -2,6 +2,34 @@
 // Provides helpers to set up owner/admin users and bookings in tests
 
 import { nextTick, ref, computed } from 'vue';
+import type { User } from '@/types';
+
+// Mock auth store interface for testing
+interface MockAuthStore {
+  session: { value: unknown };
+  user: { value: Partial<User> | null };
+  loading: { value: boolean };
+  error: { value: string | null };
+  initializing: { value: boolean };
+  isAuthenticated: { value: boolean };
+  isAdmin: { value: boolean };
+  isOwner: { value: boolean };
+  isCleaner: { value: boolean };
+  login: () => Promise<boolean>;
+  logout: () => Promise<boolean>;
+  register: () => Promise<boolean>;
+  updateUserProfile: () => Promise<boolean>;
+  clearError: () => void;
+  setUser: (user: Partial<User>) => void;
+  $patch: (updates: { fallbackUser?: Partial<User> }) => void;
+  $reset: () => void;
+  [key: string]: unknown;
+}
+
+// Booking store interface for testing
+interface MockBookingStore {
+  addBooking: (booking: Record<string, unknown>) => void;
+}
 
 /**
  * Creates a simple mock auth store for testing
@@ -48,12 +76,12 @@ function createMockAuthStore(userRole: 'owner' | 'admin', userId: string) {
     clearError: () => {},
     
     // Test-specific methods to change user
-    setUser: (newUser: any) => {
+    setUser: (newUser: Partial<User>) => {
       mockUser.value = newUser;
     },
     
     // Pinia compatibility
-    $patch: (updates: any) => {
+    $patch: (updates: { fallbackUser?: Partial<User> }) => {
       if (updates.fallbackUser) {
         mockUser.value = updates.fallbackUser;
       }
@@ -76,7 +104,7 @@ function createMockAuthStore(userRole: 'owner' | 'admin', userId: string) {
  * Sets up an owner user - returns a mock auth store for testing
  * This completely replaces the complex auth store with a simple mock
  */
-export function setOwnerUser(authStore: any, id = 'owner1') {
+export function setOwnerUser(authStore: MockAuthStore, id = 'owner1') {
   console.log(`[setOwnerUser] Creating mock auth store for owner ${id}`);
   
   const mockStore = createMockAuthStore('owner', id);
@@ -98,7 +126,7 @@ export function setOwnerUser(authStore: any, id = 'owner1') {
  * Sets up an admin user - returns a mock auth store for testing  
  * This completely replaces the complex auth store with a simple mock
  */
-export function setAdminUser(authStore: any, id = 'admin1') {
+export function setAdminUser(authStore: MockAuthStore, id = 'admin1') {
   console.log(`[setAdminUser] Creating mock auth store for admin ${id}`);
   
   const mockStore = createMockAuthStore('admin', id);
@@ -119,7 +147,7 @@ export function setAdminUser(authStore: any, id = 'admin1') {
 /**
  * Adds multiple bookings for a specific owner to the booking store
  */
-export function addOwnerBookings(bookingStore: { addBooking: (b: any) => void }, ownerId: string, count: number) {
+export function addOwnerBookings(bookingStore: MockBookingStore, ownerId: string, count: number) {
   for (let i = 1; i <= count; i++) {
     bookingStore.addBooking({
       id: `${ownerId}-booking${i}`, // Make IDs unique per owner
@@ -136,7 +164,7 @@ export function addOwnerBookings(bookingStore: { addBooking: (b: any) => void },
 /**
  * Adds multiple bookings for admin testing (across different owners)
  */
-export function addAdminBookings(bookingStore: { addBooking: (b: any) => void }, count: number) {
+export function addAdminBookings(bookingStore: MockBookingStore, count: number) {
   for (let i = 1; i <= count; i++) {
     bookingStore.addBooking({
       id: `adminBooking${i}`,

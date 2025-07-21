@@ -297,8 +297,8 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
   }
 
   // Watch for auth changes to invalidate cache
-  authStore.$subscribe((mutation, state) => {
-    if (mutation.storeId === 'auth' && state.user?.id !== lastOwnerId.value) {
+  authStore.$subscribe((mutation) => {
+    if (mutation.storeId === 'auth' && authStore.user?.id !== lastOwnerId.value) {
       invalidateCache()
     }
   })

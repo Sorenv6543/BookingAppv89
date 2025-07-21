@@ -149,8 +149,8 @@ export const usePropertyStore = defineStore('property', () => {
           properties.value.set(prop.id, prop);
         }
       }
-    } catch (err: any) {
-      error.value = err.message || 'Failed to fetch properties.';
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Failed to fetch properties.';
       console.error('fetchProperties error:', err);
     } finally {
       loading.value = false;
@@ -167,9 +167,9 @@ export const usePropertyStore = defineStore('property', () => {
       const { error: supaError } = await supabase.from('properties').insert([property]);
       if (supaError) throw supaError;
       invalidateCache(); // Invalidate cache after successful insert
-    } catch (err: any) {
+    } catch (err: unknown) {
       properties.value.delete(property.id);
-      error.value = err.message || 'Failed to add property.';
+      error.value = err instanceof Error ? err.message : 'Failed to add property.';
       console.error('addProperty error:', err);
       throw err;
     }
@@ -199,10 +199,10 @@ export const usePropertyStore = defineStore('property', () => {
       
       if (supaError) throw supaError;
       invalidateCache(); // Invalidate cache after successful update
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Rollback on error
       properties.value.set(id, existing);
-      error.value = err.message || 'Failed to update property.';
+      error.value = err instanceof Error ? err.message : 'Failed to update property.';
       console.error('updateProperty error:', err);
       throw err;
     }
@@ -231,10 +231,10 @@ export const usePropertyStore = defineStore('property', () => {
       // Remove from local state after successful soft delete
       properties.value.delete(id);
       invalidateCache(); // Invalidate cache after successful delete
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Rollback on error
       properties.value.set(id, existing);
-      error.value = err.message || 'Failed to remove property.';
+      error.value = err instanceof Error ? err.message : 'Failed to remove property.';
       console.error('removeProperty error:', err);
       throw err;
     }

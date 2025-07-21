@@ -410,7 +410,7 @@ const handleSubmit = async () => {
     backgroundSync.queueOperation(
       operation,
       data,
-      form.value.owner_id || 'current-user', // TODO: Get from auth
+      String(form.value.owner_id || 'current-user'), // TODO: Get from auth
       'owner'
     )
     

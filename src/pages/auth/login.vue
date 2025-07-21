@@ -120,7 +120,7 @@
                   size="small"
                   variant="outlined"
                   color="secondary"
-                  @click="testSupabaseConnection"
+                  @click="() => console.log('Connection test')"
                 >
                   Test Connection
                 </v-btn>

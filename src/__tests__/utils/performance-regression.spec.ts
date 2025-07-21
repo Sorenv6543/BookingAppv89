@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { ref, computed, nextTick } from 'vue'
+import { ref, nextTick } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { usePerformanceMonitor } from '@/composables/shared/usePerformanceMonitor'
 
@@ -117,7 +117,10 @@ describe('Performance Regression Tests', () => {
       const result = measureRolePerformance('admin', 'filter-admin-data', () => {
         // Simulate processing larger dataset (admin role) with measurable work
         const start = performance.now()
-        while (performance.now() - start < 1) {} // Small delay to ensure measurable time
+        while (performance.now() - start < 1) { 
+          // Intentional empty block - creating minimal delay for performance measurement
+          // This ensures the measurement has enough time to register a meaningful value
+        }
         const mockBookings = Array.from({ length: 100 }, (_, i) => ({ id: i, owner_id: `owner-${i % 10}` }))
         return mockBookings // No filtering for admin
       })
@@ -154,7 +157,10 @@ describe('Performance Regression Tests', () => {
       measureRolePerformance('admin', 'filter-admin-data', () => {
         // Add small delay to ensure measurable time
         const start = performance.now()
-        while (performance.now() - start < 1) {} // Small delay
+        while (performance.now() - start < 1) { 
+          // Intentional empty block - creating minimal delay for performance measurement
+          // This simulates processing time to demonstrate admin vs owner performance differences
+        }
         return largeDataset // No filtering
       })
       
@@ -316,7 +322,7 @@ describe('Performance Regression Tests', () => {
     it('should maintain performance history', async () => {
       const { 
         enableMonitoring, 
-        performanceHistory,
+        _performanceHistory,
         createPerformanceSnapshot 
       } = usePerformanceMonitor()
       

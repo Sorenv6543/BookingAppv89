@@ -25,14 +25,14 @@ export function useBookings() {
     
     try {
       // Validate property exists
-      const property = propertyStore.getPropertyById(formData.property_id);
+      const property = propertyStore.getPropertyById(formData.property_id as string);
       if (!property) {
         throw new Error('Property not found');
       }
       
       // Validate dates
-      const checkoutDate = new Date(formData.checkout_date);
-      const checkinDate = new Date(formData.checkin_date);
+      const checkoutDate = new Date(formData.checkout_date as string);
+      const checkinDate = new Date(formData.checkin_date as string);
       
       if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {
         throw new Error('Invalid dates provided');
@@ -54,9 +54,16 @@ export function useBookings() {
       // Create booking object
       const newBooking: Booking = {
         id: uuidv4(),
-        ...formData,
+        property_id: formData.property_id as string,
+        owner_id: formData.owner_id as string,
+        checkout_date: formData.checkout_date as string,
+        checkin_date: formData.checkin_date as string,
         booking_type: bookingType as BookingType,
         status: 'pending', // New bookings start as pending
+        guest_count: formData.guest_count as number,
+        notes: formData.notes as string,
+        priority: formData.priority as 'low' | 'normal' | 'high' | 'urgent',
+        assigned_cleaner_id: formData.assigned_cleaner_id as string,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -92,7 +99,7 @@ export function useBookings() {
       
       // Validate property if changed
       if (updates.property_id && updates.property_id !== booking.property_id) {
-        const property = propertyStore.getPropertyById(updates.property_id);
+        const property = propertyStore.getPropertyById(updates.property_id as string);
         if (!property) {
           throw new Error('Property not found');
         }
@@ -100,11 +107,11 @@ export function useBookings() {
       
       // Validate dates if changed
       let shouldRecalculateType = false;
-      let checkoutDate = new Date(booking.checkout_date);
-      let checkinDate = new Date(booking.checkin_date);
+      let checkoutDate = new Date(booking.checkout_date as string);
+      let checkinDate = new Date(booking.checkin_date as string);
       
       if (updates.checkout_date) {
-        checkoutDate = new Date(updates.checkout_date);
+        checkoutDate = new Date(updates.checkout_date as string);
         if (isNaN(checkoutDate.getTime())) {
           throw new Error('Invalid checkout date');
         }
@@ -112,7 +119,7 @@ export function useBookings() {
       }
       
       if (updates.checkin_date) {
-        checkinDate = new Date(updates.checkin_date);
+        checkinDate = new Date(updates.checkin_date as string);
         if (isNaN(checkinDate.getTime())) {
           throw new Error('Invalid checkin date');
         }

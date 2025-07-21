@@ -177,7 +177,7 @@ async function runPropertyDeleteTest() {
     
     // First make sure we don't have any bookings for this property
     const propertyBookings = bookingStore.bookingsByProperty(testPropertyId.value);
-    for (const booking of propertyBookings) {
+    for (const booking of propertyBookings.values()) {
       await deleteBooking(booking.id);
     }
     

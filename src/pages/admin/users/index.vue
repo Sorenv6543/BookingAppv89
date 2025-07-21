@@ -241,7 +241,7 @@
         show-select
       >
         <!-- User Info Column -->
-        <template #item.user="{ item }">
+        <template #[`item.user`]="{ item }">
           <div class="d-flex align-center py-2">
             <v-avatar
               :color="getRoleColor(item.role)"
@@ -264,7 +264,7 @@
         </template>
 
         <!-- Role Column -->
-        <template #item.role="{ item }">
+        <template #[`item.role`]="{ item }">
           <v-chip
             :color="getRoleColor(item.role)"
             :text="item.role.toUpperCase()"
@@ -274,7 +274,7 @@
         </template>
 
         <!-- Status Column -->
-        <template #item.status="{ item }">
+        <template #[`item.status`]="{ item }">
           <v-chip
             :color="getStatusColor(item)"
             :text="getStatusText(item)"
@@ -284,7 +284,7 @@
         </template>
 
         <!-- Company Column -->
-        <template #item.company_name="{ item }">
+        <template #[`item.company_name`]="{ item }">
           <span v-if="item.company_name">{{ item.company_name }}</span>
           <span
             v-else
@@ -293,7 +293,7 @@
         </template>
 
         <!-- Last Activity Column -->
-        <template #item.last_sign_in="{ item }">
+        <template #[`item.last_sign_in`]="{ item }">
           <span v-if="item.last_sign_in_at">
             {{ formatDate(item.last_sign_in_at) }}
           </span>
@@ -304,7 +304,7 @@
         </template>
 
         <!-- Actions Column -->
-        <template #item.actions="{ item }">
+        <template #[`item.actions`]="{ item }">
           <div class="d-flex gap-1">
             <v-tooltip text="Edit User">
               <template #activator="{ props }">

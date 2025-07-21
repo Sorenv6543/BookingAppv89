@@ -256,7 +256,7 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
       });
       
       uiStore.showNotification('Booking updated successfully', 'success');
-    } catch (error) {
+    } catch (_error) {
       uiStore.showNotification('Failed to update booking', 'error');
       // Revert the event position
       dropInfo.revert();
@@ -278,7 +278,7 @@ const handleUpdateBooking = async (data: { id: string; start: string; end: strin
     });
     
     uiStore.showNotification('Booking updated successfully', 'success');
-  } catch (error) {
+  } catch (_error) {
     uiStore.showNotification('Failed to update booking', 'error');
   }
 };

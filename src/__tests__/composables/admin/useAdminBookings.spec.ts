@@ -27,7 +27,7 @@ describe('useAdminBookings (Role-Based)', () => {
     const userStore = useAuthStore();
     
     // Set up admin user
-    const adminUser: User = {
+    const _adminUser: User = {
       id: 'admin1',
       email: 'admin@example.com',
       name: 'Admin User',
@@ -78,7 +78,7 @@ describe('useAdminBookings (Role-Based)', () => {
     const userStore = useAuthStore();
     
     // Set up admin user
-    const adminUser: User = {
+    const _adminUser: User = {
       id: 'admin1',
       email: 'admin@example.com',
       name: 'Admin User',
@@ -140,7 +140,7 @@ describe('useAdminBookings (Role-Based)', () => {
     const userStore = useAuthStore();
     
     // Set up admin user
-    const adminUser: User = {
+    const _adminUser: User = {
       id: 'admin1',
       email: 'admin@example.com',
       name: 'Admin User',
@@ -182,7 +182,7 @@ describe('useAdminBookings (Role-Based)', () => {
     const userStore = useAuthStore();
     
     // Set up admin user
-    const adminUser: User = {
+    const _adminUser: User = {
       id: 'admin1',
       email: 'admin@example.com',
       name: 'Admin User',
@@ -226,7 +226,7 @@ describe('useAdminBookings (Role-Based)', () => {
     const userStore = useAuthStore();
     
     // Set up admin user
-    const adminUser: User = {
+    const _adminUser: User = {
       id: 'admin1',
       email: 'admin@example.com',
       name: 'Admin User',
@@ -279,7 +279,7 @@ describe('useAdminBookings (Role-Based)', () => {
     const userStore = useAuthStore();
     
     // Set up admin user
-    const adminUser: User = {
+    const _adminUser: User = {
       id: 'admin1',
       email: 'admin@example.com',
       name: 'Admin User',
@@ -344,7 +344,7 @@ describe('useAdminBookings (Role-Based)', () => {
     const userStore = useAuthStore();
     
     // Set up admin user
-    const adminUser: User = {
+    const _adminUser: User = {
       id: 'admin1',
       email: 'admin@example.com',
       name: 'Admin User',

@@ -575,7 +575,7 @@ const getStorageEstimate = async () => {
       const used = estimate.usage ? (estimate.usage / 1024 / 1024).toFixed(2) : 'Unknown'
       const quota = estimate.quota ? (estimate.quota / 1024 / 1024).toFixed(2) : 'Unknown'
       storageInfo.value = `${used}MB / ${quota}MB`
-    } catch (error) {
+    } catch (_error) {
       storageInfo.value = 'Not available'
     }
   } else {
