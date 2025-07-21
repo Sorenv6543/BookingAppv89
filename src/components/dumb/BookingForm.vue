@@ -2,11 +2,13 @@
   <v-dialog
     v-model="isOpen"
     max-width="700px"
+    max-height="90vh"
     persistent
+    scrollable
     @keydown.esc="handleClose"
   >
-    <v-card>
-      <v-card-title class="text-h5 pb-2">
+    <v-card class="modal-card">
+      <v-card-title class="text-h5 pb-2 flex-shrink-0">
         {{ formTitle }}
         <v-chip
           v-if="form.booking_type === 'turn'"
@@ -20,7 +22,7 @@
       
       <v-divider />
       
-      <v-card-text>
+      <v-card-text class="modal-content">
         <v-form
           ref="formRef"
           v-model="formValid"
@@ -41,6 +43,7 @@
                   variant="outlined"
                   :disabled="loading"
                   :error-messages="errors.get('property_id')"
+                  prepend-inner-icon="mdi-home"
                 />
               </v-col>
             </v-row>
@@ -62,6 +65,7 @@
                   :error-messages="errors.get('checkout_date')"
                   hint="When guests leave"
                   persistent-hint
+                  prepend-inner-icon="mdi-calendar-remove"
                   @update:model-value="updateBookingType"
                 />
               </v-col>
@@ -81,6 +85,7 @@
                   :error-messages="errors.get('checkin_date')"
                   hint="When new guests arrive"
                   persistent-hint
+                  prepend-inner-icon="mdi-calendar-plus"
                   @update:model-value="updateBookingType"
                 />
               </v-col>
@@ -101,6 +106,7 @@
                   variant="outlined"
                   :disabled="loading"
                   :error-messages="errors.get('booking_type')"
+                  prepend-inner-icon="mdi-tag"
                 />
                 
                 <v-checkbox
@@ -124,6 +130,7 @@
                   :error-messages="errors.get('guest_count')"
                   hint="Optional"
                   persistent-hint
+                  prepend-inner-icon="mdi-account-group"
                 />
               </v-col>
             </v-row>
@@ -141,6 +148,7 @@
                   persistent-hint
                   :counter="500"
                   rows="3"
+                  prepend-inner-icon="mdi-note-text"
                 />
               </v-col>
             </v-row>
@@ -155,6 +163,7 @@
                   variant="outlined"
                   :disabled="loading"
                   :error-messages="errors.get('status')"
+                  prepend-inner-icon="mdi-progress-check"
                 />
               </v-col>
             </v-row>
@@ -228,7 +237,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from 'vue';
+import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue';
 import { usePropertyStore } from '@/stores/property';
 import type { Booking, BookingFormData, BookingStatus, BookingType, Property } from '@/types';
 import type { VForm } from 'vuetify/components';
@@ -238,6 +247,7 @@ interface Props {
   open?: boolean;
   mode?: 'create' | 'edit';
   booking?: Booking;
+  initialData?: Partial<BookingFormData>;
 }
 
 interface Emits {
@@ -249,7 +259,8 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   open: false,
   mode: 'create',
-  booking: undefined
+  booking: undefined,
+  initialData: undefined
 });
 
 const emit = defineEmits<Emits>();
@@ -379,10 +390,14 @@ function resetForm(): void {
   
   if (props.mode === 'edit' && props.booking) {
     // Populate form with existing booking data
+    // Convert dates to the format expected by Vuetify date inputs (YYYY-MM-DD)
+    const checkoutDate = props.booking.checkout_date;
+    const checkinDate = props.booking.checkin_date;
+    
     Object.assign(form, {
       property_id: props.booking.property_id,
-      checkout_date: props.booking.checkout_date,
-      checkin_date: props.booking.checkin_date,
+      checkout_date: formatDateForInput(checkoutDate),
+      checkin_date: formatDateForInput(checkinDate),
       booking_type: props.booking.booking_type,
       guest_count: props.booking.guest_count,
       notes: props.booking.notes,
@@ -390,8 +405,8 @@ function resetForm(): void {
       owner_id: props.booking.owner_id
     });
   } else {
-    // Reset to defaults for create mode
-    Object.assign(form, {
+    // Reset to defaults for create mode, but use initial data if provided
+    const defaults = {
       property_id: '',
       checkout_date: '',
       checkin_date: '',
@@ -400,7 +415,27 @@ function resetForm(): void {
       notes: '',
       status: 'pending',
       owner_id: ''
-    });
+    };
+    
+    // Merge defaults with initial data, mapping calendar date properties
+    const initialData = props.initialData || {};
+    const formData = { 
+      ...defaults, 
+      ...initialData,
+      // Map calendar date properties to form properties
+      checkout_date: initialData.start || initialData.checkout_date || '',
+      checkin_date: initialData.end || initialData.checkin_date || ''
+    };
+    
+    // Format dates if they exist
+    if (formData.checkout_date) {
+      formData.checkout_date = formatDateForInput(formData.checkout_date);
+    }
+    if (formData.checkin_date) {
+      formData.checkin_date = formatDateForInput(formData.checkin_date);
+    }
+    
+    Object.assign(form, formData);
   }
 }
 
@@ -502,6 +537,35 @@ function handleClose(): void {
   emit('close');
 }
 
+// Format date for input field (ensure YYYY-MM-DD format)
+function formatDateForInput(dateStr: string): string {
+  if (!dateStr) return '';
+  
+  // If it's already in YYYY-MM-DD format, return as-is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return dateStr;
+  }
+  
+  // Try to parse and format the date
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date:', dateStr);
+      return '';
+    }
+    
+    // Format as YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    console.error('Error formatting date:', dateStr, error);
+    return '';
+  }
+}
+
 // LIFECYCLE HOOKS
 onMounted(() => {
   resetForm();
@@ -510,12 +574,21 @@ onMounted(() => {
 // WATCHERS
 watch(() => props.open, (newValue) => {
   if (newValue) {
+    // Add small delay to ensure props are fully updated
+    nextTick(() => {
+      resetForm();
+    });
+  }
+});
+
+watch(() => props.booking, (newBooking, oldBooking) => {
+  if (props.open && props.mode === 'edit' && newBooking && newBooking.id !== oldBooking?.id) {
     resetForm();
   }
 });
 
-watch(() => props.booking, () => {
-  if (props.open && props.mode === 'edit') {
+watch(() => props.initialData, (newInitialData) => {
+  if (props.open && props.mode === 'create' && newInitialData) {
     resetForm();
   }
 });
@@ -524,5 +597,18 @@ watch(() => props.booking, () => {
 <style scoped>
 .v-alert {
   margin-top: 8px;
+}
+
+/* Modal viewport constraints */
+.modal-card {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content {
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 120px); /* Subtract header and footer space */
 }
 </style> 

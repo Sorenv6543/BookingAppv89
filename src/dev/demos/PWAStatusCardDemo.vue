@@ -12,8 +12,13 @@
           <v-card-text>
             <v-row>
               <!-- Development Mode (Always Visible) -->
-              <v-col cols="12" md="6">
-                <h3 class="text-h6 mb-3">Development Mode</h3>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <h3 class="text-h6 mb-3">
+                  Development Mode
+                </h3>
                 <p class="text-body-2 mb-3">
                   In development mode, the PWA status card is always visible for debugging.
                 </p>
@@ -21,8 +26,13 @@
               </v-col>
               
               <!-- Production Mode (Hidden by Default) -->
-              <v-col cols="12" md="6">
-                <h3 class="text-h6 mb-3">Production Mode (Force Show)</h3>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <h3 class="text-h6 mb-3">
+                  Production Mode (Force Show)
+                </h3>
                 <p class="text-body-2 mb-3">
                   In production, the card is hidden unless explicitly enabled.
                 </p>
@@ -35,14 +45,22 @@
               <v-col cols="12">
                 <v-card variant="outlined">
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2">mdi-code-tags</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-code-tags
+                    </v-icon>
                     Integration Examples
                   </v-card-title>
                   <v-card-text>
                     <v-tabs v-model="selectedTab">
-                      <v-tab value="sidebar">In Sidebar</v-tab>
-                      <v-tab value="admin">Admin Dashboard</v-tab>
-                      <v-tab value="owner">Owner Dashboard</v-tab>
+                      <v-tab value="sidebar">
+                        In Sidebar
+                      </v-tab>
+                      <v-tab value="admin">
+                        Admin Dashboard
+                      </v-tab>
+                      <v-tab value="owner">
+                        Owner Dashboard
+                      </v-tab>
                     </v-tabs>
                     
                     <v-window v-model="selectedTab">
@@ -104,9 +122,14 @@ import PWAStatusCard from '@/components/dumb/shared/PWAStatusCard.vue'
             <!-- Usage Notes -->
             <v-row class="mt-4">
               <v-col cols="12">
-                <v-card variant="outlined" color="info">
+                <v-card
+                  variant="outlined"
+                  color="info"
+                >
                   <v-card-title class="text-h6">
-                    <v-icon class="mr-2">mdi-information</v-icon>
+                    <v-icon class="mr-2">
+                      mdi-information
+                    </v-icon>
                     Usage Notes
                   </v-card-title>
                   <v-card-text>

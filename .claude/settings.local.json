@@ -1,32 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(claude mcp:*)",
-      "mcp__desktop-commander__read_file",
-      "mcp__desktop-commander__search_code",
-      "mcp__desktop-commander__list_directory",
       "mcp__sequential-thinking__sequentialthinking",
-      "WebFetch(domain:github.com)",
-      "mcp__puppeteer__puppeteer_navigate",
-      "Bash(npx puppeteer browsers:*)",
-      "Bash(curl:*)",
-      "Bash(npx:*)",
-      "Bash(where chrome)",
-      "WebFetch(domain:docs.anthropic.com)",
-      "Bash(claude --version)",
-      "mcp__desktop-commander__execute_command",
-      "mcp__desktop-commander__write_file",
-      "mcp__desktop-commander__read_output",
-      "Bash(mkdir:*)",
-      "Bash(pnpm test:e2e:mobile:*)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs",
       "mcp__supabase__get_project_url",
       "mcp__supabase__list_tables",
       "mcp__supabase__get_anon_key",
-      "Bash(npm view:*)"
-    ],
-    "deny": []
+      "Bash(npm view:*)",
+      "Bash(npm run lint)"
+    ]
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [

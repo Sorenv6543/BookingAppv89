@@ -101,10 +101,10 @@ export function getMobileCalendarOptions() {
   const { width } = getViewportDimensions();
   
   if (width <= 599) {
-    // Mobile phone - reduced dayMaxEvents to trigger bottom sheet sooner
+    // Mobile phone - show 2 bookings before +more link for better UX
     return {
       height: calculateCalendarHeight(),
-      dayMaxEvents: 1,
+      dayMaxEvents: 2,
       eventDisplay: 'block',
       headerToolbar: false,
       initialView: 'dayGridMonth',
@@ -114,10 +114,10 @@ export function getMobileCalendarOptions() {
       dayHeaderFormat: { weekday: 'narrow' }
     };
   } else if (width <= 959) {
-    // Tablet - reduced dayMaxEvents to trigger bottom sheet sooner
+    // Tablet - show 3 bookings before +more link
     return {
       height: calculateCalendarHeight(),
-      dayMaxEvents: 2,
+      dayMaxEvents: 3,
       eventDisplay: 'block',
       headerToolbar: false,
       initialView: 'dayGridMonth',
@@ -128,16 +128,16 @@ export function getMobileCalendarOptions() {
     };
   }
   
-  // Desktop fallback - keep more events visible on desktop
+  // Desktop fallback - show 5 bookings before +more link
   return {
     height: '100%',
-    dayMaxEvents: 3,
+    dayMaxEvents: 5,
     eventDisplay: 'block',
     headerToolbar: false,
     initialView: 'dayGridMonth',
     aspectRatio: undefined,
     expandRows: true,
-    eventMinHeight: 28,
+    eventMinHeight: 22,
     dayHeaderFormat: { weekday: 'short' }
   };
 }

@@ -9,8 +9,7 @@
 
 
 
-import { createRouter, createWebHistory } from 'vue-router'
-// import { authGuard, loadingGuard, afterNavigationGuard, developmentGuard } from '@/router/guards'
+import { createRouter, createWebHistory } from 'vue-router' 
 
 // 
 const router = createRouter({
@@ -23,7 +22,7 @@ const router = createRouter({
       name: 'home',
       component: () => import('@/pages/auth/login.vue'),
       meta: {
-        layout: 'default'
+        layout: 'auth'
       }
     },
     {
@@ -41,19 +40,91 @@ const router = createRouter({
       name: 'owner-dashboard',
       component: () => import('@/pages/owner/dashboard.vue'),
       meta: {
-        layout: 'owner',
-       
+        layout: 'owner', 
         role: 'owner'
       }
     },
     {
       path: '/owner/properties',
       name: 'owner-properties',
-      component: () => import('@/pages/owner/properties/index.vue'),
+      component: () => import('@/components/smart/owner/OwnerProperties.vue'),
       meta: {
         layout: 'owner',
-       
         role: 'owner'
+      }
+    },
+    {
+      path: '/owner/dashboard',
+      name: 'owner-dashboard',
+      component: () => import('@/pages/owner/dashboard.vue'),
+      meta: {
+        layout: 'owner',
+        role: 'owner'
+      }
+    },
+
+    // Admin routes - only accessible to admin users
+    {
+      path: '/admin',
+      name: 'admin-dashboard',
+      component: () => import('@/pages/admin/dashboard.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/properties',
+      name: 'admin-properties',
+      component: () => import('@/components/smart/admin/AdminProperties.vue'),
+      meta: {
+        layout: 'default',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/properties/:id',
+      name: 'admin-properties-view',
+      component: () => import('@/pages/admin/properties/view.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/owner/properties/:id',
+      name: 'owner-properties-view',
+      component: () => import('@/pages/owner/properties/view.vue'),
+      meta: {
+        layout: 'owner',
+        role: 'owner'
+      }
+    },
+    {
+      path: '/admin/properties/:id/edit',
+      name: 'admin-properties-edit',
+      component: () => import('@/pages/admin/properties/edit.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/owner/properties/:id/edit',
+      name: 'owner-properties-edit',
+      component: () => import('@/pages/owner/properties/edit.vue'),
+      meta: {
+        layout: 'owner',
+        role: 'owner'
+      }
+    },
+    {
+      path: '/admin/bookings',
+      name: 'admin-bookings',
+      component: () => import('@/pages/admin/bookings/index.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
       }
     },
     {
@@ -76,15 +147,23 @@ const router = createRouter({
         role: 'owner'
       }
     },
+    {
+      path: '/owner/profile',
+      name: 'owner-profile',
+      component: () => import('@/pages/owner/profile.vue'),
+      meta: {
+        layout: 'owner',
+        role: 'owner'
+      }
+    },
 
     // Admin routes - only accessible to admin users
     {
       path: '/admin',
-      name: 'admin',
-      component: () => import('@/pages/admin/index.vue'),
+      name: 'admin-dashboard',
+      component: () => import('@/pages/admin/dashboard.vue'),
       meta: {
         layout: 'admin',
-        
         role: 'admin'
       }
     },
@@ -138,24 +217,67 @@ const router = createRouter({
         role: 'admin'
       }
     },
-    
-    // Testing routes
     {
-      path: '/testing/crud',
-      name: 'crud-testing',
-      component: () => import('@/pages/crud-testing.vue'),
+      path: '/admin/profile',
+      name: 'admin-profile',
+      component: () => import('@/pages/admin/profile.vue'),
       meta: {
-        
+        layout: 'admin',
+        role: 'admin'
       }
     },
-    
-    // Demo routes - required for E2E testing
     {
-      path: '/demos',
-      name: 'demos-index',
-      component: () => import('@/pages/demos/index.vue'),
+      path: '/admin/settings',
+      name: 'admin-settings',
+      component: () => import('@/pages/admin/settings.vue'),
       meta: {
-        
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/owners',
+      name: 'admin-owners',
+      component: () => import('@/pages/admin/owners/index.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/cleaners',
+      name: 'admin-cleaners',
+      component: () => import('@/pages/admin/cleaners/index.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/users',
+      name: 'admin-users',
+      component: () => import('@/pages/admin/users/index.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/users/:id',
+      name: 'admin-users-view',
+      component: () => import('@/pages/admin/users/view.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
+      path: '/admin/users/:id/edit',
+      name: 'admin-users-edit',
+      component: () => import('@/pages/admin/users/edit.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
       }
     },
     {
@@ -166,209 +288,11 @@ const router = createRouter({
         layout: 'default'
       }
     },
-      // Demo routes - now in src/dev/demos/
-      // {
-      //   path: '/demos/uiux-enhancements',
-      //   name: 'uiux-enhancements-demo',
-      //   component: () => import('@/dev/demos/UIUXEnhancementsDemo.vue'),
-      //   meta: {  
-      //   }
-      // },
-    // {
-    //   path: '/demos/pwa',
-    //   name: 'pwa-demo',
-    //   component: () => import('@/dev/demos/PWADemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/owner-data-store',
-    //   name: 'owner-data-store-demo',
-    //   component: () => import('@/dev/demos/OwnerDataStoreDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/admin-data-store',
-    //   name: 'admin-data-store-demo',
-    //   component: () => import('@/dev/demos/AdminDataStoreDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/owner-data-store',
-    //   name: 'owner-data-store-demo',
-    //   component: () => import('@/dev/demos/OwnerDataStoreDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/admin-user-management',
-    //   name: 'admin-user-management-demo',
-    //   component: () => import('@/dev/demos/AdminUserManagementDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/responsive-layout',
-    //   name: 'responsive-layout-demo',
-    //   component: () => import('@/dev/demos/ResponsiveLayoutDemo.vue'),
-    //   meta: {
-
-    //   }
-    // },
-
-    // {
-    //   path: '/demos/home-admin',
-    //   name: 'home-admin-demo',
-    //   component: () => import('@/dev/demos/HomeAdminDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-
-    // {
-    //   path: '/demos/turn-alerts',
-    //   name: 'turn-alerts-demo',
-    //   component: () => import('@/dev/demos/TurnAlertsDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-
-    // {
-    //   path: '/demos/property-card',
-    //   name: 'property-card-demo',
-    //   component: () => import('@/dev/demos/PropertyCardDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/components/smart/admin/use-admin-bookings',
-    //   name: 'use-admin-bookings-demo',
-    //   component: () => import('@/dev/demos/UseAdminBookingsDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-
-    // {
-    //   path: '/components/smart/admin/admin-calendar',
-    //   name: 'admin-calendar-demo',
-    //   component: () => import('@/dev/demos/AdminCalendarDemo.vue'),
-    //   meta: {
-    //     layout: 'default'
-    //   }
-    // },
-    // {
-    //   path: '/components/smart/owner/owner-calendar',
-    //   name: 'owner-calendar-demo',
-    //   component: () => import('@/dev/demos/OwnerCalendarDemo.vue'),
-    //   meta: {
-    //     layout: 'default'
-    //   }
-    // },
-    // {
-    //   path: '/demos/use-owner-bookings',
-    //   name: 'use-owner-bookings-demo',
-    //   component: () => import('@/dev/demos/UseOwnerBookingsDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/use-owner-properties',
-    //   name: 'use-owner-properties-demo',
-    //   component: () => import('@/dev/demos/UseOwnerPropertiesDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/use-owner-calendar-state',
-    //   name: 'use-owner-calendar-state-demo',
-    //   component: () => import('@/dev/demos/UseOwnerCalendarStateDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/use-admin-properties',
-    //   name: 'use-admin-properties-demo',
-    //   component: () => import('@/dev/demos/UseAdminPropertiesDemo.vue'),
-    //   meta: {
-
-    //   }
-    // },
-    // {
-    //   path: '/demos/use-admin-calendar-state',
-    //   name: 'use-admin-calendar-state-demo',
-    //   component: () => import('@/dev/demos/UseAdminCalendarStateDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/owner-property-creation',
-    //   name: 'owner-property-creation-demo',
-    //   component: () => import('@/dev/demos/OwnerPropertyCreationDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/pwa',
-    //   name: 'pwa-demo',
-    //   component: () => import('@/dev/demos/PWADemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-    // {
-    //   path: '/demos/pwa-notifications',
-    //   name: 'pwa-notifications-demo',
-    //   component: () => import('@/components/dumb/shared/PWANotificationsEnhanced.vue'),
-    //   meta: {
-        
-    //     public: true,
-    //     demo: true,
-    //     title: 'PWANotificationsEnhanced Demo'
-    //   }
-    // },
- 
-    // {
-    //   path: '/demos/admin-sidebar-width-test',
-    //   name: 'admin-sidebar-width-test',
-    //   component: () => import('@/dev/demos/admin-sidebar-width-test.vue'),
-    //   meta: {
-        
-    //     public: true,
-    //     demo: true,
-    //     title: 'Admin Sidebar Width Test'
-    //   }
-    // },
-
-
-    // {
-    //   path: '/testing/turn-alerts',
-    //   name: 'turn-alerts-demo',
-    //   component: () => import('@/dev/demos/TurnAlertsDemo.vue'),
-    //   meta: {
-        
-    //   }
-    // },
-
-
+  
   ]
 })
 
-// Apply navigation guards
+// // Apply navigation guards
 // router.beforeEach(developmentGuard)
 // router.beforeEach(loadingGuard)
 // router.beforeEach(authGuard)

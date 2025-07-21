@@ -2,11 +2,13 @@
   <v-dialog
     v-model="isOpen"
     max-width="700px"
+    max-height="90vh"
     persistent
+    scrollable
     @keydown.esc="handleClose"
   >
-    <v-card>
-      <v-card-title class="text-h5 pb-2">
+    <v-card class="modal-card">
+      <v-card-title class="text-h5 pb-2 flex-shrink-0">
         {{ formTitle }}
         <v-chip
           v-if="form.active"
@@ -28,7 +30,7 @@
       
       <v-divider />
       
-      <v-card-text>
+      <v-card-text class="modal-content">
         <v-form
           ref="formRef"
           v-model="formValid"
@@ -48,6 +50,7 @@
                   :error-messages="errors.get('name')"
                   hint="Enter the property name as it should appear in the system"
                   persistent-hint
+                  prepend-inner-icon="mdi-home"
                 />
               </v-col>
             </v-row>
@@ -65,6 +68,7 @@
                   :error-messages="errors.get('address')"
                   hint="Full address including street, city, state, and zip code"
                   persistent-hint
+                  prepend-inner-icon="mdi-map-marker"
                 />
               </v-col>
             </v-row>
@@ -87,6 +91,7 @@
                   :error-messages="errors.get('cleaning_duration')"
                   hint="Time required for standard cleaning"
                   persistent-hint
+                  prepend-inner-icon="mdi-clock-outline"
                 />
               </v-col>
               
@@ -105,6 +110,7 @@
                   :error-messages="errors.get('pricing_tier')"
                   hint="Determines pricing and service level"
                   persistent-hint
+                  prepend-inner-icon="mdi-currency-usd"
                 />
               </v-col>
             </v-row>
@@ -122,6 +128,7 @@
                   persistent-hint
                   :counter="1000"
                   rows="4"
+                  prepend-inner-icon="mdi-note-text"
                 />
               </v-col>
             </v-row>
@@ -528,5 +535,18 @@ watch(() => props.property, () => {
 /* Divider theming */
 :deep(.v-divider) {
   border-color: rgba(var(--v-theme-on-surface), 0.12) !important;
+}
+
+/* Modal viewport constraints */
+.modal-card {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content {
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 120px); /* Subtract header and footer space */
 }
 </style> 

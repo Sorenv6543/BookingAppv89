@@ -585,33 +585,33 @@ const getAvailabilityIcon = (cleaner: Cleaner) => {
   return icons[status] || 'mdi-help-circle'
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const getCleanerTodayBookings = (_: string) => {
   // Mock data - would come from bookings store
   return Math.floor(Math.random() * 6)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const getCleanerRating = (_: string) => {
   // Mock data - would come from performance data
   return 3.5 + Math.random() * 1.5
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const getDistanceText = (_: Cleaner) => {
   // Mock data - would calculate from cleaner location and property
   const distance = Math.floor(Math.random() * 20) + 1
   return `${distance} km away`
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const getTravelTime = (_: Cleaner) => {
   // Mock data - would calculate based on distance and traffic
   const time = Math.floor(Math.random() * 30) + 10
   return `${time} minutes`
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const hasScheduleConflict = (_: Cleaner) => {
   // Mock conflict detection - would check against existing bookings
   return Math.random() < 0.2 // 20% chance of conflict

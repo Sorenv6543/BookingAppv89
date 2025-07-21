@@ -156,7 +156,10 @@
                 Admin Features
               </v-card-title>
               
-              <v-alert type="info" variant="tonal">
+              <v-alert
+                type="info"
+                variant="tonal"
+              >
                 Admin users have access to system-wide management features
               </v-alert>
             </v-card>

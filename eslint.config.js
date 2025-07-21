@@ -7,10 +7,23 @@ import vue from 'eslint-plugin-vue';
 import vueParser from 'vue-eslint-parser';
 
 export default [
+  {
+    ignores: [
+      'dist/**',
+      'dev-dist/**',
+      'node_modules/**',
+      '*.config.js',
+      'coverage/**',
+      'test-results/**',
+      'playwright-report/**',
+      '.vscode/**',
+      '.nuxt/**',
+    ],
+  },
   js.configs.recommended,
   ...vue.configs['flat/recommended'],
   {
-    files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
+    files: ['**/*.{js,mjs,cjs}'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -21,7 +34,7 @@ export default [
     },
   },
   {
-    files: ['**/*.ts', '**/*.tsx'],
+    files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
@@ -38,6 +51,8 @@ export default [
     },
     rules: {
       ...typescript.configs.recommended.rules,
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-unused-vars': 'off',
     },
   },
   {
@@ -48,6 +63,7 @@ export default [
         parser: typescriptParser,
         ecmaVersion: 'latest',
         sourceType: 'module',
+        extraFileExtensions: ['.vue'],
       },
       globals: {
         ...globals.browser,
@@ -69,6 +85,8 @@ export default [
       'vue/define-emits-declaration': ['error', 'type-based'],
       'vue/prefer-define-options': 'error',
       'vue/no-v-html': 'warn',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-unused-vars': 'off',
     },
   },
 ]; 

@@ -29,6 +29,17 @@ export interface User {
   role: UserRole; // Database column is 'role'
   company_name?: string; // for property owners
   
+  // Contact and verification fields
+  address?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  phone?: string;
+  email_verified?: boolean;
+  
+  // User preferences
+  date_format?: string;
+  
   // Flattened settings (primary - matches database schema)
   notifications_enabled: boolean;
   timezone: string;

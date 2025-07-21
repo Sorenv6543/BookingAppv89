@@ -96,34 +96,43 @@
           <div class="d-flex mt-4 gap-2 flex-wrap">
             <v-btn
               v-if="canInstall"
-              @click="handleInstall"
               :loading="installing"
               color="primary"
               size="small"
+              @click="handleInstall"
             >
-              <v-icon left icon="mdi-download" />
+              <v-icon
+                left
+                icon="mdi-download"
+              />
               Install
             </v-btn>
             
             <v-btn
               v-if="showUpdatePrompt"
-              @click="handleUpdate"
               :loading="updating"
               color="warning"
               size="small"
+              @click="handleUpdate"
             >
-              <v-icon left icon="mdi-update" />
+              <v-icon
+                left
+                icon="mdi-update"
+              />
               Update
             </v-btn>
             
             <v-btn
               v-if="syncQueueLength > 0"
-              @click="retrySync"
               :loading="isProcessingSync"
               color="info"
               size="small"
+              @click="retrySync"
             >
-              <v-icon left icon="mdi-sync" />
+              <v-icon
+                left
+                icon="mdi-sync"
+              />
               Sync Now
             </v-btn>
           </div>

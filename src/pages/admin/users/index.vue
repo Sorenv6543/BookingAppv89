@@ -1,5 +1,8 @@
 <template>
-  <v-container fluid class="pa-6">
+  <v-container
+    fluid
+    class="pa-6"
+  >
     <!-- Page Header -->
     <div class="d-flex justify-space-between align-center mb-6">
       <div>
@@ -24,57 +27,117 @@
 
     <!-- Stats Cards -->
     <v-row class="mb-6">
-      <v-col cols="12" sm="6" md="3">
-        <v-card class="pa-4" elevation="2">
+      <v-col
+        cols="12"
+        sm="6"
+        md="3"
+      >
+        <v-card
+          class="pa-4"
+          elevation="2"
+        >
           <div class="d-flex align-center">
-            <v-avatar color="primary" size="48" class="me-3">
+            <v-avatar
+              color="primary"
+              size="48"
+              class="me-3"
+            >
               <v-icon>mdi-account-group</v-icon>
             </v-avatar>
             <div>
-              <p class="text-caption text-medium-emphasis mb-1">Total Users</p>
-              <p class="text-h5 font-weight-bold">{{ totalUsers }}</p>
+              <p class="text-caption text-medium-emphasis mb-1">
+                Total Users
+              </p>
+              <p class="text-h5 font-weight-bold">
+                {{ totalUsers }}
+              </p>
             </div>
           </div>
         </v-card>
       </v-col>
       
-      <v-col cols="12" sm="6" md="3">
-        <v-card class="pa-4" elevation="2">
+      <v-col
+        cols="12"
+        sm="6"
+        md="3"
+      >
+        <v-card
+          class="pa-4"
+          elevation="2"
+        >
           <div class="d-flex align-center">
-            <v-avatar color="success" size="48" class="me-3">
+            <v-avatar
+              color="success"
+              size="48"
+              class="me-3"
+            >
               <v-icon>mdi-shield-account</v-icon>
             </v-avatar>
             <div>
-              <p class="text-caption text-medium-emphasis mb-1">Admins</p>
-              <p class="text-h5 font-weight-bold">{{ adminCount }}</p>
+              <p class="text-caption text-medium-emphasis mb-1">
+                Admins
+              </p>
+              <p class="text-h5 font-weight-bold">
+                {{ adminCount }}
+              </p>
             </div>
           </div>
         </v-card>
       </v-col>
       
-      <v-col cols="12" sm="6" md="3">
-        <v-card class="pa-4" elevation="2">
+      <v-col
+        cols="12"
+        sm="6"
+        md="3"
+      >
+        <v-card
+          class="pa-4"
+          elevation="2"
+        >
           <div class="d-flex align-center">
-            <v-avatar color="info" size="48" class="me-3">
+            <v-avatar
+              color="info"
+              size="48"
+              class="me-3"
+            >
               <v-icon>mdi-home-account</v-icon>
             </v-avatar>
             <div>
-              <p class="text-caption text-medium-emphasis mb-1">Owners</p>
-              <p class="text-h5 font-weight-bold">{{ ownerCount }}</p>
+              <p class="text-caption text-medium-emphasis mb-1">
+                Owners
+              </p>
+              <p class="text-h5 font-weight-bold">
+                {{ ownerCount }}
+              </p>
             </div>
           </div>
         </v-card>
       </v-col>
       
-      <v-col cols="12" sm="6" md="3">
-        <v-card class="pa-4" elevation="2">
+      <v-col
+        cols="12"
+        sm="6"
+        md="3"
+      >
+        <v-card
+          class="pa-4"
+          elevation="2"
+        >
           <div class="d-flex align-center">
-            <v-avatar color="warning" size="48" class="me-3">
+            <v-avatar
+              color="warning"
+              size="48"
+              class="me-3"
+            >
               <v-icon>mdi-broom</v-icon>
             </v-avatar>
             <div>
-              <p class="text-caption text-medium-emphasis mb-1">Cleaners</p>
-              <p class="text-h5 font-weight-bold">{{ cleanerCount }}</p>
+              <p class="text-caption text-medium-emphasis mb-1">
+                Cleaners
+              </p>
+              <p class="text-h5 font-weight-bold">
+                {{ cleanerCount }}
+              </p>
             </div>
           </div>
         </v-card>
@@ -82,15 +145,23 @@
     </v-row>
 
     <!-- Filters and Search -->
-    <v-card class="mb-6" elevation="2">
+    <v-card
+      class="mb-6"
+      elevation="2"
+    >
       <v-card-title class="pb-2">
-        <v-icon class="me-2">mdi-filter-variant</v-icon>
+        <v-icon class="me-2">
+          mdi-filter-variant
+        </v-icon>
         Filters
       </v-card-title>
       
       <v-card-text>
         <v-row>
-          <v-col cols="12" md="4">
+          <v-col
+            cols="12"
+            md="4"
+          >
             <v-text-field
               v-model="search"
               label="Search users..."
@@ -102,7 +173,10 @@
             />
           </v-col>
           
-          <v-col cols="12" md="3">
+          <v-col
+            cols="12"
+            md="3"
+          >
             <v-select
               v-model="roleFilter"
               :items="roleOptions"
@@ -114,7 +188,10 @@
             />
           </v-col>
           
-          <v-col cols="12" md="3">
+          <v-col
+            cols="12"
+            md="3"
+          >
             <v-select
               v-model="statusFilter"
               :items="statusOptions"
@@ -126,7 +203,10 @@
             />
           </v-col>
           
-          <v-col cols="12" md="2">
+          <v-col
+            cols="12"
+            md="2"
+          >
             <v-btn
               color="primary"
               variant="outlined"
@@ -144,31 +224,41 @@
     <!-- Users Data Table -->
     <v-card elevation="2">
       <v-card-title class="pb-2">
-        <v-icon class="me-2">mdi-account-multiple</v-icon>
+        <v-icon class="me-2">
+          mdi-account-multiple
+        </v-icon>
         System Users
       </v-card-title>
       
       <v-data-table
         v-model:items-per-page="itemsPerPage"
+        v-model="selected"
         :headers="headers"
         :items="filteredUsers"
         :loading="isLoading"
         :search="search"
         item-value="id"
         show-select
-        v-model="selected"
       >
         <!-- User Info Column -->
         <template #item.user="{ item }">
           <div class="d-flex align-center py-2">
-            <v-avatar :color="getRoleColor(item.role)" size="40" class="me-3">
+            <v-avatar
+              :color="getRoleColor(item.role)"
+              size="40"
+              class="me-3"
+            >
               <span class="text-white font-weight-bold">
                 {{ item.name.charAt(0).toUpperCase() }}
               </span>
             </v-avatar>
             <div>
-              <p class="font-weight-medium mb-1">{{ item.name }}</p>
-              <p class="text-caption text-medium-emphasis">{{ item.email }}</p>
+              <p class="font-weight-medium mb-1">
+                {{ item.name }}
+              </p>
+              <p class="text-caption text-medium-emphasis">
+                {{ item.email }}
+              </p>
             </div>
           </div>
         </template>
@@ -196,7 +286,10 @@
         <!-- Company Column -->
         <template #item.company_name="{ item }">
           <span v-if="item.company_name">{{ item.company_name }}</span>
-          <span v-else class="text-medium-emphasis">—</span>
+          <span
+            v-else
+            class="text-medium-emphasis"
+          >—</span>
         </template>
 
         <!-- Last Activity Column -->
@@ -204,7 +297,10 @@
           <span v-if="item.last_sign_in_at">
             {{ formatDate(item.last_sign_in_at) }}
           </span>
-          <span v-else class="text-medium-emphasis">Never</span>
+          <span
+            v-else
+            class="text-medium-emphasis"
+          >Never</span>
         </template>
 
         <!-- Actions Column -->
@@ -244,8 +340,8 @@
                   size="small"
                   variant="text"
                   color="error"
-                  @click="deleteUser(item)"
                   :disabled="item.id === currentUser?.id"
+                  @click="deleteUser(item)"
                 />
               </template>
             </v-tooltip>
@@ -261,11 +357,18 @@
 
     <!-- Bulk Actions (when users are selected) -->
     <v-slide-y-transition>
-      <v-card v-if="selected.length > 0" class="mt-4" color="primary" variant="tonal">
+      <v-card
+        v-if="selected.length > 0"
+        class="mt-4"
+        color="primary"
+        variant="tonal"
+      >
         <v-card-text>
           <div class="d-flex align-center justify-space-between">
             <div>
-              <v-icon class="me-2">mdi-checkbox-marked-circle</v-icon>
+              <v-icon class="me-2">
+                mdi-checkbox-marked-circle
+              </v-icon>
               {{ selected.length }} user{{ selected.length > 1 ? 's' : '' }} selected
             </div>
             
@@ -422,7 +525,7 @@ async function fetchUsers() {
     // setLoading(true) // This line was removed as per the edit hint
     users.value = await authStore.fetchAllUsers()
   } catch (error) {
-    handleError(error, 'Failed to fetch users')
+    handleError(error, { title: 'Failed to fetch users' })
   } finally {
     // setLoading(false) // This line was removed as per the edit hint
   }

@@ -1,14 +1,38 @@
 <!-- layouts/admin.vue -->
 <template>
   <v-app>
+    <div class="admin-layout-container">
+      <!-- Admin Sidebar -->
+      <AdminSidebar
+        v-model="sidebarOpen"
+        :bookings="mockBookings"
+        :properties="mockProperties"
+        :total-properties="mockProperties.length"
+        :active-cleanings-today="5"
+        :urgent-turns-count="3"
+        :loading="false"
+        current-view="dashboard"
+        :current-date="new Date()"
+      />
+      
+      <!-- Main Content -->
+      <div
+        class="admin-main-content"
+        :class="{ 'sidebar-open': !mobile && sidebarOpen }"
+      >
+        <router-view />
+      </div>
+    </div>
+  </v-app>
+</template>
     <!-- Admin App Bar -->
-    <v-app-bar
+    <!-- <v-app-bar
       app
       color="surface"
       elevation="2"
       class="admin-app-bar"
     >
-      <!-- Logo and Title -->
+     
       <div class="d-flex align-center">
         <v-avatar
           color="primary"
@@ -29,10 +53,10 @@
         </div>
       </div>
 
-      <v-spacer />
+      <v-spacer /> -->
 
       <!-- Admin Navigation -->
-      <div class="d-flex align-center mr-4">
+      <!-- <div class="d-flex align-center mr-4">
         <v-btn
           to="/admin"
           variant="text"
@@ -73,10 +97,10 @@
         >
           Reports
         </v-btn>
-      </div>
+      </div> -->
 
       <!-- User Menu -->
-      <v-menu
+      <!-- <v-menu
         location="bottom end"
         offset="5"
       >
@@ -115,81 +139,82 @@
           />
         </v-list>
       </v-menu>
-    </v-app-bar>
+    </v-app-bar> -->
 
     <!-- Main Content Area -->
-    <v-main 
-    app
-    class="admin-main">
-      <router-view />
-    </v-main>
 
-        <!-- Global Notification Area -->
-        <div id="notification-area">
-          <!-- Global notifications will be mounted here -->
-        </div>
-      
-        <!-- Global Modal Area -->
-        <div id="modal-area">
-          <!-- Global modals will be mounted here -->
-        </div>
-      
-  </v-app>
-</template>
+  
 
 <script setup lang="ts">
-import { useAuth } from '@/composables/shared/useAuth'
-import { useRouter } from 'vue-router'
+import { ref } from 'vue';
+import { useDisplay } from 'vuetify';
+import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
 
-const { logout: authLogout } = useAuth()
-const router = useRouter()
+// Composables
+const { mobile } = useDisplay();
 
-const logout = async () => {
-  await authLogout()
-  router.push('/auth/login')
-}
+// State
+const sidebarOpen = ref(true);
+
+// Mock data - TODO: Replace with actual data from stores/composables
+const mockBookings = ref([
+  {
+    id: '1',
+    property_id: '1',
+    booking_type: 'turn',
+    status: 'pending',
+    checkout_date: '2024-01-15',
+    checkin_date: '2024-01-16'
+  }
+]);
+
+const mockProperties = ref([
+  {
+    id: '1',
+    name: 'Sunset Villa',
+    address: '123 Beach Road'
+  },
+  {
+    id: '2', 
+    name: 'Mountain Lodge',
+    address: '456 Pine Street'
+  }
+]);
 </script>
 
-<style scoped>
-.admin-app-bar {
-  border-bottom: 1px solid rgb(var(--v-theme-primary)) !important;
+
+
+<style>
+/* Admin layout styles */
+.admin-layout-container {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+  display: flex;
 }
 
-.admin-badge {
-  font-size: 0.75rem;
-  color: rgb(var(--v-theme-primary));
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* Reset any Vuetify v-main styles that could interfere */
+.v-application .admin-layout-container {
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-.admin-main {
-  height: 100%;
-  background-color: rgb(238, 238, 238);
-
+.admin-main-content {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  transition: margin-left 0.3s ease;
 }
 
-/* Admin-specific button styling */
-.v-btn--variant-text {
-  color: rgb(var(--v-theme-on-surface)) !important;
+.admin-main-content.sidebar-open {
+  margin-left: 280px; /* SIDEBAR_WIDTH */
 }
 
-.v-btn--variant-text:hover {
-  background: rgba(var(--v-theme-primary), 0.08) !important;
+/* Responsive adjustments */
+@media (max-width: 959px) {
+  .admin-main-content.sidebar-open {
+    margin-left: 0;
+  }
 }
-
-.v-btn--variant-text.router-link-active {
-  background: rgba(var(--v-theme-primary), 452) !important;
-  color: rgb(var(--v-theme-primary)) !important;
-}
-
-/* List items in user menu */
-.v-list-item:hover {
-  background: rgba(var(--v-theme-primary), 0.08) !important;
-}
-
-.v-list-item--active {
-  background: rgba(var(--v-theme-primary), 0.12) !important;
-  color: rgb(var(--v-theme-primary)) !important;
-}
-</style> 
+</style>

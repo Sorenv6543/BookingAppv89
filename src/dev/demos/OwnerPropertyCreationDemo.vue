@@ -50,8 +50,12 @@
                   mdi-sidebar-menu
                 </v-icon>
                 <div class="step-content">
-                  <div class="step-title">1. OwnerSidebar</div>
-                  <div class="step-description">Smart Component - User clicks "Add Property"</div>
+                  <div class="step-title">
+                    1. OwnerSidebar
+                  </div>
+                  <div class="step-description">
+                    Smart Component - User clicks "Add Property"
+                  </div>
                   <v-chip
                     size="small"
                     color="primary"
@@ -77,8 +81,12 @@
                   mdi-home-account
                 </v-icon>
                 <div class="step-content">
-                  <div class="step-title">2. HomeOwner</div>
-                  <div class="step-description">Orchestrator - Handles business logic</div>
+                  <div class="step-title">
+                    2. HomeOwner
+                  </div>
+                  <div class="step-description">
+                    Orchestrator - Handles business logic
+                  </div>
                   <v-chip
                     size="small"
                     color="secondary"
@@ -104,8 +112,12 @@
                   mdi-form-select
                 </v-icon>
                 <div class="step-content">
-                  <div class="step-title">3. PropertyModal</div>
-                  <div class="step-description">Shared Component - Displays form with owner_id set</div>
+                  <div class="step-title">
+                    3. PropertyModal
+                  </div>
+                  <div class="step-description">
+                    Shared Component - Displays form with owner_id set
+                  </div>
                   <v-chip
                     size="small"
                     color="success"
@@ -243,9 +255,15 @@
               v-model="activeTab"
               color="primary"
             >
-              <v-tab value="sidebar">OwnerSidebar.vue</v-tab>
-              <v-tab value="homeowner">HomeOwner.vue</v-tab>
-              <v-tab value="modal">PropertyModal</v-tab>
+              <v-tab value="sidebar">
+                OwnerSidebar.vue
+              </v-tab>
+              <v-tab value="homeowner">
+                HomeOwner.vue
+              </v-tab>
+              <v-tab value="modal">
+                PropertyModal
+              </v-tab>
             </v-tabs>
 
             <v-window v-model="activeTab">
@@ -324,7 +342,9 @@ const handleCreateProperty = (): void =&gt; {
                 variant="tonal"
                 class="mt-4"
               >
-                <div class="text-subtitle-2 mb-2">Implementation Benefits:</div>
+                <div class="text-subtitle-2 mb-2">
+                  Implementation Benefits:
+                </div>
                 <ul class="text-body-2">
                   <li><strong>Separation of Concerns:</strong> Sidebar handles UI, HomeOwner handles logic</li>
                   <li><strong>Role-Based Security:</strong> owner_id automatically set, no cross-owner access</li>

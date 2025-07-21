@@ -21,6 +21,7 @@ src/components/smart/owner/HomeOwner.vue -
       flat
       height="56"
       class="main-app-header"
+      :class="{ 'sidebar-open': sidebarOpen && !mobile }"
       color="white"
     >
       <v-app-bar-nav-icon
@@ -38,57 +39,57 @@ src/components/smart/owner/HomeOwner.vue -
       </v-app-bar-title>
       <!--logo-->
     </v-app-bar>
-<!--test-->
+    <!--test-->
     <!-- Owner Sidebar -->
     <OwnerSidebar
       v-model="sidebarOpen"
-      :temporary="mobile"
-      scrim="true"
-      scrim-color="scrimColor"   
-      scrim-opacity="0.9"
-      scrim-blur-amount="20"
-      scrim-blur-radius="20"
-     
-
-
       @create-booking="handleCreateBooking"
       @create-property="handleCreateProperty"
-      v-bind:style="{ height: '100vh' }"
+      @edit-property="handleEditProperty"
+      @view-property="handleViewProperty"
     />
 
     <!-- Main Calendar Area -->
-    <div class="calendar-main-container">
+    <div
+      class="calendar-main-container"
+      :class="{ 'sidebar-open': sidebarOpen && !mobile }"
+    >
       <div class="calendar-layout">
         <!-- Calendar Header - Fixed height -->
         <v-card
           flat
           density="compact"
-          class="calendar-header-card flex-shrink-0"
+          class="calendar-header-card flex-shrink-0 prominent-header"
+          elevation="3"
         >
           <v-card-text class="pa-4">
             <div class="d-flex align-center justify-space-between">
               <!-- Left Navigation Arrow -->
               <v-btn
                 icon="mdi-chevron-left"
-                variant="text"
+                variant="elevated"
                 density="comfortable"
                 size="default"
-                class="nav-arrow-simple"
+                class="nav-arrow-prominent"
+                color="primary"
                 @click="handlePrevious"
               />
               
               <!-- Centered Month Display -->
-              <div class="month-pill-display">
-                {{ formattedMonthYear }}
+              <div class="month-display-prominent">
+                <div class="month-title">
+                  {{ formattedMonthYear }}
+                </div>
               </div>
               
               <!-- Right Navigation Arrow -->
               <v-btn
                 icon="mdi-chevron-right"
-                variant="text"
+                variant="elevated"
                 density="comfortable"
                 size="default"
-                class="nav-arrow-simple"
+                class="nav-arrow-prominent"
+                color="primary"
                 @click="handleNext"
               />
             </div>
@@ -121,7 +122,8 @@ src/components/smart/owner/HomeOwner.vue -
     <BookingForm
       :open="eventModalOpen"
       :mode="eventModalMode"
-      :booking="eventModalData"
+      :booking="eventModalMode === 'edit' ? eventModalData : undefined"
+      :initial-data="eventModalMode === 'create' ? eventModalData : undefined"
       @close="handleEventModalClose"
       @save="handleEventModalSave"
       @delete="handleEventModalDelete"
@@ -153,7 +155,7 @@ src/components/smart/owner/HomeOwner.vue -
       v-if="mobile && speedDialOpen"
       class="speed-dial-custom-scrim"
       @click="speedDialOpen = false"
-    ></div>
+    />
 
     <!-- Mobile Enhanced Speed Dial FAB -->
     <v-speed-dial
@@ -272,7 +274,7 @@ const propertyStore = usePropertyStore();
 const bookingStore = useBookingStore();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
-const { xs, md, lg, mobile, sm } = useDisplay();
+const { xs, mobile } = useDisplay();
 
 // ============================================================================
 // COMPOSABLES - BUSINESS LOGIC
@@ -297,21 +299,17 @@ const {
   filterBookings,
   setCalendarView,
   goToDate,
-  goToToday,
   next,
-  prev,
-  clearPropertyFilters,
-  togglePropertyFilter
+  prev
 } = useCalendarState();
 
 // ============================================================================
 // LOCAL STATE
 // ============================================================================
 const calendarRef = ref<InstanceType<typeof OwnerCalendar> | null>(null);
-const sidebarOpen = ref(!xs.value);
+const sidebarOpen = ref(false);
 const selectedPropertyFilter = ref<string | null>(null);
 const speedDialOpen = ref(false);
-const scrimColor = ref('rgba(0, 0, 0, 0.9)');
 
 // ============================================================================
 // OWNER-SPECIFIC DATA ACCESS
@@ -344,13 +342,6 @@ const loading = computed(() => {
     propertiesLoading.value || 
     uiStore.isLoading('bookings') || 
     uiStore.isLoading('properties');
-});
-
-const formattedDate = computed(() => {
-  const options: Intl.DateTimeFormatOptions = { 
-    month: 'long'
-  };
-  return currentDate.value.toLocaleDateString('en-US', options);
 });
 
 const formattedMonthYear = computed(() => {
@@ -412,65 +403,6 @@ const ownerBookingsMap = computed(() => {
   }
   
   return map;
-});
-
-// Owner's today's turn bookings - stabilized
-const ownerTodayTurns = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  
-  const turns = new Map<string, Booking>();
-  
-  if (!isOwnerAuthenticated.value) {
-    return turns;
-  }
-
-  try {
-    // Filter owner's bookings for today's turns
-    Array.from(ownerBookingsMap.value.values()).forEach(booking => {
-      if (
-        booking.booking_type === 'turn' &&
-        new Date(booking.checkout_date) >= today &&
-        new Date(booking.checkout_date) < tomorrow
-      ) {
-        turns.set(booking.id, booking);
-      }
-    });
-  } catch (error) {
-    console.error('❌ [HomeOwner] Error filtering today turns:', error);
-  }
-  
-  return turns;
-});
-
-// Owner's upcoming cleanings - stabilized
-const ownerUpcomingCleanings = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const inOneWeek = new Date(today);
-  inOneWeek.setDate(inOneWeek.getDate() + 7);
-  
-  const cleanings = new Map<string, Booking>();
-  
-  if (!isOwnerAuthenticated.value) {
-    return cleanings;
-  }
-
-  try {
-    // Filter owner's bookings for upcoming cleanings
-    Array.from(ownerBookingsMap.value.values()).forEach(booking => {
-      const checkoutDate = new Date(booking.checkout_date);
-      if (checkoutDate >= today && checkoutDate <= inOneWeek) {
-        cleanings.set(booking.id, booking);
-      }
-    });
-  } catch (error) {
-    console.error('❌ [HomeOwner] Error filtering upcoming cleanings:', error);
-  }
-  
-  return cleanings;
 });
 
 // Owner's filtered bookings - stabilized with better error handling
@@ -559,98 +491,6 @@ const confirmDialogData = computed(() => {
 // OWNER-SPECIFIC EVENT HANDLERS
 // ============================================================================
 
-const handleNavigateToBooking = (bookingId: string): void => {
-      // Log receiving event from OwnerSidebar
-    eventLogger.logEvent(
-      'OwnerSidebar', 
-    'HomeOwner', 
-    'navigateToBooking', 
-    bookingId, 
-    'receive'
-  );
-  
-  // Only navigate to owner's bookings
-  const booking = ownerBookingsMap.value.get(bookingId);
-  if (booking) {
-    const bookingDate = new Date(booking.checkout_date);
-    handleNavigateToDate(bookingDate);
-    
-    // Highlight the booking
-    setTimeout(() => {
-      const calendarApi = calendarRef.value?.getApi?.();
-      if (calendarApi) {
-        const event = calendarApi.getEventById(bookingId);
-        if (event) {
-          event.setProp('classNames', [...event.classNames, 'highlighted']);
-          setTimeout(() => {
-            event.setProp('classNames', event.classNames.filter(c => c !== 'highlighted'));
-          }, 3000);
-        }
-      }
-    }, 100);
-  } else {
-    // Owner-friendly error message
-    console.warn('Booking not found in your properties');
-  }
-};
-
-const handleNavigateToDate = (date: Date): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'navigateToDate', 
-    date, 
-    'receive'
-  );
-  
-  goToDate(date);
-  
-  eventLogger.logEvent(
-    'HomeOwner', 
-    'FullCalendar', 
-    'goToDate', 
-    date, 
-    'emit'
-  );
-  
-  const calendarApi = calendarRef.value?.getApi?.();
-  if (calendarApi) {
-    calendarApi.gotoDate(date);
-  }
-};
-
-const handleFilterByProperty = (propertyId: string | null): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'filterByProperty', 
-    propertyId, 
-    'receive'
-  );
-  
-  // Only allow filtering by owner's properties
-  if (propertyId && !ownerPropertiesMap.value.has(propertyId)) {
-    console.warn('Cannot filter by property not owned by current user');
-    return;
-  }
-  
-  selectedPropertyFilter.value = propertyId;
-  if (propertyId) {
-    togglePropertyFilter(propertyId);
-  } else {
-    clearPropertyFilters();
-  }
-  uiStore.setPropertyFilter(propertyId);
-  
-  eventLogger.logEvent(
-    'HomeOwner', 
-    'FullCalendar', 
-    'filteredBookingsUpdate', 
-    { propertyId, count: ownerFilteredBookings.value.size }, 
-    'emit'
-  );
-};
-
 const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
       eventLogger.logEvent(
       'OwnerSidebar',
@@ -684,6 +524,28 @@ const handleCreateProperty = (): void => {
   };
   
   uiStore.openModal('propertyModal', 'create', propertyData);
+};
+
+const handleEditProperty = (property: Property): void => {
+  eventLogger.logEvent(
+    'OwnerSidebar',
+    'HomeOwner',
+    'editProperty',
+    property,
+    'receive'
+  );
+  uiStore.openModal('propertyModal', 'edit', property as Record<string, unknown>);
+};
+
+const handleViewProperty = (property: Property): void => {
+  eventLogger.logEvent(
+    'OwnerSidebar',
+    'HomeOwner',
+    'viewProperty',
+    property,
+    'receive'
+  );
+  uiStore.openModal('propertyModal', 'view', property as Record<string, unknown>);
 };
 
 const handleCreateTurn = (): void => {
@@ -735,10 +597,19 @@ const handleEventClick = (clickInfo: EventClickArg): void => {
     'receive'
   );
   
-  // Only allow editing owner's bookings
+  // Check if this is an edit event from the bottom sheet
+  const extendedProps = clickInfo.event.extendedProps;
+  if (extendedProps && extendedProps.isEdit && extendedProps.booking) {
+    // Use the booking data directly from the bottom sheet
+    const booking = extendedProps.booking as Booking;
+    uiStore.openModal('eventModal', 'edit', booking);
+    return;
+  }
+  
+  // Fallback: Only allow editing owner's bookings
   const booking = ownerBookingsMap.value.get(clickInfo.event.id);
   if (booking) {
-    uiStore.openModal('eventModal', 'edit', { booking });
+    uiStore.openModal('eventModal', 'edit', booking);
   } else {
     console.warn('Cannot edit booking not owned by current user');
   }
@@ -845,14 +716,6 @@ const handleNext = (): void => {
 };
 
 
-const handleViewChange = (view: string): void => {
-  // Map display strings to FullCalendar view types
-  const calendarView = view === 'Week' ? 'timeGridWeek' : 
-                      view === 'Day' ? 'timeGridDay' : 
-                      'dayGridMonth';
-  setCalendarView(calendarView);
-};
-
 const handleCalendarViewChange = (view: string): void => {
   // Map CalendarView to FullCalendar view type
   const calendarView = view === 'week' ? 'timeGridWeek' : 
@@ -911,14 +774,8 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     if (eventModalMode.value === 'create') {
       await createMyBooking(bookingData as BookingFormData);
     } else if (eventModalData.value) {
-      // Fix: eventModalData.value contains { booking } not the booking directly
-      const booking = (eventModalData.value as any)?.booking || eventModalData.value;
-      
-      console.log('🔍 [HomeOwner] Editing booking:', { 
-        bookingId: booking?.id,
-        isInOwnerMap: booking?.id ? ownerBookingsMap.value.has(booking.id) : false,
-        ownerMapSize: ownerBookingsMap.value.size
-      });
+      // eventModalData.value should be the booking directly
+      const booking = eventModalData.value;
       
       // Verify owner can update this booking
       if (!booking?.id || !ownerBookingsMap.value.has(booking.id)) {
@@ -1164,6 +1021,23 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  transition: margin-left 0.3s ease-in-out;
+  margin-left: 0;
+}
+
+.calendar-main-container.sidebar-open {
+  margin-left: 280px; /* Match sidebar width */
+}
+
+/* Responsive behavior - overlay on mobile */
+@media (max-width: 959px) {
+  .calendar-main-container.sidebar-open {
+    margin-left: 0; /* No push on mobile */
+  }
+  
+  .main-app-header.sidebar-open {
+    margin-left: 0; /* No push on mobile */
+  }
 }
 
 .calendar-layout {
@@ -1177,9 +1051,18 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
   background: rgb(var(--v-theme-surface));
   /* Fixed height for consistent layout calculations */
-  height: 60px;
-  min-height: 60px;
-  max-height: 60px;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+}
+
+.prominent-header {
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgba(var(--v-theme-primary), 0.9) 100%) !important;
+  border-bottom: 3px solid rgba(var(--v-theme-secondary), 0.8) !important;
+  height: 70px !important;
+  min-height: 70px !important;
+  max-height: 70px !important;
+  box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.25) !important;
 }
 
 .calendar-content {
@@ -1188,7 +1071,7 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   overflow: hidden;
   position: relative;
   /* Mobile-specific height management */
-  height: calc(100% - 60px); /* Subtract header card height */
+  height: calc(100% - 70px); /* Subtract prominent header card height */
 }
 
 /* Clean Calendar Header Layout */
@@ -1207,6 +1090,22 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   border-color: #ccc !important;
 }
 
+/* Prominent Navigation Arrows */
+.nav-arrow-prominent {
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: rgb(var(--v-theme-primary)) !important;
+  border: 2px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+}
+
+.nav-arrow-prominent:hover {
+  background: rgba(255, 255, 255, 1) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
 /* Centered Month Pill Display */
 .month-pill-display {
   background: #e3f2fd;
@@ -1218,6 +1117,37 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   text-align: center;
   min-width: 140px;
   border: 1px solid #bbdefb;
+}
+
+/* Prominent Month Display */
+.month-display-prominent {
+  background: rgba(255, 255, 255, 0.95);
+  color: rgb(var(--v-theme-primary));
+  padding: 8px 24px;
+  border-radius: 16px;
+  text-align: center;
+  min-width: 200px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.month-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1.2;
+  color: rgb(var(--v-theme-primary));
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.month-subtitle {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(var(--v-theme-primary), 0.8);
+  line-height: 1;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* ================================================================ */
@@ -1241,20 +1171,49 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   }
   
   .calendar-header-card .v-card-text {
-    padding: 6px 8px !important;
+    padding: 4px 8px !important;
+  }
+  
+  .prominent-header {
+    height: 60px !important;
+    min-height: 60px !important;
+    max-height: 60px !important;
+  }
+  
+  .calendar-content {
+    height: calc(100% - 60px) !important;
   }
   
   /* Compact navigation on mobile */
   .month-pill-display {
     font-size: 0.9rem !important;
-    padding: 8px 16px;
+    padding: 6px 14px;
     min-width: 120px;
   }
   
+  .month-display-prominent {
+    min-width: 160px !important;
+    padding: 6px 16px !important;
+  }
+  
+  .month-title {
+    font-size: 1rem !important;
+  }
+  
+  .month-subtitle {
+    font-size: 0.7rem !important;
+  }
+  
   .nav-arrow-simple {
-    min-width: 36px !important;
-    width: 36px !important;
-    height: 36px !important;
+    min-width: 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .nav-arrow-prominent {
+    min-width: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
   }
   
   /* More compact buttons on mobile */
@@ -1280,7 +1239,7 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 /* Desktop optimizations */
 @media (min-width: 960px) {
   .calendar-main-container {
-    margin-left: 280px; /* Account for permanent sidebar */
+    margin-left: 0; /* No permanent sidebar offset - toggleable sidebar */
     height: calc(100vh - 56px) !important;
     margin-top: 56px !important;
   }
@@ -1396,6 +1355,12 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
   border-bottom: 1px solid #e0e0e0 !important;
   z-index: 19 !important; /* Lower than sidebar z-index */
+  transition: margin-left 0.3s ease-in-out;
+  margin-left: 0;
+}
+
+.main-app-header.sidebar-open {
+  margin-left: 280px; /* Match sidebar width */
 }
 
 .app-title {

@@ -247,8 +247,8 @@ export function useAdminBookings() {
       
       success.value = 'Booking updated successfully';
     } catch (err: unknown) {
-      const error = err as Error;
-      error.value = `Failed to update booking: ${error.message}`;
+      const errorObj = err as Error;
+      error.value = `Failed to update booking: ${errorObj.message}`;
       trackCachePerformance('admin-update-booking', false); // Changed to boolean
     } finally {
       loading.value = false;
@@ -264,15 +264,15 @@ export function useAdminBookings() {
       
       success.value = 'Booking deleted successfully';
     } catch (err: unknown) {
-      const error = err as Error;
-      error.value = `Failed to delete booking: ${error.message}`;
+      const errorObj = err as Error;
+      error.value = `Failed to delete booking: ${errorObj.message}`;
     } finally {
       loading.value = false;
     }
   };
 
   // Role-specific performance metrics
-  const getAdminPerformanceMetrics = computed(() => {
+  const _getAdminPerformanceMetrics = computed(() => {
     return {
       totalBookingsProcessed: allBookings.value.length,
       totalPropertiesManaged: allProperties.value.length,

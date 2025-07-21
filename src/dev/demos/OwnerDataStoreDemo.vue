@@ -10,7 +10,10 @@ Based on TASK-072 implementation
       <v-col cols="12">
         <v-card>
           <v-card-title class="d-flex align-center">
-            <v-icon icon="mdi-speedometer" class="mr-3" />
+            <v-icon
+              icon="mdi-speedometer"
+              class="mr-3"
+            />
             Enhanced Owner Data Store Demo
             <v-spacer />
             <v-chip
@@ -42,8 +45,14 @@ Based on TASK-072 implementation
 
             <!-- Cache Status -->
             <v-row class="mb-4">
-              <v-col cols="12" md="6">
-                <v-card color="surface-variant" variant="tonal">
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-card
+                  color="surface-variant"
+                  variant="tonal"
+                >
                   <v-card-title>Cache Status</v-card-title>
                   <v-card-text>
                     <v-chip 
@@ -62,26 +71,48 @@ Based on TASK-072 implementation
                 </v-card>
               </v-col>
               
-              <v-col cols="12" md="6">
-                <v-card color="primary" variant="tonal">
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-card
+                  color="primary"
+                  variant="tonal"
+                >
                   <v-card-title>Owner Stats</v-card-title>
                   <v-card-text>
                     <v-row dense>
                       <v-col cols="6">
-                        <div class="text-h6">{{ ownerData.stats.propertiesCount }}</div>
-                        <div class="text-caption">Properties</div>
+                        <div class="text-h6">
+                          {{ ownerData.stats.propertiesCount }}
+                        </div>
+                        <div class="text-caption">
+                          Properties
+                        </div>
                       </v-col>
                       <v-col cols="6">
-                        <div class="text-h6">{{ ownerData.stats.bookingsCount }}</div>
-                        <div class="text-caption">Bookings</div>
+                        <div class="text-h6">
+                          {{ ownerData.stats.bookingsCount }}
+                        </div>
+                        <div class="text-caption">
+                          Bookings
+                        </div>
                       </v-col>
                       <v-col cols="6">
-                        <div class="text-h6">{{ ownerData.stats.urgentTurnsCount }}</div>
-                        <div class="text-caption">Urgent Turns</div>
+                        <div class="text-h6">
+                          {{ ownerData.stats.urgentTurnsCount }}
+                        </div>
+                        <div class="text-caption">
+                          Urgent Turns
+                        </div>
                       </v-col>
                       <v-col cols="6">
-                        <div class="text-h6">${{ ownerData.stats.totalRevenue.toLocaleString() }}</div>
-                        <div class="text-caption">Revenue</div>
+                        <div class="text-h6">
+                          ${{ ownerData.stats.totalRevenue.toLocaleString() }}
+                        </div>
+                        <div class="text-caption">
+                          Revenue
+                        </div>
                       </v-col>
                     </v-row>
                   </v-card-text>
@@ -94,7 +125,10 @@ Based on TASK-072 implementation
               <v-col cols="12">
                 <v-card>
                   <v-card-title class="d-flex align-center">
-                    <v-icon icon="mdi-home-group" class="mr-2" />
+                    <v-icon
+                      icon="mdi-home-group"
+                      class="mr-2"
+                    />
                     My Properties ({{ ownerData.ownerProperties.length }})
                     <v-spacer />
                     <v-btn
@@ -129,7 +163,10 @@ Based on TASK-072 implementation
                             <div class="text-caption mb-2">
                               {{ typeof property.address === 'string' ? property.address : property.address?.city || 'No address' }}
                             </div>
-                            <v-chip size="small" variant="tonal">
+                            <v-chip
+                              size="small"
+                              variant="tonal"
+                            >
                               {{ property.pricing_tier }}
                             </v-chip>
                             <div class="mt-2">
@@ -139,8 +176,14 @@ Based on TASK-072 implementation
                         </v-card>
                       </v-col>
                       
-                      <v-col v-if="ownerData.ownerProperties.length === 0" cols="12">
-                        <v-alert type="info" variant="tonal">
+                      <v-col
+                        v-if="ownerData.ownerProperties.length === 0"
+                        cols="12"
+                      >
+                        <v-alert
+                          type="info"
+                          variant="tonal"
+                        >
                           No properties found. Add a property to see role-based filtering in action.
                         </v-alert>
                       </v-col>
@@ -155,7 +198,10 @@ Based on TASK-072 implementation
               <v-col cols="12">
                 <v-card>
                   <v-card-title class="d-flex align-center">
-                    <v-icon icon="mdi-calendar-check" class="mr-2" />
+                    <v-icon
+                      icon="mdi-calendar-check"
+                      class="mr-2"
+                    />
                     My Bookings ({{ ownerData.ownerBookings.length }})
                     <v-spacer />
                     <v-btn
@@ -171,32 +217,62 @@ Based on TASK-072 implementation
                   
                   <v-card-text>
                     <v-row>
-                      <v-col cols="12" md="4">
-                        <v-card color="success" variant="tonal">
+                      <v-col
+                        cols="12"
+                        md="4"
+                      >
+                        <v-card
+                          color="success"
+                          variant="tonal"
+                        >
                           <v-card-title>Upcoming</v-card-title>
                           <v-card-text>
-                            <div class="text-h4">{{ ownerData.upcomingBookings.length }}</div>
-                            <div class="text-caption">Confirmed bookings</div>
+                            <div class="text-h4">
+                              {{ ownerData.upcomingBookings.length }}
+                            </div>
+                            <div class="text-caption">
+                              Confirmed bookings
+                            </div>
                           </v-card-text>
                         </v-card>
                       </v-col>
                       
-                      <v-col cols="12" md="4">
-                        <v-card color="warning" variant="tonal">
+                      <v-col
+                        cols="12"
+                        md="4"
+                      >
+                        <v-card
+                          color="warning"
+                          variant="tonal"
+                        >
                           <v-card-title>Urgent Turns</v-card-title>
                           <v-card-text>
-                            <div class="text-h4">{{ ownerData.urgentTurns.length }}</div>
-                            <div class="text-caption">Within 24 hours</div>
+                            <div class="text-h4">
+                              {{ ownerData.urgentTurns.length }}
+                            </div>
+                            <div class="text-caption">
+                              Within 24 hours
+                            </div>
                           </v-card-text>
                         </v-card>
                       </v-col>
                       
-                      <v-col cols="12" md="4">
-                        <v-card color="info" variant="tonal">
+                      <v-col
+                        cols="12"
+                        md="4"
+                      >
+                        <v-card
+                          color="info"
+                          variant="tonal"
+                        >
                           <v-card-title>Today</v-card-title>
                           <v-card-text>
-                            <div class="text-h4">{{ ownerData.todayBookings.length }}</div>
-                            <div class="text-caption">Today's activities</div>
+                            <div class="text-h4">
+                              {{ ownerData.todayBookings.length }}
+                            </div>
+                            <div class="text-caption">
+                              Today's activities
+                            </div>
                           </v-card-text>
                         </v-card>
                       </v-col>
@@ -239,7 +315,11 @@ Based on TASK-072 implementation
                       </v-list>
                     </div>
                     
-                    <v-alert v-else type="info" variant="tonal">
+                    <v-alert
+                      v-else
+                      type="info"
+                      variant="tonal"
+                    >
                       No bookings found. Add a booking to see role-based filtering.
                     </v-alert>
                   </v-card-text>
@@ -278,13 +358,19 @@ Based on TASK-072 implementation
 
             <!-- Performance Metrics -->
             <v-expand-transition>
-              <v-row v-if="showMetrics" class="mt-4">
+              <v-row
+                v-if="showMetrics"
+                class="mt-4"
+              >
                 <v-col cols="12">
                   <v-card color="surface-variant">
                     <v-card-title>Performance Metrics</v-card-title>
                     <v-card-text>
                       <v-row>
-                        <v-col cols="12" md="6">
+                        <v-col
+                          cols="12"
+                          md="6"
+                        >
                           <h4>Revenue Metrics</h4>
                           <div class="mt-2">
                             <div>Total Revenue: <strong>${{ ownerData.stats.totalRevenue.toLocaleString() }}</strong></div>
@@ -292,7 +378,10 @@ Based on TASK-072 implementation
                           </div>
                         </v-col>
                         
-                        <v-col cols="12" md="6">
+                        <v-col
+                          cols="12"
+                          md="6"
+                        >
                           <h4>Property Metrics</h4>
                           <div class="mt-2">
                             <div>Active Properties: <strong>{{ ownerData.stats.activePropertiesCount }}/{{ ownerData.stats.propertiesCount }}</strong></div>

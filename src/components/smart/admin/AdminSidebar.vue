@@ -1,1435 +1,934 @@
 <template>
-  <!-- Desktop: Grid-integrated sidebar -->
-  <v-card
-    v-if="lgAndUp"
-    class="admin-sidebar-desktop"
-    :elevation="0"
-    height="100%"
-    color="surface"
-  >
-    <v-container class="py-2">
-      <!-- Business Management Header -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <h2 class="text-h6 font-weight-bold">
-            Business Management
-          </h2>
-          <div class="text-subtitle-2 text-medium-emphasis">
-            {{ formattedDate }}
-          </div>
-          <!-- System Metrics Summary -->
-          <div class="mt-2">
-            <v-chip
-              size="small"
-              color="primary"
-              variant="outlined"
-              class="mr-1 mb-1"
-            >
-              {{ totalProperties }} Properties
-            </v-chip>
-            <v-chip
-              size="small"
-              color="warning"
-              variant="outlined"
-              class="mr-1 mb-1"
-            >
-              {{ urgentTurnsCount }} Urgent Turns
-            </v-chip>
-            <v-chip
-              size="small"
-              color="success"
-              variant="outlined"
-              class="mr-1 mb-1"
-            >
-              {{ availableCleanersCount }} Available Cleaners
-            </v-chip>
-          </div>
-        </v-col>
-      </v-row>
-
-      <!-- System-wide Turn Alerts -->
-      <v-row v-if="systemTodayTurnsArray.length > 0">
-        <v-col cols="12">
-          <v-card
-            class="system-turn-alerts mb-4"
-            variant="outlined"
-            color="warning"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-alert-circle"
-                class="mr-2"
-                color="warning"
-              />
-              System-wide Urgent Turns
-              <v-spacer />
-              <v-chip
-                size="small"
-                color="warning"
-                variant="flat"
-              >
-                {{ systemTodayTurnsArray.length }}
-              </v-chip>
-            </v-card-title>
-            <v-card-text>
-              <TurnAlerts 
-                :bookings="systemTodayBookingsWithMetadata" 
-                :properties="allPropertiesMap"
-                @view="$emit('navigateToBooking', $event)"
-                @assign="handleAssignCleaner"
-                @view-all="handleViewAll('turns')"
-              />
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- System-wide Upcoming Cleanings -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <v-card
-            class="system-upcoming-cleanings"
-            variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-calendar-clock"
-                class="mr-2"
-              />
-              System-wide Schedule
-              <v-spacer />
-              <v-chip
-                size="small"
-                color="info"
-                variant="flat"
-              >
-                {{ systemUpcomingCleaningsArray.length }}
-              </v-chip>
-            </v-card-title>
-            <v-card-text>
-              <UpcomingCleanings 
-                :bookings="systemUpcomingBookingsWithMetadata"
-                :properties="allPropertiesMap"
-                @view="$emit('navigateToBooking', $event)"
-                @assign="handleAssignCleaner"
-                @view-all="handleViewAll($event)"
-                @toggle-expanded="toggleUpcomingExpanded"
-              />
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Advanced Property Filter -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <v-card
-            class="advanced-property-filter"
-            variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-filter-variant"
-                class="mr-2"
-              />
-              Advanced Filters
-            </v-card-title>
-            <v-card-text>
-              <!-- Property Filter -->
-              <v-select
-                v-model="selectedProperty"
-                :items="propertySelectItems"
-                label="Filter by Property"
-                clearable
-                class="mb-2"
-                @update:model-value="handlePropertyFilterChange"
-              >
-                <template #prepend-item>
-                  <v-list-item
-                    title="All Properties"
-                    value=""
-                    @click="selectedProperty = null"
-                  />
-                  <v-divider class="mt-2" />
-                </template>
-              </v-select>
-
-              <!-- Owner Filter -->
-              <v-select
-                v-model="selectedOwner"
-                :items="ownerSelectItems"
-                label="Filter by Property Owner"
-                clearable
-                class="mb-2"
-                @update:model-value="handleOwnerFilterChange"
-              >
-                <template #prepend-item>
-                  <v-list-item
-                    title="All Owners"
-                    value=""
-                    @click="selectedOwner = null"
-                  />
-                  <v-divider class="mt-2" />
-                </template>
-              </v-select>
-
-              <!-- Status Filter -->
-              <v-select
-                v-model="selectedStatus"
-                :items="statusSelectItems"
-                label="Filter by Status"
-                clearable
-                @update:model-value="handleStatusFilterChange"
-              >
-                <template #prepend-item>
-                  <v-list-item
-                    title="All Statuses"
-                    value=""
-                    @click="selectedStatus = null"
-                  />
-                  <v-divider class="mt-2" />
-                </template>
-              </v-select>
-
-              <!-- Clear All Filters -->
-              <v-btn
-                v-if="hasActiveFilters"
-                variant="outlined"
-                size="small"
-                prepend-icon="mdi-filter-remove"
-                class="mt-2"
-                @click="clearAllFilters"
-              >
-                Clear All Filters
-              </v-btn>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Business Analytics Dashboard -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <v-card
-            class="business-analytics"
-            variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-chart-line"
-                class="mr-2"
-              />
-              Business Analytics
-            </v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="6">
-                  <div class="text-center">
-                    <div class="text-h4 font-weight-bold text-primary">
-                      {{ totalProperties }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      Total Properties
-                    </div>
-                  </div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="text-center">
-                    <div class="text-h4 font-weight-bold text-success">
-                      {{ activeCleaningsToday }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      Active Today
-                    </div>
-                  </div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="text-center">
-                    <div class="text-h4 font-weight-bold text-warning">
-                      {{ urgentTurnsCount }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      Urgent Turns
-                    </div>
-                  </div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="text-center">
-                    <div class="text-h4 font-weight-bold text-info">
-                      {{ totalPropertyOwners }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      Property Owners
-                    </div>
-                  </div>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Cleaner Availability Status -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <v-card
-            class="cleaner-availability"
-            variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-account-hard-hat"
-                class="mr-2"
-              />
-              Cleaner Status
-              <v-spacer />
-              <v-chip
-                size="small"
-                color="success"
-                variant="flat"
-              >
-                {{ availableCleanersCount }} Available
-              </v-chip>
-            </v-card-title>
-            <v-card-text>
-              <div
-                v-if="cleanerStatusList.length === 0"
-                class="text-center text-medium-emphasis"
-              >
-                No cleaner data available
-              </div>
-              <div v-else>
-                <v-list density="compact">
-                  <v-list-item
-                    v-for="cleaner in cleanerStatusList.slice(0, 5)"
-                    :key="cleaner.id"
-                    :title="cleaner.name"
-                    :subtitle="cleaner.status"
-                  >
-                    <template #prepend>
-                      <v-avatar
-                        size="small"
-                        :color="cleaner.statusColor"
-                      >
-                        <v-icon
-                          :icon="cleaner.statusIcon"
-                          size="small"
-                        />
-                      </v-avatar>
-                    </template>
-                    <template #append>
-                      <v-btn
-                        v-if="cleaner.status === 'Available'"
-                        size="x-small"
-                        variant="outlined"
-                        color="primary"
-                        @click="handleQuickAssign(cleaner.id)"
-                      >
-                        Assign
-                      </v-btn>
-                    </template>
-                  </v-list-item>
-                </v-list>
-                <v-btn
-                  v-if="cleanerStatusList.length > 5"
-                  variant="text"
-                  size="small"
-                  class="mt-2"
-                  @click="$emit('manageSystem')"
-                >
-                  View All Cleaners ({{ cleanerStatusList.length }})
-                </v-btn>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Admin Quick Actions -->
-      <v-row>
-        <v-col cols="12">
-          <v-card
-            class="admin-quick-actions"
-            variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-lightning-bolt"
-                class="mr-2"
-              />
-              Admin Actions
-            </v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="12">
-                  <v-btn
-                    prepend-icon="mdi-account-hard-hat"
-                    color="warning"
-                    variant="tonal"
-                    block
-                    class="mb-2"
-                    @click="$emit('assignCleaner', { bookingId: '', cleanerId: '' })"
-                  >
-                    Assign Cleaners
-                  </v-btn>
-                </v-col>
-                <v-col cols="12">
-                  <v-btn
-                    prepend-icon="mdi-chart-line"
-                    color="info"
-                    variant="tonal"
-                    block
-                    class="mb-2"
-                    @click="$emit('generateReports')"
-                  >
-                    Generate Reports
-                  </v-btn>
-                </v-col>
-                <v-col cols="12">
-                  <v-btn
-                    prepend-icon="mdi-cog"
-                    color="primary"
-                    variant="tonal"
-                    block
-                    class="mb-2"
-                    @click="$emit('manageSystem')"
-                  >
-                    Manage System
-                  </v-btn>
-                </v-col>
-                <v-col cols="6">
-                  <v-btn
-                    prepend-icon="mdi-calendar-plus"
-                    color="secondary"
-                    variant="outlined"
-                    block
-                    size="small"
-                    @click="$emit('createBooking')"
-                  >
-                    New Booking
-                  </v-btn>
-                </v-col>
-                <v-col cols="6">
-                  <v-btn
-                    prepend-icon="mdi-home-plus"
-                    color="secondary"
-                    variant="outlined"
-                    block
-                    size="small"
-                    @click="$emit('createProperty')"
-                  >
-                    New Property
-                  </v-btn>
-                </v-col>
-                <v-col cols="12">
-                  <v-btn
-                    prepend-icon="mdi-alert-circle"
-                    color="error"
-                    variant="outlined"
-                    block
-                    size="small"
-                    class="mt-2"
-                    @click="$emit('emergencyResponse')"
-                  >
-                    Emergency Response
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-
-    <!-- Loading Overlay -->
-    <v-overlay 
-      :model-value="loading"
-      :contained="true"
-      :persistent="true"
-      class="align-center justify-center"
-    >
-      <v-progress-circular
-        indeterminate
-        color="primary"
-      />
-    </v-overlay>
-  </v-card>
-
-  <!-- Mobile: Navigation drawer overlay -->
   <v-navigation-drawer
-    v-else
-    :model-value="props.modelValue"
-    class="admin-sidebar-mobile"
-    :temporary="true"
-    :mobile-breakpoint="960"
-    :elevation="8"
-    color="surface"
-    width="320"
-    @update:model-value="emit('update:modelValue', $event)"
+    v-model="sidebarOpen"
+    class="admin-sidebar"
+    :width="SIDEBAR_WIDTH"
+    elevation="4"
+    color="white"
+    :temporary="mobile"
+    location="left"
+    :permanent="!mobile"
   >
-    <v-container class="py-2">
-      <!-- Business Management Header -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <h2 class="text-h6 font-weight-bold">
-            Business Management
-          </h2>
-          <div class="text-subtitle-2 text-medium-emphasis">
-            {{ formattedDate }}
-          </div>
-          <!-- System Metrics Summary -->
-          <div class="mt-2">
-            <v-chip
-              size="small"
+    <!-- Main Content Wrapper -->
+    <div class="sidebar-content-wrapper">
+      <!-- Brand Overlay -->
+      <div 
+        v-show="showBrandOverlay"
+        class="claro-brand-overlay"
+      >
+        <div class="claro-brand-section">
+          <div class="claro-brand-icon">
+            <v-btn
+              icon
               color="primary"
-              variant="outlined"
-              class="mr-1 mb-1"
+              elevation="8"
+              size="x-large"
+              class="prominent-icon"
             >
-              {{ totalProperties }} Properties
-            </v-chip>
-            <v-chip
-              size="small"
-              color="warning"
-              variant="outlined"
-              class="mr-1 mb-1"
-            >
-              {{ urgentTurnsCount }} Urgent Turns
-            </v-chip>
-            <v-chip
-              size="small"
-              color="success"
-              variant="outlined"
-              class="mr-1 mb-1"
-            >
-              {{ availableCleanersCount }} Available Cleaners
-            </v-chip>
+              <v-icon
+                color="white"
+                size="32"
+              >
+                mdi-shield-crown
+              </v-icon>
+            </v-btn>
           </div>
-        </v-col>
-      </v-row>
+          <div class="claro-brand-info">
+            <div class="claro-brand-title">
+              Claro Admin
+            </div>
+            <div class="claro-brand-subtitle">
+              Business Management
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- System-wide Turn Alerts -->
-      <v-row v-if="systemTodayTurnsArray.length > 0">
-        <v-col cols="12">
-          <v-card
-            class="system-turn-alerts mb-4"
-            variant="outlined"
-            color="warning"
+      <!-- Navigation Section -->
+      <div class="nav-section sidebar-content-spacing">
+        <div class="section-header">
+          Administration
+        </div>
+        
+        <v-list
+          class="nav-list"
+          density="compact"
+        >
+          <v-list-item
+            class="nav-item"
+            :class="{ 'active-nav-item': $route.path === '/admin' }"
+            prepend-icon="mdi-view-dashboard"
+            title="Dashboard"
+            @click="navigateTo('/admin')"
           >
-            <v-card-title class="d-flex align-center">
+            <template
+              v-if="$route.path === '/admin'"
+              #append
+            >
               <v-icon
-                icon="mdi-alert-circle"
-                class="mr-2"
-                color="warning"
-              />
-              System-wide Urgent Turns
-              <v-spacer />
-              <v-chip
-                size="small"
-                color="warning"
-                variant="flat"
+                size="16"
+                color="white"
               >
-                {{ systemTodayTurnsArray.length }}
-              </v-chip>
-            </v-card-title>
-            <v-card-text>
-              <TurnAlerts 
-                :bookings="systemTodayBookingsWithMetadata" 
-                :properties="allPropertiesMap"
-                @view="$emit('navigateToBooking', $event)"
-                @assign="handleAssignCleaner"
-                @view-all="handleViewAll('turns')"
-              />
+                mdi-chevron-right
+              </v-icon>
+            </template>
+          </v-list-item>
+          
+          <v-list-item
+            class="nav-item"
+            :class="{ 'active-nav-item': $route.path === '/admin/bookings' }"
+            prepend-icon="mdi-calendar-check"
+            title="All Bookings"
+            @click="navigateTo('/admin/bookings')"
+          >
+            <template
+              v-if="$route.path === '/admin/bookings'"
+              #append
+            >
+              <v-icon
+                size="16"
+                color="white"
+              >
+                mdi-chevron-right
+              </v-icon>
+            </template>
+          </v-list-item>
+          
+          <v-list-item
+            class="nav-item"
+            :class="{ 'active-nav-item': $route.path === '/admin/properties' }"
+            prepend-icon="mdi-home-city"
+            title="Properties"
+            @click="navigateTo('/admin/properties')"
+          >
+            <template
+              v-if="$route.path === '/admin/properties'"
+              #append
+            >
+              <v-icon
+                size="16"
+                color="white"
+              >
+                mdi-chevron-right
+              </v-icon>
+            </template>
+          </v-list-item>
+          
+          <v-list-item
+            class="nav-item"
+            :class="{ 'active-nav-item': $route.path === '/admin/cleaners' }"
+            prepend-icon="mdi-account-hard-hat"
+            title="Cleaners"
+            @click="navigateTo('/admin/cleaners')"
+          >
+            <template
+              v-if="$route.path === '/admin/cleaners'"
+              #append
+            >
+              <v-icon
+                size="16"
+                color="white"
+              >
+                mdi-chevron-right
+              </v-icon>
+            </template>
+          </v-list-item>
+          
+          <v-list-item
+            class="nav-item"
+            :class="{ 'active-nav-item': $route.path === '/admin/owners' }"
+            prepend-icon="mdi-account-group"
+            title="Property Owners"
+            @click="navigateTo('/admin/owners')"
+          >
+            <template
+              v-if="$route.path === '/admin/owners'"
+              #append
+            >
+              <v-icon
+                size="16"
+                color="white"
+              >
+                mdi-chevron-right
+              </v-icon>
+            </template>
+          </v-list-item>
+          
+          <v-list-item
+            class="nav-item"
+            :class="{ 'active-nav-item': $route.path === '/admin/reports' }"
+            prepend-icon="mdi-chart-line"
+            title="Reports"
+            @click="navigateTo('/admin/reports')"
+          >
+            <template
+              v-if="$route.path === '/admin/reports'"
+              #append
+            >
+              <v-icon
+                size="16"
+                color="white"
+              >
+                mdi-chevron-right
+              </v-icon>
+            </template>
+          </v-list-item>
+        </v-list>
+      </div>
+
+      <!-- Business Metrics Section -->
+      <div class="metrics-section">
+        <div class="section-header">
+          <span>Business Overview</span>
+          <v-btn
+            icon="mdi-refresh"
+            size="small"
+            variant="text"
+            color="primary"
+            @click="refreshMetrics"
+          />
+        </div>
+        
+        <div class="metrics-cards">
+          <v-card
+            class="metric-card"
+            variant="outlined"
+          >
+            <v-card-text class="text-center pa-3">
+              <div class="metric-value text-primary">
+                {{ totalProperties }}
+              </div>
+              <div class="metric-label">
+                Properties
+              </div>
             </v-card-text>
           </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- System-wide Upcoming Cleanings -->
-      <v-row class="mb-4">
-        <v-col cols="12">
+          
           <v-card
-            class="system-upcoming-cleanings"
+            class="metric-card"
             variant="outlined"
           >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-calendar-clock"
-                class="mr-2"
-              />
-              System-wide Schedule
-              <v-spacer />
-              <v-chip
-                size="small"
-                color="info"
-                variant="flat"
-              >
-                {{ systemUpcomingCleaningsArray.length }}
-              </v-chip>
-            </v-card-title>
-            <v-card-text>
-              <UpcomingCleanings 
-                :bookings="systemUpcomingBookingsWithMetadata"
-                :properties="allPropertiesMap"
-                @view="$emit('navigateToBooking', $event)"
-                @assign="handleAssignCleaner"
-                @view-all="handleViewAll($event)"
-                @toggle-expanded="toggleUpcomingExpanded"
-              />
+            <v-card-text class="text-center pa-3">
+              <div class="metric-value text-success">
+                {{ activeCleaningsToday }}
+              </div>
+              <div class="metric-label">
+                Active Today
+              </div>
             </v-card-text>
           </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Advanced Property Filter -->
-      <v-row class="mb-4">
-        <v-col cols="12">
+          
           <v-card
-            class="advanced-property-filter"
+            class="metric-card"
             variant="outlined"
           >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-filter-variant"
-                class="mr-2"
-              />
-              Advanced Filters
-            </v-card-title>
-            <v-card-text>
-              <!-- Property Filter -->
-              <v-select
-                v-model="selectedProperty"
-                :items="propertySelectItems"
-                label="Filter by Property"
-                clearable
-                class="mb-2"
-                @update:model-value="handlePropertyFilterChange"
-              >
-                <template #prepend-item>
-                  <v-list-item
-                    title="All Properties"
-                    value=""
-                    @click="selectedProperty = null"
-                  />
-                  <v-divider class="mt-2" />
-                </template>
-              </v-select>
+            <v-card-text class="text-center pa-3">
+              <div class="metric-value text-warning">
+                {{ urgentTurnsCount }}
+              </div>
+              <div class="metric-label">
+                Urgent Turns
+              </div>
+            </v-card-text>
+          </v-card>
+          
+          <v-card
+            class="metric-card"
+            variant="outlined"
+          >
+            <v-card-text class="text-center pa-3">
+              <div class="metric-value text-info">
+                {{ availableCleanersCount }}
+              </div>
+              <div class="metric-label">
+                Available
+              </div>
+            </v-card-text>
+          </v-card>
+        </div>
+      </div>
 
-              <!-- Owner Filter -->
-              <v-select
-                v-model="selectedOwner"
-                :items="ownerSelectItems"
-                label="Filter by Property Owner"
-                clearable
-                class="mb-2"
-                @update:model-value="handleOwnerFilterChange"
+      <!-- Urgent Alerts Section -->
+      <div
+        v-if="urgentBookings.length > 0"
+        class="alerts-section"
+      >
+        <div class="section-header">
+          <span>Urgent Alerts</span>
+          <v-chip
+            size="small"
+            color="error"
+            variant="flat"
+          >
+            {{ urgentBookings.length }}
+          </v-chip>
+        </div>
+        
+        <v-list
+          class="alert-list"
+          density="compact"
+        >
+          <v-list-item
+            v-for="booking in urgentBookings.slice(0, 3)"
+            :key="booking.id"
+            class="alert-item"
+            @click="viewBooking(booking)"
+          >
+            <template #prepend>
+              <v-icon 
+                color="error"
+                size="16"
               >
-                <template #prepend-item>
-                  <v-list-item
-                    title="All Owners"
-                    value=""
-                    @click="selectedOwner = null"
-                  />
-                  <v-divider class="mt-2" />
-                </template>
-              </v-select>
-
-              <!-- Status Filter -->
-              <v-select
-                v-model="selectedStatus"
-                :items="statusSelectItems"
-                label="Filter by Status"
-                clearable
-                @update:model-value="handleStatusFilterChange"
-              >
-                <template #prepend-item>
-                  <v-list-item
-                    title="All Statuses"
-                    value=""
-                    @click="selectedStatus = null"
-                  />
-                  <v-divider class="mt-2" />
-                </template>
-              </v-select>
-
-              <!-- Clear All Filters -->
+                mdi-alert-circle
+              </v-icon>
+            </template>
+            
+            <div class="alert-content">
+              <div class="alert-title">
+                {{ getPropertyName(booking.property_id) }}
+              </div>
+              <div class="alert-subtitle">
+                Turn cleaning needed
+              </div>
+            </div>
+            
+            <template #append>
               <v-btn
-                v-if="hasActiveFilters"
-                variant="outlined"
+                icon="mdi-chevron-right"
                 size="small"
-                prepend-icon="mdi-filter-remove"
-                class="mt-2"
-                @click="clearAllFilters"
-              >
-                Clear All Filters
-              </v-btn>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Business Analytics Dashboard -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <v-card
-            class="business-analytics"
-            variant="outlined"
-          >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-chart-line"
-                class="mr-2"
+                variant="text"
               />
-              Business Analytics
-            </v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="6">
-                  <div class="text-center">
-                    <div class="text-h4 font-weight-bold text-primary">
-                      {{ totalProperties }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      Total Properties
-                    </div>
-                  </div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="text-center">
-                    <div class="text-h4 font-weight-bold text-success">
-                      {{ activeCleaningsToday }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      Active Today
-                    </div>
-                  </div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="text-center">
-                    <div class="text-h4 font-weight-bold text-warning">
-                      {{ urgentTurnsCount }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      Urgent Turns
-                    </div>
-                  </div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="text-center">
-                    <div class="text-h4 font-weight-bold text-info">
-                      {{ totalPropertyOwners }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      Property Owners
-                    </div>
-                  </div>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Cleaner Availability Status -->
-      <v-row class="mb-4">
-        <v-col cols="12">
-          <v-card
-            class="cleaner-availability"
-            variant="outlined"
+            </template>
+          </v-list-item>
+          
+          <v-list-item
+            v-if="urgentBookings.length > 3"
+            class="view-all-item"
+            @click="navigateTo('/admin/bookings?filter=urgent')"
           >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-account-hard-hat"
-                class="mr-2"
-              />
-              Cleaner Status
-              <v-spacer />
-              <v-chip
-                size="small"
-                color="success"
-                variant="flat"
+            <template #prepend>
+              <v-icon 
+                color="primary"
+                size="16"
               >
-                {{ availableCleanersCount }} Available
-              </v-chip>
-            </v-card-title>
-            <v-card-text>
-              <div
-                v-if="cleanerStatusList.length === 0"
-                class="text-center text-medium-emphasis"
-              >
-                No cleaner data available
+                mdi-eye
+              </v-icon>
+            </template>
+            
+            <div class="alert-content">
+              <div class="alert-title">
+                View all urgent items ({{ urgentBookings.length }})
               </div>
-              <div v-else>
-                <v-list density="compact">
-                  <v-list-item
-                    v-for="cleaner in cleanerStatusList.slice(0, 5)"
-                    :key="cleaner.id"
-                    :title="cleaner.name"
-                    :subtitle="cleaner.status"
-                  >
-                    <template #prepend>
-                      <v-avatar
-                        size="small"
-                        :color="cleaner.statusColor"
-                      >
-                        <v-icon
-                          :icon="cleaner.statusIcon"
-                          size="small"
-                        />
-                      </v-avatar>
-                    </template>
-                    <template #append>
-                      <v-btn
-                        v-if="cleaner.status === 'Available'"
-                        size="x-small"
-                        variant="outlined"
-                        color="primary"
-                        @click="handleQuickAssign(cleaner.id)"
-                      >
-                        Assign
-                      </v-btn>
-                    </template>
-                  </v-list-item>
-                </v-list>
-                <v-btn
-                  v-if="cleanerStatusList.length > 5"
-                  variant="text"
-                  size="small"
-                  class="mt-2"
-                  @click="$emit('manageSystem')"
-                >
-                  View All Cleaners ({{ cleanerStatusList.length }})
-                </v-btn>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
+            </div>
+          </v-list-item>
+        </v-list>
+      </div>
 
-      <!-- Admin Quick Actions -->
-      <v-row>
-        <v-col cols="12">
-          <v-card
-            class="admin-quick-actions"
-            variant="outlined"
+      <!-- Quick Actions Section -->
+      <div class="actions-section">
+        <div class="section-header">
+          Quick Actions
+        </div>
+        
+        <v-list
+          class="actions-list"
+          density="compact"
+        >
+          <v-list-item
+            class="action-item"
+            prepend-icon="mdi-calendar-plus"
+            title="New Booking"
+            @click="emit('createBooking')"
+          />
+          
+          <v-list-item
+            class="action-item"
+            prepend-icon="mdi-home-plus"
+            title="Add Property"
+            @click="emit('createProperty')"
+          />
+          
+          <v-list-item
+            class="action-item"
+            prepend-icon="mdi-account-plus"
+            title="Add Cleaner"
+            @click="navigateTo('/admin/cleaners/create')"
+          />
+          
+          <v-list-item
+            class="action-item"
+            prepend-icon="mdi-file-chart"
+            title="Generate Report"
+            @click="emit('generateReports')"
+          />
+          
+          <v-list-item
+            class="action-item"
+            prepend-icon="mdi-cog"
+            title="System Settings"
+            @click="navigateTo('/admin/settings')"
+          />
+        </v-list>
+      </div>
+    </div>
+
+    <!-- User Info Section at Bottom -->
+    <div class="user-info-section">
+      <v-divider class="mb-3" />
+      <div class="user-info-card">
+        <v-avatar
+          color="primary"
+          size="32"
+          class="user-avatar"
+        >
+          <v-icon
+            color="white"
+            size="18"
           >
-            <v-card-title class="d-flex align-center">
-              <v-icon
-                icon="mdi-lightning-bolt"
-                class="mr-2"
-              />
-              Admin Actions
-            </v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="12">
-                  <v-btn
-                    prepend-icon="mdi-account-hard-hat"
-                    color="warning"
-                    variant="tonal"
-                    block
-                    class="mb-2"
-                    @click="$emit('assignCleaner', { bookingId: '', cleanerId: '' })"
-                  >
-                    Assign Cleaners
-                  </v-btn>
-                </v-col>
-                <v-col cols="12">
-                  <v-btn
-                    prepend-icon="mdi-chart-line"
-                    color="info"
-                    variant="tonal"
-                    block
-                    class="mb-2"
-                    @click="$emit('generateReports')"
-                  >
-                    Generate Reports
-                  </v-btn>
-                </v-col>
-                <v-col cols="12">
-                  <v-btn
-                    prepend-icon="mdi-cog"
-                    color="primary"
-                    variant="tonal"
-                    block
-                    class="mb-2"
-                    @click="$emit('manageSystem')"
-                  >
-                    Manage System
-                  </v-btn>
-                </v-col>
-                <v-col cols="6">
-                  <v-btn
-                    prepend-icon="mdi-calendar-plus"
-                    color="secondary"
-                    variant="outlined"
-                    block
-                    size="small"
-                    @click="$emit('createBooking')"
-                  >
-                    New Booking
-                  </v-btn>
-                </v-col>
-                <v-col cols="6">
-                  <v-btn
-                    prepend-icon="mdi-home-plus"
-                    color="secondary"
-                    variant="outlined"
-                    block
-                    size="small"
-                    @click="$emit('createProperty')"
-                  >
-                    New Property
-                  </v-btn>
-                </v-col>
-                <v-col cols="12">
-                  <v-btn
-                    prepend-icon="mdi-alert-circle"
-                    color="error"
-                    variant="outlined"
-                    block
-                    size="small"
-                    class="mt-2"
-                    @click="$emit('emergencyResponse')"
-                  >
-                    Emergency Response
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+            mdi-shield-account
+          </v-icon>
+        </v-avatar>
+        
+        <div class="user-details">
+          <div class="user-name">
+            {{ authStore.user?.name || 'Admin' }}
+          </div>
+          <div class="user-email">
+            {{ authStore.user?.email || 'No email' }}
+          </div>
+        </div>
+        
+        <v-menu offset-y>
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              icon
+              size="small"
+              variant="text"
+              class="user-menu-btn"
+            >
+              <v-icon size="16">
+                mdi-dots-vertical
+              </v-icon>
+            </v-btn>
+          </template>
+          
+          <v-list density="compact">
+            <v-list-item
+              prepend-icon="mdi-account"
+              title="Profile"
+              @click="navigateTo('/admin/profile')"
+            />
+            <v-list-item
+              prepend-icon="mdi-cog"
+              title="Settings"
+              @click="navigateTo('/admin/settings')"
+            />
+            <v-divider />
+            <v-list-item
+              prepend-icon="mdi-logout"
+              title="Sign Out"
+              @click="handleSignOut"
+            />
+          </v-list>
+        </v-menu>
+      </div>
+    </div>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
-import TurnAlerts from '@/components/dumb/shared/TurnAlerts.vue';
-import UpcomingCleanings from '@/components/dumb/shared/UpcomingCleanings.vue';
+import { useAuthStore } from '@/stores/auth';
+import type { Booking, Property } from '@/types';
 
-// Import types
-import type { Booking, Property, User, BookingWithMetadata } from '@/types';
+// Constants for consistent sizing
+const SIDEBAR_WIDTH = 280;
+const BRAND_HEIGHT_DESKTOP = 200;
+const BRAND_HEIGHT_MOBILE = 100;
 
-// Import event logger
-import eventLogger from '@/composables/shared/useComponentEventLogger';
-
-// Define props - Admin sees ALL data (no owner filtering)
+// Define props matching HomeAdmin expectations
 interface Props {
-  modelValue?: boolean; // v-model for drawer state
-  rail?: boolean; // Rail mode for responsive behavior
-  todayTurns?: Map<string, Booking> | Booking[];
-  upcomingCleanings?: Map<string, Booking> | Booking[];
-  properties?: Map<string, Property> | Property[];
-  users?: Map<string, User> | User[]; // Property owners
-  cleaners?: Map<string, User> | User[]; // Cleaner staff
+  modelValue?: boolean;
+  bookings?: Booking[];
+  properties?: Property[];
+  totalProperties?: number;
+  activeCleaningsToday?: number;
+  urgentTurnsCount?: number;
   loading?: boolean;
+  currentView?: string;
+  currentDate?: Date;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: true,
-  rail: false,
-  todayTurns: () => [],
-  upcomingCleanings: () => [],
+  modelValue: false,
+  bookings: () => [],
   properties: () => [],
-  users: () => [],
-  cleaners: () => [],
-  loading: false
+  totalProperties: 0,
+  activeCleaningsToday: 0,
+  urgentTurnsCount: 0,
+  loading: false,
+  currentView: 'month',
+  currentDate: () => new Date()
 });
 
-// Define emits - Admin-specific events
+// Define emits matching HomeAdmin expectations
 interface Emits {
-  // v-model support
   (e: 'update:modelValue', value: boolean): void;
-  
-  // Navigation events
   (e: 'navigateToBooking', bookingId: string): void;
   (e: 'navigateToDate', date: Date): void;
-  (e: 'navigateToProperty', propertyId: string): void;
-  
-  // Filtering events
   (e: 'filterByProperty', propertyId: string | null): void;
-  (e: 'filterByOwner', ownerId: string | null): void;
-  (e: 'filterByStatus', status: string | null): void;
-  
-  // Admin actions
+  (e: 'createBooking'): void;
+  (e: 'createProperty'): void;
   (e: 'assignCleaner', data: { bookingId: string, cleanerId?: string }): void;
   (e: 'generateReports'): void;
   (e: 'manageSystem'): void;
   (e: 'emergencyResponse'): void;
-  
-  // CRUD operations
-  (e: 'createBooking'): void;
-  (e: 'createProperty'): void;
 }
 
 const emit = defineEmits<Emits>();
 
-// Store connections (removed unused uiStore to fix linter warning)
+// Composables
+const router = useRouter();
+const { mobile } = useDisplay();
+const authStore = useAuthStore();
 
-// Vuetify display composable for responsive behavior  
-const { lgAndUp } = useDisplay();
-
-// Local state for filters
-const selectedProperty = ref<string | null>(null);
-const selectedOwner = ref<string | null>(null);
-const selectedStatus = ref<string | null>(null);
-
-// Computed properties
-const formattedDate = computed(() => {
-  try {
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    };
-    return new Date().toLocaleDateString('en-US', options);
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return new Date().toISOString().split('T')[0];
-  }
+// v-model support
+const sidebarOpen = computed({
+  get: () => props.modelValue,
+  set: (value: boolean) => emit('update:modelValue', value)
 });
 
-// Convert inputs to proper Maps - ADMIN: NO OWNER FILTERING
-const systemTodayTurnsMap = computed(() => {
-  try {
-    if (props.todayTurns instanceof Map) return props.todayTurns;
-    
-    const map = new Map<string, Booking>();
-    if (Array.isArray(props.todayTurns)) {
-      props.todayTurns.forEach(booking => {
-        if (booking && booking.id) {
-          map.set(booking.id, booking);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing system today\'s turns:', error);
-    return new Map<string, Booking>();
-  }
+// Brand overlay display logic
+const showBrandOverlay = computed(() => {
+  return !mobile.value || sidebarOpen.value;
 });
 
-const systemUpcomingCleaningsMap = computed(() => {
-  try {
-    if (props.upcomingCleanings instanceof Map) return props.upcomingCleanings;
-    
-    const map = new Map<string, Booking>();
-    if (Array.isArray(props.upcomingCleanings)) {
-      props.upcomingCleanings.forEach(booking => {
-        if (booking && booking.id) {
-          map.set(booking.id, booking);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing system upcoming cleanings:', error);
-    return new Map<string, Booking>();
-  }
-});
-
-const allPropertiesMap = computed(() => {
-  try {
-    if (props.properties instanceof Map) return props.properties;
-    
-    const map = new Map<string, Property>();
-    if (Array.isArray(props.properties)) {
-      props.properties.forEach(property => {
-        if (property && property.id) {
-          map.set(property.id, property);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing all properties:', error);
-    return new Map<string, Property>();
-  }
-});
-
-const allUsersMap = computed(() => {
-  try {
-    if (props.users instanceof Map) return props.users;
-    
-    const map = new Map<string, User>();
-    if (Array.isArray(props.users)) {
-      props.users.forEach(user => {
-        if (user && user.id) {
-          map.set(user.id, user);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing all users:', error);
-    return new Map<string, User>();
-  }
-});
-
-const allCleanersMap = computed(() => {
-  try {
-    if (props.cleaners instanceof Map) return props.cleaners;
-    
-    const map = new Map<string, User>();
-    if (Array.isArray(props.cleaners)) {
-      props.cleaners.forEach(cleaner => {
-        if (cleaner && cleaner.id) {
-          map.set(cleaner.id, cleaner);
-        }
-      });
-    }
-    return map;
-  } catch (error) {
-    console.error('Error processing all cleaners:', error);
-    return new Map<string, User>();
-  }
-});
-
-// Convert Maps to arrays - ADMIN: ALL DATA, NO FILTERING
-const systemTodayTurnsArray = computed(() => 
-  Array.from(systemTodayTurnsMap.value.values())
-);
-
-const systemUpcomingCleaningsArray = computed(() => 
-  Array.from(systemUpcomingCleaningsMap.value.values())
-);
-
-// Add metadata to bookings - ADMIN: SYSTEM-WIDE DATA
-const systemTodayBookingsWithMetadata = computed(() => {
-  return systemTodayTurnsArray.value.map(booking => {
-    const property = allPropertiesMap.value.get(booking.property_id);
-    const owner = allUsersMap.value.get(booking.owner_id);
-    
-    // Explicit priority type declaration following established pattern
-    const priority: 'low' | 'normal' | 'high' | 'urgent' = 'urgent';
-    
-    return {
-      ...booking,
-      priority,
-      property_name: property?.name || `Property ${booking.property_id.substring(0, 8)}`,
-      owner_name: owner?.name || `Owner ${booking.owner_id.substring(0, 8)}`,
-      cleaning_window: {
-        start: booking.checkout_date,
-        end: booking.checkin_date,
-        duration: property?.cleaning_duration || 120
-      }
-    } as BookingWithMetadata;
-  });
-});
-
-const systemUpcomingBookingsWithMetadata = computed(() => {
-  return systemUpcomingCleaningsArray.value.map(booking => {
-    const property = allPropertiesMap.value.get(booking.property_id);
-    const owner = allUsersMap.value.get(booking.owner_id);
-    
-    // Explicit priority type declaration following established pattern
-    const priority: 'low' | 'normal' | 'high' | 'urgent' = 
-      booking.booking_type === 'turn' ? 'high' : 'normal';
-    
-    return {
-      ...booking,
-      priority,
-      property_name: property?.name || `Property ${booking.property_id.substring(0, 8)}`,
-      owner_name: owner?.name || `Owner ${booking.owner_id.substring(0, 8)}`,
-      cleaning_window: {
-        start: booking.checkout_date,
-        end: booking.checkin_date,
-        duration: property?.cleaning_duration || 120
-      }
-    } as BookingWithMetadata;
-  });
-});
-
-// Business Analytics - ADMIN: SYSTEM-WIDE METRICS
-const totalProperties = computed(() => allPropertiesMap.value.size);
-
-const totalPropertyOwners = computed(() => {
-  const ownerIds = new Set<string>();
-  Array.from(allPropertiesMap.value.values()).forEach(property => {
-    if (property.owner_id) {
-      ownerIds.add(property.owner_id);
-    }
-  });
-  return ownerIds.size;
-});
-
-const urgentTurnsCount = computed(() => systemTodayTurnsArray.value.length);
-
-const activeCleaningsToday = computed(() => {
-  const today = new Date().toISOString().split('T')[0];
-  return Array.from(systemUpcomingCleaningsMap.value.values())
-    .filter(booking => 
-      booking.checkout_date.startsWith(today) && 
-      booking.status === 'in_progress'
-    ).length;
-});
-
+// Computed metrics from props
 const availableCleanersCount = computed(() => {
-  return Array.from(allCleanersMap.value.values())
-    .filter(cleaner => cleaner.role === 'cleaner').length;
+  // TODO: Calculate from actual cleaner data
+  return 5; // Placeholder
 });
 
-// Filter options for admin
-const propertySelectItems = computed(() => {
-  return Array.from(allPropertiesMap.value.values())
-    .filter(property => property && property.id && property.name)
-    .map(property => ({
-      title: property.name,
-      value: property.id,
-    }));
+// Urgent bookings for alerts
+const urgentBookings = computed(() => {
+  return props.bookings.filter(booking => 
+    booking.booking_type === 'turn' && 
+    booking.status === 'pending'
+  );
 });
 
-const ownerSelectItems = computed(() => {
-  const owners = Array.from(allUsersMap.value.values())
-    .filter(user => user.role === 'owner');
-  
-  return owners.map(owner => ({
-    title: owner.name,
-    value: owner.id,
-  }));
-});
+// Navigation helper
+const navigateTo = (path: string) => {
+  router.push(path);
+};
 
-const statusSelectItems = computed(() => [
-  { title: 'Pending', value: 'pending' },
-  { title: 'Scheduled', value: 'scheduled' },
-  { title: 'In Progress', value: 'in_progress' },
-  { title: 'Completed', value: 'completed' },
-]);
-
-const hasActiveFilters = computed(() => 
-  selectedProperty.value !== null || 
-  selectedOwner.value !== null || 
-  selectedStatus.value !== null
-);
-
-// Cleaner status list
-const cleanerStatusList = computed(() => {
-  return Array.from(allCleanersMap.value.values())
-    .filter(cleaner => cleaner.role === 'cleaner')
-    .map(cleaner => ({
-      id: cleaner.id,
-      name: cleaner.name,
-      status: 'Available', // TODO: Calculate actual status
-      statusColor: 'success',
-      statusIcon: 'mdi-check-circle',
-    }));
-});
-
-// Methods
-const handlePropertyFilterChange = (propertyId: string | null): void => {
-  try {
-    eventLogger.logEvent(
-      'AdminSidebar',
-      'HomeAdmin',
-      'filterByProperty',
-      propertyId,
-      'emit'
-    );
-    
-    emit('filterByProperty', propertyId);
-  } catch (error) {
-    console.error('Error changing property filter:', error);
+// Sign out handler
+const handleSignOut = async () => {
+  const success = await authStore.logout();
+  if (success) {
+    router.push('/auth/login');
   }
 };
 
-const handleOwnerFilterChange = (ownerId: string | null): void => {
-  try {
-    eventLogger.logEvent(
-      'AdminSidebar',
-      'HomeAdmin',
-      'filterByOwner',
-      ownerId,
-      'emit'
-    );
-    
-    emit('filterByOwner', ownerId);
-  } catch (error) {
-    console.error('Error changing owner filter:', error);
-  }
+// Booking actions
+const viewBooking = (booking: Booking) => {
+  emit('navigateToBooking', booking.id);
 };
 
-const handleStatusFilterChange = (status: string | null): void => {
-  try {
-    eventLogger.logEvent(
-      'AdminSidebar',
-      'HomeAdmin',
-      'filterByStatus',
-      status,
-      'emit'
-    );
-    
-    emit('filterByStatus', status);
-  } catch (error) {
-    console.error('Error changing status filter:', error);
-  }
+// Get property name helper
+const getPropertyName = (propertyId: string): string => {
+  const property = props.properties.find(p => p.id === propertyId);
+  return property?.name || 'Unknown Property';
 };
 
-const clearAllFilters = (): void => {
-  try {
-    selectedProperty.value = null;
-    selectedOwner.value = null;
-    selectedStatus.value = null;
-    
-    emit('filterByProperty', null);
-    emit('filterByOwner', null);
-    emit('filterByStatus', null);
-    
-    eventLogger.logEvent(
-      'AdminSidebar',
-      'HomeAdmin',
-      'clearAllFilters',
-      null,
-      'emit'
-    );
-  } catch (error) {
-    console.error('Error clearing all filters:', error);
-  }
+// Refresh metrics
+const refreshMetrics = () => {
+  // TODO: Implement metrics refresh
+  console.log('Refreshing metrics...');
 };
-
-const handleAssignCleaner = (bookingId: string): void => {
-  try {
-    eventLogger.logEvent(
-      'AdminSidebar',
-      'HomeAdmin',
-      'assignCleaner',
-      { bookingId },
-      'emit'
-    );
-    
-    emit('assignCleaner', { bookingId });
-  } catch (error) {
-    console.error('Error handling assign cleaner:', error);
-  }
-};
-
-const handleQuickAssign = (cleanerId: string): void => {
-  try {
-    eventLogger.logEvent(
-      'AdminSidebar',
-      'HomeAdmin',
-      'assignCleaner',
-      { cleanerId },
-      'emit'
-    );
-    
-    emit('assignCleaner', { bookingId: '', cleanerId });
-  } catch (error) {
-    console.error('Error handling quick assign:', error);
-  }
-};
-
-const handleViewAll = (period: string): void => {
-  try {
-    const today = new Date();
-    let targetDate = today;
-    
-    if (period === 'turns') {
-      // Navigate to turn bookings
-    } else if (period === 'today') {
-      // Navigate to today's bookings
-    } else if (period === 'tomorrow') {
-      targetDate = new Date();
-      targetDate.setDate(targetDate.getDate() + 1);
-    } else {
-      try {
-        targetDate = new Date(period);
-      } catch {
-        targetDate = today;
-      }
-    }
-    
-    eventLogger.logEvent(
-      'AdminSidebar',
-      'HomeAdmin',
-      'navigateToDate',
-      targetDate,
-      'emit'
-    );
-    
-    emit('navigateToDate', targetDate);
-  } catch (error) {
-    console.error('Error handling view all:', error);
-  }
-};
-
-const toggleUpcomingExpanded = (expanded: boolean): void => {
-  console.log('Admin upcoming cleanings expanded:', expanded);
-};
-
-// Initialize on mount
-onMounted(() => {
-  try {
-    // Initialize any admin-specific state
-    console.log('AdminSidebar mounted with system-wide data access');
-  } catch (error) {
-    console.error('Error initializing AdminSidebar:', error);
-  }
-});
 </script>
 
 <style scoped>
-.admin-sidebar-desktop {
-  height: 100%;
-  overflow-y: auto;
+/* Navigation Drawer Z-Index Override */
+.admin-sidebar {
+  top: 0 !important;
+  height: 100vh !important;
+  background: #f8f9fa !important;
+}
+
+/* Main Content Wrapper */
+.sidebar-content-wrapper {
+  padding-bottom: 120px;
+  min-height: 100vh;
+  height: 100vh;
+}
+
+/* Sidebar Content Spacing */
+.sidebar-content-spacing {
+  margin-top: v-bind('BRAND_HEIGHT_DESKTOP + "px"');
+}
+
+/* Section Headers */
+.section-header {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(var(--v-theme-primary));
+  padding: 16px 20px 8px 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.admin-sidebar-desktop .v-container {
+/* Navigation Section */
+.nav-section {
+  margin-bottom: 16px;
+}
+
+.nav-list {
+  padding: 0 12px;
+}
+
+.nav-item {
+  margin-bottom: 4px;
+  border-radius: 8px !important;
+  color: rgb(var(--v-theme-success)) !important;
+  font-weight: 500 !important;
+}
+
+.nav-item:hover {
+  background: #f3f4f6 !important;
+}
+
+.nav-item.active-nav-item {
+  background: rgb(var(--v-theme-primary)) !important;
+  color: white !important;
+}
+
+.nav-item.active-nav-item :deep(.v-list-item__prepend .v-icon) {
+  color: white !important;
+}
+
+.nav-item.active-nav-item :deep(.v-list-item-title) {
+  color: white !important;
+}
+
+/* Metrics Section */
+.metrics-section {
+  margin: 16px 0;
+}
+
+.metrics-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.metric-card {
+  min-height: 70px;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: rgb(var(--v-theme-info));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+/* Alerts Section */
+.alerts-section {
+  margin: 16px 0;
+}
+
+.alert-list {
+  padding: 0 12px;
+}
+
+.alert-item {
+  margin-bottom: 4px;
+  border-radius: 6px !important;
+  border-left: 3px solid rgb(var(--v-theme-error));
+  background: rgba(var(--v-theme-error), 0.05) !important;
+  cursor: pointer;
+}
+
+.alert-item:hover {
+  background: rgba(var(--v-theme-error), 0.1) !important;
+}
+
+.view-all-item {
+  margin-top: 8px;
+  border-radius: 6px !important;
+  color: rgb(var(--v-theme-primary)) !important;
+  cursor: pointer;
+}
+
+.view-all-item:hover {
+  background: rgba(var(--v-theme-primary), 0.05) !important;
+}
+
+.alert-content {
   flex: 1;
-  overflow-y: auto;
-  height: 100%;
+  min-width: 0;
 }
 
-.admin-sidebar-mobile {
-  height: 100%;
-  overflow-y: auto;
+.alert-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgb(var(--v-theme-on-surface));
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alert-subtitle {
+  font-size: 0.7rem;
+  color: rgb(var(--v-theme-error));
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+/* Actions Section */
+.actions-section {
+  margin-top: 16px;
+}
+
+.actions-list {
+  padding: 0 12px;
+}
+
+.action-item {
+  margin-bottom: 4px;
+  border-radius: 8px !important;
+  color: rgb(var(--v-theme-success)) !important;
+  font-weight: 500 !important;
+}
+
+.action-item:hover {
+  background: #f3f4f6 !important;
+}
+
+/* Icon styling */
+:deep(.v-list-item__prepend .v-icon) {
+  color: rgb(var(--v-theme-info));
+  opacity: 1;
+}
+
+.nav-item:hover :deep(.v-list-item__prepend .v-icon) {
+  color: rgb(var(--v-theme-success));
+}
+
+.action-item:hover :deep(.v-list-item__prepend .v-icon) {
+  color: rgb(var(--v-theme-success));
+}
+
+/* List item title styling */
+:deep(.v-list-item-title) {
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+}
+
+/* User Info Section */
+.user-info-section {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 20px 20px 20px;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+}
+
+.user-info-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
   border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  z-index: 1001 !important;
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
 }
 
-.admin-sidebar-mobile .v-container {
+.user-avatar {
+  flex-shrink: 0;
+}
+
+.user-details {
   flex: 1;
-  overflow-y: auto;
-  height: 100%;
+  min-width: 0;
 }
 
-.system-turn-alerts {
-  border-left: 4px solid rgb(var(--v-theme-warning));
+.user-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(var(--v-theme-primary));
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.business-analytics .v-card-text {
-  padding-bottom: 8px;
+.user-email {
+  font-size: 0.75rem;
+  color: rgb(var(--v-theme-info));
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.cleaner-availability .v-list {
-  padding: 0;
+.user-menu-btn {
+  flex-shrink: 0;
+  opacity: 0.7;
 }
 
-.admin-quick-actions .v-card-text {
-  padding-bottom: 8px;
+.user-menu-btn:hover {
+  opacity: 1;
+  background: rgba(var(--v-theme-primary), 0.1);
 }
 
-/* Custom scrollbar for better UX */
-::-webkit-scrollbar {
-  width: 8px;
+/* Responsive adjustments */
+@media (max-width: 959px) {
+  .sidebar-content-spacing {
+    margin-top: v-bind('BRAND_HEIGHT_MOBILE + "px"');
+  }
+  
+  .metrics-cards {
+    grid-template-columns: 1fr;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+/* Brand Overlay */
+.claro-brand-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: v-bind('SIDEBAR_WIDTH + "px"');
+  height: v-bind('BRAND_HEIGHT_DESKTOP + "px"');
+  background: linear-gradient(135deg, rgb(var(--v-theme-secondary)) 0%, rgba(var(--v-theme-secondary), 0.9) 100%);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  border-bottom: 2px solid rgba(var(--v-theme-primary), 0.3);
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+.claro-brand-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+.claro-brand-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgba(var(--v-theme-primary), 0.8) 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.3);
 }
-</style> 
+
+.prominent-icon {
+  width: 64px !important;
+  height: 64px !important;
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgba(var(--v-theme-primary), 0.9) 100%) !important;
+  box-shadow: 0 6px 16px rgba(var(--v-theme-primary), 0.4) !important;
+}
+
+.claro-brand-info {
+  flex: 1;
+}
+
+.claro-brand-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: rgb(var(--v-theme-primary));
+  line-height: 1.1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
+}
+
+.claro-brand-subtitle {
+  font-size: 1rem;
+  color: rgb(var(--v-theme-info));
+  line-height: 1.2;
+  font-weight: 500;
+  margin-top: 4px;
+  opacity: 0.9;
+}
+
+/* Responsive Brand Overlay */
+@media (max-width: 959px) {
+  .claro-brand-overlay {
+    height: v-bind('BRAND_HEIGHT_MOBILE + "px"');
+    padding: 0 16px;
+  }
+  
+  .claro-brand-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .prominent-icon {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  
+  .claro-brand-title {
+    font-size: 1.4rem !important;
+    font-weight: 700;
+  }
+  
+  .claro-brand-subtitle {
+    font-size: 0.85rem !important;
+  }
+}
+</style>
+
+<!-- Unscoped styles for z-index overrides -->
+<style>
+/* Global z-index overrides for admin navigation drawer */
+.v-navigation-drawer.admin-sidebar {
+  height: 100vh !important;
+  top: 0 !important;
+}
+
+.v-navigation-drawer--temporary {
+  height: 100vh !important;
+  top: 0 !important;
+}
+
+.v-navigation-drawer--temporary .v-navigation-drawer__content {
+  height: 100vh !important;
+}
+
+.v-overlay--contained .v-overlay__scrim {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.v-overlay__scrim {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Enhanced scrim visibility for admin sidebar */
+.v-navigation-drawer--temporary + .v-overlay .v-overlay__scrim {
+  background-color: rgba(0, 0, 0, 0.65) !important;
+  backdrop-filter: blur(2px);
+}
+</style>

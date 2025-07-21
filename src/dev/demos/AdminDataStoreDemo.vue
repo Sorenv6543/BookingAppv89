@@ -10,7 +10,10 @@ Based on TASK-072 implementation
       <v-col cols="12">
         <v-card>
           <v-card-title class="d-flex align-center">
-            <v-icon icon="mdi-shield-crown" class="mr-3" />
+            <v-icon
+              icon="mdi-shield-crown"
+              class="mr-3"
+            />
             Admin Data Store Demo
             <v-spacer />
             <v-chip
@@ -42,42 +45,82 @@ Based on TASK-072 implementation
 
             <!-- System Metrics -->
             <v-row class="mb-4">
-              <v-col cols="12" md="3">
-                <v-card color="primary" variant="tonal">
+              <v-col
+                cols="12"
+                md="3"
+              >
+                <v-card
+                  color="primary"
+                  variant="tonal"
+                >
                   <v-card-title>Properties</v-card-title>
                   <v-card-text>
-                    <div class="text-h4">{{ adminData.systemMetrics.totalProperties }}</div>
-                    <div class="text-caption">{{ adminData.systemMetrics.activeProperties }} active</div>
+                    <div class="text-h4">
+                      {{ adminData.systemMetrics.totalProperties }}
+                    </div>
+                    <div class="text-caption">
+                      {{ adminData.systemMetrics.activeProperties }} active
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
               
-              <v-col cols="12" md="3">
-                <v-card color="success" variant="tonal">
+              <v-col
+                cols="12"
+                md="3"
+              >
+                <v-card
+                  color="success"
+                  variant="tonal"
+                >
                   <v-card-title>Owners</v-card-title>
                   <v-card-text>
-                    <div class="text-h4">{{ adminData.systemMetrics.totalOwners }}</div>
-                    <div class="text-caption">Property owners</div>
+                    <div class="text-h4">
+                      {{ adminData.systemMetrics.totalOwners }}
+                    </div>
+                    <div class="text-caption">
+                      Property owners
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
               
-              <v-col cols="12" md="3">
-                <v-card color="warning" variant="tonal">
+              <v-col
+                cols="12"
+                md="3"
+              >
+                <v-card
+                  color="warning"
+                  variant="tonal"
+                >
                   <v-card-title>Urgent Turns</v-card-title>
                   <v-card-text>
-                    <div class="text-h4">{{ adminData.systemMetrics.urgentTurns }}</div>
-                    <div class="text-caption">Within 24 hours</div>
+                    <div class="text-h4">
+                      {{ adminData.systemMetrics.urgentTurns }}
+                    </div>
+                    <div class="text-caption">
+                      Within 24 hours
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
               
-              <v-col cols="12" md="3">
-                <v-card color="info" variant="tonal">
+              <v-col
+                cols="12"
+                md="3"
+              >
+                <v-card
+                  color="info"
+                  variant="tonal"
+                >
                   <v-card-title>Revenue</v-card-title>
                   <v-card-text>
-                    <div class="text-h4">${{ adminData.systemMetrics.totalRevenue.toLocaleString() }}</div>
-                    <div class="text-caption">Total system revenue</div>
+                    <div class="text-h4">
+                      ${{ adminData.systemMetrics.totalRevenue.toLocaleString() }}
+                    </div>
+                    <div class="text-caption">
+                      Total system revenue
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -88,7 +131,10 @@ Based on TASK-072 implementation
               <v-col cols="12">
                 <v-card>
                   <v-card-title class="d-flex align-center">
-                    <v-icon icon="mdi-alert-circle" class="mr-2" />
+                    <v-icon
+                      icon="mdi-alert-circle"
+                      class="mr-2"
+                    />
                     Critical Alerts ({{ adminData.criticalAlerts.length }})
                   </v-card-title>
                   
@@ -126,8 +172,15 @@ Based on TASK-072 implementation
                       </v-alert>
                     </div>
                     
-                    <v-alert v-else type="success" variant="tonal">
-                      <v-icon icon="mdi-check-circle" class="mr-2" />
+                    <v-alert
+                      v-else
+                      type="success"
+                      variant="tonal"
+                    >
+                      <v-icon
+                        icon="mdi-check-circle"
+                        class="mr-2"
+                      />
                       No critical alerts! System is running smoothly.
                     </v-alert>
                   </v-card-text>
@@ -140,7 +193,10 @@ Based on TASK-072 implementation
               <v-col cols="12">
                 <v-card>
                   <v-card-title class="d-flex align-center">
-                    <v-icon icon="mdi-chart-bar" class="mr-2" />
+                    <v-icon
+                      icon="mdi-chart-bar"
+                      class="mr-2"
+                    />
                     Owner Performance Analytics
                   </v-card-title>
                   
@@ -152,13 +208,21 @@ Based on TASK-072 implementation
                       class="elevation-1"
                     >
                       <template #item.properties="{ item }">
-                        <v-chip size="small" color="primary" variant="tonal">
+                        <v-chip
+                          size="small"
+                          color="primary"
+                          variant="tonal"
+                        >
                           {{ item.properties.length }}
                         </v-chip>
                       </template>
                       
                       <template #item.bookings="{ item }">
-                        <v-chip size="small" color="success" variant="tonal">
+                        <v-chip
+                          size="small"
+                          color="success"
+                          variant="tonal"
+                        >
                           {{ item.bookings.length }}
                         </v-chip>
                       </template>
@@ -177,48 +241,91 @@ Based on TASK-072 implementation
               <v-col cols="12">
                 <v-card>
                   <v-card-title class="d-flex align-center">
-                    <v-icon icon="mdi-speedometer" class="mr-2" />
+                    <v-icon
+                      icon="mdi-speedometer"
+                      class="mr-2"
+                    />
                     Performance Insights
                   </v-card-title>
                   
                   <v-card-text>
                     <v-row>
-                      <v-col cols="12" md="3">
-                        <v-card color="surface-variant" variant="tonal">
+                      <v-col
+                        cols="12"
+                        md="3"
+                      >
+                        <v-card
+                          color="surface-variant"
+                          variant="tonal"
+                        >
                           <v-card-title>Avg Bookings</v-card-title>
                           <v-card-text>
-                            <div class="text-h6">{{ adminData.performanceInsights.avgBookingsPerProperty }}</div>
-                            <div class="text-caption">Per property</div>
+                            <div class="text-h6">
+                              {{ adminData.performanceInsights.avgBookingsPerProperty }}
+                            </div>
+                            <div class="text-caption">
+                              Per property
+                            </div>
                           </v-card-text>
                         </v-card>
                       </v-col>
                       
-                      <v-col cols="12" md="3">
-                        <v-card color="surface-variant" variant="tonal">
+                      <v-col
+                        cols="12"
+                        md="3"
+                      >
+                        <v-card
+                          color="surface-variant"
+                          variant="tonal"
+                        >
                           <v-card-title>Turn Rate</v-card-title>
                           <v-card-text>
-                            <div class="text-h6">{{ adminData.performanceInsights.turnPercentage }}%</div>
-                            <div class="text-caption">Same-day turns</div>
+                            <div class="text-h6">
+                              {{ adminData.performanceInsights.turnPercentage }}%
+                            </div>
+                            <div class="text-caption">
+                              Same-day turns
+                            </div>
                           </v-card-text>
                         </v-card>
                       </v-col>
                       
-                      <v-col cols="12" md="3">
-                        <v-card color="surface-variant" variant="tonal">
+                      <v-col
+                        cols="12"
+                        md="3"
+                      >
+                        <v-card
+                          color="surface-variant"
+                          variant="tonal"
+                        >
                           <v-card-title>Completion</v-card-title>
                           <v-card-text>
-                            <div class="text-h6">{{ adminData.performanceInsights.completionRate }}%</div>
-                            <div class="text-caption">Success rate</div>
+                            <div class="text-h6">
+                              {{ adminData.performanceInsights.completionRate }}%
+                            </div>
+                            <div class="text-caption">
+                              Success rate
+                            </div>
                           </v-card-text>
                         </v-card>
                       </v-col>
                       
-                      <v-col cols="12" md="3">
-                        <v-card color="surface-variant" variant="tonal">
+                      <v-col
+                        cols="12"
+                        md="3"
+                      >
+                        <v-card
+                          color="surface-variant"
+                          variant="tonal"
+                        >
                           <v-card-title>Avg Revenue</v-card-title>
                           <v-card-text>
-                            <div class="text-h6">${{ adminData.performanceInsights.avgRevenue }}</div>
-                            <div class="text-caption">Per booking</div>
+                            <div class="text-h6">
+                              ${{ adminData.performanceInsights.avgRevenue }}
+                            </div>
+                            <div class="text-caption">
+                              Per booking
+                            </div>
                           </v-card-text>
                         </v-card>
                       </v-col>
@@ -233,7 +340,10 @@ Based on TASK-072 implementation
               <v-col cols="12">
                 <v-card>
                   <v-card-title class="d-flex align-center">
-                    <v-icon icon="mdi-home-group" class="mr-2" />
+                    <v-icon
+                      icon="mdi-home-group"
+                      class="mr-2"
+                    />
                     All Properties ({{ adminData.allProperties.length }})
                     <v-spacer />
                     <v-btn
@@ -271,7 +381,10 @@ Based on TASK-072 implementation
                               <div class="text-caption mb-2">
                                 Address: {{ property.address || 'No address' }}
                               </div>
-                              <v-chip size="small" variant="tonal">
+                              <v-chip
+                                size="small"
+                                variant="tonal"
+                              >
                                 {{ property.pricing_tier }}
                               </v-chip>
                             </v-card-text>
@@ -289,7 +402,10 @@ Based on TASK-072 implementation
               <v-col cols="12">
                 <v-card>
                   <v-card-title class="d-flex align-center">
-                    <v-icon icon="mdi-calendar-multiple" class="mr-2" />
+                    <v-icon
+                      icon="mdi-calendar-multiple"
+                      class="mr-2"
+                    />
                     All Bookings ({{ adminData.allBookings.length }})
                     <v-spacer />
                     <v-btn

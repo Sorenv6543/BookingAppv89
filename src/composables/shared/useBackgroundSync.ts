@@ -225,7 +225,7 @@ export const useBackgroundSync = () => {
   }
 
   // Mock API call for development
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const mockApiCall = async (url: string, method: string, _data?: unknown): Promise<void> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {

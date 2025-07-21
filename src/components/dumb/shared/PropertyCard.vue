@@ -57,8 +57,12 @@
             class="metric-icon"
           />
           <div class="metric-content">
-            <div class="metric-label">Duration</div>
-            <div class="metric-value">{{ formattedCleaningDuration }}</div>
+            <div class="metric-label">
+              Duration
+            </div>
+            <div class="metric-value">
+              {{ formattedCleaningDuration }}
+            </div>
           </div>
         </div>
 
@@ -70,8 +74,12 @@
             class="metric-icon"
           />
           <div class="metric-content">
-            <div class="metric-label">Tier</div>
-            <div class="metric-value text-capitalize">{{ property.pricing_tier }}</div>
+            <div class="metric-label">
+              Tier
+            </div>
+            <div class="metric-value text-capitalize">
+              {{ property.pricing_tier }}
+            </div>
           </div>
         </div>
       </div>
@@ -109,13 +117,23 @@
         <v-row dense>
           <v-col cols="6">
             <div class="stat-item">
-              <v-icon icon="mdi-calendar-check" size="x-small" class="mr-1" color="success" />
+              <v-icon
+                icon="mdi-calendar-check"
+                size="x-small"
+                class="mr-1"
+                color="success"
+              />
               <span class="text-caption">Recent bookings: {{ recentBookingsCount }}</span>
             </div>
           </v-col>
           <v-col cols="6">
             <div class="stat-item">
-              <v-icon icon="mdi-trending-up" size="x-small" class="mr-1" color="info" />
+              <v-icon
+                icon="mdi-trending-up"
+                size="x-small"
+                class="mr-1"
+                color="info"
+              />
               <span class="text-caption">Last cleaned: {{ lastCleanedText }}</span>
             </div>
           </v-col>

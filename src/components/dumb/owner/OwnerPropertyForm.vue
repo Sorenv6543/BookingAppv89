@@ -241,7 +241,12 @@
           :loading="loading"
           @click="handleSubmit"
         >
-          <v-icon v-if="!isOnline" class="mr-2">mdi-cloud-sync</v-icon>
+          <v-icon
+            v-if="!isOnline"
+            class="mr-2"
+          >
+            mdi-cloud-sync
+          </v-icon>
           {{ isOnline ? submitButtonText : `Queue ${props.mode === 'create' ? 'Create' : 'Update'}` }}
         </v-btn>
       </v-card-actions>

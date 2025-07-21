@@ -186,6 +186,9 @@ async function handleLogin() {
   if (!valid) return
 
   try {
+    console.log('🔐 Starting login process...');
+    console.log('Auth store login method:', typeof authStore.login);
+    
     // Set a timeout to prevent infinite loading
     const loginTimeout = setTimeout(() => {
       console.warn('⚠️ Login timeout - forcing loading to stop');
@@ -195,15 +198,37 @@ async function handleLogin() {
     const success = await authStore.login(email.value, password.value)
     clearTimeout(loginTimeout);
     
+    console.log('Login result:', { success, user: authStore.user, isAuthenticated: authStore.isAuthenticated });
+    
     if (success) {
+      console.log('✅ Login successful, setting up navigation...');
       successMessage.value = authStore.getSuccessMessage() ?? ''
-      const defaultRoute = getDefaultRouteForRole(authStore.user?.role)
       
-      // Navigate immediately
-      await router.push(defaultRoute)
+      // Wait for user to be populated
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      while (!authStore.user && attempts < maxAttempts) {
+        console.log(`Waiting for user data... attempt ${attempts + 1}/${maxAttempts}`);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+      
+      if (authStore.user) {
+        const defaultRoute = getDefaultRouteForRole(authStore.user.role)
+        console.log('Navigating to:', defaultRoute);
+        await router.push(defaultRoute)
+      } else {
+        console.warn('User data not available after login - forcing navigation');
+        // Force navigation to owner dashboard as fallback
+        await router.push('/owner/dashboard');
+      }
+    } else {
+      console.error('❌ Login failed - success was false');
+      console.log('Auth store error:', authStore.error);
     }
   } catch (error) {
-    console.error('Login error:', error)
+    console.error('❌ Login error:', error)
   }
 }
 

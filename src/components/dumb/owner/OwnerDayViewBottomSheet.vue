@@ -11,15 +11,19 @@
       <v-card-title class="day-view-header">
         <div class="header-content">
           <div class="date-info">
-            <h3 class="date-title">{{ formattedDate }}</h3>
-            <p class="booking-count">{{ bookings.length }} booking{{ bookings.length !== 1 ? 's' : '' }}</p>
+            <h3 class="date-title">
+              {{ formattedDate }}
+            </h3>
+            <p class="booking-count">
+              {{ bookings.length }} booking{{ bookings.length !== 1 ? 's' : '' }}
+            </p>
           </div>
           <v-btn
             icon="mdi-close"
             variant="text"
             size="small"
-            @click="closeSheet"
             class="close-button"
+            @click="closeSheet"
           />
         </div>
       </v-card-title>
@@ -50,7 +54,13 @@
             <div class="booking-header">
               <div class="property-info">
                 <h4 class="property-name">
-                  {{ getPropertyName(booking.property_id) }}
+                  <v-icon
+                    size="small"
+                    class="property-icon"
+                  >
+                    mdi-home
+                  </v-icon>
+                  {{ getPropertyName(booking.property_id || '') }}
                   <v-chip
                     v-if="booking.booking_type === 'turn'"
                     size="x-small"
@@ -62,32 +72,53 @@
                   </v-chip>
                 </h4>
                 <p class="booking-times">
-                  {{ formatBookingTime(booking.checkout_date) }} → {{ formatBookingTime(booking.checkin_date) }}
+                  {{ formatBookingTime(booking.checkout_date || '') }} → {{ formatBookingTime(booking.checkin_date || '') }}
                 </p>
               </div>
               <div class="priority-indicator">
                 <v-chip
-                  :color="getPriorityColor(booking.priority)"
+                  :color="getPriorityColor(booking.priority || 'normal')"
                   size="small"
                   variant="elevated"
                 >
-                  {{ booking.priority.toUpperCase() }}
+                  {{ (booking.priority || 'normal').toUpperCase() }}
                 </v-chip>
               </div>
             </div>
 
             <!-- Booking Details -->
             <div class="booking-details">
-              <div v-if="booking.guest_count" class="detail-row">
-                <v-icon size="small" class="detail-icon">mdi-account-multiple</v-icon>
+              <div
+                v-if="booking.guest_count"
+                class="detail-row"
+              >
+                <v-icon
+                  size="small"
+                  class="detail-icon"
+                >
+                  mdi-account-multiple
+                </v-icon>
                 <span>{{ booking.guest_count }} guest{{ booking.guest_count !== 1 ? 's' : '' }}</span>
               </div>
               <div class="detail-row">
-                <v-icon size="small" class="detail-icon">mdi-circle-medium</v-icon>
-                <span class="status-text">{{ booking.status.replace('_', ' ').toUpperCase() }}</span>
+                <v-icon
+                  size="small"
+                  class="detail-icon"
+                >
+                  mdi-circle-medium
+                </v-icon>
+                <span class="status-text">{{ (booking.status || 'pending').replace('_', ' ').toUpperCase() }}</span>
               </div>
-              <div v-if="booking.notes" class="detail-row notes-row">
-                <v-icon size="small" class="detail-icon">mdi-note-text</v-icon>
+              <div
+                v-if="booking.notes"
+                class="detail-row notes-row"
+              >
+                <v-icon
+                  size="small"
+                  class="detail-icon"
+                >
+                  mdi-note-text
+                </v-icon>
                 <span class="notes-text">{{ booking.notes }}</span>
               </div>
             </div>
@@ -98,8 +129,8 @@
                 variant="text"
                 size="small"
                 prepend-icon="mdi-eye"
-                @click="viewBooking(booking)"
                 class="action-btn"
+                @click="viewBooking(booking)"
               >
                 View
               </v-btn>
@@ -107,8 +138,8 @@
                 variant="text"
                 size="small"
                 prepend-icon="mdi-pencil"
-                @click="editBooking(booking)"
                 class="action-btn"
+                @click="editBooking(booking)"
               >
                 Edit
               </v-btn>
@@ -118,29 +149,44 @@
                 size="small"
                 prepend-icon="mdi-check"
                 color="success"
-                @click="markComplete(booking)"
                 class="action-btn"
+                @click="markComplete(booking)"
               >
                 Complete
               </v-btn>
             </div>
 
             <!-- Divider -->
-            <v-divider v-if="index < bookings.length - 1" class="booking-divider" />
+            <v-divider
+              v-if="index < bookings.length - 1"
+              class="booking-divider"
+            />
           </div>
 
           <!-- Empty State -->
-          <div v-if="bookings.length === 0" class="empty-state">
-            <v-icon size="64" color="grey-lighten-1">mdi-calendar-blank</v-icon>
-            <h4 class="empty-title">No bookings for this day</h4>
-            <p class="empty-subtitle">Get started by adding your first booking</p>
+          <div
+            v-if="bookings.length === 0"
+            class="empty-state"
+          >
+            <v-icon
+              size="64"
+              color="grey-lighten-1"
+            >
+              mdi-calendar-blank
+            </v-icon>
+            <h4 class="empty-title">
+              No bookings for this day
+            </h4>
+            <p class="empty-subtitle">
+              Get started by adding your first booking
+            </p>
             <v-btn
               variant="elevated"
               color="primary"
               prepend-icon="mdi-plus"
-              @click="addBooking"
               class="empty-state-btn"
               size="large"
+              @click="addBooking"
             >
               Add Booking for {{ formattedDate }}
             </v-btn>
@@ -149,14 +195,17 @@
       </v-card-text>
 
       <!-- Footer Actions - Only show when there are existing bookings -->
-      <v-card-actions v-if="bookings.length > 0" class="day-view-footer">
+      <v-card-actions
+        v-if="bookings.length > 0"
+        class="day-view-footer"
+      >
         <v-btn
           variant="elevated"
           color="primary"
           prepend-icon="mdi-plus"
-          @click="addBooking"
           class="add-booking-btn"
           block
+          @click="addBooking"
         >
           Add Another Booking
         </v-btn>
@@ -214,12 +263,17 @@ const formattedDate = computed(() => {
 
 // Helper functions
 const getPropertyName = (propertyId: string): string => {
+  if (!propertyId) return 'Unknown Property';
   const property = props.properties.get(propertyId);
   return property?.name || 'Unknown Property';
 };
 
 const formatBookingTime = (dateString: string): string => {
+  if (!dateString) return 'N/A';
+  
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Invalid Date';
+  
   return date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric'
@@ -315,7 +369,7 @@ watch(internalVisible, async (newVisible) => {
 
 .day-view-card {
   border-radius: 20px 20px 0 0 !important;
-  max-height: 80vh;
+  max-height: 65vh;
   overflow: hidden;
 }
 
@@ -375,15 +429,17 @@ watch(internalVisible, async (newVisible) => {
 .booking-item {
   padding: 16px;
   border-radius: 12px;
-  background: rgb(var(--v-theme-surface));
+  background: #fafafa;
   border: 1px solid rgb(var(--v-theme-outline-variant));
-  margin-bottom: 12px;
+  margin-bottom: 20px;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 .booking-item:hover {
   background: rgb(var(--v-theme-surface-bright));
   border-color: rgb(var(--v-theme-primary));
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .booking-turn {
@@ -417,6 +473,10 @@ watch(internalVisible, async (newVisible) => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.property-icon {
+  color: rgb(var(--v-theme-primary));
 }
 
 .turn-chip {
@@ -533,7 +593,7 @@ watch(internalVisible, async (newVisible) => {
 /* Mobile-specific optimizations */
 @media (max-width: 599px) {
   .day-view-card {
-    max-height: 85vh;
+    max-height: 70vh;
   }
   
   .date-title {
@@ -542,7 +602,7 @@ watch(internalVisible, async (newVisible) => {
   
   .booking-item {
     padding: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
   }
   
   .property-name {

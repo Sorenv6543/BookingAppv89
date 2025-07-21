@@ -22,7 +22,10 @@
 
       <!-- Content Section -->
       <div class="toast-message-section">
-        <div class="toast-title" v-if="notification.title">
+        <div
+          v-if="notification.title"
+          class="toast-title"
+        >
           {{ notification.title }}
         </div>
         <div class="toast-message">
@@ -30,7 +33,10 @@
         </div>
         
         <!-- Progress Indicators -->
-        <div v-if="notification.showProgress" class="toast-progress">
+        <div
+          v-if="notification.showProgress"
+          class="toast-progress"
+        >
           <v-progress-linear
             :model-value="progressValue"
             :color="progressColor"
@@ -40,7 +46,10 @@
         </div>
 
         <!-- Additional Details -->
-        <div v-if="notification.details" class="toast-details">
+        <div
+          v-if="notification.details"
+          class="toast-details"
+        >
           <v-expansion-panels
             variant="accordion"
             class="details-panel"
@@ -58,7 +67,10 @@
       </div>
 
       <!-- Action Section -->
-      <div v-if="hasActions" class="toast-actions">
+      <div
+        v-if="hasActions"
+        class="toast-actions"
+      >
         <div class="action-buttons">
           <v-btn
             v-for="action in notification.actions"
@@ -101,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 
 export interface ToastAction {
   id: string;
