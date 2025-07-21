@@ -13,7 +13,7 @@ A Vue 3 + TypeScript property cleaning scheduler application with role-based acc
 
 ## Development Commands
 ```bash
-# Development
+# Development (http://localhost:3000)
 npm run dev
 
 # Build & Type Check
@@ -33,7 +33,7 @@ npm run perf:analysis
 - **Role-based components**: `/src/components/smart/admin/` and `/src/components/smart/owner/`
 - **Composables**: Role-specific logic in `/src/composables/admin/` and `/src/composables/owner/`
 - **Stores**: Pinia stores for auth, booking, property, user, ui
-- **Supabase**: Authentication, database, and realtime features
+- **Supabase**: Authentication, database, and realtime features (project ref: yplrudursbvzcdaroqly)
 
 ## Important Files
 - `src/router/guards.ts` - Route protection

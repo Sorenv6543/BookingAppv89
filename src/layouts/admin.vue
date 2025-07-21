@@ -1,14 +1,19 @@
 <!-- layouts/admin.vue -->
 <template>
   <v-app>
+    <div class="admin-layout-container">
+      <router-view />
+    </div>
+  </v-app>
+</template>
     <!-- Admin App Bar -->
-    <v-app-bar
+    <!-- <v-app-bar
       app
       color="surface"
       elevation="2"
       class="admin-app-bar"
     >
-      <!-- Logo and Title -->
+     
       <div class="d-flex align-center">
         <v-avatar
           color="primary"
@@ -29,10 +34,10 @@
         </div>
       </div>
 
-      <v-spacer />
+      <v-spacer /> -->
 
       <!-- Admin Navigation -->
-      <div class="d-flex align-center mr-4">
+      <!-- <div class="d-flex align-center mr-4">
         <v-btn
           to="/admin"
           variant="text"
@@ -73,10 +78,10 @@
         >
           Reports
         </v-btn>
-      </div>
+      </div> -->
 
       <!-- User Menu -->
-      <v-menu
+      <!-- <v-menu
         location="bottom end"
         offset="5"
       >
@@ -115,81 +120,30 @@
           />
         </v-list>
       </v-menu>
-    </v-app-bar>
+    </v-app-bar> -->
 
     <!-- Main Content Area -->
-    <v-main 
-    app
-    class="admin-main">
-      <router-view />
-    </v-main>
 
-        <!-- Global Notification Area -->
-        <div id="notification-area">
-          <!-- Global notifications will be mounted here -->
-        </div>
-      
-        <!-- Global Modal Area -->
-        <div id="modal-area">
-          <!-- Global modals will be mounted here -->
-        </div>
-      
-  </v-app>
-</template>
+  
 
 <script setup lang="ts">
-import { useAuth } from '@/composables/shared/useAuth'
-import { useRouter } from 'vue-router'
 
-const { logout: authLogout } = useAuth()
-const router = useRouter()
-
-const logout = async () => {
-  await authLogout()
-  router.push('/auth/login')
-}
 </script>
 
-<style scoped>
-.admin-app-bar {
-  border-bottom: 1px solid rgb(var(--v-theme-primary)) !important;
+
+
+<style>
+/* Minimal layout styles - don't interfere with HomeOwner's layout */
+.admin-layout-container {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
 }
 
-.admin-badge {
-  font-size: 0.75rem;
-  color: rgb(var(--v-theme-primary));
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* Reset any Vuetify v-main styles that could interfere */
+.v-application .admin-layout-container {
+  padding: 0 !important;
+  margin: 0 !important;
 }
-
-.admin-main {
-  height: 100%;
-  background-color: rgb(238, 238, 238);
-
-}
-
-/* Admin-specific button styling */
-.v-btn--variant-text {
-  color: rgb(var(--v-theme-on-surface)) !important;
-}
-
-.v-btn--variant-text:hover {
-  background: rgba(var(--v-theme-primary), 0.08) !important;
-}
-
-.v-btn--variant-text.router-link-active {
-  background: rgba(var(--v-theme-primary), 452) !important;
-  color: rgb(var(--v-theme-primary)) !important;
-}
-
-/* List items in user menu */
-.v-list-item:hover {
-  background: rgba(var(--v-theme-primary), 0.08) !important;
-}
-
-.v-list-item--active {
-  background: rgba(var(--v-theme-primary), 0.12) !important;
-  color: rgb(var(--v-theme-primary)) !important;
-}
-</style> 
+</style>
