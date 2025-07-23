@@ -1,0 +1,271 @@
+@startuml TypeScript Interfaces - Property Cleaning Scheduler
+' !theme spacelab
+title TypeScript Interfaces - Property Cleaning Scheduler
+skinparam backgroundColor <<rgb(48, 226, 137)>>
+
+skinparam classBorderColor <<rgb(20, 18, 12)>>
+skinparam classFontColor <<rgb(20, 18, 12)>>
+skinparam classFontName <<Arial>>
+skinparam classFontSize <<12>>
+
+' User Types and Hierarchyd
+interface User {
+  +id: string
+  +email: string
+  +name: string
+  +role: UserRole
+  +settings: UserSettings
+  +created_at?: string
+  +updated_at?: string
+}
+
+interface UserSettings {
+  +notifications: boolean
+  +timezone: string
+  +theme: 'light' | 'dark' | 'system'
+  +language: string
+}
+
+interface PropertyOwner {
+  +role: 'owner'
+  +company_name?: string
+}
+
+interface Admin {
+  +role: 'admin'
+  +access_level: 'full' | 'limited'
+}
+
+interface Cleaner {
+  +role: 'cleaner'
+  +skills: string[]
+  +max_daily_bookings: number
+  +location?: {lat: number, lng: number}
+}
+
+' Property Types
+interface Property {
+  +id: string
+  +owner_id: string
+  +name: string
+  +address: string
+  +cleaning_duration: number
+  +special_instructions?: string
+  +pricing_tier: PricingTier
+  +active: boolean
+  +created_at?: string
+  +updated_at?: string
+}
+
+interface PropertyWithMetrics {
+  +metrics: PropertyMetrics
+}
+
+class PropertyMetrics {
+  +utilizationRate: number
+  +averageGapBetweenBookings: number
+  +turnPercentage: number
+  +revenueProjection: number
+  +cleaningLoad: 'light' | 'moderate' | 'heavy'
+}
+
+' Booking Types - Core Business Entity
+interface Booking {
+  +id: string
+  +property_id: string
+  +owner_id: string
+  +checkout_date: string
+  +checkin_date: string
+  +booking_type: BookingType
+  +status: BookingStatus
+  +guest_count?: number
+  +notes?: string
+  +assigned_cleaner_id?: string
+  +created_at?: string
+  +updated_at?: string
+}
+
+interface BookingWithMetadata {
+  +property_name?: string
+  +cleaning_window?: CleaningWindow
+  +priority: Priority
+}
+
+class CleaningWindow {
+  +start: string
+  +end: string
+  +duration: number
+  +bufferTime: number
+}
+
+' UI State Types
+interface ModalState {
+  +open: boolean
+  +mode: 'create' | 'edit' | 'view' | 'delete'
+  +data?: any
+}
+
+interface ConfirmDialogState {
+  +open: boolean
+  +title: string
+  +message: string
+  +confirmText?: string
+  +cancelText?: string
+  +confirmColor?: string
+  +dangerous?: boolean
+  +data?: any
+}
+
+interface Notification {
+  +id: string
+  +type: NotificationType
+  +title: string
+  +message: string
+  +timestamp: string
+  +read: boolean
+  +autoClose?: boolean
+  +duration?: number
+}
+
+interface FilterState {
+  +propertyId?: string
+  +bookingType?: 'all' | 'standard' | 'turn'
+  +status?: BookingStatus | 'all'
+  +dateRange?: DateRange
+  +searchTerm?: string
+}
+
+class DateRange {
+  +start: string
+  +end: string
+}
+
+interface CalendarEvent {
+  +id: string
+  +title: string
+  +start: string
+  +end: string
+  +allDay: boolean
+  +classNames: string[]
+  +backgroundColor?: string
+  +borderColor?: string
+  +textColor?: string
+  +extendedProps: EventProps
+}
+
+class EventProps {
+  +booking: any
+  +type: 'standard' | 'turn'
+  +status: string
+}
+
+' Enums and Types
+enum UserRole {
+  owner
+  admin
+  cleaner
+}
+
+enum PricingTier {
+  basic
+  premium
+  luxury
+}
+
+enum BookingType {
+  standard
+  turn
+}
+
+enum BookingStatus {
+  pending
+  scheduled
+  in_progress
+  completed
+  cancelled
+}
+
+enum Priority {
+  low
+  normal
+  high
+  urgent
+}
+
+enum NotificationType {
+  success
+  info
+  warning
+  error
+}
+
+enum CalendarView {
+  month
+  week
+  day
+  list
+}
+
+' Map Collection Types
+class "Map<string, User>" as UserMap
+class "Map<string, Property>" as PropertyMap
+class "Map<string, Booking>" as BookingMap
+class "Map<string, ModalState>" as ModalMap
+
+' Relationships - Inheritance
+User <|-- PropertyOwner
+User <|-- Admin
+User <|-- Cleaner
+
+Property <|-- PropertyWithMetrics
+Booking <|-- BookingWithMetadata
+
+' Relationships - Composition
+User *-- UserSettings
+PropertyWithMetrics *-- PropertyMetrics
+BookingWithMetadata *-- CleaningWindow
+FilterState *-- DateRange
+CalendarEvent *-- EventProps
+
+' Relationships - Associations
+Property ||--o{ Booking : "has many"
+User ||--o{ Property : "owns"
+User ||--o{ Booking : "assigned to"
+
+' Relationships - Enums
+User --> UserRole
+Property --> PricingTier
+Booking --> BookingType
+Booking --> BookingStatus
+BookingWithMetadata --> Priority
+Notification --> NotificationType
+
+' Map Collections
+UserMap --> User
+PropertyMap --> Property
+BookingMap --> Booking
+ModalMap --> ModalState
+
+' Business Logic Notes
+note right of BookingType
+  **CRITICAL BUSINESS DISTINCTION**
+  - turn: Same-day checkout/checkin
+  - standard: Regular cleaning
+  
+  Turn bookings have higher priority
+  and different scheduling constraints
+end note
+
+note right of Priority
+  **PRIORITY CALCULATION**
+  - urgent: < 2-4 hours
+  - high: < 6-12 hours
+  - normal: < 24 hours
+  - low: > 24 hours
+  
+  Turn bookings are always high/urgent
+end note
+
+
+
+@enduml 

@@ -1,0 +1,39 @@
+## Development Workflow
+
+### 1. Planning Phase
+- Study project architecture in @project_summary.md
+- Review current task in @tasks.md
+- Research documentation with Context7 tool
+- Break down implementation steps with sequential thinking
+
+### 2. Implementation Phase
+- **Build in the correct sequence**:
+  1. Routing structure first
+  2. Dumb components (UI only)
+  3. Smart components (Business logic)
+  4. Home.vue orchestrator last
+- **For each component**:
+  - Examine existing components for patterns
+  - Use Map collections for all state
+  - Maintain turn vs standard booking distinction
+  - Reference existing composables and stores
+  - Add TypeScript typing
+
+### 3. Integration Phase
+- Connect components through Home.vue orchestrator
+- Follow the data flow: Dumb → Home → Smart
+- Ensure all UI state managed through UI Store
+- Test component communication paths
+
+### 4. Verification Phase
+- Run TypeScript compilation
+- Verify business logic (especially turn vs standard)
+- Test CRUD operations
+- Check proper store integration
+- Update task status in TASK.md
+
+## Core Architectural Principles
+- **State**: Maps, not arrays
+- **Logic**: Separate business logic from UI
+- **Flow**: Home.vue as central orchestrator
+- **Priority**: Turn bookings > Standard bookings

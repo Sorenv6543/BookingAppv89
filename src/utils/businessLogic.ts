@@ -267,4 +267,127 @@ export const getAvailableStatusTransitions = (booking: Booking): BookingStatus[]
  */
 export const canTransitionBookingStatus = (booking: Booking, newStatus: BookingStatus): boolean => {
   return getAvailableStatusTransitions(booking).includes(newStatus);
-}; 
+};
+
+// Extracted shared logic from stores to eliminate duplication
+export const calculateSystemMetrics = (
+  properties: Map<string, Property>,
+  bookings: Map<string, Booking>
+) => {
+  const now = new Date()
+  const twentyFourHours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+  // const thisMonth = new Date().toISOString().slice(0, 7) // Reserved for future metrics
+  
+  let totalProperties = 0
+  let activeProperties = 0
+  const ownerIds = new Set<string>()
+  
+  // Single pass through properties
+  properties.forEach(property => {
+    totalProperties++
+    if (property.active) activeProperties++
+    ownerIds.add(property.owner_id)
+  })
+  
+  let totalBookings = 0
+  let upcomingBookings = 0
+  let urgentTurns = 0
+  
+  // Single pass through bookings
+  bookings.forEach(booking => {
+    totalBookings++
+    
+    const checkinDate = new Date(booking.checkin_date)
+    const checkoutDate = new Date(booking.checkout_date)
+    
+    if (checkinDate > now && ['confirmed', 'scheduled'].includes(booking.status)) {
+      upcomingBookings++
+    }
+    
+    if (booking.booking_type === 'turn' && 
+        booking.status === 'pending' && 
+        checkoutDate <= twentyFourHours) {
+      urgentTurns++
+    }
+  })
+  
+  return {
+    totalProperties,
+    activeProperties,
+    totalOwners: ownerIds.size,
+    totalBookings,
+    upcomingBookings,
+    urgentTurns
+  }
+}
+
+export const filterBookingsByDateRange = (
+  bookings: Map<string, Booking>,
+  startDate: string,
+  endDate: string
+): Map<string, Booking> => {
+  const start = new Date(startDate).getTime()
+  const end = new Date(endDate).getTime()
+  const filtered = new Map<string, Booking>()
+  
+  bookings.forEach((booking, id) => {
+    const bookingStart = new Date(booking.checkout_date).getTime()
+    const bookingEnd = new Date(booking.checkin_date).getTime()
+    
+    if (bookingStart <= end && bookingEnd >= start) {
+      filtered.set(id, booking)
+    }
+  })
+  
+  return filtered
+}
+
+export const getUrgentTurns = (
+  bookings: Map<string, Booking>,
+  hoursAhead: number = 24
+): Map<string, Booking> => {
+  const cutoffTime = new Date(Date.now() + hoursAhead * 60 * 60 * 1000)
+  const urgentTurns = new Map<string, Booking>()
+  
+  bookings.forEach((booking, id) => {
+    if (booking.booking_type === 'turn' &&
+        booking.status === 'pending' &&
+        new Date(booking.checkout_date) <= cutoffTime) {
+      urgentTurns.set(id, booking)
+    }
+  })
+  
+  return urgentTurns
+}
+
+export const getUpcomingBookings = (
+  bookings: Map<string, Booking>
+): Map<string, Booking> => {
+  const now = new Date()
+  const upcoming = new Map<string, Booking>()
+  
+  bookings.forEach((booking, id) => {
+    if (new Date(booking.checkin_date) > now &&
+        ['confirmed', 'scheduled', 'pending'].includes(booking.status)) {
+      upcoming.set(id, booking)
+    }
+  })
+  
+  return upcoming
+}
+
+export const getRecentBookings = (
+  bookings: Map<string, Booking>,
+  daysBack: number = 30
+): Map<string, Booking> => {
+  const cutoffDate = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000)
+  const recent = new Map<string, Booking>()
+  
+  bookings.forEach((booking, id) => {
+    if (new Date(booking.checkout_date) >= cutoffDate) {
+      recent.set(id, booking)
+    }
+  })
+  
+  return recent
+} 

@@ -1,0 +1,28 @@
+> Read @project_summaryV2.md and @tasks.md to understand the  and current task structure.
+> Examine @repomix-output.md for the current context. look at existing patterns, implementations and state flow.
+
+## For this problem...
+
+1. Plan: While using sequential thinking to break down the problem and plan implementation, look for the relevant keywords within the scope
+of the problem that so context 7 can search for correct combination of tech documentation.   
+refer to @context7_techstack_ids.md for usage examples
+
+2. Implement: fix the problem by following established patterns from @project_summaryV2.md
+
+3. Integrate: Ensure implementation fits the broader project architecture and Map collection patterns
+
+4. Document: update @problemfix.md with new detailed notes about what the problem was why it occured and how it was fixed 
+
+## Key Patterns to Follow:
+- 
+- Follow the Home.vue central orchestrator pattern
+- Maintain turn vs standard booking distinction in all business logic
+- Reference existing composables and stores for consistency
+- Implement proper TypeScript typing and error handling
+
+## Before Marking Complete:
+- [ ] TypeScript compiles without errors
+- [ ] Follows established naming conventions
+- [ ] Integrates with existing stores/composables
+- [ ] Includes basic error handling
+- [ ] Updates any dependent interfaces/types

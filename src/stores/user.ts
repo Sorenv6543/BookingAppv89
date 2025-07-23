@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { User } from '@/types';
-import { usePropertyStore } from './property';
-import { useBookingStore } from './booking';
+import type { User, Property, Booking } from '@/types';
+import { usePropertyStore } from '@/stores/property';
+import { useBookingStore } from '@/stores/booking';
 
 /**
  * User store for the Property Cleaning Scheduler
@@ -38,6 +38,8 @@ export const useUserStore = defineStore('user', () => {
 
   // Getters - User-specific filtered views
   const isAuthenticated = computed(() => !!user.value);
+  const currentUser = computed(() => user.value);
+  const sessionId = computed(() => user.value ? `session-${user.value.id}` : undefined);
   
   /**
    * User's properties (filtered by ownership or admin access)
@@ -56,7 +58,23 @@ export const useUserStore = defineStore('user', () => {
    * User's active properties only
    */
   const userActiveProperties = computed(() => {
-    return userProperties.value.filter(property => property.active);
+    const activeMap = new Map<string, Property>();
+    
+    if (Array.isArray(userProperties.value)) {
+      userProperties.value.forEach(property => {
+        if (property.active) {
+          activeMap.set(property.id, property);
+        }
+      });
+    } else {
+      userProperties.value.forEach((property, id) => {
+        if (property.active) {
+          activeMap.set(id, property);
+        }
+      });
+    }
+    
+    return activeMap;
   });
   
   /**
@@ -83,26 +101,69 @@ export const useUserStore = defineStore('user', () => {
    */
   const userTodayBookings = computed(() => {
     const today = new Date().toISOString().split('T')[0];
-    return userBookings.value.filter(booking => 
-      booking.checkout_date.startsWith(today) || 
-      booking.checkin_date.startsWith(today)
-    );
+    const todayMap = new Map<string, Booking>();
+    
+    if (Array.isArray(userBookings.value)) {
+      userBookings.value.forEach(booking => {
+        if (booking.checkout_date.startsWith(today) || booking.checkin_date.startsWith(today)) {
+          todayMap.set(booking.id, booking);
+        }
+      });
+    } else {
+      userBookings.value.forEach((booking, id) => {
+        if (booking.checkout_date.startsWith(today) || booking.checkin_date.startsWith(today)) {
+          todayMap.set(id, booking);
+        }
+      });
+    }
+    
+    return todayMap;
   });
   
   /**
    * User's turn bookings (urgent)
    */
   const userTurnBookings = computed(() => {
-    return userBookings.value.filter(booking => booking.booking_type === 'turn');
+    const turnMap = new Map<string, Booking>();
+    
+    if (Array.isArray(userBookings.value)) {
+      userBookings.value.forEach(booking => {
+        if (booking.booking_type === 'turn') {
+          turnMap.set(booking.id, booking);
+        }
+      });
+    } else {
+      userBookings.value.forEach((booking, id) => {
+        if (booking.booking_type === 'turn') {
+          turnMap.set(id, booking);
+        }
+      });
+    }
+    
+    return turnMap;
   });
   
   /**
    * User's favorite properties
    */
   const favoriteProperties = computed(() => {
-    return userProperties.value.filter(property => 
-      viewPreferences.value.favoriteProperties.has(property.id)
-    );
+    const favoritesMap = new Map<string, Property>();
+    
+    if (Array.isArray(userProperties.value)) {
+      userProperties.value.forEach(property => {
+        if (viewPreferences.value.favoriteProperties.has(property.id)) {
+          favoritesMap.set(property.id, property);
+        }
+      });
+    } else {
+      userProperties.value.forEach((property, id) => {
+        if (viewPreferences.value.favoriteProperties.has(property.id)) {
+          favoritesMap.set(id, property);
+        }
+      });
+    }
+    
+    return favoritesMap;
   });
   
   /**
@@ -205,6 +266,8 @@ export const useUserStore = defineStore('user', () => {
     
     // Getters - User-filtered views
     isAuthenticated,
+    currentUser,
+    sessionId,
     userProperties,
     userActiveProperties,
     userBookings,

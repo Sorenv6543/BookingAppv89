@@ -30,9 +30,12 @@ export interface Booking {
   status: BookingStatus;
   guest_count?: number;
   notes?: string;
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
   assigned_cleaner_id?: string;
   created_at?: string;
   updated_at?: string;
+  // Add index signature to allow conversion to Record<string, unknown>
+  [key: string]: unknown;
 }
 
 /**
@@ -51,8 +54,12 @@ export interface BookingWithMetadata extends Booking {
 
 /**
  * Form data for creating/editing bookings
+ * Includes optional start/end properties for FullCalendar integration
  */
-export type BookingFormData = Omit<Booking, 'id' | 'created_at' | 'updated_at'>;
+export type BookingFormData = Omit<Booking, 'id' | 'created_at' | 'updated_at'> & {
+  start?: string;
+  end?: string;
+};
 
 /**
  * Map type for booking collections
@@ -62,10 +69,13 @@ export type BookingMap = Map<string, Booking>;
 /**
  * Type guard for Booking objects
  */
-export function isBooking(obj: any): obj is Booking {
-  return obj && 
-    typeof obj.id === 'string' &&
-    typeof obj.property_id === 'string' &&
-    typeof obj.checkout_date === 'string' &&
-    typeof obj.checkin_date === 'string';
+export function isBooking(obj: unknown): obj is Booking {
+  if (typeof obj !== 'object' || obj === null) return false;
+  const b = obj as Partial<Booking>;
+  return (
+    typeof b.id === 'string' &&
+    typeof b.property_id === 'string' &&
+    typeof b.checkout_date === 'string' &&
+    typeof b.checkin_date === 'string'
+  );
 }

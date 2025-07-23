@@ -1,0 +1,221 @@
+@startuml Event Flow Sequence - Property Cleaning Scheduler
+!theme plain
+title Event Flow Sequence - Property Cleaning Scheduler
+
+actor User
+participant "Sidebar.vue" as Sidebar
+participant "Home.vue" as Home <<Central Orchestrator>>
+participant "FullCalendar.vue" as Calendar
+participant "BookingForm.vue" as BookingForm
+participant "PropertyModal.vue" as PropertyModal
+participant "ConfirmationDialog.vue" as ConfirmDialog
+
+box "Pinia Stores" #LightBlue
+  participant "UIStore" as UIStore
+  participant "BookingStore" as BookingStore
+  participant "PropertyStore" as PropertyStore
+end box
+
+box "Business Logic" #LightGreen
+  participant "useBookings" as UseBookings
+  participant "businessLogic.ts" as BusinessLogic
+end box
+
+== User Navigates to Booking from Sidebar ==
+
+User -> Sidebar: Click on turn alert booking
+activate Sidebar
+Sidebar -> Home: emit('navigateToBooking', bookingId)
+activate Home
+note right: Central orchestrator receives event
+Home -> Calendar: goToBooking(bookingId)
+activate Calendar
+Calendar -> BookingStore: getBooking(bookingId)
+activate BookingStore
+BookingStore --> Calendar: booking data
+deactivate BookingStore
+Calendar -> Calendar: highlightEvent(booking)
+Calendar --> Home: booking highlighted
+deactivate Calendar
+Home --> Sidebar: navigation complete
+deactivate Home
+deactivate Sidebar
+
+== User Filters by Property ==
+
+User -> Sidebar: Select property filter
+activate Sidebar
+Sidebar -> Home: emit('filterByProperty', propertyId)
+activate Home
+Home -> Home: updateFilteredBookings(propertyId)
+Home -> BookingStore: getBookingsByProperty(propertyId)
+activate BookingStore
+BookingStore --> Home: filtered bookings
+deactivate BookingStore
+Home -> Calendar: updateBookings(filteredBookings)
+activate Calendar
+Calendar -> Calendar: rerenderEvents()
+Calendar --> Home: calendar updated
+deactivate Calendar
+Home --> Sidebar: filter applied
+deactivate Home
+deactivate Sidebar
+
+== User Creates New Booking ==
+
+User -> Sidebar: Click "New Booking" button
+activate Sidebar
+Sidebar -> Home: emit('createBooking')
+activate Home
+Home -> UIStore: openModal('booking', 'create')
+activate UIStore
+UIStore --> Home: modal state updated
+deactivate UIStore
+Home -> BookingForm: open modal (mode: create)
+activate BookingForm
+BookingForm --> User: Show booking form
+User -> BookingForm: Fill form and submit
+BookingForm -> BookingForm: validateForm()
+BookingForm -> Home: emit('save', bookingData)
+Home -> UseBookings: createBooking(bookingData)
+activate UseBookings
+UseBookings -> BusinessLogic: validateBooking(bookingData)
+activate BusinessLogic
+BusinessLogic -> BusinessLogic: calculatePriority()
+BusinessLogic -> BusinessLogic: detectConflicts()
+BusinessLogic --> UseBookings: validation result
+deactivate BusinessLogic
+UseBookings -> BookingStore: createBooking(validatedData)
+activate BookingStore
+BookingStore -> BookingStore: bookings.set(id, booking)
+BookingStore --> UseBookings: created booking
+deactivate BookingStore
+UseBookings --> Home: booking created
+deactivate UseBookings
+Home -> UIStore: closeModal('booking')
+activate UIStore
+UIStore --> Home: modal closed
+deactivate UIStore
+Home -> Calendar: refreshBookings()
+activate Calendar
+Calendar -> BookingStore: getAllBookings()
+activate BookingStore
+BookingStore --> Calendar: updated bookings
+deactivate BookingStore
+Calendar -> Calendar: rerenderEvents()
+Calendar --> Home: calendar refreshed
+deactivate Calendar
+Home --> BookingForm: close modal
+deactivate BookingForm
+deactivate Home
+deactivate Sidebar
+
+== User Drags Event on Calendar ==
+
+User -> Calendar: Drag booking event to new time
+activate Calendar
+Calendar -> Calendar: validateDrop()
+Calendar -> Home: emit('eventDrop', {bookingId, newDate})
+activate Home
+Home -> UseBookings: updateBooking(bookingId, {date: newDate})
+activate UseBookings
+UseBookings -> BusinessLogic: validateTurnBooking()
+activate BusinessLogic
+BusinessLogic -> BusinessLogic: checkTimeConstraints()
+BusinessLogic --> UseBookings: validation result
+deactivate BusinessLogic
+
+alt Validation Successful
+  UseBookings -> BookingStore: updateBooking(bookingId, updates)
+  activate BookingStore
+  BookingStore -> BookingStore: bookings.set(id, updatedBooking)
+  BookingStore --> UseBookings: updated booking
+  deactivate BookingStore
+  UseBookings --> Home: update successful
+  Home -> Calendar: confirmDrop()
+  Calendar -> Calendar: updateEventDisplay()
+  Calendar --> User: Visual confirmation
+else Validation Failed
+  UseBookings --> Home: validation error
+  Home -> Calendar: revertDrop()
+  Calendar -> Calendar: revertEventPosition()
+  Home -> UIStore: addNotification(error)
+  activate UIStore
+  UIStore --> Home: error notification added
+  deactivate UIStore
+  Calendar --> User: Show error message
+end
+
+deactivate UseBookings
+deactivate Home
+deactivate Calendar
+
+== User Deletes Booking ==
+
+User -> Calendar: Click on booking event
+activate Calendar
+Calendar -> Home: emit('eventClick', booking)
+activate Home
+Home -> UIStore: openModal('booking', 'edit', booking)
+activate UIStore
+UIStore --> Home: modal opened
+deactivate UIStore
+Home -> BookingForm: open modal (mode: edit, data: booking)
+activate BookingForm
+BookingForm --> User: Show booking details
+User -> BookingForm: Click delete button
+BookingForm -> Home: emit('delete', bookingId)
+Home -> UIStore: openModal('confirm', 'delete')
+activate UIStore
+UIStore --> Home: confirmation modal opened
+deactivate UIStore
+Home -> ConfirmDialog: show confirmation
+activate ConfirmDialog
+ConfirmDialog --> User: "Are you sure?"
+User -> ConfirmDialog: Confirm deletion
+ConfirmDialog -> Home: emit('confirm')
+Home -> UseBookings: deleteBooking(bookingId)
+activate UseBookings
+UseBookings -> BookingStore: deleteBooking(bookingId)
+activate BookingStore
+BookingStore -> BookingStore: bookings.delete(id)
+BookingStore --> UseBookings: booking deleted
+deactivate BookingStore
+UseBookings --> Home: deletion successful
+deactivate UseBookings
+Home -> UIStore: closeModal('confirm')
+activate UIStore
+UIStore --> Home: confirmation closed
+deactivate UIStore
+Home -> UIStore: closeModal('booking')
+UIStore --> Home: booking modal closed
+deactivate UIStore
+Home -> Calendar: refreshBookings()
+activate Calendar
+Calendar -> BookingStore: getAllBookings()
+activate BookingStore
+BookingStore --> Calendar: updated bookings
+deactivate BookingStore
+Calendar -> Calendar: rerenderEvents()
+Calendar --> User: Booking removed from calendar
+deactivate Calendar
+Home --> ConfirmDialog: close dialog
+deactivate ConfirmDialog
+Home --> BookingForm: close modal
+deactivate BookingForm
+deactivate Home
+deactivate Calendar
+
+== Error Handling Flow ==
+
+note over Home, BusinessLogic
+  **Error Handling Pattern**
+  1. Business logic validation fails
+  2. Error propagated up through composables
+  3. Home.vue catches error
+  4. UIStore manages error notification
+  5. User sees error message
+  6. UI reverts to previous state
+end note
+
+@enduml 

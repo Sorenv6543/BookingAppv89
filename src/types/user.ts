@@ -9,8 +9,7 @@
 export type UserRole = 'owner' | 'admin' | 'cleaner';
 
 /**
- * User settings interface
- * Contains customizable user preferences
+ * User settings interface (nested structure)
  */
 export interface UserSettings {
   notifications: boolean;
@@ -21,16 +20,48 @@ export interface UserSettings {
 
 /**
  * Base User interface
- * Core data model for all users
+ * Core data model for all users - supports both flattened and nested settings
  */
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: UserRole;
-  settings: UserSettings;
+  role: UserRole; // Database column is 'role'
+  company_name?: string; // for property owners
+  
+  // Contact and verification fields
+  address?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  phone?: string;
+  email_verified?: boolean;
+  
+  // User preferences
+  date_format?: string;
+  
+  // Flattened settings (primary - matches database schema)
+  notifications_enabled: boolean;
+  timezone: string;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  
+  // Nested settings (for backward compatibility)
+  settings?: UserSettings;
+  
+  // Admin-specific fields
+  access_level?: string;
+  
+  // Cleaner-specific fields
+  skills?: string[];
+  max_daily_bookings?: number;
+  location?: { lat: number; lng: number; };
+  location_lat?: number;
+  location_lng?: number;
+  
   created_at?: string;
   updated_at?: string;
+  last_sign_in_at?: string;
 }
 
 /**
@@ -40,6 +71,12 @@ export interface User {
 export interface PropertyOwner extends User {
   role: 'owner';
   company_name?: string;
+  // Ensure settings compatibility
+  notifications_enabled: boolean;
+  timezone: string;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  settings?: UserSettings;
 }
 
 /**
@@ -49,6 +86,12 @@ export interface PropertyOwner extends User {
 export interface Admin extends User {
   role: 'admin';
   access_level: 'full' | 'limited';
+  // Ensure settings compatibility
+  notifications_enabled: boolean;
+  timezone: string;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  settings?: UserSettings;
 }
 
 /**
@@ -59,10 +102,15 @@ export interface Cleaner extends User {
   role: 'cleaner';
   skills: string[];
   max_daily_bookings: number;
-  location?: {
-    lat: number;
-    lng: number;
-  };
+  location_lat?: number;
+  location_lng?: number;
+  // Ensure settings compatibility and location support
+  notifications_enabled: boolean;
+  timezone: string;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  settings?: UserSettings;
+  City?: string;// For useCleanerManagement compatibility
 }
 
 /**

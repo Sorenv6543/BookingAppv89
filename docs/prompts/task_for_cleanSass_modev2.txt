@@ -1,0 +1,34 @@
+> Read @project_summary.md and @tasks.md to understand **role-based multi-tenant architecture** and current task structure.
+> Check @repomix-output.md for current project state and existing implementations.
+
+## For TASK-039M
+1. **Context First**: Use Context7 tool to research relevant documentation from @context7_techstack_ids.md before starting
+2. **Plan**: Use sequential thinking to break down the task and plan im*role-based considerations**
+3. **Implement**: Build the feature following established **role-based patterns** from @project_summary.md
+4. **Integrate**: Ensure implementation fits the **multi-tenant architecture** and Map collection patterns
+5. **Test**: Create/update **role-specific tests** and use demo components for verification
+6. **Update**: Change task status from "Not Started" to "Complete" in tasks.md
+7. **Document**: Add detailed notes about implementation decisions, **role-specific features**, and any challenges
+8. **Verify**: Check off task with [x] and ensure it enables future dependent tasks
+
+## Key Patterns to Follow:
+
+### **Role-Based Architecture Patterns**
+- **Multi-Tenant Design**: Property owners (30-40 clients) vs cleaning business admin interfaces
+- **Data Scoping**: Owner sees only their data, admin sees all data across all clients
+- **Role-Specific Orchestrators**: HomeOwner.vue vs HomeAdmin.vue (not generic Home.vue)
+- **Component Separation**: owner/, admin/, shared/ folder structure
+- **Security Awareness**: Frontend filtering for UX, document need for backend RLS
+
+ Use Map collections for all state management
+ Follow the Home.vue central orchestrator pattern
+ Maintain turn vs standard booking distinction in all business logic
+ Reference existing composables and stores for consistency
+ Implement proper TypeScript typing and error handling
+
+ Before Marking Complete:
+[ ] TypeScript compiles without errors
+[ ] Follows established naming conventions
+[ ] Integrates with existing stores/composables
+[ ] Includes basic error handling
+[ ] Updates any dependent interfaces/types

@@ -1,0 +1,37 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--project-ref=yplrudursbvzcdaroqly",
+        "--access-token=sbp_715bd10f073b43503b77a744b3e75cb47621d99f"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "sbp_715bd10f073b43503b77a744b3e75cb47621d99f"
+      }
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {}
+    },
+    "desktop-commander": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@wonderwhy-er/desktop-commander"
+      ],
+      "env": {}
+    }
+  }
+}

@@ -17,7 +17,7 @@ describe('Property Store', () => {
     expect(store.error).toBeNull();
   });
 
-  it('should add properties to the Map', () => {
+  it('should add properties to the Map', async () => {
     const store = usePropertyStore();
     const property: Property = {
       id: 'prop1',
@@ -29,13 +29,13 @@ describe('Property Store', () => {
       active: true
     };
 
-    store.addProperty(property);
+    await store.addProperty(property);
     expect(store.properties.size).toBe(1);
     expect(store.properties.get('prop1')).toEqual(property);
     expect(store.propertiesArray.length).toBe(1);
   });
 
-  it('should update properties in the Map', () => {
+  it('should update properties in the Map', async () => {
     const store = usePropertyStore();
     const property: Property = {
       id: 'prop1',
@@ -47,8 +47,8 @@ describe('Property Store', () => {
       active: true
     };
 
-    store.addProperty(property);
-    store.updateProperty('prop1', { 
+    await store.addProperty(property);
+    await store.updateProperty('prop1', { 
       name: 'Updated Beach House', 
       cleaning_duration: 150 
     });
@@ -59,7 +59,7 @@ describe('Property Store', () => {
     expect(updated?.updated_at).toBeDefined();
   });
 
-  it('should remove properties from the Map', () => {
+  it('should remove properties from the Map', async () => {
     const store = usePropertyStore();
     const property: Property = {
       id: 'prop1',
@@ -71,18 +71,18 @@ describe('Property Store', () => {
       active: true
     };
 
-    store.addProperty(property);
+    await store.addProperty(property);
     expect(store.properties.size).toBe(1);
     
-    store.removeProperty('prop1');
+    await store.removeProperty('prop1');
     expect(store.properties.size).toBe(0);
     expect(store.properties.get('prop1')).toBeUndefined();
   });
   
-  it('should filter active properties', () => {
+  it('should filter active properties', async () => {
     const store = usePropertyStore();
     
-    store.addProperty({
+    await store.addProperty({
       id: 'prop1',
       owner_id: 'owner1',
       name: 'Active Property',
@@ -92,7 +92,7 @@ describe('Property Store', () => {
       active: true
     });
     
-    store.addProperty({
+    await store.addProperty({
       id: 'prop2',
       owner_id: 'owner1',
       name: 'Inactive Property',
@@ -107,10 +107,10 @@ describe('Property Store', () => {
     expect(store.activeProperties[0].name).toBe('Active Property');
   });
   
-  it('should filter properties by pricing tier', () => {
+  it('should filter properties by pricing tier', async () => {
     const store = usePropertyStore();
     
-    store.addProperty({
+    await store.addProperty({
       id: 'prop1',
       owner_id: 'owner1',
       name: 'Basic Property',
@@ -120,7 +120,7 @@ describe('Property Store', () => {
       active: true
     });
     
-    store.addProperty({
+    await store.addProperty({
       id: 'prop2',
       owner_id: 'owner1',
       name: 'Premium Property',
@@ -130,7 +130,7 @@ describe('Property Store', () => {
       active: true
     });
     
-    store.addProperty({
+    await store.addProperty({
       id: 'prop3',
       owner_id: 'owner2',
       name: 'Luxury Property',
@@ -141,16 +141,16 @@ describe('Property Store', () => {
     });
     
     expect(store.properties.size).toBe(3);
-    expect(store.propertiesByPricingTier('basic').length).toBe(1);
-    expect(store.propertiesByPricingTier('premium').length).toBe(1);
-    expect(store.propertiesByPricingTier('luxury').length).toBe(1);
-    expect(store.propertiesByPricingTier('basic')[0].name).toBe('Basic Property');
+    expect(store.propertiesByPricingTier('basic').size).toBe(1);
+    expect(store.propertiesByPricingTier('premium').size).toBe(1);
+    expect(store.propertiesByPricingTier('luxury').size).toBe(1);
+    expect(Array.from(store.propertiesByPricingTier('basic').values())[0].name).toBe('Basic Property');
   });
   
-  it('should filter properties by owner', () => {
+  it('should filter properties by owner', async () => {
     const store = usePropertyStore();
     
-    store.addProperty({
+    await store.addProperty({
       id: 'prop1',
       owner_id: 'owner1',
       name: 'Owner 1 Property A',
@@ -160,7 +160,7 @@ describe('Property Store', () => {
       active: true
     });
     
-    store.addProperty({
+    await store.addProperty({
       id: 'prop2',
       owner_id: 'owner1',
       name: 'Owner 1 Property B',
@@ -170,7 +170,7 @@ describe('Property Store', () => {
       active: true
     });
     
-    store.addProperty({
+    await store.addProperty({
       id: 'prop3',
       owner_id: 'owner2',
       name: 'Owner 2 Property',
@@ -180,15 +180,15 @@ describe('Property Store', () => {
       active: true
     });
     
-    expect(store.propertiesByOwner('owner1').length).toBe(2);
-    expect(store.propertiesByOwner('owner2').length).toBe(1);
-    expect(store.propertiesByOwner('owner3').length).toBe(0);
+    expect(store.propertiesByOwner('owner1').size).toBe(2);
+    expect(store.propertiesByOwner('owner2').size).toBe(1);
+    expect(store.propertiesByOwner('owner3').size).toBe(0);
   });
   
-  it('should clear all properties', () => {
+  it('should clear all properties', async () => {
     const store = usePropertyStore();
     
-    store.addProperty({
+    await store.addProperty({
       id: 'prop1',
       owner_id: 'owner1',
       name: 'Property 1',
@@ -198,7 +198,7 @@ describe('Property Store', () => {
       active: true
     });
     
-    store.addProperty({
+    await store.addProperty({
       id: 'prop2',
       owner_id: 'owner1',
       name: 'Property 2',

@@ -57,6 +57,6 @@ export interface AuthResponse {
     id: string;
     email: string;
   } | null;
-  session: any | null;
+  session: Record<string, unknown> | null;
   error: string | null;
 }

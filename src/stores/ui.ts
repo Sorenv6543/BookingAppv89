@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { ModalState, Notification, NotificationType, FilterState } from '@/types';
+import type { ModalState, ConfirmDialogState, Notification, NotificationType, FilterState, ModalData, FilterValue } from '@/types';
 
 /**
  * UI store for the Property Cleaning Scheduler
@@ -9,6 +9,7 @@ import type { ModalState, Notification, NotificationType, FilterState } from '@/
 export const useUIStore = defineStore('ui', () => {
   // State
   const modals = ref<Map<string, ModalState>>(new Map());
+  const confirmDialogs = ref<Map<string, ConfirmDialogState>>(new Map());
   const sidebars = ref<Map<string, boolean>>(new Map([
     ['main', true], // Main sidebar is open by default
     ['filters', false],
@@ -24,12 +25,15 @@ export const useUIStore = defineStore('ui', () => {
   const error = ref<string | null>(null);
   const filterState = ref<FilterState>({
     bookingType: 'all',
-    status: [],
+    status: 'all',
     dateRange: undefined,
     propertyId: undefined,
     searchTerm: undefined
   });
   const currentCalendarView = ref<string>('timeGridWeek');
+  const selectedPropertyFilter = ref<string | null>(null);
+  // Additional arbitrary filter values map
+  const filterValues = ref<Map<string, FilterValue>>(new Map());
   
   // Getters
   const isModalOpen = computed(() => (modalId: string): boolean => {
@@ -38,6 +42,18 @@ export const useUIStore = defineStore('ui', () => {
   
   const getModalState = computed(() => (modalId: string): ModalState | undefined => {
     return modals.value.get(modalId);
+  });
+  
+  const getModalData = computed(() => (modalId: string): ModalData => {
+    return modals.value.get(modalId)?.data;
+  });
+  
+  const isConfirmDialogOpen = computed(() => (dialogId: string): boolean => {
+    return confirmDialogs.value.get(dialogId)?.open || false;
+  });
+  
+  const getConfirmDialogState = computed(() => (dialogId: string): ConfirmDialogState | undefined => {
+    return confirmDialogs.value.get(dialogId);
   });
   
   const isSidebarOpen = computed(() => (sidebarId: string): boolean => {
@@ -57,7 +73,7 @@ export const useUIStore = defineStore('ui', () => {
   });
   
   // Actions
-  function openModal(modalId: string, mode: 'create' | 'edit' | 'view' | 'delete' = 'view', data?: any) {
+  function openModal(modalId: string, mode: 'create' | 'edit' | 'view' | 'delete' = 'view', data?: ModalData) {
     modals.value.set(modalId, {
       open: true,
       mode,
@@ -84,6 +100,49 @@ export const useUIStore = defineStore('ui', () => {
     });
   }
   
+  function openConfirmDialog(
+    dialogId: string, 
+    options: {
+          title?: string;
+          message?: string;
+          confirmText?: string;
+          cancelText?: string;
+          confirmColor?: string;
+          dangerous?: boolean;
+          data?: ModalData;
+        } = {}  
+  ) {
+    confirmDialogs.value.set(dialogId, {
+      open: true,
+      title: options.title || '',
+      message: options.message || '',
+      confirmText: options.confirmText,
+      cancelText: options.cancelText,
+      confirmColor: options.confirmColor,
+      dangerous: options.dangerous,
+      data: options.data
+    });
+  }
+  
+  function closeConfirmDialog(dialogId: string) {
+    const dialog = confirmDialogs.value.get(dialogId);
+    if (dialog) {
+      confirmDialogs.value.set(dialogId, {
+        ...dialog,
+        open: false
+      });
+    }
+  }
+  
+  function closeAllConfirmDialogs() {
+    confirmDialogs.value.forEach((dialog, id) => {
+      confirmDialogs.value.set(id, {
+        ...dialog,
+        open: false
+      });
+    });
+  }
+  
   function toggleSidebar(sidebarId: string) {
     const currentState = sidebars.value.get(sidebarId) || false;
     sidebars.value.set(sidebarId, !currentState);
@@ -103,6 +162,7 @@ export const useUIStore = defineStore('ui', () => {
       type,
       title,
       message,
+      read: false,
       timestamp: new Date().toISOString(),
       autoClose,
       duration: autoClose ? 5000 : undefined
@@ -139,41 +199,155 @@ export const useUIStore = defineStore('ui', () => {
       addNotification('error', 'Error', errorMessage);
     }
   }
+
+  // Convenience methods for common UI patterns
+  function showNotification(message: string, type: NotificationType = 'info') {
+    return addNotification(type, type.charAt(0).toUpperCase() + type.slice(1), message);
+  }
+  
+  function showConfirmation(
+    title: string,
+    message: string,
+    options: {
+      confirmText?: string;
+      cancelText?: string;
+      dangerous?: boolean;
+    } = {}
+  ): Promise<boolean> {
+    return new Promise((resolve) => {
+      const dialogId = 'confirmation-' + crypto.randomUUID();
+      openConfirmDialog(dialogId, {
+        title,
+        message,
+        confirmText: options.confirmText || 'Confirm',
+        cancelText: options.cancelText || 'Cancel',
+        dangerous: options.dangerous || false
+      });
+      
+      // Return promise that resolves when dialog is closed
+      // This is a simplified implementation - in a real app you'd use events
+      setTimeout(() => {
+        closeConfirmDialog(dialogId);
+        resolve(false); // For now, always resolve false - would need event handling for real implementation
+      }, 100);
+    });
+  }
   
   function updateFilter(filter: Partial<FilterState>) {
     filterState.value = {
       ...filterState.value,
       ...filter
     };
+    
+    // Keep selectedPropertyFilter in sync with filterState.propertyId
+    if (filter.propertyId !== undefined) {
+      selectedPropertyFilter.value = filter.propertyId;
+    }
   }
   
   function resetFilters() {
     filterState.value = {
       bookingType: 'all',
-      status: [],
+      status: 'all',
       dateRange: undefined,
       propertyId: undefined,
       searchTerm: undefined
     };
+    
+    // Reset selectedPropertyFilter too
+    selectedPropertyFilter.value = null;
+    
+    // Also clear the filterValues map
+    filterValues.value.clear();
   }
   
   function setCalendarView(view: string) {
     currentCalendarView.value = view;
   }
   
+  function setPropertyFilter(propertyId: string | null) {
+    selectedPropertyFilter.value = propertyId;
+    
+    // Keep filterState.propertyId in sync with selectedPropertyFilter
+    updateFilter({
+      propertyId: propertyId || undefined
+    });
+  }
+  
+  /**
+   * Set an arbitrary filter value by key
+   * This allows for flexible filtering not covered by the FilterState interface
+   */
+  function setFilter(key: string, value: FilterValue) {
+    filterValues.value.set(key, value);
+    
+    // Special case handling for known filter keys
+    if (key === 'calendarView' && typeof value === 'string') {
+      setCalendarView(value);
+    }
+    else if (key === 'dateRangeStart' && typeof value === 'string' && filterState.value.dateRange) {
+      updateFilter({
+        dateRange: {
+          ...filterState.value.dateRange,
+          start: value
+        }
+      });
+    }
+    else if (key === 'dateRangeEnd' && typeof value === 'string' && filterState.value.dateRange) {
+      updateFilter({
+        dateRange: {
+          ...filterState.value.dateRange,
+          end: value
+        }
+      });
+    }
+    else if (key === 'dateRangeStart' && typeof value === 'string' && !filterState.value.dateRange) {
+      // Initialize dateRange if it doesn't exist
+      updateFilter({
+        dateRange: {
+          start: value,
+          end: value // Default to same as start if not set
+        }
+      });
+    }
+    else if (key === 'dateRangeEnd' && typeof value === 'string' && !filterState.value.dateRange) {
+      // Initialize dateRange if it doesn't exist
+      updateFilter({
+        dateRange: {
+          start: value, // Default to same as end if not set
+          end: value
+        }
+      });
+    }
+  }
+  
+  /**
+   * Get an arbitrary filter value by key
+   * Returns undefined if the filter doesn't exist
+   */
+  function getFilter(key: string): FilterValue {
+    return filterValues.value.get(key);
+  }
+  
   return {
     // State
     modals,
+    confirmDialogs,
     sidebars,
     notifications,
     loading,
     error,
     filterState,
     currentCalendarView,
+    selectedPropertyFilter,
+    filterValues,
     
     // Getters
     isModalOpen,
     getModalState,
+    getModalData,
+    isConfirmDialogOpen,
+    getConfirmDialogState,
     isSidebarOpen,
     isLoading,
     anyLoading,
@@ -183,6 +357,9 @@ export const useUIStore = defineStore('ui', () => {
     openModal,
     closeModal,
     closeAllModals,
+    openConfirmDialog,
+    closeConfirmDialog,
+    closeAllConfirmDialogs,
     toggleSidebar,
     setSidebarState,
     setLoading,
@@ -190,8 +367,13 @@ export const useUIStore = defineStore('ui', () => {
     removeNotification,
     clearNotifications,
     setError,
+    showNotification,
+    showConfirmation,
     updateFilter,
     resetFilters,
-    setCalendarView
+    setCalendarView,
+    setPropertyFilter,
+    setFilter,
+    getFilter
   };
 }); 
