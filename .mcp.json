@@ -1,5 +1,16 @@
 {
   "mcpServers": {
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {}
+    },
     "supabase": {
       "type": "stdio",
       "command": "cmd",
@@ -17,8 +28,10 @@
     },
     "context7": {
       "type": "stdio",
-      "command": "npx",
+      "command": "cmd",
       "args": [
+        "/c",
+        "npx",
         "-y",
         "@upstash/context7-mcp"
       ],
@@ -26,8 +39,10 @@
     },
     "desktop-commander": {
       "type": "stdio",
-      "command": "npx",
+      "command": "cmd",
       "args": [
+        "/c",
+        "npx",
         "-y",
         "@wonderwhy-er/desktop-commander"
       ],
