@@ -28,28 +28,26 @@
 
     <!-- Main Content -->
     <div class="page-content">
-     
-        <v-row no-gutters class="fill-height">
-          <!-- Calendar (Full Width) -->
-          <v-col cols="12" md="12" class="calendar-col">
-            <AdminCalendar
-              :bookings="bookingStore.bookings"
-              :properties="propertyStore.properties"
-              :users="usersMap"
-              :loading="loading"
-              @date-select="handleDateSelect"
-              @event-click="handleEventClick"
-              @event-drop="handleEventDrop"
-              @create-booking="handleCreateBooking"
-              @update-booking="handleUpdateBooking"
-              @assign-cleaner="handleAssignCleaner"
-              @update-booking-status="handleUpdateBookingStatus"
-              @view-change="handleViewChange"
-              @date-change="handleDateChange"
-            />
-          </v-col>
-        </v-row>
-     
+      <v-row no-gutters class="fill-height">
+        <!-- Calendar (Full Width) -->
+        <v-col cols="12" md="12" class="calendar-col">
+          <AdminCalendar
+            :bookings="bookingStore.bookings"
+            :properties="propertyStore.properties"
+            :users="usersMap"
+            :loading="loading"
+            @date-select="handleDateSelect"
+            @event-click="handleEventClick"
+            @event-drop="handleEventDrop"
+            @create-booking="handleCreateBooking"
+            @update-booking="handleUpdateBooking"
+            @assign-cleaner="handleAssignCleaner"
+            @update-booking-status="handleUpdateBookingStatus"
+            @view-change="handleViewChange"
+            @date-change="handleDateChange"
+          />
+        </v-col>
+      </v-row>
     </div>
 
     <!-- Modals -->
@@ -93,7 +91,7 @@ import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/c
 const uiStore = useUIStore()
 const bookingStore = useBookingStore()
 const propertyStore = usePropertyStore()
-const userStore = useUserStore()
+const _userStore = useUserStore()
 const { users: allUsers, fetchAllUsers } = useAdminUserManagement()
 // const router = useRouter()
 const { createBooking: createBookingFn, updateBooking } = useAdminBookings()

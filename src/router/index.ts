@@ -34,7 +34,7 @@ const router = createRouter({
     // Owner routes - only accessible to owner users
     {
       path: '/owner/dashboard',
-      name: 'owner-dashboard',
+      name: 'HomeOwner',
       component: () => import('@/pages/owner/dashboard.vue'),
       meta: {
         layout: 'owner', 
@@ -82,7 +82,7 @@ const router = createRouter({
     {
       path: '/admin',
       name: 'admin-dashboard',
-      component: () => import('@/pages/admin/dashboard.vue'),
+      component: () => import('@/pages/admin/index.vue'),
       meta: {
         layout: 'admin',
         role: 'admin'

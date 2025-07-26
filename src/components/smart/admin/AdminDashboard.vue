@@ -405,16 +405,63 @@
               </v-card>
             </v-col>
           </v-row>
+
+          <!-- Calendar Preview Section -->
+          <v-row class="mt-4">
+            <v-col cols="12">
+              <v-card class="dashboard-widget">
+                <v-card-title class="d-flex align-center pa-3 pa-sm-4">
+                  <v-icon class="mr-2">
+                    mdi-calendar
+                  </v-icon>
+                  <span :class="mobile ? 'text-subtitle-1' : 'text-h6'">Calendar Overview</span>
+                  <v-spacer />
+                  <v-btn
+                    color="primary"
+                    variant="outlined"
+                    size="small"
+                    @click="navigateTo('/admin/schedule')"
+                  >
+                    <v-icon start>mdi-fullscreen</v-icon>
+                    Full Calendar
+                  </v-btn>
+                </v-card-title>
+                
+                <v-card-text class="pa-2 pa-sm-4">
+                  <!-- Calendar Preview Component -->
+                  <div class="calendar-preview-container">
+                    <AdminCalendar
+                      :bookings="bookingStore.bookings"
+                      :properties="propertyStore.properties"
+                      :users="usersMap"
+                      :loading="loading"
+                      :preview-mode="true"
+                      @date-select="handleCalendarDateSelect"
+                      @event-click="handleCalendarEventClick"
+                      @view-change="handleViewChange"
+                      @date-change="handleDateChange"
+                    />
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
         </v-container>
       </div>
     </div>
   </div>
 </template>
 
+<!-- This violate current project archetectute where HomaAdmin handles state flow (props) emits as described in project_summary.md -->
+
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
+import AdminCalendar from './AdminCalendar.vue';
+import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
+import { useBookingStore } from '@/stores/booking';
+import { usePropertyStore } from '@/stores/property';
 
 // Props & Emits
 interface Emits {
@@ -426,9 +473,21 @@ const emit = defineEmits<Emits>();
 // Composables
 const router = useRouter();
 const { mobile } = useDisplay();
+const bookingStore = useBookingStore();
+const propertyStore = usePropertyStore();
+const { users: allUsers, fetchAllUsers } = useAdminUserManagement();
 
 // Reactive state
 const loading = ref(false);
+
+// Create users Map for AdminCalendar
+const usersMap = computed(() => {
+  const map = new Map();
+  allUsers.value.forEach(user => {
+    map.set(user.id, user);
+  });
+  return map;
+});
 
 // Dashboard data (mock data)
 const dashboardData = ref({
@@ -572,9 +631,41 @@ const getPerformanceColor = (performance: number) => {
   return 'error';
 };
 
+// Calendar preview handlers
+const handleCalendarDateSelect = (selectInfo: any) => {
+  // Navigate to full calendar with date selection
+  router.push(`/admin/schedule?date=${selectInfo.startStr}&action=create`);
+};
+
+const handleCalendarEventClick = (clickInfo: any) => {
+  // Navigate to full calendar with event selected
+  const booking = clickInfo.event.extendedProps.booking;
+  router.push(`/admin/schedule?booking=${booking.id}`);
+};
+
+const handleViewChange = (view: string) => {
+  console.log('Calendar view changed:', view);
+};
+
+const handleDateChange = (date: Date) => {
+  console.log('Calendar date changed:', date);
+};
+
 // Lifecycle
-onMounted(() => {
+onMounted(async () => {
   console.log('Admin dashboard component mounted');
+  
+  // Load calendar data for preview
+  try {
+    await Promise.all([
+      fetchAllUsers(),
+      bookingStore.fetchBookings(),
+      propertyStore.fetchProperties()
+    ]);
+    console.log('✅ [AdminDashboard] Calendar data loaded for preview');
+  } catch (error) {
+    console.error('❌ [AdminDashboard] Failed to fetch calendar data:', error);
+  }
 });
 </script>
 
@@ -767,6 +858,33 @@ onMounted(() => {
   
   .dashboard-widget {
     margin-bottom: 8px;
+  }
+}
+
+/* Calendar Preview Styles */
+.calendar-preview-container {
+  height: 500px;
+  overflow: hidden;
+}
+
+.calendar-preview-container :deep(.fc) {
+  height: 100%;
+}
+
+.calendar-preview-container :deep(.fc-toolbar-chunk) {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 960px) {
+  .calendar-preview-container {
+    height: 400px;
+  }
+}
+
+@media (max-width: 600px) {
+  .calendar-preview-container {
+    height: 300px;
   }
 }
 </style>
