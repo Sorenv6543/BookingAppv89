@@ -4,84 +4,11 @@
       <v-row align="center" no-gutters>
         <!-- Year Navigation (New Feature) -->
         <v-col cols="12" lg="2" class="mb-2 mb-lg-0">
-          <div class="d-flex align-center year-navigation">
-            <v-btn
-              icon="mdi-chevron-double-left"
-              variant="text"
-              size="small"
-              :disabled="loading"
-              @click="$emit('navigate', 'prevYear')"
-            />
-            
-            <v-chip
-              variant="outlined"
-              size="small"
-              class="mx-2"
-              @click="openDatePicker"
-            >
-              {{ currentYear }}
-            </v-chip>
-            
-            <v-btn
-              icon="mdi-chevron-double-right"
-              variant="text"
-              size="small"
-              :disabled="loading"
-              @click="$emit('navigate', 'nextYear')"
-            />
-          </div>
+
         </v-col>
 
         <!-- Enhanced Month Navigation -->
-        <v-col cols="12" lg="4" class="mb-2 mb-lg-0">
-          <div class="d-flex align-center month-navigation justify-center">
-            <!-- History Back -->
-            <v-btn
-              icon="mdi-arrow-left"
-              variant="text"
-              size="small"
-              :disabled="loading || !canGoBack"
-              @click="$emit('navigate', 'historyBack')"
-            />
-            
-            <!-- Previous Month -->
-            <v-btn
-              icon="mdi-chevron-left"
-              variant="text"
-              size="small"
-              :disabled="loading"
-              @click="$emit('navigate', 'prev')"
-            />
-            
-            <!-- Current Date Display (Clickable) -->
-            <v-btn
-              variant="text"
-              class="mx-2 current-date-display"
-              :disabled="loading"
-              @click="openDatePicker"
-            >
-              {{ currentMonthYear }}
-            </v-btn>
-            
-            <!-- Next Month -->
-            <v-btn
-              icon="mdi-chevron-right"
-              variant="text"
-              size="small"
-              :disabled="loading"
-              @click="$emit('navigate', 'next')"
-            />
-            
-            <!-- History Forward -->
-            <v-btn
-              icon="mdi-arrow-right"
-              variant="text"
-              size="small"
-              :disabled="loading || !canGoForward"
-              @click="$emit('navigate', 'historyForward')"
-            />
-          </div>
-        </v-col>
+        
 
         <!-- Navigation Tools -->
         <v-col cols="12" lg="6">

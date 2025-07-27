@@ -1,7 +1,7 @@
 <template>
   <div class="owner-calendar-container">
     <!-- Enhanced Owner Calendar Navigation Toolbar -->
-    <EnhancedNavigationToolbar
+    <!-- <EnhancedNavigationToolbar
       :current-view="enhancedNavigation.currentView.value"
       :current-date="enhancedNavigation.currentDate.value"
       :current-month-year="enhancedNavigation.currentMonthYear.value"
@@ -15,7 +15,7 @@
       @view-change="handleEnhancedViewChange"
       @date-selected="handleEnhancedDateSelected"
       @smart-navigate="handleSmartNavigation"
-    />
+    /> -->
 
     <!-- Owner Calendar: Shows only owner's bookings across their properties -->
     <FullCalendar
