@@ -1,5 +1,22 @@
 <template>
   <div class="owner-calendar-container">
+    <!-- Enhanced Owner Calendar Navigation Toolbar -->
+    <EnhancedNavigationToolbar
+      :current-view="enhancedNavigation.currentView.value"
+      :current-date="enhancedNavigation.currentDate.value"
+      :current-month-year="enhancedNavigation.currentMonthYear.value"
+      :current-year="enhancedNavigation.currentYear.value"
+      :can-go-back="enhancedNavigation.canGoBack.value"
+      :can-go-forward="enhancedNavigation.canGoForward.value"
+      :smart-navigation-counts="enhancedNavigation.smartNavigationCounts.value"
+      :loading="props.loading"
+      class="mb-3"
+      @navigate="handleEnhancedNavigation"
+      @view-change="handleEnhancedViewChange"
+      @date-selected="handleEnhancedDateSelected"
+      @smart-navigate="handleSmartNavigation"
+    />
+
     <!-- Owner Calendar: Shows only owner's bookings across their properties -->
     <FullCalendar
       ref="calendarRef"
@@ -17,8 +34,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, onMounted } from 'vue';
 import FullCalendar from '@/components/smart/FullCalendar.vue';
+import { useEnhancedCalendarNavigation } from '@/composables/shared/useEnhancedCalendarNavigation';
+import EnhancedNavigationToolbar from '@/components/dumb/shared/EnhancedNavigationToolbar.vue';
 import type { Booking, Property } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
@@ -52,6 +71,9 @@ const emit = defineEmits<Emits>();
 
 // ===== REFS AND REACTIVE DATA =====
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+
+// Enhanced Calendar Navigation (Replaces basic prop-based navigation)
+const enhancedNavigation = useEnhancedCalendarNavigation();
 
 // ===== COMPUTED PROPERTIES (SAFE - NO CIRCULAR DEPENDENCIES) =====
 // Removed height computed properties - using CSS flexbox instead
@@ -89,21 +111,25 @@ const handleCreateBooking = (data: { start: string; end: string; propertyId?: st
 
 const goToDate = (date: string | Date): void => {
   console.log('🗓️ [OwnerCalendar] goToDate called:', date);
+  const targetDate = typeof date === 'string' ? new Date(date) : date;
+  enhancedNavigation.goToDateWithHistory(targetDate);
+  
   if (calendarRef.value) {
-    calendarRef.value.goToDate(date);
-    
-    // Emit date change event
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    emit('dateChange', dateObj);
+    calendarRef.value.goToDate(targetDate);
   }
+  
+  // Emit date change event
+  emit('dateChange', targetDate);
 };
 
 const changeView = (view: string): void => {
   console.log('👁️ [OwnerCalendar] changeView called:', view);
+  enhancedNavigation.setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
+  
   if (calendarRef.value) {
     calendarRef.value.changeView(view);
-    emit('viewChange', view);
   }
+  emit('viewChange', view);
 };
 
 const refreshEvents = (): void => {
@@ -117,6 +143,82 @@ const getApi = () => {
   return calendarRef.value?.getApi() || null;
 };
 
+// Enhanced Navigation Event Handlers
+const handleEnhancedNavigation = (action: string): void => {
+  console.log('🧭 [OwnerCalendar] Enhanced navigation:', action);
+  
+  switch (action) {
+    case 'prev':
+      enhancedNavigation.goToPrevMonth();
+      break;
+    case 'next':
+      enhancedNavigation.goToNextMonth();
+      break;
+    case 'prevYear':
+      enhancedNavigation.goToPrevYear();
+      break;
+    case 'nextYear':
+      enhancedNavigation.goToNextYear();
+      break;
+    case 'today':
+      enhancedNavigation.goToToday();
+      break;
+    case 'historyBack':
+      enhancedNavigation.goBackInHistory();
+      break;
+    case 'historyForward':
+      enhancedNavigation.goForwardInHistory();
+      break;
+  }
+  
+  // Update calendar API to match enhanced navigation state
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    api?.gotoDate(enhancedNavigation.currentDate.value);
+  }
+  
+  emit('dateChange', enhancedNavigation.currentDate.value);
+};
+
+const handleEnhancedViewChange = (view: string): void => {
+  console.log('👁️ [OwnerCalendar] Enhanced view change:', view);
+  enhancedNavigation.setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
+  
+  // Update calendar API
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    api?.changeView(view);
+  }
+  
+  emit('viewChange', view);
+};
+
+const handleEnhancedDateSelected = (date: Date): void => {
+  console.log('📅 [OwnerCalendar] Enhanced date selected:', date);
+  enhancedNavigation.goToDateWithHistory(date);
+  
+  // Update calendar API
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    api?.gotoDate(date);
+  }
+  
+  emit('dateChange', date);
+};
+
+const handleSmartNavigation = async (option: string): Promise<void> => {
+  console.log('🧠 [OwnerCalendar] Smart navigation:', option);
+  await enhancedNavigation.executeSmartNavigation(option);
+  
+  // Update calendar API to match new date
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    api?.gotoDate(enhancedNavigation.currentDate.value);
+  }
+  
+  emit('dateChange', enhancedNavigation.currentDate.value);
+};
+
 // ===== WATCHERS (SAFE - SIMPLE, NON-CIRCULAR) =====
 
 // Watch for view changes from parent (safe - simple prop watching)
@@ -125,6 +227,7 @@ watch(() => props.currentView, (newView) => {
   
   nextTick(() => {
     if (newView && calendarRef.value) {
+      enhancedNavigation.setCalendarView(newView);
       changeView(newView);
     }
   });
@@ -136,13 +239,48 @@ watch(() => props.currentDate, (newDate) => {
   
   nextTick(() => {
     if (newDate && calendarRef.value) {
+      enhancedNavigation.goToDateWithHistory(newDate);
       goToDate(newDate);
     }
   });
 });
 
+// Watch enhanced navigation view changes
+watch(() => enhancedNavigation.currentView.value, (newView) => {
+  console.log('🎯 [OwnerCalendar] Enhanced navigation view changed:', newView);
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    api?.changeView(newView);
+  }
+});
+
+// Watch enhanced navigation date changes
+watch(() => enhancedNavigation.currentDate.value, (newDate) => {
+  console.log('📅 [OwnerCalendar] Enhanced navigation date changed:', newDate);
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    api?.gotoDate(newDate);
+  }
+});
+
 // ===== LIFECYCLE =====
-console.log('✅ [OwnerCalendar] Setup complete - using safe reactive patterns!');
+onMounted(async () => {
+  console.log('🎬 [OwnerCalendar] Component mounted');
+  
+  // Wait for DOM to be fully ready
+  await nextTick();
+  
+  // Small delay to ensure calendar is ready
+  setTimeout(() => {
+    // Integrate enhanced navigation with calendar
+    if (calendarRef.value) {
+      enhancedNavigation.attachNavigationToCalendar(calendarRef.value);
+      console.log('🔗 [OwnerCalendar] Enhanced navigation attached to calendar');
+    }
+  }, 100);
+});
+
+console.log('✅ [OwnerCalendar] Setup complete - using enhanced navigation patterns!');
 
 // ===== EXPOSE METHODS TO PARENT =====
 defineExpose({

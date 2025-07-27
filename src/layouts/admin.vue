@@ -1,220 +1,255 @@
-<!-- layouts/admin.vue -->
+<!-- layouts/admin.vue - Full admin layout with sidebar -->
 <template>
   <v-app>
-    <div class="admin-layout-container">
-      <!-- Admin Sidebar -->
-      <AdminSidebar
-        v-model="sidebarOpen"
-        :bookings="mockBookings"
-        :properties="mockProperties"
-        :total-properties="mockProperties.length"
-        :active-cleanings-today="5"
-        :urgent-turns-count="3"
-        :loading="false"
-        current-view="dashboard"
-        :current-date="new Date()"
+    <!-- Main App Header -->
+    <v-app-bar
+      order="0"
+      app
+      flat
+      height="56"
+      class="main-app-header"
+      :class="{ 'sidebar-open': isSidebarOpen && !mobile }"
+      color="white"
+    >
+      <v-app-bar-nav-icon
+        color="black"
+        @click="toggleSidebar"
       />
-      
-      <!-- Main Content -->
-      <div
-        class="admin-main-content"
-        :class="{ 'sidebar-open': !mobile && sidebarOpen }"
-      >
-        <router-view />
-      </div>
+      <!--logo-->
+      <v-app-bar-title class="app-title">
+        <div class="brand-container">
+          <div class="brand-icon">
+            C
+          </div>
+          <span class="brand-text">Claro</span>
+        </div>
+      </v-app-bar-title>
+      <!--logo-->
+    </v-app-bar>
+
+    <!-- Admin Sidebar -->
+    <AdminSidebar
+      v-model="isSidebarOpen"
+      :bookings="bookings"
+      :properties="properties"
+      :total-properties="totalProperties"
+      :active-cleanings-today="activeCleaningsToday"
+      :urgent-turns-count="urgentTurnsCount"
+      :loading="loading"
+      :current-view="currentView"
+      :current-date="currentDate"
+      @navigate-to-booking="handleNavigateToBooking"
+      @navigate-to-date="handleNavigateToDate"
+      @filter-by-property="handleFilterByProperty"
+      @create-booking="handleCreateBooking"
+      @create-property="handleCreateProperty"
+      @assign-cleaner="handleAssignCleaner"
+      @generate-reports="handleGenerateReports"
+      @manage-system="handleManageSystem"
+      @emergency-response="handleEmergencyResponse"
+      @toggle-sidebar="toggleSidebar"
+    />
+
+    <!-- Main Content Area -->
+    <div 
+      class="admin-main-content"
+      :class="{ 'sidebar-open': isSidebarOpen && !mobile }"
+    >
+      <router-view />
     </div>
   </v-app>
 </template>
-    <!-- Admin App Bar -->
-    <!-- <v-app-bar
-      app
-      color="surface"
-      elevation="2"
-      class="admin-app-bar"
-    >
-     
-      <div class="d-flex align-center">
-        <v-avatar
-          color="primary"
-          size="36"
-          class="mr-3"
-        >
-          <v-icon color="white">
-            mdi-shield-crown
-          </v-icon>
-        </v-avatar>
-        <div>
-          <div class="text-h6 font-weight-bold">
-            Property Scheduler
-          </div>
-          <div class="admin-badge">
-            Admin Dashboard
-          </div>
-        </div>
-      </div>
-
-      <v-spacer /> -->
-
-      <!-- Admin Navigation -->
-      <!-- <div class="d-flex align-center mr-4">
-        <v-btn
-          to="/admin"
-          variant="text"
-          prepend-icon="mdi-view-dashboard"
-          class="mr-2"
-        >
-          Dashboard
-        </v-btn>
-        <v-btn
-          to="/admin/schedule"
-          variant="text"
-          prepend-icon="mdi-calendar-clock"
-          class="mr-2"
-        >
-          Schedule
-        </v-btn>
-        <v-btn
-          to="/admin/cleaners"
-          variant="text"
-          prepend-icon="mdi-account-hard-hat"
-          class="mr-2"
-        >
-          Cleaners
-        </v-btn>
-        <v-btn
-          to="/admin/properties"
-          variant="text"
-          prepend-icon="mdi-home-group"
-          class="mr-2"
-        >
-          Properties
-        </v-btn>
-        <v-btn
-          to="/admin/reports"
-          variant="text"
-          prepend-icon="mdi-chart-line"
-          class="mr-4"
-        >
-          Reports
-        </v-btn>
-      </div> -->
-
-      <!-- User Menu -->
-      <!-- <v-menu
-        location="bottom end"
-        offset="5"
-      >
-        <template #activator="{ props: menuProps }">
-          <v-btn 
-            icon
-            v-bind="menuProps"
-          >
-            <v-avatar size="36">
-              <v-icon>mdi-account-circle</v-icon>
-            </v-avatar>
-          </v-btn>
-        </template>
-          
-        <v-list min-width="200">
-          <v-list-subheader>Admin Options</v-list-subheader>
-          <v-list-item
-            prepend-icon="mdi-account-outline"
-            title="Profile"
-          />
-          <v-list-item
-            prepend-icon="mdi-cog-outline"
-            title="System Settings"
-          />
-          <v-list-item
-            to="/"
-            prepend-icon="mdi-home"
-            title="Owner View"
-          />
-          <v-divider class="my-2" />
-          <v-list-item
-            prepend-icon="mdi-logout"
-            title="Logout"
-            color="error"
-            @click="logout"
-          />
-        </v-list>
-      </v-menu>
-    </v-app-bar> -->
-
-    <!-- Main Content Area -->
-
-  
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
 
+import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
+import { useBookingStore } from '@/stores/booking';
+import { usePropertyStore } from '@/stores/property';
+import type { Booking, Property } from '@/types';
+
 // Composables
+const router = useRouter();
 const { mobile } = useDisplay();
+const bookingStore = useBookingStore();
+const propertyStore = usePropertyStore();
+const { users: allUsers, fetchAllUsers } = useAdminUserManagement();
 
-// State
-const sidebarOpen = ref(true);
+// Initialize state
+const currentView = ref('month');
+const currentDate = ref(new Date());
+const isSidebarOpen = ref(true);
+const loading = ref<boolean>(false);
 
-// Mock data - TODO: Replace with actual data from stores/composables
-const mockBookings = ref([
-  {
-    id: '1',
-    property_id: '1',
-    booking_type: 'turn',
-    status: 'pending',
-    checkout_date: '2024-01-15',
-    checkin_date: '2024-01-16'
+const bookings = ref<Booking[]>([]);
+const properties = ref<Property[]>([]);
+
+// Computed stats for sidebar
+const totalProperties = computed(() => propertyStore.properties.size);
+
+const activeCleaningsToday = computed(() => {
+  const today = new Date().toISOString().split('T')[0];
+  return Array.from(bookingStore.bookings.values())
+    .filter(booking => 
+      booking.checkout_date.startsWith(today) && 
+      booking.status === 'in_progress'
+    ).length;
+});
+
+const urgentTurnsCount = computed(() => {
+  const today = new Date().toISOString().split('T')[0];
+  return Array.from(bookingStore.bookings.values())
+    .filter(booking => 
+      booking.checkout_date.startsWith(today) && 
+      booking.booking_type === 'turn' && 
+      booking.status !== 'completed'
+    ).length;
+});
+
+// Navigation handlers
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value;
+};
+
+// Event handlers for sidebar
+const handleNavigateToBooking = (bookingId: string) => {
+  router.push(`/admin/bookings/${bookingId}`);
+};
+
+const handleNavigateToDate = (date: Date) => {
+  router.push(`/admin/schedule?date=${date.toISOString().split('T')[0]}`);
+};
+
+const handleFilterByProperty = (propertyId: string | null) => {
+  console.log('Filter by property:', propertyId);
+};
+
+const handleCreateBooking = () => {
+  router.push('/admin/bookings/create');
+};
+
+const handleCreateProperty = () => {
+  router.push('/admin/properties/create');
+};
+
+const handleAssignCleaner = (data: { bookingId: string, cleanerId?: string }) => {
+  console.log('Assign cleaner:', data);
+};
+
+const handleGenerateReports = () => {
+  router.push('/admin/reports');
+};
+
+const handleManageSystem = () => {
+  router.push('/admin/settings');
+};
+
+const handleEmergencyResponse = () => {
+  console.log('Emergency response triggered');
+};
+
+// Initialize data on mount
+onMounted(async () => {
+  console.log('🎛️ [AdminLayout] Loading admin layout data...');
+  loading.value = true;
+  try {
+    await Promise.all([
+      fetchAllUsers(),
+      bookingStore.fetchBookings(),
+      propertyStore.fetchProperties()
+    ]);
+    console.log('✅ [AdminLayout] Admin layout data loaded');
+  } catch (error) {
+    console.error('❌ [AdminLayout] Failed to fetch admin layout data:', error);
+  } finally {
+    loading.value = false;
   }
-]);
-
-const mockProperties = ref([
-  {
-    id: '1',
-    name: 'Sunset Villa',
-    address: '123 Beach Road'
-  },
-  {
-    id: '2', 
-    name: 'Mountain Lodge',
-    address: '456 Pine Street'
-  }
-]);
+});
 </script>
 
+<style scoped>
+/* ================================================================ */
+/* MAIN APP HEADER */
+/* ================================================================ */
 
+.main-app-header {
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  z-index: 19 !important; /* Lower than sidebar z-index */
+  transition: margin-left 0.3s ease-in-out;
+  margin-left: 0;
+}
 
-<style>
-/* Admin layout styles */
-.admin-layout-container {
-  height: 100vh;
-  width: 100vw;
-  position: relative;
-  overflow: hidden;
+.main-app-header.sidebar-open {
+  margin-left: 280px; /* Match sidebar width */
+}
+
+.app-title {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.brand-container {
   display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* Reset any Vuetify v-main styles that could interfere */
-.v-application .admin-layout-container {
-  padding: 0 !important;
-  margin: 0 !important;
+.brand-icon {
+  background: #1976d2;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.1rem;
 }
+
+.brand-text {
+  color: black;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.main-app-header .v-app-bar-nav-icon {
+  color: black !important;
+}
+
+.main-app-header .v-app-bar-nav-icon:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ================================================================ */
+/* ADMIN MAIN CONTENT LAYOUT */
+/* ================================================================ */
 
 .admin-main-content {
-  flex: 1;
-  height: 100vh;
-  overflow-y: auto;
-  transition: margin-left 0.3s ease;
+  transition: margin-left 0.3s ease-in-out;
+  margin-left: 0;
+  margin-top: 56px; /* Account for app header */
+  min-height: calc(100vh - 56px);
 }
 
 .admin-main-content.sidebar-open {
-  margin-left: 280px; /* SIDEBAR_WIDTH */
+  margin-left: 280px; /* Match sidebar width */
 }
 
-/* Responsive adjustments */
+/* Responsive behavior - overlay on mobile */
 @media (max-width: 959px) {
   .admin-main-content.sidebar-open {
-    margin-left: 0;
+    margin-left: 0; /* No push on mobile */
+  }
+  
+  .main-app-header.sidebar-open {
+    margin-left: 0; /* No push on mobile */
   }
 }
 </style>

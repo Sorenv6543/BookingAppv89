@@ -76,6 +76,26 @@
           
           <v-list-item
             class="nav-item"
+            :class="{ 'active-nav-item': $route.path === '/admin/schedule' }"
+            prepend-icon="mdi-calendar-month"
+            title="Master Schedule"
+            @click="navigateTo('/admin/schedule')"
+          >
+            <template
+              v-if="$route.path === '/admin/schedule'"
+              #append
+            >
+              <v-icon
+                size="16"
+                color="white"
+              >
+                mdi-chevron-right
+              </v-icon>
+            </template>
+          </v-list-item>
+          
+          <v-list-item
+            class="nav-item"
             :class="{ 'active-nav-item': $route.path === '/admin/bookings' }"
             prepend-icon="mdi-calendar-check"
             title="All Bookings"
@@ -136,13 +156,33 @@
           
           <v-list-item
             class="nav-item"
-            :class="{ 'active-nav-item': $route.path === '/admin/owners' }"
+            :class="{ 'active-nav-item': $route.path === '/admin/property-owners' }"
             prepend-icon="mdi-account-group"
             title="Property Owners"
-            @click="navigateTo('/admin/owners')"
+            @click="navigateTo('/admin/property-owners')"
           >
             <template
-              v-if="$route.path === '/admin/owners'"
+              v-if="$route.path === '/admin/property-owners'"
+              #append
+            >
+              <v-icon
+                size="16"
+                color="white"
+              >
+                mdi-chevron-right
+              </v-icon>
+            </template>
+          </v-list-item>
+          
+          <v-list-item
+            class="nav-item"
+            :class="{ 'active-nav-item': $route.path === '/admin/users' }"
+            prepend-icon="mdi-account-cog"
+            title="System Users"
+            @click="navigateTo('/admin/users')"
+          >
+            <template
+              v-if="$route.path === '/admin/users'"
               #append
             >
               <v-icon

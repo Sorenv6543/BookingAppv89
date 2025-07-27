@@ -1,92 +1,74 @@
 <!-- eslint-disable vue/no-template-shadow -->
 <template>
   <div class="admin-calendar-container">
-    <!-- Advanced Admin Calendar Toolbar -->
+
+    <FullCalendar
+      ref="calendarRef"
+      :options="adminCalendarOptions"
+      :bookings="props.bookings"
+      :properties="props.properties"
+      :loading="props.loading"
+      class="owner-calendar"
+      @date-select="handleAdminDateSelect"
+      @event-click="handleAdminEventClick"
+      @event-drop="handleAdminEventDrop"
+      @event-resize="handleAdminEventResize"
+    />
+  </div>
+  
+      <!-- Context Menu -->
+      <v-menu
+        v-model="contextMenu.show"
+        :position-x="contextMenu.x"
+        :position-y="contextMenu.y"
+        absolute
+        offset-y
+      >
+        <v-list density="compact">
+          <v-list-item
+            v-for="action in contextMenuActions"
+            :key="action.key"
+            :prepend-icon="action.icon"
+            :title="action.title"
+            @click="handleContextAction(action.key)"
+          />
+        </v-list>
+      </v-menu>
+
+    <!-- Enhanced Admin Calendar Navigation Toolbar -->
+    <EnhancedNavigationToolbar
+      v-if="!previewMode"
+      :current-view="enhancedNavigation.currentView.value"
+      :current-date="enhancedNavigation.currentDate.value"
+      :current-month-year="enhancedNavigation.currentMonthYear.value"
+      :current-year="enhancedNavigation.currentYear.value"
+      :can-go-back="enhancedNavigation.canGoBack.value"
+      :can-go-forward="enhancedNavigation.canGoForward.value"
+      :smart-navigation-counts="enhancedNavigation.smartNavigationCounts.value"
+      :users="props.users"
+      :loading="props.loading"
+      class="mb-4"
+      @navigate-to-next-month="enhancedNavigation.goToNextMonth"
+              @navigate-to-previous-month="enhancedNavigation.goToPrevMonth"
+      @navigate="handleEnhancedNavigation"
+      @view-change="handleEnhancedViewChange"
+      @date-selected="handleEnhancedDateSelected"
+      @smart-navigate="handleSmartNavigation"
+      @owner-navigate="handleOwnerNavigation"
+      @status-navigate="handleStatusNavigation"
+    />
+
+    <!-- Admin Filters & Controls Panel -->
     <v-card
       v-if="!previewMode"
-      class="admin-calendar-toolbar mb-4"
-      elevation="2"
+      class="admin-filters-panel mb-4"
+      elevation="1"
     >
-      <v-card-text class="pb-2">
-        <v-row
-          align="center"
-          no-gutters
-        >
-          <!-- View Controls -->
-          <v-col
-            cols="12"
-            md="3"
-            class="mb-2 mb-md-0"
-          >
-            <v-btn-toggle
-              v-model="currentView"
-              mandatory
-              variant="outlined"
-              density="compact"
-              class="admin-view-toggle"
-            >
-              <v-btn
-                value="dayGridMonth"
-                size="small"
-              >
-                Month
-              </v-btn>
-              <v-btn
-                value="timeGridWeek"
-                size="small"
-              >
-                Week
-              </v-btn>
-              <v-btn
-                value="timeGridDay"
-                size="small"
-              >
-                Day
-              </v-btn>
-              <v-btn
-                value="listWeek"
-                size="small"
-              >
-                List
-              </v-btn>
-            </v-btn-toggle>
-          </v-col>
-
-          <!-- Date Navigation -->
-          <v-col
-            cols="12"
-            md="4"
-            class="mb-2 mb-md-0"
-          >
-            <div class="d-flex align-center justify-center">
-              <v-btn
-                icon="mdi-chevron-left"
-                variant="text"
-                size="small"
-                @click="navigateCalendar('prev')"
-              />
-              <v-btn
-                variant="text"
-                class="mx-2 admin-date-title"
-                @click="goToToday"
-              >
-                {{ currentDateTitle }}
-              </v-btn>
-              <v-btn
-                icon="mdi-chevron-right"
-                variant="text"
-                size="small"
-                @click="navigateCalendar('next')"
-              />
-            </div>
-          </v-col>
-
+      <v-card-text class="py-2">
+        <v-row align="center" no-gutters>
           <!-- Admin Filters -->
-          <v-col
-            cols="12"
-            md="5"
-          >
-            <div class="d-flex align-center justify-end flex-wrap ga-2">
+          <v-col cols="12" lg="8">
+            <div class="d-flex align-center flex-wrap ga-2">
               <!-- Cleaner Filter -->
               <v-select
                 v-model="selectedCleaner"
@@ -140,7 +122,12 @@
                 hide-details
                 class="admin-view-toggle-switch"
               />
+            </div>
+          </v-col>
 
+          <!-- Action Buttons -->
+          <v-col cols="12" lg="4">
+            <div class="d-flex align-center justify-end flex-wrap ga-2">
               <!-- Color Picker Toggle -->
               <v-btn
                 :color="showColorPicker ? 'primary' : 'default'"
@@ -290,52 +277,7 @@
       </v-card>
     </v-expand-transition>
 
-    <!-- FullCalendar Component -->
-    <v-card
-      elevation="2"
-      class="admin-calendar-card"
-      :style="{ height: calendarCardHeight }"
-    >
-      <div
-        v-if="!isMounted || !isCalendarReady"
-        class="calendar-loading"
-      >
-        <v-progress-circular
-          indeterminate
-          color="primary"
-          size="64"
-        />
-        <p class="text-center mt-4">
-          Loading calendar...
-        </p>
-      </div>
-      <FullCalendar
-        v-else
-        ref="calendarRef"
-        :options="adminCalendarOptions"
-        class="admin-calendar"
-        :style="{ height: fullCalendarHeight, width: '100%' }"
-      />
-    </v-card>
 
-    <!-- Context Menu -->
-    <v-menu
-      v-model="contextMenu.show"
-      :position-x="contextMenu.x"
-      :position-y="contextMenu.y"
-      absolute
-      offset-y
-    >
-      <v-list density="compact">
-        <v-list-item
-          v-for="action in contextMenuActions"
-          :key="action.key"
-          :prepend-icon="action.icon"
-          :title="action.title"
-          @click="handleContextAction(action.key)"
-        />
-      </v-list>
-    </v-menu>
 
     <!-- Cleaner Assignment Modal -->
     <v-dialog
@@ -396,10 +338,15 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </div>
+  
 </template>
 
 <script setup lang="ts">
+// AdminCalendar.vue - Calendar component for admin interface
+// This component provides a full-featured calendar view for managing bookings
+// It includes filtering, event colors, and context menus for cleaner assignments
+
+// imports 
 import FullCalendar from '@fullcalendar/vue3';
 import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg, EventApi, ViewApi, Duration } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -410,6 +357,10 @@ import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useTheme, useDisplay } from 'vuetify';
 import type { Booking, Property, User, Cleaner } from '@/types';
 import { getMobileCalendarOptions, handleViewportResize } from '@/utils/mobileViewport';
+
+// Import enhanced navigation system
+import { useEnhancedCalendarNavigation } from '@/composables/shared/useEnhancedCalendarNavigation';
+import EnhancedNavigationToolbar from '@/components/dumb/shared/EnhancedNavigationToolbar.vue';
 
 // Import event logger for component communication
 import eventLogger from '@/composables/shared/useComponentEventLogger';
@@ -443,17 +394,6 @@ interface EventContentInfo {
   el: HTMLElement;
 }
 
-interface DayCellContentInfo {
-  date: Date;
-  dateStr: string;
-  dayNumberText: string;
-  view: ViewApi;
-  isToday: boolean;
-  isPast: boolean;
-  isFuture: boolean;
-  isOther: boolean;
-}
-
 interface Props {
   bookings: Map<string, Booking>;
   properties: Map<string, Property>;
@@ -462,6 +402,7 @@ interface Props {
   previewMode?: boolean;
 }
 
+// Emits
 interface Emits {
   (e: 'dateSelect', selectInfo: DateSelectArg): void;
   (e: 'eventClick', clickInfo: EventClickArg): void;
@@ -474,17 +415,51 @@ interface Emits {
   (e: 'dateChange', date: Date): void;
 }
 
+// Props
 const props = withDefaults(defineProps<Props>(), {
+  bookings: () => new Map<string, Booking>(),
+  properties: () => new Map<string, Property>(),
+  users: () => new Map<string, User>(),
   loading: false,
   previewMode: false
 });
 
 const emit = defineEmits<Emits>();
 
+// Add debug logging for component mounting
+console.log('🎨 [AdminCalendar] Script setup starting...');
+console.log('🎨 [AdminCalendar] Props received:', {
+  bookingsSize: props.bookings?.size || 0,
+  propertiesSize: props.properties?.size || 0,
+  usersSize: props.users?.size || 0,
+  loading: props.loading
+});
+
+// Enhanced error handling for component initialization
+try {
+  // Validate that props are actual Map objects
+  if (!(props.bookings instanceof Map)) {
+    console.error('❌ [AdminCalendar] bookings prop is not a Map:', typeof props.bookings);
+  }
+  if (!(props.properties instanceof Map)) {
+    console.error('❌ [AdminCalendar] properties prop is not a Map:', typeof props.properties);
+  }
+  if (!(props.users instanceof Map)) {
+    console.error('❌ [AdminCalendar] users prop is not a Map:', typeof props.users);
+  }
+  
+  console.log('✅ [AdminCalendar] Props validation passed');
+} catch (error) {
+  console.error('❌ [AdminCalendar] Error during props validation:', error);
+}
+
 // Theme integration and mobile detection
 const theme = useTheme();
 const { mobile } = useDisplay();
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+
+// Enhanced Calendar Navigation (Replaces basic currentView state)
+const enhancedNavigation = useEnhancedCalendarNavigation();
 
 // Component mounting state
 const isMounted = ref(false);
@@ -494,8 +469,7 @@ const isCalendarReady = ref(false);
 const mobileOptions = ref(getMobileCalendarOptions());
 let cleanupViewportListener: (() => void) | null = null;
 
-// Admin calendar state
-const currentView = ref<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek'>('dayGridMonth');
+// Admin calendar state (reduced since enhanced navigation handles most state)
 const currentDateTitle = ref('');
 
 // Admin filtering state
@@ -533,14 +507,24 @@ const cleanerAssignmentModal = ref({
 
 // Get all cleaners from users Map
 const availableCleaners = computed(() => {
-  return Array.from(props.users.values())
-    .filter(user => user.role === 'cleaner')
-    .map(cleaner => ({
-      id: cleaner.id,
-      name: cleaner.name,
-      email: cleaner.email,
-      max_daily_bookings: (cleaner as Cleaner).max_daily_bookings || 5
-    }));
+  // Safety guard: Don't process if users data isn't ready
+  if (!props.users || props.users.size === 0) {
+    return [];
+  }
+
+  try {
+    return Array.from(props.users.values())
+      .filter(user => user && user.role === 'cleaner')
+      .map(cleaner => ({
+        id: cleaner.id,
+        name: cleaner.name || 'Unknown',
+        email: cleaner.email || '',
+        max_daily_bookings: (cleaner as Cleaner).max_daily_bookings || 5
+      }));
+  } catch (error) {
+    console.error('Error processing available cleaners:', error);
+    return [];
+  }
 });
 
 // Filter options
@@ -560,17 +544,6 @@ const bookingTypeOptions = [
   { label: 'Turn Bookings', value: 'turn' },
   { label: 'Standard Bookings', value: 'standard' }
 ];
-
-// Height calculations for responsive full-viewport calendar
-const calendarCardHeight = computed(() => {
-  // Calculate available height: viewport minus toolbar height (approx 120px)
-  return 'calc(100vh - 180px)';
-});
-
-const fullCalendarHeight = computed(() => {
-  // FullCalendar height should fill the card minus padding
-  return 'calc(100vh - 200px)';
-});
 
 // Admin sees ALL bookings (no owner filtering)
 const allBookings = computed(() => {
@@ -605,146 +578,177 @@ const filteredBookings = computed(() => {
 
 // Convert admin's filtered bookings to FullCalendar events
 const adminCalendarEvents = computed(() => {
-  if (isSimplifiedView.value) {
-    // Simplified view: create individual events for check-in, check-out, and turns
-    const events: any[] = [];
-    
-    filteredBookings.value.forEach(booking => {
-      const property = props.properties.get(booking.property_id);
-      const owner = props.users.get(booking.owner_id);
-      const cleaner = booking.assigned_cleaner_id ? props.users.get(booking.assigned_cleaner_id) : undefined;
-      const isTurn = booking.booking_type === 'turn';
+  // Safety guard: Don't process events if data isn't ready
+  if (!props.bookings || props.bookings.size === 0 || 
+      !props.properties || props.properties.size === 0 || 
+      !props.users || props.users.size === 0) {
+    return [];
+  }
+
+  try {
+    if (isSimplifiedView.value) {
+      // Simplified view: create individual events for check-in, check-out, and turns
+      const events: any[] = [];
       
-      // Check-out event (single day) - using custom color with glassmorphism
-      events.push({
-        id: `${booking.id}-checkout`,
-        title: `${(property?.address || property?.name || 'PROPERTY').toUpperCase()} - OUT`,
-        start: booking.checkout_date,
-        allDay: true,
-        backgroundColor: eventColors.value.checkout,
-        borderColor: 'rgba(255, 255, 255, 0.3)',
-        textColor: '#ffffff',
-        extendedProps: {
-          booking,
-          property,
-          owner,
-          cleaner,
-          eventType: 'checkout',
-          bookingType: booking.booking_type,
-          status: booking.status,
-          assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
-        },
-        classNames: [
-          'admin-simplified-checkout',
-          `admin-booking-${booking.booking_type}`,
-          `admin-status-${booking.status}`
-        ]
-      });
-      
-      // Check-in event (single day) - using custom color with glassmorphism
-      events.push({
-        id: `${booking.id}-checkin`,
-        title: `${(property?.address || property?.name || 'PROPERTY').toUpperCase()} - IN`,
-        start: booking.checkin_date,
-        allDay: true,
-        backgroundColor: eventColors.value.checkin,
-        borderColor: 'rgba(255, 255, 255, 0.3)',
-        textColor: '#ffffff',
-        extendedProps: {
-          booking,
-          property,
-          owner,
-          cleaner,
-          eventType: 'checkin',
-          bookingType: booking.booking_type,
-          status: booking.status,
-          assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
-        },
-        classNames: [
-          'admin-simplified-checkin',
-          `admin-booking-${booking.booking_type}`,
-          `admin-status-${booking.status}`
-        ]
-      });
-      
-      // Turn event (if it's a turn booking) - single day between checkout and checkin
-      if (isTurn) {
-        const checkoutDate = new Date(booking.checkout_date);
-        const checkinDate = new Date(booking.checkin_date);
-        
-        // Turn happens the day after checkout (or same day if same-day turn)
-        const turnDate = new Date(checkoutDate);
-        if (checkoutDate.toDateString() !== checkinDate.toDateString()) {
-          turnDate.setDate(turnDate.getDate() + 1);
+      filteredBookings.value.forEach(booking => {
+        // Safety guards for undefined data
+        if (!booking || !booking.id || !booking.checkout_date || !booking.checkin_date) {
+          console.warn('Skipping invalid booking:', booking);
+          return;
         }
+
+        const property = props.properties.get(booking.property_id);
+        const owner = props.users.get(booking.owner_id);
+        const cleaner = booking.assigned_cleaner_id ? props.users.get(booking.assigned_cleaner_id) : undefined;
+        const isTurn = booking.booking_type === 'turn';
         
+        // Safety check for property name
+        const propertyName = property?.address || property?.name || 'PROPERTY';
+        
+        // Check-out event (single day) - using custom color with glassmorphism
         events.push({
-          id: `${booking.id}-turn`,
-          title: `${(property?.address || property?.name || 'PROPERTY').toUpperCase()} - TURN`,
-          start: turnDate.toISOString().split('T')[0],
+          id: `${booking.id}-checkout`,
+          title: `${propertyName.toUpperCase()} - OUT`,
+          start: booking.checkout_date,
           allDay: true,
-          backgroundColor: eventColors.value.turn,
-          borderColor: 'rgba(255, 255, 255, 0.4)',
+          backgroundColor: eventColors.value.checkout,
+          borderColor: 'rgba(255, 255, 255, 0.3)',
           textColor: '#ffffff',
           extendedProps: {
             booking,
             property,
             owner,
             cleaner,
-            eventType: 'turn',
+            eventType: 'checkout',
             bookingType: booking.booking_type,
             status: booking.status,
             assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
           },
           classNames: [
-            'admin-simplified-turn',
+            'admin-simplified-checkout',
             `admin-booking-${booking.booking_type}`,
-            `admin-status-${booking.status}`,
-            'admin-priority-urgent'
+            `admin-status-${booking.status}`
           ]
         });
+        
+        // Check-in event (single day) - using custom color with glassmorphism
+        events.push({
+          id: `${booking.id}-checkin`,
+          title: `${propertyName.toUpperCase()} - IN`,
+          start: booking.checkin_date,
+          allDay: true,
+          backgroundColor: eventColors.value.checkin,
+          borderColor: 'rgba(255, 255, 255, 0.3)',
+          textColor: '#ffffff',
+          extendedProps: {
+            booking,
+            property,
+            owner,
+            cleaner,
+            eventType: 'checkin',
+            bookingType: booking.booking_type,
+            status: booking.status,
+            assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
+          },
+          classNames: [
+            'admin-simplified-checkin',
+            `admin-booking-${booking.booking_type}`,
+            `admin-status-${booking.status}`
+          ]
+        });
+        
+        // Turn event (if it's a turn booking) - single day between checkout and checkin
+        if (isTurn) {
+          try {
+            const checkoutDate = new Date(booking.checkout_date);
+            const checkinDate = new Date(booking.checkin_date);
+            
+            // Turn happens the day after checkout (or same day if same-day turn)
+            const turnDate = new Date(checkoutDate);
+            if (checkoutDate.toDateString() !== checkinDate.toDateString()) {
+              turnDate.setDate(turnDate.getDate() + 1);
+            }
+            
+            events.push({
+              id: `${booking.id}-turn`,
+              title: `${propertyName.toUpperCase()} - TURN`,
+              start: turnDate.toISOString().split('T')[0],
+              allDay: true,
+              backgroundColor: eventColors.value.turn,
+              borderColor: 'rgba(255, 255, 255, 0.4)',
+              textColor: '#ffffff',
+              extendedProps: {
+                booking,
+                property,
+                owner,
+                cleaner,
+                eventType: 'turn',
+                bookingType: booking.booking_type,
+                status: booking.status,
+                assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
+              },
+              classNames: [
+                'admin-simplified-turn',
+                `admin-booking-${booking.booking_type}`,
+                `admin-status-${booking.status}`,
+                'admin-priority-urgent'
+              ]
+            });
+          } catch (error) {
+            console.warn('Error creating turn event for booking:', booking.id, error);
+          }
+        }
+      });
+      
+      return events;
+    }
+    
+    // Full view: show booking as date ranges (original implementation)
+    return filteredBookings.value.map(booking => {
+      // Safety guards for undefined data
+      if (!booking || !booking.id || !booking.checkout_date || !booking.checkin_date) {
+        console.warn('Skipping invalid booking in full view:', booking);
+        return null;
       }
-    });
-    
-    return events;
+
+      const property = props.properties.get(booking.property_id);
+      const owner = props.users.get(booking.owner_id);
+      const cleaner = booking.assigned_cleaner_id ? props.users.get(booking.assigned_cleaner_id) : undefined;
+      const isTurn = booking.booking_type === 'turn';
+      
+      return {
+        id: booking.id,
+        title: getAdminEventTitle(booking, property),
+        start: booking.checkout_date,
+        end: booking.checkin_date,
+        backgroundColor: getAdminEventColor(booking),
+        borderColor: getAdminEventBorderColor(booking),
+        textColor: getAdminEventTextColor(booking),
+        extendedProps: {
+          booking,
+          property,
+          owner,
+          cleaner,
+          bookingType: booking.booking_type,
+          status: booking.status,
+          assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
+        },
+        classNames: [
+          `admin-booking-${booking.booking_type}`,
+          `admin-status-${booking.status}`,
+          `admin-assignment-${booking.assigned_cleaner_id ? 'assigned' : 'unassigned'}`,
+          isTurn ? 'admin-priority-urgent' : 'admin-priority-normal'
+        ]
+      };
+    }).filter(event => event !== null); // Remove any null events
+  } catch (error) {
+    console.error('Error creating admin calendar events:', error);
+    return [];
   }
-  
-  // Full view: show booking as date ranges (original implementation)
-  return filteredBookings.value.map(booking => {
-    const property = props.properties.get(booking.property_id);
-    const owner = props.users.get(booking.owner_id);
-    const cleaner = booking.assigned_cleaner_id ? props.users.get(booking.assigned_cleaner_id) : undefined;
-    const isTurn = booking.booking_type === 'turn';
-    
-    return {
-      id: booking.id,
-      title: getAdminEventTitle(booking, property, owner, cleaner),
-      start: booking.checkout_date,
-      end: booking.checkin_date,
-      backgroundColor: getAdminEventColor(booking),
-      borderColor: getAdminEventBorderColor(booking),
-      textColor: getAdminEventTextColor(booking),
-      extendedProps: {
-        booking,
-        property,
-        owner,
-        cleaner,
-        bookingType: booking.booking_type,
-        status: booking.status,
-        assignmentStatus: booking.assigned_cleaner_id ? 'assigned' : 'unassigned'
-      },
-      classNames: [
-        `admin-booking-${booking.booking_type}`,
-        `admin-status-${booking.status}`,
-        `admin-assignment-${booking.assigned_cleaner_id ? 'assigned' : 'unassigned'}`,
-        isTurn ? 'admin-priority-urgent' : 'admin-priority-normal'
-      ]
-    };
-  });
 });
 
 // Event title formatting for full view (simplified view creates its own titles)
-const getAdminEventTitle = (booking: Booking, property?: Property, owner?: User, cleaner?: User): string => {
+const getAdminEventTitle = (booking: Booking, property?: Property): string => {
   const checkoutDate = new Date(booking.checkout_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const checkinDate = new Date(booking.checkin_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const propertyName = property?.name || 'Unknown Property';
@@ -827,102 +831,115 @@ const getAdminEventTextColor = (booking: Booking): string => {
 
 // Admin-focused calendar configuration with advanced features
 const adminCalendarOptions = computed<CalendarOptions>(() => {
-  // Don't return options until component is ready
-  if (!isMounted.value || !isCalendarReady.value) {
+  // Enhanced safety guards: Don't return options until component AND data is ready
+  if (!isMounted.value || !isCalendarReady.value || props.loading ||
+      !props.bookings || !props.properties || !props.users) {
     return {
       plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
       initialView: 'dayGridMonth',
       headerToolbar: false,
-      events: []
+      events: [],
+      height: 'auto'
     };
   }
   
-  return {
-    plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+  try {
+    return {
+      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+      
+      // View settings - all views available for admin (using enhanced navigation)
+      initialView: enhancedNavigation.currentView.value,
+      headerToolbar: false, // We handle toolbar externally
     
-    // View settings - all views available for admin
-    initialView: currentView.value,
-    headerToolbar: false, // We handle toolbar externally
-  
-  // Event settings - mobile optimized from OwnerCalendar
-  events: adminCalendarEvents.value,
-  eventDisplay: mobileOptions.value.eventDisplay,
-  eventOverlap: true, // Allow overlapping for admin view
-  eventResizableFromStart: true,
-  
-  // Admin interaction settings (full features)
-  selectable: true,
-  selectMirror: true,
-  editable: true, // Enable drag-and-drop for admin
-  droppable: true, // Enable drag-to-assign
-  eventDurationEditable: true,
-  
-  // Date/time settings
-  locale: 'en',
-  timeZone: 'local',
-  slotMinTime: '06:00:00',
-  slotMaxTime: '22:00:00',
-  slotDuration: '01:00:00',
-  snapDuration: '00:30:00',
-  
-  // Use mobile-optimized height calculation from OwnerCalendar
-  height: props.previewMode ? '100%' : mobileOptions.value.height,
-  aspectRatio: undefined, // Remove aspect ratio constraints for full height
-  expandRows: true, // Make calendar rows expand to fill available height
-  
-  // Custom styling based on theme
-  themeSystem: 'standard',
-  
-  // Event handlers - admin-specific
-  select: handleAdminDateSelect,
-  eventClick: handleAdminEventClick,
-  eventDrop: handleAdminEventDrop,
-  eventResize: handleAdminEventResize,
-  datesSet: handleDatesSet,
-  
-  // Loading state
-  loading: handleLoading,
-  
-  // Custom rendering - admin-focused
-  eventContent: renderAdminEventContent,
-  // Removed dayCellContent to eliminate extra numbers on dates
-  
-  // Business hours
-  businessHours: {
-    daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // Monday - Sunday
-    startTime: '08:00',
-    endTime: '18:00'
-  },
-  
-  // Weekend styling
-  weekends: true,
-  
-  // Month view specific - mobile optimized
-  dayMaxEvents: mobileOptions.value.dayMaxEvents,
-  moreLinkClick: 'popover', // Show popover for more events
-  
-  // Week/day view specific
-  allDaySlot: false,
-  nowIndicator: true,
-  scrollTime: '07:00:00',
-  
-  // List view specific
-  listDayFormat: { weekday: 'long', month: 'short', day: 'numeric' },
-  
-  // Right-click context menu
-  eventMouseEnter: (info) => {
-    info.el.style.cursor = 'pointer';
-  },
-  
-  // Custom event rendering for admin features
-  eventDidMount: (info) => {
-    // Add right-click context menu
-    info.el.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      showContextMenu(e, info.event.extendedProps.booking);
-    });
+    // Event settings - mobile optimized from OwnerCalendar
+    events: adminCalendarEvents.value,
+    eventDisplay: mobileOptions.value.eventDisplay,
+    eventOverlap: true, // Allow overlapping for admin view
+    eventResizableFromStart: true,
+    
+    // Admin interaction settings (full features)
+    selectable: true,
+    selectMirror: true,
+    editable: true, // Enable drag-and-drop for admin
+    droppable: true, // Enable drag-to-assign
+    eventDurationEditable: true,
+    
+    // Date/time settings
+    locale: 'en',
+    timeZone: 'local',
+    slotMinTime: '06:00:00',
+    slotMaxTime: '22:00:00',
+    slotDuration: '01:00:00',
+    snapDuration: '00:30:00',
+    
+    // Use mobile-optimized height calculation from OwnerCalendar
+    height: props.previewMode ? '100%' : mobileOptions.value.height,
+    aspectRatio: undefined, // Remove aspect ratio constraints for full height
+    expandRows: true, // Make calendar rows expand to fill available height
+    
+    // Custom styling based on theme
+    themeSystem: 'standard',
+    
+    // Event handlers - admin-specific
+    select: handleAdminDateSelect,
+    eventClick: handleAdminEventClick,
+    eventDrop: handleAdminEventDrop,
+    eventResize: handleAdminEventResize,
+    datesSet: handleDatesSet,
+    
+    // Loading state
+    loading: handleLoading,
+    
+    // Custom rendering - admin-focused
+    eventContent: renderAdminEventContent,
+    // Removed dayCellContent to eliminate extra numbers on dates
+    
+    // Business hours
+    businessHours: {
+      daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // Monday - Sunday
+      startTime: '08:00',
+      endTime: '18:00'
+    },
+    
+    // Weekend styling
+    weekends: true,
+    
+    // Month view specific - mobile optimized
+    dayMaxEvents: mobileOptions.value.dayMaxEvents,
+    moreLinkClick: 'popover', // Show popover for more events
+    
+    // Week/day view specific
+    allDaySlot: false,
+    nowIndicator: true,
+    scrollTime: '07:00:00',
+    
+    // List view specific
+    listDayFormat: { weekday: 'long', month: 'short', day: 'numeric' },
+    
+    // Right-click context menu
+    eventMouseEnter: (info) => {
+      info.el.style.cursor = 'pointer';
+    },
+    
+    // Custom event rendering for admin features
+    eventDidMount: (info) => {
+      // Add right-click context menu
+      info.el.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showContextMenu(e, info.event.extendedProps.booking);
+      });
+    }
+    };
+  } catch (error) {
+    console.error('Error creating admin calendar options:', error);
+    return {
+      plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+      initialView: 'dayGridMonth',
+      headerToolbar: false,
+      events: [],
+      height: 'auto'
+    };
   }
-  };
 });
 
 // Admin-specific event handlers
@@ -1149,24 +1166,6 @@ const assignCleanerToBooking = async (): Promise<void> => {
   }
 };
 
-// Calendar navigation methods
-const navigateCalendar = (direction: 'prev' | 'next'): void => {
-  if (calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    if (direction === 'prev') {
-      api.prev();
-    } else {
-      api.next();
-    }
-  }
-};
-
-const goToToday = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().today();
-  }
-};
-
 const createNewBooking = (): void => {
   const today = new Date();
   const tomorrow = new Date(today);
@@ -1176,6 +1175,142 @@ const createNewBooking = (): void => {
     start: today.toISOString().split('T')[0],
     end: tomorrow.toISOString().split('T')[0]
   });
+};
+
+// Enhanced Navigation Event Handlers
+const handleEnhancedNavigation = (action: string): void => {
+  switch (action) {
+    case 'prev':
+      enhancedNavigation.goToPrevMonth();
+      break;
+    case 'next':
+      enhancedNavigation.goToNextMonth();
+      break;
+    case 'prevYear':
+      enhancedNavigation.goToPrevYear();
+      break;
+    case 'nextYear':
+      enhancedNavigation.goToNextYear();
+      break;
+    case 'today':
+      enhancedNavigation.goToToday();
+      break;
+    case 'historyBack':
+      enhancedNavigation.goBackInHistory();
+      break;
+    case 'historyForward':
+      enhancedNavigation.goForwardInHistory();
+      break;
+  }
+  
+  // Update calendar API to match enhanced navigation state
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    api.gotoDate(enhancedNavigation.currentDate.value);
+  }
+};
+
+const handleEnhancedViewChange = (view: string): void => {
+  enhancedNavigation.setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
+  
+  // Update calendar API
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    api.changeView(view);
+  }
+  
+  emit('viewChange', view);
+};
+
+const handleEnhancedDateSelected = (date: Date): void => {
+  enhancedNavigation.goToDateWithHistory(date);
+  
+  // Update calendar API
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    api.gotoDate(date);
+  }
+  
+  emit('dateChange', date);
+};
+
+const handleSmartNavigation = async (option: string): Promise<void> => {
+  await enhancedNavigation.executeSmartNavigation(option);
+  
+  // Update calendar API to match new date
+  if (calendarRef.value) {
+    const api = calendarRef.value.getApi();
+    api.gotoDate(enhancedNavigation.currentDate.value);
+  }
+  
+  emit('dateChange', enhancedNavigation.currentDate.value);
+};
+
+const handleOwnerNavigation = (ownerId: string): void => {
+  // Find the next booking for this owner and navigate to it
+  const now = new Date();
+  const ownerBookings = Array.from(props.bookings.values())
+    .filter(booking => 
+      booking.owner_id === ownerId && 
+      new Date(booking.checkout_date) >= now &&
+      booking.status !== 'completed' &&
+      booking.status !== 'cancelled'
+    )
+    .sort((a, b) => 
+      new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime()
+    );
+
+  if (ownerBookings.length > 0) {
+    const targetDate = new Date(ownerBookings[0].checkout_date);
+    enhancedNavigation.goToDateWithHistory(targetDate);
+    
+    // Update calendar API
+    if (calendarRef.value) {
+      const api = calendarRef.value.getApi();
+      api.gotoDate(targetDate);
+    }
+    
+    emit('dateChange', targetDate);
+  }
+};
+
+const handleStatusNavigation = (status: string): void => {
+  // Find the next booking with this status and navigate to it
+  const now = new Date();
+  let targetBookings: Booking[] = [];
+
+  if (status === 'unassigned') {
+    targetBookings = Array.from(props.bookings.values())
+      .filter(booking => 
+        !booking.assigned_cleaner_id && 
+        new Date(booking.checkout_date) >= now &&
+        booking.status !== 'completed' &&
+        booking.status !== 'cancelled'
+      );
+  } else {
+    targetBookings = Array.from(props.bookings.values())
+      .filter(booking => 
+        booking.status === status && 
+        new Date(booking.checkout_date) >= now
+      );
+  }
+
+  targetBookings.sort((a, b) => 
+    new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime()
+  );
+
+  if (targetBookings.length > 0) {
+    const targetDate = new Date(targetBookings[0].checkout_date);
+    enhancedNavigation.goToDateWithHistory(targetDate);
+    
+    // Update calendar API
+    if (calendarRef.value) {
+      const api = calendarRef.value.getApi();
+      api.gotoDate(targetDate);
+    }
+    
+    emit('dateChange', targetDate);
+  }
 };
 
 // Color preset functions
@@ -1275,12 +1410,23 @@ watch(() => theme.global.current.value.dark, () => {
 });
 
 // Enhanced event rendering from OwnerCalendar with admin-specific additions
-const renderAdminEventContent = (eventInfo: EventContentInfo) => {
-  const booking = eventInfo.event.extendedProps.booking as Booking;
-  const property = eventInfo.event.extendedProps.property as Property;
-  const owner = eventInfo.event.extendedProps.owner as User;
-  const cleaner = eventInfo.event.extendedProps.cleaner as User;
-  const eventType = eventInfo.event.extendedProps.eventType; // 'checkout', 'checkin', 'turn' for simplified view
+        const renderAdminEventContent = (eventInfo: EventContentInfo) => {
+          // Safety guards for undefined data
+          if (!eventInfo || !eventInfo.event || !eventInfo.event.extendedProps) {
+            console.warn('Invalid eventInfo passed to renderAdminEventContent');
+            return { html: '<div>Invalid Event</div>' };
+          }
+
+          const booking = eventInfo.event.extendedProps.booking as Booking;
+          const property = eventInfo.event.extendedProps.property as Property;
+          const eventType = eventInfo.event.extendedProps.eventType; // 'checkout', 'checkin', 'turn' for simplified view
+          
+          // Safety checks for required data
+          if (!booking) {
+            console.warn('No booking data in event extendedProps');
+            return { html: '<div>No Booking Data</div>' };
+          }
+
   const isAssigned = !!booking.assigned_cleaner_id;
   
   // For simplified view, the events already have their own titles and colors set
@@ -1288,7 +1434,7 @@ const renderAdminEventContent = (eventInfo: EventContentInfo) => {
     // Just return the event as-is since titles and colors are already set in adminCalendarEvents
     return {
       html: `
-        <div class="fc-event-content-wrapper admin-simplified-${eventType}" 
+        <div class="fc-event-content-wrapper admin-simplified-${eventType || 'unknown'}" 
              style="background-color: ${eventInfo.event.backgroundColor}; border-color: ${eventInfo.event.borderColor}; color: ${eventInfo.event.textColor};">
           <div class="fc-event-title">
             ${eventInfo.event.title} ${!isAssigned ? '⚠️' : ''}
@@ -1324,46 +1470,25 @@ const renderAdminEventContent = (eventInfo: EventContentInfo) => {
     }
   };
   
-  const priorityIcon = getPriorityIcon(booking.priority, booking.booking_type);
+  const priorityIcon = getPriorityIcon(booking.priority || 'normal', booking.booking_type);
+  const propertyName = property?.name || 'Property';
   
   return {
     html: `
-      <div class="fc-event-content-wrapper booking-${booking.booking_type} priority-${booking.priority}" 
+      <div class="fc-event-content-wrapper booking-${booking.booking_type} priority-${booking.priority || 'normal'}" 
            style="background-color: ${eventColor}; border-color: ${borderColor}; color: ${textColor};">
         <div class="fc-event-title">
-          ${priorityIcon} ${property?.name || 'Property'} ${!isAssigned ? '⚠️' : ''}
+          ${priorityIcon} ${propertyName} ${!isAssigned ? '⚠️' : ''}
         </div>
       </div>
     `
   };
 };
 
-// Admin-focused day cell rendering
-const renderAdminDayCell = (dayInfo: DayCellContentInfo) => {
-  const dayBookings = allBookings.value.filter(booking => {
-    const checkoutDate = new Date(booking.checkout_date).toDateString();
-    const dayDate = dayInfo.date.toDateString();
-    return checkoutDate === dayDate;
-  });
-  
-  const turnCount = dayBookings.filter(b => b.booking_type === 'turn').length;
-  const unassignedCount = dayBookings.filter(b => !b.assigned_cleaner_id).length;
-  const totalCount = dayBookings.length;
-  
-  return {
-    html: `
-      <div class="admin-day-number">
-        ${dayInfo.dayNumberText}
-        ${turnCount > 0 ? `<span class="admin-turn-indicator">${turnCount}</span>` : ''}
-        ${unassignedCount > 0 ? `<span class="admin-unassigned-indicator">${unassignedCount}</span>` : ''}
-        ${totalCount > 0 && turnCount === 0 && unassignedCount === 0 ? `<span class="admin-booking-indicator">${totalCount}</span>` : ''}
-      </div>
-    `
-  };
-};
+
 
 // Watch for view changes
-watch(currentView, (newView) => {
+watch(() => enhancedNavigation.currentView.value, (newView) => {
   if (calendarRef.value) {
     calendarRef.value.getApi().changeView(newView);
     emit('viewChange', newView);
@@ -1408,20 +1533,31 @@ watch(() => props.bookings, (newBookings) => {
   );
 }, { deep: true });
 
-// Programmatic calendar methods for admin
+// Programmatic calendar methods for admin (Enhanced Navigation Integration)
 const goToDate = (date: string | Date): void => {
+  const targetDate = typeof date === 'string' ? new Date(date) : date;
+  enhancedNavigation.goToDateWithHistory(targetDate);
+  
   if (calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(date);
+    calendarRef.value.getApi().gotoDate(targetDate);
   }
 };
 
 const changeView = (viewName: string): void => {
   const validViews: readonly string[] = ['dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listWeek'];
   if (validViews.includes(viewName)) {
-    currentView.value = viewName as typeof currentView.value;
+    enhancedNavigation.setCalendarView(viewName as typeof enhancedNavigation.currentView.value);
+    
+    if (calendarRef.value) {
+      calendarRef.value.getApi().changeView(viewName);
+    }
   } else {
     console.warn(`Invalid view name: ${viewName}. Using default 'timeGridWeek'.`);
-    currentView.value = 'timeGridWeek';
+    enhancedNavigation.setCalendarView('timeGridWeek');
+    
+    if (calendarRef.value) {
+      calendarRef.value.getApi().changeView('timeGridWeek');
+    }
   }
 };
 
@@ -1459,8 +1595,8 @@ onMounted(async () => {
   await nextTick();
   
   // Set up mobile viewport listener from OwnerCalendar
-  cleanupViewportListener = handleViewportResize((newOptions) => {
-    mobileOptions.value = newOptions;
+  cleanupViewportListener = handleViewportResize(() => {
+    mobileOptions.value = getMobileCalendarOptions();
   });
   
   // Add a small delay to ensure Vuetify layout is ready
@@ -1469,6 +1605,11 @@ onMounted(async () => {
     
     // Add resize listener after calendar is ready
     window.addEventListener('resize', handleWindowResize);
+    
+    // Integrate enhanced navigation with calendar
+    if (calendarRef.value) {
+      enhancedNavigation.attachNavigationToCalendar(calendarRef.value);
+    }
   }, 100);
 });
 
@@ -1515,6 +1656,14 @@ onBeforeUnmount(() => {
 .admin-calendar-toolbar {
   background: rgb(var(--v-theme-surface));
   border: 1px solid rgb(var(--v-theme-outline), 0.12);
+  flex-shrink: 0;
+}
+
+.admin-filters-panel {
+  background: rgba(var(--v-theme-surface), 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(var(--v-theme-outline), 0.15);
   flex-shrink: 0;
 }
 
@@ -1717,9 +1866,11 @@ onBeforeUnmount(() => {
 }
 
 .admin-calendar {
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .admin-calendar {

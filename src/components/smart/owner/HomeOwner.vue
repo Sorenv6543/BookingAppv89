@@ -1011,9 +1011,6 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   display: flex;
 }
 
-
-
-
 .calendar-main-container {
   flex: 1;
   height: 100vh;

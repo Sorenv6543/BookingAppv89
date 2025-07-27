@@ -2,29 +2,39 @@
 <template>
   <div class="admin-schedule-page">
     <!-- Page Header -->
-    <!-- <div class="page-header">
+     <div class="page-header">
+
+    </div> 
+
+    <!-- Calendar Navigation -->
+    <div class="calendar-navigation">
       <v-container fluid>
-        <v-row align="center">
-          <v-col>
-            <h1 class="text-h4 font-weight-bold">
-              Master Schedule
-            </h1>
-            <p class="text-subtitle-1 text-medium-emphasis">
-              System-wide calendar and cleaner assignment management
-            </p>
-          </v-col>
-          <v-col cols="auto">
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-plus"
-              @click="createBooking"
-            >
-              New Booking
-            </v-btn>
-          </v-col>
-        </v-row>
+        <div class="d-flex align-center justify-center">
+          <!-- Previous Month Button -->
+          <v-btn
+            icon="mdi-chevron-left"
+            variant="text"
+            size="large"
+            @click="navigateToPreviousMonth"
+          />
+          
+          <!-- Month and Year Display -->
+          <div class="calendar-month-year mx-6">
+            <h2 class="text-h5 font-weight-bold text-primary">
+              {{ getCurrentMonthYear() }}
+            </h2>
+          </div>
+          
+          <!-- Next Month Button -->
+          <v-btn
+            icon="mdi-chevron-right"
+            variant="text"
+            size="large"
+            @click="navigateToNextMonth"
+          />
+        </div>
       </v-container>
-    </div> -->
+    </div>
 
     <!-- Main Content -->
     <div class="page-content">
@@ -36,6 +46,7 @@
             :properties="propertyStore.properties"
             :users="usersMap"
             :loading="loading"
+            :current-date="currentDate"
             @date-select="handleDateSelect"
             @event-click="handleEventClick"
             @event-drop="handleEventDrop"
@@ -91,7 +102,6 @@ import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/c
 const uiStore = useUIStore()
 const bookingStore = useBookingStore()
 const propertyStore = usePropertyStore()
-const _userStore = useUserStore()
 const { users: allUsers, fetchAllUsers } = useAdminUserManagement()
 // const router = useRouter()
 const { createBooking: createBookingFn, updateBooking } = useAdminBookings()
@@ -105,6 +115,7 @@ const isEditMode = ref(false)
 const loading = ref(false)
 const currentView = ref('dayGridMonth')
 const currentDate = ref(new Date())
+const currentViewingDate = ref(new Date()) // For calendar navigation
 
 // Create users Map for AdminCalendar
 const usersMap = computed(() => {
@@ -172,11 +183,7 @@ const handleEventDrop = async (dropInfo: EventDropArg) => {
   }
 }
 
-// const createBooking = () => {
-//   selectedBooking.value = null
-//   isEditMode.value = false
-//   uiStore.openModal('event')
-// }
+
 
 const handleBookingSave = async (bookingData: Partial<Booking>) => {
   try {
@@ -262,6 +269,26 @@ const handleViewChange = (view: string) => {
 
 const handleDateChange = (date: Date) => {
   currentDate.value = date
+  currentViewingDate.value = date // Sync with navigation
+}
+
+// Calendar navigation functions
+const getCurrentMonthYear = () => {
+  return currentViewingDate.value.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
+const navigateToPreviousMonth = () => {
+  const newDate = new Date(currentViewingDate.value);
+  newDate.setMonth(newDate.getMonth() - 1);
+  currentViewingDate.value = newDate;
+  currentDate.value = newDate; // Update calendar view
+}
+
+const navigateToNextMonth = () => {
+  const newDate = new Date(currentViewingDate.value);
+  newDate.setMonth(newDate.getMonth() + 1);
+  currentViewingDate.value = newDate;
+  currentDate.value = newDate; // Update calendar view
 }
 
 // Initialize data on mount
@@ -296,6 +323,23 @@ onMounted(async () => {
   background: rgb(var(--v-theme-surface));
 }
 
+.calendar-navigation {
+  flex-shrink: 0;
+  background: rgb(var(--v-theme-surface));
+  border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
+  padding: 16px 0;
+}
+
+.calendar-month-year {
+  min-width: 250px;
+  text-align: center;
+}
+
+.calendar-month-year h2 {
+  margin: 0;
+  color: rgb(var(--v-theme-primary));
+}
+
 .page-content {
   flex: 1;
   overflow: hidden;
@@ -316,6 +360,18 @@ onMounted(async () => {
   .sidebar-col {
     border-right: none;
     border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
+  }
+  
+  .calendar-navigation {
+    padding: 12px 0;
+  }
+  
+  .calendar-month-year {
+    min-width: 200px;
+  }
+  
+  .calendar-month-year h2 {
+    font-size: 1.3rem;
   }
 }
 </style> 

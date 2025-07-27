@@ -1,0 +1,1244 @@
+<!-- 
+👑 ADMIN INTERFACE
+ src/components/smart/admin/HomeAdmin.vue - 
+
+✅ UNFILTERED VIEW - Admin sees all data
+✅ Access to all properties across all owners
+✅ System-wide metrics and controls
+✅ Can manage any owner's data 
+-->
+<template>
+  <div class="home-admin-container">
+    <!-- Admin Sidebar -->
+    <AdminSidebar
+      v-model="sidebarOpen"
+      :today-turns="systemTodayTurns"
+      :upcoming-cleanings="[]"
+      :properties="Array.from(allPropertiesMap.values())"
+      :users="Array.from(allUsersMap.values())"
+      :cleaners="Array.from(allUsersMap.values())"
+      :loading="loading"
+      @navigate-to-booking="handleNavigateToBooking"
+      @navigate-to-date="handleNavigateToDate"
+      @filter-by-property="handleFilterByProperty"
+      @filter-by-owner="handleFilterByOwner"
+      @filter-by-status="handleFilterByStatus"
+      @assign-cleaner="handleAssignCleaner"
+      @generate-reports="handleGenerateReports"
+      @manage-system="handleManageSystem"
+      @emergency-response="handleEmergencyResponse"
+      @create-booking="handleCreateBooking"
+      @create-property="handleCreateProperty"
+    />
+
+    <!-- Main Calendar Area -->
+    <div
+      class="calendar-column"
+      :class="{
+        'mobile-layout': mobile,
+        'tablet-layout': md,
+        'desktop-layout': lg,
+        'sidebar-open': sidebarOpen
+      }"
+    >
+      <!-- Calendar Header -->
+      <div class="calendar-header">     
+        <v-container
+          fluid
+          class="pa-4"
+        >
+          <div class="d-flex align-center">
+            <!-- Mobile menu button -->
+            <v-btn
+              v-if="$vuetify.display.mdAndDown"
+              icon="mdi-menu"
+              variant="text"
+              class="mr-4"
+              @click="sidebarOpen = !sidebarOpen"
+            />  
+               
+            <!-- Calendar Navigation -->
+            <v-btn
+              icon="mdi-arrow-left"
+              variant="text"
+              class="mr-2"
+              @click="handlePrevious"
+            />
+            <v-btn 
+              variant="outlined" 
+              class="mr-2" 
+              @click="handleGoToday"
+            >
+              Today
+            </v-btn>
+            <v-btn
+              icon="mdi-arrow-right"
+              variant="text"
+              class="mr-4"
+              @click="handleNext"
+            />
+            <div class="text-h6 mr-4 calendar-header-date">
+              {{ formattedDate }}
+            </div>
+               
+            <v-spacer />
+          </div>
+        </v-container>
+      </div>
+
+      <!-- Calendar Content -->
+      <div class="calendar-content">
+        <AdminCalendar 
+          ref="calendarRef"
+          :bookings="adminFilteredBookings"
+          :loading="loading"
+          :current-view="currentView"
+          :current-date="currentDate"
+          :properties="allPropertiesMap"
+          :users="allUsersMap"
+          @date-select="handleDateSelect"
+          @event-click="handleEventClick"
+          @event-drop="handleEventDrop"
+          @event-resize="handleEventResize"
+          @view-change="handleCalendarViewChange"
+          @date-change="handleCalendarDateChange"
+          @create-booking="handleCreateBookingFromCalendar"
+          @update-booking="handleUpdateBooking"
+        />
+      </div>
+    </div>
+    <!-- Admin-focused Modals -->
+    <BookingForm
+      :open="eventModalOpen"
+      :mode="eventModalMode"
+      :booking="eventModalData"
+      @close="handleEventModalClose"
+      @save="handleEventModalSave"
+      @delete="handleEventModalDelete"
+    />
+
+    <PropertyModal
+      :open="propertyModalOpen"
+      :mode="propertyModalMode"
+      :property="propertyModalData"
+      @close="handlePropertyModalClose"
+      @save="handlePropertyModalSave"
+      @delete="handlePropertyModalDelete"
+    />
+
+    <ConfirmationDialog
+      :open="confirmDialogOpen"
+      :title="confirmDialogTitle"
+      :message="confirmDialogMessage"
+      :confirm-text="confirmDialogConfirmText"
+      :cancel-text="confirmDialogCancelText"
+      :dangerous="confirmDialogDangerous"
+      @confirm="handleConfirmDialogConfirm"
+      @cancel="handleConfirmDialogCancel"
+      @close="handleConfirmDialogClose"
+    />
+
+    <!-- TODO: Add admin-specific modals -->
+    <!-- CleanerAssignmentModal -->
+    <!-- ReportsModal -->
+    <!-- SystemManagementModal -->
+  </div>
+
+  <!-- Mobile Floating Action Button for Sidebar Toggle - Outside main container -->
+  <v-fab
+    v-if="$vuetify.display.mdAndDown"
+    icon="mdi-plus"
+    size="large"
+    color="primary"
+    class="mobile-sidebar-fab"
+    :class="{ 'fab-shifted': sidebarOpen }"
+    @click="sidebarOpen = !sidebarOpen"
+  />
+</template>
+
+<script setup lang="ts">
+import { useRealtimeSync } from '@/composables/supabase/useRealtimeSync';
+useRealtimeSync()
+
+// Real-time sync will auto-initialize when user is authenticated
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { useDisplay } from 'vuetify';
+
+// Admin components
+import AdminSidebar from '@/components/smart/admin/AdminSidebar.vue';
+import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
+import BookingForm from '@/components/dumb/BookingForm.vue';
+import PropertyModal from '@/components/dumb/PropertyModal.vue';
+import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
+
+// State management
+import { useUserStore } from '@/stores/user';
+import { useUIStore } from '@/stores/ui';
+import { useAuthStore } from '@/stores/auth';
+
+// Business logic composables
+import { useAdminBookings } from '@/composables/admin/useAdminBookings';
+import { useAdminProperties } from '@/composables/admin/useAdminProperties';
+import { useCalendarState } from '@/composables/shared/useCalendarState';
+
+// Types
+import type { Booking, Property, BookingFormData, PropertyFormData, User } from '@/types';
+import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+
+// Import event logger for component communication
+
+
+// ============================================================================
+// STORE CONNECTIONS & STATE
+// ============================================================================
+const userStore = useUserStore();
+const uiStore = useUIStore();
+const authStore = useAuthStore();
+const { xs,  md, lg, mobile } = useDisplay();
+
+// Create computed properties for missing display breakpoints
+// const tablet = computed(() => sm.value || md.value);
+// const desktop = computed(() => lg.value || xl.value || (!mobile.value && !tablet.value));
+
+// Import event logger for component communication
+import eventLogger from '@/composables/shared/useComponentEventLogger';
+
+// COMPOSABLES - ADMIN BUSINESS LOGIC
+// ============================================================================
+const { 
+  allBookings,
+  allProperties,
+  systemTodayTurns,
+  // systemUpcomingCleanings,
+  // systemMetrics,
+  loading: adminLoading,
+  fetchAllBookings,
+  fetchAllProperties,
+  createBooking,
+  updateBooking,
+  deleteBooking
+} = useAdminBookings();
+
+const { 
+  createProperty,
+  updateProperty,
+  deleteProperty
+} = useAdminProperties();
+
+const {
+  currentView,
+  currentDate,
+  filterBookings,
+  setCalendarView,
+  goToDate,
+  goToToday,
+  next,
+  prev
+} = useCalendarState();
+
+// ============================================================================
+// LOCAL STATE
+// ============================================================================
+const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
+const sidebarOpen = ref(!xs.value);
+const selectedPropertyFilter = ref<string | null>(null);
+
+// Navigation drawer responsive behavior
+// const railMode = computed(() => {
+//   // Use rail mode on desktop when there's limited space
+//   return !xs.value && !sidebarOpen.value;
+// });
+
+// ============================================================================
+// ADMIN-SPECIFIC DATA ACCESS
+// ============================================================================
+
+// Check if user is authenticated and is an admin
+const isAdminAuthenticated = computed(() => {
+  return authStore.isAuthenticated && 
+         authStore.user?.role === 'admin';
+});
+
+// ============================================================================
+// COMPUTED STATE - ADMIN ALL-DATA ACCESS (NO FILTERING)
+// ============================================================================
+
+const loading = computed(() => 
+  adminLoading.value || 
+  uiStore.isLoading('bookings') || 
+  uiStore.isLoading('properties')
+);
+
+const formattedDate = computed(() => {
+  const options: Intl.DateTimeFormatOptions = { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  };
+  return currentDate.value.toLocaleDateString('en-US', options);
+});
+
+// ALL properties (no owner filtering for admin)
+const allPropertiesMap = computed(() => {
+  if (!isAdminAuthenticated.value) {
+    return new Map<string, Property>();
+  }
+
+  // Admin sees ALL properties across ALL owners
+  if (allProperties.value instanceof Map) {
+    return allProperties.value;
+  } else {
+    const map = new Map<string, Property>();
+    allProperties.value.forEach((property: Property) => {
+      if (property && property.id) {
+        map.set(property.id, property);
+      }
+    });
+    return map;
+  }
+});
+
+// ALL users (no filtering for admin)
+const allUsersMap = computed(() => {
+  const map = new Map<string, User>();
+  
+  if (!isAdminAuthenticated.value) {
+    return map;
+  }
+
+  // For now, just include the current user
+  // TODO: Implement user management store for all users when needed
+  if (userStore.user) {
+    map.set(userStore.user.id, userStore.user);
+  }
+  
+  return map;
+});
+
+// Admin's filtered bookings (all data with filters applied)
+const adminFilteredBookings = computed(() => {
+  let bookings = Array.from(allBookings.value);
+  
+  // Apply property filter if selected (can be any property)
+  if (selectedPropertyFilter.value) {
+    bookings = bookings.filter(booking => 
+      booking.property_id === selectedPropertyFilter.value
+    );
+  }
+  
+  // Apply calendar state filters
+  bookings = filterBookings(bookings);
+  
+  // Convert to Map for components that expect Map format
+  const map = new Map<string, Booking>();
+  bookings.forEach(booking => {
+    map.set(booking.id, booking);
+  });
+  
+  return map;
+});
+
+// System-wide metrics for admin header
+// const systemMetricsText = computed(() => {
+//   const totalProperties = allPropertiesMap.value.size;
+//   const totalBookings = allBookings.value.length;
+//   const urgentTurns = systemTodayTurns.value.length;
+//   const upcomingCount = allBookings.value.filter(booking => {
+//     const checkoutDate = new Date(booking.checkout_date);
+//     const today = new Date();
+//     const inOneWeek = new Date(today);
+//     inOneWeek.setDate(inOneWeek.getDate() + 7);
+//     return checkoutDate >= today && checkoutDate <= inOneWeek;
+//   }).length;
+  
+//   return `${totalProperties} properties • ${totalBookings} bookings • ${urgentTurns} urgent turns • ${upcomingCount} upcoming`;
+// });
+
+// ============================================================================
+// DATA LOADING ON MOUNT  
+// ============================================================================
+
+// Fetch data when component mounts
+onMounted(async () => {
+  console.log('🚀 [HomeAdmin] Component mounted, starting data fetch...');
+  
+  if (!isAdminAuthenticated.value) {
+    console.log('⚠️ [HomeAdmin] User not authenticated as admin, skipping data fetch');
+    return;
+  }
+
+  try {
+    // Fetch both properties and bookings in parallel for better performance
+    await Promise.all([
+      fetchAllBookings(),
+      fetchAllProperties()
+    ]);
+    
+    console.log('✅ [HomeAdmin] Admin data fetch completed successfully');
+    console.log('🔍 [HomeAdmin] Data state after loading:', {
+      propertiesInStore: allProperties.value.length,
+      bookingsInStore: allBookings.value.length,
+      allProperties: allPropertiesMap.value.size,
+      allBookings: allBookings.value.length,
+      systemTurns: systemTodayTurns.value.length,
+     
+    });
+  } catch (error) {
+    console.error('❌ [HomeAdmin] Error fetching admin data on mount:', error);
+    // Error is already handled by the stores and displayed in UI
+  }
+});
+
+// Watch for authentication changes
+watch(isAdminAuthenticated, async (newValue, oldValue) => {
+  console.log('🔄 [HomeAdmin] isAdminAuthenticated changed:', { 
+    from: oldValue, 
+    to: newValue,
+    user: authStore.user
+  });
+  if (newValue && !oldValue) {
+    // User became authenticated as admin - load data
+    console.log('✅ [HomeAdmin] User became authenticated as admin, loading data...');
+    try {
+      await Promise.all([
+        fetchAllBookings(),
+        fetchAllProperties()
+      ]);
+      console.log('✅ [HomeAdmin] Admin data loaded after auth change');
+    } catch (error) {
+      console.error('❌ [HomeAdmin] Failed to load admin data after auth change:', error);
+    }
+  } else if (!newValue && oldValue) {
+    // User became unauthenticated - could clear data if needed
+    console.log('⚠️ [HomeAdmin] User lost admin authentication');
+  }
+});
+
+// ============================================================================
+// UI STATE - MODAL MANAGEMENT
+// ============================================================================
+
+// Event Modal State
+const eventModalOpen = computed(() => uiStore.isModalOpen('event'));
+const eventModalMode = computed((): 'create' | 'edit' | undefined => {
+  const modalState = uiStore.getModalState('event');
+  const mode = modalState?.mode;
+  return (mode === 'create' || mode === 'edit') ? mode : undefined;
+});
+const eventModalData = computed((): Booking | undefined => {
+  const modalData = uiStore.getModalData('event') as { booking?: Booking };
+  return modalData?.booking || undefined;
+});
+
+// Property Modal State
+const propertyModalOpen = computed(() => uiStore.isModalOpen('property'));
+const propertyModalMode = computed((): 'create' | 'edit' | undefined => {
+  const modalState = uiStore.getModalState('property');
+  const mode = modalState?.mode;
+  return (mode === 'create' || mode === 'edit') ? mode : undefined;
+});
+const propertyModalData = computed((): Property | undefined => {
+  const modalData = uiStore.getModalData('property') as { property?: Property };
+  return modalData?.property || undefined;
+});
+
+// Confirmation Dialog State
+const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirm'));
+const confirmDialogTitle = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.title || '';
+});
+const confirmDialogMessage = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.message || '';
+});
+const confirmDialogConfirmText = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.confirmText || 'Confirm';
+});
+const confirmDialogCancelText = computed((): string => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return dialogState?.cancelText || 'Cancel';
+});
+const confirmDialogDangerous = computed((): boolean => {
+  const dialogState = uiStore.getConfirmDialogState('confirm');
+  return Boolean(dialogState?.dangerous) || false;
+});
+
+// ============================================================================
+// EVENT HANDLERS - NAVIGATION
+// ============================================================================
+
+const handleNavigateToBooking = (bookingId: string): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'navigateToBooking',
+      bookingId,
+      'receive'
+    );
+
+    const booking = allBookings.value.find(b => b.id === bookingId);
+    if (booking) {
+      uiStore.openModal('event', 'edit', {
+        booking: booking
+      });
+    } else {
+      console.warn(`Booking with ID ${bookingId} not found`);
+    }
+  } catch (error) {
+    console.error('Error navigating to booking:', error);
+  }
+};
+
+const handleNavigateToDate = (date: Date): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'navigateToDate',
+      date,
+      'receive'
+    );
+
+    goToDate(date);
+  } catch (error) {
+    console.error('Error navigating to date:', error);
+  }
+};
+
+const handleFilterByProperty = (propertyId: string | null): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'filterByProperty',
+      propertyId,
+      'receive'
+    );
+
+    selectedPropertyFilter.value = propertyId;
+  } catch (error) {
+    console.error('Error filtering by property:', error);
+  }
+};
+
+const handleFilterByOwner = (ownerId: string | null): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'filterByOwner',
+      ownerId,
+      'receive'
+    );
+    // TODO: Implement owner filtering
+    console.log('Filter by owner:', ownerId);
+  } catch (error) {
+    console.error('Error filtering by owner:', error);
+  }
+};
+
+const handleFilterByStatus = (status: string | null): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'filterByStatus',
+      status,
+      'receive'
+    );
+    // TODO: Implement status filtering
+    console.log('Filter by status:', status);
+  } catch (error) {
+    console.error('Error filtering by status:', error);
+  }
+};
+
+// ============================================================================
+// EVENT HANDLERS - ADMIN ACTIONS
+// ============================================================================
+
+const handleAssignCleaner = (data: { bookingId: string; cleanerId?: string }): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'assignCleaner',
+      data,
+      'receive'
+    );
+    console.log('Admin: Assign Cleaner', data);
+    // TODO: Open cleaner assignment modal
+  } catch (error) {
+    console.error('Error assigning cleaner:', error);
+  }
+};
+
+const handleGenerateReports = (): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'generateReports',
+      null,
+      'receive'
+    );
+    console.log('Admin: Generate Reports');
+    // TODO: Open reports modal
+  } catch (error) {
+    console.error('Error generating reports:', error);
+  }
+};
+
+const handleManageSystem = (): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'manageSystem',
+      null,
+      'receive'
+    );
+    console.log('Admin: Manage System');
+    // TODO: Open system management modal
+  } catch (error) {
+    console.error('Error managing system:', error);
+  }
+};
+
+const handleEmergencyResponse = (): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'emergencyResponse',
+      null,
+      'receive'
+    );
+    console.log('Admin: Emergency Response');
+    // TODO: Open emergency response modal
+  } catch (error) {
+    console.error('Error handling emergency response:', error);
+  }
+};
+
+const handleCreateBooking = (): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'createBooking',
+      null,
+      'receive'
+    );
+
+    uiStore.openModal('event', 'create', {
+      booking: null
+    });
+  } catch (error) {
+    console.error('Error creating booking:', error);
+  }
+};
+
+const handleCreateProperty = (): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminSidebar',
+      'HomeAdmin',
+      'createProperty',
+      null,
+      'receive'
+    );
+
+    uiStore.openModal('property', 'create', {
+      property: null
+    });
+  } catch (error) {
+    console.error('Error creating property:', error);
+  }
+};
+
+// const handleNavigateToBooking = (bookingId: string): void => {
+//   try {
+//     // Log receiving event from AdminSidebar (or generic Sidebar)
+//     eventLogger.logEvent(
+//       'Sidebar',
+//       'HomeAdmin',
+//       'navigateToBooking',
+//       bookingId,
+//       'receive'
+//     );
+
+//     // Open booking modal for editing
+//     const booking = allBookings.value.find(b => b.id === bookingId);
+//     if (booking) {
+//       uiStore.openModal('event', 'edit', {
+//         booking: booking
+//       });
+//     } else {
+//       console.warn(`Booking with ID ${bookingId} not found`);
+//     }
+//   } catch (error) {
+//     console.error('Error navigating to booking:', error);
+//     // TODO: Show admin-specific error notification
+//   }
+// };
+
+// const handleNavigateToDate = (date: Date): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'Sidebar',
+//       'HomeAdmin',
+//       'navigateToDate',
+//       date,
+//       'receive'
+//     );
+
+//     goToDate(date);
+//   } catch (error) {
+//     console.error('Error navigating to date:', error);
+//     // TODO: Show admin-specific error notification
+//   }
+// };
+
+// const handleFilterByProperty = (propertyId: string | null): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'Sidebar',
+//       'HomeAdmin',
+//       'filterByProperty',
+//       propertyId,
+//       'receive'
+//     );
+
+//     selectedPropertyFilter.value = propertyId;
+    
+//     // Admin can filter by any property (not just their own)
+//     if (propertyId) {
+//       togglePropertyFilter(propertyId);
+//     } else {
+//       clearPropertyFilters();
+//     }
+//   } catch (error) {
+//     console.error('Error filtering by property:', error);
+//     // TODO: Show admin-specific error notification
+//   }
+// };
+
+// ============================================================================
+// EVENT HANDLERS - ADMIN-SPECIFIC ACTIONS
+// ============================================================================
+
+// const handleAssignCleaners = (): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'HomeAdmin',
+//       'HomeAdmin',
+//       'assignCleaners',
+//       null,
+//       'emit'
+//     );
+
+//     // TODO: Open cleaner assignment modal when TASK-039Q is complete
+//     console.log('Admin: Assign Cleaners clicked');
+//     // uiStore.openModal('cleanerAssignment', { bookings: unassignedBookings });
+//   } catch (error) {
+//     console.error('Error opening cleaner assignment:', error);
+//   }
+// };
+
+// const handleGenerateReports = (): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'HomeAdmin',
+//       'HomeAdmin',
+//       'generateReports',
+//       null,
+//       'emit'
+//     );
+
+//     // TODO: Open reports modal or navigate to reports page
+//     console.log('Admin: Generate Reports clicked');
+//     // uiStore.openModal('reports', { dateRange: currentWeek });
+//   } catch (error) {
+//     console.error('Error opening reports:', error);
+//   }
+// };
+
+// const handleManageSystem = (): void => {
+//   try {
+//     eventLogger.logEvent(
+//       'HomeAdmin',
+//       'HomeAdmin',
+//       'manageSystem',
+//       null,
+//       'emit'
+//     );
+
+//     // TODO: Open system management modal or navigate to admin settings
+//     console.log('Admin: Manage System clicked');
+//     // uiStore.openModal('systemManagement', {});
+//   } catch (error) {
+//     console.error('Error opening system management:', error);
+//   }
+// };
+
+// ============================================================================
+// EVENT HANDLERS - CRUD OPERATIONS
+// ============================================================================
+
+// Functions moved to avoid duplicates - already defined above
+
+const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string }): void => {
+  try {
+    eventLogger.logEvent(
+      'FullCalendar',
+      'HomeAdmin',
+      'createBooking',
+      data,
+      'receive'
+    );
+
+    // Convert FullCalendar data format to BookingFormData format
+    const bookingData: Partial<BookingFormData> = {
+      checkout_date: data.start,
+      checkin_date: data.end,
+      property_id: data.propertyId,
+      booking_type: 'standard',
+      status: 'pending'
+    };
+
+    uiStore.openModal('event', 'create', {
+      booking: bookingData
+    });
+  } catch (error) {
+    console.error('Error creating booking from calendar:', error);
+  }
+};
+
+// ============================================================================
+// EVENT HANDLERS - CALENDAR INTERACTIONS
+// ============================================================================
+
+const handleDateSelect = (selectInfo: DateSelectArg): void => {
+  try {
+    const data = {
+      start: selectInfo.startStr,
+      end: selectInfo.endStr
+    };
+
+    handleCreateBookingFromCalendar(data);
+  } catch (error) {
+    console.error('Error handling date select:', error);
+  }
+};
+
+const handleEventClick = (clickInfo: EventClickArg): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminCalendar',
+      'HomeAdmin',
+      'eventClick',
+      clickInfo.event.id,
+      'receive'
+    );
+
+    const bookingId = clickInfo.event.id;
+    const booking = allBookings.value.find(b => b.id === bookingId);
+    
+    if (booking) {
+      uiStore.openModal('event', 'edit', {
+        booking: booking
+      });
+    } else {
+      console.warn(`Booking with ID ${bookingId} not found`);
+    }
+  } catch (error) {
+    console.error('Error handling event click:', error);
+  }
+};
+
+const handleEventDrop = (dropInfo: EventDropArg): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminCalendar',
+      'HomeAdmin',
+      'eventDrop',
+      dropInfo.event.id,
+      'receive'
+    );
+
+    const bookingId = dropInfo.event.id;
+    const booking = allBookings.value.find(b => b.id === bookingId);
+    
+    if (booking) {
+      // Update booking with new dates
+      updateBooking(booking.id, {
+        checkout_date: dropInfo.event.startStr,
+        checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+      });
+    } else {
+      console.warn(`Booking with ID ${bookingId} not found`);
+    }
+  } catch (error) {
+    console.error('Error handling event drop:', error);
+  }
+};
+
+const handleEventResize = (resizeInfo: any): void => {
+  try {
+    eventLogger.logEvent(
+      'AdminCalendar',
+      'HomeAdmin',
+      'eventResize',
+      resizeInfo.event.id,
+      'receive'
+    );
+
+    const bookingId = resizeInfo.event.id;
+    const booking = allBookings.value.find(b => b.id === bookingId);
+    
+    if (booking) {
+      // Update booking with new end date
+      updateBooking(booking.id, {
+        checkin_date: resizeInfo.event.endStr || resizeInfo.event.end?.toISOString()
+      });
+    } else {
+      console.warn(`Booking with ID ${bookingId} not found`);
+    }
+  } catch (error) {
+    console.error('Error handling event resize:', error);
+  }
+};
+
+const handleUpdateBooking = (data: { id: string; updates: Partial<Booking> }): void => {
+  try {
+    // Use the updates directly from the event
+    updateBooking(data.id, data.updates);
+  } catch (error) {
+    console.error('Error updating booking:', error);
+  }
+};
+
+// ============================================================================
+// EVENT HANDLERS - CALENDAR CONTROLS
+// ============================================================================
+
+const handleCalendarViewChange = (view: string): void => {
+  try {
+    // Convert string view to FullCalendar-specific view names
+    let fullCalendarView: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
+    switch (view) {
+      case 'month':
+      case 'dayGridMonth':
+        fullCalendarView = 'dayGridMonth';
+        break;
+      case 'week':
+      case 'timeGridWeek':
+        fullCalendarView = 'timeGridWeek';
+        break;
+      case 'day':
+      case 'timeGridDay':
+        fullCalendarView = 'timeGridDay';
+        break;
+      default:
+        fullCalendarView = 'timeGridWeek';
+    }
+    setCalendarView(fullCalendarView);
+  } catch (error) {
+    console.error('Error changing calendar view:', error);
+  }
+};
+
+const handleCalendarDateChange = (date: Date): void => {
+  try {
+    goToDate(date);
+  } catch (error) {
+    console.error('Error changing calendar date:', error);
+  }
+};
+
+const handlePrevious = (): void => {
+  try {
+    prev();
+  } catch (error) {
+    console.error('Error going to previous:', error);
+  }
+};
+
+const handleNext = (): void => {
+  try {
+    next();
+  } catch (error) {
+    console.error('Error going to next:', error);
+  }
+};
+
+const handleGoToday = (): void => {
+  try {
+    goToToday();
+  } catch (error) {
+    console.error('Error going to today:', error);
+  }
+};
+
+// ============================================================================
+// EVENT HANDLERS - MODAL MANAGEMENT
+// ============================================================================
+
+const handleEventModalClose = (): void => {
+  try {
+    uiStore.closeModal('event');
+  } catch (error) {
+    console.error('Error closing event modal:', error);
+  }
+};
+
+const handleEventModalSave = async (bookingData: BookingFormData): Promise<void> => {
+  try {
+    const mode = eventModalMode.value;
+    const isEditing = mode === 'edit';
+    
+    if (isEditing) {
+      const booking = eventModalData.value;
+      if (booking) {
+        await updateBooking(booking.id, bookingData);
+      }
+    } else {
+      await createBooking(bookingData);
+    }
+    
+    // Close modal after successful save
+    uiStore.closeModal('event');
+  } catch (error) {
+    console.error('Error saving booking:', error);
+    // Error handling is done by the composable
+  }
+};
+
+const handleEventModalDelete = async (bookingId: string): Promise<void> => {
+  try {
+    const booking = allBookings.value.find(b => b.id === bookingId);
+    if (!booking) {
+      console.warn(`Booking with ID ${bookingId} not found`);
+      return;
+    }
+    
+    // Admin can delete any booking - show confirmation with business impact
+    const property = allPropertiesMap.value.get(booking.property_id);
+    const propertyName = property?.name || 'Unknown Property';
+    
+    uiStore.openConfirmDialog('confirm', {
+      title: 'Delete Booking',
+      message: `Are you sure you want to delete this booking for ${propertyName}? This action cannot be undone and may affect business operations.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      dangerous: true,
+      data: {
+        onConfirm: async () => {
+          await deleteBooking(bookingId);
+          uiStore.closeModal('event');
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+  }
+};
+
+const handlePropertyModalClose = (): void => {
+  try {
+    uiStore.closeModal('property');
+  } catch (error) {
+    console.error('Error closing property modal:', error);
+  }
+};
+
+const handlePropertyModalSave = async (propertyData: PropertyFormData): Promise<void> => {
+  try {
+    if (propertyModalMode.value === 'create') {
+      await createProperty(propertyData);
+    } else if (propertyModalMode.value === 'edit') {
+      // Get the property ID from modal data since PropertyFormData doesn't include id
+      const modalData = uiStore.getModalData('property') as { property?: Property };
+      const propertyId = modalData?.property?.id;
+      if (propertyId) {
+        await updateProperty(propertyId, propertyData);
+      }
+    }
+    
+    uiStore.closeModal('property');
+  } catch (error) {
+    console.error('Error saving property:', error);
+    // TODO: Show admin-specific error notification
+  }
+};
+
+const handlePropertyModalDelete = (propertyId: string): void => {
+  try {
+    // Show confirmation dialog for admin with business impact warning
+    const property = allPropertiesMap.value.get(propertyId);
+    const relatedBookings = allBookings.value.filter(booking => booking.property_id === propertyId);
+    
+    uiStore.openConfirmDialog('confirm', {
+      title: 'Delete Property',
+      message: `Are you sure you want to delete "${property?.name}"? This will affect ${relatedBookings.length} bookings and impact the property owner's business.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      dangerous: true,
+      data: {
+        onConfirm: () => {
+          deleteProperty(propertyId);
+          uiStore.closeModal('property');
+          uiStore.closeConfirmDialog('confirm');
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting property:', error);
+  }
+};
+
+// ============================================================================
+// EVENT HANDLERS - CONFIRMATION DIALOG
+// ============================================================================
+
+const handleConfirmDialogConfirm = (): void => {
+  try {
+    const confirmData = uiStore.getConfirmDialogState('confirm');
+    const onConfirm = confirmData?.data?.onConfirm;
+    if (onConfirm && typeof onConfirm === 'function') {
+      onConfirm();
+    }
+  } catch (error) {
+    console.error('Error handling confirm dialog confirm:', error);
+  }
+};
+
+const handleConfirmDialogCancel = (): void => {
+  try {
+    const confirmData = uiStore.getConfirmDialogState('confirm');
+    const onCancel = confirmData?.data?.onCancel;
+    if (onCancel && typeof onCancel === 'function') {
+      onCancel();
+    }
+    uiStore.closeConfirmDialog('confirm');
+  } catch (error) {
+    console.error('Error handling confirm dialog cancel:', error);
+  }
+};
+
+const handleConfirmDialogClose = (): void => {
+  try {
+    uiStore.closeConfirmDialog('confirm');
+  } catch (error) {
+    console.error('Error closing confirm dialog:', error);
+  }
+};
+
+// ============================================================================
+// UI HELPERS
+// ============================================================================
+
+// ============================================================================
+// LIFECYCLE HOOKS
+// ============================================================================
+
+onMounted(async () => {
+  try {
+    // Admin needs to fetch ALL data
+    await Promise.all([
+      fetchAllBookings(),
+      fetchAllProperties()
+    ]);
+    
+    // Set up responsive sidebar
+    watch(xs, (newVal) => {
+      sidebarOpen.value = !newVal;
+    }, { immediate: true });
+    
+  } catch (error) {
+    console.error('Error initializing HomeAdmin:', error);
+    // TODO: Show admin-specific error notification
+  }
+});
+
+onUnmounted(() => {
+  // Cleanup if needed
+});
+</script>
+
+<style scoped>
+.home-admin-container {
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+.calendar-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.calendar-header {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
+  color: rgb(var(--v-theme-on-primary));
+}
+
+.calendar-header .v-btn {
+  color: rgb(var(--v-theme-on-primary));
+}
+
+.calendar-header .text-h6 {
+  color: rgb(var(--v-theme-on-primary));
+  font-weight: 600;
+}
+
+.calendar-content {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Mobile responsive */
+@media (max-width: 959px) {
+  .home-admin-container {
+    flex-direction: column;
+  }
+  
+  .calendar-column.mobile-layout,
+  .calendar-column.tablet-layout {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  .calendar-header {
+    background: rgb(var(--v-theme-surface));
+    color: rgb(var(--v-theme-on-surface));
+  }
+  
+  .calendar-header .v-btn {
+    color: rgb(var(--v-theme-on-surface));
+  }
+  
+  .calendar-header .text-h6 {
+    color: rgb(var(--v-theme-on-surface));
+  }
+}
+
+/* Desktop with sidebar open */
+@media (min-width: 960px) {
+  .calendar-column.desktop-layout.sidebar-open {
+    margin-left: 0;
+    width: calc(100% - 320px);
+  }
+}
+</style> 

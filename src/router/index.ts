@@ -89,11 +89,20 @@ const router = createRouter({
       }
     },
     {
+      path: '/admin/schedule',
+      name: 'admin-schedule',
+      component: () => import('@/pages/admin/schedule/index.vue'),
+      meta: {
+        layout: 'admin',
+        role: 'admin'
+      }
+    },
+    {
       path: '/admin/properties',
       name: 'admin-properties',
-      component: () => import('@/components/smart/admin/AdminProperties.vue'),
+      component: () => import('@/pages/admin/properties/index.vue'),
       meta: {
-        layout: 'default',
+        layout: 'admin',
         role: 'admin'
       }
     },
@@ -115,7 +124,6 @@ const router = createRouter({
         role: 'admin'
       }
     },
-
     {
       path: '/admin/bookings',
       name: 'admin-bookings',
@@ -126,41 +134,11 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin',
-      name: 'admin-dashboard',
-      component: () => import('@/pages/admin/dashboard.vue'),
+      path: '/admin/property-owners',
+      name: 'admin-property-owners',
+      component: () => import('@/pages/admin/property-owners/index.vue'),
       meta: {
         layout: 'admin',
-        role: 'admin'
-      }
-    },
-    {
-      path: '/admin/schedule',
-      name: 'admin-schedule',
-      component: () => import('@/pages/admin/schedule/index.vue'),
-      meta: {
-        layout: 'admin',
-        
-        role: 'admin'
-      }
-    },
-    {
-      path: '/admin/properties',
-      name: 'admin-properties',
-      component: () => import('@/pages/admin/properties/index.vue'),
-      meta: {
-        layout: 'admin',
-        
-        role: 'admin'
-      }
-    },
-    {
-      path: '/admin/bookings',
-      name: 'admin-bookings',
-      component: () => import('@/pages/admin/bookings/index.vue'),
-      meta: {
-        layout: 'admin',
-        
         role: 'admin'
       }
     },
@@ -170,37 +148,9 @@ const router = createRouter({
       component: () => import('@/pages/admin/reports/index.vue'),
       meta: {
         layout: 'admin',
-        
         role: 'admin'
       }
     },
-    // {
-    //   path: '/admin/profile',
-    //   name: 'admin-profile',
-    //   component: () => import('@/pages/admin/profile/index.vue'),
-    //   meta: {
-    //     layout: 'admin',
-    //     role: 'admin'
-    //   }
-    // },
-    // {
-    //   path: '/admin/settings',
-    //   name: 'admin-settings',
-    //   component: () => import('@/pages/admin/settings/index.vue'),
-    //   meta: {
-    //     layout: 'admin',
-    //     role: 'admin'
-    //   }
-    // },
-    // {
-    //   path: '/admin/owners',
-    //   name: 'admin-owners',
-    //   component: () => import('@/pages/admin/owners/index.vue'),
-    //   meta: {
-    //     layout: 'admin',
-    //     role: 'admin'
-    //   }
-    // },
     {
       path: '/admin/cleaners',
       name: 'admin-cleaners',
@@ -213,24 +163,6 @@ const router = createRouter({
     {
       path: '/admin/users',
       name: 'admin-users',
-      component: () => import('@/pages/admin/users/index.vue'),
-      meta: {
-        layout: 'admin',
-        role: 'admin'
-      }
-    },
-    {
-      path: '/admin/users/:id',
-      name: 'admin-users-view',
-      component: () => import('@/pages/admin/users/index.vue'),
-      meta: {
-        layout: 'admin',
-        role: 'admin'
-      }
-    },
-    {
-      path: '/admin/users/:id/edit',
-      name: 'admin-users-edit',
       component: () => import('@/pages/admin/users/index.vue'),
       meta: {
         layout: 'admin',
