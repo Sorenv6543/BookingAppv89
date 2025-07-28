@@ -152,9 +152,4 @@ const ownerBookings = computed(() =>
 
 - **Main Rules**: `.cursor/rules/production-ready-project-rules.md`
 - **Architecture**: `@project_summary.md` (role-based multi-tenant overview)
-- **Current Status**: `@tasks.md` (completion status and priorities)
-- **Implementation**: `@repomix-output.md` (existing code patterns)
 
----
-
-**🚀 REMEMBER: This is a PRODUCTION-READY project. Focus on finalization and optimization, not major changes.**
