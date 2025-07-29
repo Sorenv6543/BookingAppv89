@@ -344,7 +344,7 @@ Based on TASK-072 implementation
                       icon="mdi-home-group"
                       class="mr-2"
                     />
-                    All Properties ({{ adminData.allProperties.length }})
+                    All Properties ({{ adminData.allProperties.size }})
                     <v-spacer />
                     <v-btn
                       color="primary"

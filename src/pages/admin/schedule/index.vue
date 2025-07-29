@@ -125,15 +125,15 @@ const usersMap = computed(() => {
 })
 
 // // Event handlers
-// const handlePropertySelected = (propertyId: string | null) => {
-//   selectedPropertyId.value = propertyId
-// }
+const handlePropertySelected = (propertyId: string | null) => {
+  selectedPropertyId.value = propertyId
+}
 
-// const handleTurnAlertClicked = (booking: Booking) => {
-//   selectedBooking.value = booking
-//   isEditMode.value = true
-//   uiStore.openModal('event')
-// }
+const handleTurnAlertClicked = (booking: Booking) => {
+  selectedBooking.value = booking
+  isEditMode.value = true
+  uiStore.openModal('event')
+}
 
 // const handleQuickAction = (action: string) => {
 //   switch (action) {

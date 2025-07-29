@@ -197,8 +197,10 @@ export function useAdminBookings() {
       error.value = null;
 
       const bookingWithId: Booking = {
+        id: `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         ...bookingData,
-        id: `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
       await bookingStore.addBooking(bookingWithId);
@@ -220,8 +222,10 @@ export function useAdminBookings() {
 
       // Convert BookingFormData to Booking by adding required id
       const bookingWithId: Booking = {
+        id: crypto.randomUUID(),
         ...bookingData,
-        id: crypto.randomUUID(), // Generate ID for new booking
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
       await bookingStore.addBooking(bookingWithId);
@@ -271,7 +275,7 @@ export function useAdminBookings() {
     }
   };
 
-  // Role-specific performance metrics
+  // Role-specific performance metrics (prefixed with _ to indicate intentionally unused)
   const _getAdminPerformanceMetrics = computed(() => {
     return {
       totalBookingsProcessed: allBookings.value.length,

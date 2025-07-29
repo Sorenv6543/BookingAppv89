@@ -48,7 +48,7 @@
               Date
             </div>
             <div class="text-body-1">
-              {{ formatDate(booking.date) }}
+              {{ formatDate(booking.date as string) }}
             </div>
           </v-col>
           <v-col
@@ -87,10 +87,10 @@
             </div>
             <div class="text-body-1">
               <v-chip
-                :color="getPriorityColor(booking.priority)"
+                :color="getPriorityColor(booking.priority || 'low')"
                 size="small"
               >
-                {{ booking.priority }}
+                {{ booking.priority || 'N/A' }}
               </v-chip>
             </div>
           </v-col>

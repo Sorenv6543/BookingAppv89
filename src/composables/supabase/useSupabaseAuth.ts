@@ -114,8 +114,10 @@ export function useSupabaseAuth() {
           setTimeout(() => reject(new Error('Profile query timeout after 3 seconds')), 3000);
         });
         
-        const { data, error: profileError } = await Promise.race([queryPromise, timeoutPromise]);
+        const result = await Promise.race([queryPromise, timeoutPromise]) as { data: any; error: any };
 
+        const { data, error: profileError } = result;
+        
         // Handle null data (profile not found) or errors
         if (profileError) {
           console.warn(`⚠️ Profile query failed (attempt ${attempt}):`, profileError);

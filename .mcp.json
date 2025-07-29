@@ -60,14 +60,19 @@
       "env": {}
     },
     "browser-tools-enhanced": {
-      "type": "stdio",
       "command": "cmd",
+      "type": "stdio",
       "args": [
         "/c",
         "npx",
         "-y",
         "@eqiz/browser-tools-mcp-enhanced"
       ],
+      "env": {}
+    },
+    "playwright": {
+      "command": "cmd /c npx -y @playwright/mcp@latest",
+      "type": "stdio",
       "env": {}
     }
   }
