@@ -2,9 +2,7 @@
 <template>
   <div class="admin-schedule-page">
     <!-- Page Header -->
-     <div class="page-header">
-
-    </div> 
+    <div class="page-header" /> 
 
     <!-- Calendar Navigation -->
     <div class="calendar-navigation">

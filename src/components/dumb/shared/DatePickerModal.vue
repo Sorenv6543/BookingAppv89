@@ -1,15 +1,17 @@
 <template>
   <v-dialog
     :model-value="visible"
-    @update:model-value="(value) => emit('update:visible', value)"
     max-width="400"
     persistent
+    @update:model-value="(value) => emit('update:visible', value)"
     @keydown.esc="handleCancel"
     @keydown.enter="handleConfirm"
   >
     <v-card class="date-picker-modal">
       <v-card-title class="d-flex align-center">
-        <v-icon class="mr-2">mdi-calendar</v-icon>
+        <v-icon class="mr-2">
+          mdi-calendar
+        </v-icon>
         Go to Date
         <v-spacer />
         <v-btn

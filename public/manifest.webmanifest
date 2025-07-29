@@ -1,0 +1,9 @@
+{
+  "name": "Property Cleaning Scheduler (Dev)",
+  "short_name": "CleanSync Dev",
+  "description": "Development version - PWA features disabled",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1976d2"
+} 

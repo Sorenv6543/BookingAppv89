@@ -11,7 +11,27 @@ export async function authGuard(
 ) {
   const authStore = useAuthStore();
   
-  // Wait for authentication check to complete
+  // Wait for authentication initialization to complete
+  // This ensures the auth state listener has finished processing
+  const maxWaitTime = 500; // 500ms max wait (reduced from 1 second)
+  const checkInterval = 50; // Check every 50ms (reduced from 100ms)
+  let waitedTime = 0;
+  
+  console.log('🔄 Auth guard: Waiting for initialization...');
+  
+  // Wait for initialization to complete
+  while (authStore.initializing && waitedTime < maxWaitTime) {
+    await new Promise(resolve => setTimeout(resolve, checkInterval));
+    waitedTime += checkInterval;
+  }
+  
+  if (authStore.initializing) {
+    console.warn('⚠️ Auth initialization timeout in guard, proceeding anyway');
+  } else {
+    console.log('✅ Auth initialization completed');
+  }
+  
+  // Now check auth state
   await authStore.checkAuth();
   
   console.log('🛡️ Auth guard check:', {

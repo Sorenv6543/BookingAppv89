@@ -12,10 +12,9 @@
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
-    "supabase",
     "sequential-thinking",
+    "supabase",
     "context7",
-    "desktop-commander",
-    "puppeteer"
+    "desktop-commander"
   ]
 }

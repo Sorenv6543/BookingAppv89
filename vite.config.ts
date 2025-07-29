@@ -31,47 +31,58 @@ vueDevTools({
     launchEditor: 'code',
   }
 }),
-    VitePWA({
+    // Only include PWA plugin in production to prevent manifest errors in development
+    ...(process.env.NODE_ENV === 'production' ? [VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['pwa-icon.svg'],
-        manifest: {
-          name: 'Property Cleaning Scheduler',
-          short_name: 'CleanSync',
-          description: 'Professional property cleaning management for owners and administrators',
-          theme_color: '#1976d2',
-          background_color: '#ffffff',
-          display: 'standalone',
-          scope: '/',
-          start_url: '/',
-          categories: ['productivity', 'cleaning', 'property management'],
-          lang: 'en-US',
-          orientation: 'portrait', 
-          icons: [
-            {
-              src: 'pwa-icon.svg',
-              sizes: 'any',
-              type: 'image/svg+xml'
-            },
-            {
-              src: 'pwa-icon.svg',
-              sizes: '192x192',
-              type: 'image/svg+xml'
-            },
-            {
-              src: 'pwa-icon.svg',
-              sizes: '512x512',
-              type: 'image/svg+xml'
-            },
-            {
-              src: 'pwa-icon.svg',
-              sizes: '512x512',
-              type: 'image/svg+xml',
-              purpose: 'maskable'
-            }
-          ]
-        },  
+      manifest: {
+        name: 'Property Cleaning Scheduler',
+        short_name: 'CleanSync',
+        description: 'Professional property cleaning management for owners and administrators',
+        theme_color: '#1976d2',
+        background_color: '#ffffff',
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
+        categories: ['productivity', 'cleaning', 'property management'],
+        lang: 'en-US',
+        orientation: 'portrait', 
+        icons: [
+          {
+            src: 'pwa-icon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml'
+          },
+          {
+            src: 'pwa-icon.svg',
+            sizes: '192x192',
+            type: 'image/svg+xml'
+          },
+          {
+            src: 'pwa-icon.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml'
+          },
+          {
+            src: 'pwa-icon.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'maskable'
+          }
+        ]
+      },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: [
+          '**/*.js',
+          '**/*.css', 
+          '**/*.html',
+          '**/*.svg',
+          '**/*.woff2',
+          '**/*.woff',
+          '**/*.ttf',
+          '**/*.eot'
+        ],
+        globDirectory: 'dist', // Explicitly set the build output directory
         runtimeCaching: [
           {
             // Cache your role-based chunks
@@ -121,15 +132,22 @@ vueDevTools({
         navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         clientsClaim: true,
         skipWaiting: true,
-          },
-      devOptions: {
-        enabled: true,
-        type: 'module'
       },
-      // Enable advanced PWA features
+      devOptions: {
+        enabled: false, // Disable PWA in development to prevent manifest errors
+        type: 'module',
+        navigateFallback: '/index.html'
+      },
+      // Enable advanced PWA features only in production
       mode: 'production',
       // Handle navigation fallback for SPA
-    }),
+      injectRegister: 'auto',
+      // Ensure PWA only runs in production builds
+      includeManifestIcons: false,
+      injectManifest: {
+        injectionPoint: undefined
+      }
+    })] : []),
 
 
 
@@ -161,7 +179,9 @@ vueDevTools({
     __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
     // Ensure Vue feature flags are properly set
     __VUE_OPTIONS_API__: JSON.stringify(true),
-    __VUE_PROD_DEVTOOLS__: JSON.stringify(true)
+    __VUE_PROD_DEVTOOLS__: JSON.stringify(true),
+    // Suppress Sass deprecation warnings
+    'process.env.SASS_SILENCE_DEPRECATION_WARNINGS': JSON.stringify('legacy-js-api')
   },
     // CSS and SCSS sourcemap configuration
     css: {
@@ -173,7 +193,13 @@ vueDevTools({
           sourceMapEmbed: false,
           // Fix Sass legacy API deprecation warnings
           api: 'modern-compiler',
-          silenceDeprecations: ['legacy-js-api']
+          silenceDeprecations: ['legacy-js-api'],
+          // Additional options to suppress deprecation warnings
+          quietDeps: true,
+          style: 'compressed',
+          // Use modern Sass API to avoid deprecation warnings
+          loadPaths: ['node_modules'],
+          charset: false
         }
       }
     },

@@ -207,7 +207,7 @@ Based on TASK-072 implementation
                       item-key="ownerId"
                       class="elevation-1"
                     >
-                      <template #item.properties="{ item }">
+                      <template #[`item.properties`]="{ item }">
                         <v-chip
                           size="small"
                           color="primary"
@@ -217,7 +217,7 @@ Based on TASK-072 implementation
                         </v-chip>
                       </template>
                       
-                      <template #item.bookings="{ item }">
+                      <template #[`item.bookings`]="{ item }">
                         <v-chip
                           size="small"
                           color="success"
@@ -227,7 +227,7 @@ Based on TASK-072 implementation
                         </v-chip>
                       </template>
                       
-                      <template #item.revenue="{ item }">
+                      <template #[`item.revenue`]="{ item }">
                         <strong>${{ item.revenue.toLocaleString() }}</strong>
                       </template>
                     </v-data-table>

@@ -46,7 +46,6 @@ interface Emits {
   (e: 'dateSelect', selectInfo: DateSelectArg): void;
   (e: 'eventClick', clickInfo: EventClickArg): void;
   (e: 'eventDrop', dropInfo: EventDropArg): void;
-  (e: 'eventResize', resizeInfo: any): void;
   (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
   (e: 'updateBooking', data: { id: string; start: string; end: string }): void;
 }
@@ -241,7 +240,6 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   select: handleDateSelect,
   eventClick: handleEventClick,
   eventDrop: handleEventDrop,
-  eventResize: handleEventResize,
   
   // Loading state
   loading: handleLoading,
@@ -329,28 +327,10 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
   // Removed duplicate updateBooking emit to prevent infinite loops
 };
 
-const handleEventResize = (resizeInfo: any): void => {
-  const booking = (resizeInfo as { event: { extendedProps: { booking: Booking }; startStr: string; endStr: string } }).event.extendedProps.booking;
-  
-  // Log emitting event to Home
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'eventResize',
-    { 
-      id: booking.id, 
-      start: resizeInfo.event.startStr, 
-      end: resizeInfo.event.endStr 
-    },
-    'emit'
-  );
-  
-  emit('eventResize', resizeInfo);
-  // Removed duplicate updateBooking emit to prevent infinite loops
-};
+
 
 // Custom event rendering with enhanced visual variety
-const renderEventContent = (eventInfo: any) => {
+const renderEventContent = (eventInfo: { event: { extendedProps: { booking: Booking; property: Property; eventColor?: string; borderColor?: string; textColor?: string }; backgroundColor?: string; borderColor?: string; textColor?: string } }) => {
   const booking = eventInfo.event.extendedProps.booking as Booking;
   const property = eventInfo.event.extendedProps.property as Property;
   const eventColor = eventInfo.event.extendedProps.eventColor || eventInfo.event.backgroundColor;
@@ -499,7 +479,7 @@ const handleEditBooking = (booking: Booking): void => {
       id: booking.id,
       extendedProps: { booking, isEdit: true }
     }
-  } as any);
+  } as unknown as EventClickArg);
   
   console.log('✏️ [FullCalendar] Edit booking from day view:', booking.id);
 };
@@ -574,15 +554,16 @@ const attachMoreLinkListeners = (): void => {
   
   moreLinks.forEach((link: Element) => {
     // Remove existing listeners to prevent duplicates
-    link.removeEventListener('click', handleManualMoreLinkClick as any);
-    link.removeEventListener('mousedown', handleManualMoreLinkClick as any);
-    link.removeEventListener('touchstart', handleManualMoreLinkClick as any);
+    link.removeEventListener('click', handleManualMoreLinkClick);
+    link.removeEventListener('mousedown', handleManualMoreLinkClick);
+    link.removeEventListener('touchstart', handleManualMoreLinkClick);
     
     // Add our custom click handlers with high priority (capture phase)
-    link.addEventListener('click', handleManualMoreLinkClick as any, true);
-    link.addEventListener('mousedown', handleManualMoreLinkClick as any, true);
-    link.addEventListener('touchstart', handleManualMoreLinkClick as any, true);
+    link.addEventListener('click', handleManualMoreLinkClick, true);
+    link.addEventListener('mousedown', handleManualMoreLinkClick, true);
+    link.addEventListener('touchstart', handleManualMoreLinkClick, true);
   });
+
   
   console.log('📎 [FullCalendar] Attached listeners to', moreLinks.length, 'more links');
 };

@@ -2,7 +2,7 @@
   <div class="admin-prop-owner">
     <!-- Main Content -->
     <div class="owners-content">
-    >
+      >
       <!-- Header (Desktop only) -->
       <div
         v-if="!mobile"
@@ -124,7 +124,7 @@
               :mobile-breakpoint="0"
               @click:row="viewOwnerDetails"
             >
-              <template #item.avatar="{ item }">
+              <template #[`item.avatar`]="{ item }">
                 <v-avatar
                   :color="item.avatarColor"
                   :size="mobile ? 32 : 40"
@@ -145,7 +145,7 @@
                 </v-avatar>
               </template>
 
-              <template #item.name="{ item }">
+              <template #[`item.name`]="{ item }">
                 <div class="owner-name-cell">
                   <div 
                     class="owner-name font-weight-medium"
@@ -163,7 +163,7 @@
                 </div>
               </template>
 
-              <template #item.properties="{ item }">
+              <template #[`item.properties`]="{ item }">
                 <div class="properties-cell">
                   <div class="d-flex align-center gap-2">
                     <v-icon
@@ -192,7 +192,7 @@
                 </div>
               </template>
 
-              <template #item.contact="{ item }">
+              <template #[`item.contact`]="{ item }">
                 <div class="contact-cell">
                   <div 
                     class="contact-email d-flex align-center gap-1"
@@ -234,7 +234,7 @@
                 </div>
               </template>
 
-              <template #item.status="{ item }">
+              <template #[`item.status`]="{ item }">
                 <v-chip
                   :color="getStatusColor(item.status)"
                   :size="mobile ? 'x-small' : 'small'"
@@ -244,7 +244,7 @@
                 </v-chip>
               </template>
 
-              <template #item.joinDate="{ item }">
+              <template #[`item.joinDate`]="{ item }">
                 <div 
                   class="join-date"
                   :class="mobile ? 'text-caption' : 'text-body-2'"
@@ -253,7 +253,7 @@
                 </div>
               </template>
 
-              <template #item.actions="{ item }">
+              <template #[`item.actions`]="{ item }">
                 <div class="d-flex align-center gap-1">
                   <v-btn
                     icon="mdi-eye"

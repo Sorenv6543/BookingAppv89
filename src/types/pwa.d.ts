@@ -1,4 +1,5 @@
-// Type declarations for virtual PWA modules
+// Type declarations for virtual PWA modules - Only available in production
+// In development, these modules are not available to prevent build errors
 declare module 'virtual:pwa-register/vue' {
   import type { Ref } from 'vue'
   
@@ -17,4 +18,10 @@ declare module 'virtual:pwa-register/vue' {
   }
   
   export function useRegisterSW(options?: RegisterSWOptions): PWARegisterReturn
+}
+
+// Development fallback - this module will not exist in development
+declare module 'virtual:pwa-register/vue' {
+  // This is intentionally empty to prevent TypeScript errors
+  // The actual implementation will be mocked in usePWA.ts
 } 

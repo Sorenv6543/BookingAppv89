@@ -2,7 +2,7 @@
   <div class="admin-system-users">
     <!-- Main Content -->
     <div class="users-content">
-    >
+      >
       <!-- Header (Desktop only) -->
       <div
         v-if="!mobile"
@@ -221,7 +221,7 @@
               :mobile-breakpoint="0"
               @click:row="viewUserDetails"
             >
-              <template #item.avatar="{ item }">
+              <template #[`item.avatar`]="{ item }">
                 <v-avatar
                   :color="getRoleColor(item.role)"
                   :size="mobile ? 32 : 40"
@@ -233,7 +233,7 @@
                 </v-avatar>
               </template>
 
-              <template #item.name="{ item }">
+              <template #[`item.name`]="{ item }">
                 <div class="user-name-cell">
                   <div 
                     class="user-name font-weight-medium"
@@ -250,7 +250,7 @@
                 </div>
               </template>
 
-              <template #item.role="{ item }">
+              <template #[`item.role`]="{ item }">
                 <v-chip
                   :color="getRoleColor(item.role)"
                   size="small"
@@ -260,7 +260,7 @@
                 </v-chip>
               </template>
 
-              <template #item.status="{ item }">
+              <template #[`item.status`]="{ item }">
                 <v-chip
                   :color="getStatusColor(item)"
                   size="small"
@@ -270,7 +270,7 @@
                 </v-chip>
               </template>
 
-              <template #item.lastActivity="{ item }">
+              <template #[`item.lastActivity`]="{ item }">
                 <div 
                   class="last-activity"
                   :class="mobile ? 'text-caption' : 'text-body-2'"
@@ -279,7 +279,7 @@
                 </div>
               </template>
 
-              <template #item.actions="{ item }">
+              <template #[`item.actions`]="{ item }">
                 <div class="d-flex align-center gap-1">
                   <v-btn
                     icon="mdi-eye"
@@ -307,11 +307,11 @@
                       <v-list-item @click="resetPassword(item)">
                         <v-list-item-title>Reset Password</v-list-item-title>
                       </v-list-item>
-                                              <v-list-item @click="toggleUserStatus(item)">
-                          <v-list-item-title>
-                            {{ getStatusText(item) === 'Active' ? 'Deactivate' : 'Activate' }}
-                          </v-list-item-title>
-                        </v-list-item>
+                      <v-list-item @click="toggleUserStatus(item)">
+                        <v-list-item-title>
+                          {{ getStatusText(item) === 'Active' ? 'Deactivate' : 'Activate' }}
+                        </v-list-item-title>
+                      </v-list-item>
                       <v-divider />
                       <v-list-item
                         class="text-error"
@@ -559,7 +559,7 @@ const resetPassword = (user: User) => {
   // TODO: Implement password reset
 };
 
-const toggleUserStatus = async (user: User) => {
+const toggleUserStatus = async (_user: User) => {
   // Status is determined by created_at and last_sign_in_at properties
   // Cannot be directly toggled - would require database schema changes
   console.log('User status toggle not implemented - status is derived from user activity');

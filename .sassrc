@@ -1,0 +1,7 @@
+{
+  "silenceDeprecations": ["legacy-js-api"],
+  "quietDeps": true,
+  "style": "compressed",
+  "loadPaths": ["node_modules"],
+  "charset": false
+} 

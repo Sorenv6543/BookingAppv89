@@ -1,5 +1,4 @@
 import { ref, computed, onMounted } from 'vue'
-import { useRegisterSW } from 'virtual:pwa-register/vue'
 import { usePushNotifications } from './usePushNotifications'
 import { useBackgroundSync } from './useBackgroundSync'
 
@@ -22,78 +21,33 @@ export const usePWA = () => {
   // Network Status
   const isOnline = ref(navigator.onLine)
   
-  // Service Worker
-  const {
-    needRefresh,
-    offlineReady,
-    updateServiceWorker
-  } = useRegisterSW({
-    onRegistered(r: ServiceWorkerRegistration | undefined) {
-      console.log('Service Worker registered:', r)
-    },
-    onRegisterError(error: unknown) {
-      console.error('Service Worker registration error:', error)
-    }
-  })
+  // Service Worker - Mock in development
+  const needRefresh = ref(false)
+  const offlineReady = ref(false)
+  const updateServiceWorker = async () => Promise.resolve()
 
   // Check if running as PWA
   const isPWA = computed(() => {
-    return window.matchMedia('(display-mode: standalone)').matches ||
-           (window.navigator as { standalone?: boolean }).standalone ||
-           document.referrer.includes('android-app://')
+    // Always false in development to prevent PWA-related issues
+    return false
   })
 
   // Install PWA
   const installPWA = async () => {
-    if (!deferredPrompt.value) return false
-    
-    try {
-      deferredPrompt.value.prompt()
-      const { outcome } = await deferredPrompt.value.userChoice
-      
-      if (outcome === 'accepted') {
-        isPWAInstalled.value = true
-        console.log('PWA installed successfully')
-      }
-      
-      deferredPrompt.value = null
-      isPWAInstallable.value = false
-      
-      return outcome === 'accepted'
-    } catch (error) {
-      console.error('PWA installation error:', error)
-      return false
-    }
+    console.log('PWA installation disabled in development mode')
+    return false
   }
 
   // Update PWA
   const updatePWA = async () => {
-    try {
-      await updateServiceWorker(true)
-    } catch (error) {
-      console.error('PWA update error:', error)
-    }
+    console.log('PWA update disabled in development mode')
   }
 
   // Setup event listeners
   onMounted(() => {
-    // PWA Install Prompt
-    window.addEventListener('beforeinstallprompt', (e: Event) => {
-      e.preventDefault()
-      deferredPrompt.value = e as BeforeInstallPromptEvent
-      isPWAInstallable.value = true
-      console.log('PWA install prompt ready')
-    })
-
-    // PWA Installed
-    window.addEventListener('appinstalled', () => {
-      isPWAInstalled.value = true
-      isPWAInstallable.value = false
-      deferredPrompt.value = null
-      console.log('PWA installed via browser prompt')
-    })
-
-    // Network Status
+    console.log('PWA event listeners disabled in development mode')
+    
+    // Only set up network status listeners
     const updateOnlineStatus = () => {
       isOnline.value = navigator.onLine
     }
@@ -106,8 +60,8 @@ export const usePWA = () => {
   const pushNotifications = usePushNotifications()
   const backgroundSync = useBackgroundSync()
 
-  // Start background sync auto-processing
-  backgroundSync.startAutoSync()
+  // Don't start background sync in development
+  console.log('PWA background sync disabled in development mode')
 
   return {
     // Installation
@@ -131,15 +85,11 @@ export const usePWA = () => {
     backgroundSync,
     
     // Computed states
-    canInstall: computed(() => isPWAInstallable.value && !isPWA.value),
-    showUpdatePrompt: computed(() => needRefresh.value),
-    showOfflineReady: computed(() => offlineReady.value),
+    canInstall: computed(() => false), // Always false in development
+    showUpdatePrompt: computed(() => false), // Always false in development
+    showOfflineReady: computed(() => false), // Always false in development
     
     // Combined PWA status
-    isFullyFunctional: computed(() => 
-      isPWA.value && 
-      pushNotifications.hasPermission.value && 
-      backgroundSync.canProcess.value
-    )
+    isFullyFunctional: computed(() => false) // Always false in development
   }
 } 

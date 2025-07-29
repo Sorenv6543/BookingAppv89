@@ -107,7 +107,7 @@
             size="small"
             variant="text"
             color="primary"
-            @click="navigateTo('/owner/properties/create')"
+            @click="openCreatePropertyModal"
           />
         </div>
       
@@ -142,9 +142,9 @@
           
             <template #append>
               <v-menu>
-                <template #activator="{ props }">
+                <template #activator="{ props: activatorProps }">
                   <v-btn
-                    v-bind="props"
+                    v-bind="activatorProps"
                     icon="mdi-dots-vertical"
                     size="x-small"
                     variant="text"
@@ -192,7 +192,7 @@
               size="small"
               color="primary"
               variant="outlined"
-              @click="navigateTo('/owner/properties/create')"
+              @click="openCreatePropertyModal"
             >
               Add Property
             </v-btn>
@@ -261,9 +261,9 @@
         </div>
         
         <v-menu offset-y>
-          <template #activator="{ props }">
+          <template #activator="{ props: menuProps }">
             <v-btn
-              v-bind="props"
+              v-bind="menuProps"
               icon
               size="small"
               variant="text"
@@ -296,6 +296,16 @@
         </v-menu>
       </div>
     </div>
+
+    <!-- Property Modal -->
+    <PropertyModal
+      :open="showPropertyModal"
+      :mode="propertyModalMode"
+      :property="selectedPropertyForEdit"
+      @close="closePropertyModal"
+      @save="handlePropertySave"
+      @delete="handlePropertyDelete"
+    />
   </v-navigation-drawer>
 </template>
 
@@ -305,7 +315,8 @@ import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { useAuthStore } from '@/stores/auth';
 import { usePropertyStore } from '@/stores/property';
-import type { Property } from '@/types';
+import PropertyModal from '@/components/dumb/PropertyModal.vue';
+import type { Property, PropertyFormData, PricingTier } from '@/types';
 
 // Constants for consistent sizing
 const SIDEBAR_WIDTH = 280;
@@ -314,7 +325,7 @@ const BRAND_HEIGHT_MOBILE = 100;
 
 // Define props
 interface Props {
-  modelValue: boolean;
+  modelValue?: boolean;
   temporary?: boolean;
 }
 
@@ -345,6 +356,9 @@ const propertyStore = usePropertyStore();
 
 // Local state
 const selectedPropertyId = ref<string | null>(null);
+const showPropertyModal = ref(false);
+const propertyModalMode = ref<'create' | 'edit'>('create');
+const selectedPropertyForEdit = ref<Property | undefined>(undefined);
 
 // v-model support
 const sidebarOpen = computed({
@@ -388,13 +402,76 @@ const selectProperty = (property: Property) => {
 };
 
 const editProperty = (property: Property) => {
-  // Navigate to property edit page
-  navigateTo(`/owner/properties/${property.id}/edit`);
+  openEditPropertyModal(property);
 };
 
 const viewProperty = (property: Property) => {
   // Navigate to property view page
   navigateTo(`/owner/properties/${property.id}`);
+};
+
+// Property modal functions
+const openCreatePropertyModal = () => {
+  propertyModalMode.value = 'create';
+  selectedPropertyForEdit.value = undefined;
+  showPropertyModal.value = true;
+};
+
+const openEditPropertyModal = (property: Property) => {
+  propertyModalMode.value = 'edit';
+  selectedPropertyForEdit.value = property;
+  showPropertyModal.value = true;
+};
+
+const closePropertyModal = () => {
+  showPropertyModal.value = false;
+  selectedPropertyForEdit.value = undefined;
+};
+
+const handlePropertySave = async (propertyData: PropertyFormData) => {
+  try {
+    if (propertyModalMode.value === 'create') {
+      // Transform PropertyFormData to Property for creation
+      const newProperty: Property = {
+        id: crypto.randomUUID(),
+        owner_id: authStore.user?.id || '',
+        name: propertyData.name as string,
+        address: propertyData.address as string,
+        cleaning_duration: propertyData.cleaning_duration as number,
+        pricing_tier: propertyData.pricing_tier as PricingTier,
+        active: propertyData.active as boolean,
+        bedrooms: propertyData.bedrooms as number | undefined,
+        bathrooms: propertyData.bathrooms as number | undefined,
+        square_feet: propertyData.square_feet as number | undefined,
+        property_type: propertyData.property_type as 'apartment' | 'house' | 'condo' | 'townhouse' | undefined,
+        special_instructions: propertyData.special_instructions as string | undefined,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      await propertyStore.addProperty(newProperty);
+    } else if (propertyModalMode.value === 'edit' && selectedPropertyForEdit.value) {
+      await propertyStore.updateProperty(selectedPropertyForEdit.value.id, propertyData);
+    }
+    closePropertyModal();
+  } catch (error) {
+    console.error('Failed to save property:', error);
+    // TODO: Show error toast/snackbar
+  }
+};
+
+const handlePropertyDelete = async (propertyId: string) => {
+  try {
+    await propertyStore.removeProperty(propertyId);
+    // Clear selection if deleted property was selected
+    if (selectedPropertyId.value === propertyId) {
+      selectedPropertyId.value = null;
+      emit('filterByProperty', null);
+    }
+    closePropertyModal();
+  } catch (error) {
+    console.error('Failed to delete property:', error);
+    // TODO: Show error toast/snackbar
+  }
 };
 
 const deleteProperty = async (property: Property) => {

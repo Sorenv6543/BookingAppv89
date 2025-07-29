@@ -25,13 +25,18 @@ export function useSupabaseAuth() {
   const currentUserId = computed(() => session.value?.user?.id || null);
 
   // Declare timeout variable first
-  let initializationTimeout: NodeJS.Timeout;
+  let initializationTimeout: ReturnType<typeof setTimeout>;
 
   // Initialize auth listener immediately with better error handling
   initializeAuthListener();
 
   function initializeAuthListener() {
     try {
+      // CRITICAL: Set initializing to false immediately to prevent timeouts
+      console.log('🚀 Setting initializing to false immediately in initializeAuthListener');
+      initializing.value = false;
+      clearTimeout(initializationTimeout);
+      
       supabase.auth.onAuthStateChange(async (event, newSession) => {
         console.log('[Auth Debug] Auth state changed:', { event, userId: newSession?.user?.id });
         
@@ -41,9 +46,8 @@ export function useSupabaseAuth() {
             if (newSession) {
               await loadUserProfile(newSession.user.id);
             }
-            // CRITICAL: Always set initializing to false for INITIAL_SESSION
-            console.log('🚀 Setting initializing to false after INITIAL_SESSION');
-            initializing.value = false;
+            // Already set initializing to false above
+            console.log('✅ INITIAL_SESSION processed');
           } else if (event === 'SIGNED_IN' && newSession) {
             session.value = newSession;
             try {
@@ -65,13 +69,36 @@ export function useSupabaseAuth() {
         } catch (err) {
           console.error('Auth state change error:', err);
           error.value = err instanceof Error ? err.message : 'Authentication error';
-          // CRITICAL: Always set initializing to false even on errors
-          if (event === 'INITIAL_SESSION') {
-            console.log('🚀 Setting initializing to false after INITIAL_SESSION error');
-            initializing.value = false;
-          }
         }
       });
+      
+      // Immediate fallback: Check current session and set initializing to false
+      supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+        if (currentSession) {
+          console.log('🔄 Found existing session, loading profile');
+          session.value = currentSession;
+          loadUserProfile(currentSession.user.id).then(() => {
+            console.log('✅ Existing session profile loaded');
+          }).catch(err => {
+            console.error('❌ Existing session profile loading failed:', err);
+          });
+        } else {
+          console.log('🔄 No existing session found');
+        }
+        // Ensure initializing is false regardless
+        if (initializing.value) {
+          initializing.value = false;
+          clearTimeout(initializationTimeout);
+        }
+      }).catch(err => {
+        console.error('❌ Session check failed:', err);
+        // Ensure initializing is false even on error
+        if (initializing.value) {
+          initializing.value = false;
+          clearTimeout(initializationTimeout);
+        }
+      });
+      
     } catch (err) {
       console.error('❌ Failed to initialize auth listener:', err);
       // Fallback: set initializing to false if listener setup fails
@@ -81,93 +108,143 @@ export function useSupabaseAuth() {
   }
 
   async function loadUserProfile(userId: string): Promise<void> {
-    try {
-      console.log('🔍 Loading user profile for:', userId);
-      
-      // Add timeout to prevent hanging
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Profile query timeout')), 5000);
-      });
+    const maxRetries = 3;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔍 Loading user profile for: ${userId} (attempt ${attempt}/${maxRetries})`);
+        
+        // Direct query without custom timeout - let Supabase handle its own timeouts
+        const { data, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('id, email, name, role, company_name, notifications_enabled, timezone, theme, language, created_at, updated_at')
+          .eq('id', userId)
+          .single();
 
-      const queryPromise = supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+        console.log(`📋 Profile query result (attempt ${attempt}):`, { 
+          success: !profileError, 
+          hasData: !!data,
+          error: profileError?.message,
+          errorCode: profileError?.code,
+          dataKeys: data ? Object.keys(data) : null
+        });
 
-      const { data, error: profileError } = await Promise.race([queryPromise, timeoutPromise]) as any;
+        if (profileError) {
+          console.warn(`⚠️ Profile query failed (attempt ${attempt}):`, profileError);
+          
+          // Check if it's a "not found" error (user profile doesn't exist)
+          if (profileError.code === 'PGRST116' || profileError.message?.includes('No rows found')) {
+            console.log('ℹ️ User profile not found in database, creating fallback profile');
+            // Create a basic user profile from session data
+            user.value = {
+              id: userId,
+              email: session.value?.user?.email || '',
+              name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
+              role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
+              company_name: session.value?.user?.user_metadata?.company_name || '',
+              notifications_enabled: true,
+              timezone: 'America/New_York',
+              theme: 'light',
+              language: 'en',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            };
+            console.log('✅ Created fallback profile from session metadata:', { email: user.value.email, role: user.value.role });
+            return; // Success with fallback, exit the retry loop
+          }
+          
+          // If this is the last attempt, use fallback
+          if (attempt === maxRetries) {
+            console.error('❌ All profile query attempts failed, using fallback profile');
+            // Create a basic user profile from session data instead of throwing
+            user.value = {
+              id: userId,
+              email: session.value?.user?.email || '',
+              name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
+              role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
+              company_name: session.value?.user?.user_metadata?.company_name || '',
+              notifications_enabled: true,
+              timezone: 'America/New_York',
+              theme: 'light',
+              language: 'en',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            };
+            console.log('⚠️ Using fallback profile due to error:', profileError);
+            return;
+          }
+          
+          // Wait before retry (exponential backoff)
+          const retryDelay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+          console.log(`⏳ Waiting ${retryDelay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          continue;
+        }
 
-      console.log('📋 Profile query result:', { data, profileError });
-
-      if (profileError) {
-        console.error('❌ Failed to load user profile:', profileError);
-        // Create a basic user profile from session data instead of throwing
-        user.value = {
-          id: userId,
-          email: session.value?.user?.email || '',
-          name: session.value?.user?.email?.split('@')[0] || 'User',
-          role: 'owner' as UserRole,
-          company_name: '',
-          notifications_enabled: true,
-          timezone: 'America/New_York',
-          theme: 'light',
-          language: 'en',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        console.log('⚠️ Using fallback profile due to error:', profileError);
-        return;
+        // Success! Process the data
+        if (data) {
+          user.value = {
+            id: data.id,
+            email: session.value?.user?.email || data.email || '',
+            name: data.name,
+            role: data.role as UserRole,
+            company_name: data.company_name,
+            notifications_enabled: data.notifications_enabled ?? true,
+            timezone: data.timezone || 'America/New_York',
+            theme: data.theme || 'light',
+            language: data.language || 'en',
+            created_at: data.created_at,
+            updated_at: data.updated_at
+          };
+          console.log('✅ User profile loaded successfully:', { email: user.value.email, role: user.value.role });
+          return; // Success, exit the retry loop
+        } else {
+          console.warn('⚠️ No user profile data returned, using fallback');
+          // Create a basic user profile from session data
+          user.value = {
+            id: userId,
+            email: session.value?.user?.email || '',
+            name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
+            role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
+            company_name: session.value?.user?.user_metadata?.company_name || '',
+            notifications_enabled: true,
+            timezone: 'America/New_York',
+            theme: 'light',
+            language: 'en',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          return; // Success with fallback, exit the retry loop
+        }
+      } catch (err) {
+        console.error(`❌ Error loading user profile (attempt ${attempt}):`, err);
+        
+        // If this is the last attempt, use fallback
+        if (attempt === maxRetries) {
+          console.error('❌ All profile loading attempts failed, using fallback profile');
+          // Create a basic user profile from session data instead of throwing
+          user.value = {
+            id: userId,
+            email: session.value?.user?.email || '',
+            name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
+            role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
+            company_name: session.value?.user?.user_metadata?.company_name || '',
+            notifications_enabled: true,
+            timezone: 'America/New_York',
+            theme: 'light',
+            language: 'en',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          console.log('⚠️ Using fallback profile due to exception:', err);
+          return;
+        }
+        
+        // Wait before retry (exponential backoff)
+        const retryDelay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        console.log(`⏳ Waiting ${retryDelay}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
       }
-
-      if (data) {
-        user.value = {
-          id: data.id,
-          email: session.value?.user?.email || data.email || '',
-          name: data.name,
-          role: data.role as UserRole,
-          company_name: data.company_name,
-          notifications_enabled: data.notifications_enabled ?? true,
-          timezone: data.timezone || 'America/New_York',
-          theme: data.theme || 'light',
-          language: data.language || 'en',
-          created_at: data.created_at,
-          updated_at: data.updated_at
-        };
-        console.log('✅ User profile loaded:', { email: user.value.email, role: user.value.role });
-      } else {
-        console.warn('⚠️ No user profile data returned, using fallback');
-        // Create a basic user profile from session data
-        user.value = {
-          id: userId,
-          email: session.value?.user?.email || '',
-          name: session.value?.user?.email?.split('@')[0] || 'User',
-          role: 'owner' as UserRole,
-          company_name: '',
-          notifications_enabled: true,
-          timezone: 'America/New_York',
-          theme: 'light',
-          language: 'en',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-      }
-    } catch (err) {
-      console.error('❌ Error loading user profile:', err);
-      // Create a basic user profile from session data instead of throwing
-      user.value = {
-        id: userId,
-        email: session.value?.user?.email || '',
-        name: session.value?.user?.email?.split('@')[0] || 'User',
-        role: 'owner' as UserRole,
-        company_name: '',
-        notifications_enabled: true,
-        timezone: 'America/New_York',
-        theme: 'light',
-        language: 'en',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      console.log('⚠️ Using fallback profile due to error:', err);
     }
   }
 
@@ -359,17 +436,30 @@ export function useSupabaseAuth() {
       if (currentSession) {
         session.value = currentSession;
         if (!user.value) {
+          console.log('🔄 No user profile found, loading from session...');
           await loadUserProfile(currentSession.user.id);
         }
         console.log('✅ Auth check complete - user authenticated');
       } else {
         console.log('ℹ️ Auth check complete - no active session');
+        // Clear any stale data
+        if (user.value) {
+          user.value = null;
+        }
+        if (session.value) {
+          session.value = null;
+        }
       }
     } catch (err) {
       console.error('❌ Auth check error:', err);
       error.value = err instanceof Error ? err.message : 'Auth check failed';
     } finally {
-      initializing.value = false;
+      // Always ensure initialization is complete after auth check
+      if (initializing.value) {
+        console.log('🔄 Setting initializing to false after auth check');
+        initializing.value = false;
+        clearTimeout(initializationTimeout);
+      }
     }
   }
 
@@ -493,8 +583,20 @@ export function useSupabaseAuth() {
       initializing.value = false;
       // Don't set error here as user might be successfully authenticated
       // The auth state listener will handle the actual auth state
+      
+      // Try to get current session as fallback
+      supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+        if (currentSession && !user.value) {
+          console.log('🔄 Timeout fallback: Loading user profile from current session');
+          loadUserProfile(currentSession.user.id).catch(err => {
+            console.error('❌ Timeout fallback profile loading failed:', err);
+          });
+        }
+      }).catch(err => {
+        console.error('❌ Timeout fallback session check failed:', err);
+      });
     }
-  }, 8000); // 8 second single timeout
+  }, 1000); // Reduced from 2 seconds to 1 second for faster startup
 
   return {
     // State

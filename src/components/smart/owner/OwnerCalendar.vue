@@ -1,22 +1,5 @@
 <template>
   <div class="owner-calendar-container">
-    <!-- Enhanced Owner Calendar Navigation Toolbar -->
-    <!-- <EnhancedNavigationToolbar
-      :current-view="enhancedNavigation.currentView.value"
-      :current-date="enhancedNavigation.currentDate.value"
-      :current-month-year="enhancedNavigation.currentMonthYear.value"
-      :current-year="enhancedNavigation.currentYear.value"
-      :can-go-back="enhancedNavigation.canGoBack.value"
-      :can-go-forward="enhancedNavigation.canGoForward.value"
-      :smart-navigation-counts="enhancedNavigation.smartNavigationCounts.value"
-      :loading="props.loading"
-      class="mb-3"
-      @navigate="handleEnhancedNavigation"
-      @view-change="handleEnhancedViewChange"
-      @date-selected="handleEnhancedDateSelected"
-      @smart-navigate="handleSmartNavigation"
-    /> -->
-
     <!-- Owner Calendar: Shows only owner's bookings across their properties -->
     <FullCalendar
       ref="calendarRef"
@@ -36,8 +19,6 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted } from 'vue';
 import FullCalendar from '@/components/smart/FullCalendar.vue';
-import { useEnhancedCalendarNavigation } from '@/composables/shared/useEnhancedCalendarNavigation';
-import EnhancedNavigationToolbar from '@/components/dumb/shared/EnhancedNavigationToolbar.vue';
 import type { Booking, Property } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
@@ -55,7 +36,7 @@ interface Emits {
   (e: 'dateSelect', selectInfo: DateSelectArg): void;
   (e: 'eventClick', clickInfo: EventClickArg): void;
   (e: 'eventDrop', dropInfo: EventDropArg): void;
-  (e: 'eventResize', resizeInfo: any): void;
+  (e: 'eventResize', resizeInfo: EventDropArg): void;
   (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
   (e: 'viewChange', view: string): void;
   (e: 'dateChange', date: Date): void;
@@ -72,11 +53,7 @@ const emit = defineEmits<Emits>();
 // ===== REFS AND REACTIVE DATA =====
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
 
-// Enhanced Calendar Navigation (Replaces basic prop-based navigation)
-const enhancedNavigation = useEnhancedCalendarNavigation();
 
-// ===== COMPUTED PROPERTIES (SAFE - NO CIRCULAR DEPENDENCIES) =====
-// Removed height computed properties - using CSS flexbox instead
 
 // ===== EVENT HANDLERS (SAFE - SIMPLE EMIT PATTERNS) =====
 
@@ -95,7 +72,7 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
   emit('eventDrop', dropInfo);
 };
 
-const handleEventResize = (resizeInfo: any): void => {
+const handleEventResize = (resizeInfo: EventDropArg): void => {
   console.log('🔄 [OwnerCalendar] Event resized:', resizeInfo.event.id);
   emit('eventResize', resizeInfo);
 };
@@ -105,14 +82,11 @@ const handleCreateBooking = (data: { start: string; end: string; propertyId?: st
   emit('createBooking', data);
 };
 
-// Removed handleUpdateBooking - now handled through eventDrop/eventResize events
-
 // ===== PROGRAMMATIC CALENDAR METHODS =====
 
 const goToDate = (date: string | Date): void => {
   console.log('🗓️ [OwnerCalendar] goToDate called:', date);
   const targetDate = typeof date === 'string' ? new Date(date) : date;
-  enhancedNavigation.goToDateWithHistory(targetDate);
   
   if (calendarRef.value) {
     calendarRef.value.goToDate(targetDate);
@@ -124,7 +98,6 @@ const goToDate = (date: string | Date): void => {
 
 const changeView = (view: string): void => {
   console.log('👁️ [OwnerCalendar] changeView called:', view);
-  enhancedNavigation.setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
   
   if (calendarRef.value) {
     calendarRef.value.changeView(view);
@@ -143,82 +116,6 @@ const getApi = () => {
   return calendarRef.value?.getApi() || null;
 };
 
-// Enhanced Navigation Event Handlers
-const handleEnhancedNavigation = (action: string): void => {
-  console.log('🧭 [OwnerCalendar] Enhanced navigation:', action);
-  
-  switch (action) {
-    case 'prev':
-      enhancedNavigation.goToPrevMonth();
-      break;
-    case 'next':
-      enhancedNavigation.goToNextMonth();
-      break;
-    case 'prevYear':
-      enhancedNavigation.goToPrevYear();
-      break;
-    case 'nextYear':
-      enhancedNavigation.goToNextYear();
-      break;
-    case 'today':
-      enhancedNavigation.goToToday();
-      break;
-    case 'historyBack':
-      enhancedNavigation.goBackInHistory();
-      break;
-    case 'historyForward':
-      enhancedNavigation.goForwardInHistory();
-      break;
-  }
-  
-  // Update calendar API to match enhanced navigation state
-  if (calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    api?.gotoDate(enhancedNavigation.currentDate.value);
-  }
-  
-  emit('dateChange', enhancedNavigation.currentDate.value);
-};
-
-const handleEnhancedViewChange = (view: string): void => {
-  console.log('👁️ [OwnerCalendar] Enhanced view change:', view);
-  enhancedNavigation.setCalendarView(view as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay');
-  
-  // Update calendar API
-  if (calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    api?.changeView(view);
-  }
-  
-  emit('viewChange', view);
-};
-
-const handleEnhancedDateSelected = (date: Date): void => {
-  console.log('📅 [OwnerCalendar] Enhanced date selected:', date);
-  enhancedNavigation.goToDateWithHistory(date);
-  
-  // Update calendar API
-  if (calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    api?.gotoDate(date);
-  }
-  
-  emit('dateChange', date);
-};
-
-const handleSmartNavigation = async (option: string): Promise<void> => {
-  console.log('🧠 [OwnerCalendar] Smart navigation:', option);
-  await enhancedNavigation.executeSmartNavigation(option);
-  
-  // Update calendar API to match new date
-  if (calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    api?.gotoDate(enhancedNavigation.currentDate.value);
-  }
-  
-  emit('dateChange', enhancedNavigation.currentDate.value);
-};
-
 // ===== WATCHERS (SAFE - SIMPLE, NON-CIRCULAR) =====
 
 // Watch for view changes from parent (safe - simple prop watching)
@@ -227,7 +124,6 @@ watch(() => props.currentView, (newView) => {
   
   nextTick(() => {
     if (newView && calendarRef.value) {
-      enhancedNavigation.setCalendarView(newView);
       changeView(newView);
     }
   });
@@ -239,48 +135,23 @@ watch(() => props.currentDate, (newDate) => {
   
   nextTick(() => {
     if (newDate && calendarRef.value) {
-      enhancedNavigation.goToDateWithHistory(newDate);
       goToDate(newDate);
     }
   });
 });
 
-// Watch enhanced navigation view changes
-watch(() => enhancedNavigation.currentView.value, (newView) => {
-  console.log('🎯 [OwnerCalendar] Enhanced navigation view changed:', newView);
-  if (calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    api?.changeView(newView);
-  }
-});
-
-// Watch enhanced navigation date changes
-watch(() => enhancedNavigation.currentDate.value, (newDate) => {
-  console.log('📅 [OwnerCalendar] Enhanced navigation date changed:', newDate);
-  if (calendarRef.value) {
-    const api = calendarRef.value.getApi();
-    api?.gotoDate(newDate);
-  }
-});
-
 // ===== LIFECYCLE =====
+
 onMounted(async () => {
   console.log('🎬 [OwnerCalendar] Component mounted');
   
   // Wait for DOM to be fully ready
   await nextTick();
   
-  // Small delay to ensure calendar is ready
-  setTimeout(() => {
-    // Integrate enhanced navigation with calendar
-    if (calendarRef.value) {
-      enhancedNavigation.attachNavigationToCalendar(calendarRef.value);
-      console.log('🔗 [OwnerCalendar] Enhanced navigation attached to calendar');
-    }
-  }, 100);
+  console.log('🔗 [OwnerCalendar] Component ready');
 });
 
-console.log('✅ [OwnerCalendar] Setup complete - using enhanced navigation patterns!');
+console.log('✅ [OwnerCalendar] Setup complete!');
 
 // ===== EXPOSE METHODS TO PARENT =====
 defineExpose({
@@ -368,91 +239,76 @@ defineExpose({
 }
 
 /* ================================================================ */
-/* RESPONSIVE ADJUSTMENTS FOR OWNERS */
+/* MOBILE OPTIMIZATIONS */
 /* ================================================================ */
 
-/* Mobile portrait - Optimize for owner's mobile usage */
-@media (max-width: 599px) {
+@media (max-width: 768px) {
   .owner-calendar-container {
-    /* Ensure proper height calculation for mobile */
-    height: 100% !important;
+    height: calc(100vh - 120px); /* Account for mobile navigation */
+  }
+  
+  :deep(.fc-header-toolbar) {
+    flex-direction: column;
+    gap: 0.5em;
+  }
+  
+  :deep(.fc-toolbar-chunk) {
+    display: flex;
+    justify-content: center;
+  }
+  
+  :deep(.fc-button) {
     font-size: 0.875rem;
-    /* Prevent content from being cut off */
-    overflow: hidden;
-  }
-  
-  .owner-calendar {
-    /* Force full height utilization on mobile */
-    height: 100% !important;
-    width: 100% !important;
-  }
-  
-  /* Smaller event text for mobile */
-  :deep(.fc-event-title) {
-    font-size: 0.7rem;
-    line-height: 1.1;
-    /* Ensure text doesn't overflow on small screens */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  /* Compact day cells */
-  :deep(.fc-daygrid-day-number) {
-    font-size: 0.75rem;
-    padding: 2px;
-  }
-  
-  /* Mobile-optimized day cell heights */
-  :deep(.fc-daygrid-day-frame) {
-    min-height: 35px;
-  }
-  
-  /* Improve touch targets on mobile */
-  :deep(.fc-event) {
-    min-height: 20px;
-    padding: 1px 2px;
+    padding: 0.5em 0.75em;
   }
 }
 
-/* Tablet landscape - Good balance for owners */
-@media (min-width: 600px) and (max-width: 1279px) {
-  .owner-calendar-container {
-    font-size: 0.9rem;
-    height: 100% !important;
+/* ================================================================ */
+/* TOUCH GESTURE OPTIMIZATIONS */
+/* ================================================================ */
+
+/* Ensure calendar area is touch-friendly */
+.owner-calendar {
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent text selection during swipes */
+.owner-calendar-container {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Smooth transitions for swipe gestures */
+:deep(.fc-view-harness) {
+  transition: transform 0.2s ease-out;
+}
+
+/* ================================================================ */
+/* ACCESSIBILITY */
+/* ================================================================ */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :deep(.fc-event) {
+    border-width: 2px !important;
   }
   
-  .owner-calendar {
-    height: 100% !important;
-    width: 100% !important;
-  }
-  
-  :deep(.fc-event-title) {
-    font-size: 0.8rem;
-    line-height: 1.2;
-  }
-  
-  /* Tablet-optimized day cell heights */
-  :deep(.fc-daygrid-day-frame) {
-    min-height: 45px;
+  :deep(.fc-button) {
+    border-width: 2px !important;
   }
 }
 
-/* Desktop - Full feature set for owners */
-@media (min-width: 1280px) {
-  .owner-calendar-container {
-    font-size: 1rem;
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  :deep(.fc-view-harness) {
+    transition: none;
   }
   
-  /* Enhanced hover effects on desktop */
-  :deep(.fc-event) {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  
-  :deep(.fc-event:hover) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    z-index: 10;
+  :deep(.fc-event.priority-urgent) {
+    animation: none;
   }
 }
 </style> 

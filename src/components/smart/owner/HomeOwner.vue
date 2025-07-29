@@ -655,7 +655,7 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   }
 };
 
-const handleEventResize = async (resizeInfo: { event: { extendedProps: { booking: Booking }; startStr: string; endStr: string }; revert: () => void }): Promise<void> => {
+const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
   const booking = resizeInfo.event.extendedProps.booking as Booking;
   
   // Verify owner can modify this booking
