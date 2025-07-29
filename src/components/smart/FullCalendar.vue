@@ -26,7 +26,7 @@ import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg } from
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { computed, ref, watch, onMounted, onUnmounted } from 'vue';
+import { computed, ref, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue';
 import { useTheme } from 'vuetify';
 import type { Booking, Property } from '@/types';
 import { getMobileCalendarOptions, handleViewportResize } from '@/utils/mobileViewport';
@@ -245,7 +245,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   loading: handleLoading,
   
   // Calendar lifecycle
-  didMount: handleCalendarMount,
+  datesSet: handleCalendarMount,
   viewDidMount: handleViewMount,
   
   // Custom rendering
@@ -389,22 +389,43 @@ const renderEventContent = (eventInfo: { event: { extendedProps: { booking: Book
 };
 
 
-// Programmatic calendar methods
+// Programmatic calendar methods with enhanced safety checks
 const goToDate = (date: string | Date): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().gotoDate(date);
+  if (!calendarRef.value) return;
+  
+  try {
+    const calendarApi = calendarRef.value.getApi();
+    if (calendarApi && typeof calendarApi.gotoDate === 'function') {
+      calendarApi.gotoDate(date);
+    }
+  } catch (error) {
+    console.warn('Error going to date:', error);
   }
 };
 
 const changeView = (viewName: string): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().changeView(viewName);
+  if (!calendarRef.value) return;
+  
+  try {
+    const calendarApi = calendarRef.value.getApi();
+    if (calendarApi && typeof calendarApi.changeView === 'function') {
+      calendarApi.changeView(viewName);
+    }
+  } catch (error) {
+    console.warn('Error changing view:', error);
   }
 };
 
 const refreshEvents = (): void => {
-  if (calendarRef.value) {
-    calendarRef.value.getApi().refetchEvents();
+  if (!calendarRef.value) return;
+  
+  try {
+    const calendarApi = calendarRef.value.getApi();
+    if (calendarApi && typeof calendarApi.refetchEvents === 'function') {
+      calendarApi.refetchEvents();
+    }
+  } catch (error) {
+    console.warn('Error refreshing events:', error);
   }
 };
 
@@ -546,26 +567,32 @@ const handleViewMount = (): void => {
 const attachMoreLinkListeners = (): void => {
   if (!calendarRef.value) return;
   
-  const calendarEl = calendarRef.value.$el || calendarRef.value.getApi().el;
-  if (!calendarEl) return;
-  
-  // Find all "+N more" links
-  const moreLinks = calendarEl.querySelectorAll('.fc-more-link');
-  
-  moreLinks.forEach((link: Element) => {
-    // Remove existing listeners to prevent duplicates
-    link.removeEventListener('click', handleManualMoreLinkClick);
-    link.removeEventListener('mousedown', handleManualMoreLinkClick);
-    link.removeEventListener('touchstart', handleManualMoreLinkClick);
+  try {
+    const calendarApi = calendarRef.value.getApi();
+    if (!calendarApi) return;
     
-    // Add our custom click handlers with high priority (capture phase)
-    link.addEventListener('click', handleManualMoreLinkClick, true);
-    link.addEventListener('mousedown', handleManualMoreLinkClick, true);
-    link.addEventListener('touchstart', handleManualMoreLinkClick, true);
-  });
-
+    const calendarEl = calendarRef.value.$el || calendarApi.el;
+    if (!calendarEl) return;
   
-  console.log('📎 [FullCalendar] Attached listeners to', moreLinks.length, 'more links');
+    // Find all "+N more" links
+    const moreLinks = calendarEl.querySelectorAll('.fc-more-link');
+    
+    moreLinks.forEach((link: Element) => {
+      // Remove existing listeners to prevent duplicates
+      link.removeEventListener('click', handleManualMoreLinkClick);
+      link.removeEventListener('mousedown', handleManualMoreLinkClick);
+      link.removeEventListener('touchstart', handleManualMoreLinkClick);
+      
+      // Add our custom click handlers with high priority (capture phase)
+      link.addEventListener('click', handleManualMoreLinkClick, true);
+      link.addEventListener('mousedown', handleManualMoreLinkClick, true);
+      link.addEventListener('touchstart', handleManualMoreLinkClick, { passive: false, capture: true });
+    });
+    
+    console.log('📎 [FullCalendar] Attached listeners to', moreLinks.length, 'more links');
+  } catch (error) {
+    console.warn('Error attaching more link listeners:', error);
+  }
 };
 
 // Manual more link click handler
@@ -677,10 +704,37 @@ onMounted(() => {
   });
 });
 
-onUnmounted(() => {
-  // Clean up viewport listener
+onBeforeUnmount(() => {
+  // Clean up calendar instance before component unmounts
+  if (calendarRef.value) {
+    try {
+      const calendarApi = calendarRef.value.getApi();
+      if (calendarApi && typeof calendarApi.destroy === 'function') {
+        calendarApi.destroy();
+      }
+    } catch (error) {
+      console.warn('Calendar cleanup error in beforeUnmount:', error);
+    } finally {
+      // Clear the ref to prevent further access
+      calendarRef.value = null;
+    }
+  }
+  
+  // Clean up viewport listener early
   if (cleanupViewportListener) {
     cleanupViewportListener();
+    cleanupViewportListener = null;
+  }
+});
+
+onUnmounted(() => {
+  // Ensure everything is cleaned up
+  if (calendarRef.value) {
+    calendarRef.value = null;
+  }
+  if (cleanupViewportListener) {
+    cleanupViewportListener();
+    cleanupViewportListener = null;
   }
 });
 
@@ -689,7 +743,16 @@ defineExpose({
   goToDate,
   changeView,
   refreshEvents,
-  getApi: () => calendarRef.value?.getApi()
+  getApi: () => {
+    if (!calendarRef.value) return null;
+    
+    try {
+      return calendarRef.value.getApi() || null;
+    } catch (error) {
+      console.warn('Error getting calendar API:', error);
+      return null;
+    }
+  }
 });
 </script>
 

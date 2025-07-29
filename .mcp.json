@@ -47,6 +47,28 @@
         "@wonderwhy-er/desktop-commander"
       ],
       "env": {}
+    },
+    "browser-tools": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "browser-tools-mcp"
+      ],
+      "env": {}
+    },
+    "browser-tools-enhanced": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@eqiz/browser-tools-mcp-enhanced"
+      ],
+      "env": {}
     }
   }
 }

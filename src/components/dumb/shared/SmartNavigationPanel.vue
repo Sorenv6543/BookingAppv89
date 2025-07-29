@@ -5,7 +5,9 @@
     elevation="2"
   >
     <v-card-title class="pb-2">
-      <v-icon class="mr-2">mdi-navigation</v-icon>
+      <v-icon class="mr-2">
+        mdi-navigation
+      </v-icon>
       Quick Navigation
       <v-spacer />
       <v-btn

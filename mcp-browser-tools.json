@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "browser-tools": {
+      "command": "npx",
+      "args": ["browser-tools-mcp"],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    "browser-tools-enhanced": {
+      "command": "npx",
+      "args": ["@eqiz/browser-tools-mcp-enhanced"],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  }
+} 

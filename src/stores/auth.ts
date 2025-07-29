@@ -123,9 +123,7 @@ export const useAuthStore = defineStore('auth', () => {
     $reset,
     // ... other computed and methods ...
     login: async (email: string, password: string) => {
-      console.log('Auth store login called with:', email);
       const result = await signIn(email, password);
-      console.log('Auth store login result:', result);
       return result;
     },
     logout: supabaseSignOut,

@@ -32,8 +32,7 @@ export function useSupabaseAuth() {
 
   function initializeAuthListener() {
     try {
-      // CRITICAL: Set initializing to false immediately to prevent timeouts
-      console.log('🚀 Setting initializing to false immediately in initializeAuthListener');
+      // Set initializing to false immediately to prevent timeouts
       initializing.value = false;
       clearTimeout(initializationTimeout);
       
@@ -47,15 +46,10 @@ export function useSupabaseAuth() {
               await loadUserProfile(newSession.user.id);
             }
             // Already set initializing to false above
-            console.log('✅ INITIAL_SESSION processed');
           } else if (event === 'SIGNED_IN' && newSession) {
             session.value = newSession;
             try {
               await loadUserProfile(newSession.user.id);
-              console.log('✅ User signed in successfully:', { 
-                email: newSession.user.email, 
-                userRole: user.value?.role 
-              });
             } catch (profileError) {
               console.error('❌ Profile loading failed during SIGNED_IN:', profileError);
               // Don't throw here - let the sign in continue even if profile fails
@@ -75,15 +69,10 @@ export function useSupabaseAuth() {
       // Immediate fallback: Check current session and set initializing to false
       supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
         if (currentSession) {
-          console.log('🔄 Found existing session, loading profile');
           session.value = currentSession;
-          loadUserProfile(currentSession.user.id).then(() => {
-            console.log('✅ Existing session profile loaded');
-          }).catch(err => {
+          loadUserProfile(currentSession.user.id).catch(err => {
             console.error('❌ Existing session profile loading failed:', err);
           });
-        } else {
-          console.log('🔄 No existing session found');
         }
         // Ensure initializing is false regardless
         if (initializing.value) {
@@ -114,71 +103,46 @@ export function useSupabaseAuth() {
       try {
         console.log(`🔍 Loading user profile for: ${userId} (attempt ${attempt}/${maxRetries})`);
         
-        // Direct query without custom timeout - let Supabase handle its own timeouts
-        const { data, error: profileError } = await supabase
+        // Try a simplified query with timeout to avoid hanging
+        const queryPromise = supabase
           .from('user_profiles')
-          .select('id, email, name, role, company_name, notifications_enabled, timezone, theme, language, created_at, updated_at')
+          .select('*')
           .eq('id', userId)
-          .single();
-
-        console.log(`📋 Profile query result (attempt ${attempt}):`, { 
-          success: !profileError, 
-          hasData: !!data,
-          error: profileError?.message,
-          errorCode: profileError?.code,
-          dataKeys: data ? Object.keys(data) : null
+          .maybeSingle(); // Use maybeSingle instead of single to avoid errors when not found
+        
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Profile query timeout after 3 seconds')), 3000);
         });
+        
+        const { data, error: profileError } = await Promise.race([queryPromise, timeoutPromise]);
 
+        // Handle null data (profile not found) or errors
         if (profileError) {
           console.warn(`⚠️ Profile query failed (attempt ${attempt}):`, profileError);
-          
-          // Check if it's a "not found" error (user profile doesn't exist)
-          if (profileError.code === 'PGRST116' || profileError.message?.includes('No rows found')) {
+        }
+        
+        if (!data || profileError) {
+          // Profile not found or error occurred, create fallback profile
+          if (profileError?.code === 'PGRST116' || profileError?.message?.includes('No rows found') || !data) {
             console.log('ℹ️ User profile not found in database, creating fallback profile');
-            // Create a basic user profile from session data
-            user.value = {
-              id: userId,
-              email: session.value?.user?.email || '',
-              name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
-              role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
-              company_name: session.value?.user?.user_metadata?.company_name || '',
-              notifications_enabled: true,
-              timezone: 'America/New_York',
-              theme: 'light',
-              language: 'en',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            };
-            console.log('✅ Created fallback profile from session metadata:', { email: user.value.email, role: user.value.role });
-            return; // Success with fallback, exit the retry loop
           }
           
-          // If this is the last attempt, use fallback
-          if (attempt === maxRetries) {
-            console.error('❌ All profile query attempts failed, using fallback profile');
-            // Create a basic user profile from session data instead of throwing
-            user.value = {
-              id: userId,
-              email: session.value?.user?.email || '',
-              name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
-              role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
-              company_name: session.value?.user?.user_metadata?.company_name || '',
-              notifications_enabled: true,
-              timezone: 'America/New_York',
-              theme: 'light',
-              language: 'en',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            };
-            console.log('⚠️ Using fallback profile due to error:', profileError);
-            return;
-          }
-          
-          // Wait before retry (exponential backoff)
-          const retryDelay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-          console.log(`⏳ Waiting ${retryDelay}ms before retry...`);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
-          continue;
+          // Create a basic user profile from session data
+          user.value = {
+            id: userId,
+            email: session.value?.user?.email || '',
+            name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
+            role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
+            company_name: session.value?.user?.user_metadata?.company_name || '',
+            notifications_enabled: true,
+            timezone: 'America/New_York',
+            theme: 'light',
+            language: 'en',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          console.log('✅ Created fallback profile from session metadata:', { email: user.value.email, role: user.value.role });
+          return; // Success with fallback, exit the retry loop
         }
 
         // Success! Process the data
@@ -219,6 +183,25 @@ export function useSupabaseAuth() {
       } catch (err) {
         console.error(`❌ Error loading user profile (attempt ${attempt}):`, err);
         
+        // If it's a timeout error, use fallback immediately to avoid hanging login
+        if (err instanceof Error && err.message.includes('timeout')) {
+          user.value = {
+            id: userId,
+            email: session.value?.user?.email || '',
+            name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
+            role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
+            company_name: session.value?.user?.user_metadata?.company_name || '',
+            notifications_enabled: true,
+            timezone: 'America/New_York',
+            theme: 'light',
+            language: 'en',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          console.log('✅ Fallback profile created due to timeout');
+          return;
+        }
+        
         // If this is the last attempt, use fallback
         if (attempt === maxRetries) {
           console.error('❌ All profile loading attempts failed, using fallback profile');
@@ -252,17 +235,9 @@ export function useSupabaseAuth() {
     try {
       loading.value = true;
       error.value = null;
-      console.log('🔐 Attempting sign in for:', email);
-
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
-      });
-
-      console.log('🔍 SignIn response:', { 
-        hasUser: !!data.user, 
-        hasSession: !!data.session, 
-        error: signInError 
       });
 
       if (signInError) {
@@ -272,20 +247,16 @@ export function useSupabaseAuth() {
 
       if (data.user && data.session) {
         // Auth state change handler will take care of loading profile
-        console.log('✅ Sign in successful, waiting for profile load...');
-        console.log('🔄 Returning true from signIn method');
         return true;
       }
 
-      console.log('❌ Sign in failed - no user or session data');
       return false;
     } catch (err) {
       console.error('❌ Sign in error:', err);
       error.value = err instanceof Error ? err.message : 'Sign in failed';
       return false;
     } finally {
-      // CRITICAL: Always set loading to false, with a small delay to ensure state updates
-      console.log('🔄 Setting loading to false in signIn finally block');
+      // Always set loading to false, with a small delay to ensure state updates
       setTimeout(() => {
         loading.value = false;
       }, 100);
@@ -304,7 +275,6 @@ export function useSupabaseAuth() {
     try {
       loading.value = true;
       error.value = null;
-      console.log('📝 Registering new user:', email, 'as', userData.role || 'owner');
 
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -323,16 +293,9 @@ export function useSupabaseAuth() {
       }
 
       if (data.user) {
-        console.log('✅ User registered successfully:', data.user.email);
-        
         // If user is immediately confirmed, the auth state change will handle profile loading
         // If not confirmed, they'll need to verify email first
-        if (data.user.email_confirmed_at) {
-          return true;
-        } else {
-          console.log('📧 Email verification required');
-          return true; // Still successful registration
-        }
+        return true;
       }
 
       return false;
@@ -341,7 +304,6 @@ export function useSupabaseAuth() {
       error.value = err instanceof Error ? err.message : 'Sign up failed';
       return false;
     } finally {
-      // CRITICAL: Always set loading to false
       setTimeout(() => {
         loading.value = false;
       }, 100);
@@ -430,18 +392,14 @@ export function useSupabaseAuth() {
 
   async function checkAuth(): Promise<void> {
     try {
-      console.log('🔍 Checking current auth state...');
       const { data: { session: currentSession } } = await supabase.auth.getSession();
       
       if (currentSession) {
         session.value = currentSession;
         if (!user.value) {
-          console.log('🔄 No user profile found, loading from session...');
           await loadUserProfile(currentSession.user.id);
         }
-        console.log('✅ Auth check complete - user authenticated');
       } else {
-        console.log('ℹ️ Auth check complete - no active session');
         // Clear any stale data
         if (user.value) {
           user.value = null;
@@ -456,7 +414,6 @@ export function useSupabaseAuth() {
     } finally {
       // Always ensure initialization is complete after auth check
       if (initializing.value) {
-        console.log('🔄 Setting initializing to false after auth check');
         initializing.value = false;
         clearTimeout(initializationTimeout);
       }
@@ -581,13 +538,10 @@ export function useSupabaseAuth() {
     if (initializing.value) {
       console.warn('⚠️ Auth initialization timeout - forcing completion');
       initializing.value = false;
-      // Don't set error here as user might be successfully authenticated
-      // The auth state listener will handle the actual auth state
       
       // Try to get current session as fallback
       supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
         if (currentSession && !user.value) {
-          console.log('🔄 Timeout fallback: Loading user profile from current session');
           loadUserProfile(currentSession.user.id).catch(err => {
             console.error('❌ Timeout fallback profile loading failed:', err);
           });
@@ -596,7 +550,7 @@ export function useSupabaseAuth() {
         console.error('❌ Timeout fallback session check failed:', err);
       });
     }
-  }, 1000); // Reduced from 2 seconds to 1 second for faster startup
+  }, 1000);
 
   return {
     // State
