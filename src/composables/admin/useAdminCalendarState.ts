@@ -34,8 +34,6 @@ export function useAdminCalendarState() {
   const showOverdueOnly = ref<boolean>(false);
   const calendarViewMode = ref<'standard' | 'cleaner' | 'owner' | 'priority'>('standard');
   
-
-  
   // COMPUTED PROPERTIES - Admin system-wide data access (NO filtering)
   
   /**
@@ -43,14 +41,14 @@ export function useAdminCalendarState() {
    * This is the key difference from owner version
    */
   const allBookings = computed(() => {
-    return Array.from(bookingStore.bookings.values());
+    return bookingStore.bookings;
   });
   
   /**
    * Get ALL properties across all owners (no filtering)
    */
   const allProperties = computed(() => {
-    return Array.from(propertyStore.properties.values());
+    return propertyStore.properties;
   });
   
   /**
@@ -60,7 +58,7 @@ export function useAdminCalendarState() {
     const now = new Date();
     const sixHoursFromNow = new Date(now.getTime() + (6 * 60 * 60 * 1000));
     
-    return allBookings.value
+    return Array.from(bookingStore.bookings.values())
       .filter(booking => {
         if (booking.booking_type !== 'turn' || booking.status === 'completed') {
           return false;
@@ -71,7 +69,7 @@ export function useAdminCalendarState() {
       })
       .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime())
       .map(booking => {
-        const property = allProperties.value.find(p => p.id === booking.property_id);
+        const property = propertyStore.properties.get(booking.property_id);
         const hoursUntil = Math.max(0, Math.floor((new Date(booking.checkout_date).getTime() - now.getTime()) / (1000 * 60 * 60)));
         
         return {
@@ -95,7 +93,7 @@ export function useAdminCalendarState() {
       unassigned: []
     };
     
-    allBookings.value.forEach(booking => {
+    Array.from(bookingStore.bookings.values()).forEach(booking => {
       if (!booking.assigned_cleaner_id) {
         schedules.unassigned.push(booking);
       } else {
@@ -110,192 +108,110 @@ export function useAdminCalendarState() {
   });
   
   /**
-   * Get admin calendar events - format ALL bookings for calendar (no filtering)
+   * Get owner schedules (bookings grouped by owner)
    */
-  function getAdminCalendarEvents() {
-    let bookingsToShow = allBookings.value;
+  const ownerSchedules = computed(() => {
+    const schedules: Record<string, Booking[]> = {};
     
-    // Apply admin-specific filters
-    if (selectedCleanerIds.value.size > 0) {
-      bookingsToShow = bookingsToShow.filter(booking => 
-        booking.assigned_cleaner_id && selectedCleanerIds.value.has(booking.assigned_cleaner_id)
-      );
-    }
-    
-    if (selectedOwnerIds.value.size > 0) {
-      bookingsToShow = bookingsToShow.filter(booking => 
-        selectedOwnerIds.value.has(booking.owner_id)
-      );
-    }
-    
-    if (showUnassignedOnly.value) {
-      bookingsToShow = bookingsToShow.filter(booking => !booking.assigned_cleaner_id);
-    }
-    
-    if (showOverdueOnly.value) {
-      const now = new Date();
-      bookingsToShow = bookingsToShow.filter(booking => {
-        const checkoutTime = new Date(booking.checkout_date);
-        return booking.status === 'pending' && checkoutTime < now;
-      });
-    }
-    
-    // Apply base calendar filtering
-    const filteredBookings = baseCalendarState.filterBookings(bookingsToShow);
-    
-    // Convert to calendar events with admin-specific enhancements
-    return filteredBookings.map(booking => {
-      const property = allProperties.value.find(p => p.id === booking.property_id);
-      const isPriority = booking.booking_type === 'turn';
-      const isOverdue = new Date(booking.checkout_date) < new Date() && booking.status === 'pending';
-      const isUnassigned = !booking.assigned_cleaner_id;
-      
-      // Admin-specific color coding
-      let backgroundColor = '#42A5F5'; // Default blue
-      let borderColor = '#42A5F5';
-      
-      if (isOverdue) {
-        backgroundColor = '#E53935'; // Red for overdue
-        borderColor = '#E53935';
-      } else if (isPriority) {
-        backgroundColor = '#FF5722'; // Deep orange for turns
-        borderColor = '#FF5722';
-      } else if (isUnassigned) {
-        backgroundColor = '#FFA726'; // Orange for unassigned
-        borderColor = '#FFA726';
-      } else {
-        // Status-based colors
-        const statusColors = {
-          pending: '#FFA726',     // Orange
-          scheduled: '#42A5F5',   // Blue
-          in_progress: '#AB47BC', // Purple
-          completed: '#66BB6A',   // Green
-          cancelled: '#E53935'    // Red
-        };
-        backgroundColor = statusColors[booking.status];
-        borderColor = statusColors[booking.status];
+    Array.from(bookingStore.bookings.values()).forEach(booking => {
+      if (!schedules[booking.owner_id]) {
+        schedules[booking.owner_id] = [];
       }
-      
-      // Admin-specific title with more details
-      let title = '';
-      if (isPriority) {
-        title = '🔥 TURN';
-      } else {
-        title = 'Cleaning';
-      }
-      
-      if (isUnassigned) {
-        title += ' (Unassigned)';
-      }
-      
-      if (property) {
-        title += ` - ${property.name}`;
-      }
-      
-      return {
-        id: booking.id,
-        title,
-        start: booking.checkout_date,
-        end: booking.checkin_date,
-        backgroundColor,
-        borderColor,
-        textColor: '#FFFFFF',
-        extendedProps: {
-          booking_type: booking.booking_type,
-          status: booking.status,
-          property_id: booking.property_id,
-          property_name: property?.name || 'Unknown Property',
-          property_address: property?.address || 'Unknown Address',
-          owner_id: booking.owner_id,
-          assigned_cleaner_id: booking.assigned_cleaner_id,
-          notes: booking.notes || '',
-          priority: isPriority ? 'high' : 'normal',
-          is_overdue: isOverdue,
-          is_unassigned: isUnassigned,
-          guest_count: booking.guest_count
-        }
-      };
-    });
-  }
-  
-  /**
-   * Handle admin event click - admin booking management interface
-   */
-  function handleAdminEventClick(eventInfo: any) {
-    const booking = allBookings.value.find(b => b.id === eventInfo.event.id);
-    if (!booking) {
-      error.value = 'Booking not found';
-      return;
-    }
-    
-    // Open admin booking management modal with enhanced options
-    uiStore.openModal('adminBookingModal', 'edit', {
-      booking,
-      mode: 'admin-edit',
-      availableActions: [
-        'edit-details',
-        'assign-cleaner',
-        'update-status',
-        'view-history',
-        'generate-report'
-      ]
+      schedules[booking.owner_id].push(booking);
     });
     
-    success.value = `Opened admin management for booking: ${booking.id}`;
-  }
+    return schedules;
+  });
   
   /**
-   * Get specific cleaner's schedule
+   * Get system-wide metrics and analytics
    */
-  function getCleanerSchedule(cleanerId: string) {
-    const cleanerBookings = cleanerSchedules.value[cleanerId] || [];
-    
-    // Filter by current date range
-    const filteredBookings = baseCalendarState.filterBookings(cleanerBookings);
-    
-    // Calculate cleaner metrics
-    const totalHours = filteredBookings.reduce((total, booking) => {
-      const property = allProperties.value.find(p => p.id === booking.property_id);
-      return total + (property?.cleaning_duration || 2); // Default 2 hours
-    }, 0);
-    
-    const completedBookings = filteredBookings.filter(b => b.status === 'completed').length;
-    const pendingBookings = filteredBookings.filter(b => b.status === 'pending').length;
-    const turnBookings = filteredBookings.filter(b => b.booking_type === 'turn').length;
+  const systemMetrics = computed(() => {
+    const bookings = Array.from(bookingStore.bookings.values());
+    const total = bookings.length;
+    const turns = bookings.filter(b => b.booking_type === 'turn').length;
+    const urgentTurns = systemTurnAlerts.value.length;
+    const unassigned = bookings.filter(b => !b.assigned_cleaner_id && b.status !== 'completed' && b.status !== 'cancelled').length;
+    const completed = bookings.filter(b => b.status === 'completed').length;
+    const pending = bookings.filter(b => b.status === 'pending').length;
     
     return {
-      cleanerId,
-      bookings: filteredBookings,
-      metrics: {
-        totalBookings: filteredBookings.length,
-        totalHours,
-        completedBookings,
-        pendingBookings,
-        turnBookings,
-        completionRate: filteredBookings.length > 0 
-          ? Math.round((completedBookings / filteredBookings.length) * 100) 
-          : 0
-      },
-      events: filteredBookings.map(booking => {
-        const property = allProperties.value.find(p => p.id === booking.property_id);
-        return {
-          id: booking.id,
-          title: `${booking.booking_type === 'turn' ? '🔥 TURN' : 'Cleaning'} - ${property?.name || 'Unknown'}`,
-          start: booking.checkout_date,
-          end: booking.checkin_date,
-          backgroundColor: booking.booking_type === 'turn' ? '#FF5722' : '#42A5F5',
-          extendedProps: {
-            ...booking,
-            property_name: property?.name,
-            property_address: property?.address
-          }
-        };
-      })
+      total,
+      turns,
+      urgentTurns,
+      unassigned,
+      completed,
+      pending,
+      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
+      turnPercentage: total > 0 ? Math.round((turns / total) * 100) : 0
     };
+  });
+  
+  // HELPER FUNCTIONS
+  
+  /**
+   * Get booking color based on status
+   */
+  function getBookingColor(status: BookingStatus): string {
+    switch (status) {
+      case 'pending': return '#ff9800';
+      case 'scheduled': return '#2196f3';
+      case 'in_progress': return '#9c27b0';
+      case 'completed': return '#4caf50';
+      case 'cancelled': return '#f44336';
+      default: return '#757575';
+    }
   }
   
   /**
-   * Advanced filtering with multiple criteria
+   * Get booking border color based on status
+   */
+  function getBookingBorderColor(status: BookingStatus): string {
+    switch (status) {
+      case 'pending': return '#e65100';
+      case 'scheduled': return '#1565c0';
+      case 'in_progress': return '#6a1b9a';
+      case 'completed': return '#2e7d32';
+      case 'cancelled': return '#c62828';
+      default: return '#424242';
+    }
+  }
+  
+  /**
+   * Handle admin event click with business logic
+   */
+  function handleAdminEventClick(eventInfo: any) {
+    const booking = eventInfo.event.extendedProps.booking as Booking;
+    
+    // Admin-specific logic: show different options based on booking state
+    if (booking.status === 'pending' && !booking.assigned_cleaner_id) {
+      // Show cleaner assignment modal
+      uiStore.openModal('cleanerAssignment', { booking });
+    } else if (booking.status === 'in_progress') {
+      // Show completion options
+      uiStore.openModal('bookingActions', { booking, actions: ['complete', 'cancel'] });
+    } else {
+      // Show standard booking details
+      uiStore.openModal('bookingDetails', { booking });
+    }
+  }
+  
+  /**
+   * Get cleaner schedule for specific cleaner
+   */
+  function getCleanerSchedule(cleanerId: string) {
+    return cleanerSchedules.value[cleanerId] || [];
+  }
+  
+  /**
+   * Get owner schedule for specific owner
+   */
+  function getOwnerSchedule(ownerId: string) {
+    return ownerSchedules.value[ownerId] || [];
+  }
+  
+  /**
+   * Advanced filtering for admin interface
    */
   function filterByMultipleCriteria(criteria: {
     status?: BookingStatus[];
@@ -308,112 +224,98 @@ export function useAdminCalendarState() {
     overdueOnly?: boolean;
     priorityOnly?: boolean;
   }) {
-    let filteredBookings = allBookings.value;
-    
-    // Filter by status
-    if (criteria.status && criteria.status.length > 0) {
-      filteredBookings = filteredBookings.filter(booking => 
-        criteria.status!.includes(booking.status)
-      );
-    }
-    
-    // Filter by booking type
-    if (criteria.bookingType && criteria.bookingType.length > 0) {
-      filteredBookings = filteredBookings.filter(booking => 
-        criteria.bookingType!.includes(booking.booking_type)
-      );
-    }
-    
-    // Filter by cleaner
-    if (criteria.cleanerIds && criteria.cleanerIds.length > 0) {
-      filteredBookings = filteredBookings.filter(booking => 
-        booking.assigned_cleaner_id && criteria.cleanerIds!.includes(booking.assigned_cleaner_id)
-      );
-    }
-    
-    // Filter by owner
-    if (criteria.ownerIds && criteria.ownerIds.length > 0) {
-      filteredBookings = filteredBookings.filter(booking => 
-        criteria.ownerIds!.includes(booking.owner_id)
-      );
-    }
-    
-    // Filter by property
-    if (criteria.propertyIds && criteria.propertyIds.length > 0) {
-      filteredBookings = filteredBookings.filter(booking => 
-        criteria.propertyIds!.includes(booking.property_id)
-      );
-    }
-    
-    // Filter by date range
-    if (criteria.dateRange) {
-      const startDate = new Date(criteria.dateRange.start);
-      const endDate = new Date(criteria.dateRange.end);
+    return Array.from(bookingStore.bookings.values()).filter(booking => {
+      // Status filter
+      if (criteria.status && criteria.status.length > 0) {
+        if (!criteria.status.includes(booking.status)) return false;
+      }
       
-      filteredBookings = filteredBookings.filter(booking => {
-        const bookingStart = new Date(booking.checkout_date);
-        const bookingEnd = new Date(booking.checkin_date);
-        
-        return (
-          (bookingStart >= startDate && bookingStart <= endDate) ||
-          (bookingEnd >= startDate && bookingEnd <= endDate) ||
-          (bookingStart <= startDate && bookingEnd >= endDate)
-        );
-      });
-    }
-    
-    // Filter unassigned only
-    if (criteria.unassignedOnly) {
-      filteredBookings = filteredBookings.filter(booking => !booking.assigned_cleaner_id);
-    }
-    
-    // Filter overdue only
-    if (criteria.overdueOnly) {
-      const now = new Date();
-      filteredBookings = filteredBookings.filter(booking => {
+      // Booking type filter
+      if (criteria.bookingType && criteria.bookingType.length > 0) {
+        if (!criteria.bookingType.includes(booking.booking_type)) return false;
+      }
+      
+      // Cleaner filter
+      if (criteria.cleanerIds && criteria.cleanerIds.length > 0) {
+        if (!booking.assigned_cleaner_id || !criteria.cleanerIds.includes(booking.assigned_cleaner_id)) {
+          return false;
+        }
+      }
+      
+      // Owner filter
+      if (criteria.ownerIds && criteria.ownerIds.length > 0) {
+        if (!criteria.ownerIds.includes(booking.owner_id)) return false;
+      }
+      
+      // Property filter
+      if (criteria.propertyIds && criteria.propertyIds.length > 0) {
+        if (!criteria.propertyIds.includes(booking.property_id)) return false;
+      }
+      
+      // Unassigned filter
+      if (criteria.unassignedOnly) {
+        if (booking.assigned_cleaner_id) return false;
+      }
+      
+      // Overdue filter
+      if (criteria.overdueOnly) {
         const checkoutTime = new Date(booking.checkout_date);
-        return booking.status === 'pending' && checkoutTime < now;
-      });
-    }
-    
-    // Filter priority only (turns)
-    if (criteria.priorityOnly) {
-      filteredBookings = filteredBookings.filter(booking => booking.booking_type === 'turn');
-    }
-    
-    return filteredBookings;
+        if (checkoutTime > new Date()) return false;
+      }
+      
+      // Priority filter (turns only)
+      if (criteria.priorityOnly) {
+        if (booking.booking_type !== 'turn') return false;
+      }
+      
+      // Date range filter
+      if (criteria.dateRange) {
+        const bookingDate = new Date(booking.checkout_date);
+        const startDate = new Date(criteria.dateRange.start);
+        const endDate = new Date(criteria.dateRange.end);
+        if (bookingDate < startDate || bookingDate > endDate) return false;
+      }
+      
+      return true;
+    });
   }
   
-  /**
-   * Get calendar events with admin-specific formatting
-   */
-  const adminCalendarEvents = computed(() => getAdminCalendarEvents());
-  
+  // Return admin-specific interface
   return {
-    // Extend base calendar state
-    ...baseCalendarState,
-    
-    // Admin-specific state
+    // State
     loading,
     error,
     success,
+    
+    // Calendar state from base composable
+    currentView: baseCalendarState.currentView,
+    currentDate: baseCalendarState.currentDate,
+    
+    // Computed properties (system-wide, no filtering)
+    allBookings,
+    allProperties,
+    systemTurnAlerts,
+    cleanerSchedules,
+    ownerSchedules,
+    systemMetrics,
+    
+    // Admin-specific filters
     selectedCleanerIds,
     selectedOwnerIds,
     showUnassignedOnly,
     showOverdueOnly,
     calendarViewMode,
     
-    // Admin-specific computed properties
-    allBookings,
-    allProperties,
-    systemTurnAlerts,
-    cleanerSchedules,
-    adminCalendarEvents,
-    
-    // Admin-specific functions
-    getAdminCalendarEvents,
+    // Functions
     handleAdminEventClick,
     getCleanerSchedule,
-    filterByMultipleCriteria
+    getOwnerSchedule,
+    filterByMultipleCriteria,
+    setCalendarView: baseCalendarState.setCalendarView,
+    goToDate: baseCalendarState.goToDate,
+    
+    // Helper functions
+    getBookingColor,
+    getBookingBorderColor
   };
 } 

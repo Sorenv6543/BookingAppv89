@@ -1,7 +1,6 @@
 <template>
   <div class="admin-users-page">
     <AdminUsers />
-  </div>
 </template>
 
 <script setup lang="ts">

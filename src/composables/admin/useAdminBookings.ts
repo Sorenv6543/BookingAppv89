@@ -191,14 +191,21 @@ export function useAdminBookings() {
   }
 
   // Admin function to create booking for any owner
-  async function createBookingForOwner(bookingData: Omit<Booking, 'id'>): Promise<Booking> {
+  async function createBookingForOwner(bookingData: Partial<Booking> & { id?: never }): Promise<Booking> {
     try {
       loading.value = true;
       error.value = null;
 
       const bookingWithId: Booking = {
         id: `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        ...bookingData,
+        property_id: bookingData.property_id || '',
+        owner_id: bookingData.owner_id || '',
+        checkout_date: bookingData.checkout_date || new Date().toISOString(),
+        checkin_date: bookingData.checkin_date || new Date().toISOString(),
+        status: bookingData.status || 'pending',
+        booking_type: bookingData.booking_type || 'standard',
+        assigned_cleaner_id: bookingData.assigned_cleaner_id || null,
+        notes: bookingData.notes || '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -223,7 +230,14 @@ export function useAdminBookings() {
       // Convert BookingFormData to Booking by adding required id
       const bookingWithId: Booking = {
         id: crypto.randomUUID(),
-        ...bookingData,
+        property_id: bookingData.property_id || '',
+        owner_id: bookingData.owner_id || '',
+        checkout_date: bookingData.checkout_date || new Date().toISOString(),
+        checkin_date: bookingData.checkin_date || new Date().toISOString(),
+        status: bookingData.status || 'pending',
+        booking_type: bookingData.booking_type || 'standard',
+        assigned_cleaner_id: bookingData.assigned_cleaner_id || undefined,
+        notes: bookingData.notes || '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };

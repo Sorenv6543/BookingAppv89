@@ -2,30 +2,19 @@
 <template>
   <v-app>
     <!-- Main App Header -->
-    <v-app-bar
-      order="0"
-      app
-      flat
-      height="56"
-      class="main-app-header"
-      :class="{ 'sidebar-open': isSidebarOpen && !mobile }"
-      color="white"
-    >
-      <v-app-bar-nav-icon
-        color="black"
+    <v-btn
+        color="primary"
+        variant="elevated"
+        class="menu-button"
+        
+        size="large"
+        location="top"
+        max-width="100"
+        max-height="100"
         @click="toggleSidebar"
-      />
-      <!--logo-->
-      <v-app-bar-title class="app-title">
-        <div class="brand-container">
-          <div class="brand-icon">
-            C
-          </div>
-          <span class="brand-text">Claro</span>
-        </div>
-      </v-app-bar-title>
-      <!--logo-->
-    </v-app-bar>
+      >
+        <v-icon>mdi-menu</v-icon> 
+      </v-btn>
 
     <!-- Admin Sidebar -->
     <AdminSidebar
@@ -234,8 +223,17 @@ onMounted(async () => {
 .admin-main-content {
   transition: margin-left 0.3s ease-in-out;
   margin-left: 0;
-  margin-top: 56px; /* Account for app header */
-  min-height: calc(100vh - 56px);
+
+  margin-top: 130px; /* Account for app header */
+  min-height: calc(100vh - 30px);
+}
+.menu-button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 100px;
+  left: 10px;
 }
 
 .admin-main-content.sidebar-open {

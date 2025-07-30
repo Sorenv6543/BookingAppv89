@@ -26,7 +26,7 @@ export default defineConfig({
     }),   
 vueDevTools({
   componentInspector: {
-    enabled: false,
+    enabled: true,
     toggleComboKey: 'alt-shift',
     launchEditor: 'code',
   }
@@ -139,7 +139,7 @@ vueDevTools({
         navigateFallback: '/index.html'
       },
       // Enable advanced PWA features only in production
-      mode: 'production',
+      mode: 'development',
       // Handle navigation fallback for SPA
       injectRegister: 'auto',
       // Ensure PWA only runs in production builds

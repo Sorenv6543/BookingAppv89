@@ -10,7 +10,16 @@
       "mcp__browser-tools-enhanced__runDebuggerMode",
       "mcp__browser-tools__getConsoleLogs",
       "mcp__browser-tools__getConsoleErrors",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(compgen:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(sed:*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(Remove-Item -Recurse -Force node_modules.vite -ErrorAction SilentlyContinue)",
+      "Bash(rm:*)",
+      "Bash(curl:*)",
+      "mcp__sequential-thinking__get-library-docs"
     ],
     "deny": []
   },
