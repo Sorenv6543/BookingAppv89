@@ -85,7 +85,7 @@ const calendarEvents = computed(() => {
       id: booking.id,
       title: `${property?.name || 'Unknown Property'} - ${isTurn ? 'TURN' : 'Standard'}`,
       start: booking.checkout_date,
-      end: booking.checkin_date,
+      end: addOneDay(booking.checkin_date), // Add one day to make end date inclusive
       backgroundColor: eventColor,
       borderColor: borderColor,
       textColor: textColor,
@@ -119,6 +119,13 @@ const calendarEvents = computed(() => {
    
   return events;
 });
+
+// Helper function to add one day to a date string
+const addOneDay = (dateString: string): string => {
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + 1);
+  return date.toISOString().split('T')[0];
+};
 
 // Enhanced dynamic color system with more variety
 const getEventColor = (booking: Booking): string => {

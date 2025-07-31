@@ -81,21 +81,26 @@
       v-model="cleanerAssignmentModal.show"
       :booking="cleanerAssignmentModal.booking"
       :cleaners="cleanerAssignmentModal.cleaners"
-      :properties="allProperties"
+      :properties="Array.from(allProperties.values())"
       :loading="cleanerAssignmentModal.loading"
       @assign="handleCleanerAssignment"
       @close="closeCleanerAssignmentModal"
     />
 
-    <!-- Booking Details Modal -->
-    <BookingDetailsModal
-      v-model="bookingDetailsModal.show"
-      :booking="bookingDetailsModal.booking"
-      :property="bookingDetailsModal.property"
-      :cleaner="bookingDetailsModal.cleaner"
-      @update="handleBookingUpdate"
-      @delete="handleBookingDelete"
-      @close="closeBookingDetailsModal"
+    <!-- Admin Booking Form Modal -->
+    <AdminBookingForm
+      v-model="adminBookingFormModal.show"
+      :mode="adminBookingFormModal.mode"
+      :booking="adminBookingFormModal.booking"
+      :properties="Array.from(allProperties.values())"
+      :cleaners="(allUsers as any).filter((user: any) => user.role === 'cleaner' || user.role === 'admin')"
+      :loading="adminBookingFormModal.loading"
+      :errors="adminBookingFormModal.errors"
+      @submit="handleAdminBookingFormSubmit"
+      @delete="handleAdminBookingFormDelete"
+      @mark-complete="handleAdminBookingFormMarkComplete"
+      @assign-cleaner="handleAdminBookingFormAssignCleaner"
+      @open-cleaner-modal="handleAdminBookingFormOpenCleanerModal"
     />
   </div>
 </template>
@@ -104,37 +109,34 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import CleanerAssignmentModal from '@/components/dumb/admin/CleanerAssignmentModal.vue'
 import FullCalendar from '@/components/smart/FullCalendar.vue';
-import BookingDetailsModal from '@/components/dumb/admin/BookingDetailsModal.vue';
+import AdminBookingForm from '@/components/dumb/admin/AdminBookingForm.vue';
 
 import { useAdminCalendarState } from '@/composables/admin/useAdminCalendarState';
 import { useAdminBookings } from '@/composables/admin/useAdminBookings';
 import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
-import type { Booking, Property, User, Cleaner } from '@/types'
+import type { Booking, User, Cleaner } from '@/types'
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core'
 
 // Use the admin calendar state composable for centralized state management
 const {
   // State
   loading,
-  error,
-  success,
+  
   currentView,
   currentDate,
   
   // Computed properties
   allBookings,
   allProperties,
-  systemTurnAlerts,
   
   // Functions
   handleAdminEventClick,
   setCalendarView,
-  goToDate,
-  filterByMultipleCriteria
+  goToDate
 } = useAdminCalendarState();
 
 // Additional composables for admin functionality
-const { updateBooking, assignCleanerToBooking } = useAdminBookings();
+const { updateBooking, deleteBooking, createBooking, assignCleanerToBooking } = useAdminBookings();
 const { users: allUsers } = useAdminUserManagement();
 
 // Calendar reference
@@ -159,12 +161,13 @@ const cleanerAssignmentModal = ref({
   loading: false
 });
 
-// Booking details modal state
-const bookingDetailsModal = ref({
+// Admin booking form modal state
+const adminBookingFormModal = ref({
   show: false,
+  mode: 'edit' as 'create' | 'edit',
   booking: null as Booking | null,
-  property: null as Property | null,
-  cleaner: null as User | null
+  loading: false,
+  errors: new Map<string, string[]>()
 });
 
 // Context menu actions
@@ -222,7 +225,13 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
 
 const handleEventClick = (clickInfo: EventClickArg): void => {
   console.log('👆 [AdminCalendar] Event clicked:', clickInfo.event.id);
-  handleAdminEventClick(clickInfo);
+  
+  // Extract booking data from the event
+  const booking = clickInfo.event.extendedProps.booking as Booking;
+  if (booking) {
+    // Open the AdminBookingForm modal in edit mode
+    openAdminBookingFormModal(booking, 'edit');
+  }
 };
 
 const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
@@ -311,10 +320,10 @@ const handleContextAction = (action: string): void => {
 
   switch (action) {
     case 'view':
-      openBookingDetailsModal(booking);
+      openAdminBookingFormModal(booking, 'edit');
       break;
     case 'edit':
-      openBookingDetailsModal(booking);
+      openAdminBookingFormModal(booking, 'edit');
       break;
     case 'assign':
       openCleanerAssignmentModal(booking);
@@ -330,29 +339,27 @@ const handleContextAction = (action: string): void => {
   contextMenu.value.show = false;
 };
 
-// Modal handlers
-const openBookingDetailsModal = (booking: Booking): void => {
-  const property = allProperties.find((p: Property) => p.id === booking.property_id);
-  const cleaner = booking.assigned_cleaner_id ? allUsers.find((u: User) => u.id === booking.assigned_cleaner_id) : null;
-  
-  bookingDetailsModal.value = {
+// Admin booking form modal handlers
+const openAdminBookingFormModal = (booking: Booking, mode: 'create' | 'edit' = 'edit'): void => {
+  adminBookingFormModal.value = {
     show: true,
-    booking,
-    property: property || null,
-    cleaner: cleaner || null
+    mode,
+    booking: mode === 'edit' ? booking : null,
+    loading: false,
+    errors: new Map<string, string[]>()
   };
 };
 
-const closeBookingDetailsModal = (): void => {
-  bookingDetailsModal.value.show = false;
-  bookingDetailsModal.value.booking = null;
-  bookingDetailsModal.value.property = null;
-  bookingDetailsModal.value.cleaner = null;
+const closeAdminBookingFormModal = (): void => {
+  adminBookingFormModal.value.show = false;
+  adminBookingFormModal.value.booking = null;
+  adminBookingFormModal.value.loading = false;
+  adminBookingFormModal.value.errors = new Map<string, string[]>();
 };
 
 const openCleanerAssignmentModal = (booking: Booking): void => {
   // Get available cleaners (users with cleaner role)
-  const cleaners = allUsers.filter((user: User) => 
+  const cleaners = (allUsers as any).filter((user: User) => 
     user.role === 'cleaner' || user.role === 'admin'
   ) as Cleaner[];
   
@@ -387,14 +394,58 @@ const handleCleanerAssignment = async (cleanerId: string): Promise<void> => {
   }
 };
 
-const handleBookingUpdate = (data: { id: string; updates: Partial<Booking> }): void => {
-  updateBooking(data.id, data.updates);
-  closeBookingDetailsModal();
+// Admin booking form event handlers
+const handleAdminBookingFormSubmit = async (data: any): Promise<void> => {
+  adminBookingFormModal.value.loading = true;
+  try {
+    if (adminBookingFormModal.value.mode === 'create') {
+      await createBooking(data);
+    } else if (adminBookingFormModal.value.booking) {
+      await updateBooking(adminBookingFormModal.value.booking.id, data);
+    }
+    closeAdminBookingFormModal();
+  } catch (error) {
+    console.error('Failed to save booking:', error);
+  } finally {
+    adminBookingFormModal.value.loading = false;
+  }
 };
 
-const handleBookingDelete = (bookingId: string): void => {
-  console.log('Delete booking:', bookingId);
-  closeBookingDetailsModal();
+const handleAdminBookingFormDelete = async (bookingId: string): Promise<void> => {
+  adminBookingFormModal.value.loading = true;
+  try {
+    await deleteBooking(bookingId);
+    closeAdminBookingFormModal();
+  } catch (error) {
+    console.error('Failed to delete booking:', error);
+  } finally {
+    adminBookingFormModal.value.loading = false;
+  }
+};
+
+const handleAdminBookingFormMarkComplete = async (bookingId: string): Promise<void> => {
+  adminBookingFormModal.value.loading = true;
+  try {
+    await updateBooking(bookingId, { status: 'completed' });
+    closeAdminBookingFormModal();
+  } catch (error) {
+    console.error('Failed to mark booking complete:', error);
+  } finally {
+    adminBookingFormModal.value.loading = false;
+  }
+};
+
+const handleAdminBookingFormAssignCleaner = async (bookingId: string, cleanerId: string): Promise<void> => {
+  try {
+    await updateBooking(bookingId, { assigned_cleaner_id: cleanerId });
+  } catch (error) {
+    console.error('Failed to assign cleaner:', error);
+  }
+};
+
+const handleAdminBookingFormOpenCleanerModal = (booking: any): void => {
+  console.log('Open cleaner modal for booking:', booking);
+  // Could implement cleaner modal logic here
 };
 
 // Watchers

@@ -20,15 +20,7 @@
     
 
       <!-- Owner-focused Modals -->
-      <BookingForm
-      :open="eventModalOpen"
-      :mode="eventModalMode"
-      :booking="eventModalMode === 'edit' ? eventModalData : undefined"
-      :initial-data="eventModalMode === 'create' ? eventModalData : undefined"
-      @close="handleEventModalClose"
-      @save="handleEventModalSave"
-      @delete="handleEventModalDelete"
-    />
+<!-- 
 
     <PropertyModal
       :open="propertyModalOpen"
@@ -49,7 +41,7 @@
       @confirm="handleConfirmDialogConfirm"
       @cancel="handleConfirmDialogCancel"
       @close="handleConfirmDialogClose"
-    />
+    /> -->
 </template>
 
 <script setup lang="ts">
@@ -60,8 +52,7 @@ import { useDisplay } from 'vuetify';
 
 import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
 import AdminDashboard from './AdminDashboard.vue';
-import BookingForm from '@/components/dumb/BookingForm.vue';
-import PropertyModal from '@/components/dumb/PropertyModal.vue';
+
 import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
 
 
@@ -76,7 +67,8 @@ import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 import { useAdminBookings } from '@/composables/admin/useAdminBookings';
 import { useAdminProperties } from '@/composables/admin/useAdminProperties';
-  import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
+import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
+import { useCleanerManagement } from '@/composables/admin/useCleanerManagement';
   import type { Booking, Property, BookingFormData, PropertyFormData,  } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
@@ -108,6 +100,10 @@ const {
 } = useAdminProperties();
 
 const {
+  allCleaners
+} = useCleanerManagement();
+
+const {
   currentView,
   currentDate,
   setCalendarView,
@@ -131,6 +127,7 @@ const { users: allUsers, fetchAllUsers } = useAdminUserManagement()
 const selectedDate = ref<string | null>(null)
 const isEditMode = ref(false)
 const loading = ref(false)
+const errors = ref<Map<string, string[]>>(new Map())
 
 
 // Computed properties for admin authentication and data
@@ -388,6 +385,27 @@ const handleEventModalDelete = async (bookingId: string): Promise<void> => {
     dangerous: true,
     data: { type: 'booking', id: bookingId }
   });
+};
+
+const handleEventModalMarkComplete = async (bookingId: string): Promise<void> => {
+  try {
+    await updateBooking(bookingId, { status: 'completed' });
+  } catch (error) {
+    console.error('Failed to mark booking as complete:', error);
+  }
+};
+
+const handleEventModalAssignCleaner = async (bookingId: string, cleanerId: string): Promise<void> => {
+  try {
+    await updateBooking(bookingId, { assigned_cleaner_id: cleanerId });
+  } catch (error) {
+    console.error('Failed to assign cleaner:', error);
+  }
+};
+
+const handleEventModalOpenCleanerModal = (booking: Partial<BookingFormData>): void => {
+  // Handle opening cleaner modal - could be implemented later
+  console.log('Open cleaner modal for booking:', booking);
 };
 
 const handlePropertyModalClose = (): void => {
@@ -882,3 +900,4 @@ watch(isAdminAuthenticated, async (newValue, oldValue) => {
   }
 }
 </style>
+
