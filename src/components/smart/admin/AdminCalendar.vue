@@ -513,7 +513,7 @@ defineExpose({
 }
 
 .page-content {
-  flex: 1;
+  flex-grow: 1;
   overflow: hidden;
 }
 
@@ -547,15 +547,15 @@ defineExpose({
   }
 }
 .admin-calendar-container{
-  margin-top: -100px;
+  margin-top: 0px;
 }
 .v-btn{
-  margin-top: -100px;
+  margin-top: 0px;
 }
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .admin-calendar {
-    min-height: 500px;
+    min-height: 100vh;
   }
 }
 </style> 

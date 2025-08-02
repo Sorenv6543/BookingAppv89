@@ -657,6 +657,7 @@ watch(isAdminAuthenticated, async (newValue, oldValue) => {
   height: 100%;
   width: 100%;
   display: flex;
+  flex-direction: column;
 }
 
 .calendar-main-container {

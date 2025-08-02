@@ -2,7 +2,7 @@
   <div class="admin-dashboard">
     <!-- Main Content -->
     <div class="dashboard-content">
-      >
+      
       <!-- Header (Desktop only) -->
       <div
         v-if="!mobile"

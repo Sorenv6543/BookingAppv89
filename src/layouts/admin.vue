@@ -1,21 +1,6 @@
 <!-- layouts/admin.vue - Full admin layout with sidebar -->
 <template>
   <v-app>
-    <!-- Main App Header -->
-    <v-btn
-        color="primary"
-        variant="elevated"
-        class="menu-button"
-        
-        size="large"
-        location="top"
-        max-width="100"
-        max-height="100"
-        @click="toggleSidebar"
-      >
-        <v-icon>mdi-menu</v-icon> 
-      </v-btn>
-
     <!-- Admin Sidebar -->
     <AdminSidebar
       v-model="isSidebarOpen"
@@ -224,8 +209,8 @@ onMounted(async () => {
   transition: margin-left 0.3s ease-in-out;
   margin-left: 0;
 
-  margin-top: 130px; /* Account for app header */
-  min-height: calc(100vh - 30px);
+  margin-top: 16px; /* Account for app header */
+  min-height: 100vh;
 }
 .menu-button{
   display: flex;

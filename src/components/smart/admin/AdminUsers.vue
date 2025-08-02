@@ -2,7 +2,6 @@
   <div class="admin-system-users">
     <!-- Main Content -->
     <div class="users-content">
-      >
       <!-- Header (Desktop only) -->
       <div
         v-if="!mobile"

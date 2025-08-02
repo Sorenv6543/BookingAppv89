@@ -26,7 +26,7 @@ export default defineConfig({
     }),   
 vueDevTools({
   componentInspector: {
-    enabled: true,
+    enabled: false,
     toggleComboKey: 'alt-shift',
     launchEditor: 'code',
   }
