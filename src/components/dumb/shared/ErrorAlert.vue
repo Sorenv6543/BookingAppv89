@@ -197,6 +197,12 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   show: true,
   type: 'error',
+  title: '',
+  userRole: 'owner',
+  businessImpact: 'low',
+  errorDetails: '',
+  affectedResources: () => [],
+  helpText: '',
   variant: 'tonal',
   closable: true,
   prominent: false,

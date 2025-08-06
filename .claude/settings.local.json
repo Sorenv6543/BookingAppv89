@@ -19,7 +19,10 @@
       "Bash(Remove-Item -Recurse -Force node_modules.vite -ErrorAction SilentlyContinue)",
       "Bash(rm:*)",
       "Bash(curl:*)",
-      "mcp__sequential-thinking__get-library-docs"
+      "mcp__sequential-thinking__get-library-docs",
+      "Bash(npm run lint)",
+      "Bash(grep:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   },
@@ -30,6 +33,8 @@
     "context7",
     "desktop-commander",
     "browser-tools",
-    "browser-tools-enhanced"
+    "browser-tools-enhanced",
+    "puppeteer",
+    "playwright"
   ]
 }

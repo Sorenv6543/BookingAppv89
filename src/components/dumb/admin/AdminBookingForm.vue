@@ -113,48 +113,48 @@
               </v-col>
             </v-row>
             
-                         <!-- Dates and Times -->
-             <v-row>
-               <v-col
-                 cols="12"
-                 sm="6"
-               >
-                 <v-text-field
-                   v-model="form.checkin_date"
-                   label="Checkin Date"
-                   type="date"
-                   :rules="dateRules"
-                   required
-                   variant="outlined"
-                   :disabled="loading"
-                   :error-messages="errors.get('checkin_date')"
-                   hint="When new guests arrive"
-                   persistent-hint
-                   prepend-inner-icon="mdi-calendar-import"
-                   @update:model-value="updateBookingType"
-                 />
-               </v-col>
+            <!-- Dates and Times -->
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-text-field
+                  v-model="form.checkin_date"
+                  label="Checkin Date"
+                  type="date"
+                  :rules="dateRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('checkin_date')"
+                  hint="When new guests arrive"
+                  persistent-hint
+                  prepend-inner-icon="mdi-calendar-import"
+                  @update:model-value="updateBookingType"
+                />
+              </v-col>
                
-               <v-col
-                 cols="12"
-                 sm="6"
-               >
-                 <v-text-field
-                   v-model="form.checkout_date"
-                   label="Checkout Date"
-                   type="date"
-                   :rules="dateRules"
-                   required
-                   variant="outlined"
-                   :disabled="loading"
-                   :error-messages="errors.get('checkout_date')"
-                   hint="When guests depart"
-                   persistent-hint
-                   prepend-inner-icon="mdi-calendar-export"
-                   @update:model-value="updateBookingType"
-                 />
-               </v-col>
-             </v-row>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-text-field
+                  v-model="form.checkout_date"
+                  label="Checkout Date"
+                  type="date"
+                  :rules="dateRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('checkout_date')"
+                  hint="When guests depart"
+                  persistent-hint
+                  prepend-inner-icon="mdi-calendar-export"
+                  @update:model-value="updateBookingType"
+                />
+              </v-col>
+            </v-row>
             
             <!-- Cleaner Assignment Section -->
             <v-row>
@@ -431,6 +431,7 @@ import { ref, computed, watch, nextTick } from 'vue'
 import type { Property } from '@/types/property'
 import type { Booking, BookingFormData } from '@/types/booking'
 import type { Cleaner } from '@/types/user'
+import { safeString } from '@/utils/typeHelpers'
 
 // Props
 interface Props {
@@ -791,8 +792,8 @@ watch(() => props.booking, (newBooking) => {
       owner_id: newBooking.owner_id,
       property_id: newBooking.property_id,
       // Swap dates to match logical flow: checkin first (earlier), checkout later (later)
-      checkin_date: formatDateForInput(newBooking.checkout_date), // Earlier date
-      checkout_date: formatDateForInput(newBooking.checkin_date), // Later date
+      checkin_date: formatDateForInput(safeString(newBooking.guest_departure_date)), // Earlier date
+      checkout_date: formatDateForInput(safeString(newBooking.guest_arrival_date)), // Later date
       booking_type: newBooking.booking_type,
       guest_count: newBooking.guest_count,
       notes: newBooking.notes || '',

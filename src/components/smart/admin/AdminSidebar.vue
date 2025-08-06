@@ -567,9 +567,19 @@ const navigateTo = (path: string) => {
 
 // Sign out handler
 const handleSignOut = async () => {
-  const success = await authStore.logout();
-  if (success) {
-    router.push('/auth/login');
+  try {
+    const success = await authStore.logout();
+    if (success) {
+      // Small delay to ensure auth state is fully cleared
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await router.push('/auth/login');
+    } else {
+      console.error('Logout failed');
+    }
+  } catch (error) {
+    console.error('Error during logout:', error);
+    // Force redirect even if logout had issues
+    await router.push('/auth/login');
   }
 };
 

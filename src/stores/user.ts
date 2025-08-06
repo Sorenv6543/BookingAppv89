@@ -105,13 +105,13 @@ export const useUserStore = defineStore('user', () => {
     
     if (Array.isArray(userBookings.value)) {
       userBookings.value.forEach(booking => {
-        if (booking.checkout_date.startsWith(today) || booking.checkin_date.startsWith(today)) {
+        if (booking.guest_departure_date.startsWith(today) || booking.guest_arrival_date.startsWith(today)) {
           todayMap.set(booking.id, booking);
         }
       });
     } else {
       userBookings.value.forEach((booking, id) => {
-        if (booking.checkout_date.startsWith(today) || booking.checkin_date.startsWith(today)) {
+        if (booking.guest_departure_date.startsWith(today) || booking.guest_arrival_date.startsWith(today)) {
           todayMap.set(id, booking);
         }
       });

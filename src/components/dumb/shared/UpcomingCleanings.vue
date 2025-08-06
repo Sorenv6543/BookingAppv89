@@ -60,8 +60,8 @@
                     </v-list-item-title>
                     <v-list-item-subtitle>
                       <div class="d-flex flex-column">
-                        <span>Checkout: {{ formatTime(booking.checkout_date) }}</span>
-                        <span>Checkin: {{ formatTime(booking.checkin_date) }}</span>
+                        <span>Checkout: {{ formatTime(safeString(booking.guest_departure_date)) }}</span>
+                        <span>Checkin: {{ formatTime(safeString(booking.guest_arrival_date)) }}</span>
                         <span
                           v-if="booking.cleaning_window"
                           class="text-caption"
@@ -151,8 +151,8 @@
                     </v-list-item-title>
                     <v-list-item-subtitle>
                       <div class="d-flex flex-column">
-                        <span>Checkout: {{ formatTime(booking.checkout_date) }}</span>
-                        <span>Checkin: {{ formatTime(booking.checkin_date) }}</span>
+                        <span>Checkout: {{ formatTime(safeString(booking.guest_departure_date)) }}</span>
+                        <span>Checkin: {{ formatTime(safeString(booking.guest_arrival_date)) }}</span>
                         <span
                           v-if="booking.cleaning_window"
                           class="text-caption"
@@ -249,8 +249,8 @@
                       </v-list-item-title>
                       <v-list-item-subtitle>
                         <div class="d-flex flex-column">
-                          <span>Checkout: {{ formatTime(booking.checkout_date) }}</span>
-                          <span>Checkin: {{ formatTime(booking.checkin_date) }}</span>
+                          <span>Checkout: {{ formatTime(safeString(booking.guest_departure_date)) }}</span>
+                          <span>Checkin: {{ formatTime(safeString(booking.guest_arrival_date)) }}</span>
                           <span
                             v-if="booking.cleaning_window"
                             class="text-caption"
@@ -329,6 +329,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { BookingWithMetadata } from '@/types';
+import { safeString, safeDepartureDate } from '@/utils/typeHelpers';
 
 interface Props {
   bookings: BookingWithMetadata[];
@@ -405,22 +406,22 @@ const hasUrgentCleanings = computed((): boolean => {
 // Computed properties for grouped cleanings
 const todayCleanings = computed((): BookingWithMetadata[] => {
   return props.bookings
-    .filter(booking => isToday(booking.checkout_date))
-    .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime());
+    .filter(booking => isToday(safeString(booking.guest_departure_date)))
+    .sort((a, b) => safeDepartureDate(a).getTime() - safeDepartureDate(b).getTime());
 });
 
 const tomorrowCleanings = computed((): BookingWithMetadata[] => {
   return props.bookings
-    .filter(booking => isTomorrow(booking.checkout_date))
-    .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime());
+    .filter(booking => isTomorrow(safeString(booking.guest_departure_date)))
+    .sort((a, b) => safeDepartureDate(a).getTime() - safeDepartureDate(b).getTime());
 });
 
 const upcomingCleanings = computed((): BookingWithMetadata[] => {
   return props.bookings
-    .filter(booking => !isToday(booking.checkout_date) && 
-                      !isTomorrow(booking.checkout_date) && 
-                      isWithinDays(booking.checkout_date, props.daysAhead))
-    .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime());
+    .filter(booking => !isToday(safeString(booking.guest_departure_date)) && 
+                      !isTomorrow(safeString(booking.guest_departure_date)) && 
+                      isWithinDays(safeString(booking.guest_departure_date), props.daysAhead))
+    .sort((a, b) => safeDepartureDate(a).getTime() - safeDepartureDate(b).getTime());
 });
 
 // Group upcoming cleanings by date
@@ -428,7 +429,7 @@ const groupedUpcomingCleanings = computed(() => {
   const groups: Record<string, BookingWithMetadata[]> = {};
   
   upcomingCleanings.value.forEach(booking => {
-    const dateKey = getDateString(booking.checkout_date);
+    const dateKey = getDateString(safeString(booking.guest_departure_date));
     if (!groups[dateKey]) {
       groups[dateKey] = [];
     }

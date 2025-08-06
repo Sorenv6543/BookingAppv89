@@ -472,6 +472,14 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
+import type { PropertyOwner } from '@/types/user';
+
+// Flexible type for mock data or partial owner data
+type OwnerLike = Partial<PropertyOwner> & { 
+  id: string; 
+  name: string; 
+  email: string; 
+};
 
 // Composables
 const router = useRouter();
@@ -672,24 +680,24 @@ const addOwner = () => {
   router.push('/admin/owners/create');
 };
 
-const viewOwnerDetails = (owner: any) => {
+const viewOwnerDetails = (owner: OwnerLike) => {
   router.push(`/admin/owners/${owner.id}`);
 };
 
-const editOwner = (owner: any) => {
+const editOwner = (owner: OwnerLike) => {
   router.push(`/admin/owners/${owner.id}/edit`);
 };
 
-const contactOwner = (owner: any) => {
+const contactOwner = (owner: OwnerLike) => {
   // Open email client
   window.location.href = `mailto:${owner.email}?subject=Regarding Your Properties`;
 };
 
-const viewProperties = (owner: any) => {
+const viewProperties = (owner: OwnerLike) => {
   router.push(`/admin/properties?owner=${owner.id}`);
 };
 
-const deactivateOwner = (owner: any) => {
+const deactivateOwner = (owner: OwnerLike) => {
   console.log('Deactivate owner:', owner.name);
   // TODO: Implement deactivation
 };

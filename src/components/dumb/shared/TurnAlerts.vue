@@ -70,7 +70,7 @@
                       size="x-small"
                       class="mr-1"
                     />
-                    <span class="text-caption">{{ formatTime(booking.checkout_date) }}</span>
+                    <span class="text-caption">{{ formatTime(booking.guest_departure_date) }}</span>
                   </div>
                   <div class="d-flex align-center">
                     <v-icon
@@ -78,7 +78,7 @@
                       size="x-small"
                       class="mr-1"
                     />
-                    <span class="text-caption">{{ formatTime(booking.checkin_date) }}</span>
+                    <span class="text-caption">{{ formatTime(booking.guest_arrival_date) }}</span>
                   </div>
                   <div
                     v-if="booking.cleaning_window"
@@ -175,6 +175,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { BookingWithMetadata } from '@/types';
+import { safeDate, safeDepartureDate } from '@/utils/typeHelpers';
 
 interface Props {
   bookings: BookingWithMetadata[];
@@ -216,7 +217,7 @@ const limitedBookings = computed((): BookingWithMetadata[] => {
     }
     
     // Then by checkout date (earlier first)
-    return new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime();
+    return safeDepartureDate(a).getTime() - safeDepartureDate(b).getTime();
   });
   
   return sorted.slice(0, props.limit);
@@ -231,7 +232,7 @@ function getPropertyName(booking: BookingWithMetadata): string {
 }
 
 function formatTime(dateString: string): string {
-  const date = new Date(dateString);
+  const date = safeDate(dateString);
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 

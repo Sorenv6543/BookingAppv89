@@ -153,8 +153,8 @@ export function addOwnerBookings(bookingStore: MockBookingStore, ownerId: string
       id: `${ownerId}-booking${i}`, // Make IDs unique per owner
       property_id: `${ownerId}-prop${i}`,
       owner_id: ownerId,
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      guest_departure_date: '2023-06-01T11:00:00Z',
+      guest_arrival_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending',
     });
@@ -170,8 +170,8 @@ export function addAdminBookings(bookingStore: MockBookingStore, count: number) 
       id: `adminBooking${i}`,
       property_id: `adminProp${i}`,
       owner_id: `owner${i}`,
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      guest_departure_date: '2023-06-01T11:00:00Z',
+      guest_arrival_date: '2023-06-03T15:00:00Z',
       booking_type: i % 2 === 0 ? 'turn' : 'standard',
       status: i % 2 === 0 ? 'scheduled' : 'pending',
     });

@@ -46,6 +46,7 @@ interface Emits {
   (e: 'dateSelect', selectInfo: DateSelectArg): void;
   (e: 'eventClick', clickInfo: EventClickArg): void;
   (e: 'eventDrop', dropInfo: EventDropArg): void;
+  (e: 'eventResize', resizeInfo: EventDropArg): void;
   (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
   (e: 'updateBooking', data: { id: string; start: string; end: string }): void;
 }
@@ -84,8 +85,8 @@ const calendarEvents = computed(() => {
     return {
       id: booking.id,
       title: `${property?.name || 'Unknown Property'} - ${isTurn ? 'TURN' : 'Standard'}`,
-      start: booking.checkout_date,
-      end: addOneDay(booking.checkin_date), // Add one day to make end date inclusive
+      start: booking.guest_arrival_date,
+      end: addOneDay(booking.guest_departure_date), // Add one day to make end date inclusive
       backgroundColor: eventColor,
       borderColor: borderColor,
       textColor: textColor,
@@ -220,12 +221,17 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   eventDisplay: mobileOptions.value.eventDisplay,
   eventOverlap: true,
   eventResizableFromStart: true,
+  eventResizableFromEnd: true,
+  eventStartEditable: true,
+  eventDurationEditable: true,
   
   // Interaction settings
   selectable: true,
   selectMirror: true,
   editable: true,
   droppable: true,
+  eventDrop: handleEventDrop,
+  eventResize: handleEventResize,
   
   // Date/time settings
   locale: 'en',
@@ -247,6 +253,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   select: handleDateSelect,
   eventClick: handleEventClick,
   eventDrop: handleEventDrop,
+  dayClick: handleDayClick,
   
   // Loading state
   loading: handleLoading,
@@ -332,6 +339,55 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
   
   emit('eventDrop', dropInfo);
   // Removed duplicate updateBooking emit to prevent infinite loops
+};
+
+const handleEventResize = (resizeInfo: EventDropArg): void => {
+  const booking = resizeInfo.event.extendedProps.booking as Booking;
+  
+  // Log emitting event to Home
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'eventResize',
+    { 
+      id: booking.id, 
+      start: resizeInfo.event.startStr, 
+      end: resizeInfo.event.endStr || resizeInfo.event.startStr 
+    },
+    'emit'
+  );
+  
+  emit('eventResize', resizeInfo);
+};
+
+const handleDayClick = (dayClickInfo: any): void => {
+  console.log('🗓️ [FullCalendar] Day clicked:', dayClickInfo.dateStr);
+  
+  // Set the selected date
+  selectedDate.value = dayClickInfo.date;
+  
+  // Find bookings for this specific day
+  const clickedDate = dayClickInfo.dateStr;
+  const dayBookings = Array.from(props.bookings.values()).filter(booking => {
+    const arrivalDate = booking.guest_arrival_date;
+    const departureDate = booking.guest_departure_date;
+    
+    // Check if the clicked date falls within the booking period
+    return clickedDate >= arrivalDate && clickedDate < departureDate;
+  });
+  
+  selectedDayBookings.value = dayBookings;
+  
+  // Show the bottom sheet
+  dayViewVisible.value = true;
+  
+  console.log('📅 [FullCalendar] Day view opened with', dayBookings.length, 'bookings for date:', clickedDate);
+  console.log('📅 [FullCalendar] Day bookings:', dayBookings.map(b => ({
+    id: b.id,
+    property_id: b.property_id,
+    arrival: b.guest_arrival_date,
+    departure: b.guest_departure_date
+  })));
 };
 
 
@@ -451,8 +507,8 @@ watch(() => props.bookings, (newBookings, oldBookings) => {
       id: b.id,
       property_id: b.property_id,
       owner_id: b.owner_id,
-      checkout_date: b.checkout_date,
-      checkin_date: b.checkin_date
+        guest_arrival_date: b.guest_arrival_date,
+      guest_departure_date: b.guest_departure_date
     }))
   });
   
@@ -517,8 +573,8 @@ const handleCompleteBooking = (booking: Booking): void => {
   
   emit('updateBooking', {
     id: booking.id,
-    start: booking.checkout_date,
-    end: booking.checkin_date
+    start: booking.guest_arrival_date,
+    end: booking.guest_departure_date
   });
   
   console.log('✅ [FullCalendar] Complete booking from day view:', booking.id);
@@ -680,8 +736,8 @@ const handleManualMoreLinkClick = (event: Event): void => {
   const dayBookings: Booking[] = [];
   
   Array.from(props.bookings.values()).forEach(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
-    const checkinDate = new Date(booking.checkin_date);
+    const checkoutDate = new Date(booking.guest_departure_date);
+    const checkinDate = new Date(booking.guest_arrival_date);
     
     // Check if the clicked date falls within the booking period
     const bookingStartsOnDate = checkoutDate.toDateString() === clickedDateStr;
@@ -935,11 +991,34 @@ defineExpose({
   opacity: 0.75 !important;
   transform: rotate(2deg) !important;
   z-index: 999 !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
 }
 
 :deep(.fc-event-mirror) {
   opacity: 0.8 !important;
   transform: rotate(-2deg) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Drop zone feedback */
+:deep(.fc-daygrid-day.fc-day-today) {
+  background-color: rgba(var(--v-theme-primary), 0.05) !important;
+}
+
+:deep(.fc-daygrid-day:hover) {
+  background-color: rgba(var(--v-theme-primary), 0.1) !important;
+}
+
+/* Resize handles */
+:deep(.fc-event-resizer) {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  border-radius: 2px !important;
+}
+
+:deep(.fc-event-resizer:hover) {
+  background-color: rgba(255, 255, 255, 1) !important;
+  border-color: rgba(var(--v-theme-primary), 0.5) !important;
 }
 
 @keyframes pulse {

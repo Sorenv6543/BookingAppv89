@@ -192,8 +192,13 @@ async function addBooking(booking: Booking) {
   error.value = null;
   
   try {
+    // Database already has correct column names - no mapping needed!
     const { error: supaError } = await supabase.from('bookings').insert(booking);
-    if (supaError) throw supaError;
+    if (supaError) {
+      console.error('❌ [BookingStore] Supabase error:', supaError);
+      throw supaError;
+    }
+    console.log('✅ [BookingStore] Successfully added booking to Supabase');
     invalidateCache(); // Invalidate cache after successful insert
   } catch (err: unknown) {
     // Rollback on error
@@ -298,11 +303,11 @@ async function addBooking(booking: Booking) {
     try {
       console.log('🔍 [BookingStore] Fetching bookings from Supabase...');
       
-      // Fetch bookings from Supabase
+      // Fetch bookings from Supabase - database has correct column names!
       const { data, error: fetchError } = await supabase
         .from('bookings')
         .select('*')
-        .order('checkout_date', { ascending: true });
+        .order('guest_departure_date', { ascending: true }); // Order by departure date
       
       if (fetchError) {
         console.error('❌ [BookingStore] Supabase error:', fetchError);
@@ -315,7 +320,8 @@ async function addBooking(booking: Booking) {
       bookings.value.clear();
       
       if (data && data.length > 0) {
-        data.forEach(booking => {
+        data.forEach((booking: Booking) => {
+          // Database already has correct column names - no mapping needed!
           bookings.value.set(booking.id, booking);
         });
         console.log(`✅ [BookingStore] Added ${data.length} bookings to store`);

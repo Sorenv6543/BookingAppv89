@@ -125,6 +125,7 @@
 import { computed } from 'vue';
 import { useBookingStore } from '@/stores/booking';
 import type { User } from '@/types';
+import { safeDepartureDate } from '@/utils/typeHelpers';
 
 interface Props {
   visible: boolean;
@@ -225,7 +226,7 @@ const topOwners = computed(() => {
   
   Array.from(bookingStore.bookings.values())
     .filter(booking => {
-      const checkoutDate = new Date(booking.checkout_date);
+      const checkoutDate = safeDepartureDate(booking);
       return checkoutDate >= now && 
              checkoutDate <= nextMonth &&
              booking.status !== 'completed' &&
@@ -264,7 +265,7 @@ const statusOptions = computed(() => {
 
   Array.from(bookingStore.bookings.values())
     .filter(booking => {
-      const checkoutDate = new Date(booking.checkout_date);
+      const checkoutDate = safeDepartureDate(booking);
       return checkoutDate >= now;
     })
     .forEach(booking => {

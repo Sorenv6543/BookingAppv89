@@ -1,5 +1,6 @@
 {
   "mcpServers": {
+    
     "sequential-thinking": {
       "type": "stdio",
       "command": "cmd",
@@ -48,17 +49,7 @@
       ],
       "env": {}
     },
-    "browser-tools": {
-      "type": "stdio",
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "browser-tools-mcp"
-      ],
-      "env": {}
-    },
+
     "browser-tools-enhanced": {
       "type": "stdio",
       "command": "cmd",
@@ -71,25 +62,24 @@
       "env": {}
     },
    "puppeteer": {
-              "command": "cmd",
-              "args": [
-                "/c",
-                "npx",
-                "-y",
-                "puppeteer-mcp-server"
-              ],
-              "env": {}
-            },
-            
-            "playwright": {
-              "command": "cmd",
-              "args": [
-                "/c",
-                "npx",
-                "-y",
-                "@executeautomation/playwright-mcp-server"
-              ],
-              "env": {}
-            }
+    "command": "cmd",
+    "args": [
+      "/c",
+      "npx",
+      "-y",
+      "puppeteer-mcp-server"
+    ],
+    "env": {}
+  },
+  "playwright": {
+    "command": "cmd",
+    "args": [
+      "/c",
+      "npx",
+      "-y",
+      "@executeautomation/playwright-mcp-server"
+    ],
+    "env": {}
+  }
   }
 }

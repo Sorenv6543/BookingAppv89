@@ -12,14 +12,12 @@
   <div class="home-admin-layout">
     <!-- Main Dashboard Content (sidebar and header are now in admin layout) -->
     <AdminDashboard />
-    
-
-    </div>
+  </div>
    
   
     
 
-      <!-- Owner-focused Modals -->
+  <!-- Owner-focused Modals -->
 <!-- 
 
     <PropertyModal

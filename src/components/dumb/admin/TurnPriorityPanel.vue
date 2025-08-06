@@ -272,14 +272,14 @@
                     >
                       mdi-calendar-export
                     </v-icon>
-                    {{ formatDateTime(turn.checkout_date) }}
+                    {{ formatDateTime(turn.guest_departure_date) }}
                     <v-icon
                       size="small"
                       class="mx-2"
                     >
                       mdi-calendar-import
                     </v-icon>
-                    {{ formatDateTime(turn.checkin_date) }}
+                    {{ formatDateTime(turn.guest_arrival_date) }}
                   </div>
                 </v-list-item-subtitle>
                 
@@ -396,6 +396,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import type { Booking } from '@/types/booking'
 import type { Property } from '@/types/property'
 import type { Cleaner } from '@/types/user'
+import { safeDepartureDate } from '@/utils/typeHelpers'
 
 // Props
 interface Props {
@@ -479,7 +480,7 @@ const filteredTurns = computed(() => {
     if (bUrgency === 'critical' && aUrgency !== 'critical') return 1
     
     // Sort by checkout time (earliest first)
-    return new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime()
+    return safeDepartureDate(a).getTime() - safeDepartureDate(b).getTime()
   })
 })
 
@@ -524,7 +525,7 @@ const statusFilterOptions = [
 // Methods
 const getUrgencyLevel = (turn: Booking): 'critical' | 'urgent' | 'standard' => {
   const now = new Date()
-  const checkoutTime = new Date(turn.checkout_date)
+  const checkoutTime = safeDepartureDate(turn)
   const hoursUntil = (checkoutTime.getTime() - now.getTime()) / (1000 * 60 * 60)
   
   if (hoursUntil <= 2) return 'critical'
@@ -572,7 +573,7 @@ const getTurnItemClass = (turn: Booking) => {
 
 const getTimeRemaining = (turn: Booking) => {
   const now = new Date()
-  const checkoutTime = new Date(turn.checkout_date)
+  const checkoutTime = safeDepartureDate(turn)
   const diffMs = checkoutTime.getTime() - now.getTime()
   
   if (diffMs <= 0) return 'OVERDUE'

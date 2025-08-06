@@ -6,7 +6,10 @@
 
     <!-- Calendar Navigation -->
     <div class="calendar-navigation">
-      <v-container fluid class="pa-0">
+      <v-container
+        fluid
+        class="pa-0"
+      >
         <div class="d-flex align-center justify-center">
           <!-- Previous Month Button -->
           <v-btn
@@ -39,9 +42,16 @@
     <!-- Admin Calendar: Shows all bookings across all properties -->
     <!-- Main Content -->
     <div class="page-content">
-      <v-row no-gutters class="fill-height">
+      <v-row
+        no-gutters
+        class="fill-height"
+      >
         <!-- Calendar (Full Width) -->
-        <v-col cols="12" md="12" class="calendar-col">
+        <v-col
+          cols="12"
+          md="12"
+          class="calendar-col"
+        >
           <FullCalendar
             ref="calendarRef"
             :bookings="allBookings"
@@ -114,7 +124,7 @@ import AdminBookingForm from '@/components/dumb/admin/AdminBookingForm.vue';
 import { useAdminCalendarState } from '@/composables/admin/useAdminCalendarState';
 import { useAdminBookings } from '@/composables/admin/useAdminBookings';
 import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
-import type { Booking, User, Cleaner } from '@/types'
+import type { Booking, User, Cleaner, BookingFormData } from '@/types'
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core'
 
 // Use the admin calendar state composable for centralized state management
@@ -130,7 +140,7 @@ const {
   allProperties,
   
   // Functions
-  handleAdminEventClick,
+ 
   setCalendarView,
   goToDate
 } = useAdminCalendarState();
@@ -359,7 +369,7 @@ const closeAdminBookingFormModal = (): void => {
 
 const openCleanerAssignmentModal = (booking: Booking): void => {
   // Get available cleaners (users with cleaner role)
-  const cleaners = (allUsers as any).filter((user: User) => 
+  const cleaners = allUsers.value.filter((user: User) => 
     user.role === 'cleaner' || user.role === 'admin'
   ) as Cleaner[];
   
@@ -395,7 +405,7 @@ const handleCleanerAssignment = async (cleanerId: string): Promise<void> => {
 };
 
 // Admin booking form event handlers
-const handleAdminBookingFormSubmit = async (data: any): Promise<void> => {
+const handleAdminBookingFormSubmit = async (data: Record<string, unknown>): Promise<void> => {
   adminBookingFormModal.value.loading = true;
   try {
     if (adminBookingFormModal.value.mode === 'create') {
@@ -443,7 +453,7 @@ const handleAdminBookingFormAssignCleaner = async (bookingId: string, cleanerId:
   }
 };
 
-const handleAdminBookingFormOpenCleanerModal = (booking: any): void => {
+const handleAdminBookingFormOpenCleanerModal = (booking: Partial<BookingFormData>): void => {
   console.log('Open cleaner modal for booking:', booking);
   // Could implement cleaner modal logic here
 };

@@ -48,24 +48,24 @@
               </v-col>
             </v-row>
             
-            <!-- Dates -->
+            <!-- Dates and Times -->
             <v-row>
               <v-col
                 cols="12"
                 md="6"
               >
                 <v-text-field
-                  v-model="form.checkout_date"
-                  label="Checkout Date"
+                  v-model="form.guest_arrival_date"
+                  label="Check-in Date"
                   type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('checkout_date')"
-                  hint="When guests leave"
+                  :error-messages="errors.get('guest_arrival_date')"
+                  hint="When guests arrive (start of stay)"
                   persistent-hint
-                  prepend-inner-icon="mdi-calendar-remove"
+                  prepend-inner-icon="mdi-calendar-plus"
                   @update:model-value="updateBookingType"
                 />
               </v-col>
@@ -75,18 +75,55 @@
                 md="6"
               >
                 <v-text-field
-                  v-model="form.checkin_date"
-                  label="Checkin Date"
+                  v-model="form.guest_departure_date"
+                  label="Check-out Date"
                   type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('checkin_date')"
-                  hint="When new guests arrive"
+                  :error-messages="errors.get('guest_departure_date')"
+                  hint="When guests leave (end of stay)"
                   persistent-hint
-                  prepend-inner-icon="mdi-calendar-plus"
+                  prepend-inner-icon="mdi-calendar-remove"
                   @update:model-value="updateBookingType"
+                />
+              </v-col>
+            </v-row>
+            
+            <!-- Times (Optional) -->
+            <v-row>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="form.guest_arrival_time"
+                  label="Check-in Time (Optional)"
+                  type="time"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('guest_arrival_time')"
+                  hint="Exact time guests arrive (HH:MM)"
+                  persistent-hint
+                  prepend-inner-icon="mdi-clock-outline"
+                />
+              </v-col>
+              
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="form.guest_departure_time"
+                  label="Check-out Time (Optional)"
+                  type="time"
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('guest_departure_time')"
+                  hint="Exact time guests leave (HH:MM)"
+                  persistent-hint
+                  prepend-inner-icon="mdi-clock-outline"
                 />
               </v-col>
             </v-row>
@@ -241,6 +278,7 @@ import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue';
 import { usePropertyStore } from '@/stores/property';
 import type { Booking, BookingFormData, BookingStatus, BookingType, Property } from '@/types';
 import type { VForm } from 'vuetify/components';
+import { safeString } from '@/utils/typeHelpers';
 
 // PROPS & EMITS
 interface Props {
@@ -278,8 +316,10 @@ const autoDetectType = ref<boolean>(true);
 // FORM DATA
 const form = reactive<Partial<BookingFormData>>({
   property_id: '',
-  checkout_date: '',
-  checkin_date: '',
+  guest_departure_date: '',
+  guest_arrival_date: '',
+  guest_departure_time: '', // Optional time when guests leave
+  guest_arrival_time: '',   // Optional time when guests arrive
   booking_type: 'standard',
   guest_count: undefined,
   notes: '',
@@ -309,10 +349,10 @@ const propertiesArray = computed((): Property[] => {
 
 // Check if dates indicate a turn booking (same day)
 const isTurnBooking = computed((): boolean => {
-  if (!form.checkout_date || !form.checkin_date) return false;
+  if (!form.guest_departure_date || !form.guest_arrival_date) return false;
   
-  const checkoutDate = new Date(form.checkout_date as string);
-  const checkinDate = new Date(form.checkin_date as string);
+  const checkoutDate = new Date(form.guest_departure_date as string);
+  const checkinDate = new Date(form.guest_arrival_date as string);
   
   if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {
     return false;
@@ -371,10 +411,10 @@ const bookingTypeRules = [
 // Automatically update booking type based on dates if auto-detect is enabled
 function updateBookingType(): void {
   if (!autoDetectType.value) return;
-  if (!form.checkout_date || !form.checkin_date) return;
+  if (!form.guest_departure_date || !form.guest_arrival_date) return;
   
-  const checkoutDate = new Date(form.checkout_date as string);
-  const checkinDate = new Date(form.checkin_date as string);
+  const checkoutDate = new Date(form.guest_departure_date as string);
+  const checkinDate = new Date(form.guest_arrival_date as string);
   
   if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {
     return;
@@ -391,13 +431,15 @@ function resetForm(): void {
   if (props.mode === 'edit' && props.booking) {
     // Populate form with existing booking data
     // Convert dates to the format expected by Vuetify date inputs (YYYY-MM-DD)
-    const checkoutDate = props.booking.checkout_date;
-    const checkinDate = props.booking.checkin_date;
+    const checkoutDate = props.booking.guest_departure_date;
+    const checkinDate = props.booking.guest_arrival_date;
     
     Object.assign(form, {
       property_id: props.booking.property_id,
-      checkout_date: formatDateForInput(checkoutDate),
-      checkin_date: formatDateForInput(checkinDate),
+      guest_departure_date: formatDateForInput(safeString(checkoutDate)),
+      guest_arrival_date: formatDateForInput(safeString(checkinDate)),
+      guest_arrival_time: props.booking.guest_arrival_time || '',
+      guest_departure_time: props.booking.guest_departure_time || '',
       booking_type: props.booking.booking_type,
       guest_count: props.booking.guest_count,
       notes: props.booking.notes,
@@ -408,8 +450,10 @@ function resetForm(): void {
     // Reset to defaults for create mode, but use initial data if provided
     const defaults = {
       property_id: '',
-      checkout_date: '',
-      checkin_date: '',
+      guest_departure_date: '',
+      guest_arrival_date: '',
+      guest_departure_time: '', // Optional time when guests leave
+      guest_arrival_time: '',   // Optional time when guests arrive
       booking_type: 'standard',
       guest_count: undefined,
       notes: '',
@@ -419,20 +463,21 @@ function resetForm(): void {
     
     // Merge defaults with initial data, mapping calendar date properties
     const initialData = props.initialData || {};
+    
     const formData = { 
       ...defaults, 
       ...initialData,
-      // Map calendar date properties to form properties
-      checkout_date: initialData.start || initialData.checkout_date || '',
-      checkin_date: initialData.end || initialData.checkin_date || ''
+      // Map calendar date properties to form properties  
+      guest_arrival_date: initialData.start || initialData.guest_arrival_date || initialData.checkin_date || '',      // ✅ start = arrival
+      guest_departure_date: initialData.end || initialData.guest_departure_date || initialData.checkout_date || ''    // ✅ end = departure
     };
     
     // Format dates if they exist
-    if (formData.checkout_date) {
-      formData.checkout_date = formatDateForInput(String(formData.checkout_date));
+    if (formData.guest_departure_date) {
+      formData.guest_departure_date = formatDateForInput(String(formData.guest_departure_date));
     }
-    if (formData.checkin_date) {
-      formData.checkin_date = formatDateForInput(String(formData.checkin_date));
+    if (formData.guest_arrival_date) {
+      formData.guest_arrival_date = formatDateForInput(String(formData.guest_arrival_date));
     }
     
     Object.assign(form, formData);
@@ -449,19 +494,19 @@ async function validate(): Promise<boolean> {
   if (!valid) return false;
   
   // Additional validation
-  const checkoutDate = new Date(String(form.checkout_date || ''));
-  const checkinDate = new Date(String(form.checkin_date || ''));
+  const checkoutDate = new Date(String(form.guest_departure_date || ''));
+  const checkinDate = new Date(String(form.guest_arrival_date || ''));
   
   // Check if dates are valid
   if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {
-    errors.value.set('checkout_date', 'Invalid date format');
-    errors.value.set('checkin_date', 'Invalid date format');
+    errors.value.set('guest_departure_date', 'Invalid date format');
+    errors.value.set('guest_arrival_date', 'Invalid date format');
     return false;
   }
   
-  // Check if checkout is after checkin
-  if (checkoutDate > checkinDate) {
-    errors.value.set('checkout_date', 'Checkout date must be before or same as checkin date');
+  // Check if checkin is after checkout (arrival should be before departure)
+  if (checkinDate > checkoutDate) {
+    errors.value.set('guest_arrival_date', 'Check-in date must be before or same as check-out date');
     return false;
   }
   
@@ -487,7 +532,7 @@ async function handleSubmit(): Promise<void> {
     }
     
     // Ensure all required fields are present
-    if (!form.property_id || !form.checkout_date || !form.checkin_date || !form.booking_type) {
+    if (!form.property_id || !form.guest_departure_date || !form.guest_arrival_date || !form.booking_type) {
       errors.value.set('form', 'Please fill in all required fields');
       loading.value = false;
       return;
@@ -496,8 +541,10 @@ async function handleSubmit(): Promise<void> {
     // Prepare data for emission
     const bookingData: BookingFormData = {
       property_id: form.property_id,
-      checkout_date: form.checkout_date,
-      checkin_date: form.checkin_date,
+      guest_departure_date: form.guest_departure_date,
+      guest_arrival_date: form.guest_arrival_date,
+      guest_departure_time: form.guest_departure_time,
+      guest_arrival_time: form.guest_arrival_time,
       booking_type: form.booking_type as BookingType,
       status: (form.status as BookingStatus) || 'pending',
       owner_id: form.owner_id as string,

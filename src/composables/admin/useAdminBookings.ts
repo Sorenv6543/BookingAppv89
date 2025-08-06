@@ -75,7 +75,7 @@ export function useAdminBookings() {
     
     return allBookings.value.filter(booking => 
       booking.booking_type === 'turn' &&
-      booking.checkout_date.startsWith(today) &&
+      booking.guest_departure_date.startsWith(today) &&
       booking.status !== 'completed'
     );
   });
@@ -198,14 +198,14 @@ export function useAdminBookings() {
 
       const bookingWithId: Booking = {
         id: `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        property_id: bookingData.property_id || '',
-        owner_id: bookingData.owner_id || '',
-        checkout_date: bookingData.checkout_date || new Date().toISOString(),
-        checkin_date: bookingData.checkin_date || new Date().toISOString(),
-        status: bookingData.status || 'pending',
-        booking_type: bookingData.booking_type || 'standard',
-        assigned_cleaner_id: bookingData.assigned_cleaner_id || null,
-        notes: bookingData.notes || '',
+        property_id: (bookingData.property_id as string) || '',
+        owner_id: (bookingData.owner_id as string) || '',
+        guest_departure_date: bookingData.guest_departure_date || new Date().toISOString(),
+        guest_arrival_date: bookingData.guest_arrival_date || new Date().toISOString(),
+        status: (bookingData.status as BookingStatus) || 'pending',
+        booking_type: (bookingData.booking_type as BookingType) || 'standard',
+        assigned_cleaner_id: bookingData.assigned_cleaner_id || undefined,
+        notes: (bookingData.notes as string) || '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -230,14 +230,14 @@ export function useAdminBookings() {
       // Convert BookingFormData to Booking by adding required id
       const bookingWithId: Booking = {
         id: crypto.randomUUID(),
-        property_id: bookingData.property_id || '',
-        owner_id: bookingData.owner_id || '',
-        checkout_date: bookingData.checkout_date || new Date().toISOString(),
-        checkin_date: bookingData.checkin_date || new Date().toISOString(),
-        status: bookingData.status || 'pending',
-        booking_type: bookingData.booking_type || 'standard',
+        property_id: (bookingData.property_id as string) || '',
+        owner_id: (bookingData.owner_id as string) || '',
+        guest_departure_date: bookingData.guest_departure_date || new Date().toISOString(),
+        guest_arrival_date: bookingData.guest_arrival_date || new Date().toISOString(),
+        status: (bookingData.status as BookingStatus) || 'pending',
+        booking_type: (bookingData.booking_type as BookingType) || 'standard',
         assigned_cleaner_id: bookingData.assigned_cleaner_id || undefined,
-        notes: bookingData.notes || '',
+        notes: (bookingData.notes as string) || '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -343,7 +343,7 @@ export function useAdminBookings() {
       success.value = `Loaded ${allBookings.value.length} bookings across all properties`;
       loading.value = false;
       return true;
-    } catch (err) {
+    } catch (_err) {
       error.value = 'Unable to load system bookings. Please try again.';
       loading.value = false;
       return false;
@@ -449,7 +449,7 @@ export function useAdminBookings() {
           } else {
             results.failed.push(bookingId);
           }
-        } catch (err) {
+        } catch (_err) {
           results.failed.push(bookingId);
         }
       }
@@ -465,7 +465,7 @@ export function useAdminBookings() {
       
       loading.value = false;
       return results;
-    } catch (err) {
+    } catch (_err) {
       error.value = 'Bulk assignment operation failed. System error occurred.';
       loading.value = false;
       return { success: [], failed: bookingIds };
@@ -497,7 +497,7 @@ export function useAdminBookings() {
           } else {
             results.failed.push(bookingId);
           }
-        } catch (err) {
+        } catch (_err) {
           results.failed.push(bookingId);
         }
       }
@@ -513,7 +513,7 @@ export function useAdminBookings() {
       
       loading.value = false;
       return results;
-    } catch (err) {
+    } catch (_err) {
       error.value = 'Bulk status update operation failed. System error occurred.';
       loading.value = false;
       return { success: [], failed: bookingIds };
@@ -657,7 +657,7 @@ export function useAdminBookings() {
       
       // Date range filter
       if (criteria.dateRange) {
-        const bookingDate = new Date(booking.checkout_date);
+        const bookingDate = new Date(booking.guest_departure_date);
         const startDate = new Date(criteria.dateRange.start);
         const endDate = new Date(criteria.dateRange.end);
         if (bookingDate < startDate || bookingDate > endDate) return false;

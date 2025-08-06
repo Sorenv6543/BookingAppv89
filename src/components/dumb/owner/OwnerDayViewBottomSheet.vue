@@ -72,7 +72,7 @@
                   </v-chip>
                 </h4>
                 <p class="booking-times">
-                  {{ formatBookingTime(booking.checkout_date || '') }} → {{ formatBookingTime(booking.checkin_date || '') }}
+                  {{ formatBookingTime(safeString(booking.guest_departure_date)) }} → {{ formatBookingTime(safeString(booking.guest_arrival_date)) }}
                 </p>
               </div>
               <div class="priority-indicator">
@@ -218,6 +218,7 @@
 import { computed, ref, watch, nextTick } from 'vue';
 import { useDisplay } from 'vuetify';
 import type { Booking, Property } from '@/types';
+import { safeString } from '@/utils/typeHelpers';
 
 interface Props {
   visible: boolean;

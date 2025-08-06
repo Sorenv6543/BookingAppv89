@@ -50,7 +50,7 @@
 ### 🔧 Configuration & Setup
 - **[Auth Files Breakdown](knowledgebase/auth_files_breakdown.md)** - Authentication system
 - **[Route Guards Implementation](implementation-notes/task-039u-route-guards.md)** - Route protection
-- **[Vuetify RAG Integration](knowledgebase/vuetify-rag-integration-guide.md)** - Vuetify documentation
+
 
 ---
 

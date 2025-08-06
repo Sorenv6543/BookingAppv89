@@ -10,7 +10,7 @@ src/components/smart/owner/HomeOwner.vue -
  -->
 
 <template>
-  <div class="home-owner-layout">
+  q<div class="home-owner-layout">
     <!-- Brand Overlay - Fixed on top of everything -->
 
 
@@ -106,9 +106,9 @@ src/components/smart/owner/HomeOwner.vue -
             :current-date="currentDate"
             :properties="ownerPropertiesMap"
             @date-select="handleDateSelect"
-            @event-click="handleEventClick"
-            @event-drop="handleEventDrop"
-            @event-resize="handleEventResize"
+                  @event-click="handleEventClick"
+      @event-drop="handleEventDrop"
+      @event-resize="handleEventResize"
             @view-change="handleCalendarViewChange"
             @date-change="handleCalendarDateChange"
             @create-booking="handleCreateBookingFromCalendar"
@@ -492,10 +492,10 @@ const confirmDialogData = computed(() => {
 // ============================================================================
 
 const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
-      eventLogger.logEvent(
-      'OwnerSidebar',
-      'HomeOwner',
-      'createBooking', 
+  eventLogger.logEvent(
+    'OwnerSidebar',
+    'HomeOwner',
+    'createBooking', 
     data, 
     'receive'
   );
@@ -580,8 +580,8 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
   );
   
   const bookingData: Partial<BookingFormData> = {
-    checkout_date: selectInfo.startStr,
-    checkin_date: selectInfo.endStr,
+    guest_arrival_date: selectInfo.startStr,    // ✅ Guests arrive on start date
+    guest_departure_date: selectInfo.endStr,    // ✅ Guests leave on end date  
     owner_id: currentOwnerId.value
   };
   
@@ -637,14 +637,22 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     await nextTick();
     
     const result = await updateMyBooking(booking.id, {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr,
+      guest_arrival_date: dropInfo.event.startStr,
+      guest_departure_date: dropInfo.event.endStr || dropInfo.event.startStr,
       owner_id: booking.owner_id,
     });
     
     if (!result) {
       throw new Error('Update failed');
     }
+    
+    // Show success notification
+    uiStore.showNotification({
+      type: 'success',
+      title: 'Booking Updated',
+      message: 'Your booking has been successfully moved to the new date.',
+      duration: 3000
+    });
     
     // Additional nextTick to ensure DOM updates complete
     await nextTick();
@@ -677,14 +685,22 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
     await nextTick();
     
     const result = await updateMyBooking(booking.id, {
-      checkout_date: resizeInfo.event.startStr,
-      checkin_date: resizeInfo.event.endStr,
+      guest_arrival_date: resizeInfo.event.startStr,
+      guest_departure_date: resizeInfo.event.endStr,
       owner_id: booking.owner_id,
     });
     
     if (!result) {
       throw new Error('Resize update failed');
     }
+    
+    // Show success notification
+    uiStore.showNotification({
+      type: 'success',
+      title: 'Booking Updated',
+      message: 'Your booking duration has been successfully updated.',
+      duration: 3000
+    });
     
     // Additional nextTick to ensure DOM updates complete
     await nextTick();
@@ -765,11 +781,30 @@ const handleEventModalClose = (): void => {
 
 const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
   try {
+    console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Raw form data:', {
+      guest_arrival_date: data.guest_arrival_date,
+      guest_departure_date: data.guest_departure_date,
+      guest_arrival_time: data.guest_arrival_time,
+      guest_departure_time: data.guest_departure_time,
+      property_id: data.property_id,
+      booking_type: data.booking_type
+    });
+    
     // Ensure owner_id is set
     const bookingData = {
       ...data,
       owner_id: currentOwnerId.value
     };
+    
+    console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Final booking data:', {
+      guest_arrival_date: bookingData.guest_arrival_date,
+      guest_departure_date: bookingData.guest_departure_date,
+      guest_arrival_time: bookingData.guest_arrival_time,
+      guest_departure_time: bookingData.guest_departure_time,
+      property_id: bookingData.property_id,
+      owner_id: bookingData.owner_id,
+      booking_type: bookingData.booking_type
+    });
     
     if (eventModalMode.value === 'create') {
       await createMyBooking(bookingData as BookingFormData);
