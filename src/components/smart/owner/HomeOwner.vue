@@ -247,8 +247,8 @@ import PropertyModal from '@/components/dumb/PropertyModal.vue';
 import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
 
 // State management
-import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
+import { useSupabaseProperties } from '@/composables/supabase/useSupabaseProperties';
+import { useSupabaseBookings } from '@/composables/supabase/useSupabaseBookings';
 import { useUIStore } from '@/stores/ui';
 
 import { useAuthStore } from '@/stores/auth';
@@ -270,8 +270,8 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 // ============================================================================
 
 //useRealtimeSync(); // Just call it for side effects
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
+const { properties, fetchProperties } = useSupabaseProperties();
+const { bookings, fetchBookings } = useSupabaseBookings();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
 const { xs, mobile } = useDisplay();
@@ -362,20 +362,12 @@ const ownerPropertiesMap = computed(() => {
   }
 
   // Filter properties by owner_id
-  if (propertyStore.properties instanceof Map) {
-    propertyStore.properties.forEach((property, id) => {
+  if (properties.value && Array.isArray(properties.value)) {
+    properties.value.forEach((property) => {
       if (property.owner_id === currentOwnerId.value) {
-        map.set(id, property);
+        map.set(property.id, property);
       }
     });
-  } else {
-    propertyStore.propertiesArray
-      .filter(property => property.owner_id === currentOwnerId.value)
-      .forEach(property => {
-        if (property && property.id) {
-          map.set(property.id, property);
-        }
-      });
   }
   
   return map;
@@ -391,7 +383,7 @@ const ownerBookingsMap = computed(() => {
 
   try {
     // Filter bookings by owner_id
-    const ownerBookings = bookingStore.bookingsArray
+    const ownerBookings = bookings.value
       .filter(booking => booking.owner_id === currentOwnerId.value);
       
     ownerBookings.forEach(booking => {
@@ -958,15 +950,15 @@ onMounted(async () => {
     try {
       // Fetch data using store methods directly for better performance
       await Promise.all([
-        propertyStore.fetchProperties(),
-        bookingStore.fetchBookings()
+        fetchProperties(),
+        fetchBookings()
       ]);
       console.log('✅ [HomeOwner] Owner data loaded successfully');
       
       // Debug data after loading
       console.log('🔍 [HomeOwner] Data state after loading:', {
-        allProperties: propertyStore.propertiesArray.length,
-        allBookings: bookingStore.bookingsArray.length,
+        allProperties: properties.value.length,
+        allBookings: bookings.value.length,
         ownerProperties: ownerPropertiesMap.value.size,
         ownerBookings: ownerBookingsMap.value.size,
         filteredBookings: ownerFilteredBookings.value.size
@@ -974,7 +966,7 @@ onMounted(async () => {
       
       // Debug booking data specifically
       console.log('🔍 [HomeOwner] Bookings data:', {
-        allBookings: bookingStore.bookingsArray.map(b => ({
+        allBookings: bookings.value.map(b => ({
           id: b.id,
           owner_id: b.owner_id,
           property_id: b.property_id,
@@ -1044,8 +1036,8 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
     console.log('✅ [HomeOwner] User became authenticated, loading data...');
     try {
       await Promise.all([
-        propertyStore.fetchProperties(),
-        bookingStore.fetchBookings()
+        fetchProperties(),
+        fetchBookings()
       ]);
       console.log('✅ [HomeOwner] Data loaded after auth change');
       

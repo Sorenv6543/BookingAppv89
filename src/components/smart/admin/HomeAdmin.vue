@@ -53,8 +53,8 @@ import AdminDashboard from './AdminDashboard.vue';
 
 
 
-import { useBookingStore } from '@/stores/booking';
-import { usePropertyStore } from '@/stores/property';
+import { useSupabaseBookings } from '@/composables/supabase/useSupabaseBookings';
+import { useSupabaseProperties } from '@/composables/supabase/useSupabaseProperties';
 // import { useUIStore } from '@/stores/ui';
 import { useAuthStore } from '@/stores/auth';
 // import { useCalendarState } from '@/composables/shared/useCalendarState';
@@ -74,8 +74,8 @@ import { useAdminUserManagement } from '@/composables/admin/useAdminUserManageme
 // ============================================================================
 
 //useRealtimeSync(); // Just call it for side effects
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
+const { properties, fetchProperties } = useSupabaseProperties();
+const { bookings, fetchBookings } = useSupabaseBookings();
 // const uiStore = useUIStore();
 const authStore = useAuthStore();
 const { xs } = useDisplay();
@@ -127,8 +127,8 @@ const { users: allUsers, fetchAllUsers } = useAdminUserManagement()
 // Computed properties for admin authentication and data
 const isAdminAuthenticated = computed(() => authStore.isAuthenticated && authStore.user?.role === 'admin');
 
-const allProperties = computed(() => Array.from(propertyStore.properties.values()));
-const allBookings = computed(() => Array.from(bookingStore.bookings.values()));
+const allProperties = computed(() => properties.value);
+const allBookings = computed(() => bookings.value);
 const systemMetrics = computed(() => ({
   totalProperties: allProperties.value.length,
   totalBookings: allBookings.value.length,
@@ -578,8 +578,8 @@ onMounted(async () => {
     try {
       // Fetch ALL data across system - admin has full access
       await Promise.all([
-        propertyStore.fetchProperties(),
-        bookingStore.fetchBookings(),
+        fetchProperties(),
+        fetchBookings(),
         fetchAllUsers()
       ]);
       console.log('✅ [HomeAdmin] System data loaded successfully');
@@ -627,8 +627,8 @@ watch(isAdminAuthenticated, async (newValue, oldValue) => {
     console.log('✅ [HomeAdmin] User gained admin authentication, loading system data...');
     try {
       await Promise.all([
-        propertyStore.fetchProperties(),
-        bookingStore.fetchBookings(),
+        fetchProperties(),
+        fetchBookings(),
         fetchAllUsers()
       ]);
       console.log('✅ [HomeAdmin] System data loaded after auth change');
