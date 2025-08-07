@@ -89,6 +89,47 @@
               </v-col>
             </v-row>
             
+            <!-- Times (Required) -->
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-text-field
+                  v-model="form.guest_arrival_time"
+                  label="Check-in Time"
+                  type="time"
+                  :rules="checkinTimeRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('guest_arrival_time')"
+                  :hint="checkinTimeHint"
+                  persistent-hint
+                  prepend-inner-icon="mdi-clock-outline"
+                />
+              </v-col>
+              
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-text-field
+                  v-model="form.guest_departure_time"
+                  label="Check-out Time"
+                  type="time"
+                  :rules="checkoutTimeRules"
+                  required
+                  variant="outlined"
+                  :disabled="loading"
+                  :error-messages="errors.get('guest_departure_time')"
+                  :hint="checkoutTimeHint"
+                  persistent-hint
+                  prepend-inner-icon="mdi-clock-outline"
+                />
+              </v-col>
+            </v-row>
+            
             <!-- Guest Count -->
             <v-row>
               <v-col cols="12">
@@ -191,6 +232,12 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import type { Property } from '@/types/property'
 import type { Booking, BookingFormData } from '@/types/booking'
+import { 
+  getDefaultTimes, 
+  getTimeValidationRules, 
+  getCheckinTimeValidationRules, 
+  getTimeHint 
+} from '@/utils/timeDefaults'
 
 // Props
 interface Props {
@@ -228,6 +275,8 @@ const form = ref<BookingFormData>({
   owner_id: '',
   guest_departure_date: '',
   guest_arrival_date: '',
+  guest_departure_time: '',
+  guest_arrival_time: '',
   booking_type: 'standard',
   status: 'pending',
   guest_count: undefined,
@@ -255,6 +304,18 @@ const propertiesArray = computed(() => {
     address: property.address
   }))
 })
+
+// Get selected property for default times
+const selectedProperty = computed((): Property | undefined => {
+  if (!form.value.property_id) return undefined;
+  return props.properties.find(p => p.id === form.value.property_id);
+});
+
+// Time validation rules and hints
+const checkoutTimeRules = computed(() => getTimeValidationRules(selectedProperty.value));
+const checkinTimeRules = computed(() => getCheckinTimeValidationRules(form.value.guest_departure_time || '', selectedProperty.value));
+const checkoutTimeHint = computed(() => getTimeHint('checkout', selectedProperty.value));
+const checkinTimeHint = computed(() => getTimeHint('checkin', selectedProperty.value));
 
 const showSameDayAlert = computed(() => {
   return form.value.guest_departure_date && 
@@ -311,6 +372,8 @@ const resetForm = () => {
     owner_id: '',
     guest_departure_date: '',
     guest_arrival_date: '',
+    guest_departure_time: '',
+    guest_arrival_time: '',
     booking_type: 'standard',
     status: 'pending',
     guest_count: undefined,
@@ -326,8 +389,10 @@ const populateForm = (booking: Booking) => {
   form.value = {
     property_id: booking.property_id,
     owner_id: booking.owner_id,
-            guest_departure_date: booking.guest_departure_date,
-        guest_arrival_date: booking.guest_arrival_date,
+    guest_departure_date: booking.guest_departure_date,
+    guest_arrival_date: booking.guest_arrival_date,
+    guest_departure_time: booking.guest_departure_time || '',
+    guest_arrival_time: booking.guest_arrival_time || '',
     booking_type: booking.booking_type,
     status: booking.status,
     guest_count: booking.guest_count,
@@ -372,6 +437,23 @@ watch(() => props.modelValue, (newValue) => {
 watch(() => props.booking, (newBooking) => {
   if (newBooking && props.mode === 'edit') {
     populateForm(newBooking)
+  }
+})
+
+// Watch for property selection to set default times
+watch(() => form.value.property_id, (newPropertyId) => {
+  if (newPropertyId && props.mode === 'create') {
+    const property = props.properties.find(p => p.id === newPropertyId);
+    if (property) {
+      const defaultTimes = getDefaultTimes(property);
+      // Only set defaults if times are not already set
+      if (!form.value.guest_departure_time) {
+        form.value.guest_departure_time = defaultTimes.checkout;
+      }
+      if (!form.value.guest_arrival_time) {
+        form.value.guest_arrival_time = defaultTimes.checkin;
+      }
+    }
   }
 })
 </script>

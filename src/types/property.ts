@@ -25,6 +25,8 @@ export interface Property {
   special_instructions?: string;
   pricing_tier: PricingTier;
   active: boolean;
+  default_checkout_time?: string; // HH:MM format, e.g., '11:00'
+  default_checkin_time?: string;  // HH:MM format, e.g., '15:00'
   created_at?: string;
   updated_at?: string;
   // Add index signature to allow conversion to Record<string, unknown>

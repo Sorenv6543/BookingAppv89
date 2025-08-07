@@ -91,7 +91,7 @@
               </v-col>
             </v-row>
             
-            <!-- Times (Optional) -->
+            <!-- Times (Required) -->
             <v-row>
               <v-col
                 cols="12"
@@ -99,12 +99,14 @@
               >
                 <v-text-field
                   v-model="form.guest_arrival_time"
-                  label="Check-in Time (Optional)"
+                  label="Check-in Time"
                   type="time"
+                  :rules="checkinTimeRules"
+                  required
                   variant="outlined"
                   :disabled="loading"
                   :error-messages="errors.get('guest_arrival_time')"
-                  hint="Exact time guests arrive (HH:MM)"
+                  :hint="checkinTimeHint"
                   persistent-hint
                   prepend-inner-icon="mdi-clock-outline"
                 />
@@ -116,12 +118,14 @@
               >
                 <v-text-field
                   v-model="form.guest_departure_time"
-                  label="Check-out Time (Optional)"
+                  label="Check-out Time"
                   type="time"
+                  :rules="checkoutTimeRules"
+                  required
                   variant="outlined"
                   :disabled="loading"
                   :error-messages="errors.get('guest_departure_time')"
-                  hint="Exact time guests leave (HH:MM)"
+                  :hint="checkoutTimeHint"
                   persistent-hint
                   prepend-inner-icon="mdi-clock-outline"
                 />
@@ -279,6 +283,12 @@ import { usePropertyStore } from '@/stores/property';
 import type { Booking, BookingFormData, BookingStatus, BookingType, Property } from '@/types';
 import type { VForm } from 'vuetify/components';
 import { safeString } from '@/utils/typeHelpers';
+import { 
+  getDefaultTimes, 
+  getTimeValidationRules, 
+  getCheckinTimeValidationRules, 
+  getTimeHint 
+} from '@/utils/timeDefaults';
 
 // PROPS & EMITS
 interface Props {
@@ -318,8 +328,8 @@ const form = reactive<Partial<BookingFormData>>({
   property_id: '',
   guest_departure_date: '',
   guest_arrival_date: '',
-  guest_departure_time: '', // Optional time when guests leave
-  guest_arrival_time: '',   // Optional time when guests arrive
+  guest_departure_time: '', // Required time when guests leave
+  guest_arrival_time: '',   // Required time when guests arrive
   booking_type: 'standard',
   guest_count: undefined,
   notes: '',
@@ -344,8 +354,28 @@ const submitButtonText = computed((): string => {
 });
 
 const propertiesArray = computed((): Property[] => {
-  return propertyStore.activeProperties;
+  const properties = propertyStore.activeProperties;
+  console.log('🔍 propertiesArray computed - available properties:', properties.length);
+  return properties;
 });
+
+// Get selected property for default times
+const selectedProperty = computed((): Property | undefined => {
+  console.log('🔍 selectedProperty computed - form.property_id:', form.property_id);
+  if (!form.property_id) {
+    console.log('🔍 selectedProperty computed - no property_id, returning undefined');
+    return undefined;
+  }
+  const property = propertyStore.getPropertyById(form.property_id);
+  console.log('🔍 selectedProperty computed - found property:', property);
+  return property;
+});
+
+// Time validation rules and hints
+const checkoutTimeRules = computed(() => getTimeValidationRules(selectedProperty.value));
+const checkinTimeRules = computed(() => getCheckinTimeValidationRules(form.guest_departure_time || '', selectedProperty.value));
+const checkoutTimeHint = computed(() => getTimeHint('checkout', selectedProperty.value));
+const checkinTimeHint = computed(() => getTimeHint('checkin', selectedProperty.value));
 
 // Check if dates indicate a turn booking (same day)
 const isTurnBooking = computed((): boolean => {
@@ -426,9 +456,11 @@ function updateBookingType(): void {
 
 // Reset form to default or to booking data
 function resetForm(): void {
+  console.log('🔍 resetForm called - mode:', props.mode);
   errors.value.clear();
   
   if (props.mode === 'edit' && props.booking) {
+    console.log('🔍 resetForm - editing existing booking');
     // Populate form with existing booking data
     // Convert dates to the format expected by Vuetify date inputs (YYYY-MM-DD)
     const checkoutDate = props.booking.guest_departure_date;
@@ -447,13 +479,14 @@ function resetForm(): void {
       owner_id: props.booking.owner_id
     });
   } else {
+    console.log('🔍 resetForm - creating new booking');
     // Reset to defaults for create mode, but use initial data if provided
     const defaults = {
       property_id: '',
       guest_departure_date: '',
       guest_arrival_date: '',
-      guest_departure_time: '', // Optional time when guests leave
-      guest_arrival_time: '',   // Optional time when guests arrive
+      guest_departure_time: '', // Will be set with smart defaults
+      guest_arrival_time: '',   // Will be set with smart defaults
       booking_type: 'standard',
       guest_count: undefined,
       notes: '',
@@ -481,6 +514,11 @@ function resetForm(): void {
     }
     
     Object.assign(form, formData);
+    console.log('🔍 resetForm - form data after reset:', {
+      property_id: form.property_id,
+      guest_departure_time: form.guest_departure_time,
+      guest_arrival_time: form.guest_arrival_time
+    });
   }
 }
 
@@ -514,6 +552,28 @@ async function validate(): Promise<boolean> {
   if (form.booking_type === 'turn' && !isTurnBooking.value) {
     errors.value.set('booking_type', 'Turn bookings must have checkout and checkin on the same day');
     return false;
+  }
+  
+  // Validate required times
+  if (!form.guest_departure_time) {
+    errors.value.set('guest_departure_time', 'Checkout time is required');
+    return false;
+  }
+  
+  if (!form.guest_arrival_time) {
+    errors.value.set('guest_arrival_time', 'Checkin time is required');
+    return false;
+  }
+  
+  // Validate time order
+  if (form.guest_departure_time && form.guest_arrival_time) {
+    const checkoutTime = new Date(`2000-01-01T${form.guest_departure_time}:00`);
+    const checkinTime = new Date(`2000-01-01T${form.guest_arrival_time}:00`);
+    
+    if (checkoutTime >= checkinTime) {
+      errors.value.set('guest_departure_time', 'Checkout time must be before checkin time');
+      return false;
+    }
   }
   
   // All validation passed
@@ -637,6 +697,45 @@ watch(() => props.booking, (newBooking, oldBooking) => {
 watch(() => props.initialData, (newInitialData) => {
   if (props.open && props.mode === 'create' && newInitialData) {
     resetForm();
+  }
+});
+
+// Watch for property selection to set default times
+watch(() => form.property_id, (newPropertyId) => {
+  console.log('🔍 Property watcher triggered with newPropertyId:', newPropertyId);
+  console.log('🔍 Current form mode:', props.mode);
+  console.log('🔍 Current form times:', { 
+    departure: form.guest_departure_time, 
+    arrival: form.guest_arrival_time 
+  });
+  
+  if (newPropertyId && props.mode === 'create') {
+    const property = propertyStore.getPropertyById(newPropertyId);
+    console.log('🔍 Found property:', property);
+    
+    if (property) {
+      const defaultTimes = getDefaultTimes(property);
+      console.log('🔍 Got default times:', defaultTimes);
+      
+      // Only set defaults if times are not already set
+      if (!form.guest_departure_time) {
+        console.log('🔍 Setting departure time to:', defaultTimes.checkout);
+        form.guest_departure_time = defaultTimes.checkout;
+      } else {
+        console.log('🔍 Departure time already set, not overriding');
+      }
+      
+      if (!form.guest_arrival_time) {
+        console.log('🔍 Setting arrival time to:', defaultTimes.checkin);
+        form.guest_arrival_time = defaultTimes.checkin;
+      } else {
+        console.log('🔍 Arrival time already set, not overriding');
+      }
+    } else {
+      console.log('🔍 Property not found in store');
+    }
+  } else {
+    console.log('🔍 Skipping default time setting - conditions not met');
   }
 });
 </script>

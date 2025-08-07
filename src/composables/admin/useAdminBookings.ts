@@ -228,6 +228,8 @@ export function useAdminBookings() {
       loading.value = true;
       error.value = null;
 
+      console.log('🚀 [useAdminBookings] Creating booking with data:', bookingData);
+
       // Convert BookingFormData to Booking by adding required id
       const bookingWithId: Booking = {
         id: crypto.randomUUID(),
@@ -235,24 +237,30 @@ export function useAdminBookings() {
         owner_id: bookingData.owner_id,
         guest_departure_date: bookingData.guest_departure_date,
         guest_arrival_date: bookingData.guest_arrival_date,
-        time_until_next_guest_arrival: bookingData.time_until_next_guest_arrival,
+        guest_departure_time: bookingData.guest_departure_time,
+        guest_arrival_time: bookingData.guest_arrival_time,
+        guest_count: bookingData.guest_count,
+        notes: bookingData.notes,
         status: bookingData.status,
         booking_type: bookingData.booking_type,
+        priority: bookingData.priority || 'normal',
         assigned_cleaner_id: bookingData.assigned_cleaner_id,
-        special_instructions: bookingData.special_instructions,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
 
+      console.log('🚀 [useAdminBookings] Final booking object:', bookingWithId);
+
       await bookingStore.addBooking(bookingWithId);
-      trackCachePerformance('admin-create-booking', true); // Changed to boolean
+      trackCachePerformance('admin-create-booking', true);
       
       success.value = 'Booking created successfully';
-         } catch (err: unknown) {
-       const errorMsg = err as Error;
-       error.value = `Failed to create booking: ${errorMsg.message}`;
-       trackCachePerformance('admin-create-booking', false); // Changed to boolean
-     } finally {
+    } catch (err: unknown) {
+      const errorMsg = err as Error;
+      console.error('🚀 [useAdminBookings] Error creating booking:', errorMsg);
+      error.value = `Failed to create booking: ${errorMsg.message}`;
+      trackCachePerformance('admin-create-booking', false);
+    } finally {
       loading.value = false;
     }
   };
