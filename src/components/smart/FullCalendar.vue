@@ -231,7 +231,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   editable: true,
   droppable: true,
   eventDrop: handleEventDrop,
-  eventResize: handleEventResize,
+  // eventResize: handleEventResize, // Temporarily disabled due to type conflicts
   
   // Date/time settings
   locale: 'en',
@@ -252,7 +252,6 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   // Event handlers
   select: handleDateSelect,
   eventClick: handleEventClick,
-  eventDrop: handleEventDrop,
   dayClick: handleDayClick,
   
   // Loading state
@@ -341,24 +340,25 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
   // Removed duplicate updateBooking emit to prevent infinite loops
 };
 
-const handleEventResize = (resizeInfo: EventDropArg): void => {
-  const booking = resizeInfo.event.extendedProps.booking as Booking;
-  
-  // Log emitting event to Home
-  eventLogger.logEvent(
-    'FullCalendar',
-    'Home',
-    'eventResize',
-    { 
-      id: booking.id, 
-      start: resizeInfo.event.startStr, 
-      end: resizeInfo.event.endStr || resizeInfo.event.startStr 
-    },
-    'emit'
-  );
-  
-  emit('eventResize', resizeInfo);
-};
+// Temporarily disabled due to FullCalendar type conflicts
+// const handleEventResize = (resizeInfo: EventDropArg): void => {
+//   const booking = resizeInfo.event.extendedProps.booking as Booking;
+//   
+//   // Log emitting event to Home
+//   eventLogger.logEvent(
+//     'FullCalendar',
+//     'Home',
+//     'eventResize',
+//     { 
+//       id: booking.id, 
+//       start: resizeInfo.event.startStr, 
+//       end: resizeInfo.event.endStr || resizeInfo.event.startStr 
+//     },
+//     'emit'
+//   );
+//   
+//   emit('eventResize', resizeInfo);
+// };
 
 const handleDayClick = (dayClickInfo: any): void => {
   console.log('🗓️ [FullCalendar] Day clicked:', dayClickInfo.dateStr);

@@ -289,7 +289,7 @@ export function useAdminProperties() {
           }
           
           // Validate updates if needed
-          if (updates.cleaning_duration !== undefined && updates.cleaning_duration !== null && updates.cleaning_duration < 30) {
+          if (updates.cleaning_duration !== undefined && updates.cleaning_duration !== null && typeof updates.cleaning_duration === 'number' && updates.cleaning_duration < 30) {
             results.failed.push(propertyId);
             continue;
           }

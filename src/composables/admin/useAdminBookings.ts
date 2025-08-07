@@ -198,14 +198,15 @@ export function useAdminBookings() {
 
       const bookingWithId: Booking = {
         id: `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        property_id: (bookingData.property_id as string) || '',
-        owner_id: (bookingData.owner_id as string) || '',
+        property_id: bookingData.property_id || '',
+        owner_id: bookingData.owner_id || '',
         guest_departure_date: bookingData.guest_departure_date || new Date().toISOString(),
         guest_arrival_date: bookingData.guest_arrival_date || new Date().toISOString(),
-        status: (bookingData.status as BookingStatus) || 'pending',
-        booking_type: (bookingData.booking_type as BookingType) || 'standard',
+        time_until_next_guest_arrival: 0, // Default to 0, will be calculated
+        status: bookingData.status || 'pending',
+        booking_type: bookingData.booking_type || 'standard',
         assigned_cleaner_id: bookingData.assigned_cleaner_id || undefined,
-        notes: (bookingData.notes as string) || '',
+        special_instructions: bookingData.special_instructions || '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -230,14 +231,15 @@ export function useAdminBookings() {
       // Convert BookingFormData to Booking by adding required id
       const bookingWithId: Booking = {
         id: crypto.randomUUID(),
-        property_id: (bookingData.property_id as string) || '',
-        owner_id: (bookingData.owner_id as string) || '',
-        guest_departure_date: bookingData.guest_departure_date || new Date().toISOString(),
-        guest_arrival_date: bookingData.guest_arrival_date || new Date().toISOString(),
-        status: (bookingData.status as BookingStatus) || 'pending',
-        booking_type: (bookingData.booking_type as BookingType) || 'standard',
-        assigned_cleaner_id: bookingData.assigned_cleaner_id || undefined,
-        notes: (bookingData.notes as string) || '',
+        property_id: bookingData.property_id,
+        owner_id: bookingData.owner_id,
+        guest_departure_date: bookingData.guest_departure_date,
+        guest_arrival_date: bookingData.guest_arrival_date,
+        time_until_next_guest_arrival: bookingData.time_until_next_guest_arrival,
+        status: bookingData.status,
+        booking_type: bookingData.booking_type,
+        assigned_cleaner_id: bookingData.assigned_cleaner_id,
+        special_instructions: bookingData.special_instructions,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -290,15 +292,15 @@ export function useAdminBookings() {
   };
 
   // Role-specific performance metrics (prefixed with _ to indicate intentionally unused)
-  const _getAdminPerformanceMetrics = computed(() => {
-    return {
-      totalBookingsProcessed: allBookings.value.length,
-      totalPropertiesManaged: allProperties.value.length,
-      systemLoad: allBookings.value.length > 100 ? 'high' : 
-                 allBookings.value.length > 50 ? 'medium' : 'low',
-      dataProcessingEfficiency: allBookings.value.length > 0 ? 'optimal' : 'idle'
-    };
-  });
+  // const _getAdminPerformanceMetrics = computed(() => {
+  //   return {
+  //     totalBookingsProcessed: allBookings.value.length,
+  //     totalPropertiesManaged: allProperties.value.length,
+  //     systemLoad: allBookings.value.length > 100 ? 'high' : 
+  //                allBookings.value.length > 50 ? 'medium' : 'low',
+  //     dataProcessingEfficiency: allBookings.value.length > 0 ? 'optimal' : 'idle'
+  //   };
+  // });
 
   // Permission functions expected by tests
   function canManageAnyBooking(): boolean {

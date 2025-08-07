@@ -186,13 +186,13 @@ export function useAdminCalendarState() {
     // Admin-specific logic: show different options based on booking state
     if (booking.status === 'pending' && !booking.assigned_cleaner_id) {
       // Show cleaner assignment modal
-      uiStore.openModal('cleanerAssignment', { booking });
+      uiStore.openModal('cleanerAssignment', 'view', { booking });
     } else if (booking.status === 'in_progress') {
       // Show completion options
-      uiStore.openModal('bookingActions', { booking, actions: ['complete', 'cancel'] });
+      uiStore.openModal('bookingActions', 'edit', { booking, actions: ['complete', 'cancel'] });
     } else {
       // Show standard booking details
-      uiStore.openModal('bookingDetails', { booking });
+      uiStore.openModal('bookingDetails', 'view', { booking });
     }
   }
   

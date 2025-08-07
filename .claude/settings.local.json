@@ -22,7 +22,9 @@
       "mcp__sequential-thinking__get-library-docs",
       "Bash(npm run lint)",
       "Bash(grep:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(grep:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   },

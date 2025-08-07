@@ -654,12 +654,7 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     }
     
     // Show success notification
-    uiStore.showNotification({
-      type: 'success',
-      title: 'Booking Updated',
-      message: 'Your booking has been successfully moved to the new date.',
-      duration: 3000
-    });
+    uiStore.showNotification('Your booking has been successfully moved to the new date.', 'success');
     
     // Additional nextTick to ensure DOM updates complete
     await nextTick();
@@ -702,12 +697,7 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
     }
     
     // Show success notification
-    uiStore.showNotification({
-      type: 'success',
-      title: 'Booking Updated',
-      message: 'Your booking duration has been successfully updated.',
-      duration: 3000
-    });
+    uiStore.showNotification('Your booking duration has been successfully updated.', 'success');
     
     // Additional nextTick to ensure DOM updates complete
     await nextTick();
@@ -804,13 +794,13 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     };
     
     console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Final booking data:', {
-      guest_arrival_date: bookingData.guest_arrival_date,
-      guest_departure_date: bookingData.guest_departure_date,
-      guest_arrival_time: bookingData.guest_arrival_time,
-      guest_departure_time: bookingData.guest_departure_time,
-      property_id: bookingData.property_id,
+      guest_arrival_date: (bookingData as any).guest_arrival_date,
+      guest_departure_date: (bookingData as any).guest_departure_date,
+      guest_arrival_time: (bookingData as any).guest_arrival_time,
+      guest_departure_time: (bookingData as any).guest_departure_time,
+      property_id: (bookingData as any).property_id,
       owner_id: bookingData.owner_id,
-      booking_type: bookingData.booking_type
+      booking_type: (bookingData as any).booking_type
     });
     
     if (eventModalMode.value === 'create') {

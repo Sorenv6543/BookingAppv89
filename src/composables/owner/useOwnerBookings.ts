@@ -454,6 +454,7 @@ function useOwnerBookingsPinia() {
         owner_id: currentUserId.value,
         guest_departure_date: formData.guest_departure_date || '',
         guest_arrival_date: formData.guest_arrival_date || '',
+        time_until_next_guest_arrival: 0, // Default to 0, will be calculated
         booking_type: formData.booking_type || 'standard',
         status: formData.status || 'pending',
       };

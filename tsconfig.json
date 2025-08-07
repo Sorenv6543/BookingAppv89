@@ -35,11 +35,13 @@
       "@assets/*": ["./src/assets/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/utils/business_logic_store_updates.md", "src/test-supabase-connection.js", "src/test-supabase-connection.js", "src/plugins/supabase-plugin-config.ts.bak"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
   "exclude": [
     "node_modules",
     "dist", 
     "dev-dist",
+    "temp-disabled",
+    "temp-disabled/**/*",
     "src/__tests__",
     "src/__tests__/**/*",
     "src/**/__tests__",

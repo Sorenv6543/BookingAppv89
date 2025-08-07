@@ -61,8 +61,9 @@ export function useBookings() {
         owner_id: formData.owner_id as string,
         guest_departure_date: formData.guest_departure_date as string,
         guest_arrival_date: formData.guest_arrival_date as string,
-        guest_arrival_time: formData.guest_arrival_time || null,
-        guest_departure_time: formData.guest_departure_time || null,
+        guest_arrival_time: formData.guest_arrival_time,
+        guest_departure_time: formData.guest_departure_time,
+        time_until_next_guest_arrival: 0, // Default to 0, will be calculated
         booking_type: bookingType as BookingType,
         status: 'pending', // New bookings start as pending
         guest_count: formData.guest_count as number,

@@ -28,7 +28,7 @@ export const useAuthStore = defineStore('auth', () => {
   let supabaseSignOut: () => Promise<boolean> = async () => true;
   let updateProfile: (updates: Partial<User>) => Promise<boolean> = async () => true;
   let resetPassword: (email: string) => Promise<boolean> = async () => true;
-  let _checkAuth: () => Promise<void> = async () => {};
+  // let _checkAuth: (() => Promise<void>) | null = null;
   let getAllUsers: () => Promise<User[]> = async () => [];
   let updateUserRole: (userId: string, newRole: UserRole) => Promise<boolean> = async () => true;
   let deleteUser: (userId: string) => Promise<boolean> = async () => true;
@@ -47,7 +47,7 @@ export const useAuthStore = defineStore('auth', () => {
     supabaseSignOut = composable.signOut;
     updateProfile = composable.updateProfile;
     resetPassword = composable.resetPassword;
-    _checkAuth = composable.checkAuth;
+    // _checkAuth = composable.checkAuth;
     getAllUsers = composable.getAllUsers;
     updateUserRole = composable.updateUserRole;
     deleteUser = composable.deleteUser;

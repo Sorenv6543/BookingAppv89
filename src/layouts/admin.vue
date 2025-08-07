@@ -50,7 +50,7 @@ const router = useRouter();
 const { mobile } = useDisplay();
 const bookingStore = useBookingStore();
 const propertyStore = usePropertyStore();
-const { users: allUsers, fetchAllUsers } = useAdminUserManagement();
+const { users: _allUsers, fetchAllUsers } = useAdminUserManagement();
 
 // Initialize state
 const currentView = ref('month');
