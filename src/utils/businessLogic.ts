@@ -5,13 +5,12 @@ import type { Property } from '@/types/property';
  * Calculate booking priority based on booking type and timing
  */
 export const calculateBookingPriority = (booking: Booking): 'low' | 'normal' | 'high' | 'urgent' => {
-  const now = new Date();
-  const checkoutDate = new Date(booking.guest_departure_date);
-  const checkinDate = new Date(booking.guest_arrival_date);
+  const checkoutDate = new Date(booking.checkout_date);
+  const checkinDate = new Date(booking.checkin_date);
   
   // Turn bookings are always high priority or urgent
   if (booking.booking_type === 'turn') {
-    const hoursUntilCheckout = (checkoutDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+    const hoursUntilCheckout = (checkoutDate.getTime() - new Date().getTime()) / (1000 * 60 * 60);
     
     if (hoursUntilCheckout <= 2) return 'urgent';   // Less than 2 hours
     if (hoursUntilCheckout <= 6) return 'high';     // Less than 6 hours
@@ -19,7 +18,7 @@ export const calculateBookingPriority = (booking: Booking): 'low' | 'normal' | '
   }
   
   // Standard bookings priority based on time until checkin
-  const hoursUntilCheckin = (checkinDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+  const hoursUntilCheckin = (checkinDate.getTime() - new Date().getTime()) / (1000 * 60 * 60);
   
   if (hoursUntilCheckin <= 4) return 'urgent';      // Less than 4 hours
   if (hoursUntilCheckin <= 12) return 'high';       // Less than 12 hours
@@ -36,8 +35,8 @@ export const getCleaningWindow = (booking: Booking, property: Property): {
   duration: number;
   bufferTime: number;
 } => {
-  const checkoutDate = new Date(booking.guest_departure_date);
-  const checkinDate = new Date(booking.guest_arrival_date);
+  const checkoutDate = new Date(booking.checkout_date);
+  const checkinDate = new Date(booking.checkin_date);
   const cleaningDuration = property.cleaning_duration || 120; // Default 2 hours
   
   if (booking.booking_type === 'turn') {
@@ -85,8 +84,8 @@ export const canScheduleCleaning = (booking: Booking, property: Property): {
   reason?: string;
   suggestedTimes?: string[];
 } => {
-  const checkoutDate = new Date(booking.guest_departure_date);
-  const checkinDate = new Date(booking.guest_arrival_date);
+  const checkoutDate = new Date(booking.checkout_date);
+  const checkinDate = new Date(booking.checkin_date);
   const timeDiff = (checkinDate.getTime() - checkoutDate.getTime()) / (1000 * 60); // minutes
   
   const minCleaningTime = property.cleaning_duration || 120;
@@ -120,8 +119,8 @@ export const validateTurnBooking = (
     return { valid: true, errors, warnings };
   }
   
-  const checkoutDate = new Date(booking.guest_departure_date!);
-  const checkinDate = new Date(booking.guest_arrival_date!);
+  const checkoutDate = new Date(booking.checkout_date!);
+  const checkinDate = new Date(booking.checkin_date!);
   
   // Check if same day
   if (checkoutDate.toDateString() !== checkinDate.toDateString()) {
@@ -160,8 +159,8 @@ export const detectBookingConflicts = (
   booking: Booking,
   existingBookings: Booking[]
 ): Booking[] => {
-  const checkoutTime = new Date(booking.guest_departure_date);
-  const checkinTime = new Date(booking.guest_arrival_date);
+  const checkoutTime = new Date(booking.checkout_date);
+  const checkinTime = new Date(booking.checkin_date);
   
   // Check for overlapping bookings
   return existingBookings.filter(otherBooking => {
@@ -169,8 +168,8 @@ export const detectBookingConflicts = (
       return false; // Same booking or different property
     }
     
-    const otherCheckout = new Date(otherBooking.guest_departure_date);
-    const otherCheckin = new Date(otherBooking.guest_arrival_date);
+    const otherCheckout = new Date(otherBooking.checkout_date);
+    const otherCheckin = new Date(otherBooking.checkin_date);
     
     // Check for overlap
     return (
@@ -199,13 +198,13 @@ export const validateBooking = (
   const warnings: string[] = [];
   
   // Basic validation
-  if (!booking.guest_departure_date || !booking.guest_arrival_date) {
+  if (!booking.checkout_date || !booking.checkin_date) {
     errors.push('Guest departure and arrival dates are required');
     return { valid: false, errors, warnings };
   }
   
-  const checkoutDate = new Date(booking.guest_departure_date);
-  const checkinDate = new Date(booking.guest_arrival_date);
+  const checkoutDate = new Date(booking.checkout_date);
+  const checkinDate = new Date(booking.checkin_date);
   
   // Check if checkin is after checkout
   if (checkinDate <= checkoutDate) {
@@ -297,8 +296,8 @@ export const calculateSystemMetrics = (
   bookings.forEach(booking => {
     totalBookings++
     
-    const checkinDate = new Date(booking.guest_arrival_date)
-    const checkoutDate = new Date(booking.guest_departure_date)
+    const checkinDate = new Date(booking.checkin_date)
+    const checkoutDate = new Date(booking.checkout_date)
     
     if (checkinDate > now && ['confirmed', 'scheduled'].includes(booking.status)) {
       upcomingBookings++
@@ -331,8 +330,8 @@ export const filterBookingsByDateRange = (
   const filtered = new Map<string, Booking>()
   
   bookings.forEach((booking, id) => {
-    const bookingStart = new Date(booking.guest_departure_date).getTime()
-    const bookingEnd = new Date(booking.guest_arrival_date).getTime()
+    const bookingStart = new Date(booking.checkout_date).getTime()
+    const bookingEnd = new Date(booking.checkin_date).getTime()
     
     if (bookingStart <= end && bookingEnd >= start) {
       filtered.set(id, booking)
@@ -352,7 +351,7 @@ export const getUrgentTurns = (
   bookings.forEach((booking, id) => {
     if (booking.booking_type === 'turn' &&
         booking.status === 'pending' &&
-        new Date(booking.guest_departure_date) <= cutoffTime) {
+        new Date(booking.checkout_date) <= cutoffTime) {
       urgentTurns.set(id, booking)
     }
   })
@@ -367,7 +366,7 @@ export const getUpcomingBookings = (
   const upcoming = new Map<string, Booking>()
   
   bookings.forEach((booking, id) => {
-    if (new Date(booking.guest_arrival_date) > now &&
+    if (new Date(booking.checkin_date) > now &&
         ['confirmed', 'scheduled', 'pending'].includes(booking.status)) {
       upcoming.set(id, booking)
     }
@@ -384,7 +383,7 @@ export const getRecentBookings = (
   const recent = new Map<string, Booking>()
   
   bookings.forEach((booking, id) => {
-    if (new Date(booking.guest_departure_date) >= cutoffDate) {
+    if (new Date(booking.checkout_date) >= cutoffDate) {
       recent.set(id, booking)
     }
   })

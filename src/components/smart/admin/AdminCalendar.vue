@@ -42,8 +42,8 @@
           <v-btn
             color="primary"
             prepend-icon="mdi-plus"
-            @click="openNewBookingForm"
             class="new-booking-btn"
+            @click="openNewBookingForm"
           >
             New Booking
           </v-btn>
@@ -256,10 +256,10 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
     id: crypto.randomUUID(),
     property_id: '',
     owner_id: '',
-    guest_departure_date: finalDepartureDate,
-    guest_arrival_date: finalArrivalDate,
-    guest_departure_time: '11:00',
-    guest_arrival_time: '15:00',
+            checkout_date: finalDepartureDate,
+        checkin_date: finalArrivalDate,
+    checkout_time: '11:00',
+    checkin_time: '15:00',
     booking_type: 'standard',
     status: 'pending',
     created_at: new Date().toISOString(),
@@ -284,10 +284,10 @@ const openNewBookingForm = (): void => {
     id: crypto.randomUUID(),
     property_id: '',
     owner_id: '',
-    guest_departure_date: today,      // Guests leave today
-    guest_arrival_date: tomorrowStr,  // New guests arrive tomorrow
-    guest_departure_time: '11:00',
-    guest_arrival_time: '15:00',
+            checkout_date: today,      // Guests leave today
+        checkin_date: tomorrowStr,  // New guests arrive tomorrow
+    checkout_time: '11:00',
+    checkin_time: '15:00',
     booking_type: 'standard',
     status: 'pending',
     created_at: new Date().toISOString(),
@@ -315,8 +315,8 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   
   try {
     await updateBooking(booking.id, {
-              guest_departure_date: dropInfo.event.startStr,
-        guest_arrival_date: dropInfo.event.endStr || dropInfo.event.startStr
+      checkout_date: dropInfo.event.startStr,
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
     });
   } catch (error) {
     console.error('Failed to update booking:', error);
@@ -330,8 +330,8 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
   
   try {
     await updateBooking(booking.id, {
-              guest_departure_date: resizeInfo.event.startStr,
-        guest_arrival_date: resizeInfo.event.endStr
+      checkout_date: resizeInfo.event.startStr,
+      checkin_date: resizeInfo.event.endStr
     });
   } catch (error) {
     console.error('Failed to update booking:', error);

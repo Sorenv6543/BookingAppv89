@@ -148,8 +148,7 @@ export function getTimeValidationRules(property?: Property) {
 /**
  * Get checkin time validation rules (depends on checkout time)
  */
-export function getCheckinTimeValidationRules(checkoutTime: string, property?: Property) {
-  const defaultTimes = getDefaultTimes(property);
+export function getCheckinTimeValidationRules(checkoutTime: string) {
   
   return [
     (v: string) => !!v || 'Time is required',

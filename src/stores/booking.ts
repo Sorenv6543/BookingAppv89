@@ -310,7 +310,7 @@ async function addBooking(booking: Booking) {
       const { data, error: fetchError } = await supabase
         .from('bookings')
         .select('*')
-        .order('guest_departure_date', { ascending: true }); // Order by departure date
+        .order('checkout_date', { ascending: true }); // Order by checkout date
       
       if (fetchError) {
         console.error('❌ [BookingStore] Supabase error:', fetchError);

@@ -24,10 +24,10 @@ export interface Booking {
   id: string;
   property_id: string;
   owner_id: string;
-  guest_departure_date: string; // ISO date when guests leave (was checkout_date)
-  guest_arrival_date: string;   // ISO date when new guests arrive (was checkin_date)
-  guest_departure_time: string; // Required time when guests leave (HH:MM format)
-  guest_arrival_time: string;   // Required time when guests arrive (HH:MM format)
+  checkout_date: string; // ISO date when previous guests check out (leave)
+  checkin_date: string;  // ISO date when new guests check in (arrive)
+  checkout_time: string; // Required time when guests leave (HH:MM format)
+  checkin_time: string;   // Required time when guests arrive (HH:MM format)
   booking_type: BookingType;
   status: BookingStatus;
   guest_count?: number;
@@ -80,7 +80,7 @@ export function isBooking(obj: unknown): obj is Booking {
   return (
     typeof b.id === 'string' &&
     typeof b.property_id === 'string' &&
-    typeof b.guest_departure_date === 'string' &&
-    typeof b.guest_arrival_date === 'string'
+    typeof b.checkout_date === 'string' &&
+    typeof b.checkin_date === 'string'
   );
 }

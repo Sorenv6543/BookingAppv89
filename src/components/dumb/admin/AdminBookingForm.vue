@@ -120,14 +120,14 @@
                 sm="6"
               >
                 <v-text-field
-                  v-model="form.guest_arrival_date"
-                  label="Checkin Date"
+                  v-model="form.checkin_date"
+                  label="Check-in Date"
                   type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('guest_arrival_date')"
+                  :error-messages="errors.get('checkin_date')"
                   hint="When new guests arrive"
                   persistent-hint
                   prepend-inner-icon="mdi-calendar-import"
@@ -140,14 +140,14 @@
                 sm="6"
               >
                 <v-text-field
-                  v-model="form.guest_departure_date"
-                  label="Checkout Date"
+                  v-model="form.checkout_date"
+                  label="Check-out Date"
                   type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('guest_departure_date')"
+                  :error-messages="errors.get('checkout_date')"
                   hint="When guests depart"
                   persistent-hint
                   prepend-inner-icon="mdi-calendar-export"
@@ -163,14 +163,14 @@
                 sm="6"
               >
                 <v-text-field
-                  v-model="form.guest_arrival_time"
+                  v-model="form.checkin_time"
                   label="Check-in Time"
                   type="time"
                   :rules="checkinTimeRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('guest_arrival_time')"
+                  :error-messages="errors.get('checkin_time')"
                   :hint="checkinTimeHint"
                   persistent-hint
                   prepend-inner-icon="mdi-clock-outline"
@@ -182,14 +182,14 @@
                 sm="6"
               >
                 <v-text-field
-                  v-model="form.guest_departure_time"
+                  v-model="form.checkout_time"
                   label="Check-out Time"
                   type="time"
                   :rules="checkoutTimeRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('guest_departure_time')"
+                  :error-messages="errors.get('checkout_time')"
                   :hint="checkoutTimeHint"
                   persistent-hint
                   prepend-inner-icon="mdi-clock-outline"
@@ -263,7 +263,7 @@
                         <v-btn
                           variant="outlined"
                           color="primary"
-                          :disabled="!form.property_id || !form.guest_departure_date"
+                          :disabled="!form.property_id || !form.checkout_date"
                           @click="openCleanerAssignmentModal"
                         >
                           <v-icon start>
@@ -518,10 +518,10 @@ const formValid = ref(false)
 const defaultForm: BookingFormData = {
   owner_id: '', // Required field for admin forms
   property_id: '',
-  guest_departure_date: '',
-  guest_arrival_date: '',
-  guest_departure_time: '',
-  guest_arrival_time: '',
+  checkout_date: '',
+  checkin_date: '',
+  checkout_time: '',
+  checkin_time: '',
   booking_type: 'standard',
   guest_count: undefined,
   notes: '',
@@ -582,7 +582,7 @@ const selectedProperty = computed((): Property | undefined => {
 
 // Time validation rules and hints
 const checkoutTimeRules = computed(() => getTimeValidationRules(selectedProperty.value));
-const checkinTimeRules = computed(() => getCheckinTimeValidationRules(form.value.guest_departure_time || '', selectedProperty.value));
+const checkinTimeRules = computed(() => getCheckinTimeValidationRules(form.value.checkout_time || ''));
 const checkoutTimeHint = computed(() => getTimeHint('checkin', selectedProperty.value));
 const checkinTimeHint = computed(() => getTimeHint('checkout', selectedProperty.value));
 
@@ -610,9 +610,9 @@ const priorityOptions = [
   // })
   
   const showDateError = computed(() => {
-    if (!form.value.guest_departure_date || !form.value.guest_arrival_date) return false
+    if (!form.value.checkout_date || !form.value.checkin_date) return false
     // For cleaning events: departure should be before arrival
-    return new Date(form.value.guest_departure_date as string) >= new Date(form.value.guest_arrival_date as string)
+    return new Date(form.value.checkout_date as string) >= new Date(form.value.checkin_date as string)
   })
 
 const showBusinessImpactAlert = computed(() => {
@@ -643,15 +643,7 @@ const businessImpactAlert = computed(() => {
 })
 
 // Validation rules
-const rules = {
-  property_id: [(v: string) => !!v || 'Property is required'],
-  owner_id: [(v: string) => !!v || 'Owner is required'],
-  guest_departure_date: [(v: string) => !!v || 'Departure date is required'],
-  guest_arrival_date: [(v: string) => !!v || 'Arrival date is required'],
-  guest_departure_time: checkoutTimeRules,
-  guest_arrival_time: checkinTimeRules,
-  guest_count: [(v: number) => v > 0 || 'Guest count must be greater than 0']
-};
+
 
 const propertyRules = [
   (v: string) => !!v || 'Property selection is required'
@@ -690,11 +682,11 @@ const dateRules = [
 
 // Methods
 const updateBookingType = () => {
-  if (!form.value.guest_departure_date || !form.value.guest_arrival_date) return
+      if (!form.value.checkout_date || !form.value.checkin_date) return
   
   console.log('🔄 [AdminBookingForm] updateBookingType called')
-  console.log('🔄 [AdminBookingForm] guest_departure_date:', form.value.guest_departure_date)
-  console.log('🔄 [AdminBookingForm] guest_arrival_date:', form.value.guest_arrival_date)
+      console.log('🔄 [AdminBookingForm] checkout_date:', form.value.checkout_date)
+    console.log('🔄 [AdminBookingForm] checkin_date:', form.value.checkin_date)
   
   // Parse dates as local dates to avoid timezone issues
   const parseDateString = (dateStr: string) => {
@@ -703,8 +695,8 @@ const updateBookingType = () => {
     return new Date(year, month - 1, day).toDateString()
   }
   
-      const checkoutDate = parseDateString(form.value.guest_departure_date as string)
-    const checkinDate = parseDateString(form.value.guest_arrival_date as string)
+      const checkoutDate = parseDateString(form.value.checkout_date as string)
+    const checkinDate = parseDateString(form.value.checkin_date as string)
   
   console.log('🔄 [AdminBookingForm] parsed checkoutDate:', checkoutDate)
   console.log('🔄 [AdminBookingForm] parsed checkinDate:', checkinDate)
@@ -834,10 +826,10 @@ const handleSubmit = async () => {
     owner_id: form.value.owner_id || null,
     property_id: form.value.property_id || null,
     // Keep dates and times as they are (no swapping needed)
-    guest_departure_date: form.value.guest_departure_date,
-    guest_arrival_date: form.value.guest_arrival_date,
-    guest_departure_time: form.value.guest_departure_time,
-    guest_arrival_time: form.value.guest_arrival_time,
+            checkout_date: form.value.checkout_date,
+        checkin_date: form.value.checkin_date,
+          checkout_time: form.value.checkout_time,
+      checkin_time: form.value.checkin_time,
     guest_count: form.value.guest_count || 1,
     notes: form.value.notes || '',
     priority: form.value.priority || 'normal',
@@ -892,10 +884,10 @@ watch(() => props.booking, (newBooking) => {
       owner_id: newBooking.owner_id,
       property_id: newBooking.property_id,
       // Use dates as stored in database (no swapping)
-      guest_arrival_date: formatDateForInput(safeString(newBooking.guest_arrival_date)),
-      guest_departure_date: formatDateForInput(safeString(newBooking.guest_departure_date)),
-      guest_arrival_time: newBooking.guest_arrival_time || '',
-      guest_departure_time: newBooking.guest_departure_time || '',
+              checkin_date: formatDateForInput(safeString(newBooking.checkin_date)),
+        checkout_date: formatDateForInput(safeString(newBooking.checkout_date)),
+      checkin_time: newBooking.checkin_time || '',
+      checkout_time: newBooking.checkout_time || '',
       booking_type: newBooking.booking_type,
       guest_count: newBooking.guest_count,
       notes: newBooking.notes || '',
@@ -923,8 +915,8 @@ watch(() => form.value.property_id, (newPropertyId) => {
   console.log('🔍 Property watcher triggered with newPropertyId:', newPropertyId);
   console.log('🔍 Current form mode:', props.mode);
   console.log('🔍 Current form times:', { 
-    departure: form.value.guest_departure_time, 
-    arrival: form.value.guest_arrival_time 
+          departure: form.value.checkout_time,
+      arrival: form.value.checkin_time 
   });
   
   if (newPropertyId && props.mode === 'create') {
@@ -943,13 +935,13 @@ watch(() => form.value.property_id, (newPropertyId) => {
       console.log('🔍 Got default times:', defaultTimes);
       
       // Only set defaults if times are not already set
-      if (!form.value.guest_departure_time) {
+      if (!form.value.checkout_time) {
         console.log('🔍 Setting default checkout time:', defaultTimes.checkout);
-        form.value.guest_departure_time = defaultTimes.checkout;
+        form.value.checkout_time = defaultTimes.checkout;
       }
-      if (!form.value.guest_arrival_time) {
+      if (!form.value.checkin_time) {
         console.log('🔍 Setting default checkin time:', defaultTimes.checkin);
-        form.value.guest_arrival_time = defaultTimes.checkin;
+        form.value.checkin_time = defaultTimes.checkin;
       }
     }
   }
