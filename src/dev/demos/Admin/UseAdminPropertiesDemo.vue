@@ -715,7 +715,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useAdminProperties } from '@/composables/admin/useAdminProperties';
-import type { PricingTier, Property } from '@/types';
+import type { PricingTier, Property } from '@/types/property';
 
 // Use the admin properties composable
 const {

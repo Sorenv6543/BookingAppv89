@@ -179,7 +179,7 @@
                   v-for="booking in sampleBookingsArray"
                   :key="booking.id"
                   :title="`${booking.booking_type.toUpperCase()} - ${getPropertyName(booking.property_id)}`"
-                  :subtitle="`Owner: ${getOwnerName(booking.owner_id)} | ${formatDate(booking.checkout_date)} → ${formatDate(booking.checkin_date)}`"
+                  :subtitle="`Owner: ${getOwnerName(booking.owner_id)} | ${formatDate(booking.guest_departure_date)} → ${formatDate(booking.guest_arrival_date)}`"
                 >
                   <template #prepend>
                     <v-chip
@@ -266,7 +266,7 @@ const todayTurnsCount = computed(() => {
   const today = new Date().toISOString().split('T')[0];
   return sampleBookingsArray.value.filter(b => 
     b.booking_type === 'turn' && 
-    b.checkout_date.startsWith(today)
+            b.guest_departure_date.startsWith(today)
   ).length;
 });
 
@@ -276,7 +276,7 @@ const upcomingCleaningsCount = computed(() => {
   inOneWeek.setDate(today.getDate() + 7);
   
   return sampleBookingsArray.value.filter(b => {
-    const checkoutDate = new Date(b.checkout_date);
+          const checkoutDate = new Date(b.guest_departure_date);
     return checkoutDate >= today && checkoutDate <= inOneWeek;
   }).length;
 });
@@ -364,8 +364,8 @@ const loadSampleData = (): void => {
       id: 'booking-1',
       property_id: 'prop-1',
       owner_id: '1', // John Smith
-      checkout_date: new Date().toISOString().split('T')[0] + 'T11:00:00Z',
-      checkin_date: new Date().toISOString().split('T')[0] + 'T15:00:00Z',
+              guest_departure_date: new Date().toISOString().split('T')[0] + 'T11:00:00Z',
+              guest_arrival_date: new Date().toISOString().split('T')[0] + 'T15:00:00Z',
       booking_type: 'turn',
       guest_count: 4,
       notes: 'Same-day turnaround, high priority',
@@ -377,8 +377,8 @@ const loadSampleData = (): void => {
       id: 'booking-2',
       property_id: 'prop-3',
       owner_id: '2', // Sarah Johnson
-      checkout_date: new Date().toISOString().split('T')[0] + 'T10:00:00Z',
-      checkin_date: new Date().toISOString().split('T')[0] + 'T16:00:00Z',
+              guest_departure_date: new Date().toISOString().split('T')[0] + 'T10:00:00Z',
+              guest_arrival_date: new Date().toISOString().split('T')[0] + 'T16:00:00Z',
       booking_type: 'turn',
       guest_count: 2,
       notes: 'Mountain cabin turnaround',
@@ -391,8 +391,8 @@ const loadSampleData = (): void => {
       id: 'booking-3',
       property_id: 'prop-5',
       owner_id: '3', // Mike Wilson
-      checkout_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
-      checkin_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
+              guest_departure_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T11:00:00Z',
+              guest_arrival_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T15:00:00Z',
       booking_type: 'standard',
       guest_count: 6,
       notes: 'Regular cleaning, family with kids',
@@ -404,8 +404,8 @@ const loadSampleData = (): void => {
       id: 'booking-4',
       property_id: 'prop-6',
       owner_id: '4', // Lisa Brown
-      checkout_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
-      checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
+      guest_departure_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T12:00:00Z',
+      guest_arrival_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T14:00:00Z',
       booking_type: 'standard',
       guest_count: 2,
       notes: 'Historic home, careful cleaning',
@@ -417,8 +417,8 @@ const loadSampleData = (): void => {
       id: 'booking-5',
       property_id: 'prop-2',
       owner_id: '1', // John Smith
-      checkout_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T09:00:00Z',
-      checkin_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T17:00:00Z',
+      guest_departure_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T09:00:00Z',
+      guest_arrival_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T17:00:00Z',
       booking_type: 'turn',
       guest_count: 3,
       notes: 'Downtown loft quick turn',
@@ -430,8 +430,8 @@ const loadSampleData = (): void => {
       id: 'booking-6',
       property_id: 'prop-4',
       owner_id: '2', // Sarah Johnson
-      checkout_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T10:00:00Z',
-      checkin_date: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T16:00:00Z',
+      guest_departure_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T10:00:00Z',
+      guest_arrival_date: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T16:00:00Z',
       booking_type: 'standard',
       guest_count: 1,
       notes: 'Studio apartment, minimal cleaning',

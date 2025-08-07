@@ -74,7 +74,7 @@
                         >
                           mdi-calendar-export
                         </v-icon>
-                        {{ booking.checkout_date ? formatDateTime(booking.checkout_date as string) : 'Not set' }}
+                        {{ booking.guest_departure_date ? formatDateTime(booking.guest_departure_date as string) : 'Not set' }}
                       </div>
                       <div class="text-body-1">
                         <v-icon
@@ -83,7 +83,7 @@
                         >
                           mdi-calendar-import
                         </v-icon>
-                        {{ booking.checkin_date ? formatDateTime(booking.checkin_date as string) : 'Not set' }}
+                        {{ booking.guest_arrival_date ? formatDateTime(booking.guest_arrival_date as string) : 'Not set' }}
                       </div>
                     </v-col>
                   </v-row>
@@ -631,10 +631,10 @@ const formatDateTime = (dateTime: string) => {
 }
 
 const getCleaningWindow = () => {
-  if (!props.booking?.checkout_date || !props.booking?.checkin_date) return ''
-  
-  const checkout = new Date(props.booking.checkout_date as string)
-  const checkin = new Date(props.booking.checkin_date as string)
+      if (!props.booking?.guest_departure_date || !props.booking?.guest_arrival_date) return ''
+    
+    const checkout = new Date(props.booking.guest_departure_date as string)
+    const checkin = new Date(props.booking.guest_arrival_date as string)
   const diffHours = Math.abs(checkin.getTime() - checkout.getTime()) / (1000 * 60 * 60)
   
   if (diffHours < 1) {

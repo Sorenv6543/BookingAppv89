@@ -67,8 +67,8 @@ const testProperty = reactive<PropertyFormData>({
 const testBooking = reactive<BookingFormData>({
   property_id: '',
   owner_id: 'test-owner-123',
-  checkout_date: new Date().toISOString().split('T')[0],
-  checkin_date: new Date().toISOString().split('T')[0],
+          guest_departure_date: new Date().toISOString().split('T')[0],
+        guest_arrival_date: new Date().toISOString().split('T')[0],
   booking_type: 'turn',
   status: 'pending',
   guest_count: 2,
@@ -78,8 +78,8 @@ const testBooking = reactive<BookingFormData>({
 const testBookingStandard = reactive<BookingFormData>({
   property_id: '',
     owner_id: 'test-owner-123',
-  checkout_date: new Date().toISOString().split('T')[0],
-  checkin_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 days later
+          guest_departure_date: new Date().toISOString().split('T')[0],
+        guest_arrival_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 days later
   booking_type: 'standard',
   status: 'pending',
   guest_count: 4,

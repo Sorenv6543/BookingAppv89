@@ -46,8 +46,8 @@ describe('useAdminBookings (Role-Based)', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      guest_departure_date: '2023-06-01T11:00:00Z',
+      guest_arrival_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };
@@ -56,8 +56,8 @@ describe('useAdminBookings (Role-Based)', () => {
       id: 'booking2',
       property_id: 'prop2',
       owner_id: 'owner2',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-01T15:00:00Z',
+      guest_departure_date: '2023-06-01T11:00:00Z',
+      guest_arrival_date: '2023-06-01T15:00:00Z',
       booking_type: 'turn',
       status: 'scheduled'
     };
@@ -97,8 +97,8 @@ describe('useAdminBookings (Role-Based)', () => {
       id: 'turn1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-01T15:00:00Z',
+      guest_departure_date: '2023-06-01T11:00:00Z',
+      guest_arrival_date: '2023-06-01T15:00:00Z',
       booking_type: 'turn',
       status: 'pending'
     };
@@ -107,8 +107,8 @@ describe('useAdminBookings (Role-Based)', () => {
       id: 'turn2',
       property_id: 'prop2',
       owner_id: 'owner2',
-      checkout_date: '2023-06-01T12:00:00Z',
-      checkin_date: '2023-06-01T16:00:00Z',
+      guest_departure_date: '2023-06-01T12:00:00Z',
+      guest_arrival_date: '2023-06-01T16:00:00Z',
       booking_type: 'turn',
       status: 'pending'
     };
@@ -117,8 +117,8 @@ describe('useAdminBookings (Role-Based)', () => {
       id: 'standard1',
       property_id: 'prop3',
       owner_id: 'owner1',
-      checkout_date: '2023-06-02T11:00:00Z',
-      checkin_date: '2023-06-04T15:00:00Z',
+      guest_departure_date: '2023-06-02T11:00:00Z',
+      guest_arrival_date: '2023-06-04T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };
@@ -160,8 +160,8 @@ describe('useAdminBookings (Role-Based)', () => {
     const newBookingData = {
       property_id: 'prop1',
       owner_id: 'owner1', // Admin can specify any owner
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      guest_departure_date: '2023-06-01T11:00:00Z',
+      guest_arrival_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard' as const,
       status: 'pending' as const
     };
@@ -198,10 +198,10 @@ describe('useAdminBookings (Role-Based)', () => {
 
     // Add bookings with different statuses from multiple owners
     const bookings: Booking[] = [
-      { id: 'b1', property_id: 'p1', owner_id: 'owner1', checkout_date: '2023-06-01T11:00:00Z', checkin_date: '2023-06-01T15:00:00Z', booking_type: 'turn', status: 'pending' },
-      { id: 'b2', property_id: 'p2', owner_id: 'owner2', checkout_date: '2023-06-01T11:00:00Z', checkin_date: '2023-06-01T15:00:00Z', booking_type: 'turn', status: 'scheduled' },
-      { id: 'b3', property_id: 'p3', owner_id: 'owner1', checkout_date: '2023-06-01T11:00:00Z', checkin_date: '2023-06-01T15:00:00Z', booking_type: 'standard', status: 'completed' },
-      { id: 'b4', property_id: 'p4', owner_id: 'owner3', checkout_date: '2023-06-01T11:00:00Z', checkin_date: '2023-06-01T15:00:00Z', booking_type: 'standard', status: 'cancelled' }
+      { id: 'b1', property_id: 'p1', owner_id: 'owner1', guest_departure_date: '2023-06-01T11:00:00Z', guest_arrival_date: '2023-06-01T15:00:00Z', booking_type: 'turn', status: 'pending' },
+      { id: 'b2', property_id: 'p2', owner_id: 'owner2', guest_departure_date: '2023-06-01T11:00:00Z', guest_arrival_date: '2023-06-01T15:00:00Z', booking_type: 'turn', status: 'scheduled' },
+      { id: 'b3', property_id: 'p3', owner_id: 'owner1', guest_departure_date: '2023-06-01T11:00:00Z', guest_arrival_date: '2023-06-01T15:00:00Z', booking_type: 'standard', status: 'completed' },
+      { id: 'b4', property_id: 'p4', owner_id: 'owner3', guest_departure_date: '2023-06-01T11:00:00Z', guest_arrival_date: '2023-06-01T15:00:00Z', booking_type: 'standard', status: 'cancelled' }
     ];
 
     bookings.forEach(booking => bookingStore.addBooking(booking));
@@ -245,8 +245,8 @@ describe('useAdminBookings (Role-Based)', () => {
       id: 'unassigned1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-01T15:00:00Z',
+      guest_departure_date: '2023-06-01T11:00:00Z',
+      guest_arrival_date: '2023-06-01T15:00:00Z',
       booking_type: 'turn',
       status: 'pending'
     };
@@ -255,8 +255,8 @@ describe('useAdminBookings (Role-Based)', () => {
       id: 'unassigned2',
       property_id: 'prop2',
       owner_id: 'owner2',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-01T15:00:00Z',
+      guest_departure_date: '2023-06-01T11:00:00Z',
+      guest_arrival_date: '2023-06-01T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };
@@ -301,8 +301,8 @@ describe('useAdminBookings (Role-Based)', () => {
       id: 'urgent1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: `${today}T11:00:00Z`,
-      checkin_date: `${today}T15:00:00Z`,
+      guest_departure_date: `${today}T11:00:00Z`,
+      guest_arrival_date: `${today}T15:00:00Z`,
       booking_type: 'turn',
       status: 'pending'
     };
@@ -311,8 +311,8 @@ describe('useAdminBookings (Role-Based)', () => {
       id: 'urgent2',
       property_id: 'prop2',
       owner_id: 'owner2',
-      checkout_date: `${today}T12:00:00Z`,
-      checkin_date: `${today}T16:00:00Z`,
+      guest_departure_date: `${today}T12:00:00Z`,
+      guest_arrival_date: `${today}T16:00:00Z`,
       booking_type: 'turn',
       status: 'pending'
     };
@@ -321,8 +321,8 @@ describe('useAdminBookings (Role-Based)', () => {
       id: 'future1',
       property_id: 'prop3',
       owner_id: 'owner1',
-      checkout_date: `${tomorrow}T11:00:00Z`,
-      checkin_date: `${tomorrow}T15:00:00Z`,
+      guest_departure_date: `${tomorrow}T11:00:00Z`,
+      guest_arrival_date: `${tomorrow}T15:00:00Z`,
       booking_type: 'turn',
       status: 'pending'
     };

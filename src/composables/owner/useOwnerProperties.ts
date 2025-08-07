@@ -309,7 +309,7 @@ export function useOwnerProperties() {
       if (!active) {
         const now = new Date();
         const upcomingBookings = Array.from(bookingStore.bookingsByProperty(id).values()).filter((booking: Booking) => {
-          const checkinDate = new Date(booking.checkin_date);
+          const checkinDate = new Date(booking.guest_arrival_date);
           return checkinDate > now && ['pending', 'scheduled'].includes(booking.status);
         });
         

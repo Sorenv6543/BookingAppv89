@@ -159,8 +159,8 @@ const usersMap = {
 
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
   const bookingData: Partial<BookingFormData> = {
-    checkout_date: selectInfo.startStr,
-    checkin_date: selectInfo.endStr,
+            guest_departure_date: selectInfo.startStr,
+        guest_arrival_date: selectInfo.endStr,
   };
   
   uiStore.openModal('eventModal', 'create', bookingData);
@@ -198,8 +198,8 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     await nextTick();
     
     await updateBooking(booking.id, {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr,
+              guest_departure_date: dropInfo.event.startStr,
+        guest_arrival_date: dropInfo.event.endStr || dropInfo.event.startStr,
     });
     
     // Additional nextTick to ensure DOM updates complete
@@ -226,8 +226,8 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
     await nextTick();
     
     await updateBooking(booking.id, {
-      checkout_date: resizeInfo.event.startStr,
-      checkin_date: resizeInfo.event.endStr,
+              guest_departure_date: resizeInfo.event.startStr,
+        guest_arrival_date: resizeInfo.event.endStr,
     });
     
     // Additional nextTick to ensure DOM updates complete

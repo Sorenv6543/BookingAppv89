@@ -120,14 +120,14 @@
                 sm="6"
               >
                 <v-text-field
-                  v-model="form.checkin_date"
+                  v-model="form.guest_arrival_date"
                   label="Checkin Date"
                   type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('checkin_date')"
+                  :error-messages="errors.get('guest_arrival_date')"
                   hint="When new guests arrive"
                   persistent-hint
                   prepend-inner-icon="mdi-calendar-import"
@@ -140,14 +140,14 @@
                 sm="6"
               >
                 <v-text-field
-                  v-model="form.checkout_date"
+                  v-model="form.guest_departure_date"
                   label="Checkout Date"
                   type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('checkout_date')"
+                  :error-messages="errors.get('guest_departure_date')"
                   hint="When guests depart"
                   persistent-hint
                   prepend-inner-icon="mdi-calendar-export"
@@ -222,7 +222,7 @@
                         <v-btn
                           variant="outlined"
                           color="primary"
-                          :disabled="!form.property_id || !form.checkout_date"
+                          :disabled="!form.property_id || !form.guest_departure_date"
                           @click="openCleanerAssignmentModal"
                         >
                           <v-icon start>
@@ -470,8 +470,8 @@ const formValid = ref(false)
 const defaultForm: BookingFormData = {
   owner_id: '', // Required field for admin forms
   property_id: '',
-  checkout_date: '',
-  checkin_date: '',
+        guest_departure_date: '',
+      guest_arrival_date: '',
   booking_type: 'standard',
   guest_count: undefined,
   notes: '',
@@ -541,16 +541,16 @@ const priorityOptions = [
 
 // Commented out unused computed - was causing TS warning
 // const showSameDayAlert = computed(() => {
-//   if (!form.value.checkout_date || !form.value.checkin_date) return false
-//   const checkoutDate = new Date(form.value.checkout_date).toDateString()
-//   const checkinDate = new Date(form.value.checkin_date).toDateString()
-//   return checkoutDate === checkinDate
-// })
-
-const showDateError = computed(() => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return false
-  return new Date(form.value.checkin_date as string) < new Date(form.value.checkout_date as string)
-})
+  //   if (!form.value.guest_departure_date || !form.value.guest_arrival_date) return false
+  //   const checkoutDate = new Date(form.value.guest_departure_date).toDateString()
+  //   const checkinDate = new Date(form.value.guest_arrival_date).toDateString()
+  //   return checkoutDate === checkinDate
+  // })
+  
+  const showDateError = computed(() => {
+    if (!form.value.guest_departure_date || !form.value.guest_arrival_date) return false
+    return new Date(form.value.guest_arrival_date as string) < new Date(form.value.guest_departure_date as string)
+  })
 
 const showBusinessImpactAlert = computed(() => {
   return businessImpactAlert.value.messages.length > 0
@@ -617,11 +617,11 @@ const dateRules = [
 
 // Methods
 const updateBookingType = () => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return
+  if (!form.value.guest_departure_date || !form.value.guest_arrival_date) return
   
   console.log('🔄 [AdminBookingForm] updateBookingType called')
-  console.log('🔄 [AdminBookingForm] checkout_date:', form.value.checkout_date)
-  console.log('🔄 [AdminBookingForm] checkin_date:', form.value.checkin_date)
+  console.log('🔄 [AdminBookingForm] guest_departure_date:', form.value.guest_departure_date)
+  console.log('🔄 [AdminBookingForm] guest_arrival_date:', form.value.guest_arrival_date)
   
   // Parse dates as local dates to avoid timezone issues
   const parseDateString = (dateStr: string) => {
@@ -630,8 +630,8 @@ const updateBookingType = () => {
     return new Date(year, month - 1, day).toDateString()
   }
   
-  const checkoutDate = parseDateString(form.value.checkout_date as string)
-  const checkinDate = parseDateString(form.value.checkin_date as string)
+      const checkoutDate = parseDateString(form.value.guest_departure_date as string)
+    const checkinDate = parseDateString(form.value.guest_arrival_date as string)
   
   console.log('🔄 [AdminBookingForm] parsed checkoutDate:', checkoutDate)
   console.log('🔄 [AdminBookingForm] parsed checkinDate:', checkinDate)
@@ -740,9 +740,9 @@ const handleSubmit = async () => {
     assigned_cleaner_id: form.value.assigned_cleaner_id || null,
     owner_id: form.value.owner_id || null,
     property_id: form.value.property_id || null,
-    // Swap dates back to database order: checkout_date (guests leave) should be earlier than checkin_date (new guests arrive)
-    checkout_date: form.value.checkin_date, // Earlier date (guests check out)
-    checkin_date: form.value.checkout_date  // Later date (new guests check in)
+          // Swap dates back to database order: guest_departure_date (guests leave) should be earlier than guest_arrival_date (new guests arrive)
+      guest_departure_date: form.value.guest_arrival_date, // Earlier date (guests check out)
+      guest_arrival_date: form.value.guest_departure_date  // Later date (new guests check in)
   }
   
   console.log('🚀 [AdminBookingForm] Submitting cleaned form data:', cleanFormData)
@@ -792,8 +792,8 @@ watch(() => props.booking, (newBooking) => {
       owner_id: newBooking.owner_id,
       property_id: newBooking.property_id,
       // Swap dates to match logical flow: checkin first (earlier), checkout later (later)
-      checkin_date: formatDateForInput(safeString(newBooking.guest_departure_date)), // Earlier date
-      checkout_date: formatDateForInput(safeString(newBooking.guest_arrival_date)), // Later date
+      guest_arrival_date: formatDateForInput(safeString(newBooking.guest_departure_date)), // Earlier date
+      guest_departure_date: formatDateForInput(safeString(newBooking.guest_arrival_date)), // Later date
       booking_type: newBooking.booking_type,
       guest_count: newBooking.guest_count,
       notes: newBooking.notes || '',

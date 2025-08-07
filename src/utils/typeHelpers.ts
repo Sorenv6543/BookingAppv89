@@ -59,7 +59,7 @@ export function safeBookingField(booking: any, field: keyof Booking): string {
  * @returns Valid Date object
  */
 export function safeDepartureDate(booking: any): Date {
-  const dateValue = booking?.guest_departure_date || booking?.checkout_date;
+  const dateValue = booking?.guest_departure_date;
   return safeDate(dateValue);
 }
 
@@ -69,7 +69,7 @@ export function safeDepartureDate(booking: any): Date {
  * @returns Valid Date object
  */
 export function safeArrivalDate(booking: any): Date {
-  const dateValue = booking?.guest_arrival_date || booking?.checkin_date;
+  const dateValue = booking?.guest_arrival_date;
   return safeDate(dateValue);
 }
 
@@ -92,6 +92,6 @@ export function isValidDateString(value: unknown): value is string {
 export function isBookingLike(obj: any): obj is Partial<Booking> {
   return obj && 
          typeof obj === 'object' && 
-         (obj.guest_departure_date || obj.checkout_date) &&
-         (obj.guest_arrival_date || obj.checkin_date);
+         obj.guest_departure_date &&
+         obj.guest_arrival_date;
 }

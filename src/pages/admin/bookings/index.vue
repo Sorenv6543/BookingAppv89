@@ -212,9 +212,9 @@
 
             <template #[`item.dates`]="{ item }">
               <div class="text-body-2">
-                <div>{{ formatDate(item.checkout_date) }}</div>
+                <div>{{ formatDate(item.guest_departure_date) }}</div>
                 <div class="text-caption text-medium-emphasis">
-                  → {{ formatDate(item.checkin_date) }}
+                                      → {{ formatDate(item.guest_arrival_date) }}
                 </div>
               </div>
             </template>
@@ -342,14 +342,14 @@
                     >
                       mdi-calendar
                     </v-icon>
-                    {{ formatDate(booking.checkout_date) }}
+                    {{ formatDate(booking.guest_departure_date) }}
                     <v-icon
                       size="16"
                       class="ml-3 mr-1"
                     >
                       mdi-arrow-right
                     </v-icon>
-                    {{ formatDate(booking.checkin_date) }}
+                    {{ formatDate(booking.guest_arrival_date) }}
                   </div>
                   
                   <div class="d-flex align-center gap-4 mb-2">
@@ -641,16 +641,16 @@ const filteredBookings = computed(() => {
 
   // Date range filter
   if (dateFrom.value) {
-    bookings = bookings.filter(booking => booking.checkout_date >= dateFrom.value)
+            bookings = bookings.filter(booking => booking.guest_departure_date >= dateFrom.value)
   }
   if (dateTo.value) {
-    bookings = bookings.filter(booking => booking.checkout_date <= dateTo.value)
+          bookings = bookings.filter(booking => booking.guest_departure_date <= dateTo.value)
   }
 
   // Sort by date (most recent first)
   return bookings.sort((a, b) => {
-    const dateA = new Date(a.checkout_date)
-    const dateB = new Date(b.checkout_date)
+          const dateA = new Date(a.guest_departure_date)
+      const dateB = new Date(b.guest_departure_date)
     return dateB.getTime() - dateA.getTime()
   })
 })

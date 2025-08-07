@@ -68,7 +68,7 @@ const activeCleaningsToday = computed(() => {
   const today = new Date().toISOString().split('T')[0];
   return Array.from(bookingStore.bookings.values())
     .filter(booking => 
-      booking.checkout_date.startsWith(today) && 
+      booking.guest_departure_date.startsWith(today) && 
       booking.status === 'in_progress'
     ).length;
 });
@@ -77,7 +77,7 @@ const urgentTurnsCount = computed(() => {
   const today = new Date().toISOString().split('T')[0];
   return Array.from(bookingStore.bookings.values())
     .filter(booking => 
-      booking.checkout_date.startsWith(today) && 
+      booking.guest_departure_date.startsWith(today) && 
       booking.booking_type === 'turn' && 
       booking.status !== 'completed'
     ).length;

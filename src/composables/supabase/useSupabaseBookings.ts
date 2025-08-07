@@ -45,7 +45,7 @@ export function useSupabaseBookings() {
             owner_id
           )
         `)
-        .order('checkout_date', { ascending: true });
+        .order('guest_departure_date', { ascending: true });
       
       if (fetchError) throw fetchError;
       
@@ -255,7 +255,7 @@ export function useSupabaseBookings() {
     
     return bookings.value.filter(booking => 
       booking.booking_type === 'turn' &&
-      booking.checkout_date.startsWith(today) &&
+      booking.guest_departure_date.startsWith(today) &&
       booking.status !== 'completed'
     );
   });
@@ -270,12 +270,12 @@ export function useSupabaseBookings() {
     
     return bookings.value
       .filter(booking => {
-        const checkoutDate = new Date(booking.checkout_date);
+        const checkoutDate = new Date(booking.guest_departure_date);
         return checkoutDate >= now && 
                checkoutDate <= nextWeek &&
                booking.status !== 'completed';
       })
-      .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime());
+              .sort((a, b) => new Date(a.guest_departure_date).getTime() - new Date(b.guest_departure_date).getTime());
   });
   
   /**

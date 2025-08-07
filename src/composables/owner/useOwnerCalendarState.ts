@@ -58,7 +58,7 @@ export function useOwnerCalendarState() {
       ...booking,
       alertMessage: `Urgent: Turn cleaning needed for ${getPropertyName(booking.property_id)}`,
       priority: 'urgent' as const,
-      timeUntilCheckout: getTimeUntilCheckout(booking.checkout_date)
+      timeUntilCheckout: getTimeUntilCheckout(booking.guest_departure_date)
     }));
   });
   
@@ -188,7 +188,7 @@ export function useOwnerCalendarState() {
       actionText: 'View Details',
       canAssignCleaner: false, // Owners can't assign cleaners
       showPropertyName: true,
-      urgencyLevel: calculateUrgencyLevel(alert.checkout_date)
+      urgencyLevel: calculateUrgencyLevel(alert.guest_departure_date)
     }));
   }
   

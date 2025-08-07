@@ -97,7 +97,24 @@ export function useCalendarState() {
    * Update date range based on current view and date
    */
   function updateDateRange() {
-    const date = new Date(currentDate.value);
+    // Debug: Check what currentDate.value contains
+    console.log('🔍 [useCalendarState] updateDateRange - currentDate.value:', {
+      value: currentDate.value,
+      type: typeof currentDate.value,
+      isDate: currentDate.value instanceof Date,
+      isValid: currentDate.value instanceof Date ? !isNaN(currentDate.value.getTime()) : false
+    });
+
+    // Ensure currentDate.value is a valid Date object
+    let date: Date;
+    if (currentDate.value instanceof Date && !isNaN(currentDate.value.getTime())) {
+      date = new Date(currentDate.value);
+    } else {
+      console.warn('⚠️ [useCalendarState] currentDate.value is invalid, using current date');
+      date = new Date();
+      currentDate.value = date;
+    }
+
     let start: Date;
     let end: Date;
     
@@ -125,6 +142,14 @@ export function useCalendarState() {
     // Set time to beginning/end of day
     start.setHours(0, 0, 0, 0);
     end.setHours(23, 59, 59, 999);
+    
+    // Debug: Verify the dates are valid before setting
+    console.log('🔍 [useCalendarState] updateDateRange - calculated dates:', {
+      start: start.toISOString(),
+      end: end.toISOString(),
+      startValid: !isNaN(start.getTime()),
+      endValid: !isNaN(end.getTime())
+    });
     
     dateRange.value = { start, end };
     
@@ -204,7 +229,38 @@ export function useCalendarState() {
    * Filter bookings based on current filters
    */
   function filterBookings(bookings: Booking[]): Booking[] {
-    return bookings.filter(booking => {
+    try {
+      // Debug: Log the current date range and filter settings
+    console.log('🔍 [useCalendarState] Debug - Filter settings:', {
+      dateRange: {
+        start: dateRange.value.start instanceof Date && !isNaN(dateRange.value.start.getTime()) 
+          ? dateRange.value.start.toISOString() 
+          : 'INVALID_DATE',
+        end: dateRange.value.end instanceof Date && !isNaN(dateRange.value.end.getTime()) 
+          ? dateRange.value.end.toISOString() 
+          : 'INVALID_DATE'
+      },
+      showPending: showPendingBookings.value,
+      showScheduled: showScheduledBookings.value,
+      showInProgress: showInProgressBookings.value,
+      showCompleted: showCompletedBookings.value,
+      showCancelled: showCancelledBookings.value,
+      showTurn: showTurnBookings.value,
+      showStandard: showStandardBookings.value,
+      selectedProperties: selectedPropertyIds.value.size
+    });
+    
+    console.log('🔍 [useCalendarState] Processing bookings:', bookings.map(b => ({
+      id: b.id,
+      guest_departure_date: b.guest_departure_date,
+      guest_arrival_date: b.guest_arrival_date,
+      departure_date_valid: b.guest_departure_date ? !isNaN(new Date(b.guest_departure_date).getTime()) : false,
+      arrival_date_valid: b.guest_arrival_date ? !isNaN(new Date(b.guest_arrival_date).getTime()) : false,
+      status: b.status,
+      booking_type: b.booking_type
+    })));
+    
+    const filtered = bookings.filter(booking => {
       // Filter by status
       if (
         (booking.status === 'pending' && !showPendingBookings.value) ||
@@ -213,6 +269,7 @@ export function useCalendarState() {
         (booking.status === 'completed' && !showCompletedBookings.value) ||
         (booking.status === 'cancelled' && !showCancelledBookings.value)
       ) {
+        console.log(`🔍 [useCalendarState] Filtered out booking ${booking.id} by status: ${booking.status}`);
         return false;
       }
       
@@ -221,24 +278,96 @@ export function useCalendarState() {
         (booking.booking_type === 'turn' && !showTurnBookings.value) ||
         (booking.booking_type === 'standard' && !showStandardBookings.value)
       ) {
+        console.log(`🔍 [useCalendarState] Filtered out booking ${booking.id} by type: ${booking.booking_type}`);
         return false;
       }
       
+      // Debug: Log booking details to see what's happening
+      console.log(`🔍 [useCalendarState] Booking ${booking.id} passed all filters:`, {
+        status: booking.status,
+        booking_type: booking.booking_type,
+        showPending: showPendingBookings.value,
+        showScheduled: showScheduledBookings.value,
+        showInProgress: showInProgressBookings.value,
+        showCompleted: showCompletedBookings.value,
+        showCancelled: showCancelledBookings.value,
+        showTurn: showTurnBookings.value,
+        showStandard: showStandardBookings.value
+      });
+      
       // Filter by property
       if (selectedPropertyIds.value.size > 0 && !selectedPropertyIds.value.has(booking.property_id)) {
+        console.log(`🔍 [useCalendarState] Filtered out booking ${booking.id} by property: ${booking.property_id}`);
         return false;
       }
       
       // Check if booking is within current date range
-      const bookingStart = new Date(booking.checkout_date);
-      const bookingEnd = new Date(booking.checkin_date);
+      const bookingStart = new Date(booking.guest_departure_date);
+      const bookingEnd = new Date(booking.guest_arrival_date);
       
-      return (
+      // Debug: Check if the dates are valid
+      const bookingStartValid = !isNaN(bookingStart.getTime());
+      const bookingEndValid = !isNaN(bookingEnd.getTime());
+      
+      if (!bookingStartValid || !bookingEndValid) {
+        console.log(`🔍 [useCalendarState] Booking ${booking.id} has invalid dates:`, {
+          guest_departure_date: booking.guest_departure_date,
+          guest_arrival_date: booking.guest_arrival_date,
+          bookingStartValid,
+          bookingEndValid
+        });
+        return false;
+      }
+      
+      const isInRange = (
         (bookingStart >= dateRange.value.start && bookingStart <= dateRange.value.end) ||
         (bookingEnd >= dateRange.value.start && bookingEnd <= dateRange.value.end) ||
         (bookingStart <= dateRange.value.start && bookingEnd >= dateRange.value.end)
       );
+      
+      console.log(`🔍 [useCalendarState] Booking ${booking.id} date check:`, {
+        bookingStart: bookingStart.toISOString(),
+        bookingEnd: bookingEnd.toISOString(),
+        rangeStart: dateRange.value.start.toISOString(),
+        rangeEnd: dateRange.value.end.toISOString(),
+        isInRange: isInRange,
+        bookingStartValid,
+        bookingEndValid
+      });
+      
+      if (!isInRange) {
+        console.log(`🔍 [useCalendarState] Booking ${booking.id} filtered out by date range`);
+      }
+      
+      return isInRange;
     });
+    
+    console.log(`🔍 [useCalendarState] Filtered ${bookings.length} bookings down to ${filtered.length}`);
+    console.log('🔍 [useCalendarState] Filtered bookings:', filtered.map(b => ({ id: b.id, status: b.status, booking_type: b.booking_type })));
+    
+    // Debug: Show the actual date range values
+    console.log('🔍 [useCalendarState] Actual date range values:', {
+      start: dateRange.value.start.toISOString(),
+      end: dateRange.value.end.toISOString(),
+      startDate: dateRange.value.start.toDateString(),
+      endDate: dateRange.value.end.toDateString()
+    });
+    
+    // Debug: Show what happened to each booking
+    bookings.forEach(booking => {
+      console.log(`🔍 [useCalendarState] Booking ${booking.id} final result:`, {
+        id: booking.id,
+        status: booking.status,
+        booking_type: booking.booking_type,
+        isInFiltered: filtered.some(b => b.id === booking.id)
+      });
+    });
+    
+    return filtered;
+    } catch (error) {
+      console.error('❌ [useCalendarState] Error in filterBookings:', error);
+      return [];
+    }
   }
   
   /**
@@ -299,8 +428,8 @@ export function useCalendarState() {
       return {
         id: booking.id,
         title: isPriority ? '🔥 TURN BOOKING' : 'Standard Cleaning',
-        start: booking.checkout_date,
-        end: booking.checkin_date,
+              start: booking.guest_departure_date,
+      end: booking.guest_arrival_date,
         backgroundColor: statusColors[booking.status],
         borderColor: statusColors[booking.status],
         textColor: '#FFFFFF',
@@ -338,6 +467,7 @@ export function useCalendarState() {
     goToToday,
     next,
     prev,
+    updateDateRange,
     
     // Filtering
     toggleStatusFilter,

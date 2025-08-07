@@ -226,8 +226,8 @@ const router = createRouter({
         layout: 'admin',
         role: 'admin',
         requiresAuth: true,
-        development: true
-      }
+        development: true 
+            }
     },
     {
       path: '/dev/admin/use-admin-properties-demo',

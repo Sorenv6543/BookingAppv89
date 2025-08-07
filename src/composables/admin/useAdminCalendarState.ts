@@ -64,13 +64,13 @@ export function useAdminCalendarState() {
           return false;
         }
         
-        const checkoutTime = new Date(booking.checkout_date);
+        const checkoutTime = new Date(booking.guest_departure_date);
         return checkoutTime <= sixHoursFromNow;
       })
-      .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime())
+      .sort((a, b) => new Date(a.guest_departure_date).getTime() - new Date(b.guest_departure_date).getTime())
       .map(booking => {
         const property = propertyStore.properties.get(booking.property_id);
-        const hoursUntil = Math.max(0, Math.floor((new Date(booking.checkout_date).getTime() - now.getTime()) / (1000 * 60 * 60)));
+        const hoursUntil = Math.max(0, Math.floor((new Date(booking.guest_departure_date).getTime() - now.getTime()) / (1000 * 60 * 60)));
         
         return {
           ...booking,
@@ -259,7 +259,7 @@ export function useAdminCalendarState() {
       
       // Overdue filter
       if (criteria.overdueOnly) {
-        const checkoutTime = new Date(booking.checkout_date);
+        const checkoutTime = new Date(booking.guest_departure_date);
         if (checkoutTime > new Date()) return false;
       }
       
@@ -270,7 +270,7 @@ export function useAdminCalendarState() {
       
       // Date range filter
       if (criteria.dateRange) {
-        const bookingDate = new Date(booking.checkout_date);
+        const bookingDate = new Date(booking.guest_departure_date);
         const startDate = new Date(criteria.dateRange.start);
         const endDate = new Date(criteria.dateRange.end);
         if (bookingDate < startDate || bookingDate > endDate) return false;

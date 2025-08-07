@@ -300,7 +300,8 @@ const {
   setCalendarView,
   goToDate,
   next,
-  prev
+  prev,
+  updateDateRange
 } = useCalendarState();
 
 // ============================================================================
@@ -412,21 +413,27 @@ const ownerFilteredBookings = computed(() => {
   try {
     let bookings = Array.from(ownerBookingsMap.value.values());
     
+    console.log('🔍 [HomeOwner] ownerFilteredBookings - Input bookings:', bookings.length);
+    
     // Apply property filter if selected (within owner's properties)
     if (selectedPropertyFilter.value) {
       bookings = bookings.filter(booking => 
         booking.property_id === selectedPropertyFilter.value &&
         ownerPropertiesMap.value.has(booking.property_id)
       );
+      console.log('🔍 [HomeOwner] ownerFilteredBookings - After property filter:', bookings.length);
     }
     
     // Apply calendar state filters
-    bookings = filterBookings(bookings);
+    const filteredBookings = filterBookings(bookings);
+    console.log('🔍 [HomeOwner] ownerFilteredBookings - After calendar filter:', filteredBookings.length);
     
     // Convert to Map for components that expect Map format
-    bookings.forEach(booking => {
+    filteredBookings.forEach(booking => {
       map.set(booking.id, booking);
     });
+    
+    console.log('🔍 [HomeOwner] ownerFilteredBookings - Final map size:', map.size);
   } catch (error) {
     console.error('❌ [HomeOwner] Error filtering bookings:', error);
   }
@@ -765,8 +772,8 @@ const handleUpdateBooking = (data: { id: string; start: string; end: string }): 
   }
   
   updateMyBooking(data.id, {
-    checkout_date: data.start,
-    checkin_date: data.end,
+            guest_departure_date: data.start,
+        guest_arrival_date: data.end,
     owner_id: currentOwnerId.value,
   });
 };
@@ -981,10 +988,36 @@ onMounted(async () => {
           id: b.id,
           owner_id: b.owner_id,
           property_id: b.property_id,
-          checkout_date: b.checkout_date,
-          checkin_date: b.checkin_date
+                  guest_departure_date: b.guest_departure_date,
+        guest_arrival_date: b.guest_arrival_date
         })),
         currentUserId: currentOwnerId.value
+      });
+      
+      // Initialize calendar state to ensure proper date range filtering
+      updateDateRange();
+      console.log('✅ [HomeOwner] Calendar state initialized with date range');
+      
+      // Debug: Show the current date range and booking dates
+      console.log('🔍 [HomeOwner] Debug - Current date range:', {
+        currentDate: currentDate.value,
+        currentView: currentView.value
+      });
+      
+      // Debug: Show booking dates to understand filtering
+      const ownerBookings = Array.from(ownerBookingsMap.value.values());
+      console.log('🔍 [HomeOwner] Debug - Owner booking dates:', ownerBookings.map(b => ({
+        id: b.id,
+        guest_departure_date: b.guest_departure_date,
+        guest_arrival_date: b.guest_arrival_date,
+        status: b.status,
+        booking_type: b.booking_type
+      })));
+      
+      // Debug: Show the actual date range that should be used for filtering
+      console.log('🔍 [HomeOwner] Debug - Expected date range for August 2025:', {
+        start: new Date(2025, 7, 1).toISOString(), // August 1, 2025
+        end: new Date(2025, 7, 31).toISOString()   // August 31, 2025
       });
       
     } catch (error) {
@@ -1025,6 +1058,10 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
         bookingStore.fetchBookings()
       ]);
       console.log('✅ [HomeOwner] Data loaded after auth change');
+      
+      // Initialize calendar state after auth change
+      updateDateRange();
+      console.log('✅ [HomeOwner] Calendar state initialized after auth change');
     } catch (error) {
       console.error('❌ [HomeOwner] Failed to load data after auth change:', error);
     }

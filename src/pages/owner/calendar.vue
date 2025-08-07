@@ -189,7 +189,7 @@ const upcomingBookings = computed(() => {
   oneWeek.setDate(oneWeek.getDate() + 7);
   
   return ownerBookings.value.filter(booking => {
-    const checkoutDate = new Date(booking.checkout_date);
+          const checkoutDate = new Date(booking.guest_departure_date);
     return checkoutDate >= now && checkoutDate <= oneWeek;
   });
 });
@@ -228,8 +228,8 @@ const ownerPropertiesMap = computed(() => {
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
   // Open booking modal with pre-filled dates
   uiStore.openModal('eventModal', 'create', {
-    checkout_date: selectInfo.startStr,
-    checkin_date: selectInfo.endStr
+            guest_departure_date: selectInfo.startStr,
+        guest_arrival_date: selectInfo.endStr
   });
 };
 
@@ -251,8 +251,8 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     try {
       // Update booking dates
       await updateMyBooking(booking.id, {
-        checkout_date: dropInfo.event.startStr,
-        checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+        guest_departure_date: dropInfo.event.startStr,
+        guest_arrival_date: dropInfo.event.endStr || dropInfo.event.startStr
       });
       
       uiStore.showNotification('Booking updated successfully', 'success');
@@ -273,8 +273,8 @@ const handleUpdateBooking = async (data: { id: string; start: string; end: strin
   try {
     // Update booking with new dates
     await updateMyBooking(data.id, {
-      checkout_date: data.start,
-      checkin_date: data.end
+              guest_departure_date: data.start,
+        guest_arrival_date: data.end
     });
     
     uiStore.showNotification('Booking updated successfully', 'success');

@@ -162,7 +162,7 @@ export function useProperties() {
       if (!active) {
         const now = new Date();
         const upcomingBookings = Array.from(bookingStore.bookingsByProperty(id).values()).filter(booking => {
-          const checkinDate = new Date(booking.checkin_date);
+          const checkinDate = new Date(booking.guest_arrival_date);
           return checkinDate > now && ['pending', 'scheduled'].includes(booking.status);
         });
         
@@ -205,8 +205,8 @@ export function useProperties() {
     const bookedDays = new Set();
     
     propertyBookings.forEach(booking => {
-      const checkoutDate = new Date(booking.checkout_date);
-      const checkinDate = new Date(booking.checkin_date);
+      const checkoutDate = new Date(booking.guest_departure_date);
+      const checkinDate = new Date(booking.guest_arrival_date);
       
       // Count days between checkout and checkin
       let currentDate = new Date(checkoutDate);
@@ -228,13 +228,13 @@ export function useProperties() {
     
     // Sort bookings by checkout date
     const sortedBookings = [...propertyBookings].sort((a, b) => {
-      return new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime();
+      return new Date(a.guest_departure_date).getTime() - new Date(b.guest_departure_date).getTime();
     });
     
     // Calculate gaps between consecutive bookings
     for (let i = 0; i < sortedBookings.length - 1; i++) {
-      const currentCheckout = new Date(sortedBookings[i].checkin_date);
-      const nextCheckin = new Date(sortedBookings[i + 1].checkout_date);
+      const currentCheckout = new Date(sortedBookings[i].guest_arrival_date);
+      const nextCheckin = new Date(sortedBookings[i + 1].guest_departure_date);
       
       if (nextCheckin > currentCheckout) {
         const gapDays = Math.round((nextCheckin.getTime() - currentCheckout.getTime()) / (1000 * 60 * 60 * 24));

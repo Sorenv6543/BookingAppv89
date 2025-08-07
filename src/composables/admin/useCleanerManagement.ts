@@ -214,7 +214,7 @@ export function useCleanerManagement() {
       const todayBookings = Array.from(bookingStore.bookings.values())
         .filter(booking => 
           booking.assigned_cleaner_id === cleaner.id &&
-          booking.checkout_date.startsWith(today) &&
+          booking.guest_departure_date.startsWith(today) &&
           booking.status !== 'completed' &&
           booking.status !== 'cancelled'
         );
@@ -259,20 +259,20 @@ export function useCleanerManagement() {
       ).length;
       
       const todayBookings = allBookings.filter(booking => 
-        booking.checkout_date.startsWith(today) &&
+        booking.guest_departure_date.startsWith(today) &&
         booking.status !== 'completed' &&
         booking.status !== 'cancelled'
       ).length;
       
       const weekBookings = allBookings.filter(booking => {
-        const bookingDate = booking.checkout_date.split('T')[0];
+        const bookingDate = booking.guest_departure_date.split('T')[0];
         return bookingDate >= weekStartStr && 
                booking.status !== 'completed' &&
                booking.status !== 'cancelled';
       }).length;
       
       const upcomingBookings = allBookings.filter(booking => {
-        const bookingDate = new Date(booking.checkout_date);
+        const bookingDate = new Date(booking.guest_departure_date);
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         return bookingDate >= tomorrow && 
@@ -446,7 +446,7 @@ export function useCleanerManagement() {
         const todayBookings = Array.from(bookingStore.bookings.values())
           .filter(booking => 
             booking.assigned_cleaner_id === cleanerId &&
-            booking.checkout_date.startsWith(new Date().toISOString().split('T')[0]) &&
+            booking.guest_departure_date.startsWith(new Date().toISOString().split('T')[0]) &&
             booking.status !== 'completed' &&
             booking.status !== 'cancelled'
           ).length;
@@ -548,9 +548,9 @@ export function useCleanerManagement() {
       }
       
       // Check cleaner availability
-      const availability = await getCleanerAvailability(cleanerId, booking.checkout_date.split('T')[0]);
+      const availability = await getCleanerAvailability(cleanerId, booking.guest_departure_date.split('T')[0]);
       if (!availability.isAvailable) {
-        throw new Error(`Cleaner ${cleaner.name} is not available on ${booking.checkout_date.split('T')[0]} (${availability.currentBookings}/${availability.maxBookings} bookings)`);
+                  throw new Error(`Cleaner ${cleaner.name} is not available on ${booking.guest_departure_date.split('T')[0]} (${availability.currentBookings}/${availability.maxBookings} bookings)`);
       }
       
       // In a real app, this would make an API call to assign the cleaner
@@ -654,7 +654,7 @@ export function useCleanerManagement() {
     const dateBookings = Array.from(bookingStore.bookings.values())
       .filter(booking => 
         booking.assigned_cleaner_id === cleanerId &&
-        booking.checkout_date.startsWith(date) &&
+        booking.guest_departure_date.startsWith(date) &&
         booking.status !== 'completed' &&
         booking.status !== 'cancelled'
       );
@@ -694,10 +694,10 @@ export function useCleanerManagement() {
       .filter(booking => {
         if (booking.assigned_cleaner_id !== cleanerId) return false;
         
-        const bookingDate = booking.checkout_date.split('T')[0];
+        const bookingDate = booking.guest_departure_date.split('T')[0];
         return bookingDate >= startDate && bookingDate <= endDate;
       })
-      .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime());
+              .sort((a, b) => new Date(a.guest_departure_date).getTime() - new Date(b.guest_departure_date).getTime());
     
     return {
       cleanerId,
@@ -706,7 +706,7 @@ export function useCleanerManagement() {
       endDate,
       bookings: scheduleBookings,
       totalBookings: scheduleBookings.length,
-      workDays: [...new Set(scheduleBookings.map(b => b.checkout_date.split('T')[0]))].length
+              workDays: [...new Set(scheduleBookings.map(b => b.guest_departure_date.split('T')[0]))].length
     };
   }
   

@@ -53,14 +53,14 @@
                 sm="6"
               >
                 <v-text-field
-                  v-model="form.checkout_date"
+                  v-model="form.guest_departure_date"
                   label="Checkout Date"
                   type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('checkout_date')"
+                  :error-messages="errors.get('guest_departure_date')"
                   hint="When guests leave"
                   persistent-hint
                   prepend-inner-icon="mdi-calendar-export"
@@ -73,14 +73,14 @@
                 sm="6"
               >
                 <v-text-field
-                  v-model="form.checkin_date"
+                  v-model="form.guest_arrival_date"
                   label="Checkin Date"
                   type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('checkin_date')"
+                  :error-messages="errors.get('guest_arrival_date')"
                   hint="When new guests arrive"
                   persistent-hint
                   prepend-inner-icon="mdi-calendar-import"
@@ -226,8 +226,8 @@ const autoDetectType = ref(true)
 const form = ref<BookingFormData>({
   property_id: '',
   owner_id: '',
-  checkout_date: '',
-  checkin_date: '',
+  guest_departure_date: '',
+  guest_arrival_date: '',
   booking_type: 'standard',
   status: 'pending',
   guest_count: undefined,
@@ -257,15 +257,15 @@ const propertiesArray = computed(() => {
 })
 
 const showSameDayAlert = computed(() => {
-  return form.value.checkout_date && 
-         form.value.checkin_date && 
-         form.value.checkout_date === form.value.checkin_date
+  return form.value.guest_departure_date && 
+         form.value.guest_arrival_date && 
+         form.value.guest_departure_date === form.value.guest_arrival_date
 })
 
 const showDateError = computed(() => {
-  if (!form.value.checkout_date || !form.value.checkin_date) return false
-  const checkinDate = new Date(String(form.value.checkin_date || ''))
-  const checkoutDate = new Date(String(form.value.checkout_date || ''))
+  if (!form.value.guest_departure_date || !form.value.guest_arrival_date) return false
+  const checkinDate = new Date(String(form.value.guest_arrival_date || ''))
+  const checkoutDate = new Date(String(form.value.guest_departure_date || ''))
   if (isNaN(checkinDate.getTime()) || isNaN(checkoutDate.getTime())) return false
   return checkinDate < checkoutDate
 })
@@ -289,9 +289,9 @@ const dateRules = [
 const updateBookingType = () => {
   if (!autoDetectType.value) return
   
-  if (form.value.checkout_date && form.value.checkin_date) {
-    const checkoutDate = new Date(String(form.value.checkout_date || ''))
-    const checkinDate = new Date(String(form.value.checkin_date || ''))
+  if (form.value.guest_departure_date && form.value.guest_arrival_date) {
+    const checkoutDate = new Date(String(form.value.guest_departure_date || ''))
+    const checkinDate = new Date(String(form.value.guest_arrival_date || ''))
     
     // Check if dates are valid
     if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) return
@@ -309,8 +309,8 @@ const resetForm = () => {
   form.value = {
     property_id: '',
     owner_id: '',
-    checkout_date: '',
-    checkin_date: '',
+    guest_departure_date: '',
+    guest_arrival_date: '',
     booking_type: 'standard',
     status: 'pending',
     guest_count: undefined,
@@ -326,8 +326,8 @@ const populateForm = (booking: Booking) => {
   form.value = {
     property_id: booking.property_id,
     owner_id: booking.owner_id,
-    checkout_date: booking.checkout_date,
-    checkin_date: booking.checkin_date,
+            guest_departure_date: booking.guest_departure_date,
+        guest_arrival_date: booking.guest_arrival_date,
     booking_type: booking.booking_type,
     status: booking.status,
     guest_count: booking.guest_count,

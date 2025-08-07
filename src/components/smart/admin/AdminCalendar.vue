@@ -250,8 +250,8 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   
   try {
     await updateBooking(booking.id, {
-      checkout_date: dropInfo.event.startStr,
-      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+              guest_departure_date: dropInfo.event.startStr,
+        guest_arrival_date: dropInfo.event.endStr || dropInfo.event.startStr
     });
   } catch (error) {
     console.error('Failed to update booking:', error);
@@ -265,8 +265,8 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
   
   try {
     await updateBooking(booking.id, {
-      checkout_date: resizeInfo.event.startStr,
-      checkin_date: resizeInfo.event.endStr
+              guest_departure_date: resizeInfo.event.startStr,
+        guest_arrival_date: resizeInfo.event.endStr
     });
   } catch (error) {
     console.error('Failed to update booking:', error);

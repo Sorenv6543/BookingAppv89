@@ -536,8 +536,8 @@ export function useAdminBookings() {
       alerts: urgentTurns.map(turn => ({
         id: turn.id,
         property_id: turn.property_id,
-        checkout_date: turn.checkout_date,
-        checkin_date: turn.checkin_date,
+        guest_departure_date: turn.guest_departure_date,
+        guest_arrival_date: turn.guest_arrival_date,
         status: turn.status,
         assigned_cleaner_id: turn.assigned_cleaner_id,
         priority: baseBookings.calculateBookingPriority(turn),
