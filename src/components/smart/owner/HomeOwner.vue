@@ -1234,7 +1234,7 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   .calendar-main-container {
     /* Account for app bar + safe area top */
     height: calc(100vh - 56px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-    margin-top: calc(56px + env(safe-area-inset-top)) !important;
+    margin-top: calc(33px + env(safe-area-inset-top)) !important;
     /* Prevent content from being hidden behind navigation bars */
     padding-bottom: env(safe-area-inset-bottom);
   }

@@ -1061,6 +1061,99 @@ defineExpose({
   pointer-events: none !important;
 }
 
+/* Remove unnecessary padding and dead space */
+:deep(.fc-header-toolbar) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+:deep(.fc .fc-col-header-cell-cushion) {
+  padding: 2px 4px !important;
+  margin: 0 !important;
+}
+
+:deep(.fc-col-header) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+:deep(.fc-col-header-cell) {
+  padding: 2px !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+:deep(.fc-view) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+:deep(.fc-view-harness) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:deep(.fc-daygrid-header) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+:deep(.fc-daygrid-body) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:deep(.fc-scrollgrid) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+:deep(.fc-scrollgrid-section-header) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+:deep(.fc-scrollgrid-section-body) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Remove any container spacing */
+:deep(.fc) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure day cells have minimal padding */
+:deep(.fc-daygrid-day-frame) {
+  padding: 1px !important;
+  margin: 0 !important;
+}
+
+:deep(.fc-daygrid-day) {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Remove any table spacing */
+:deep(.fc table) {
+  border-spacing: 0 !important;
+  border-collapse: collapse !important;
+}
+
+:deep(.fc td),
+:deep(.fc th) {
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
 /* Mobile viewport specific fixes with proper height calculations */
 @media (max-width: 959px) {
   .calendar-container {

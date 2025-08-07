@@ -197,7 +197,7 @@ defineExpose({
 
 /* Urgent priority styling with owner branding */
 :deep(.fc-event.priority-urgent) {
-  animation: pulse-owner-urgent 2s infinite;
+  /* animation: pulse-owner-urgent 2s infinite; */
   border-color: #d32f2f !important;
 }
 
@@ -216,14 +216,14 @@ defineExpose({
 }
 
 :deep(.fc-col-header-cell) {
-  background: rgb(var(--v-theme-surface-variant));
+  background: rgb(var(--v-theme-primary));
 }
 
 /* ================================================================ */
 /* ANIMATIONS FOR OWNER CALENDAR */
 /* ================================================================ */
 
-@keyframes pulse-owner-urgent {
+/* @keyframes pulse-owner-urgent {
   0% { 
     box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.8);
     transform: scale(1);
@@ -236,7 +236,7 @@ defineExpose({
     box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
     transform: scale(1);
   }
-}
+} */
 
 /* ================================================================ */
 /* MOBILE OPTIMIZATIONS */
@@ -249,7 +249,7 @@ defineExpose({
   
   :deep(.fc-header-toolbar) {
     flex-direction: column;
-    gap: 0.5em;
+    gap: 0.0em;
   }
   
   :deep(.fc-toolbar-chunk) {
