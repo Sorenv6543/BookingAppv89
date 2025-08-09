@@ -46,7 +46,6 @@ import { useAdminBookings } from '@/composables/admin/useAdminBookings'
 ```
 🧪 TESTING - Supabase Versions:
 ├── src/pages/owner/properties/index.vue (TESTING)
-├── src/dev/demos/UseOwnerBookingsDemo.vue (TESTING)
 └── Select components for validation
 
 IMPORTS:

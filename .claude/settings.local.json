@@ -32,7 +32,15 @@
     "supabase",
     "context7",
     "desktop-commander",
-    "browser-tools",
+    "browser-tools-enhanced",
+    "puppeteer",
+    "playwright"
+  ],
+  "disabledMcpjsonServers": [
+    "sequential-thinking",
+    "supabase",
+    "context7",
+    "desktop-commander",
     "browser-tools-enhanced",
     "puppeteer",
     "playwright"

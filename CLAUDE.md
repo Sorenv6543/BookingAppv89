@@ -167,15 +167,13 @@ Key architectural patterns:
 ## Development Workflow
 
 ### Current Branch Strategy
-- **Current**: supabase-integration-point-v2
+- **Current**: main
 - **Main**: main
 - **Feature Branches**: feature/task-name
 
 ### Task Execution Pattern
 1. **Analyze Impact**: Check role-based implications
 2. **TypeScript First**: Ensure compilation success
-3. **Test Coverage**: Maintain 100% pass rate
-4. **Performance Check**: Verify optimizations maintained
 5. **Documentation**: Update relevant references
 
 ---
@@ -184,7 +182,6 @@ Key architectural patterns:
 
 ### Core Architecture
 - `src/router/guards.ts` - Route protection and role validation
-- `src/composables/supabase/useSupabaseAuth.ts` - Authentication logic
 - `src/stores/auth.ts` - Authentication state management
 - `src/types/` - TypeScript type definitions
 
@@ -203,11 +200,10 @@ Key architectural patterns:
 ## Immediate Development Context
 
 ### Active Tasks
-- **TASK-063**: TypeScript compilation cleanup (70% complete, CRITICAL)
-- **TASK-064**: Supabase property persistence (pending, HIGH)
+    - **TASK-064**: Supabase property persistence (pending, HIGH)
 
 ### Known Issues
-- 89 TypeScript errors in various components
+
 - 2 test failures related to date field access
 - Authentication dual implementation needs consolidation
 
@@ -230,11 +226,9 @@ VITE_SUPABASE_ANON_KEY=[anon_key]
 
 ### Deployment Targets
 - **Primary**: Vercel (recommended)
-- **Alternative**: Netlify, AWS S3 + CloudFront
 - **Requirements**: Static site hosting with SPA support
 
----
-
+--
 **Project Phase**: Production finalization  
 **Architecture**: 100% role-based implementation complete  
 **Critical Path**: TypeScript compilation → Supabase integration → Production deployment  
