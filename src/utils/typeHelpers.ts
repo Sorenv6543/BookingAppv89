@@ -96,3 +96,25 @@ export function isBookingLike(obj: unknown): obj is Partial<Booking> {
          'guest_departure_date' in obj &&
          'guest_arrival_date' in obj;
 }
+
+export const getBookingDate = (booking: Booking | null | undefined): Date | null => {
+  if (!booking) return null
+  const dateValue = booking?.guest_departure_date
+  return dateValue ? new Date(dateValue) : null
+}
+
+export const getBookingEndDate = (booking: Booking | null | undefined): Date | null => {
+  if (!booking) return null
+  const dateValue = booking?.guest_arrival_date
+  return dateValue ? new Date(dateValue) : null
+}
+
+export const isBooking = (obj: any): obj is Booking => {
+  return obj &&
+    typeof obj === 'object' &&
+    typeof obj.id === 'string' &&
+    typeof obj.property_id === 'string' &&
+    typeof obj.owner_id === 'string' &&
+    obj.guest_departure_date &&
+    obj.guest_arrival_date
+}

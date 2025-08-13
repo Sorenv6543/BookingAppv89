@@ -575,8 +575,8 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
   );
   
   const bookingData: Partial<BookingFormData> = {
-    guest_arrival_date: selectInfo.startStr,    // ✅ Guests arrive on start date
-    guest_departure_date: selectInfo.endStr,    // ✅ Guests leave on end date  
+              checkin_date: selectInfo.startStr,    // ✅ Guests arrive on start date
+          checkout_date: selectInfo.endStr,    // ✅ Guests leave on end date  
     owner_id: currentOwnerId.value
   };
   
@@ -632,8 +632,8 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     await nextTick();
     
     const result = await updateMyBooking(booking.id, {
-      guest_arrival_date: dropInfo.event.startStr,
-      guest_departure_date: dropInfo.event.endStr || dropInfo.event.startStr,
+      checkin_date: dropInfo.event.startStr,
+      checkout_date: dropInfo.event.endStr || dropInfo.event.startStr,
       owner_id: booking.owner_id,
     });
     
@@ -675,8 +675,8 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
     await nextTick();
     
     const result = await updateMyBooking(booking.id, {
-      guest_arrival_date: resizeInfo.event.startStr,
-      guest_departure_date: resizeInfo.event.endStr,
+      checkin_date: resizeInfo.event.startStr,
+      checkout_date: resizeInfo.event.endStr,
       owner_id: booking.owner_id,
     });
     
@@ -750,8 +750,8 @@ const handleUpdateBooking = (data: { id: string; start: string; end: string }): 
   }
   
   updateMyBooking(data.id, {
-            guest_departure_date: data.start,
-        guest_arrival_date: data.end,
+                      checkout_date: data.start,
+          checkin_date: data.end,
     owner_id: currentOwnerId.value,
   });
 };
@@ -767,8 +767,8 @@ const handleEventModalClose = (): void => {
 const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
   try {
     console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Raw form data:', {
-      guest_arrival_date: data.guest_arrival_date,
-      guest_departure_date: data.guest_departure_date,
+                checkin_date: data.checkin_date,
+          checkout_date: data.checkout_date,
       guest_arrival_time: data.guest_arrival_time,
       guest_departure_time: data.guest_departure_time,
       property_id: data.property_id,
@@ -966,8 +966,8 @@ onMounted(async () => {
           id: b.id,
           owner_id: b.owner_id,
           property_id: b.property_id,
-                  guest_departure_date: b.guest_departure_date,
-        guest_arrival_date: b.guest_arrival_date
+                  checkout_date: b.checkout_date,
+        checkin_date: b.checkin_date
         })),
         currentUserId: currentOwnerId.value
       });
@@ -986,8 +986,8 @@ onMounted(async () => {
       const ownerBookings = Array.from(ownerBookingsMap.value.values());
       console.log('🔍 [HomeOwner] Debug - Owner booking dates:', ownerBookings.map(b => ({
         id: b.id,
-        guest_departure_date: b.guest_departure_date,
-        guest_arrival_date: b.guest_arrival_date,
+        checkout_date: b.checkout_date,
+        checkin_date: b.checkin_date,
         status: b.status,
         booking_type: b.booking_type
       })));

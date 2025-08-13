@@ -86,8 +86,8 @@ const calendarEvents = computed(() => {
     return {
       id: booking.id,
       title: `${property?.name || 'Unknown Property'} - ${isTurn ? 'TURN' : 'Standard'}`,
-      start: booking.guest_arrival_date,
-      end: addOneDay(booking.guest_departure_date), // Add one day to make end date inclusive
+      start: booking.checkout_date,
+      end: addOneDay(booking.checkin_date), // Add one day to make end date inclusive
       backgroundColor: eventColor,
       borderColor: borderColor,
       textColor: textColor,
@@ -231,7 +231,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   editable: true,
   droppable: true,
   eventDrop: handleEventDrop,
-  // eventResize: handleEventResize, // Temporarily disabled due to type conflicts
+  eventResize: handleEventResize, // Enable resize handler
   
   // Date/time settings
   locale: 'en',
@@ -337,28 +337,37 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
   );
   
   emit('eventDrop', dropInfo);
-  // Removed duplicate updateBooking emit to prevent infinite loops
+  emit('updateBooking', {
+    id: booking.id,
+    start: dropInfo.event.startStr,
+    end: dropInfo.event.endStr || dropInfo.event.startStr
+  });
 };
 
-// Temporarily disabled due to FullCalendar type conflicts
-// const handleEventResize = (resizeInfo: EventDropArg): void => {
-//   const booking = resizeInfo.event.extendedProps.booking as Booking;
-//   
-//   // Log emitting event to Home
-//   eventLogger.logEvent(
-//     'FullCalendar',
-//     'Home',
-//     'eventResize',
-//     { 
-//       id: booking.id, 
-//       start: resizeInfo.event.startStr, 
-//       end: resizeInfo.event.endStr || resizeInfo.event.startStr 
-//     },
-//     'emit'
-//   );
-//   
-//   emit('eventResize', resizeInfo);
-// };
+// Enable the event resize handler
+const handleEventResize = (resizeInfo: any): void => {
+  const booking = resizeInfo.event.extendedProps.booking as Booking;
+  
+  // Log emitting event to Home
+  eventLogger.logEvent(
+    'FullCalendar',
+    'Home',
+    'eventResize',
+    { 
+      id: booking.id, 
+      start: resizeInfo.event.startStr, 
+      end: resizeInfo.event.endStr || resizeInfo.event.startStr 
+    },
+    'emit'
+  );
+  
+  emit('eventResize', resizeInfo);
+  emit('updateBooking', {
+    id: booking.id,
+    start: resizeInfo.event.startStr,
+    end: resizeInfo.event.endStr || resizeInfo.event.startStr
+  });
+};
 
 const handleDateClick = (arg: DateClickArg): void => {
   console.log('🗓️ [FullCalendar] Day clicked:', arg.dateStr);
@@ -382,8 +391,8 @@ const handleDateClick = (arg: DateClickArg): void => {
   console.log('📅 [FullCalendar] Day bookings:', dayBookings.map(b => ({
     id: b.id,
     property_id: b.property_id,
-    arrival: b.guest_arrival_date,
-    departure: b.guest_departure_date
+    arrival: b.checkin_date,
+            checkout: b.checkout_date
   })));
 };
 
@@ -504,8 +513,8 @@ watch(() => props.bookings, (newBookings, oldBookings) => {
       id: b.id,
       property_id: b.property_id,
       owner_id: b.owner_id,
-        guest_arrival_date: b.guest_arrival_date,
-      guest_departure_date: b.guest_departure_date
+        checkin_date: b.checkin_date,
+      checkout_date: b.checkout_date
     }))
   });
   
@@ -570,8 +579,8 @@ const handleCompleteBooking = (booking: Booking): void => {
   
   emit('updateBooking', {
     id: booking.id,
-    start: booking.guest_arrival_date,
-    end: booking.guest_departure_date
+    start: booking.checkout_date,
+    end: booking.checkin_date
   });
   
   console.log('✅ [FullCalendar] Complete booking from day view:', booking.id);

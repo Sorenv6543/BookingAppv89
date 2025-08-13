@@ -32,8 +32,8 @@ export function useBookings() {
       }
       
       // Validate dates
-      const checkoutDate = new Date(formData.guest_departure_date as string);
-      const checkinDate = new Date(formData.guest_arrival_date as string);
+      const checkoutDate = new Date(formData.checkout_date as string);
+      const checkinDate = new Date(formData.checkin_date as string);
       
 
       
@@ -59,10 +59,10 @@ export function useBookings() {
         id: uuidv4(),
         property_id: formData.property_id as string,
         owner_id: formData.owner_id as string,
-        guest_departure_date: formData.guest_departure_date as string,
-        guest_arrival_date: formData.guest_arrival_date as string,
-        guest_arrival_time: formData.guest_arrival_time,
-        guest_departure_time: formData.guest_departure_time,
+        checkout_date: formData.checkout_date as string,
+        checkin_date: formData.checkin_date as string,
+        checkin_time: formData.checkin_time,
+        checkout_time: formData.checkout_time,
         time_until_next_guest_arrival: 0, // Default to 0, will be calculated
         booking_type: bookingType as BookingType,
         status: 'pending', // New bookings start as pending
@@ -115,19 +115,19 @@ export function useBookings() {
       
       // Validate dates if changed
       let shouldRecalculateType = false;
-      let checkoutDate = new Date(booking.guest_departure_date as string);
-      let checkinDate = new Date(booking.guest_arrival_date as string);
+      let checkoutDate = new Date(booking.checkout_date as string);
+              let checkinDate = new Date(booking.checkin_date as string);
       
-      if (updates.guest_departure_date) {
-        checkoutDate = new Date(updates.guest_departure_date as string);
+              if (updates.checkout_date) {
+          checkoutDate = new Date(updates.checkout_date as string);
         if (isNaN(checkoutDate.getTime())) {
           throw new Error('Invalid checkout date');
         }
         shouldRecalculateType = true;
       }
       
-      if (updates.guest_arrival_date) {
-        checkinDate = new Date(updates.guest_arrival_date as string);
+              if (updates.checkin_date) {
+          checkinDate = new Date(updates.checkin_date as string);
         if (isNaN(checkinDate.getTime())) {
           throw new Error('Invalid checkin date');
         }
@@ -273,8 +273,8 @@ export function useBookings() {
       return null;
     }
     
-    const checkoutDate = new Date(booking.guest_departure_date as string);
-    const checkinDate = new Date(booking.guest_arrival_date as string);
+    const checkoutDate = new Date(booking.checkout_date as string);
+    const checkinDate = new Date(booking.checkin_date as string);
     const cleaningDuration = property.cleaning_duration; // in minutes
     
     // For turn bookings (same-day checkout/checkin)
@@ -314,8 +314,8 @@ export function useBookings() {
 // CALCULATEBOOKINGPRIORITY
   function calculateBookingPriority(booking: Booking): 'low' | 'normal' | 'high' | 'urgent' {
     const now = new Date();
-    const checkinDate = new Date(booking.guest_arrival_date as string);
-    const checkoutDate = new Date(booking.guest_departure_date as string);
+    const checkinDate = new Date(booking.checkin_date as string);
+    const checkoutDate = new Date(booking.checkout_date as string);
     const daysDiff = Math.ceil((checkinDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     
     // Turn bookings are always higher priority

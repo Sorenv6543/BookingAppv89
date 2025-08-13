@@ -75,7 +75,7 @@ export function useAdminBookings() {
     
     return allBookings.value.filter(booking => 
       booking.booking_type === 'turn' &&
-      booking.guest_departure_date.startsWith(today) &&
+      booking.checkout_date.startsWith(today) &&
       booking.status !== 'completed'
     );
   });
@@ -200,9 +200,12 @@ export function useAdminBookings() {
         id: `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         property_id: bookingData.property_id || '',
         owner_id: bookingData.owner_id || '',
-        guest_departure_date: bookingData.guest_departure_date || new Date().toISOString(),
-        guest_arrival_date: bookingData.guest_arrival_date || new Date().toISOString(),
-        time_until_next_guest_arrival: 0, // Default to 0, will be calculated
+        checkout_date: bookingData.checkout_date || new Date().toISOString(),
+        checkin_date: bookingData.checkin_date || new Date().toISOString(),
+        checkout_time: bookingData.checkout_time || '11:00:00',
+        checkin_time: bookingData.checkin_time || '15:00:00',
+        guest_count: bookingData.guest_count || 0,
+        notes: bookingData.notes || '',
         status: bookingData.status || 'pending',
         booking_type: bookingData.booking_type || 'standard',
         assigned_cleaner_id: bookingData.assigned_cleaner_id || undefined,
@@ -228,31 +231,39 @@ export function useAdminBookings() {
       loading.value = true;
       error.value = null;
 
+      console.log('🚀 [useAdminBookings] Creating booking with data:', bookingData);
+
       // Convert BookingFormData to Booking by adding required id
       const bookingWithId: Booking = {
         id: crypto.randomUUID(),
         property_id: bookingData.property_id,
         owner_id: bookingData.owner_id,
-        guest_departure_date: bookingData.guest_departure_date,
-        guest_arrival_date: bookingData.guest_arrival_date,
-        time_until_next_guest_arrival: bookingData.time_until_next_guest_arrival,
+        checkout_date: bookingData.checkout_date,
+        checkin_date: bookingData.checkin_date,
+        checkout_time: bookingData.checkout_time,
+        checkin_time: bookingData.checkin_time,
+        guest_count: bookingData.guest_count,
+        notes: bookingData.notes,
         status: bookingData.status,
         booking_type: bookingData.booking_type,
+        priority: bookingData.priority || 'normal',
         assigned_cleaner_id: bookingData.assigned_cleaner_id,
-        special_instructions: bookingData.special_instructions,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
 
+      console.log('🚀 [useAdminBookings] Final booking object:', bookingWithId);
+
       await bookingStore.addBooking(bookingWithId);
-      trackCachePerformance('admin-create-booking', true); // Changed to boolean
+      trackCachePerformance('admin-create-booking', true);
       
       success.value = 'Booking created successfully';
-         } catch (err: unknown) {
-       const errorMsg = err as Error;
-       error.value = `Failed to create booking: ${errorMsg.message}`;
-       trackCachePerformance('admin-create-booking', false); // Changed to boolean
-     } finally {
+    } catch (err: unknown) {
+      const errorMsg = err as Error;
+      console.error('🚀 [useAdminBookings] Error creating booking:', errorMsg);
+      error.value = `Failed to create booking: ${errorMsg.message}`;
+      trackCachePerformance('admin-create-booking', false);
+    } finally {
       loading.value = false;
     }
   };
@@ -538,8 +549,8 @@ export function useAdminBookings() {
       alerts: urgentTurns.map(turn => ({
         id: turn.id,
         property_id: turn.property_id,
-        guest_departure_date: turn.guest_departure_date,
-        guest_arrival_date: turn.guest_arrival_date,
+        checkout_date: turn.checkout_date,
+        checkin_date: turn.checkin_date,
         status: turn.status,
         assigned_cleaner_id: turn.assigned_cleaner_id,
         priority: baseBookings.calculateBookingPriority(turn),
@@ -659,7 +670,7 @@ export function useAdminBookings() {
       
       // Date range filter
       if (criteria.dateRange) {
-        const bookingDate = new Date(booking.guest_departure_date);
+        const bookingDate = new Date(booking.checkout_date);
         const startDate = new Date(criteria.dateRange.start);
         const endDate = new Date(criteria.dateRange.end);
         if (bookingDate < startDate || bookingDate > endDate) return false;

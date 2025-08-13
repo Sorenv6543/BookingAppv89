@@ -81,7 +81,7 @@ function useOwnerBookingsPinia() {
       
       return myBookings.value.filter(booking => 
         booking.booking_type === 'turn' &&
-        (booking.guest_departure_date as string).startsWith(today) &&
+        (booking.checkout_date as string).startsWith(today) &&
         booking.status !== 'completed'
       );
     });
@@ -99,12 +99,12 @@ function useOwnerBookingsPinia() {
         
         const upcoming = myBookings.value
           .filter(booking => {
-            const checkoutDate = new Date(booking.guest_departure_date as string);
+            const checkoutDate = new Date(booking.checkout_date as string);
             return checkoutDate >= now && 
                    checkoutDate <= nextWeek &&
                    booking.status !== 'completed';
           })
-          .sort((a, b) => new Date(a.guest_departure_date as string).getTime() - new Date(b.guest_departure_date as string).getTime());
+          .sort((a, b) => new Date(a.checkout_date as string).getTime() - new Date(b.checkout_date as string).getTime());
         
         trackCachePerformance('owner-upcoming-cleanings', upcoming.length > 0);
         return upcoming;
@@ -151,7 +151,7 @@ function useOwnerBookingsPinia() {
      */
     const myTodayBookings = computed(() => {
       const today = new Date().toISOString().split('T')[0];
-      return myBookings.value.filter(booking => (booking.guest_departure_date as string).startsWith(today));
+      return myBookings.value.filter(booking => (booking.checkout_date as string).startsWith(today));
     });
     
     // OWNER-SPECIFIC CRUD OPERATIONS
@@ -382,13 +382,13 @@ function useOwnerBookingsPinia() {
             return false;
           }
           
-          const checkoutTime = new Date(booking.guest_departure_date as string);
+          const checkoutTime = new Date(booking.checkout_date as string);
           const hoursUntil = (checkoutTime.getTime() - now.getTime()) / (1000 * 60 * 60);
           
           // Show turns that are within 6 hours or overdue
           return hoursUntil <= 6;
         })
-        .sort((a, b) => new Date(a.guest_departure_date as string).getTime() - new Date(b.guest_departure_date as string).getTime());
+        .sort((a, b) => new Date(a.checkout_date as string).getTime() - new Date(b.checkout_date as string).getTime());
     }
     
     /**
@@ -452,11 +452,17 @@ function useOwnerBookingsPinia() {
         id: 'test-id-' + Math.random().toString(36).slice(2),
         property_id: formData.property_id || '',
         owner_id: currentUserId.value,
-        guest_departure_date: formData.guest_departure_date || '',
-        guest_arrival_date: formData.guest_arrival_date || '',
-        time_until_next_guest_arrival: 0, // Default to 0, will be calculated
+        guest_count: formData.guest_count || 0,
+        priority: formData.priority || 'normal',
+        notes: formData.notes || '',
         booking_type: formData.booking_type || 'standard',
         status: formData.status || 'pending',
+        checkout_date: formData.checkout_date || '',
+        checkin_date: formData.checkin_date || '',
+        checkout_time: formData.checkout_time || '11:00:00',
+        checkin_time: formData.checkin_time || '15:00:00',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
       // Optionally add to store if needed for test
       try {

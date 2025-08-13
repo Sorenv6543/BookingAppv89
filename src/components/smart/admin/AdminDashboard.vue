@@ -1007,7 +1007,7 @@ function getCalendarDays() {
   // Generate 42 days (6 weeks)
   for (let i = 0; i < 42; i++) {
     const dateStr = currentDate.toISOString().split('T')[0];
-    const dayBookings = allBookings.value.filter(b => b.guest_departure_date.startsWith(dateStr));
+    const dayBookings = allBookings.value.filter(b => b.checkout_date.startsWith(dateStr));
     const turns = dayBookings.filter(b => b.booking_type === 'turn');
     
     days.push({
@@ -1050,8 +1050,8 @@ function getWeeklyStats() {
 function getTodaySchedule() {
   const today = new Date().toISOString().split('T')[0];
   return allBookings.value
-    .filter(booking => booking.guest_departure_date.startsWith(today) && booking.status !== 'completed')
-    .sort((a, b) => new Date(a.guest_departure_date).getTime() - new Date(b.guest_departure_date).getTime());
+    .filter(booking => booking.checkout_date.startsWith(today) && booking.status !== 'completed')
+    .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime());
 }
 
 // Initialize

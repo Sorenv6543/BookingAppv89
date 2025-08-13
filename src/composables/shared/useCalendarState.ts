@@ -252,10 +252,10 @@ export function useCalendarState() {
     
     console.log('🔍 [useCalendarState] Processing bookings:', bookings.map(b => ({
       id: b.id,
-      guest_departure_date: b.guest_departure_date,
-      guest_arrival_date: b.guest_arrival_date,
-      departure_date_valid: b.guest_departure_date ? !isNaN(new Date(b.guest_departure_date).getTime()) : false,
-      arrival_date_valid: b.guest_arrival_date ? !isNaN(new Date(b.guest_arrival_date).getTime()) : false,
+              checkout_date: b.checkout_date,
+              checkin_date: b.checkin_date,
+              checkout_date_valid: b.checkout_date ? !isNaN(new Date(b.checkout_date).getTime()) : false,
+              checkin_date_valid: b.checkin_date ? !isNaN(new Date(b.checkin_date).getTime()) : false,
       status: b.status,
       booking_type: b.booking_type
     })));
@@ -311,8 +311,8 @@ export function useCalendarState() {
       
       if (!bookingStartValid || !bookingEndValid) {
         console.log(`🔍 [useCalendarState] Booking ${booking.id} has invalid dates:`, {
-          guest_departure_date: booking.guest_departure_date,
-          guest_arrival_date: booking.guest_arrival_date,
+          checkout_date: booking.checkout_date,
+          checkin_date: booking.checkin_date,
           bookingStartValid,
           bookingEndValid
         });
