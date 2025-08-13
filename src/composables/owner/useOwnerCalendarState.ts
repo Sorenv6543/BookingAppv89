@@ -120,7 +120,7 @@ export function useOwnerCalendarState() {
       
       ownerError.value = null;
       return events;
-    } catch (error) {
+    } catch {
       ownerError.value = 'Unable to load your calendar events. Please try again.';
       return [];
     }
@@ -146,7 +146,7 @@ export function useOwnerCalendarState() {
       uiStore.openModal('booking-form', 'create');
       ownerError.value = null;
       ownerSuccess.value = 'Select your property and booking details';
-    } catch (error) {
+    } catch {
       ownerError.value = 'Unable to create booking. Please try again.';
     }
   }
@@ -172,7 +172,7 @@ export function useOwnerCalendarState() {
       // Open booking form in edit mode
       uiStore.openModal('booking-form', 'edit');
       ownerError.value = null;
-    } catch (error) {
+    } catch {
       ownerError.value = 'Unable to edit booking. Please try again.';
     }
   }
@@ -213,7 +213,7 @@ export function useOwnerCalendarState() {
       baseCalendarState.togglePropertyFilter(propertyId);
       ownerError.value = null;
       ownerSuccess.value = `Filtered to show ${ownerProperty.name} bookings only`;
-    } catch (error) {
+    } catch {
       ownerError.value = 'Unable to apply property filter. Please try again.';
     }
   }
@@ -226,7 +226,7 @@ export function useOwnerCalendarState() {
       baseCalendarState.clearPropertyFilters();
       ownerError.value = null;
       ownerSuccess.value = 'Showing all your bookings';
-    } catch (error) {
+    } catch {
       ownerError.value = 'Unable to clear filters. Please try again.';
     }
   }

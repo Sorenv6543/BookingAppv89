@@ -33,7 +33,8 @@ export interface Booking {
   booking_type: BookingType;
   status: BookingStatus;
   guest_count?: number;
-  special_instructions?: string;
+  notes?: string; // General notes and instructions for the booking
+  special_instructions?: string; // Legacy field for backward compatibility
   priority?: 'low' | 'normal' | 'high' | 'urgent';
   assigned_cleaner_id?: string;
   upcharge_reason?: string;
@@ -42,7 +43,7 @@ export interface Booking {
   created_at?: string;
   updated_at?: string;
   // Add index signature to allow conversion to Record<string, unknown>
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

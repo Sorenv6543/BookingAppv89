@@ -176,7 +176,7 @@ function useOwnerBookingsPinia() {
         success.value = `Loaded ${myBookings.value.length} of your bookings`;
         loading.value = false;
         return true;
-      } catch (err) {
+      } catch {
         error.value = 'Unable to load your bookings. Please try again.';
         loading.value = false;
         return false;

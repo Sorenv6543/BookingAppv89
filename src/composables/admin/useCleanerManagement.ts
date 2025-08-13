@@ -364,7 +364,7 @@ export function useCleanerManagement() {
       success.value = `Loaded ${allCleaners.value.length} cleaners from system`;
       loading.value = false;
       return true;
-    } catch (err) {
+    } catch {
       error.value = 'Unable to load cleaner data. System impact: High - cleaner assignments may be affected.';
       loading.value = false;
       return false;

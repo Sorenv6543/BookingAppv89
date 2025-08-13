@@ -149,7 +149,7 @@ export function useOwnerProperties() {
       success.value = `Loaded ${myProperties.value.length} of your properties`;
       loading.value = false;
       return true;
-    } catch (err) {
+    } catch {
       error.value = 'Unable to load your properties. Please try again.';
       loading.value = false;
       return false;

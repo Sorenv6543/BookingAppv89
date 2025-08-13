@@ -32,29 +32,7 @@ Vue 3 + TypeScript property cleaning scheduler with role-based architecture (Own
 - **Testing**: Vitest + Playwright + Performance tests
 - **PWA**: Vite PWA plugin with battery optimization
 
-### Development Commands
-```bash
-# Development server (localhost:3000)
-npm run dev
 
-# Production build commands
-npm run build          # Full production build ✅ Working
-npm run build:fast     # Quick build without type checking
-npm run lint           # ESLint with auto-fix
-
-# Testing commands
-npm run test           # Unit tests (89/89 passing ✅)
-npm run test:e2e       # End-to-end tests
-npm run test:performance # Performance regression tests
-
-# Analysis commands
-npm run perf:analysis  # Bundle and performance metrics
-npm run analyze:bundle # Bundle size visualization
-```
-
----
-
-## Architecture Constraints
 
 ### Role-Based Component Architecture
 ```

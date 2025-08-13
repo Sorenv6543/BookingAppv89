@@ -134,6 +134,7 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  currentRoute: '',
   height: 64,
   primaryColor: 'primary',
   autoHide: true,

@@ -345,7 +345,7 @@ export function useAdminBookings() {
       success.value = `Loaded ${allBookings.value.length} bookings across all properties`;
       loading.value = false;
       return true;
-    } catch (_err) {
+    } catch {
       error.value = 'Unable to load system bookings. Please try again.';
       loading.value = false;
       return false;
@@ -451,7 +451,7 @@ export function useAdminBookings() {
           } else {
             results.failed.push(bookingId);
           }
-        } catch (_err) {
+        } catch {
           results.failed.push(bookingId);
         }
       }
@@ -467,7 +467,7 @@ export function useAdminBookings() {
       
       loading.value = false;
       return results;
-    } catch (_err) {
+    } catch {
       error.value = 'Bulk assignment operation failed. System error occurred.';
       loading.value = false;
       return { success: [], failed: bookingIds };
@@ -499,7 +499,7 @@ export function useAdminBookings() {
           } else {
             results.failed.push(bookingId);
           }
-        } catch (_err) {
+        } catch {
           results.failed.push(bookingId);
         }
       }
@@ -515,7 +515,7 @@ export function useAdminBookings() {
       
       loading.value = false;
       return results;
-    } catch (_err) {
+    } catch {
       error.value = 'Bulk status update operation failed. System error occurred.';
       loading.value = false;
       return { success: [], failed: bookingIds };

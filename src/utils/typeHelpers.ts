@@ -48,7 +48,7 @@ export function safeString(value: unknown, fallback: string = ''): string {
  * @param field - The field name to access
  * @returns Typed field value or fallback
  */
-export function safeBookingField(booking: any, field: keyof Booking): string {
+export function safeBookingField(booking: Record<string, unknown>, field: keyof Booking): string {
   const value = booking?.[field];
   return safeString(value);
 }
@@ -58,7 +58,7 @@ export function safeBookingField(booking: any, field: keyof Booking): string {
  * @param booking - The booking object
  * @returns Valid Date object
  */
-export function safeDepartureDate(booking: any): Date {
+export function safeDepartureDate(booking: Record<string, unknown>): Date {
   const dateValue = booking?.guest_departure_date;
   return safeDate(dateValue);
 }
@@ -68,7 +68,7 @@ export function safeDepartureDate(booking: any): Date {
  * @param booking - The booking object
  * @returns Valid Date object
  */
-export function safeArrivalDate(booking: any): Date {
+export function safeArrivalDate(booking: Record<string, unknown>): Date {
   const dateValue = booking?.guest_arrival_date;
   return safeDate(dateValue);
 }
@@ -89,9 +89,10 @@ export function isValidDateString(value: unknown): value is string {
  * @param obj - Object to check
  * @returns True if object has basic booking properties
  */
-export function isBookingLike(obj: any): obj is Partial<Booking> {
+export function isBookingLike(obj: unknown): obj is Partial<Booking> {
   return obj && 
          typeof obj === 'object' && 
-         obj.guest_departure_date &&
-         obj.guest_arrival_date;
+         obj !== null &&
+         'guest_departure_date' in obj &&
+         'guest_arrival_date' in obj;
 }

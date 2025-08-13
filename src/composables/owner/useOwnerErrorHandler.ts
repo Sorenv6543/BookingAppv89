@@ -21,7 +21,7 @@ export function useOwnerErrorHandler() {
    * Handle property-related errors for owners
    */
   async function handlePropertyError(
-    error: any,
+    error: Error | unknown,
     operation: 'create' | 'update' | 'delete' | 'fetch',
     propertyId?: string
   ): Promise<string> {
@@ -71,7 +71,7 @@ export function useOwnerErrorHandler() {
    * Handle booking-related errors for owners
    */
   async function handleBookingError(
-    error: any,
+    error: Error | unknown,
     operation: 'create' | 'update' | 'delete' | 'fetch',
     bookingId?: string
   ): Promise<string> {
@@ -125,7 +125,7 @@ export function useOwnerErrorHandler() {
    * Handle form validation errors for owners
    */
   async function handleFormError(
-    validationErrors: any[],
+    validationErrors: Record<string, unknown>[],
     formType: 'property' | 'booking' | 'profile'
   ): Promise<string> {
     const context: Partial<ErrorContext> = {
@@ -149,7 +149,7 @@ export function useOwnerErrorHandler() {
    * Handle authentication errors for owners
    */
   async function handleAuthError(
-    error: any,
+    error: Error | unknown,
     operation: 'login' | 'logout' | 'register' | 'reset_password'
   ): Promise<string> {
     const context: Partial<ErrorContext> = {
@@ -214,7 +214,7 @@ export function useOwnerErrorHandler() {
    * Handle calendar-related errors for owners
    */
   async function handleCalendarError(
-    error: any,
+    error: Error | unknown,
     operation: 'load' | 'navigate' | 'filter'
   ): Promise<string> {
     const context: Partial<ErrorContext> = {
@@ -246,7 +246,7 @@ export function useOwnerErrorHandler() {
    * Handle network errors with owner-friendly messages
    */
   async function handleNetworkError(
-    error: any,
+    error: Error | unknown,
     operation: string
   ): Promise<string> {
     const context: Partial<ErrorContext> = {

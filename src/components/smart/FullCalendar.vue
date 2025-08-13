@@ -26,6 +26,7 @@ import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg } from
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import type { DateClickArg } from '@fullcalendar/interaction';
 import { computed, ref, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue';
 import { useTheme } from 'vuetify';
 import type { Booking, Property } from '@/types';
@@ -221,7 +222,6 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   eventDisplay: mobileOptions.value.eventDisplay,
   eventOverlap: true,
   eventResizableFromStart: true,
-  eventResizableFromEnd: true,
   eventStartEditable: true,
   eventDurationEditable: true,
   
@@ -252,7 +252,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   // Event handlers
   select: handleDateSelect,
   eventClick: handleEventClick,
-  dayClick: handleDayClick,
+  dateClick: handleDateClick,
   
   // Loading state
   loading: handleLoading,
@@ -360,25 +360,22 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
 //   emit('eventResize', resizeInfo);
 // };
 
-const handleDayClick = (dayClickInfo: any): void => {
-  console.log('🗓️ [FullCalendar] Day clicked:', dayClickInfo.dateStr);
+const handleDateClick = (arg: DateClickArg): void => {
+  console.log('🗓️ [FullCalendar] Day clicked:', arg.dateStr);
   
-  // Set the selected date
-  selectedDate.value = dayClickInfo.date;
+  selectedDate.value = arg.date;
   
-  // Find bookings for this specific day
-  const clickedDate = dayClickInfo.dateStr;
+  const clickedDate = arg.dateStr;
+  const currentUserId = authStore.user?.id;
   const dayBookings = Array.from(props.bookings.values()).filter(booking => {
     const arrivalDate = booking.guest_arrival_date;
     const departureDate = booking.guest_departure_date;
-    
-    // Check if the clicked date falls within the booking period
-    return clickedDate >= arrivalDate && clickedDate < departureDate;
+    const dateMatches = clickedDate >= arrivalDate && clickedDate < departureDate;
+    const ownerMatches = !currentUserId || booking.owner_id === currentUserId;
+    return dateMatches && ownerMatches;
   });
   
   selectedDayBookings.value = dayBookings;
-  
-  // Show the bottom sheet
   dayViewVisible.value = true;
   
   console.log('📅 [FullCalendar] Day view opened with', dayBookings.length, 'bookings for date:', clickedDate);
@@ -732,18 +729,14 @@ const handleManualMoreLinkClick = (event: Event): void => {
   });
   
   // Filter bookings for this date (same logic as before)
-  const clickedDateStr = clickedDate.toDateString();
+  const clickedIso = clickedDate.toISOString().split('T')[0];
   const dayBookings: Booking[] = [];
   
   Array.from(props.bookings.values()).forEach(booking => {
-    const checkoutDate = new Date(booking.guest_departure_date);
-    const checkinDate = new Date(booking.guest_arrival_date);
-    
-    // Check if the clicked date falls within the booking period
-    const bookingStartsOnDate = checkoutDate.toDateString() === clickedDateStr;
-    const bookingSpansDate = clickedDate >= checkoutDate && clickedDate < checkinDate;
-    
-    const dateMatches = bookingStartsOnDate || bookingSpansDate;
+    // Compare using ISO-only date strings to avoid timezone drift
+    const arrival = booking.guest_arrival_date;   // inclusive start
+    const departure = booking.guest_departure_date; // exclusive end
+    const dateMatches = clickedIso >= arrival && clickedIso < departure;
     const ownerMatches = !currentUserId || booking.owner_id === currentUserId;
     
     if (dateMatches && ownerMatches) {

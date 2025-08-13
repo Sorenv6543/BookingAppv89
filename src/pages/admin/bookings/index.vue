@@ -214,7 +214,7 @@
               <div class="text-body-2">
                 <div>{{ formatDate(item.guest_departure_date) }}</div>
                 <div class="text-caption text-medium-emphasis">
-                                      → {{ formatDate(item.guest_arrival_date) }}
+                  → {{ formatDate(item.guest_arrival_date) }}
                 </div>
               </div>
             </template>

@@ -106,9 +106,9 @@ src/components/smart/owner/HomeOwner.vue -
             :current-date="currentDate"
             :properties="ownerPropertiesMap"
             @date-select="handleDateSelect"
-                  @event-click="handleEventClick"
-      @event-drop="handleEventDrop"
-      @event-resize="handleEventResize"
+            @event-click="handleEventClick"
+            @event-drop="handleEventDrop"
+            @event-resize="handleEventResize"
             @view-change="handleCalendarViewChange"
             @date-change="handleCalendarDateChange"
             @create-booking="handleCreateBookingFromCalendar"
@@ -232,10 +232,7 @@ src/components/smart/owner/HomeOwner.vue -
 </template>
 
 <script setup lang="ts">
-//import { useRealtimeSync } from '@/composables/supabase/useRealtimeSync';
 
-
-// Real-time sync will auto-initialize when user is authenticated
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { useDisplay } from 'vuetify';
 
@@ -247,18 +244,19 @@ import PropertyModal from '@/components/dumb/PropertyModal.vue';
 import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
 
 // State management
-import { useSupabaseProperties } from '@/composables/supabase/useSupabaseProperties';
+import { usePropertyStore } from '@/stores/property';
 import { useSupabaseBookings } from '@/composables/supabase/useSupabaseBookings';
 import { useUIStore } from '@/stores/ui';
 
 import { useAuthStore } from '@/stores/auth';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
-  // Business logic composables
 
+// Business logic composables
 import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
+
 // Types
-import type { Booking, Property, BookingFormData, PropertyFormData,  } from '@/types';
+import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Import event logger for component communication
@@ -269,9 +267,9 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 // STORE CONNECTIONS & STATE
 // ============================================================================
 
-//useRealtimeSync(); // Just call it for side effects
-const { properties, fetchProperties } = useSupabaseProperties();
-const { bookings, fetchBookings } = useSupabaseBookings();
+
+const propertyStore = usePropertyStore();
+const { bookings, fetchBookings, createBooking: createSupabaseBooking } = useSupabaseBookings();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
 const { xs, mobile } = useDisplay();
@@ -281,7 +279,6 @@ const { xs, mobile } = useDisplay();
 // ============================================================================
 const { 
   loading: bookingsLoading, 
-  createMyBooking, 
   updateMyBooking,
   deleteMyBooking
 } = useOwnerBookings();
@@ -361,14 +358,13 @@ const ownerPropertiesMap = computed(() => {
     return map;
   }
 
-  // Filter properties by owner_id
-  if (properties.value && Array.isArray(properties.value)) {
-    properties.value.forEach((property) => {
-      if (property.owner_id === currentOwnerId.value) {
-        map.set(property.id, property);
-      }
-    });
-  }
+  // Filter properties by owner_id using the store's Map
+  const allProperties = propertyStore.properties;
+  allProperties.forEach((property, id) => {
+    if (property.owner_id === currentOwnerId.value) {
+      map.set(id, property);
+    }
+  });
   
   return map;
 });
@@ -786,17 +782,17 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     };
     
     console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Final booking data:', {
-      guest_arrival_date: (bookingData as any).guest_arrival_date,
-      guest_departure_date: (bookingData as any).guest_departure_date,
-      guest_arrival_time: (bookingData as any).guest_arrival_time,
-      guest_departure_time: (bookingData as any).guest_departure_time,
-      property_id: (bookingData as any).property_id,
+      guest_arrival_date: bookingData.guest_arrival_date,
+      guest_departure_date: bookingData.guest_departure_date,
+      guest_arrival_time: bookingData.guest_arrival_time,
+      guest_departure_time: bookingData.guest_departure_time,
+      property_id: bookingData.property_id,
       owner_id: bookingData.owner_id,
-      booking_type: (bookingData as any).booking_type
+      booking_type: bookingData.booking_type
     });
     
     if (eventModalMode.value === 'create') {
-      await createMyBooking(bookingData as BookingFormData);
+      await createSupabaseBooking(bookingData as BookingFormData);
     } else if (eventModalData.value) {
       // eventModalData.value should be the booking directly
       const booking = eventModalData.value;
@@ -950,15 +946,15 @@ onMounted(async () => {
     try {
       // Fetch data using store methods directly for better performance
       await Promise.all([
-        fetchProperties(),
+        propertyStore.fetchProperties(), // Use propertyStore
         fetchBookings()
       ]);
       console.log('✅ [HomeOwner] Owner data loaded successfully');
       
       // Debug data after loading
       console.log('🔍 [HomeOwner] Data state after loading:', {
-        allProperties: properties.value.length,
-        allBookings: bookings.value.length,
+        allProperties: propertyStore.properties.size, // Use propertyStore
+        allBookings: bookings.value?.length || 0,
         ownerProperties: ownerPropertiesMap.value.size,
         ownerBookings: ownerBookingsMap.value.size,
         filteredBookings: ownerFilteredBookings.value.size
@@ -966,7 +962,7 @@ onMounted(async () => {
       
       // Debug booking data specifically
       console.log('🔍 [HomeOwner] Bookings data:', {
-        allBookings: bookings.value.map(b => ({
+        allBookings: (bookings.value || []).map(b => ({
           id: b.id,
           owner_id: b.owner_id,
           property_id: b.property_id,
@@ -1036,7 +1032,7 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
     console.log('✅ [HomeOwner] User became authenticated, loading data...');
     try {
       await Promise.all([
-        fetchProperties(),
+        propertyStore.fetchProperties(), // Use propertyStore
         fetchBookings()
       ]);
       console.log('✅ [HomeOwner] Data loaded after auth change');

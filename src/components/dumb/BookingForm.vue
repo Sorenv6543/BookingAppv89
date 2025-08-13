@@ -344,6 +344,7 @@ const submitButtonText = computed((): string => {
 });
 
 const propertiesArray = computed((): Property[] => {
+  // Use the store's activeProperties which should be filtered by owner via RLS
   return propertyStore.activeProperties;
 });
 
