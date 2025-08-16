@@ -55,14 +55,14 @@
                 md="6"
               >
                 <v-text-field
-                  v-model="form.guest_arrival_date"
+                  v-model="form.checkin_date"
                   label="Check-in Date"
                   type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('guest_arrival_date')"
+                  :error-messages="errors.get('checkin_date')"
                   hint="When guests arrive (start of stay)"
                   persistent-hint
                   prepend-inner-icon="mdi-calendar-plus"
@@ -75,14 +75,14 @@
                 md="6"
               >
                 <v-text-field
-                  v-model="form.guest_departure_date"
+                  v-model="form.checkout_date"
                   label="Check-out Date"
                   type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('guest_departure_date')"
+                  :error-messages="errors.get('checkout_date')"
                   hint="When guests leave (end of stay)"
                   persistent-hint
                   prepend-inner-icon="mdi-calendar-remove"
@@ -91,20 +91,22 @@
               </v-col>
             </v-row>
             
-            <!-- Times (Optional) -->
+            <!-- Times (Required) -->
             <v-row>
               <v-col
                 cols="12"
                 md="6"
               >
                 <v-text-field
-                  v-model="form.guest_arrival_time"
-                  label="Check-in Time (Optional)"
+                  v-model="form.checkin_time"
+                  label="Check-in Time"
                   type="time"
+                  :rules="checkinTimeRules"
+                  required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('guest_arrival_time')"
-                  hint="Exact time guests arrive (HH:MM)"
+                  :error-messages="errors.get('checkin_time')"
+                  :hint="checkinTimeHint"
                   persistent-hint
                   prepend-inner-icon="mdi-clock-outline"
                 />
@@ -115,13 +117,15 @@
                 md="6"
               >
                 <v-text-field
-                  v-model="form.guest_departure_time"
-                  label="Check-out Time (Optional)"
+                  v-model="form.checkout_time"
+                  label="Check-out Time"
                   type="time"
+                  :rules="checkoutTimeRules"
+                  required
                   variant="outlined"
                   :disabled="loading"
-                  :error-messages="errors.get('guest_departure_time')"
-                  hint="Exact time guests leave (HH:MM)"
+                  :error-messages="errors.get('checkout_time')"
+                  :hint="checkoutTimeHint"
                   persistent-hint
                   prepend-inner-icon="mdi-clock-outline"
                 />
@@ -279,6 +283,12 @@ import { usePropertyStore } from '@/stores/property';
 import type { Booking, BookingFormData, BookingStatus, BookingType, Property } from '@/types';
 import type { VForm } from 'vuetify/components';
 import { safeString } from '@/utils/typeHelpers';
+import { 
+  getDefaultTimes, 
+  getTimeValidationRules, 
+  getCheckinTimeValidationRules, 
+  getTimeHint 
+} from '@/utils/timeDefaults';
 
 // PROPS & EMITS
 interface Props {
@@ -316,10 +326,10 @@ const autoDetectType = ref<boolean>(true);
 // FORM DATA
 const form = reactive<Partial<BookingFormData>>({
   property_id: '',
-  guest_departure_date: '',
-  guest_arrival_date: '',
-  guest_departure_time: '', // Optional time when guests leave
-  guest_arrival_time: '',   // Optional time when guests arrive
+  checkout_date: '',
+  checkin_date: '',
+  checkout_time: '', // Required time when guests leave
+  checkin_time: '',   // Required time when guests arrive
   booking_type: 'standard',
   guest_count: undefined,
   notes: '',
@@ -344,15 +354,34 @@ const submitButtonText = computed((): string => {
 });
 
 const propertiesArray = computed((): Property[] => {
+  // Use the store's activeProperties which should be filtered by owner via RLS
   return propertyStore.activeProperties;
 });
 
+// Get selected property for default times
+const selectedProperty = computed((): Property | undefined => {
+  console.log('🔍 selectedProperty computed - form.property_id:', form.property_id);
+  if (!form.property_id) {
+    console.log('🔍 selectedProperty computed - no property_id, returning undefined');
+    return undefined;
+  }
+  const property = propertyStore.getPropertyById(form.property_id as string);
+  console.log('🔍 selectedProperty computed - found property:', property);
+  return property;
+});
+
+// Time validation rules and hints
+const checkoutTimeRules = computed(() => getTimeValidationRules(selectedProperty.value));
+const checkinTimeRules = computed(() => getCheckinTimeValidationRules(form.checkout_time || ''));
+const checkoutTimeHint = computed(() => getTimeHint('checkout', selectedProperty.value));
+const checkinTimeHint = computed(() => getTimeHint('checkin', selectedProperty.value));
+
 // Check if dates indicate a turn booking (same day)
 const isTurnBooking = computed((): boolean => {
-  if (!form.guest_departure_date || !form.guest_arrival_date) return false;
+  if (!form.checkout_date || !form.checkin_date) return false;
   
-  const checkoutDate = new Date(form.guest_departure_date as string);
-  const checkinDate = new Date(form.guest_arrival_date as string);
+  const checkoutDate = new Date(form.checkout_date as string);
+  const checkinDate = new Date(form.checkin_date as string);
   
   if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {
     return false;
@@ -411,10 +440,10 @@ const bookingTypeRules = [
 // Automatically update booking type based on dates if auto-detect is enabled
 function updateBookingType(): void {
   if (!autoDetectType.value) return;
-  if (!form.guest_departure_date || !form.guest_arrival_date) return;
+  if (!form.checkout_date || !form.checkin_date) return;
   
-  const checkoutDate = new Date(form.guest_departure_date as string);
-  const checkinDate = new Date(form.guest_arrival_date as string);
+  const checkoutDate = new Date(form.checkout_date as string);
+  const checkinDate = new Date(form.checkin_date as string);
   
   if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {
     return;
@@ -426,20 +455,22 @@ function updateBookingType(): void {
 
 // Reset form to default or to booking data
 function resetForm(): void {
+  console.log('🔍 resetForm called - mode:', props.mode);
   errors.value.clear();
   
   if (props.mode === 'edit' && props.booking) {
+    console.log('🔍 resetForm - editing existing booking');
     // Populate form with existing booking data
     // Convert dates to the format expected by Vuetify date inputs (YYYY-MM-DD)
-    const checkoutDate = props.booking.guest_departure_date;
-    const checkinDate = props.booking.guest_arrival_date;
+    const checkoutDate = props.booking.checkout_date;
+    const checkinDate = props.booking.checkin_date;
     
     Object.assign(form, {
       property_id: props.booking.property_id,
-      guest_departure_date: formatDateForInput(safeString(checkoutDate)),
-      guest_arrival_date: formatDateForInput(safeString(checkinDate)),
-      guest_arrival_time: props.booking.guest_arrival_time || '',
-      guest_departure_time: props.booking.guest_departure_time || '',
+      checkout_date: formatDateForInput(safeString(checkoutDate)),
+      checkin_date: formatDateForInput(safeString(checkinDate)),
+      checkin_time: props.booking.checkin_time || '',
+      checkout_time: props.booking.checkout_time || '',
       booking_type: props.booking.booking_type,
       guest_count: props.booking.guest_count,
       notes: props.booking.notes,
@@ -447,13 +478,14 @@ function resetForm(): void {
       owner_id: props.booking.owner_id
     });
   } else {
+    console.log('🔍 resetForm - creating new booking');
     // Reset to defaults for create mode, but use initial data if provided
     const defaults = {
       property_id: '',
-      guest_departure_date: '',
-      guest_arrival_date: '',
-      guest_departure_time: '', // Optional time when guests leave
-      guest_arrival_time: '',   // Optional time when guests arrive
+      checkout_date: '',
+      checkin_date: '',
+      checkout_time: '', // Will be set with smart defaults
+      checkin_time: '',   // Will be set with smart defaults
       booking_type: 'standard',
       guest_count: undefined,
       notes: '',
@@ -468,19 +500,24 @@ function resetForm(): void {
       ...defaults, 
       ...initialData,
       // Map calendar date properties to form properties  
-      guest_arrival_date: initialData.start || initialData.guest_arrival_date || initialData.checkin_date || '',      // ✅ start = arrival
-      guest_departure_date: initialData.end || initialData.guest_departure_date || initialData.checkout_date || ''    // ✅ end = departure
+      checkin_date: initialData.start || initialData.checkin_date || initialData.guest_arrival_date || '',      // ✅ start = checkin
+      checkout_date: initialData.end || initialData.checkout_date || initialData.guest_departure_date || ''    // ✅ end = checkout
     };
     
     // Format dates if they exist
-    if (formData.guest_departure_date) {
-      formData.guest_departure_date = formatDateForInput(String(formData.guest_departure_date));
+    if (formData.checkout_date) {
+      formData.checkout_date = formatDateForInput(String(formData.checkout_date));
     }
-    if (formData.guest_arrival_date) {
-      formData.guest_arrival_date = formatDateForInput(String(formData.guest_arrival_date));
+    if (formData.checkin_date) {
+      formData.checkin_date = formatDateForInput(String(formData.checkin_date));
     }
     
     Object.assign(form, formData);
+    console.log('🔍 resetForm - form data after reset:', {
+      property_id: form.property_id,
+      checkout_time: form.checkout_time,
+      checkin_time: form.checkin_time
+    });
   }
 }
 
@@ -494,19 +531,19 @@ async function validate(): Promise<boolean> {
   if (!valid) return false;
   
   // Additional validation
-  const checkoutDate = new Date(String(form.guest_departure_date || ''));
-  const checkinDate = new Date(String(form.guest_arrival_date || ''));
+  const checkoutDate = new Date(String(form.checkout_date || ''));
+  const checkinDate = new Date(String(form.checkin_date || ''));
   
   // Check if dates are valid
   if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {
-    errors.value.set('guest_departure_date', 'Invalid date format');
-    errors.value.set('guest_arrival_date', 'Invalid date format');
+    errors.value.set('checkout_date', 'Invalid date format');
+    errors.value.set('checkin_date', 'Invalid date format');
     return false;
   }
   
-  // Check if checkin is after checkout (arrival should be before departure)
+  // Check if checkin is before or same as checkout (guests must arrive before or same day they leave)
   if (checkinDate > checkoutDate) {
-    errors.value.set('guest_arrival_date', 'Check-in date must be before or same as check-out date');
+    errors.value.set('checkout_date', 'Check-out date must be after or same as check-in date (guest stay period)');
     return false;
   }
   
@@ -514,6 +551,28 @@ async function validate(): Promise<boolean> {
   if (form.booking_type === 'turn' && !isTurnBooking.value) {
     errors.value.set('booking_type', 'Turn bookings must have checkout and checkin on the same day');
     return false;
+  }
+  
+  // Validate required times
+  if (!form.checkout_time) {
+    errors.value.set('checkout_time', 'Checkout time is required');
+    return false;
+  }
+  
+  if (!form.checkin_time) {
+    errors.value.set('checkin_time', 'Checkin time is required');
+    return false;
+  }
+  
+  // Validate time order for same-day turns only
+  if (form.checkout_time && form.checkin_time && isTurnBooking.value) {
+    const checkoutTime = new Date(`2000-01-01T${form.checkout_time}:00`);
+    const checkinTime = new Date(`2000-01-01T${form.checkin_time}:00`);
+    
+    if (checkinTime >= checkoutTime) {
+      errors.value.set('checkin_time', 'For same-day turns, check-in time must be before check-out time (guest stay before they leave)');
+      return false;
+    }
   }
   
   // All validation passed
@@ -532,7 +591,7 @@ async function handleSubmit(): Promise<void> {
     }
     
     // Ensure all required fields are present
-    if (!form.property_id || !form.guest_departure_date || !form.guest_arrival_date || !form.booking_type) {
+    if (!form.property_id || !form.checkout_date || !form.checkin_date || !form.booking_type) {
       errors.value.set('form', 'Please fill in all required fields');
       loading.value = false;
       return;
@@ -541,10 +600,10 @@ async function handleSubmit(): Promise<void> {
     // Prepare data for emission
     const bookingData: BookingFormData = {
       property_id: form.property_id,
-      guest_departure_date: form.guest_departure_date,
-      guest_arrival_date: form.guest_arrival_date,
-      guest_departure_time: form.guest_departure_time,
-      guest_arrival_time: form.guest_arrival_time,
+      checkout_date: form.checkout_date,
+      checkin_date: form.checkin_date,
+      checkout_time: form.checkout_time,
+      checkin_time: form.checkin_time,
       booking_type: form.booking_type as BookingType,
       status: (form.status as BookingStatus) || 'pending',
       owner_id: form.owner_id as string,
@@ -637,6 +696,45 @@ watch(() => props.booking, (newBooking, oldBooking) => {
 watch(() => props.initialData, (newInitialData) => {
   if (props.open && props.mode === 'create' && newInitialData) {
     resetForm();
+  }
+});
+
+// Watch for property selection to set default times
+watch(() => form.property_id, (newPropertyId) => {
+  console.log('🔍 Property watcher triggered with newPropertyId:', newPropertyId);
+  console.log('🔍 Current form mode:', props.mode);
+  console.log('🔍 Current form times:', {
+    checkout: form.checkout_time,
+    checkin: form.checkin_time
+  });
+  
+  if (newPropertyId && props.mode === 'create') {
+    const property = propertyStore.getPropertyById(newPropertyId);
+    console.log('🔍 Found property:', property);
+    
+    if (property) {
+      const defaultTimes = getDefaultTimes(property);
+      console.log('🔍 Got default times:', defaultTimes);
+      
+      // Only set defaults if times are not already set
+      if (!form.checkout_time) {
+        console.log('🔍 Setting checkout time to:', defaultTimes.checkout);
+        form.checkout_time = defaultTimes.checkout;
+      } else {
+        console.log('🔍 Checkout time already set, not overriding');
+      }
+      
+      if (!form.checkin_time) {
+        console.log('🔍 Setting checkin time to:', defaultTimes.checkin);
+        form.checkin_time = defaultTimes.checkin;
+      } else {
+        console.log('🔍 Checkin time already set, not overriding');
+      }
+    } else {
+      console.log('🔍 Property not found in store');
+    }
+  } else {
+    console.log('🔍 Skipping default time setting - conditions not met');
   }
 });
 </script>

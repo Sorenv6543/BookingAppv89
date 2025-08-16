@@ -156,8 +156,8 @@ export const useAdminDataStore = defineStore('adminData', () => {
     const propertyBookingCounts = new Map<string, number>()
 
     allBookings.value.forEach(booking => {
-      const checkoutDate = new Date(booking.guest_departure_date)
-      const checkinDate = new Date(booking.guest_arrival_date)
+      const checkoutDate = new Date(booking.checkout_date)
+              const checkinDate = new Date(booking.checkin_date)
 
       // Count unassigned cleanings
       if (!booking.assigned_cleaner_id && // Note: using assigned_cleaner_id from Booking interface

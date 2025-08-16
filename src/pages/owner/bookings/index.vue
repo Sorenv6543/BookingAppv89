@@ -207,10 +207,10 @@
               <template #[`item.dates`]="{ item }">
                 <div>
                   <div class="text-body-2">
-                    <strong>Out:</strong> {{ formatDate(item.guest_departure_date) }}
+                    <strong>Out:</strong> {{ formatDate(item.checkout_date) }}
                   </div>
                   <div class="text-body-2">
-                    <strong>In:</strong> {{ formatDate(item.guest_arrival_date) }}
+                    <strong>In:</strong> {{ formatDate(item.checkin_date) }}
                   </div>
                 </div>
               </template>
@@ -349,7 +349,7 @@ const bookingItems = computed(() => {
     ...booking,
     property_name: getPropertyName(booking.property_id)
   })).sort((a, b) => 
-          new Date(b.guest_departure_date).getTime() - new Date(a.guest_departure_date).getTime()
+          new Date(b.checkout_date).getTime() - new Date(a.checkout_date).getTime()
   );
 });
 

@@ -64,13 +64,13 @@ export function useAdminCalendarState() {
           return false;
         }
         
-        const checkoutTime = new Date(booking.guest_departure_date);
+        const checkoutTime = new Date(booking.checkout_date);
         return checkoutTime <= sixHoursFromNow;
       })
-      .sort((a, b) => new Date(a.guest_departure_date).getTime() - new Date(b.guest_departure_date).getTime())
+      .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime())
       .map(booking => {
         const property = propertyStore.properties.get(booking.property_id);
-        const hoursUntil = Math.max(0, Math.floor((new Date(booking.guest_departure_date).getTime() - now.getTime()) / (1000 * 60 * 60)));
+        const hoursUntil = Math.max(0, Math.floor((new Date(booking.checkout_date).getTime() - now.getTime()) / (1000 * 60 * 60)));
         
         return {
           ...booking,
@@ -186,13 +186,13 @@ export function useAdminCalendarState() {
     // Admin-specific logic: show different options based on booking state
     if (booking.status === 'pending' && !booking.assigned_cleaner_id) {
       // Show cleaner assignment modal
-      uiStore.openModal('cleanerAssignment', { booking });
+      uiStore.openModal('cleanerAssignment', 'view', { booking });
     } else if (booking.status === 'in_progress') {
       // Show completion options
-      uiStore.openModal('bookingActions', { booking, actions: ['complete', 'cancel'] });
+      uiStore.openModal('bookingActions', 'edit', { booking, actions: ['complete', 'cancel'] });
     } else {
       // Show standard booking details
-      uiStore.openModal('bookingDetails', { booking });
+      uiStore.openModal('bookingDetails', 'view', { booking });
     }
   }
   
@@ -259,7 +259,7 @@ export function useAdminCalendarState() {
       
       // Overdue filter
       if (criteria.overdueOnly) {
-        const checkoutTime = new Date(booking.guest_departure_date);
+        const checkoutTime = new Date(booking.checkout_date);
         if (checkoutTime > new Date()) return false;
       }
       
@@ -270,7 +270,7 @@ export function useAdminCalendarState() {
       
       // Date range filter
       if (criteria.dateRange) {
-        const bookingDate = new Date(booking.guest_departure_date);
+        const bookingDate = new Date(booking.checkout_date);
         const startDate = new Date(criteria.dateRange.start);
         const endDate = new Date(criteria.dateRange.end);
         if (bookingDate < startDate || bookingDate > endDate) return false;

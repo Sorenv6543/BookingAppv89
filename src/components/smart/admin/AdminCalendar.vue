@@ -36,6 +36,18 @@
             @click="navigateToNextMonth"
           />
         </div>
+        
+        <!-- New Booking Button -->
+        <div class="d-flex justify-end mt-2">
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-plus"
+            class="new-booking-btn"
+            @click="openNewBookingForm"
+          >
+            New Booking
+          </v-btn>
+        </div>
       </v-container>
     </div>
 
@@ -230,7 +242,60 @@ const contextMenuActions = computed(() => {
 // Event handlers - simplified using composable
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
   console.log('🗓️ [AdminCalendar] Date selected:', selectInfo.startStr, 'to', selectInfo.endStr);
-  // Handle date selection - could open booking creation modal
+  
+  // Create a new booking with the selected date range
+  // Ensure logical order: departure (checkout) should be before arrival (checkin)
+  const departureDate = selectInfo.startStr;
+  const arrivalDate = selectInfo.endStr || selectInfo.startStr;
+  
+  // If departure is after arrival, swap them for logical booking
+  const finalDepartureDate = departureDate <= arrivalDate ? departureDate : arrivalDate;
+  const finalArrivalDate = departureDate <= arrivalDate ? arrivalDate : departureDate;
+  
+  const newBooking: Booking = {
+    id: crypto.randomUUID(),
+    property_id: '',
+    owner_id: '',
+            checkout_date: finalDepartureDate,
+        checkin_date: finalArrivalDate,
+    checkout_time: '11:00',
+    checkin_time: '15:00',
+    booking_type: 'standard',
+    status: 'pending',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  // Open the booking form in create mode
+  openAdminBookingFormModal(newBooking, 'create');
+};
+
+// Function to open new booking form
+const openNewBookingForm = (): void => {
+  console.log('🚀 [AdminCalendar] Opening new booking form');
+  
+  // Create a new booking with today's date
+  const today = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+  
+  const newBooking: Booking = {
+    id: crypto.randomUUID(),
+    property_id: '',
+    owner_id: '',
+            checkout_date: today,      // Guests leave today
+        checkin_date: tomorrowStr,  // New guests arrive tomorrow
+    checkout_time: '11:00',
+    checkin_time: '15:00',
+    booking_type: 'standard',
+    status: 'pending',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  // Open the booking form in create mode
+  openAdminBookingFormModal(newBooking, 'create');
 };
 
 const handleEventClick = (clickInfo: EventClickArg): void => {
@@ -250,8 +315,8 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   
   try {
     await updateBooking(booking.id, {
-              guest_departure_date: dropInfo.event.startStr,
-        guest_arrival_date: dropInfo.event.endStr || dropInfo.event.startStr
+      checkout_date: dropInfo.event.startStr,
+      checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
     });
   } catch (error) {
     console.error('Failed to update booking:', error);
@@ -265,8 +330,8 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
   
   try {
     await updateBooking(booking.id, {
-              guest_departure_date: resizeInfo.event.startStr,
-        guest_arrival_date: resizeInfo.event.endStr
+      checkout_date: resizeInfo.event.startStr,
+      checkin_date: resizeInfo.event.endStr
     });
   } catch (error) {
     console.error('Failed to update booking:', error);

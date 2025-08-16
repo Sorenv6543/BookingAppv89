@@ -5,26 +5,49 @@ import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
 import { useAuthStore } from '@/stores/auth';
 import type { Booking, Property } from '@/types';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+
+interface OptimisticUpdate {
+  id: string;
+  type: 'booking' | 'property';
+  operation: 'insert' | 'update' | 'delete';
+  timestamp: number;
+  data: Record<string, unknown>;
+}
+
+interface PendingOperation {
+  type: 'booking' | 'property';
+  operation: 'insert' | 'update' | 'delete';
+  data: Record<string, unknown>;
+  retryCount: number;
+}
+
+interface RealtimePayload {
+  eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+  new: Record<string, unknown> | null;
+  old: Record<string, unknown> | null;
+  errors?: string[];
+}
 
 export function useRealtimeSync() {
   const bookingStore = useBookingStore();
   const propertyStore = usePropertyStore();
   const authStore = useAuthStore();
   
-  const subscriptions = ref<any[]>([]);
+  const subscriptions = ref<RealtimeChannel[]>([]);
   const connectionStatus = ref<'connecting' | 'connected' | 'disconnected'>('disconnected');
   const lastSyncTime = ref<Date | null>(null);
 
   // Track optimistic updates to avoid double-applying changes
-  const optimisticUpdates = ref(new Map<string, any>());
+  const optimisticUpdates = ref(new Map<string, OptimisticUpdate>());
 
   // Network status monitoring
   const isOnline = ref(navigator.onLine);
-  const pendingOperations = ref<any[]>([]);
+  const pendingOperations = ref<PendingOperation[]>([]);
 
   // Debug helper
   const debugRealtime = import.meta.env.VITE_DEBUG_RLS === 'true';
-  const debugLog = (message: string, data?: any) => {
+  const debugLog = (message: string, data?: unknown) => {
     if (debugRealtime) {
       console.log(`[Realtime Debug] ${message}`, data);
     }
@@ -108,7 +131,7 @@ export function useRealtimeSync() {
   }
 
   // Handle real-time booking changes
-  function handleBookingChange(payload: any) {
+  function handleBookingChange(payload: RealtimePayload) {
     const { eventType, new: newRecord, old: oldRecord } = payload;
     
     // Check if this is our own optimistic update to avoid double-applying
@@ -148,7 +171,7 @@ export function useRealtimeSync() {
   }
 
   // Handle real-time property changes
-  function handlePropertyChange(payload: any) {
+  function handlePropertyChange(payload: RealtimePayload) {
     const { eventType, new: newRecord, old: oldRecord } = payload;
     
     const optimisticKey = `property-${(newRecord || oldRecord)?.id}`;
@@ -186,7 +209,7 @@ export function useRealtimeSync() {
   }
 
   // Handle user profile changes
-  function handleProfileChange(payload: any) {
+  function handleProfileChange(payload: RealtimePayload) {
     const { new: newRecord } = payload;
     
     if (newRecord && newRecord.id === authStore.user?.id) {
@@ -291,11 +314,10 @@ export function useRealtimeSync() {
     }
   }
 
-  function addPendingOperation(operation: any) {
+  function addPendingOperation(operation: Omit<PendingOperation, 'retryCount'>) {
     pendingOperations.value.push({
-      id: Date.now().toString(),
-      execute: operation,
-      timestamp: new Date()
+      ...operation,
+      retryCount: 0,
     });
   }
 

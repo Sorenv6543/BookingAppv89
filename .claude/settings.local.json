@@ -22,7 +22,16 @@
       "mcp__sequential-thinking__get-library-docs",
       "Bash(npm run lint)",
       "Bash(grep:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm test)",
+      "Bash(find:*)",
+      "mcp__serena__replace_regex",
+      "mcp__serena__search_for_pattern",
+      "Bash(pnpm dev:*)",
+      "mcp__supabase__list_migrations",
+      "Bash(git add:*)"
     ],
     "deny": []
   },

@@ -3,34 +3,34 @@ import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import { aliases, mdi } from 'vuetify/iconsets/mdi';
-import type { ThemeDefinition } from 'vuetify';
+// import type { ThemeDefinition } from 'vuetify';
 
 // Import Vuetify styles
 import 'vuetify/styles';
 import '@mdi/font/css/materialdesignicons.css';
 
 // Theme configuration
-const _lightTheme: ThemeDefinition = {
-  dark: false,
-  colors: {
-    primary: '#1976d2', 
-    secondary: '#e0e7f81e;',
-    accent: '#045ecc', 
-    error: '#80b3ec', 
-    info: '#6b7280',
-    success: '#093d8b',
-    warning: '#FF9800',
-    background: '#ffffff', 
-    surface: '#ffffff',  
-    'on-background': '#1C1B1F',
-    'on-surface': '#1C1B1F',
-    'surface-variant': '#69acfa', 
-    'on-surface-variant': '#49454F',
-    'turn-urgent': '#F44336',
-    'turn-standard': '#FF9800', 
-    'booking-standard': '#2196F3', 
-  }
-};
+// // const _lightTheme: ThemeDefinition = {
+//   dark: false,
+//   colors: {
+//     primary: '#1976d2', 
+//     secondary: '#e0e7f81e;',
+//     accent: '#045ecc', 
+//     error: '#80b3ec', 
+//     info: '#6b7280',
+//     success: '#093d8b',
+//     warning: '#FF9800',
+//     background: '#ffffff', 
+//     surface: '#ffffff',  
+//     'on-background': '#1C1B1F',
+//     'on-surface': '#1C1B1F',
+//     'surface-variant': '#69acfa', 
+//     'on-surface-variant': '#49454F',
+//     'turn-urgent': '#F44336',
+//     'turn-standard': '#FF9800', 
+//     'booking-standard': '#2196F3', 
+//   }
+// };
 
 
 export default createVuetify({

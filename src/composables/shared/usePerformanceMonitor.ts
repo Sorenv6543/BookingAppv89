@@ -82,10 +82,10 @@ export function usePerformanceMonitor() {
   }
 
   // Safely get router - may not be available in test environment
-  let router: any = null
+  let router: ReturnType<typeof useRouter> | null = null
   try {
     router = useRouter()
-  } catch (error) {
+  } catch {
     // Router not available in test environment
     console.warn('Router not available for performance monitoring')
   }
@@ -170,11 +170,11 @@ export function usePerformanceMonitor() {
   }
 
   // Role-specific performance tracking
-  function measureRolePerformance(
+  function measureRolePerformance<T>(
     role: 'owner' | 'admin' | 'shared',
     operation: string,
-    fn: () => any
-  ): any {
+    fn: () => T
+  ): T {
     if (!isEnabled.value) return fn()
     
     const start = performance.now()
@@ -313,8 +313,8 @@ export function usePerformanceMonitor() {
 
   function getMemoryUsage(): number {
     // Use performance.memory if available (Chrome), otherwise estimate
-    if ('memory' in performance) {
-      return (performance as any).memory.usedJSHeapSize / (1024 * 1024) // Convert to MB
+    if ('memory' in performance && performance.memory) {
+      return (performance.memory as { usedJSHeapSize: number }).usedJSHeapSize / (1024 * 1024) // Convert to MB
     }
     
     // Fallback estimation based on component count and data size

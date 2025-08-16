@@ -142,7 +142,7 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
   const recentBookings = computed((): Booking[] => {
     return Array.from(recentBookingsMap.value.values())
       .sort((a, b) => 
-        new Date(b.guest_departure_date as string).getTime() - new Date(a.guest_departure_date as string).getTime()
+        new Date(b.checkout_date as string).getTime() - new Date(a.checkout_date as string).getTime()
       )
   })
 
@@ -159,8 +159,8 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
     const todayMap = new Map<string, Booking>()
     
     ownerBookingsMap.value.forEach((booking, id) => {
-      if ((booking.guest_departure_date as string).startsWith(today) ||
-          (booking.guest_arrival_date as string).startsWith(today)) {
+      if ((booking.checkout_date as string).startsWith(today) ||
+          (booking.checkin_date as string).startsWith(today)) {
         todayMap.set(id, booking)
       }
     })
@@ -194,7 +194,7 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
     
     let thisMonthCount = 0
     bookingsMap.forEach(booking => {
-      if (new Date(booking.guest_arrival_date as string) >= thisMonth) {
+      if (new Date(booking.checkin_date as string) >= thisMonth) {
         thisMonthCount++
       }
     })
@@ -217,8 +217,8 @@ export const useOwnerDataStore = defineStore('ownerData', () => {
     
     let bookedDays = 0
     bookingsMap.forEach(booking => {
-      const checkin = new Date(booking.guest_arrival_date as string)
-      const checkout = new Date(booking.guest_departure_date as string)
+              const checkin = new Date(booking.checkin_date as string)
+      const checkout = new Date(booking.checkout_date as string)
       
       if (checkin >= lastMonth && checkout <= thisMonth) {
         bookedDays += Math.ceil((checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60 * 24))

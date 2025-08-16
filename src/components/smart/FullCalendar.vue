@@ -26,6 +26,7 @@ import type { CalendarOptions, DateSelectArg, EventClickArg, EventDropArg } from
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import type { DateClickArg } from '@fullcalendar/interaction';
 import { computed, ref, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue';
 import { useTheme } from 'vuetify';
 import type { Booking, Property } from '@/types';
@@ -85,8 +86,8 @@ const calendarEvents = computed(() => {
     return {
       id: booking.id,
       title: `${property?.name || 'Unknown Property'} - ${isTurn ? 'TURN' : 'Standard'}`,
-      start: booking.guest_arrival_date,
-      end: addOneDay(booking.guest_departure_date), // Add one day to make end date inclusive
+      start: booking.checkout_date,
+      end: addOneDay(booking.checkin_date), // Add one day to make end date inclusive
       backgroundColor: eventColor,
       borderColor: borderColor,
       textColor: textColor,
@@ -221,7 +222,6 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   eventDisplay: mobileOptions.value.eventDisplay,
   eventOverlap: true,
   eventResizableFromStart: true,
-  eventResizableFromEnd: true,
   eventStartEditable: true,
   eventDurationEditable: true,
   
@@ -231,7 +231,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   editable: true,
   droppable: true,
   eventDrop: handleEventDrop,
-  eventResize: handleEventResize,
+  eventResize: handleEventResize, // Enable resize handler
   
   // Date/time settings
   locale: 'en',
@@ -252,8 +252,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   // Event handlers
   select: handleDateSelect,
   eventClick: handleEventClick,
-  eventDrop: handleEventDrop,
-  dayClick: handleDayClick,
+  dateClick: handleDateClick,
   
   // Loading state
   loading: handleLoading,
@@ -338,10 +337,15 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
   );
   
   emit('eventDrop', dropInfo);
-  // Removed duplicate updateBooking emit to prevent infinite loops
+  emit('updateBooking', {
+    id: booking.id,
+    start: dropInfo.event.startStr,
+    end: dropInfo.event.endStr || dropInfo.event.startStr
+  });
 };
 
-const handleEventResize = (resizeInfo: EventDropArg): void => {
+// Enable the event resize handler
+const handleEventResize = (resizeInfo: any): void => {
   const booking = resizeInfo.event.extendedProps.booking as Booking;
   
   // Log emitting event to Home
@@ -358,35 +362,37 @@ const handleEventResize = (resizeInfo: EventDropArg): void => {
   );
   
   emit('eventResize', resizeInfo);
+  emit('updateBooking', {
+    id: booking.id,
+    start: resizeInfo.event.startStr,
+    end: resizeInfo.event.endStr || resizeInfo.event.startStr
+  });
 };
 
-const handleDayClick = (dayClickInfo: any): void => {
-  console.log('🗓️ [FullCalendar] Day clicked:', dayClickInfo.dateStr);
+const handleDateClick = (arg: DateClickArg): void => {
+  console.log('🗓️ [FullCalendar] Day clicked:', arg.dateStr);
   
-  // Set the selected date
-  selectedDate.value = dayClickInfo.date;
+  selectedDate.value = arg.date;
   
-  // Find bookings for this specific day
-  const clickedDate = dayClickInfo.dateStr;
+  const clickedDate = arg.dateStr;
+  const currentUserId = authStore.user?.id;
   const dayBookings = Array.from(props.bookings.values()).filter(booking => {
-    const arrivalDate = booking.guest_arrival_date;
-    const departureDate = booking.guest_departure_date;
-    
-    // Check if the clicked date falls within the booking period
-    return clickedDate >= arrivalDate && clickedDate < departureDate;
+    const checkinDate = booking.checkin_date;
+    const checkoutDate = booking.checkout_date;
+    const dateMatches = clickedDate >= checkinDate && clickedDate < checkoutDate;
+    const ownerMatches = !currentUserId || booking.owner_id === currentUserId;
+    return dateMatches && ownerMatches;
   });
   
   selectedDayBookings.value = dayBookings;
-  
-  // Show the bottom sheet
   dayViewVisible.value = true;
   
   console.log('📅 [FullCalendar] Day view opened with', dayBookings.length, 'bookings for date:', clickedDate);
   console.log('📅 [FullCalendar] Day bookings:', dayBookings.map(b => ({
     id: b.id,
     property_id: b.property_id,
-    arrival: b.guest_arrival_date,
-    departure: b.guest_departure_date
+    arrival: b.checkin_date,
+            checkout: b.checkout_date
   })));
 };
 
@@ -507,8 +513,8 @@ watch(() => props.bookings, (newBookings, oldBookings) => {
       id: b.id,
       property_id: b.property_id,
       owner_id: b.owner_id,
-        guest_arrival_date: b.guest_arrival_date,
-      guest_departure_date: b.guest_departure_date
+        checkin_date: b.checkin_date,
+      checkout_date: b.checkout_date
     }))
   });
   
@@ -573,8 +579,8 @@ const handleCompleteBooking = (booking: Booking): void => {
   
   emit('updateBooking', {
     id: booking.id,
-    start: booking.guest_arrival_date,
-    end: booking.guest_departure_date
+    start: booking.checkout_date,
+    end: booking.checkin_date
   });
   
   console.log('✅ [FullCalendar] Complete booking from day view:', booking.id);
@@ -732,18 +738,14 @@ const handleManualMoreLinkClick = (event: Event): void => {
   });
   
   // Filter bookings for this date (same logic as before)
-  const clickedDateStr = clickedDate.toDateString();
+  const clickedIso = clickedDate.toISOString().split('T')[0];
   const dayBookings: Booking[] = [];
   
   Array.from(props.bookings.values()).forEach(booking => {
-    const checkoutDate = new Date(booking.guest_departure_date);
-    const checkinDate = new Date(booking.guest_arrival_date);
-    
-    // Check if the clicked date falls within the booking period
-    const bookingStartsOnDate = checkoutDate.toDateString() === clickedDateStr;
-    const bookingSpansDate = clickedDate >= checkoutDate && clickedDate < checkinDate;
-    
-    const dateMatches = bookingStartsOnDate || bookingSpansDate;
+    // Compare using ISO-only date strings to avoid timezone drift
+    const checkin = booking.checkin_date;   // inclusive start
+    const checkout = booking.checkout_date; // exclusive end
+    const dateMatches = clickedIso >= checkin && clickedIso < checkout;
     const ownerMatches = !currentUserId || booking.owner_id === currentUserId;
     
     if (dateMatches && ownerMatches) {

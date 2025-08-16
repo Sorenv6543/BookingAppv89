@@ -20,20 +20,19 @@ export type BookingStatus = 'pending' | 'scheduled' | 'in_progress' | 'completed
  * Booking Interface
  * Core data model for booking/cleaning events
  */
-//todo 
 export interface Booking {
   id: string;
   property_id: string;
   owner_id: string;
-  guest_departure_date: string; // ISO date when guests leave (was checkout_date)
-  guest_arrival_date: string;   // ISO date when new guests arrive (was checkin_date)
-  guest_departure_time?: string; // Optional time when guests leave (HH:MM format)
-  guest_arrival_time?: string;   // Optional time when guests arrive (HH:MM format)
-  time_until_next_guest_arrival: number; // minutes
+  checkout_date: string; // ISO date when previous guests check out (leave)
+  checkin_date: string;  // ISO date when new guests check in (arrive)
+  checkout_time: string; // Required time when guests leave (HH:MM format)
+  checkin_time: string;   // Required time when guests arrive (HH:MM format)
   booking_type: BookingType;
   status: BookingStatus;
   guest_count?: number;
-  special_instructions?: string;
+  notes?: string; // General notes and instructions for the booking
+  special_instructions?: string; // Legacy field for backward compatibility
   priority?: 'low' | 'normal' | 'high' | 'urgent';
   assigned_cleaner_id?: string;
   upcharge_reason?: string;
@@ -82,7 +81,7 @@ export function isBooking(obj: unknown): obj is Booking {
   return (
     typeof b.id === 'string' &&
     typeof b.property_id === 'string' &&
-    typeof b.guest_departure_date === 'string' &&
-    typeof b.guest_arrival_date === 'string'
+    typeof b.checkout_date === 'string' &&
+    typeof b.checkin_date === 'string'
   );
 }

@@ -43,96 +43,92 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDisplay } from 'vuetify';
 
 // Owner-specific components
 
-import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
+// import AdminCalendar from '@/components/smart/admin/AdminCalendar.vue';
 import AdminDashboard from './AdminDashboard.vue';
 
-import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue';
 
 
-import { useBookingStore } from '@/stores/booking';
-import { usePropertyStore } from '@/stores/property';
-import { useUIStore } from '@/stores/ui';
+import { useSupabaseBookings } from '@/composables/supabase/useSupabaseBookings';
+import { useSupabaseProperties } from '@/composables/supabase/useSupabaseProperties';
+// import { useUIStore } from '@/stores/ui';
 import { useAuthStore } from '@/stores/auth';
-import { useCalendarState } from '@/composables/shared/useCalendarState';
+// import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 
 
 
-import { useAdminBookings } from '@/composables/admin/useAdminBookings';
-import { useAdminProperties } from '@/composables/admin/useAdminProperties';
+// import { useAdminBookings } from '@/composables/admin/useAdminBookings';
+// import { useAdminProperties } from '@/composables/admin/useAdminProperties';
 import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
-import { useCleanerManagement } from '@/composables/admin/useCleanerManagement';
-  import type { Booking, Property, BookingFormData, PropertyFormData,  } from '@/types';
-import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+// import { useCleanerManagement } from '@/composables/admin/useCleanerManagement';
+  // import type { Booking, Property } from '@/types';
+// import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // ============================================================================
 // STORE CONNECTIONS & STATE
 // ============================================================================
 
 //useRealtimeSync(); // Just call it for side effects
-const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
-const uiStore = useUIStore();
+const { properties, fetchProperties } = useSupabaseProperties();
+const { bookings, fetchBookings } = useSupabaseBookings();
+// const uiStore = useUIStore();
 const authStore = useAuthStore();
 const { xs } = useDisplay();
 
 // ============================================================================
 // COMPOSABLES - BUSINESS LOGIC
 // ============================================================================
-const { 
-  loading: bookingsLoading, 
-  createBooking, 
-  updateBooking,
-  deleteBooking
-} = useAdminBookings();
+// const { 
+//   loading: bookingsLoading
+//   // createBooking, 
+//   // updateBooking,
+//   // deleteBooking
+// } = useAdminBookings();
 
-const { 
-  createProperty,
-  updateProperty,
-  deleteProperty,
-} = useAdminProperties();
+// const { 
+//   createProperty,
+//   updateProperty,
+//   deleteProperty,
+// } = useAdminProperties();
 
-const {
-  allCleaners
-} = useCleanerManagement();
+// const {
+//   allCleaners
+// } = useCleanerManagement();
 
-const {
-  currentView,
-  currentDate,
-  setCalendarView,
-  goToDate,
-  next,
-  prev
-} = useCalendarState();
+// const {
+//   currentView,
+//   setCalendarView,
+//   goToDate
+// } = useCalendarState();
 
 // ============================================================================
 // LOCAL STATE
 // ============================================================================
-const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
+// const calendarRef = ref<InstanceType<typeof AdminCalendar> | null>(null);
 const sidebarOpen = ref(false);
-const selectedPropertyFilter = ref<string | null>(null);
+// const selectedPropertyFilter = ref<string | null>(null);
 
 
   
 const { users: allUsers, fetchAllUsers } = useAdminUserManagement()
 
 
-const selectedDate = ref<string | null>(null)
-const isEditMode = ref(false)
-const loading = ref(false)
-const errors = ref<Map<string, string[]>>(new Map())
+// const selectedDate = ref<string | null>(null)
+// const isEditMode = ref(false)
+// const loading = ref(false)
+// const errors = ref<Map<string, string[]>>(new Map())
 
 
 // Computed properties for admin authentication and data
 const isAdminAuthenticated = computed(() => authStore.isAuthenticated && authStore.user?.role === 'admin');
 
-const allProperties = computed(() => Array.from(propertyStore.properties.values()));
-const allBookings = computed(() => Array.from(bookingStore.bookings.values()));
+const allProperties = computed(() => properties.value);
+const allBookings = computed(() => bookings.value);
 const systemMetrics = computed(() => ({
   totalProperties: allProperties.value.length,
   totalBookings: allBookings.value.length,
@@ -143,101 +139,101 @@ const systemPropertyMetrics = computed(() => ({
   inactiveProperties: allProperties.value.filter(p => p.status === 'inactive').length
 }));
 
-const usersMap = {
-  users: allUsers,
-  fetchAllUsers: fetchAllUsers,
-  selectedDate: selectedDate,
-  isEditMode: isEditMode,
-  loading: loading,
-  currentView: currentView,
-}
+// const usersMap = {
+//   users: allUsers,
+//   fetchAllUsers: fetchAllUsers,
+//   selectedDate: selectedDate,
+//   isEditMode: isEditMode,
+//   loading: loading,
+//   currentView: currentView,
+// }
 
 
 // ============================================================================
 // CALENDAR EVENT HANDLERS
 // ============================================================================
 
-const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  const bookingData: Partial<BookingFormData> = {
-            guest_departure_date: selectInfo.startStr,
-        guest_arrival_date: selectInfo.endStr,
-  };
-  
-  uiStore.openModal('eventModal', 'create', bookingData);
-};
+// const handleDateSelect = (selectInfo: DateSelectArg): void => {
+//   const bookingData: Partial<BookingFormData> = {
+//             guest_departure_date: selectInfo.startStr,
+//         guest_arrival_date: selectInfo.endStr,
+//   };
+//   
+//   uiStore.openModal('eventModal', 'create', bookingData);
+// };
 
-const handleEventClick = (clickInfo: EventClickArg): void => {
-  // Check if this is an edit event from the bottom sheet
-  const extendedProps = clickInfo.event.extendedProps;
-  if (extendedProps && extendedProps.isEdit && extendedProps.booking) {
-    // Use the booking data directly from the bottom sheet
-    const booking = extendedProps.booking as Booking;
-    uiStore.openModal('eventModal', 'edit', booking);
-    return;
-  }
-  
-  // Fallback: Admin can edit any booking
-  const booking = extendedProps?.booking as Booking;
-  if (booking) {
-    uiStore.openModal('eventModal', 'edit', booking);
-  }
-};
+// const handleEventClick = (clickInfo: EventClickArg): void => {
+//   // Check if this is an edit event from the bottom sheet
+//   const extendedProps = clickInfo.event.extendedProps;
+//   if (extendedProps && extendedProps.isEdit && extendedProps.booking) {
+//     // Use the booking data directly from the bottom sheet
+//     const booking = extendedProps.booking as Booking;
+//     uiStore.openModal('eventModal', 'edit', booking);
+//     return;
+//   }
+//   
+//   // Fallback: Admin can edit any booking
+//   const booking = extendedProps?.booking as Booking;
+//   if (booking) {
+//     uiStore.openModal('eventModal', 'edit', booking);
+//   }
+// };
 
-const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
-  const booking = dropInfo.event.extendedProps.booking as Booking;
-  
-  // Prevent multiple simultaneous updates
-  if (bookingsLoading.value) {
-    console.warn('Update already in progress');
-    dropInfo.revert();
-    return;
-  }
-  
-  try {
-    // Use nextTick to batch reactive updates
-    await nextTick();
-    
-    await updateBooking(booking.id, {
-              guest_departure_date: dropInfo.event.startStr,
-        guest_arrival_date: dropInfo.event.endStr || dropInfo.event.startStr,
-    });
-    
-    // Additional nextTick to ensure DOM updates complete
-    await nextTick();
-    
-  } catch (error) {
-    console.error('Failed to update booking:', error);
-    dropInfo.revert();
-  }
-};
+// const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
+//   const booking = dropInfo.event.extendedProps.booking as Booking;
+//   
+//   // Prevent multiple simultaneous updates
+//   if (bookingsLoading.value) {
+//     console.warn('Update already in progress');
+//     dropInfo.revert();
+//     return;
+//   }
+//   
+//   try {
+//     // Use nextTick to batch reactive updates
+//     await nextTick();
+//     
+//     await updateBooking(booking.id, {
+//               guest_departure_date: dropInfo.event.startStr,
+//         guest_arrival_date: dropInfo.event.endStr || dropInfo.event.startStr,
+//     });
+//     
+//     // Additional nextTick to ensure DOM updates complete
+//     await nextTick();
+//     
+//   } catch (error) {
+//     console.error('Failed to update booking:', error);
+//     dropInfo.revert();
+//   }
+// };
 
-const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
-  const booking = resizeInfo.event.extendedProps.booking as Booking;
-  
-  // Prevent multiple simultaneous updates
-  if (bookingsLoading.value) {
-    console.warn('Resize update already in progress');
-    resizeInfo.revert();
-    return;
-  }
-  
-  try {
-    // Use nextTick to batch reactive updates
-    await nextTick();
-    
-    await updateBooking(booking.id, {
-              guest_departure_date: resizeInfo.event.startStr,
-        guest_arrival_date: resizeInfo.event.endStr,
-    });
-    
-    // Additional nextTick to ensure DOM updates complete
-    await nextTick();
-    
-  } catch (error) {
-    console.error('Failed to update booking:', error);
-    resizeInfo.revert();
-  }
-};
+// const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
+//   const booking = resizeInfo.event.extendedProps.booking as Booking;
+//   
+//   // Prevent multiple simultaneous updates
+//   if (bookingsLoading.value) {
+//     console.warn('Resize update already in progress');
+//     resizeInfo.revert();
+//     return;
+//   }
+//   
+//   try {
+//     // Use nextTick to batch reactive updates
+//     await nextTick();
+//     
+//     await updateBooking(booking.id, {
+//               guest_departure_date: resizeInfo.event.startStr,
+//         guest_arrival_date: resizeInfo.event.endStr,
+//     });
+//     
+//     // Additional nextTick to ensure DOM updates complete
+//     await nextTick();
+//     
+//   } catch (error) {
+//     console.error('Failed to update booking:', error);
+//     resizeInfo.revert();
+//   }
+// };
 
 // ============================================================================
 // CALENDAR CONTROL HANDLERS
@@ -290,17 +286,17 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
 //   updateBooking(data.id, data.updates);
 // };
 
-const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }): void => {
-  const bookingData = {
-    ...data,
-  };
-  uiStore.openModal('eventModal', 'create', bookingData);
-};
+// const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }): void => {
+//   const bookingData = {
+//     ...data,
+//   };
+//   uiStore.openModal('eventModal', 'create', bookingData);
+// };
 
-const handleAssignCleaner = (data: { bookingId: string; cleanerId: string; notes?: string }): void => {
-  // Admin can assign cleaners to any booking
-  console.log('Assign cleaner:', data);
-};
+// const handleAssignCleaner = (data: { bookingId: string; cleanerId: string; notes?: string }): void => {
+//   // Admin can assign cleaners to any booking
+//   console.log('Assign cleaner:', data);
+// };
 
 // const handleUpdateBookingStatus = (data: { bookingId: string; status: Booking['status'] }): void => {
 //   // Admin can update status of any booking
@@ -311,241 +307,241 @@ const handleAssignCleaner = (data: { bookingId: string; cleanerId: string; notes
 //   setCalendarView(view);
 // };
 
-const handleDateChange = (date: Date): void => {
-  goToDate(date);
-};
+// const handleDateChange = (date: Date): void => {
+//   goToDate(date);
+// };
 
-const handleUpdateBooking = (data: { id: string; updates: Partial<Booking> }): void => {
-  // Admin can update any booking
-  updateBooking(data.id, data.updates);
-};
+// const handleUpdateBooking = (data: { id: string; updates: Partial<Booking> }): void => {
+//   // Admin can update any booking
+//   updateBooking(data.id, data.updates);
+// };
 
-const handleUpdateBookingStatus = (data: { bookingId: string; status: Booking['status'] }): void => {
-  // Admin can update status of any booking
-  updateBooking(data.bookingId, { status: data.status });
-};
+// const handleUpdateBookingStatus = (data: { bookingId: string; status: Booking['status'] }): void => {
+//   // Admin can update status of any booking
+//   updateBooking(data.bookingId, { status: data.status });
+// };
 
-const handleViewChange = (view: string): void => {
-  // Validate view type before setting
-  const validViews = ['timeGridWeek', 'dayGridMonth', 'timeGridDay'] as const;
-  if (validViews.includes(view as any)) {
-    setCalendarView(view as 'timeGridWeek' | 'dayGridMonth' | 'timeGridDay');
-  }
-};
+// const handleViewChange = (view: string): void => {
+//   // Validate view type before setting
+//   const validViews = ['timeGridWeek', 'dayGridMonth', 'timeGridDay'] as const;
+//   if (validViews.includes(view as any)) {
+//     setCalendarView(view as 'timeGridWeek' | 'dayGridMonth' | 'timeGridDay');
+//   }
+// };
 
 // ============================================================================
 // MODAL EVENT HANDLERS
 // ============================================================================
 
-const handleEventModalClose = (): void => {
-  uiStore.closeModal('eventModal');
-};
+// const handleEventModalClose = (): void => {
+//   uiStore.closeModal('eventModal');
+// };
 
-const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
-  try {
-    
-    const bookingData = {
-      ...data,
-     
-    };
-    
-    if (eventModalMode.value === 'create') {
-      await createBooking(bookingData as BookingFormData);
-    } else if (eventModalData.value) {
-      // eventModalData.value should be the booking directly
-      const booking = eventModalData.value;
-      
-      // Verify owner can update this booking
-      if (authStore.user?.role !== 'admin') {
-        console.error('🚨 [HomeAdmin] Booking ownership check failed - booking not found in owner map');
-        throw new Error('Cannot update booking not owned by current user');
-      }
-      await updateBooking(booking.id, bookingData as Partial<BookingFormData>);
-    }
-    uiStore.closeModal('eventModal');
-  } catch (error) {
-    console.error('Failed to save the booking:', error);
-  }
-};
+// const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
+//   try {
+//     
+//     const bookingData = {
+//       ...data,
+//      
+//     };
+//     
+//     if (eventModalMode.value === 'create') {
+//       await createBooking(bookingData as BookingFormData);
+//     } else if (eventModalData.value) {
+//       // eventModalData.value should be the booking directly
+//       const booking = eventModalData.value;
+//       
+//       // Verify owner can update this booking
+//       if (authStore.user?.role !== 'admin') {
+//         console.error('🚨 [HomeAdmin] Booking ownership check failed - booking not found in owner map');
+//         throw new Error('Cannot update booking not owned by current user');
+//       }
+//       await updateBooking(booking.id, bookingData as Partial<BookingFormData>);
+//     }
+//     uiStore.closeModal('eventModal');
+//   } catch (error) {
+//     console.error('Failed to save the booking:', error);
+//   }
+// };
 
-const handleEventModalDelete = async (bookingId: string): Promise<void> => {
-  // Verify owner can delete this booking
-  if (authStore.user?.role !== 'admin') {
-    console.warn('Cannot delete booking not owned by current user');
-    return;
-  }
-  
-    uiStore.openConfirmDialog('confirmDialog', {
-    title: 'Delete Booking',
-    message: 'Are you sure you want to delete this booking? This action cannot be undone.',
-    confirmText: 'Delete',
-    cancelText: 'Cancel',
-    dangerous: true,
-    data: { type: 'booking', id: bookingId }
-  });
-};
+// const handleEventModalDelete = async (bookingId: string): Promise<void> => {
+//   // Verify owner can delete this booking
+//   if (authStore.user?.role !== 'admin') {
+//     console.warn('Cannot delete booking not owned by current user');
+//     return;
+//   }
+//   
+//     uiStore.openConfirmDialog('confirmDialog', {
+//     title: 'Delete Booking',
+//     message: 'Are you sure you want to delete this booking? This action cannot be undone.',
+//     confirmText: 'Delete',
+//     cancelText: 'Cancel',
+//     dangerous: true,
+//     data: { type: 'booking', id: bookingId }
+//   });
+// };
 
-const handleEventModalMarkComplete = async (bookingId: string): Promise<void> => {
-  try {
-    await updateBooking(bookingId, { status: 'completed' });
-  } catch (error) {
-    console.error('Failed to mark booking as complete:', error);
-  }
-};
+// const handleEventModalMarkComplete = async (bookingId: string): Promise<void> => {
+//   try {
+//     await updateBooking(bookingId, { status: 'completed' });
+//   } catch (error) {
+//     console.error('Failed to mark booking as complete:', error);
+//   }
+// };
 
-const handleEventModalAssignCleaner = async (bookingId: string, cleanerId: string): Promise<void> => {
-  try {
-    await updateBooking(bookingId, { assigned_cleaner_id: cleanerId });
-  } catch (error) {
-    console.error('Failed to assign cleaner:', error);
-  }
-};
+// const handleEventModalAssignCleaner = async (bookingId: string, cleanerId: string): Promise<void> => {
+//   try {
+//     await updateBooking(bookingId, { assigned_cleaner_id: cleanerId });
+//   } catch (error) {
+//     console.error('Failed to assign cleaner:', error);
+//   }
+// };
 
-const handleEventModalOpenCleanerModal = (booking: Partial<BookingFormData>): void => {
-  // Handle opening cleaner modal - could be implemented later
-  console.log('Open cleaner modal for booking:', booking);
-};
+// const handleEventModalOpenCleanerModal = (booking: Partial<BookingFormData>): void => {
+//   // Handle opening cleaner modal - could be implemented later
+//   console.log('Open cleaner modal for booking:', booking);
+// };
 
-const handlePropertyModalClose = (): void => {
-  uiStore.closeModal('propertyModal');
-};
+// const handlePropertyModalClose = (): void => {
+//   uiStore.closeModal('propertyModal');
+// };
 
-const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
-  try {
-    // Ensure owner_id is set
-    const propertyData = {
-      ...data, 
-    };
-    
-    if (propertyModalMode.value === 'create') {
-      await createProperty(propertyData as PropertyFormData);
-    } else if (propertyModalData.value) {
-      // Verify owner can update this property
-      if (authStore.user?.role !== 'admin') {
-        throw new Error('Cannot update property not owned by current admin');
-      }
-      await updateProperty(propertyModalData.value.id, propertyData as Partial<PropertyFormData>);
-    }
-    uiStore.closeModal('propertyModal');
-  } catch (error) {
-    console.error('Failed to save the property:', error);
-  }
-};
+// const handlePropertyModalSave = async (data: PropertyFormData): Promise<void> => {
+//   try {
+//     // Ensure owner_id is set
+//     const propertyData = {
+//       ...data, 
+//     };
+//     
+//     if (propertyModalMode.value === 'create') {
+//       await createProperty(propertyData as PropertyFormData);
+//     } else if (propertyModalData.value) {
+//       // Verify owner can update this property
+//       if (authStore.user?.role !== 'admin') {
+//         throw new Error('Cannot update property not owned by current admin');
+//       }
+//       await updateProperty(propertyModalData.value.id, propertyData as Partial<PropertyFormData>);
+//     }
+//     uiStore.closeModal('propertyModal');
+//   } catch (error) {
+//     console.error('Failed to save the property:', error);
+//   }
+// };
 
-const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
-  // Verify owner can delete this property
-    if (authStore.user?.role !== 'admin') {
-    console.warn('Cannot delete property not owned by current admin');
-    return;
-  }
-  
-  uiStore.openConfirmDialog('confirmDialog', {
-    title: 'Delete Property',
-    message: 'Are you sure you want to delete this property? This will also delete all associated bookings. This action cannot be undone.',
-    confirmText: 'Delete',
-    cancelText: 'Cancel',
-    dangerous: true,
-    data: { type: 'property', id: propertyId }
-  });
-};
+// const handlePropertyModalDelete = async (propertyId: string): Promise<void> => {
+//   // Verify owner can delete this property
+//     if (authStore.user?.role !== 'admin') {
+//     console.warn('Cannot delete property not owned by current admin');
+//     return;
+//   }
+//   
+//   uiStore.openConfirmDialog('confirmDialog', {
+//     title: 'Delete Property',
+//     message: 'Are you sure you want to delete this property? This will also delete all associated bookings. This action cannot be undone.',
+//     confirmText: 'Delete',
+//     cancelText: 'Cancel',
+//     dangerous: true,
+//     data: { type: 'property', id: propertyId }
+//   });
+// };
 
 // ============================================================================
 // UI STATE - MODAL MANAGEMENT
 // ============================================================================
 
 // Event Modal
-const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
-const eventModalMode = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const eventModalData = computed(() => {
-  const modal = uiStore.getModalState('eventModal');
-  return modal?.data as Booking | undefined;
-});
-
-// Property Modal
-const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
-const propertyModalMode = computed(() => {
-  const modal = uiStore.getModalState('propertyModal');
-  return (modal?.mode as 'create' | 'edit') || 'create';
-});
-const propertyModalData = computed(() => {
-  const modal = uiStore.getModalState('propertyModal');
-  return modal?.data as Property | undefined;
-});
-
-// Confirmation Dialog
-const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirmDialog'));
-const confirmDialogTitle = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.title || 'Confirm';
-});
-const confirmDialogMessage = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.message || 'Are you sure you want to proceed?';
-});
-const confirmDialogConfirmText = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.confirmText || 'Confirm';
-});
-const confirmDialogCancelText = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.cancelText || 'Cancel';
-});
-const confirmDialogDangerous = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.dangerous || false;
-});
-const confirmDialogData = computed(() => {
-  const dialog = uiStore.getConfirmDialogState('confirmDialog');
-  return dialog?.data;
-});
+// const eventModalOpen = computed(() => uiStore.isModalOpen('eventModal'));
+// const eventModalMode = computed(() => {
+//   const modal = uiStore.getModalState('eventModal');
+//   return (modal?.mode as 'create' | 'edit') || 'create';
+// });
+// const eventModalData = computed(() => {
+//   const modal = uiStore.getModalState('eventModal');
+//   return modal?.data as Booking | undefined;
+// });
+// 
+// // Property Modal
+// const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
+// const propertyModalMode = computed(() => {
+//   const modal = uiStore.getModalState('propertyModal');
+//   return (modal?.mode as 'create' | 'edit') || 'create';
+// });
+// const propertyModalData = computed(() => {
+//   const modal = uiStore.getModalState('propertyModal');
+//   return modal?.data as Property | undefined;
+// });
+// 
+// // Confirmation Dialog
+// const confirmDialogOpen = computed(() => uiStore.isConfirmDialogOpen('confirmDialog'));
+// const confirmDialogTitle = computed(() => {
+//   const dialog = uiStore.getConfirmDialogState('confirmDialog');
+//   return dialog?.title || 'Confirm';
+// });
+// const confirmDialogMessage = computed(() => {
+//   const dialog = uiStore.getConfirmDialogState('confirmDialog');
+//   return dialog?.message || 'Are you sure you want to proceed?';
+// });
+// const confirmDialogConfirmText = computed(() => {
+//   const dialog = uiStore.getConfirmDialogState('confirmDialog');
+//   return dialog?.confirmText || 'Confirm';
+// });
+// const confirmDialogCancelText = computed(() => {
+//   const dialog = uiStore.getConfirmDialogState('confirmDialog');
+//   return dialog?.cancelText || 'Cancel';
+// });
+// const confirmDialogDangerous = computed(() => {
+//   const dialog = uiStore.getConfirmDialogState('confirmDialog');
+//   return dialog?.dangerous || false;
+// });
+// const confirmDialogData = computed(() => {
+//   const dialog = uiStore.getConfirmDialogState('confirmDialog');
+//   return dialog?.data;
+// });
 
 
 // ============================================================================
 // CONFIRMATION DIALOG HANDLERS
 // ============================================================================
 
-const handleConfirmDialogConfirm = async (): Promise<void> => {
-  const data = confirmDialogData.value;
-  
-  if (data?.type === 'booking' && data?.id) {
-    try {
-      // Admin can delete any booking - no ownership check needed
-      await deleteBooking(data.id as string);
-      uiStore.closeModal('eventModal');
-    } catch (error) {
-      console.error('Failed to delete booking:', error);
-    }
-  } else if (data?.type === 'property' && data?.id) {
-    try {
-      // Admin can delete any property - no ownership check needed
-      await deleteProperty(data.id as string);
-      uiStore.closeModal('propertyModal');
-    } catch (error) {
-      console.error('Failed to delete property:', error);
-    }
-  }
-  
-  uiStore.closeConfirmDialog('confirmDialog');
-};
+// const handleConfirmDialogConfirm = async (): Promise<void> => {
+//   const data = confirmDialogData.value;
+//   
+//   if (data?.type === 'booking' && data?.id) {
+//     try {
+//       // Admin can delete any booking - no ownership check needed
+//       await deleteBooking(data.id as string);
+//       uiStore.closeModal('eventModal');
+//     } catch (error) {
+//       console.error('Failed to delete booking:', error);
+//     }
+//   } else if (data?.type === 'property' && data?.id) {
+//     try {
+//       // Admin can delete any property - no ownership check needed
+//       await deleteProperty(data.id as string);
+//       uiStore.closeModal('propertyModal');
+//     } catch (error) {
+//       console.error('Failed to delete property:', error);
+//     }
+//   }
+//   
+//   uiStore.closeConfirmDialog('confirmDialog');
+// };
 
-const handleConfirmDialogCancel = (): void => {
-  uiStore.closeConfirmDialog('confirmDialog');
-};
+// const handleConfirmDialogCancel = (): void => {
+//   uiStore.closeConfirmDialog('confirmDialog');
+// };
 
-const handleConfirmDialogClose = (): void => {
-  uiStore.closeConfirmDialog('confirmDialog');
-};
+// const handleConfirmDialogClose = (): void => {
+//   uiStore.closeConfirmDialog('confirmDialog');
+// };
 
 // ============================================================================
 // SIDEBAR MANAGEMENT
 // ============================================================================
 
-const toggleSidebar = (): void => {
-  sidebarOpen.value = !sidebarOpen.value;
-};
+// const toggleSidebar = (): void => {
+//   sidebarOpen.value = !sidebarOpen.value;
+// };
 
 // ============================================================================
 // LIFECYCLE HOOKS
@@ -582,8 +578,8 @@ onMounted(async () => {
     try {
       // Fetch ALL data across system - admin has full access
       await Promise.all([
-        propertyStore.fetchProperties(),
-        bookingStore.fetchBookings(),
+        fetchProperties(),
+        fetchBookings(),
         fetchAllUsers()
       ]);
       console.log('✅ [HomeAdmin] System data loaded successfully');
@@ -631,8 +627,8 @@ watch(isAdminAuthenticated, async (newValue, oldValue) => {
     console.log('✅ [HomeAdmin] User gained admin authentication, loading system data...');
     try {
       await Promise.all([
-        propertyStore.fetchProperties(),
-        bookingStore.fetchBookings(),
+        fetchProperties(),
+        fetchBookings(),
         fetchAllUsers()
       ]);
       console.log('✅ [HomeAdmin] System data loaded after auth change');

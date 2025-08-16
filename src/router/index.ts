@@ -196,61 +196,66 @@ const router = createRouter({
     // Development Demo Routes - Admin Demos
     // Only available in development mode for testing composables
   
-    {
-      path: '/dev/admin/ui-ux-enhancements-demo',
-      name: 'ui-ux-enhancements-demo',
-      component: () => import('@/dev/demos/Admin/UIUXEnhancementsDemo.vue'),
-      meta: {
-        layout: 'admin',
-        role: 'admin',
-        requiresAuth: true,
-        development: true
-      }
-    },
-    {
-      path: '/dev/admin/use-admin-bookings-demo',
-      name: 'use-admin-bookings-demo',
-      component: () => import('@/dev/demos/Admin/UseAdminBookingsDemo.vue'),
-      meta: {
-        layout: 'admin',
-        role: 'admin',
-        requiresAuth: true,
-        development: true
-      }
-    },
-    {
-      path: '/dev/admin/use-admin-calendar-state-demo',
-      name: 'use-admin-calendar-state-demo',
-      component: () => import('@/dev/demos/Admin/UseAdminCalendarStateDemo.vue'),
-      meta: {
-        layout: 'admin',
-        role: 'admin',
-        requiresAuth: true,
-        development: true 
-            }
-    },
-    {
-      path: '/dev/admin/use-admin-properties-demo',
-      name: 'use-admin-properties-demo',
-      component: () => import('@/dev/demos/Admin/UseAdminPropertiesDemo.vue'),
-      meta: {
-        layout: 'admin',
-        role: 'admin',
-        requiresAuth: true,
-        development: true
-      }
-    },
-    {
-      path: '/dev/admin/turn-visual-indicators',
-      name: 'turn-visual-indicators',
-      component: () => import('@/dev/demos/Admin/turn-visual-indicators.vue'),
-      meta: {
-        layout: 'admin',
-        role: 'admin',
-        requiresAuth: true,
-        development: true
-      }
-    }
+    // Temporarily disabled - moved to temp-disabled/
+    // {
+    //   path: '/dev/admin/ui-ux-enhancements-demo',
+    //   name: 'ui-ux-enhancements-demo',
+    //   component: () => import('@/dev/demos/Admin/UIUXEnhancementsDemo.vue'),
+    //   meta: {
+    //     layout: 'admin',
+    //     role: 'admin',
+    //     requiresAuth: true,
+    //     development: true
+    //   }
+    // },
+    // Temporarily disabled - moved to temp-disabled/
+    // {
+    //   path: '/dev/admin/use-admin-bookings-demo',
+    //   name: 'use-admin-bookings-demo',
+    //   component: () => import('@/dev/demos/Admin/UseAdminBookingsDemo.vue'),
+    //   meta: {
+    //     layout: 'admin',
+    //     role: 'admin',
+    //     requiresAuth: true,
+    //     development: true
+    //   }
+    // },
+    // Temporarily disabled - moved to temp-disabled/
+    // {
+    //   path: '/dev/admin/use-admin-calendar-state-demo',
+    //   name: 'use-admin-calendar-state-demo',
+    //   component: () => import('@/dev/demos/Admin/UseAdminCalendarStateDemo.vue'),
+    //   meta: {
+    //     layout: 'admin',
+    //     role: 'admin',
+    //     requiresAuth: true,
+    //     development: true 
+    //         }
+    // },
+    // Temporarily disabled - moved to temp-disabled/
+    // {
+    //   path: '/dev/admin/use-admin-properties-demo',
+    //   name: 'use-admin-properties-demo',
+    //   component: () => import('@/dev/demos/Admin/UseAdminPropertiesDemo.vue'),
+    //   meta: {
+    //     layout: 'admin',
+    //     role: 'admin',
+    //     requiresAuth: true,
+    //     development: true
+    //   }
+    // },
+    // Temporarily disabled - moved to temp-disabled/
+    // {
+    //   path: '/dev/admin/turn-visual-indicators',
+    //   name: 'turn-visual-indicators',
+    //   component: () => import('@/dev/demos/Admin/turn-visual-indicators.vue'),
+    //   meta: {
+    //     layout: 'admin',
+    //     role: 'admin',
+    //     requiresAuth: true,
+    //     development: true
+    //   }
+    // }
   ]
 })
 

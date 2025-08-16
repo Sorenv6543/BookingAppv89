@@ -187,11 +187,14 @@ export const useBookingStore = defineStore('booking', () => {
   // }
   // Example: src/stores/booking.ts - Add these methods
 async function addBooking(booking: Booking) {
+  console.log('🚀 [BookingStore] addBooking called with:', booking);
+  
   // Optimistic update
   bookings.value.set(booking.id, booking);
   error.value = null;
   
   try {
+    console.log('🚀 [BookingStore] Inserting booking into Supabase:', booking);
     // Database already has correct column names - no mapping needed!
     const { error: supaError } = await supabase.from('bookings').insert(booking);
     if (supaError) {
@@ -204,7 +207,7 @@ async function addBooking(booking: Booking) {
     // Rollback on error
     bookings.value.delete(booking.id);
     error.value = err instanceof Error ? err.message : 'Failed to add booking.';
-    console.error('addBooking error:', err);
+    console.error('❌ [BookingStore] addBooking error:', err);
     throw err;
   }
 }
@@ -307,7 +310,7 @@ async function addBooking(booking: Booking) {
       const { data, error: fetchError } = await supabase
         .from('bookings')
         .select('*')
-        .order('guest_departure_date', { ascending: true }); // Order by departure date
+        .order('checkout_date', { ascending: true }); // Order by checkout date
       
       if (fetchError) {
         console.error('❌ [BookingStore] Supabase error:', fetchError);

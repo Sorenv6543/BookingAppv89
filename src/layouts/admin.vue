@@ -50,7 +50,7 @@ const router = useRouter();
 const { mobile } = useDisplay();
 const bookingStore = useBookingStore();
 const propertyStore = usePropertyStore();
-const { users: allUsers, fetchAllUsers } = useAdminUserManagement();
+const { users: _allUsers, fetchAllUsers } = useAdminUserManagement();
 
 // Initialize state
 const currentView = ref('month');
@@ -68,7 +68,7 @@ const activeCleaningsToday = computed(() => {
   const today = new Date().toISOString().split('T')[0];
   return Array.from(bookingStore.bookings.values())
     .filter(booking => 
-      booking.guest_departure_date.startsWith(today) && 
+      booking.checkout_date.startsWith(today) && 
       booking.status === 'in_progress'
     ).length;
 });
@@ -77,11 +77,12 @@ const urgentTurnsCount = computed(() => {
   const today = new Date().toISOString().split('T')[0];
   return Array.from(bookingStore.bookings.values())
     .filter(booking => 
-      booking.guest_departure_date.startsWith(today) && 
+      booking.checkout_date.startsWith(today) && 
       booking.booking_type === 'turn' && 
       booking.status !== 'completed'
     ).length;
 });
+
 
 // Navigation handlers
 const toggleSidebar = () => {

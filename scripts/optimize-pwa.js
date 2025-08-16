@@ -152,7 +152,7 @@ async function trackPerformanceRegression(currentSnapshot) {
     try {
       const historyData = await fs.readFile(PERFORMANCE_HISTORY_FILE, 'utf8')
       history = JSON.parse(historyData)
-    } catch (_error) {
+    } catch {
       // File doesn't exist yet, start fresh
       console.log('📝 Creating new performance history file...')
     }
@@ -246,28 +246,6 @@ async function checkPWAConfig() {
   }
 }
 
-async function analyzeServiceWorker() {
-  try {
-    const swPath = path.resolve('dist/sw.js')
-    const swStats = await fs.stat(swPath)
-    const swSizeKB = (swStats.size / 1024).toFixed(2)
-    
-    console.log('\nService Worker Analysis:')
-    console.log('========================')
-    console.log(`Service Worker Size: ${swSizeKB} KB`)
-    
-    // Check for role-based caching
-    const swContent = await fs.readFile(swPath, 'utf8')
-    const hasRoleCaching = swContent.includes('role-based-chunks')
-    const hasAPICaching = swContent.includes('api-cache')
-    
-    console.log(`Role-based caching: ${hasRoleCaching ? '✅ Enabled' : '❌ Missing'}`)
-    console.log(`API caching: ${hasAPICaching ? '✅ Enabled' : '❌ Missing'}`)
-    
-  } catch (error) {
-    console.error('Error analyzing service worker:', error)
-  }
-}
 
 // Enhanced service worker analysis with performance monitoring
 async function analyzeServiceWorkerPerformance() {
@@ -278,7 +256,7 @@ async function analyzeServiceWorkerPerformance() {
     try {
       swStats = await fs.stat(swPath)
       swContent = await fs.readFile(swPath, 'utf8')
-    } catch (_error) {
+    } catch {
       // Try alternative path
       const altSwPath = path.resolve('dist/sw.js')
       swStats = await fs.stat(altSwPath)
@@ -382,7 +360,7 @@ async function analyzeImportPaths() {
           }
         }
       })
-    } catch (_error) {
+    } catch {
       // Ignore files that can't be read
     }
   }
@@ -426,7 +404,7 @@ async function findSourceFiles() {
           sourceFiles.push(fullPath)
         }
       }
-    } catch (_error) {
+    } catch {
       // Ignore directories that can't be read
     }
   }
@@ -449,7 +427,6 @@ async function performanceRegressionTest() {
     }
     
     const current = history[history.length - 1]
-    const _baseline = history[0] // First recorded measurement
     const previous = history[history.length - 2]
     
     const tests = [

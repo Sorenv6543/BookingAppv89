@@ -164,15 +164,15 @@ export function useAdminProperties() {
       let averageGapDays = 0;
       if (propertyBookings.length > 1) {
         const sortedBookings = [...propertyBookings].sort((a, b) => 
-          new Date(a.guest_departure_date).getTime() - new Date(b.guest_departure_date).getTime()
+          new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime()
         );
         
         let totalGapDays = 0;
         let gapCount = 0;
         
         for (let i = 0; i < sortedBookings.length - 1; i++) {
-                const currentCheckout = new Date(sortedBookings[i].guest_arrival_date);
-      const nextCheckin = new Date(sortedBookings[i + 1].guest_departure_date);
+                const currentCheckout = new Date(sortedBookings[i].checkin_date);
+      const nextCheckin = new Date(sortedBookings[i + 1].checkout_date);
           
           if (nextCheckin > currentCheckout) {
             const gapDays = Math.round((nextCheckin.getTime() - currentCheckout.getTime()) / (1000 * 60 * 60 * 24));
@@ -289,7 +289,7 @@ export function useAdminProperties() {
           }
           
           // Validate updates if needed
-          if (updates.cleaning_duration !== undefined && updates.cleaning_duration !== null && updates.cleaning_duration < 30) {
+          if (updates.cleaning_duration !== undefined && updates.cleaning_duration !== null && typeof updates.cleaning_duration === 'number' && updates.cleaning_duration < 30) {
             results.failed.push(propertyId);
             continue;
           }
@@ -362,7 +362,7 @@ export function useAdminProperties() {
             const upcomingBookings = Array.from(bookingStore.bookings.values())
               .filter(booking => 
                 booking.property_id === propertyId &&
-                new Date(booking.guest_arrival_date) > now &&
+                new Date(booking.checkin_date) > now &&
                 ['pending', 'scheduled'].includes(booking.status)
               );
             

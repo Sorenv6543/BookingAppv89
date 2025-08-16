@@ -106,9 +106,9 @@ src/components/smart/owner/HomeOwner.vue -
             :current-date="currentDate"
             :properties="ownerPropertiesMap"
             @date-select="handleDateSelect"
-                  @event-click="handleEventClick"
-      @event-drop="handleEventDrop"
-      @event-resize="handleEventResize"
+            @event-click="handleEventClick"
+            @event-drop="handleEventDrop"
+            @event-resize="handleEventResize"
             @view-change="handleCalendarViewChange"
             @date-change="handleCalendarDateChange"
             @create-booking="handleCreateBookingFromCalendar"
@@ -232,10 +232,7 @@ src/components/smart/owner/HomeOwner.vue -
 </template>
 
 <script setup lang="ts">
-//import { useRealtimeSync } from '@/composables/supabase/useRealtimeSync';
 
-
-// Real-time sync will auto-initialize when user is authenticated
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { useDisplay } from 'vuetify';
 
@@ -248,17 +245,18 @@ import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue'
 
 // State management
 import { usePropertyStore } from '@/stores/property';
-import { useBookingStore } from '@/stores/booking';
+import { useSupabaseBookings } from '@/composables/supabase/useSupabaseBookings';
 import { useUIStore } from '@/stores/ui';
 
 import { useAuthStore } from '@/stores/auth';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
-  // Business logic composables
 
+// Business logic composables
 import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
+
 // Types
-import type { Booking, Property, BookingFormData, PropertyFormData,  } from '@/types';
+import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Import event logger for component communication
@@ -269,9 +267,9 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 // STORE CONNECTIONS & STATE
 // ============================================================================
 
-//useRealtimeSync(); // Just call it for side effects
+
 const propertyStore = usePropertyStore();
-const bookingStore = useBookingStore();
+const { bookings, fetchBookings, createBooking: createSupabaseBooking } = useSupabaseBookings();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
 const { xs, mobile } = useDisplay();
@@ -281,7 +279,6 @@ const { xs, mobile } = useDisplay();
 // ============================================================================
 const { 
   loading: bookingsLoading, 
-  createMyBooking, 
   updateMyBooking,
   deleteMyBooking
 } = useOwnerBookings();
@@ -361,22 +358,13 @@ const ownerPropertiesMap = computed(() => {
     return map;
   }
 
-  // Filter properties by owner_id
-  if (propertyStore.properties instanceof Map) {
-    propertyStore.properties.forEach((property, id) => {
-      if (property.owner_id === currentOwnerId.value) {
-        map.set(id, property);
-      }
-    });
-  } else {
-    propertyStore.propertiesArray
-      .filter(property => property.owner_id === currentOwnerId.value)
-      .forEach(property => {
-        if (property && property.id) {
-          map.set(property.id, property);
-        }
-      });
-  }
+  // Filter properties by owner_id using the store's Map
+  const allProperties = propertyStore.properties;
+  allProperties.forEach((property, id) => {
+    if (property.owner_id === currentOwnerId.value) {
+      map.set(id, property);
+    }
+  });
   
   return map;
 });
@@ -391,7 +379,7 @@ const ownerBookingsMap = computed(() => {
 
   try {
     // Filter bookings by owner_id
-    const ownerBookings = bookingStore.bookingsArray
+    const ownerBookings = bookings.value
       .filter(booking => booking.owner_id === currentOwnerId.value);
       
     ownerBookings.forEach(booking => {
@@ -587,8 +575,8 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
   );
   
   const bookingData: Partial<BookingFormData> = {
-    guest_arrival_date: selectInfo.startStr,    // ✅ Guests arrive on start date
-    guest_departure_date: selectInfo.endStr,    // ✅ Guests leave on end date  
+              checkin_date: selectInfo.startStr,    // ✅ Guests arrive on start date
+          checkout_date: selectInfo.endStr,    // ✅ Guests leave on end date  
     owner_id: currentOwnerId.value
   };
   
@@ -644,8 +632,8 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     await nextTick();
     
     const result = await updateMyBooking(booking.id, {
-      guest_arrival_date: dropInfo.event.startStr,
-      guest_departure_date: dropInfo.event.endStr || dropInfo.event.startStr,
+      checkin_date: dropInfo.event.startStr,
+      checkout_date: dropInfo.event.endStr || dropInfo.event.startStr,
       owner_id: booking.owner_id,
     });
     
@@ -654,12 +642,7 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     }
     
     // Show success notification
-    uiStore.showNotification({
-      type: 'success',
-      title: 'Booking Updated',
-      message: 'Your booking has been successfully moved to the new date.',
-      duration: 3000
-    });
+    uiStore.showNotification('Your booking has been successfully moved to the new date.', 'success');
     
     // Additional nextTick to ensure DOM updates complete
     await nextTick();
@@ -692,8 +675,8 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
     await nextTick();
     
     const result = await updateMyBooking(booking.id, {
-      guest_arrival_date: resizeInfo.event.startStr,
-      guest_departure_date: resizeInfo.event.endStr,
+      checkin_date: resizeInfo.event.startStr,
+      checkout_date: resizeInfo.event.endStr,
       owner_id: booking.owner_id,
     });
     
@@ -702,12 +685,7 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
     }
     
     // Show success notification
-    uiStore.showNotification({
-      type: 'success',
-      title: 'Booking Updated',
-      message: 'Your booking duration has been successfully updated.',
-      duration: 3000
-    });
+    uiStore.showNotification('Your booking duration has been successfully updated.', 'success');
     
     // Additional nextTick to ensure DOM updates complete
     await nextTick();
@@ -772,8 +750,8 @@ const handleUpdateBooking = (data: { id: string; start: string; end: string }): 
   }
   
   updateMyBooking(data.id, {
-            guest_departure_date: data.start,
-        guest_arrival_date: data.end,
+                      checkout_date: data.start,
+          checkin_date: data.end,
     owner_id: currentOwnerId.value,
   });
 };
@@ -789,8 +767,8 @@ const handleEventModalClose = (): void => {
 const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
   try {
     console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Raw form data:', {
-      guest_arrival_date: data.guest_arrival_date,
-      guest_departure_date: data.guest_departure_date,
+                checkin_date: data.checkin_date,
+          checkout_date: data.checkout_date,
       guest_arrival_time: data.guest_arrival_time,
       guest_departure_time: data.guest_departure_time,
       property_id: data.property_id,
@@ -804,17 +782,17 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     };
     
     console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Final booking data:', {
-      guest_arrival_date: bookingData.guest_arrival_date,
-      guest_departure_date: bookingData.guest_departure_date,
-      guest_arrival_time: bookingData.guest_arrival_time,
-      guest_departure_time: bookingData.guest_departure_time,
+      checkin_date: bookingData.checkin_date,
+      checkout_date: bookingData.checkout_date,
+      checkin_time: bookingData.checkin_time,
+      checkout_time: bookingData.checkout_time,
       property_id: bookingData.property_id,
       owner_id: bookingData.owner_id,
       booking_type: bookingData.booking_type
     });
     
     if (eventModalMode.value === 'create') {
-      await createMyBooking(bookingData as BookingFormData);
+      await createSupabaseBooking(bookingData as BookingFormData);
     } else if (eventModalData.value) {
       // eventModalData.value should be the booking directly
       const booking = eventModalData.value;
@@ -968,15 +946,15 @@ onMounted(async () => {
     try {
       // Fetch data using store methods directly for better performance
       await Promise.all([
-        propertyStore.fetchProperties(),
-        bookingStore.fetchBookings()
+        propertyStore.fetchProperties(), // Use propertyStore
+        fetchBookings()
       ]);
       console.log('✅ [HomeOwner] Owner data loaded successfully');
       
       // Debug data after loading
       console.log('🔍 [HomeOwner] Data state after loading:', {
-        allProperties: propertyStore.propertiesArray.length,
-        allBookings: bookingStore.bookingsArray.length,
+        allProperties: propertyStore.properties.size, // Use propertyStore
+        allBookings: bookings.value?.length || 0,
         ownerProperties: ownerPropertiesMap.value.size,
         ownerBookings: ownerBookingsMap.value.size,
         filteredBookings: ownerFilteredBookings.value.size
@@ -984,12 +962,12 @@ onMounted(async () => {
       
       // Debug booking data specifically
       console.log('🔍 [HomeOwner] Bookings data:', {
-        allBookings: bookingStore.bookingsArray.map(b => ({
+        allBookings: (bookings.value || []).map(b => ({
           id: b.id,
           owner_id: b.owner_id,
           property_id: b.property_id,
-                  guest_departure_date: b.guest_departure_date,
-        guest_arrival_date: b.guest_arrival_date
+                  checkout_date: b.checkout_date,
+        checkin_date: b.checkin_date
         })),
         currentUserId: currentOwnerId.value
       });
@@ -1008,8 +986,8 @@ onMounted(async () => {
       const ownerBookings = Array.from(ownerBookingsMap.value.values());
       console.log('🔍 [HomeOwner] Debug - Owner booking dates:', ownerBookings.map(b => ({
         id: b.id,
-        guest_departure_date: b.guest_departure_date,
-        guest_arrival_date: b.guest_arrival_date,
+        checkout_date: b.checkout_date,
+        checkin_date: b.checkin_date,
         status: b.status,
         booking_type: b.booking_type
       })));
@@ -1054,8 +1032,8 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
     console.log('✅ [HomeOwner] User became authenticated, loading data...');
     try {
       await Promise.all([
-        propertyStore.fetchProperties(),
-        bookingStore.fetchBookings()
+        propertyStore.fetchProperties(), // Use propertyStore
+        fetchBookings()
       ]);
       console.log('✅ [HomeOwner] Data loaded after auth change');
       

@@ -149,7 +149,7 @@ export function useOwnerProperties() {
       success.value = `Loaded ${myProperties.value.length} of your properties`;
       loading.value = false;
       return true;
-    } catch (err) {
+    } catch {
       error.value = 'Unable to load your properties. Please try again.';
       loading.value = false;
       return false;
@@ -309,7 +309,7 @@ export function useOwnerProperties() {
       if (!active) {
         const now = new Date();
         const upcomingBookings = Array.from(bookingStore.bookingsByProperty(id).values()).filter((booking: Booking) => {
-          const checkinDate = new Date(booking.guest_arrival_date);
+          const checkinDate = new Date(booking.checkin_date);
           return checkinDate > now && ['pending', 'scheduled'].includes(booking.status);
         });
         

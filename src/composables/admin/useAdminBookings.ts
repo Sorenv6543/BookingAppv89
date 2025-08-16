@@ -75,7 +75,7 @@ export function useAdminBookings() {
     
     return allBookings.value.filter(booking => 
       booking.booking_type === 'turn' &&
-      booking.guest_departure_date.startsWith(today) &&
+      booking.checkout_date.startsWith(today) &&
       booking.status !== 'completed'
     );
   });
@@ -198,14 +198,18 @@ export function useAdminBookings() {
 
       const bookingWithId: Booking = {
         id: `booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        property_id: (bookingData.property_id as string) || '',
-        owner_id: (bookingData.owner_id as string) || '',
-        guest_departure_date: bookingData.guest_departure_date || new Date().toISOString(),
-        guest_arrival_date: bookingData.guest_arrival_date || new Date().toISOString(),
-        status: (bookingData.status as BookingStatus) || 'pending',
-        booking_type: (bookingData.booking_type as BookingType) || 'standard',
+        property_id: bookingData.property_id || '',
+        owner_id: bookingData.owner_id || '',
+        checkout_date: bookingData.checkout_date || new Date().toISOString(),
+        checkin_date: bookingData.checkin_date || new Date().toISOString(),
+        checkout_time: bookingData.checkout_time || '11:00:00',
+        checkin_time: bookingData.checkin_time || '15:00:00',
+        guest_count: bookingData.guest_count || 0,
+        notes: bookingData.notes || '',
+        status: bookingData.status || 'pending',
+        booking_type: bookingData.booking_type || 'standard',
         assigned_cleaner_id: bookingData.assigned_cleaner_id || undefined,
-        notes: (bookingData.notes as string) || '',
+        special_instructions: bookingData.special_instructions || '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -227,30 +231,39 @@ export function useAdminBookings() {
       loading.value = true;
       error.value = null;
 
+      console.log('🚀 [useAdminBookings] Creating booking with data:', bookingData);
+
       // Convert BookingFormData to Booking by adding required id
       const bookingWithId: Booking = {
         id: crypto.randomUUID(),
-        property_id: (bookingData.property_id as string) || '',
-        owner_id: (bookingData.owner_id as string) || '',
-        guest_departure_date: bookingData.guest_departure_date || new Date().toISOString(),
-        guest_arrival_date: bookingData.guest_arrival_date || new Date().toISOString(),
-        status: (bookingData.status as BookingStatus) || 'pending',
-        booking_type: (bookingData.booking_type as BookingType) || 'standard',
-        assigned_cleaner_id: bookingData.assigned_cleaner_id || undefined,
-        notes: (bookingData.notes as string) || '',
+        property_id: bookingData.property_id,
+        owner_id: bookingData.owner_id,
+        checkout_date: bookingData.checkout_date,
+        checkin_date: bookingData.checkin_date,
+        checkout_time: bookingData.checkout_time,
+        checkin_time: bookingData.checkin_time,
+        guest_count: bookingData.guest_count,
+        notes: bookingData.notes,
+        status: bookingData.status,
+        booking_type: bookingData.booking_type,
+        priority: bookingData.priority || 'normal',
+        assigned_cleaner_id: bookingData.assigned_cleaner_id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
 
+      console.log('🚀 [useAdminBookings] Final booking object:', bookingWithId);
+
       await bookingStore.addBooking(bookingWithId);
-      trackCachePerformance('admin-create-booking', true); // Changed to boolean
+      trackCachePerformance('admin-create-booking', true);
       
       success.value = 'Booking created successfully';
-         } catch (err: unknown) {
-       const errorMsg = err as Error;
-       error.value = `Failed to create booking: ${errorMsg.message}`;
-       trackCachePerformance('admin-create-booking', false); // Changed to boolean
-     } finally {
+    } catch (err: unknown) {
+      const errorMsg = err as Error;
+      console.error('🚀 [useAdminBookings] Error creating booking:', errorMsg);
+      error.value = `Failed to create booking: ${errorMsg.message}`;
+      trackCachePerformance('admin-create-booking', false);
+    } finally {
       loading.value = false;
     }
   };
@@ -290,15 +303,15 @@ export function useAdminBookings() {
   };
 
   // Role-specific performance metrics (prefixed with _ to indicate intentionally unused)
-  const _getAdminPerformanceMetrics = computed(() => {
-    return {
-      totalBookingsProcessed: allBookings.value.length,
-      totalPropertiesManaged: allProperties.value.length,
-      systemLoad: allBookings.value.length > 100 ? 'high' : 
-                 allBookings.value.length > 50 ? 'medium' : 'low',
-      dataProcessingEfficiency: allBookings.value.length > 0 ? 'optimal' : 'idle'
-    };
-  });
+  // const _getAdminPerformanceMetrics = computed(() => {
+  //   return {
+  //     totalBookingsProcessed: allBookings.value.length,
+  //     totalPropertiesManaged: allProperties.value.length,
+  //     systemLoad: allBookings.value.length > 100 ? 'high' : 
+  //                allBookings.value.length > 50 ? 'medium' : 'low',
+  //     dataProcessingEfficiency: allBookings.value.length > 0 ? 'optimal' : 'idle'
+  //   };
+  // });
 
   // Permission functions expected by tests
   function canManageAnyBooking(): boolean {
@@ -343,7 +356,7 @@ export function useAdminBookings() {
       success.value = `Loaded ${allBookings.value.length} bookings across all properties`;
       loading.value = false;
       return true;
-    } catch (_err) {
+    } catch {
       error.value = 'Unable to load system bookings. Please try again.';
       loading.value = false;
       return false;
@@ -449,7 +462,7 @@ export function useAdminBookings() {
           } else {
             results.failed.push(bookingId);
           }
-        } catch (_err) {
+        } catch {
           results.failed.push(bookingId);
         }
       }
@@ -465,7 +478,7 @@ export function useAdminBookings() {
       
       loading.value = false;
       return results;
-    } catch (_err) {
+    } catch {
       error.value = 'Bulk assignment operation failed. System error occurred.';
       loading.value = false;
       return { success: [], failed: bookingIds };
@@ -497,7 +510,7 @@ export function useAdminBookings() {
           } else {
             results.failed.push(bookingId);
           }
-        } catch (_err) {
+        } catch {
           results.failed.push(bookingId);
         }
       }
@@ -513,7 +526,7 @@ export function useAdminBookings() {
       
       loading.value = false;
       return results;
-    } catch (_err) {
+    } catch {
       error.value = 'Bulk status update operation failed. System error occurred.';
       loading.value = false;
       return { success: [], failed: bookingIds };
@@ -536,8 +549,8 @@ export function useAdminBookings() {
       alerts: urgentTurns.map(turn => ({
         id: turn.id,
         property_id: turn.property_id,
-        guest_departure_date: turn.guest_departure_date,
-        guest_arrival_date: turn.guest_arrival_date,
+        checkout_date: turn.checkout_date,
+        checkin_date: turn.checkin_date,
         status: turn.status,
         assigned_cleaner_id: turn.assigned_cleaner_id,
         priority: baseBookings.calculateBookingPriority(turn),
@@ -657,7 +670,7 @@ export function useAdminBookings() {
       
       // Date range filter
       if (criteria.dateRange) {
-        const bookingDate = new Date(booking.guest_departure_date);
+        const bookingDate = new Date(booking.checkout_date);
         const startDate = new Date(criteria.dateRange.start);
         const endDate = new Date(criteria.dateRange.end);
         if (bookingDate < startDate || bookingDate > endDate) return false;
