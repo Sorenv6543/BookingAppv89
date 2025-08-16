@@ -377,9 +377,9 @@ const handleDateClick = (arg: DateClickArg): void => {
   const clickedDate = arg.dateStr;
   const currentUserId = authStore.user?.id;
   const dayBookings = Array.from(props.bookings.values()).filter(booking => {
-    const arrivalDate = booking.guest_arrival_date;
-    const departureDate = booking.guest_departure_date;
-    const dateMatches = clickedDate >= arrivalDate && clickedDate < departureDate;
+    const checkinDate = booking.checkin_date;
+    const checkoutDate = booking.checkout_date;
+    const dateMatches = clickedDate >= checkinDate && clickedDate < checkoutDate;
     const ownerMatches = !currentUserId || booking.owner_id === currentUserId;
     return dateMatches && ownerMatches;
   });
@@ -743,9 +743,9 @@ const handleManualMoreLinkClick = (event: Event): void => {
   
   Array.from(props.bookings.values()).forEach(booking => {
     // Compare using ISO-only date strings to avoid timezone drift
-    const arrival = booking.guest_arrival_date;   // inclusive start
-    const departure = booking.guest_departure_date; // exclusive end
-    const dateMatches = clickedIso >= arrival && clickedIso < departure;
+    const checkin = booking.checkin_date;   // inclusive start
+    const checkout = booking.checkout_date; // exclusive end
+    const dateMatches = clickedIso >= checkin && clickedIso < checkout;
     const ownerMatches = !currentUserId || booking.owner_id === currentUserId;
     
     if (dateMatches && ownerMatches) {

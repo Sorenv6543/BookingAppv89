@@ -59,7 +59,7 @@ export function safeBookingField(booking: Record<string, unknown>, field: keyof 
  * @returns Valid Date object
  */
 export function safeDepartureDate(booking: Record<string, unknown>): Date {
-  const dateValue = booking?.guest_departure_date;
+  const dateValue = booking?.checkout_date;
   return safeDate(dateValue);
 }
 
@@ -69,7 +69,7 @@ export function safeDepartureDate(booking: Record<string, unknown>): Date {
  * @returns Valid Date object
  */
 export function safeArrivalDate(booking: Record<string, unknown>): Date {
-  const dateValue = booking?.guest_arrival_date;
+  const dateValue = booking?.checkin_date;
   return safeDate(dateValue);
 }
 
@@ -93,19 +93,19 @@ export function isBookingLike(obj: unknown): obj is Partial<Booking> {
   return obj && 
          typeof obj === 'object' && 
          obj !== null &&
-         'guest_departure_date' in obj &&
-         'guest_arrival_date' in obj;
+         'checkout_date' in obj &&
+         'checkin_date' in obj;
 }
 
 export const getBookingDate = (booking: Booking | null | undefined): Date | null => {
   if (!booking) return null
-  const dateValue = booking?.guest_departure_date
+  const dateValue = booking?.checkout_date
   return dateValue ? new Date(dateValue) : null
 }
 
 export const getBookingEndDate = (booking: Booking | null | undefined): Date | null => {
   if (!booking) return null
-  const dateValue = booking?.guest_arrival_date
+  const dateValue = booking?.checkin_date
   return dateValue ? new Date(dateValue) : null
 }
 
@@ -115,6 +115,6 @@ export const isBooking = (obj: any): obj is Booking => {
     typeof obj.id === 'string' &&
     typeof obj.property_id === 'string' &&
     typeof obj.owner_id === 'string' &&
-    obj.guest_departure_date &&
-    obj.guest_arrival_date
+    obj.checkout_date &&
+    obj.checkin_date
 }

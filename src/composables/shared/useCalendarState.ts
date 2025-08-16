@@ -301,9 +301,9 @@ export function useCalendarState() {
         return false;
       }
       
-      // Check if booking is within current date range (arrival = start, departure = end)
-      const bookingStart = new Date(booking.guest_arrival_date);
-      const bookingEnd = new Date(booking.guest_departure_date);
+      // Check if booking is within current date range (checkin = start, checkout = end)
+      const bookingStart = new Date(booking.checkin_date);
+      const bookingEnd = new Date(booking.checkout_date);
       
       // Debug: Check if the dates are valid
       const bookingStartValid = !isNaN(bookingStart.getTime());
@@ -428,8 +428,8 @@ export function useCalendarState() {
       return {
         id: booking.id,
         title: isPriority ? '🔥 TURN BOOKING' : 'Standard Cleaning',
-        start: booking.guest_arrival_date,
-        end: booking.guest_departure_date,
+        start: booking.checkin_date,
+        end: booking.checkout_date,
         backgroundColor: statusColors[booking.status],
         borderColor: statusColors[booking.status],
         textColor: '#FFFFFF',
