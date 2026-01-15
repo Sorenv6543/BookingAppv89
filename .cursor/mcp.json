@@ -1,6 +1,75 @@
 {
-    "mcpServers": {
-  
-      
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "c:\\Users\\Soren\\.claude-worktrees\\BookingAppv89\\jolly-feynman"
+      ],
+      "description": "Enhanced filesystem access for project navigation"
+    },
+    "git": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git",
+        "--repository",
+        "c:\\Users\\Soren\\.claude-worktrees\\BookingAppv89\\jolly-feynman"
+      ],
+      "description": "Advanced git operations and history access"
+    },
+    "fetch": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-fetch"
+      ],
+      "description": "Enhanced web content fetching for documentation and resources"
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "[YOUR_BRAVE_API_KEY]"
+      },
+      "description": "Web search capabilities via Brave Search API",
+      "disabled": true,
+      "note": "Optional: Get free API key at https://brave.com/search/api/"
+    },
+    "postgres-local": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:postgres@localhost:54322/postgres"
+      ],
+      "description": "Local Supabase PostgreSQL database access (requires 'supabase start')",
+      "disabled": true,
+      "note": "Enable after running 'supabase start' to start your local database"
+    },
+    "postgres-remote": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:MLtNqQfQpiahnymh@db.otmfvzkokrxduipxkyga.supabase.co:5432/postgres"
+      ],
+      "description": "Remote Supabase PostgreSQL database access (production)"
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+      },
+      "description": "GitHub repository management (issues, PRs, etc.)"
     }
   }
+}

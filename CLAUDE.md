@@ -95,7 +95,7 @@ Key architectural patterns:
 ## Database Integration
 
 ### Supabase Configuration
-- **Project**: yplrudursbvzcdaroqly
+- **Project**: otmfvzkokrxduipxkyga
 - **Schema Status**: Complete (TASK-080b finished)
 - **Frontend Integration**: Pending completion
 - **Tables**: user_profiles, properties, bookings, notifications
@@ -198,7 +198,7 @@ Key architectural patterns:
 ### Development Environment
 ```bash
 # Required environment variables
-VITE_SUPABASE_URL=https://yplrudursbvzcdaroqly.supabase.co
+VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
 VITE_SUPABASE_ANON_KEY=[anon_key]
 ```
 

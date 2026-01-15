@@ -3,7 +3,7 @@
 
 ## 🎯 **Your Supabase Project is Ready!**
 
-**Project URL:** `https://yplrudursbvzcdaroqly.supabase.co`
+**Project URL:** `https://otmfvzkokrxduipxkyga.supabase.co`
 **Database:** ✅ Schema applied with RLS policies
 **Tables:** ✅ user_profiles, properties, bookings (all with RLS enabled)
 
@@ -15,8 +15,8 @@
 Create `.env.local` in your project root:
 ```bash
 # .env.local
-VITE_SUPABASE_URL=https://yplrudursbvzcdaroqly.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwbHJ1ZHVyc2J2emNkYXJvcWx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyNzIyNTAsImV4cCI6MjA2Njg0ODI1MH0.D3NN6SPNG_fJ4ys_2Ju9t_9X12P18nWLyzF_nteHIuQ
+VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90bWZ2emtva3J4ZHVpcHhreWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0NTE4MzIsImV4cCI6MjA4NDAyNzgzMn0.usa5Kiww4TJ3RttrvW5Bwus2sTuZrgJlmejdCTDsyOg
 VITE_APP_NAME="Property Cleaning Scheduler"
 VITE_DEBUG_AUTH=false
 ```
