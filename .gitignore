@@ -30,6 +30,10 @@ dist-ssr
 .env.*
 !.env.example
 
+# MCP Configuration (contains sensitive credentials)
+.cursor/mcp.json
+.mcp.json
+
 # Build output
 /dist
 /build

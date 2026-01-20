@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import path from 'path'
-import vueDevTools from 'vite-plugin-vue-devtools'
+// import vueDevTools from 'vite-plugin-vue-devtools' // Temporarily disabled
 import { VitePWA } from 'vite-plugin-pwa'
 
 
@@ -23,14 +23,15 @@ export default defineConfig({
           styles: {
             configFile: 'src/styles/variables.scss'
           }
-    }),   
-vueDevTools({
-  componentInspector: {
-    enabled: false,
-    toggleComboKey: 'alt-shift',
-    launchEditor: 'code',
-  }
-}),
+    }),
+// Temporarily disabled due to localStorage error in Node.js context
+// vueDevTools({
+//   componentInspector: {
+//     enabled: false,
+//     toggleComboKey: 'alt-shift',
+//     launchEditor: 'code',
+//   }
+// }),
     // Only include PWA plugin in production to prevent manifest errors in development
     ...(process.env.NODE_ENV === 'production' ? [VitePWA({
       registerType: 'autoUpdate',

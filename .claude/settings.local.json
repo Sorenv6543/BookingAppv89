@@ -31,7 +31,13 @@
       "mcp__serena__search_for_pattern",
       "Bash(pnpm dev:*)",
       "mcp__supabase__list_migrations",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(wc:*)",
+      "Bash(npm install:*)",
+      "Bash(npx supabase@latest:*)",
+      "Bash(docker --version:*)",
+      "Bash(ls:*)",
+      "Bash(npm run type-check:*)"
     ],
     "deny": []
   },
