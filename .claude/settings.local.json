@@ -36,7 +36,8 @@
       "Bash(npm install:*)",
       "Bash(npx supabase@latest:*)",
       "Bash(docker --version:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npm run type-check:*)"
     ],
     "deny": []
   },
