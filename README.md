@@ -5,6 +5,19 @@
 
 ---
 
+## **🚀 Quick Deployment**
+
+**Want to host your app online right now?** 
+
+👉 **[QUICK START DEPLOYMENT GUIDE](./QUICK_START_DEPLOYMENT.md)** - Deploy in 5 minutes!
+
+Or use the automated script:
+```bash
+./deploy.sh
+```
+
+---
+
 ## **🎯 Overview**
 
 BookingApp v89 is a modern web application designed for property cleaning businesses managing multiple clients. It features a role-based architecture serving two distinct user types:
