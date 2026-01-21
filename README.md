@@ -24,17 +24,33 @@ BookingApp v89 is a modern web application designed for property cleaning busine
 
 ## **🚀 Quick Start**
 
-### **Prerequisites**
-- **Node.js** 18+ 
-- **pnpm** package manager
-- **Git** for version control
+### **Easy Setup (Recommended)**
 
-### **Installation**
+We provide ready-to-run scripts that automatically set up Node.js, install dependencies, and run the project:
+
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/BookingAppv89.git
+git clone https://github.com/Sorenv6543/BookingAppv89.git
 cd BookingAppv89
 
+# Run the quick setup script (sets up everything automatically)
+bash setup-and-run.sh
+```
+
+That's it! The script will:
+- ✅ Check Node.js installation
+- ✅ Install pnpm package manager
+- ✅ Install all dependencies
+- ✅ Start the development server
+
+See [QUICK_START.md](QUICK_START.md) for detailed documentation on all available scripts.
+
+### **Manual Installation** (Alternative)
+
+If you prefer manual setup:
+
+```bash
+# Prerequisites: Node.js 18+ and pnpm
 # Install dependencies
 pnpm install
 
@@ -43,6 +59,24 @@ pnpm run dev
 ```
 
 ### **Available Scripts**
+
+#### **Quick Start Scripts**
+```bash
+# Simple setup and run (recommended for first-time users)
+bash setup-and-run.sh              # Start dev server
+bash setup-and-run.sh build        # Build project
+bash setup-and-run.sh test         # Run tests
+
+# Advanced commit runner (for testing different commits)
+bash run-commit.sh --list          # List all commits
+bash run-commit.sh HEAD build      # Build current commit
+bash run-commit.sh abc123 test     # Test specific commit
+bash run-commit.sh --all test      # Test all commits
+```
+
+See [QUICK_START.md](QUICK_START.md) for detailed script documentation.
+
+#### **npm/pnpm Scripts**
 ```bash
 # Development
 pnpm run dev                # Start dev server with HMR
