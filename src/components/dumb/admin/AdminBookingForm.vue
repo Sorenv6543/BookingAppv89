@@ -582,7 +582,7 @@ const selectedProperty = computed((): Property | undefined => {
 
 // Time validation rules and hints
 const checkoutTimeRules = computed(() => getTimeValidationRules(selectedProperty.value));
-const checkinTimeRules = computed(() => getCheckinTimeValidationRules(form.value.checkout_time || ''));
+const checkinTimeRules = computed(() => getCheckinTimeValidationRules(safeString(form.value.checkout_time)));
 const checkoutTimeHint = computed(() => getTimeHint('checkin', selectedProperty.value));
 const checkinTimeHint = computed(() => getTimeHint('checkout', selectedProperty.value));
 
