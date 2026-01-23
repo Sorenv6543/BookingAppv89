@@ -603,9 +603,9 @@ const priorityOptions = [
 
 // Commented out unused computed - was causing TS warning
 // const showSameDayAlert = computed(() => {
-  //   if (!form.value.guest_departure_date || !form.value.guest_arrival_date) return false
-  //   const checkoutDate = new Date(form.value.guest_departure_date).toDateString()
-  //   const checkinDate = new Date(form.value.guest_arrival_date).toDateString()
+  //   if (!form.value.checkout_date || !form.value.checkin_date) return false
+  //   const checkoutDate = new Date(form.value.checkout_date).toDateString()
+  //   const checkinDate = new Date(form.value.checkin_date).toDateString()
   //   return checkoutDate === checkinDate
   // })
   

@@ -80,7 +80,7 @@
       "args": ["-y", "@upstash/context7-mcp"],
       "description": "Up-to-date documentation and code examples for any library/framework",
       "note": "Optional: Get API key at https://context7.com/dashboard for higher rate limits"
-    },
+    }
 
   }
 }

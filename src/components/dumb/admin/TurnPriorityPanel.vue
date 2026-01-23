@@ -272,14 +272,14 @@
                     >
                       mdi-calendar-export
                     </v-icon>
-                    {{ formatDateTime(turn.guest_departure_date) }}
+                    {{ formatDateTime(turn.checkout_date) }}
                     <v-icon
                       size="small"
                       class="mx-2"
                     >
                       mdi-calendar-import
                     </v-icon>
-                    {{ formatDateTime(turn.guest_arrival_date) }}
+                    {{ formatDateTime(turn.checkin_date) }}
                   </div>
                 </v-list-item-subtitle>
                 

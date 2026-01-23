@@ -70,7 +70,7 @@
                       size="x-small"
                       class="mr-1"
                     />
-                    <span class="text-caption">{{ formatTime(booking.guest_departure_date) }}</span>
+                    <span class="text-caption">{{ formatTime(booking.checkout_date) }}</span>
                   </div>
                   <div class="d-flex align-center">
                     <v-icon
@@ -78,7 +78,7 @@
                       size="x-small"
                       class="mr-1"
                     />
-                    <span class="text-caption">{{ formatTime(booking.guest_arrival_date) }}</span>
+                    <span class="text-caption">{{ formatTime(booking.checkin_date) }}</span>
                   </div>
                   <div
                     v-if="booking.cleaning_window"

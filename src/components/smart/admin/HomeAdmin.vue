@@ -155,8 +155,8 @@ const systemPropertyMetrics = computed(() => ({
 
 // const handleDateSelect = (selectInfo: DateSelectArg): void => {
 //   const bookingData: Partial<BookingFormData> = {
-//             guest_departure_date: selectInfo.startStr,
-//         guest_arrival_date: selectInfo.endStr,
+//             checkout_date: selectInfo.startStr,
+//         checkin_date: selectInfo.endStr,
 //   };
 //   
 //   uiStore.openModal('eventModal', 'create', bookingData);
@@ -194,8 +194,8 @@ const systemPropertyMetrics = computed(() => ({
 //     await nextTick();
 //     
 //     await updateBooking(booking.id, {
-//               guest_departure_date: dropInfo.event.startStr,
-//         guest_arrival_date: dropInfo.event.endStr || dropInfo.event.startStr,
+//               checkout_date: dropInfo.event.startStr,
+//         checkin_date: dropInfo.event.endStr || dropInfo.event.startStr,
 //     });
 //     
 //     // Additional nextTick to ensure DOM updates complete
@@ -222,8 +222,8 @@ const systemPropertyMetrics = computed(() => ({
 //     await nextTick();
 //     
 //     await updateBooking(booking.id, {
-//               guest_departure_date: resizeInfo.event.startStr,
-//         guest_arrival_date: resizeInfo.event.endStr,
+//               checkout_date: resizeInfo.event.startStr,
+//         checkin_date: resizeInfo.event.endStr,
 //     });
 //     
 //     // Additional nextTick to ensure DOM updates complete

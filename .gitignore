@@ -15,8 +15,8 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+
+
 .idea
 .DS_Store
 *.suo
@@ -26,12 +26,11 @@ dist-ssr
 *.sw?
 
 # Environment files
-.env
-.env.*
+
 !.env.example
 
 # MCP Configuration (contains sensitive credentials)
-.cursor/mcp.json
+
 .mcp.json
 
 # Build output

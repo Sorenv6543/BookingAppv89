@@ -72,7 +72,7 @@
                   </v-chip>
                 </h4>
                 <p class="booking-times">
-                  {{ formatBookingTime(safeString(booking.guest_departure_date)) }} → {{ formatBookingTime(safeString(booking.guest_arrival_date)) }}
+                  {{ formatBookingTime(safeString(booking.checkout_date)) }} → {{ formatBookingTime(safeString(booking.checkin_date)) }}
                 </p>
               </div>
               <div class="priority-indicator">
