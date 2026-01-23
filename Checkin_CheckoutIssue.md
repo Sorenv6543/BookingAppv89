@@ -21,9 +21,16 @@ The system has conflicting mental models for bookings:
 2. **Change DB model** - Swap constraint to match hotel booking logic
 3. **Add transformation layer** - Form collects naturally, swap values before saving
 
+# It seems like number two would be cleanest wayest for a guest booking app.
+2. **Change DB model** - Swap constraint to match hotel booking logic
+
+5. **Change DB model** - Swap constraint to match hotel booking logic
+
+
 ## Recommendation
 Clarify whether this is:
 - A cleaning scheduling app (keep current DB model)
 - A guest booking app (change DB constraint and swap field mapping)
-
 Then implement consistent labeling throughout the codebase.
+
+# It's a guest booking app
