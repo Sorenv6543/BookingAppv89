@@ -500,8 +500,8 @@ function resetForm(): void {
       ...defaults, 
       ...initialData,
       // Map calendar date properties to form properties  
-      checkin_date: initialData.start || initialData.checkin_date || initialData.guest_arrival_date || '',      // ✅ start = checkin
-      checkout_date: initialData.end || initialData.checkout_date || initialData.guest_departure_date || ''    // ✅ end = checkout
+      checkin_date: initialData.start || initialData.checkin_date || '',      // ✅ start = checkin
+      checkout_date: initialData.end || initialData.checkout_date || ''    // ✅ end = checkout
     };
     
     // Format dates if they exist

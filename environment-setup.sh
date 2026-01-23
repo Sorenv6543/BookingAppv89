@@ -1,9 +1,10 @@
 # .env.local - Create this file in your project root
+# NEVER commit this file - it contains sensitive credentials
 
-# Supabase Configuration (Production)
-# Project ID: otmfvzkokrxduipxkyga
-VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90bWZ2emtva3J4ZHVpcHhreWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0NTE4MzIsImV4cCI6MjA4NDAyNzgzMn0.usa5Kiww4TJ3RttrvW5Bwus2sTuZrgJlmejdCTDsyOg
+# Supabase Configuration
+# Get these values from your Supabase project settings
+VITE_SUPABASE_URL=<your-supabase-url>
+VITE_SUPABASE_ANON_KEY=<your-anon-key>
 
 # App Configuration
 VITE_APP_NAME="Property Cleaning Scheduler"

@@ -7,7 +7,9 @@ Your combined migration script is ready at: `supabase/combined_migration.sql`
 ### Step 1: Open SQL Editor
 
 Go to your Supabase SQL Editor:
-**https://app.supabase.com/project/otmfvzkokrxduipxkyga/sql/new**
+**https://app.supabase.com/project/<YOUR_PROJECT_REF>/sql/new**
+
+Replace `<YOUR_PROJECT_REF>` with your actual Supabase project reference (found in your project settings).
 
 ### Step 2: Copy and Paste Migration
 
@@ -35,12 +37,16 @@ You should see:
 
 ### Step 4: Test Connection from Your App
 
-Once the migration completes, your app will be able to connect to the database using the credentials already configured in `.env.local`:
+Once the migration completes, your app will be able to connect to the database using the credentials configured in `.env.local`:
 
 ```bash
-VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_URL=https://<YOUR_PROJECT_REF>.supabase.co
+VITE_SUPABASE_ANON_KEY=<YOUR_ANON_KEY>
 ```
+
+Replace:
+- `<YOUR_PROJECT_REF>` with your Supabase project reference
+- `<YOUR_ANON_KEY>` with your Supabase anonymous (public) API key (from Project Settings > API)
 
 ---
 

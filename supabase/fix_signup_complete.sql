@@ -13,15 +13,19 @@ SET search_path = public, auth -- Explicitly set search path
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  -- Insert into user_profiles with explicit schema reference
+  -- Insert into user_profiles with explicit schema reference and safe role casting
   INSERT INTO public.user_profiles (id, email, name, role, company_name)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'name', NEW.raw_user_meta_data->>'full_name', NEW.email),
-    COALESCE((NEW.raw_user_meta_data->>'role')::user_role, 'owner'::user_role),
+    CASE 
+      WHEN (NEW.raw_user_meta_data->>'role') IN ('owner', 'admin', 'cleaner') 
+      THEN (NEW.raw_user_meta_data->>'role')::user_role
+      ELSE 'owner'::user_role
+    END,
     NEW.raw_user_meta_data->>'company_name'
-  );
+  )
 
   RETURN NEW;
 EXCEPTION
@@ -46,10 +50,7 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_new_user();
 
--- Step 6: Temporarily disable RLS for testing (we'll re-enable it after verifying)
-ALTER TABLE public.user_profiles DISABLE ROW LEVEL SECURITY;
-
--- Step 7: Verify setup
+-- Step 6: Verify setup
 SELECT 'SUCCESS: Trigger and function recreated with proper permissions' as status;
 
 -- Show current RLS status
