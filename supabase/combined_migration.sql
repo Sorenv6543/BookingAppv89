@@ -9,9 +9,6 @@
 -- Enable UUID extension for primary keys
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Enable Row Level Security
-ALTER DATABASE postgres SET row_security = on;
-
 -- Create enum types
 CREATE TYPE user_role AS ENUM ('owner', 'admin', 'cleaner');
 CREATE TYPE booking_type AS ENUM ('standard', 'turn');
@@ -173,7 +170,6 @@ END;
 $$;
 
 -- Grant execute permissions to the function
-GRANT EXECUTE ON FUNCTION public.handle_new_user() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.handle_new_user() TO service_role;
 
 -- Ensure the function owner has the right permissions
@@ -216,21 +212,19 @@ RETURNS user_role AS $$
 DECLARE
   user_role_result user_role;
 BEGIN
-  -- Disable RLS for this function to avoid recursion
-  SET row_security = off;
+  -- Disable RLS only for this transaction to avoid recursion
+  SET LOCAL row_security = off;
 
   SELECT role INTO user_role_result
   FROM public.user_profiles
   WHERE id = user_id;
 
-  -- Re-enable RLS
-  SET row_security = on;
+  -- SET LOCAL automatically reverts at end of transaction
 
   RETURN COALESCE(user_role_result, 'owner'::user_role);
 EXCEPTION
   WHEN others THEN
-    -- Re-enable RLS in case of error
-    SET row_security = on;
+    -- SET LOCAL automatically reverts, no need to re-enable manually
     RETURN 'owner'::user_role;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -269,8 +263,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Admin user creation function
+-- Admin user creation function (requires auth_user_id from auth.users)
 CREATE OR REPLACE FUNCTION public.create_admin_user(
+  auth_user_id UUID,
   user_email TEXT,
   user_name TEXT
 )
@@ -278,9 +273,11 @@ RETURNS UUID AS $$
 DECLARE
   new_user_id UUID;
 BEGIN
+  -- Use provided auth_user_id instead of generating new UUID
+  -- This ensures FK to auth.users(id) is satisfied
   INSERT INTO public.user_profiles (id, email, name, role, access_level)
   VALUES (
-    gen_random_uuid(),
+    auth_user_id,
     user_email,
     user_name,
     'admin'::user_role,
@@ -301,8 +298,7 @@ GRANT USAGE ON SCHEMA private TO authenticated;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA private TO authenticated;
-GRANT EXECUTE ON FUNCTION public.handle_new_user() TO authenticated;
-GRANT EXECUTE ON FUNCTION public.create_admin_user(TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_admin_user(UUID, TEXT, TEXT) TO service_role;
 
 -- ============================================================================
 -- ENABLE ROW LEVEL SECURITY
