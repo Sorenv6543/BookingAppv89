@@ -4,10 +4,10 @@
 
 ## Architecture Overview
 
-### Data Model: Guest-Stay Booking System
-- **Standard Booking**: `checkin_date <= checkout_date` (guest arrival → departure with cleaning gap)
-- **Turn Booking**: Same-day `checkin_date == checkout_date` (urgent same-day turnover, high priority)
-- **Constraint**: Database enforces `CHECK (checkin_date <= checkout_date)` on bookings table
+### Data Model: Cleaning-Window Booking System
+- **Standard Booking**: `checkout_date < checkin_date` (guest departure → next guest arrival with cleaning window between)
+- **Turn Booking**: Same-day `checkout_date == checkin_date` (urgent same-day turnover, high priority)
+- **Constraint**: Database enforces `CHECK (checkout_date < checkin_date)` on bookings table (guests must depart before or at same time as next guests arrive)
 - **Key Fields**: `checkout_date`, `checkin_date`, `booking_type`, `status`, `priority`
 
 ### Component Architecture: Smart/Dumb Separation
@@ -71,8 +71,8 @@ pnpm run analyze:bundle   # Visualize bundle size
 
 ### Booking Validation
 Located in `src/utils/businessLogic.ts` and forms:
-1. **Date Order**: Always validate `checkinDate <= checkoutDate` (not greater than)
-2. **Turn Consistency**: If `booking_type == 'turn'`, dates MUST be same day
+1. **Date Order**: Always validate `checkoutDate <= checkinDate` (cleaning window: guests depart, then cleaning, then next guests arrive)
+2. **Turn Consistency**: If `booking_type == 'turn'`, dates MUST be same day (`checkoutDate == checkinDate`)
 3. **Time Order (turns only)**: For same-day turns, `checkout_time < checkin_time` (guests leave before next guests arrive)
 4. **Optional Times**: `checkout_time` and `checkin_time` are optional fields; validation only checks order if both provided
 
@@ -109,7 +109,7 @@ Turn bookings always ≥ high priority; standard bookings escalate based on hour
 - **Enum Types**: `user_role`, `booking_type`, `booking_status`, `property_type` defined in migrations
 
 ### Database Constraints
-- **Booking Dates**: `CHECK (checkin_date <= checkout_date)` ensures valid guest-stay model
+- **Booking Dates**: `CHECK (checkout_date < checkin_date)` ensures valid cleaning-window model (guests depart before next guests arrive)
 - **User Roles**: `role` column typed as `user_role` enum; defaults to `'owner'`
 - **Trigger Functions**: `handle_new_user()` creates `user_profiles` row on auth.users insert (SECURITY DEFINER)
 
@@ -120,7 +120,7 @@ Turn bookings always ≥ high priority; standard bookings escalate based on hour
 
 ## Common Pitfalls to Avoid
 
-1. **Date Model Confusion**: Remember `checkin_date <= checkout_date` (guest stay); NOT `checkout < checkin`
+1. **Date Model Confusion**: Remember `checkout_date < checkin_date` (cleaning window: guests depart, then cleaning, then next guests arrive); NOT `checkin < checkout`
 2. **Time Validation**: Only validate time order for same-day turns; times are optional elsewhere
 3. **RLS Policy Loops**: Avoid recursive role checks in policies (use direct `auth.uid()` queries)
 4. **Subscription Leaks**: Always unsubscribe from Supabase channels; monitor logs for 🚀 prefix warnings

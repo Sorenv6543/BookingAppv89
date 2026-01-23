@@ -412,7 +412,7 @@
                                 variant="flat"
                                 class="me-2"
                               >
-                                {{ formatTime(booking.guest_arrival_date) }}
+                                {{ formatTime(booking.checkin_date) }}
                               </v-chip>
                               <span class="text-body-2">
                                 {{ getPropertyName(booking.property_id) }}
@@ -555,7 +555,7 @@
                               color="primary"
                               variant="flat"
                             >
-                              🕐 {{ formatTime(checkout.guest_departure_date) }}
+                              🕐 {{ formatTime(checkout.checkout_date) }}
                             </v-chip>
                             <v-chip
                               size="x-small"
@@ -674,7 +674,7 @@
                               color="primary"
                               variant="flat"
                             >
-                              🕐 {{ formatTime(turn.guest_departure_date) }}
+                              🕐 {{ formatTime(turn.checkout_date) }}
                             </v-chip>
                             <v-chip
                               size="x-small"
@@ -759,7 +759,7 @@ const propertiesData = computed(() => {
   const active = allProperties.value.filter(p => p.active).length;
   const booked = allBookings.value.filter(b => {
     const today = new Date().toISOString().split('T')[0];
-    return b.guest_departure_date >= today && b.status !== 'completed';
+    return b.checkout_date >= today && b.status !== 'completed';
   }).length;
 
   return {
@@ -775,7 +775,7 @@ const clientsData = computed(() => {
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
   
   const activeThisMonth = allBookings.value
-    .filter(b => b.guest_departure_date >= firstDayOfMonth)
+    .filter(b => b.checkout_date >= firstDayOfMonth)
     .map(b => allProperties.value.find(p => p.id === b.property_id)?.owner_id)
     .filter(Boolean)
     .reduce((acc, ownerId) => acc.add(ownerId), new Set()).size;
@@ -799,17 +799,17 @@ const bookingsData = computed(() => {
   const allBookingsCount = allBookings.value.length;
   const turns = allBookings.value.filter(b => b.booking_type === 'turn');
   const urgentTurns = turns.filter(b => {
-    const checkoutTime = new Date(b.guest_departure_date);
+    const checkoutTime = new Date(b.checkout_date);
     const hoursUntil = (checkoutTime.getTime() - now.getTime()) / (1000 * 60 * 60);
     return hoursUntil <= 6 && b.status !== 'completed';
   });
 
   const checkoutsThisWeek = allBookings.value.filter(b => 
-    b.guest_departure_date >= weekStart && b.guest_departure_date <= weekEnd
+    b.checkout_date >= weekStart && b.checkout_date <= weekEnd
   ).length;
 
   const turnsThisWeek = turns.filter(b => 
-    b.guest_departure_date >= weekStart && b.guest_departure_date <= weekEnd
+    b.checkout_date >= weekStart && b.checkout_date <= weekEnd
   ).length;
 
   
@@ -838,11 +838,11 @@ const filteredCheckouts = computed(() => {
   return allBookings.value
     .filter(booking => 
       booking.booking_type !== 'turn' && 
-      booking.guest_departure_date >= filter.start && 
-      booking.guest_departure_date <= filter.end &&
+      booking.checkout_date >= filter.start && 
+      booking.checkout_date <= filter.end &&
       booking.status !== 'completed'
     )
-    .sort((a, b) => new Date(a.guest_departure_date).getTime() - new Date(b.guest_departure_date).getTime());
+    .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime());
 });
 
 const filteredTurns = computed(() => {
@@ -850,11 +850,11 @@ const filteredTurns = computed(() => {
   return allBookings.value
     .filter(booking => 
       booking.booking_type === 'turn' && 
-      booking.guest_departure_date >= filter.start && 
-      booking.guest_departure_date <= filter.end &&
+      booking.checkout_date >= filter.start && 
+      booking.checkout_date <= filter.end &&
       booking.status !== 'completed'
     )
-    .sort((a, b) => new Date(a.guest_departure_date).getTime() - new Date(b.guest_departure_date).getTime());
+    .sort((a, b) => new Date(a.checkout_date).getTime() - new Date(b.checkout_date).getTime());
 });
 
 // Helper functions
@@ -912,9 +912,9 @@ function formatTime(dateString: string): string {
 }
 
 function getNextCheckinDays(booking: Booking): string {
-  if (booking.guest_arrival_date) {
-    const checkinDate = new Date(booking.guest_arrival_date);
-    const checkoutDate = new Date(booking.guest_departure_date);
+  if (booking.checkin_date) {
+    const checkinDate = new Date(booking.checkin_date);
+    const checkoutDate = new Date(booking.checkout_date);
     const diffTime = checkinDate.getTime() - checkoutDate.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
@@ -927,8 +927,8 @@ function getNextCheckinDays(booking: Booking): string {
 
 function getCleaningWindow(turn: Booking): string {
   // Calculate cleaning window based on checkout and checkin times
-  const checkoutTime = new Date(turn.guest_departure_date);
-  const checkinTime = turn.guest_arrival_date ? new Date(turn.guest_arrival_date) : null;
+  const checkoutTime = new Date(turn.checkout_date);
+  const checkinTime = turn.checkin_date ? new Date(turn.checkin_date) : null;
   
   if (!checkinTime) return 'TBD';
   
@@ -941,7 +941,7 @@ function getCleaningWindow(turn: Booking): string {
 
 function getTurnUrgencyColor(turn: Booking): string {
   const now = new Date();
-  const checkoutTime = new Date(turn.guest_departure_date);
+  const checkoutTime = new Date(turn.checkout_date);
   const hoursUntil = (checkoutTime.getTime() - now.getTime()) / (1000 * 60 * 60);
   
   if (hoursUntil <= 2) return 'error';
@@ -1036,7 +1036,7 @@ function getWeeklyStats() {
   const weekEnd = endOfWeek.toISOString().split('T')[0];
 
   const weekBookings = allBookings.value.filter(b => 
-    b.guest_departure_date >= weekStart && b.guest_departure_date <= weekEnd
+    b.checkout_date >= weekStart && b.checkout_date <= weekEnd
   );
 
   return {

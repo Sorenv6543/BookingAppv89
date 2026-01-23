@@ -148,7 +148,7 @@
                       {{ formatBookingTitle(booking) }}
                     </v-list-item-title>
                     <v-list-item-subtitle>
-                      {{ formatDateRange(booking.guest_arrival_date, booking.guest_departure_date) }}
+                      {{ formatDateRange(booking.checkin_date, booking.checkout_date) }}
                     </v-list-item-subtitle>
                     <template #append>
                       <v-chip
@@ -278,7 +278,7 @@ const totalBookings = computed(() => recentBookings.value.length);
 const upcomingBookings = computed(() => {
   const today = new Date();
   return recentBookings.value.filter(booking => 
-            new Date(booking.guest_arrival_date) > today
+            new Date(booking.checkin_date) > today
   ).length;
 });
 
