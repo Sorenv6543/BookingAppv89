@@ -26,7 +26,8 @@ dist-ssr
 *.sw?
 
 # Environment files
-
+.env
+.env.*
 !.env.example
 
 # MCP Configuration (contains sensitive credentials)
