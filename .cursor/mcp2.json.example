@@ -5,7 +5,7 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "c:/Users/Soren/.claude-worktrees/BookingAppv89/jolly-feynman"
+        "${PROJECT_ROOT}"
       ],
       "description": "Enhanced filesystem access for project navigation"
     },

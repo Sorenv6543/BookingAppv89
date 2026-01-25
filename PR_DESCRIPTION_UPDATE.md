@@ -31,7 +31,7 @@ This PR completes the UI component layer refactoring to align with the updated d
 ## 📋 Already Complete (Pre-existing)
 - Database migrations (008-009) with new field names
 - Type definitions in `src/types/booking.ts`
-- Database constraint: `CHECK (checkout_date < checkin_date)`
+- Database constraint: `CHECK (checkout_date < checkin_date)` (cleaning-window model: previous checkout before next checkin)
 - Store layer, composables, and business logic
 
 ## ✅ Testing
@@ -40,8 +40,8 @@ This PR completes the UI component layer refactoring to align with the updated d
 - Type safety verified with `vue-tsc --noEmit`
 
 ## 🏗️ Technical Details
-This refactoring maintains the cleaning-window booking model:
-- `checkout_date < checkin_date` (guests depart → cleaning window → next guests arrive)
+This refactoring maintains the cleaning-window booking model (intentionally different from a "guest stay" model):
+- `checkout_date < checkin_date` models **cleaning availability**: guests depart → cleaning window → next guests arrive
 - Same-day turns: `checkout_date == checkin_date` with `checkout_time < checkin_time`
 
 ## 📝 Commit

@@ -17,7 +17,9 @@ DROP POLICY IF EXISTS "Admins can delete profiles" ON public.user_profiles;
 -- CREATE SECURITY DEFINER FUNCTION TO BYPASS RLS
 -- ============================================================================
 
--- This function runs with elevated privileges and bypasses RLS to check role
+-- This function runs with elevated privileges and bypasses RLS to check role.
+-- Explicit search_path is set to avoid search_path injection issues when
+-- running as SECURITY DEFINER.
 CREATE OR REPLACE FUNCTION auth.user_has_role(check_role user_role)
 RETURNS BOOLEAN AS $$
 DECLARE
@@ -34,7 +36,8 @@ EXCEPTION
   WHEN OTHERS THEN
     RETURN false;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+   SET search_path = pg_catalog, public;
 
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION auth.user_has_role(user_role) TO authenticated;
