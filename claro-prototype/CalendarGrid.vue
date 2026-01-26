@@ -3,33 +3,21 @@
     <!-- Header Controls -->
     <div class="calendar-header">
       <div class="header-left">
-        <button
-          class="btn-icon"
-          @click="previousWeek"
-        >
+        <button @click="previousWeek" class="btn-icon">
           <ChevronLeftIcon class="w-5 h-5" />
         </button>
-        <h2 class="week-title">
-          {{ weekRangeText }}
-        </h2>
-        <button
-          class="btn-icon"
-          @click="nextWeek"
-        >
+        <h2 class="week-title">{{ weekRangeText }}</h2>
+        <button @click="nextWeek" class="btn-icon">
           <ChevronRightIcon class="w-5 h-5" />
         </button>
       </div>
       <div class="header-right">
-        <button
-          :class="['view-toggle', { active: viewMode === 'cleaners' }]" 
-          @click="viewMode = 'cleaners'"
-        >
+        <button @click="viewMode = 'cleaners'" 
+                :class="['view-toggle', { active: viewMode === 'cleaners' }]">
           Cleaners View
         </button>
-        <button
-          :class="['view-toggle', { active: viewMode === 'properties' }]" 
-          @click="viewMode = 'properties'"
-        >
+        <button @click="viewMode = 'properties'" 
+                :class="['view-toggle', { active: viewMode === 'properties' }]">
           Properties View
         </button>
       </div>
@@ -37,60 +25,33 @@
 
     <!-- Main Calendar Grid -->
     <div class="calendar-wrapper">
-      <div
-        class="calendar-grid"
-        :class="`view-${viewMode}`"
-      >
+      <div class="calendar-grid" :class="`view-${viewMode}`">
         <!-- Header Row -->
         <div class="grid-header">
-          <div class="corner-cell">
-            {{ viewMode === 'cleaners' ? 'Cleaners' : 'Properties' }}
-          </div>
-          <template
-            v-for="day in weekDays"
-            :key="day.date"
-          >
+          <div class="corner-cell">{{ viewMode === 'cleaners' ? 'Cleaners' : 'Properties' }}</div>
+          <template v-for="day in weekDays" :key="day.date">
             <div class="day-header">
-              <div class="day-name">
-                {{ day.name }}
-              </div>
-              <div class="day-date">
-                {{ day.date }}
-              </div>
+              <div class="day-name">{{ day.name }}</div>
+              <div class="day-date">{{ day.date }}</div>
             </div>
           </template>
         </div>
 
         <!-- Time Slots -->
-        <template
-          v-for="slot in timeSlots"
-          :key="slot"
-        >
+        <template v-for="slot in timeSlots" :key="slot">
           <div class="slot-section">
-            <div class="slot-label">
-              {{ slot }}
-            </div>
+            <div class="slot-label">{{ slot }}</div>
             
             <!-- Rows (Cleaners or Properties) -->
             <template v-if="viewMode === 'cleaners'">
-              <div
-                v-for="cleaner in cleaners"
-                :key="`${cleaner.id}-${slot}`"
-                class="grid-row"
-              >
-                <CleanerCell
-                  :slot="slot"
-                  :cleaner="cleaner"
-                />
+              <div v-for="cleaner in cleaners" :key="`${cleaner.id}-${slot}`" class="grid-row">
+                <CleanerCell :cleaner="cleaner" :slot="slot" />
                 
-                <template
-                  v-for="day in weekDays"
-                  :key="`${cleaner.id}-${day.date}-${slot}`"
-                >
+                <template v-for="day in weekDays" :key="`${cleaner.id}-${day.date}-${slot}`">
                   <TimeSlotCell
-                    :slot="slot"
-                    :cleaner-id="cleaner.id"
+                    :cleanerId="cleaner.id"
                     :day="day.date"
+                    :slot="slot"
                     :jobs="getJobsForSlot(cleaner.id, day.date, slot)"
                     @drop="handleJobDrop"
                     @job-click="selectJob"
@@ -101,11 +62,7 @@
 
             <template v-else>
               <!-- Properties view implementation -->
-              <div
-                v-for="property in properties"
-                :key="`${property.id}-${slot}`"
-                class="grid-row"
-              >
+              <div v-for="property in properties" :key="`${property.id}-${slot}`" class="grid-row">
                 <PropertyCell :property="property" />
                 <!-- Property slots... -->
               </div>
