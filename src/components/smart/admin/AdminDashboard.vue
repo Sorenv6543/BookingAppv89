@@ -412,7 +412,7 @@
                                 variant="flat"
                                 class="me-2"
                               >
-                                {{ formatTime(booking.checkin_date) }}
+                                {{ formatTime(booking.checkout_date) }}
                               </v-chip>
                               <span class="text-body-2">
                                 {{ getPropertyName(booking.property_id) }}

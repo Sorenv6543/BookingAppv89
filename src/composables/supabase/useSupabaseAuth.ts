@@ -110,13 +110,15 @@ export function useSupabaseAuth() {
           .eq('id', userId)
           .maybeSingle(); // Use maybeSingle instead of single to avoid errors when not found
         
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Profile query timeout after 3 seconds')), 3000);
+        const timeoutPromise: Promise<never> = new Promise((_, reject) => {
+          // Slightly longer timeout to reduce spurious warnings in slow networks
+          setTimeout(() => reject(new Error('Profile query timeout after 8 seconds')), 8000);
         });
         
-        const result = await Promise.race([queryPromise, timeoutPromise]) as { data: any; error: any };
-
-        const { data, error: profileError } = result;
+        const { data, error: profileError } = await Promise.race([
+          queryPromise,
+          timeoutPromise
+        ]);
         
         // Handle null data (profile not found) or errors
         if (profileError) {
@@ -183,10 +185,9 @@ export function useSupabaseAuth() {
           return; // Success with fallback, exit the retry loop
         }
       } catch (err) {
-        console.error(`❌ Error loading user profile (attempt ${attempt}):`, err);
-        
-        // If it's a timeout error, use fallback immediately to avoid hanging login
+        // If it's a timeout error, use fallback immediately but only log a warning
         if (err instanceof Error && err.message.includes('timeout')) {
+          console.warn(`⏱️ Profile query timed out (attempt ${attempt}), using fallback profile:`, err);
           user.value = {
             id: userId,
             email: session.value?.user?.email || '',
@@ -203,6 +204,8 @@ export function useSupabaseAuth() {
           console.log('✅ Fallback profile created due to timeout');
           return;
         }
+        
+        console.error(`❌ Error loading user profile (attempt ${attempt}):`, err);
         
         // If this is the last attempt, use fallback
         if (attempt === maxRetries) {

@@ -9,10 +9,11 @@ export default defineConfig({
     vue(),
     vuetify({
       autoImport: true,
+      styles: {
+        configFile: 'src/styles/variables.scss',
+      },
     }),
-    //  
 
-    
   ],
   test: {
     globals: true,

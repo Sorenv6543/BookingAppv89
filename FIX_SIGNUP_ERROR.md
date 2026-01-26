@@ -41,6 +41,44 @@ Or paste this directly:
 -- COMPLETE FIX FOR SIGNUP 500 ERROR
 -- ============================================================================
 
+-- ============================================================================
+-- CREATE MISSING ENUM TYPES (idempotent - safe to run multiple times)
+-- ============================================================================
+
+-- Create user_role enum if it doesn't exist
+DO $$ BEGIN
+  CREATE TYPE user_role AS ENUM ('owner', 'manager', 'staff', 'admin');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Create booking_type enum if it doesn't exist
+DO $$ BEGIN
+  CREATE TYPE booking_type AS ENUM ('standard', 'turn');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Create booking_status enum if it doesn't exist
+DO $$ BEGIN
+  CREATE TYPE booking_status AS ENUM ('pending', 'confirmed', 'completed', 'cancelled');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Create property_type enum if it doesn't exist
+DO $$ BEGIN
+  CREATE TYPE property_type AS ENUM ('apartment', 'house', 'condo', 'villa', 'other');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Create priority_level enum if it doesn't exist
+DO $$ BEGIN
+  CREATE TYPE priority_level AS ENUM ('low', 'medium', 'high', 'urgent');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- ============================================================================
+-- DROP EXISTING TRIGGER AND FUNCTION
+-- ============================================================================
+
 -- Drop existing trigger and function
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
@@ -227,11 +265,23 @@ ALTER FUNCTION public.handle_new_user() OWNER TO postgres;
    - `prosecdef` should be `true` (SECURITY DEFINER)
    - `proconfig` should include `{search_path=public,auth}`
 
-4. **Test trigger manually:**
+4. **Verify trigger function exists and has correct configuration:**
    ```sql
-   -- This will show any error messages
-   SELECT public.handle_new_user();
+   -- Check that handle_new_user function exists with proper security settings
+   SELECT 
+       proname,
+       prosecdef as "SECURITY DEFINER",
+       proconfig as "config (should contain search_path)",
+       prokind
+   FROM pg_proc
+   WHERE proname = 'handle_new_user';
    ```
+   
+   **Expected output:**
+   - `proname`: `handle_new_user`
+   - `SECURITY DEFINER`: `true` (function runs with elevated privileges)
+   - `config`: Should contain `{search_path=public,auth}` (explicit schema resolution)
+   - `prokind`: `f` (normal function)
 
 ### If you see "permission denied" errors:
 
