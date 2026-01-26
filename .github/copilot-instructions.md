@@ -4,6 +4,14 @@
 
 **You are working in a production-ready Vue 3 + TypeScript + Supabase app. Preserve the existing role-based architecture and performance guarantees.**
 
+## AI agent quickstart
+
+- For any feature, locate the relevant store in `src/stores` and any role-specific composables in `src/composables/admin` or `src/composables/owner` before touching components.
+- Implement data orchestration in a smart component under `src/components/smart/{owner,admin,shared}` and pass plain props/events into dumb components under `src/components/dumb`.
+- Read and reuse existing helpers in `src/utils/businessLogic.ts` and `src/utils/timeDefaults.ts` instead of adding new booking/validation rules inline.
+- When you change data shapes or rules, update both `supabase/migrations/*` and matching types in `src/types/*`.
+- Before finishing, run `pnpm test:run` and `pnpm build` to keep tests passing and type-checking clean.
+
 ## Big picture
 
 - Multi-tenant property cleaning scheduler with distinct Owner and Admin interfaces; a Cleaner role exists in types but is not yet surfaced in the UI.
