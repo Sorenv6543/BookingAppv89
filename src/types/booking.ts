@@ -18,23 +18,28 @@ export type BookingStatus = 'pending' | 'scheduled' | 'in_progress' | 'completed
 
 /**
  * Booking Interface
- * Core data model for booking/cleaning events
+ * Core data model for guest bookings/stays (following industry best practices)
+ * 
+ * IMPORTANT: As of migration 011, this follows the standard hotel model:
+ * - Bookings represent GUEST STAYS (when guests occupy the property)
+ * - checkin_date < checkout_date (guests arrive, stay, then depart)
+ * - Cleaning tasks are managed separately in the cleaning_tasks table
  */
 export interface Booking {
   id: string;
   property_id: string;
   owner_id: string;
-  checkout_date: string; // ISO date when previous guests check out (leave) - start of cleaning window
-  checkin_date: string;  // ISO date when new guests check in (arrive) - end of cleaning window
-  checkout_time: string; // Required time when guests leave (HH:MM format)
-  checkin_time: string;   // Required time when guests arrive (HH:MM format)
+  checkin_date: string;   // ISO date when guests CHECK IN (arrive) - start of guest stay
+  checkout_date: string;  // ISO date when guests CHECK OUT (depart) - end of guest stay
+  checkin_time: string;   // Time when guests arrive (HH:MM format)
+  checkout_time: string;  // Time when guests depart (HH:MM format)
   booking_type: BookingType;
   status: BookingStatus;
   guest_count?: number;
   notes?: string; // General notes and instructions for the booking
   special_instructions?: string; // Legacy field for backward compatibility
   priority?: 'low' | 'normal' | 'high' | 'urgent';
-  assigned_cleaner_id?: string;
+  assigned_cleaner_id?: string; // DEPRECATED: Use cleaning_tasks table instead
   upcharge_reason?: string;
   upcharge_amount?: number;
   cleaning_duration?: number; // minutes
@@ -47,6 +52,9 @@ export interface Booking {
 /**
  * Extended booking with calculated fields
  * Used for display and business logic
+ * 
+ * NOTE: cleaning_window is DEPRECATED as of migration 011.
+ * Use cleaning_tasks table for operational cleaning scheduling.
  */
 export interface BookingWithMetadata extends Booking {
   property_name?: string;
@@ -54,7 +62,7 @@ export interface BookingWithMetadata extends Booking {
     start: string;
     end: string;
     duration: number; // minutes
-  };
+  }; // DEPRECATED: Use cleaning_tasks instead
   priority: 'low' | 'normal' | 'high' | 'urgent';
 }
 
@@ -81,7 +89,7 @@ export function isBooking(obj: unknown): obj is Booking {
   return (
     typeof b.id === 'string' &&
     typeof b.property_id === 'string' &&
-    typeof b.checkout_date === 'string' &&
-    typeof b.checkin_date === 'string'
+    typeof b.checkin_date === 'string' &&
+    typeof b.checkout_date === 'string'
   );
 }
