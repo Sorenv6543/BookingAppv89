@@ -24,8 +24,8 @@ export interface Booking {
   id: string;
   property_id: string;
   owner_id: string;
-  checkout_date: string; // ISO date when previous guests check out (leave) - start of cleaning window
-  checkin_date: string;  // ISO date when new guests check in (arrive) - end of cleaning window
+  checkout_date: string; // ISO date when previous guests check out (leave)
+  checkin_date: string;  // ISO date when new guests check in (arrive)
   checkout_time: string; // Required time when guests leave (HH:MM format)
   checkin_time: string;   // Required time when guests arrive (HH:MM format)
   booking_type: BookingType;
