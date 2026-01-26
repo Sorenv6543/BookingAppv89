@@ -28,6 +28,7 @@ SUPABASE_ACCESS_TOKEN = sbp_4347f981d0522ae228c41efaed4cbb690bf85e3c
 SUPABASE_DB_URL = postgresql://postgres:MLtNqQfQpiahnymh@db.otmfvzkokrxduipxkyga.supabase.co:5432/postgres
 GITHUB_PERSONAL_ACCESS_TOKEN = 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
 BRAVE_API_KEY = BSAqG_Ln3kp38vwd8ODru8PJn633hQt
+CONTEXT7_API_KEY = your_context7_api_key
 ```
 
 3. Restart your terminal and editor
@@ -50,6 +51,7 @@ After setting up environment variables and restarting your editor:
 # Test in PowerShell
 $env:SUPABASE_ACCESS_TOKEN  # Should show token
 $env:SUPABASE_DB_URL        # Should show connection string
+$env:CONTEXT7_API_KEY       # Should show token
 ```
 
 ## Troubleshooting

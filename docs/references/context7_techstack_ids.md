@@ -68,6 +68,9 @@
 Here are the specific commands you can use to get documentation for each library:
 
 ```bash
+# Context7 MCP server (optional for higher rate limits)
+CONTEXT7_API_KEY=your_context7_api_key npx -y @upstash/context7-mcp
+
 # Vue 3 Documentation
 get-library-docs /vuejs/docs --topic="composition-api typescript"
 
@@ -121,6 +124,4 @@ curl "http://localhost:8000/search?q=responsive layout&limit=5"
 **Integration Files**:
 - `docs/knowledgebase/vuetify-rag-integration-guide.md` - HTTP request examples
 - `docs/knowledgebase/vuetify-rag-project-integration.md` - Complete integration guide
-
-
 

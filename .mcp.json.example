@@ -18,6 +18,17 @@
         "${SUPABASE_ACCESS_TOKEN}"
       ],
       "description": "Supabase MCP Server - requires SUPABASE_ACCESS_TOKEN env var set before running"
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      },
+      "description": "Context7 MCP Server - requires CONTEXT7_API_KEY env var for higher rate limits"
     }
   }
 }
