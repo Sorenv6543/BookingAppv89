@@ -23,8 +23,8 @@ describe('Booking Store', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };
@@ -41,8 +41,8 @@ describe('Booking Store', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };
@@ -65,8 +65,8 @@ describe('Booking Store', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };
@@ -86,8 +86,8 @@ describe('Booking Store', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     });
@@ -96,8 +96,8 @@ describe('Booking Store', () => {
       id: 'booking2',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-05T11:00:00Z',
-      checkin_date: '2023-06-07T15:00:00Z',
+      checkin_date: '2023-06-05T11:00:00Z',
+      checkout_date: '2023-06-07T15:00:00Z',
       booking_type: 'standard',
       status: 'scheduled'
     });
@@ -116,8 +116,8 @@ describe('Booking Store', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     });
@@ -126,8 +126,8 @@ describe('Booking Store', () => {
       id: 'booking2',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-05T11:00:00Z',
-      checkin_date: '2023-06-05T15:00:00Z',
+      checkin_date: '2023-06-05T11:00:00Z',
+      checkout_date: '2023-06-05T15:00:00Z',
       booking_type: 'turn',
       status: 'pending'
     });
@@ -146,8 +146,8 @@ describe('Booking Store', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     });
@@ -156,8 +156,8 @@ describe('Booking Store', () => {
       id: 'booking2',
       property_id: 'prop2',
       owner_id: 'owner1',
-      checkout_date: '2023-06-05T11:00:00Z',
-      checkin_date: '2023-06-07T15:00:00Z',
+      checkin_date: '2023-06-05T11:00:00Z',
+      checkout_date: '2023-06-07T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     });
@@ -174,8 +174,8 @@ describe('Booking Store', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     });
@@ -184,8 +184,8 @@ describe('Booking Store', () => {
       id: 'booking2',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-10T11:00:00Z',
-      checkin_date: '2023-06-12T15:00:00Z',
+      checkin_date: '2023-06-10T11:00:00Z',
+      checkout_date: '2023-06-12T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     });
@@ -202,8 +202,8 @@ describe('Booking Store', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };
@@ -221,8 +221,8 @@ describe('Booking Store', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };
@@ -241,8 +241,8 @@ describe('Booking Store', () => {
       id: 'booking1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     });
@@ -251,8 +251,8 @@ describe('Booking Store', () => {
       id: 'booking2',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-05T11:00:00Z',
-      checkin_date: '2023-06-07T15:00:00Z',
+      checkin_date: '2023-06-05T11:00:00Z',
+      checkout_date: '2023-06-07T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     });

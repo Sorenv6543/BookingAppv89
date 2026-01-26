@@ -3,17 +3,18 @@ import type { Property } from '@/types/property';
 
 /**
  * Calculate booking priority based on booking type and timing
+ * NOTE: As of migration 011, checkin_date < checkout_date (guest stays)
  */
 export const calculateBookingPriority = (booking: Booking): 'low' | 'normal' | 'high' | 'urgent' => {
-  const checkoutDate = new Date(booking.checkout_date);
   const checkinDate = new Date(booking.checkin_date);
+  const checkoutDate = new Date(booking.checkout_date);
   
   // Turn bookings are always high priority or urgent
   if (booking.booking_type === 'turn') {
-    const hoursUntilCheckout = (checkoutDate.getTime() - new Date().getTime()) / (1000 * 60 * 60);
+    const hoursUntilCheckin = (checkinDate.getTime() - new Date().getTime()) / (1000 * 60 * 60);
     
-    if (hoursUntilCheckout <= 2) return 'urgent';   // Less than 2 hours
-    if (hoursUntilCheckout <= 6) return 'high';     // Less than 6 hours
+    if (hoursUntilCheckin <= 2) return 'urgent';   // Less than 2 hours
+    if (hoursUntilCheckin <= 6) return 'high';     // Less than 6 hours
     return 'high'; // All turns are at least high priority
   }
   
@@ -28,6 +29,8 @@ export const calculateBookingPriority = (booking: Booking): 'low' | 'normal' | '
 
 /**
  * Calculate the cleaning window for a booking
+ * DEPRECATED: As of migration 011, use cleaning_tasks table instead
+ * This is kept for backward compatibility with existing code
  */
 export const getCleaningWindow = (booking: Booking, property: Property): {
   start: string;
@@ -35,78 +38,44 @@ export const getCleaningWindow = (booking: Booking, property: Property): {
   duration: number;
   bufferTime: number;
 } => {
-  const checkoutDate = new Date(booking.checkout_date);
   const checkinDate = new Date(booking.checkin_date);
+  const checkoutDate = new Date(booking.checkout_date);
   const cleaningDuration = property.cleaning_duration || 120; // Default 2 hours
   
-  if (booking.booking_type === 'turn') {
-    // Turn: Cleaning must happen between checkout and checkin
-    const availableTime = (checkinDate.getTime() - checkoutDate.getTime()) / (1000 * 60);
-    const bufferTime = 30; // 30 minute buffer before checkin
-    const maxCleaningTime = Math.max(60, availableTime - bufferTime); // Minimum 1 hour
-    
-    const cleaningStart = new Date(checkoutDate.getTime() + (30 * 60 * 1000)); // 30 min after checkout
-    const cleaningEnd = new Date(cleaningStart.getTime() + (Math.min(cleaningDuration, maxCleaningTime) * 60 * 1000));
-    
-    return {
-      start: cleaningStart.toISOString(),
-      end: cleaningEnd.toISOString(),
-      duration: Math.min(cleaningDuration, maxCleaningTime),
-      bufferTime
-    };
-  } else {
-    // Standard: Flexible scheduling between checkout and checkin
-    const cleaningStart = new Date(checkoutDate);
-    cleaningStart.setHours(11, 0, 0, 0); // Default 11 AM start
-    
-    const cleaningEnd = new Date(cleaningStart.getTime() + (cleaningDuration * 60 * 1000));
-    
-    // Ensure cleaning ends at least 1 hour before checkin
-    const oneHourBeforeCheckin = new Date(checkinDate.getTime() - (60 * 60 * 1000));
-    if (cleaningEnd > oneHourBeforeCheckin) {
-      cleaningEnd.setTime(oneHourBeforeCheckin.getTime());
-    }
-    
-    return {
-      start: cleaningStart.toISOString(),
-      end: cleaningEnd.toISOString(),
-      duration: cleaningDuration,
-      bufferTime: 60
-    };
-  }
+  // For guest stays, cleaning happens after checkout
+  // We'll schedule it for checkout time with default duration
+  const cleaningStart = new Date(checkoutDate);
+  const cleaningEnd = new Date(cleaningStart.getTime() + (cleaningDuration * 60 * 1000));
+  
+  return {
+    start: cleaningStart.toISOString(),
+    end: cleaningEnd.toISOString(),
+    duration: cleaningDuration,
+    bufferTime: 60
+  };
 };
 
 /**
  * Check if a cleaning can be scheduled for a booking
+ * DEPRECATED: As of migration 011, use cleaning_tasks table instead
  */
 export const canScheduleCleaning = (booking: Booking, property: Property): {
   possible: boolean;
   reason?: string;
   suggestedTimes?: string[];
 } => {
-  const checkoutDate = new Date(booking.checkout_date);
   const checkinDate = new Date(booking.checkin_date);
-  const timeDiff = (checkinDate.getTime() - checkoutDate.getTime()) / (1000 * 60); // minutes
+  const checkoutDate = new Date(booking.checkout_date);
+  const stayDuration = (checkoutDate.getTime() - checkinDate.getTime()) / (1000 * 60); // minutes
   
-  const minCleaningTime = property.cleaning_duration || 120;
-  const bufferTime = booking.booking_type === 'turn' ? 30 : 60;
-  const requiredTime = minCleaningTime + bufferTime;
-  
-  if (timeDiff < requiredTime) {
-    return {
-      possible: false,
-      reason: `Insufficient time. Need ${requiredTime} minutes, have ${Math.floor(timeDiff)} minutes.`,
-      suggestedTimes: [
-        new Date(checkoutDate.getTime() + (requiredTime * 60 * 1000)).toISOString()
-      ]
-    };
-  }
-  
+  // For the new model, we can always schedule cleaning after checkout
   return { possible: true };
 };
 
 /**
  * Validate a turn booking for potential issues
+ * NOTE: As of migration 011, turn bookings are same-day bookings where
+ * guests check in and check out on the same day (short stay)
  */
 export const validateTurnBooking = (
   booking: Partial<Booking>, 
@@ -119,30 +88,29 @@ export const validateTurnBooking = (
     return { valid: true, errors, warnings };
   }
   
-  const checkoutDate = new Date(booking.checkout_date!);
   const checkinDate = new Date(booking.checkin_date!);
+  const checkoutDate = new Date(booking.checkout_date!);
   
   // Check if same day
-  if (checkoutDate.toDateString() !== checkinDate.toDateString()) {
-    errors.push('Turn bookings must have checkout and checkin on the same day');
+  if (checkinDate.toDateString() !== checkoutDate.toDateString()) {
+    errors.push('Turn bookings must have checkin and checkout on the same day');
   }
   
-  // Check minimum time gap
-  const timeDiff = (checkinDate.getTime() - checkoutDate.getTime()) / (1000 * 60); // minutes
-  const minTime = (property.cleaning_duration || 120) + 30; // cleaning time + buffer
+  // Check minimum stay time
+  const stayDuration = (checkoutDate.getTime() - checkinDate.getTime()) / (1000 * 60); // minutes
   
-  if (timeDiff < minTime) {
-    errors.push(`Insufficient time for turn cleaning. Need at least ${minTime} minutes, have ${Math.floor(timeDiff)} minutes.`);
-  }
-  
-  // Check if checkout is after typical checkout time (11 AM)
-  if (checkoutDate.getHours() > 12) {
-    warnings.push('Late checkout may impact cleaning schedule');
+  if (stayDuration < 60) {
+    errors.push(`Turn bookings must be at least 1 hour long. Current duration: ${Math.floor(stayDuration)} minutes.`);
   }
   
   // Check if checkin is before typical checkin time (3 PM)
   if (checkinDate.getHours() < 15) {
-    warnings.push('Early checkin may require rushed cleaning');
+    warnings.push('Early checkin for same-day booking');
+  }
+  
+  // Check if checkout is after typical checkout time (11 AM)
+  if (checkoutDate.getHours() > 11) {
+    warnings.push('Late checkout for same-day booking may impact next booking');
   }
   
   return {
@@ -154,13 +122,14 @@ export const validateTurnBooking = (
 
 /**
  * Detect time conflicts between bookings
+ * NOTE: As of migration 011, bookings represent guest stays (checkin < checkout)
  */
 export const detectBookingConflicts = (
   booking: Booking,
   existingBookings: Booking[]
 ): Booking[] => {
-  const checkoutTime = new Date(booking.checkout_date);
   const checkinTime = new Date(booking.checkin_date);
+  const checkoutTime = new Date(booking.checkout_date);
   
   // Check for overlapping bookings
   return existingBookings.filter(otherBooking => {
@@ -168,21 +137,22 @@ export const detectBookingConflicts = (
       return false; // Same booking or different property
     }
     
-    const otherCheckout = new Date(otherBooking.checkout_date);
     const otherCheckin = new Date(otherBooking.checkin_date);
+    const otherCheckout = new Date(otherBooking.checkout_date);
     
-    // Check for overlap
+    // Check for overlap (guest stays overlapping)
     return (
       // Case 1: New booking starts before existing ends AND new booking ends after existing starts
-      (checkoutTime <= otherCheckin && checkinTime >= otherCheckout) ||
+      (checkinTime < otherCheckout && checkoutTime > otherCheckin) ||
       // Case 2: Existing booking starts before new ends AND existing booking ends after new starts
-      (otherCheckout <= checkinTime && otherCheckin >= checkoutTime)
+      (otherCheckin < checkoutTime && otherCheckout > checkinTime)
     );
   });
 };
 
 /**
  * Validate a booking for scheduling
+ * NOTE: As of migration 011, bookings represent guest stays (checkin < checkout)
  */
 export const validateBooking = (
   booking: Partial<Booking>,
@@ -198,17 +168,17 @@ export const validateBooking = (
   const warnings: string[] = [];
   
   // Basic validation
-  if (!booking.checkout_date || !booking.checkin_date) {
-    errors.push('Guest departure and arrival dates are required');
+  if (!booking.checkin_date || !booking.checkout_date) {
+    errors.push('Check-in and check-out dates are required');
     return { valid: false, errors, warnings };
   }
   
-  const checkoutDate = new Date(booking.checkout_date);
   const checkinDate = new Date(booking.checkin_date);
+  const checkoutDate = new Date(booking.checkout_date);
   
-  // Check if checkin is after checkout
-  if (checkinDate <= checkoutDate) {
-    errors.push('Checkin date must be after checkout date');
+  // Check if checkout is after checkin (industry standard)
+  if (checkoutDate <= checkinDate) {
+    errors.push('Check-out date must be after check-in date');
   }
   
   // For turn bookings, use the specialized validation
@@ -218,9 +188,9 @@ export const validateBooking = (
     warnings.push(...turnValidation.warnings);
   } else {
     // Standard booking validation
-    const timeDiff = (checkinDate.getTime() - checkoutDate.getTime()) / (1000 * 60 * 60); // hours
-    if (timeDiff < 3) {
-      warnings.push('Very short time between checkout and checkin. Consider marking as a turn booking.');
+    const stayDuration = (checkoutDate.getTime() - checkinDate.getTime()) / (1000 * 60 * 60); // hours
+    if (stayDuration < 1) {
+      warnings.push('Very short stay (less than 1 hour). Consider marking as a turn booking.');
     }
   }
   
@@ -275,7 +245,6 @@ export const calculateSystemMetrics = (
 ) => {
   const now = new Date()
   const twentyFourHours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-  // const thisMonth = new Date().toISOString().slice(0, 7) // Reserved for future metrics
   
   let totalProperties = 0
   let activeProperties = 0
@@ -299,13 +268,15 @@ export const calculateSystemMetrics = (
     const checkinDate = new Date(booking.checkin_date)
     const checkoutDate = new Date(booking.checkout_date)
     
+    // Upcoming bookings are those where guests haven't checked in yet
     if (checkinDate > now && ['confirmed', 'scheduled'].includes(booking.status)) {
       upcomingBookings++
     }
     
+    // Urgent turns are same-day bookings starting within 24 hours
     if (booking.booking_type === 'turn' && 
         booking.status === 'pending' && 
-        checkoutDate <= twentyFourHours) {
+        checkinDate <= twentyFourHours) {
       urgentTurns++
     }
   })
@@ -330,9 +301,10 @@ export const filterBookingsByDateRange = (
   const filtered = new Map<string, Booking>()
   
   bookings.forEach((booking, id) => {
-    const bookingStart = new Date(booking.checkout_date).getTime()
-    const bookingEnd = new Date(booking.checkin_date).getTime()
+    const bookingStart = new Date(booking.checkin_date).getTime()
+    const bookingEnd = new Date(booking.checkout_date).getTime()
     
+    // Include if booking overlaps with date range
     if (bookingStart <= end && bookingEnd >= start) {
       filtered.set(id, booking)
     }
@@ -351,7 +323,7 @@ export const getUrgentTurns = (
   bookings.forEach((booking, id) => {
     if (booking.booking_type === 'turn' &&
         booking.status === 'pending' &&
-        new Date(booking.checkout_date) <= cutoffTime) {
+        new Date(booking.checkin_date) <= cutoffTime) {
       urgentTurns.set(id, booking)
     }
   })
@@ -366,6 +338,7 @@ export const getUpcomingBookings = (
   const upcoming = new Map<string, Booking>()
   
   bookings.forEach((booking, id) => {
+    // Upcoming bookings are those where guests haven't checked in yet
     if (new Date(booking.checkin_date) > now &&
         ['confirmed', 'scheduled', 'pending'].includes(booking.status)) {
       upcoming.set(id, booking)
@@ -383,7 +356,8 @@ export const getRecentBookings = (
   const recent = new Map<string, Booking>()
   
   bookings.forEach((booking, id) => {
-    if (new Date(booking.checkout_date) >= cutoffDate) {
+    // Recent bookings are those that checked in within the time window
+    if (new Date(booking.checkin_date) >= cutoffDate) {
       recent.set(id, booking)
     }
   })

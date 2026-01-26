@@ -37,8 +37,8 @@ describe('useOwnerBookings (Role-Based)', () => {
       id: 'turn1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-01T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-01T15:00:00Z',
       booking_type: 'turn',
       status: 'pending'
     };
@@ -47,8 +47,8 @@ describe('useOwnerBookings (Role-Based)', () => {
       id: 'standard1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-02T11:00:00Z',
-      checkin_date: '2023-06-04T15:00:00Z',
+      checkin_date: '2023-06-02T11:00:00Z',
+      checkout_date: '2023-06-04T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };
@@ -75,8 +75,8 @@ describe('useOwnerBookings (Role-Based)', () => {
 
     const newBookingData = {
       property_id: 'prop1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard' as const,
       status: 'pending' as const
     };
@@ -102,8 +102,8 @@ describe('useOwnerBookings (Role-Based)', () => {
         id: `booking${i}`,
         property_id: `prop${i}`,
         owner_id: i <= 3 ? 'owner1' : 'other_owner',
-        checkout_date: '2023-06-01T11:00:00Z',
-        checkin_date: '2023-06-03T15:00:00Z',
+        checkin_date: '2023-06-01T11:00:00Z',
+        checkout_date: '2023-06-03T15:00:00Z',
         booking_type: 'standard',
         status: 'pending'
       });
@@ -133,8 +133,8 @@ describe('useOwnerBookings (Role-Based)', () => {
       id: 'today1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: `${today}T11:00:00Z`,
-      checkin_date: `${today}T15:00:00Z`,
+      checkin_date: `${today}T11:00:00Z`,
+      checkout_date: `${today}T15:00:00Z`,
       booking_type: 'turn',
       status: 'pending'
     };
@@ -144,8 +144,8 @@ describe('useOwnerBookings (Role-Based)', () => {
       id: 'tomorrow1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: `${tomorrow}T11:00:00Z`,
-      checkin_date: `${tomorrow}T15:00:00Z`,
+      checkin_date: `${tomorrow}T11:00:00Z`,
+      checkout_date: `${tomorrow}T15:00:00Z`,
       booking_type: 'standard',
       status: 'pending'
     };
@@ -172,8 +172,8 @@ describe('useOwnerBookings (Role-Based)', () => {
       id: 'booking_owner1',
       property_id: 'prop1',
       owner_id: 'owner1',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };
@@ -182,8 +182,8 @@ describe('useOwnerBookings (Role-Based)', () => {
       id: 'booking_other',
       property_id: 'prop2',
       owner_id: 'other_owner',
-      checkout_date: '2023-06-01T11:00:00Z',
-      checkin_date: '2023-06-03T15:00:00Z',
+      checkin_date: '2023-06-01T11:00:00Z',
+      checkout_date: '2023-06-03T15:00:00Z',
       booking_type: 'standard',
       status: 'pending'
     };

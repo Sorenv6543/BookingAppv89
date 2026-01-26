@@ -215,8 +215,8 @@
                 <v-alert
                   type="warning"
                   variant="tonal"
-                  title="Same-Day Turnover"
-                  text="This booking has same-day checkout and checkin dates, which typically indicates a 'turn' booking (urgent same-day cleaning between guests)."
+                  title="Same-Day Booking"
+                  text="This booking has same-day checkin and checkout dates, which indicates a 'turn' booking (short same-day guest stay)."
                   class="mb-0"
                 />
               </v-col>
@@ -229,7 +229,7 @@
                   type="error"
                   variant="tonal"
                   title="Invalid Turn Booking"
-                  text="Turn bookings must have checkout and checkin on the same day. Please adjust dates or change booking type to standard."
+                  text="Turn bookings must have checkin and checkout on the same day. Please adjust dates or change booking type to standard."
                   class="mb-0"
                 />
               </v-col>
@@ -402,8 +402,8 @@ const showTurnError = computed((): boolean => {
 
 // DROPDOWN OPTIONS
 const bookingTypeItems = [
-  { title: 'Standard Booking', value: 'standard', subtitle: 'Regular cleaning with time gap between guests' },
-  { title: 'Turn (Urgent)', value: 'turn', subtitle: 'Same-day checkout/checkin, high priority' }
+  { title: 'Standard Booking', value: 'standard', subtitle: 'Multi-day guest stay' },
+  { title: 'Turn (Urgent)', value: 'turn', subtitle: 'Same-day short stay, high priority' }
 ];
 
 const statusItems = [
@@ -549,7 +549,7 @@ async function validate(): Promise<boolean> {
   
   // Check turn booking consistency
   if (form.booking_type === 'turn' && !isTurnBooking.value) {
-    errors.value.set('booking_type', 'Turn bookings must have checkout and checkin on the same day');
+    errors.value.set('booking_type', 'Turn bookings must have checkin and checkout on the same day');
     return false;
   }
   

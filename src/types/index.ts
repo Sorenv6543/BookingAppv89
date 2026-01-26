@@ -11,6 +11,9 @@ export * from './property';
 // Booking types
 export * from './booking';
 
+// Cleaning Task types
+export * from './cleaningTask';
+
 // UI types - export everything except UserRole
 export type {
   ModalData,

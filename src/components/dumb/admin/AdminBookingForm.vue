@@ -610,9 +610,9 @@ const priorityOptions = [
   // })
   
   const showDateError = computed(() => {
-    if (!form.value.checkout_date || !form.value.checkin_date) return false
-    // For cleaning events: departure should be before arrival
-    return new Date(form.value.checkout_date as string) >= new Date(form.value.checkin_date as string)
+    if (!form.value.checkin_date || !form.value.checkout_date) return false
+    // Industry standard: checkin (arrival) should be before checkout (departure)
+    return new Date(form.value.checkin_date as string) >= new Date(form.value.checkout_date as string)
   })
 
 const showBusinessImpactAlert = computed(() => {
