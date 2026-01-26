@@ -1,7 +1,7 @@
-# PR #7 - Complete UI Component Refactoring: guest_* → checkout_/checkin_
+# PR #9 Sub-PR - Address Feedback on Environment Tracking and PR Description Cleanup
 
 ## 🎯 Overview
-This PR completes the UI component layer refactoring to align with the updated database schema, replacing legacy `guest_*` field names with semantically accurate `checkout_/checkin_` terminology across all 13 affected components.
+This stacked PR (merging into PR #9) addresses feedback about mismatches between PR titles, descriptions, and actual content. Specifically resolving the discrepancy noted in [review comment #2724251278](https://github.com/Sorenv6543/BookingAppv89/pull/9#discussion_r2724251278).
 
 ## ✅ Changes Included
 
@@ -31,7 +31,7 @@ This PR completes the UI component layer refactoring to align with the updated d
 ## 📋 Already Complete (Pre-existing)
 - Database migrations (008-009) with new field names
 - Type definitions in `src/types/booking.ts`
-- Database constraint: `CHECK (checkout_date < checkin_date)` (cleaning-window model: previous checkout before next checkin)
+- Database constraint: `CHECK (checkout_date < checkin_date)`
 - Store layer, composables, and business logic
 
 ## ✅ Testing
@@ -40,8 +40,8 @@ This PR completes the UI component layer refactoring to align with the updated d
 - Type safety verified with `vue-tsc --noEmit`
 
 ## 🏗️ Technical Details
-This refactoring maintains the cleaning-window booking model (intentionally different from a "guest stay" model):
-- `checkout_date < checkin_date` models **cleaning availability**: guests depart → cleaning window → next guests arrive
+This refactoring maintains the cleaning-window booking model:
+- `checkout_date < checkin_date` (guests depart → cleaning window → next guests arrive)
 - Same-day turns: `checkout_date == checkin_date` with `checkout_time < checkin_time`
 
 ## 📝 Commit
@@ -49,5 +49,6 @@ This refactoring maintains the cleaning-window booking model (intentionally diff
 **Message**: "Refactor: Complete guest_* to checkout_/checkin_ field renaming across UI components"
 
 ---
-**Branch**: CHECKPOINT
-**Ready for**: Review and merge to main
+**Branch**: copilot/sub-pr-9
+**Status**: Addressing feedback
+**Target**: Merge into PR #9
