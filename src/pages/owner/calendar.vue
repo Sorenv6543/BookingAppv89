@@ -228,8 +228,8 @@ const ownerPropertiesMap = computed(() => {
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
   // Open booking modal with pre-filled dates
   uiStore.openModal('eventModal', 'create', {
-            checkout_date: selectInfo.startStr,
-        checkin_date: selectInfo.endStr
+            checkin_date: selectInfo.startStr,
+        checkout_date: selectInfo.endStr
   });
 };
 
@@ -251,8 +251,8 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     try {
       // Update booking dates
       await updateMyBooking(booking.id, {
-        checkout_date: dropInfo.event.startStr,
-        checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+        checkin_date: dropInfo.event.startStr || dropInfo.event.endStr,
+        checkout_date: dropInfo.event.endStr || dropInfo.event.startStr
       });
       
       uiStore.showNotification('Booking updated successfully', 'success');

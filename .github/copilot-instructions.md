@@ -1,150 +1,51 @@
-# BookingApp v89 - AI Agent Coding Instructions
+# BookingApp v89 – AI Coding Guide
 
-> Multi-tenant property cleaning scheduler with role-based architecture (Owner/Admin), Supabase integration, and PWA support.
+> Vue 3 + TypeScript + Vuetify + Supabase multi-tenant cleaning scheduler (Owner/Admin). Booking model uses checkout→clean→checkin windows; RLS enforces role isolation.
 
-## Architecture Overview
+## Architecture & Patterns
+- **Smart vs Dumb**: `src/components/smart/**` fetch + orchestrate (role-filtered via Supabase/composables); `src/components/dumb/**` are pure UI/emit only.
+- **Data model**: `bookings` require `checkout_date < checkin_date`; turns have `checkout_date == checkin_date`. Key enums: `user_role`, `booking_type`, `booking_status`, `priority_level`, `property_type`.
+- **Composables**: `useAdminBookings`, `useOwnerBookings`, Supabase wrappers under `src/composables/**` (real-time, role-filtered). Follow existing date mapping (checkin = start, checkout = end).
+- **State**: Pinia stores in `src/stores` (auth, booking, property, ui). Supabase auth flows use JWT in localStorage.
+- **Routing/guards**: Role-based access in router guards; owners see own data, admin sees all (RLS still authoritative).
 
-### Data Model: Cleaning-Window Booking System
-- **Standard Booking**: `checkout_date < checkin_date` (guest departure → next guest arrival with cleaning window between)
-- **Turn Booking**: Same-day `checkout_date == checkin_date` (urgent same-day turnover, high priority)
-- **Constraint**: Database enforces `CHECK (checkout_date < checkin_date)` on bookings table (guests must depart before or at same time as next guests arrive)
-- **Key Fields**: `checkout_date`, `checkin_date`, `booking_type`, `status`, `priority`
+## Build, Test, Perf
+- Dev: `pnpm run dev`
+- Type check: `vue-tsc --noEmit`
+- Tests: `pnpm run test:run` (Vitest); coverage `pnpm run test:coverage`.
+- Builds: `pnpm run build` (full), `pnpm run build:fast` (no type check), `pnpm run build:pwa`.
+- Perf: `pnpm run perf:analysis`, `pnpm run analyze:bundle`.
 
-### Component Architecture: Smart/Dumb Separation
-```
-src/components/
-├── smart/              # Data-aware (handle Supabase, business logic)
-│   ├── admin/         # AdminDashboard, AdminUsers, AdminCalendar
-│   ├── owner/         # OwnerDashboard, OwnerProperties, OwnerCalendar
-│   └── shared/        # FullCalendar, PropertyCard, shared widgets
-└── dumb/              # Pure UI (accept props, emit events)
-    ├── forms/         # BookingForm, AdminBookingForm, OwnerBookingForm
-    ├── layouts/       # Layout containers
-    └── navigation/    # Navigation components
-```
+## Booking Rules (apply everywhere)
+1) `checkout_date <= checkin_date` (DB CHECK enforces). Turns: dates equal.  
+2) If both times provided on turns, require `checkout_time < checkin_time`; times optional otherwise.  
+3) Cleaning window helpers in `src/utils/businessLogic.ts`; defaults in `src/utils/timeDefaults.ts`.  
+4) Error copy lives in `src/utils/errorMessages.ts` (role-aware messaging).
 
-**Pattern**: Smart components fetch data and manage state; dumb components display data and delegate events. Smart components automatically filter data by user role (Supabase RLS).
+## PWA/Performance
+- Role-based code splitting in `vite.config.ts`; keep chunks aligned to admin/owner/shared.
+- Track Supabase subscriptions (target ≤40) and memory; unsubscribe on unmount; debug logs use 🚀 prefix.
+- PWA manifests auto-formatted via `scripts/format-manifest.js`; battery-aware caching in PWA build.
 
-### Role-Based Access Control
-- **Owner**: Sees only their own properties and bookings (enforced via RLS)
-- **Admin**: Sees all properties/bookings, can manage cleaners and system settings
-- **Cleaner**: (Role exists in enum but not yet implemented in UI)
-- **RLS Policies**: Every table has RLS enabled; queries are automatically filtered server-side
+## Supabase Integration
+- Tables: `user_profiles`, `properties`, `bookings`; all RLS-enabled. Trigger `handle_new_user` inserts profile (SECURITY DEFINER).
+- Enum creation scripts under `supabase/`; keep casts (e.g., `::user_role`) valid by ensuring enums exist before triggers.
+- API via `@supabase/supabase-js@^2.50.0`; errors mapped to friendly messages.
 
-### State Management
-- **Primary Store**: Pinia (booking.ts, property.ts, auth.ts, ui.ts)
-- **Real-time**: Supabase subscriptions in composables (`useAdminBookings`, `useOwnerBookings`)
-- **Performance**: Tracks subscription count (target ≤40) and memory usage to detect leaks
+## Conventions & Pitfalls
+- Keep smart components role-filtered; do not duplicate client-side filtering in dumb components.
+- Maintain checkin/checkout ordering in handlers (checkin = start, checkout = end) to satisfy DB constraint.
+- No `any` for booking/property flows; types in `src/types/*.ts` govern contracts.
+- Watch for subscription leaks and unnecessary reactivity in composables.
+- Environment secrets are git-ignored; use `.env.local` (never commit secrets).
 
-## Critical Development Workflows
+## Key References
+- Business logic: `src/utils/businessLogic.ts`, `src/utils/timeDefaults.ts`.
+- Types: `src/types/booking.ts`, `property.ts`, enums shared with DB.
+- Composables: `src/composables/admin/useAdminBookings.ts`, `src/composables/owner/useOwnerBookings.ts`.
+- UI examples: `src/components/smart/admin/AdminDashboard.vue`, `src/components/smart/owner/HomeOwner.vue`, shared calendar components.
 
-### Build & Test Commands
-```bash
-# Development
-pnpm run dev              # Start dev server with HMR
-pnpm run test             # Run tests in watch mode
-pnpm run test:run         # Single test run
-pnpm run test:coverage    # Coverage report with v8
-
-# Production Builds
-pnpm run build            # Full build (TypeScript check + minify)
-pnpm run build:fast       # Skip TypeScript check (dev only)
-pnpm run build:pwa        # PWA build with manifest optimization
-
-# Performance Analysis
-pnpm run perf:analysis    # Bundle + regression test report
-pnpm run analyze:bundle   # Visualize bundle size
-```
-
-### TypeScript & Validation
-- **Zero Errors Required**: All production code must pass `vue-tsc --noEmit` without errors
-- **Strict Mode**: `tsconfig.json` uses strict: true; no `any` types in bookings/properties
-- **Type Files**: Core types in `src/types/` (booking.ts, property.ts, enums shared with database)
-
-### Testing Standards
-- **Test Framework**: Vitest + Vue Test Utils + Playwright (e2e)
-- **Test Files**: `src/__tests__/` mirror source structure
-- **Coverage Target**: 89 tests passing (100% pass rate); vitest@^4.0.18 + @vitest/coverage-v8@^4.0.17 aligned
-- **Performance Tests**: Detect memory leaks in `performance-regression.spec.ts`
-
-## Project-Specific Patterns
-
-### Booking Validation
-Located in `src/utils/businessLogic.ts` and forms:
-1. **Date Order**: Always validate `checkoutDate <= checkinDate` (cleaning window: guests depart, then cleaning, then next guests arrive)
-2. **Turn Consistency**: If `booking_type == 'turn'`, dates MUST be same day (`checkoutDate == checkinDate`)
-3. **Time Order (turns only)**: For same-day turns, `checkout_time < checkin_time` (guests leave before next guests arrive)
-4. **Optional Times**: `checkout_time` and `checkin_time` are optional fields; validation only checks order if both provided
-
-**Error Messages**: Use role-appropriate language in `src/utils/errorMessages.ts` (user_role-keyed messages)
-
-### Form Time Handling
-- **Auto-Population**: `getDefaultTimes()` in `src/utils/timeDefaults.ts` provides default checkout/checkin times based on property
-- **BookingForm.vue**: Times are optional; auto-populated when property is selected, but form still submits without times if not set
-- **Validation**: Only validates time order for same-day turns; missing times don't block submission
-
-### Cleaning Window Calculation
-- **Standard Bookings**: Flexible scheduling between checkout and checkin (default 11 AM start)
-- **Turn Bookings**: Tight window; 30-min buffer after checkout, cleaning must complete 1 hour before checkin
-- **Reference**: `getCleaningWindow()` in businessLogic.ts calculates available time window
-
-### Performance Optimization
-- **Subscription Tracking**: All smart components log subscription count and memory (debug logs prefixed with 🚀)
-- **Role-Based Code Splitting**: Separate bundles for owner/admin routes to reduce initial load
-- **PWA Optimization**: Battery-aware caching; manifest auto-formatted on build
-
-### Priority Calculation
-Turn bookings always ≥ high priority; standard bookings escalate based on hours until checkin:
-- Turn + ≤2 hours: `urgent`
-- Turn + ≤6 hours: `high`
-- Standard + ≤4 hours: `urgent`
-- Standard + ≤12 hours: `high`
-
-## Critical Integration Points
-
-### Supabase Configuration
-- **Project ID**: Referenced as `{SUPABASE_PROJECT_ID}` placeholder in docs; actual ID in `.env.local`
-- **Auth Flow**: JWT tokens stored in localStorage; auto-refreshed by Supabase client
-- **RLS Enforcement**: Policies check `auth.uid()` and `user_profiles.role` column
-- **Enum Types**: `user_role`, `booking_type`, `booking_status`, `property_type` defined in migrations
-
-### Database Constraints
-- **Booking Dates**: `CHECK (checkout_date < checkin_date)` ensures valid cleaning-window model (guests depart before next guests arrive)
-- **User Roles**: `role` column typed as `user_role` enum; defaults to `'owner'`
-- **Trigger Functions**: `handle_new_user()` creates `user_profiles` row on auth.users insert (SECURITY DEFINER)
-
-### API Communication
-- **Supabase SDK**: `@supabase/supabase-js@^2.50.0` for queries/subscriptions
-- **Composables**: Wrap Supabase calls (e.g., `useAdminBookings`, `useOwnerBookings`)
-- **Error Handling**: Supabase errors mapped to user-friendly messages via errorMessages.ts
-
-## Common Pitfalls to Avoid
-
-1. **Date Model Confusion**: Remember `checkout_date < checkin_date` (cleaning window: guests depart, then cleaning, then next guests arrive); NOT `checkin < checkout`
-2. **Time Validation**: Only validate time order for same-day turns; times are optional elsewhere
-3. **RLS Policy Loops**: Avoid recursive role checks in policies (use direct `auth.uid()` queries)
-4. **Subscription Leaks**: Always unsubscribe from Supabase channels; monitor logs for 🚀 prefix warnings
-5. **Component Role Filtering**: Smart components automatically filter by role; don't re-filter in dumb components
-6. **TypeScript Strict Mode**: No `any` types; use union types or generics instead
-
-## Key Files by Purpose
-
-| Purpose | File(s) |
-|---------|---------|
-| **Booking Rules** | `src/utils/businessLogic.ts` |
-| **Error Messages** | `src/utils/errorMessages.ts` |
-| **Type Definitions** | `src/types/booking.ts`, `property.ts` |
-| **Form Components** | `src/components/dumb/BookingForm.vue`, `AdminBookingForm.vue` |
-| **State Management** | `src/stores/booking.ts`, `property.ts`, `auth.ts` |
-| **Composables** | `src/composables/admin/useAdminBookings.ts`, `owner/useOwnerBookings.ts` |
-| **Database Schema** | `supabase/migrations/` |
-| **Build Config** | `vite.config.ts`, `tsconfig.json` |
-
-## Verification Steps Before Commit
-
-- [ ] `pnpm run test:run` passes (89 tests)
-- [ ] `pnpm run build` succeeds (TypeScript check + minify)
-- [ ] No `🚀` debug logs indicate subscription leaks in console
-- [ ] Date validation: `checkin <= checkout` for all booking types
-- [ ] RLS: No recursive role checks in Supabase policies
-- [ ] Form times: Optional fields don't block submission
+## Before PR/Commit
+- `pnpm run test:run` and `pnpm run build` succeed (type-clean).
+- Validate booking date/time rules and RLS assumptions.
+- Ensure subscriptions cleaned up; no 🚀 leak warnings in console.
