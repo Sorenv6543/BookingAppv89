@@ -1,36 +1,39 @@
-# Check-in/Checkout Issue Analysis
+# Check-in/Checkout Issue Analysis - RESOLVED
 
-## Problem Summary
-The system has conflicting mental models for bookings:
-- **Database model**: Cleaning window (checkout_date < checkin_date)
+## Problem Summary (HISTORICAL)
+The system previously had conflicting mental models for bookings:
+- **Old Database model**: Cleaning window (checkout_date < checkin_date)
 - **Homeowner expectation**: Guest stay (arrival < departure)
 
-## Current System Logic
+## Resolution
+**Decision:** Change DB model to match hotel booking logic (Solution #2)
+**Status:** ✅ RESOLVED via Migration 011
+
+## New System Logic (Current)
 | Field | Meaning |
 |-------|---------|
-| `checkout_date` | When previous guests leave (cleaning window start) |
-| `checkin_date` | When new guests arrive (cleaning window end) |
+| `checkin_date` | When guest arrives (check-in date) - start of stay |
+| `checkout_date` | When guest departs (check-out date) - end of stay |
 
-## The Conflict
-- Form collects: Guest Arrival → Guest Departure
-- Database expects: checkout_date < checkin_date
-- These don't align for a single guest stay
+## Database Constraint
+```sql
+CHECK (checkin_date <= checkout_date)
+```
+- Allows same-day stays (turn bookings) where dates are equal
+- Guests must check in before or on the same day they check out
 
-## Solutions
-1. **Keep DB, fix labels** - Rename to "Previous Guest Checkout" / "Next Guest Checkin"
-2. **Change DB model** - Swap constraint to match hotel booking logic
-3. **Add transformation layer** - Form collects naturally, swap values before saving
+## Implementation
+- **Migration 011**: `supabase/migrations/011_fix_booking_date_constraint.sql`
+- **Changed Constraint**: From `checkout_date < checkin_date` to `checkin_date <= checkout_date`
+- **Updated Types**: `src/types/booking.ts` comments reflect hotel model
+- **Updated Validation**: All form validation and business logic updated
+- **Updated Documentation**: `.github/copilot-instructions.md` now describes hotel model
 
-# It seems like number two would be cleanest wayest for a guest booking app.
-2. **Change DB model** - Swap constraint to match hotel booking logic
+## Booking Types
+- **Standard Booking**: Multi-day guest stay (checkin < checkout, different days)
+- **Turn Booking**: Same-day guest stay (checkin == checkout, same day but different times)
 
-5. **Change DB model** - Swap constraint to match hotel booking logic
+---
 
-
-## Recommendation
-Clarify whether this is:
-- A cleaning scheduling app (keep current DB model)
-- A guest booking app (change DB constraint and swap field mapping)
-Then implement consistent labeling throughout the codebase.
-
-# It's a guest booking app
+**Last Updated:** 2026-01-26  
+**Resolution:** Migration 011 applied, all code updated to hotel booking model
