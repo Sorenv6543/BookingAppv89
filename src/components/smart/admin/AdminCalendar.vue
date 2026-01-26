@@ -244,20 +244,20 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
   console.log('🗓️ [AdminCalendar] Date selected:', selectInfo.startStr, 'to', selectInfo.endStr);
   
   // Create a new booking with the selected date range
-  // Ensure logical order: departure (checkout) should be before arrival (checkin)
-  const departureDate = selectInfo.startStr;
-  const arrivalDate = selectInfo.endStr || selectInfo.startStr;
+  // Industry standard: checkin (arrival) should be before checkout (departure)
+  const checkinDate = selectInfo.startStr;
+  const checkoutDate = selectInfo.endStr || selectInfo.startStr;
   
-  // If departure is after arrival, swap them for logical booking
-  const finalDepartureDate = departureDate <= arrivalDate ? departureDate : arrivalDate;
-  const finalArrivalDate = departureDate <= arrivalDate ? arrivalDate : departureDate;
+  // If checkin is after checkout, swap them for logical booking
+  const finalCheckinDate = checkinDate <= checkoutDate ? checkinDate : checkoutDate;
+  const finalCheckoutDate = checkinDate <= checkoutDate ? checkoutDate : checkinDate;
   
   const newBooking: Booking = {
     id: crypto.randomUUID(),
     property_id: '',
     owner_id: '',
-            checkout_date: finalDepartureDate,
-        checkin_date: finalArrivalDate,
+            checkin_date: finalCheckinDate,
+        checkout_date: finalCheckoutDate,
     checkout_time: '11:00',
     checkin_time: '15:00',
     booking_type: 'standard',

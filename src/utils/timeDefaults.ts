@@ -91,24 +91,25 @@ export function formatTimeForDisplay(time: string): string {
 }
 
 /**
- * Validate that checkout time is before checkin time
+ * Validate that checkin time is before checkout time (industry standard)
+ * For guest stays: guests arrive (checkin), stay, then depart (checkout)
  */
-export function validateTimeOrder(checkoutTime: string, checkinTime: string): {
+export function validateTimeOrder(checkinTime: string, checkoutTime: string): {
   valid: boolean;
   error?: string;
 } {
-  if (!checkoutTime || !checkinTime) {
-    return { valid: false, error: 'Both checkout and checkin times are required' };
+  if (!checkinTime || !checkoutTime) {
+    return { valid: false, error: 'Both checkin and checkout times are required' };
   }
 
   try {
-    const checkout = new Date(`2000-01-01T${checkoutTime}:00`);
     const checkin = new Date(`2000-01-01T${checkinTime}:00`);
+    const checkout = new Date(`2000-01-01T${checkoutTime}:00`);
     
-    if (checkout >= checkin) {
+    if (checkin >= checkout) {
       return { 
         valid: false, 
-        error: 'Checkout time must be before checkin time' 
+        error: 'Checkin time must be before checkout time' 
       };
     }
     
@@ -137,26 +138,26 @@ export function getTimeValidationRules(property?: Property) {
     (v: string) => validateTimeFormat(v) || 'Invalid time format (HH:MM)',
     (v: string) => {
       if (!v) return true;
-      const checkoutTime = v;
-      const checkinTime = defaultTimes.checkin;
-      const validation = validateTimeOrder(checkoutTime, checkinTime);
+      const checkinTime = v;
+      const checkoutTime = defaultTimes.checkout;
+      const validation = validateTimeOrder(checkinTime, checkoutTime);
       return validation.valid || validation.error || 'Invalid time order';
     }
   ];
 }
 
 /**
- * Get checkin time validation rules (depends on checkout time)
+ * Get checkout time validation rules (depends on checkin time)
  */
-export function getCheckinTimeValidationRules(checkoutTime: string) {
+export function getCheckoutTimeValidationRules(checkinTime: string) {
   
   return [
     (v: string) => !!v || 'Time is required',
     (v: string) => validateTimeFormat(v) || 'Invalid time format (HH:MM)',
     (v: string) => {
-      if (!v || !checkoutTime) return true;
-      const validation = validateTimeOrder(checkoutTime, v);
-      return validation.valid || validation.error || 'Checkin time must be after checkout time';
+      if (!v || !checkinTime) return true;
+      const validation = validateTimeOrder(checkinTime, v);
+      return validation.valid || validation.error || 'Checkout time must be after checkin time';
     }
   ];
 }
