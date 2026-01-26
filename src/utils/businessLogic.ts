@@ -168,12 +168,8 @@ export const detectBookingConflicts = (
     const otherCheckout = new Date(otherBooking.checkout_date);
     
     // Check for overlap: two bookings overlap if one starts before the other ends
-    return (
-      // Case 1: New booking starts before existing ends AND new booking ends after existing starts
-      (checkinTime < otherCheckout && checkoutTime > otherCheckin) ||
-      // Case 2: Existing booking starts before new ends AND existing booking ends after new starts
-      (otherCheckin < checkoutTime && otherCheckout > checkinTime)
-    );
+    // Standard interval overlap: (start1 < end2) AND (end1 > start2)
+    return checkinTime < otherCheckout && checkoutTime > otherCheckin;
   });
 };
 
