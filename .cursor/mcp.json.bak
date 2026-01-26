@@ -1,0 +1,97 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "c:/Users/Soren/.claude-worktrees/BookingAppv89/jolly-feynman"
+      ],
+      "description": "Enhanced filesystem access for project navigation"
+    },
+
+    
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "description": "Enhanced web content fetching for documentation and resources"
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      },
+      "description": "Web search capabilities via Brave Search API",
+      "disabled": false,
+
+      "note": "Set BRAVE_API_KEY in your environment (e.g., .env.local); do not commit secrets"
+      
+    },
+
+    "postgres-local": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "${SUPABASE_DB_LOCAL_URL}"
+      ],
+      "description": "Local Supabase PostgreSQL database access (requires 'supabase start')",
+      "disabled": true,
+      "note": "Set SUPABASE_DB_LOCAL_URL in your environment; enable after running 'supabase start'"
+    },
+
+    "postgres-remote": {
+      "command": "npx",
+      "args": [
+        "-y", 
+        "@modelcontextprotocol/server-postgres",
+        "${SUPABASE_DB_URL}"
+      ],
+      "description": "Remote Supabase PostgreSQL database access (production)"
+    },
+
+    "github": {
+
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      },
+      "description": "GitHub repository management (issues, PRs, etc.)",
+      "note": "Requires GITHUB_PERSONAL_ACCESS_TOKEN in .env.local"
+    },
+
+"mcp": {
+  "servers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "YOUR_API_KEY"
+      }
+    }
+  }
+}
+
+  }
+}
+useSupabaseAuth.ts:186 ❌ Error loading user profile (attempt 1): Error: Profile query timeout after 3 seconds
+    at useSupabaseAuth.ts:114:35
+loadUserProfile	@	useSupabaseAuth.ts:186
+await in loadUserProfile		
+(anonymous)	@	useSupabaseAuth.ts:52
+(anonymous)	@	@supabase_supabase-js.js?v=631bb3e8:6700
+_notifyAllSubscribers	@	@supabase_supabase-js.js?v=631bb3e8:6698
+_recoverAndRefresh	@	@supabase_supabase-js.js?v=631bb3e8:6641
+await in _recoverAndRefresh		
+_initialize	@	@supabase_supabase-js.js?v=631bb3e8:5312
+await in _initialize		
+(anonymous)	@	@supabase_supabase-js.js?v=631bb3e8:5266
+(anonymous)	@	@supabase_supabase-js.js?v=631bb3e8:5944
+(anonymous)	@	@supabase_supabase-js.js?v=631bb3e8:5061
