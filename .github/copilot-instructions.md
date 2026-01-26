@@ -4,11 +4,12 @@
 
 ## Architecture Overview
 
-### Data Model: Cleaning-Window Booking System
-- **Standard Booking**: `checkout_date < checkin_date` (guest departure → next guest arrival with cleaning window between)
-- **Turn Booking**: Same-day `checkout_date == checkin_date` (urgent same-day turnover, high priority)
-- **Constraint**: Database enforces `CHECK (checkout_date < checkin_date)` on bookings table (guests must depart before or at same time as next guests arrive)
-- **Key Fields**: `checkout_date`, `checkin_date`, `booking_type`, `status`, `priority`
+### Data Model: Standard Hotel Booking System
+- **Standard Booking**: `checkin_date <= checkout_date` (guest arrival → guest departure, representing a guest stay)
+- **Turn Booking**: Same-day `checkin_date == checkout_date` (same-day stay with rapid turnover, high priority)
+- **Constraint**: Database enforces `CHECK (checkin_date <= checkout_date)` on bookings table (guests arrive, then depart)
+- **Key Fields**: `checkin_date`, `checkout_date`, `booking_type`, `status`, `priority`
+- **Cleaning**: Derived from bookings - scheduled after checkout, before next booking's checkin
 
 ### Component Architecture: Smart/Dumb Separation
 ```
@@ -71,10 +72,10 @@ pnpm run analyze:bundle   # Visualize bundle size
 
 ### Booking Validation
 Located in `src/utils/businessLogic.ts` and forms:
-1. **Date Order**: Always validate `checkoutDate <= checkinDate` (cleaning window: guests depart, then cleaning, then next guests arrive)
-2. **Turn Consistency**: If `booking_type == 'turn'`, dates MUST be same day (`checkoutDate == checkinDate`)
-3. **Time Order (turns only)**: For same-day turns, `checkout_time < checkin_time` (guests leave before next guests arrive)
-4. **Optional Times**: `checkout_time` and `checkin_time` are optional fields; validation only checks order if both provided
+1. **Date Order**: Always validate `checkinDate <= checkoutDate` (hotel model: guests arrive, stay, then depart)
+2. **Turn Consistency**: If `booking_type == 'turn'`, dates MUST be same day (`checkinDate == checkoutDate`)
+3. **Time Order (turns only)**: For same-day turns, `checkin_time < checkout_time` (guests arrive, then depart same day)
+4. **Optional Times**: `checkin_time` and `checkout_time` are optional fields; validation only checks order if both provided
 
 **Error Messages**: Use role-appropriate language in `src/utils/errorMessages.ts` (user_role-keyed messages)
 
@@ -84,9 +85,9 @@ Located in `src/utils/businessLogic.ts` and forms:
 - **Validation**: Only validates time order for same-day turns; missing times don't block submission
 
 ### Cleaning Window Calculation
-- **Standard Bookings**: Flexible scheduling between checkout and checkin (default 11 AM start)
-- **Turn Bookings**: Tight window; 30-min buffer after checkout, cleaning must complete 1 hour before checkin
-- **Reference**: `getCleaningWindow()` in businessLogic.ts calculates available time window
+- **Standard Bookings**: Cleaning scheduled after checkout (default 1 hour buffer)
+- **Turn Bookings**: Same-day stays require rapid turnover; cleaning starts 30 min after checkout
+- **Reference**: `getCleaningWindow()` in businessLogic.ts calculates when to schedule cleaning after guest departure
 
 ### Performance Optimization
 - **Subscription Tracking**: All smart components log subscription count and memory (debug logs prefixed with 🚀)
@@ -94,11 +95,11 @@ Located in `src/utils/businessLogic.ts` and forms:
 - **PWA Optimization**: Battery-aware caching; manifest auto-formatted on build
 
 ### Priority Calculation
-Turn bookings always ≥ high priority; standard bookings escalate based on hours until checkin:
-- Turn + ≤2 hours: `urgent`
-- Turn + ≤6 hours: `high`
-- Standard + ≤4 hours: `urgent`
-- Standard + ≤12 hours: `high`
+Turn bookings (same-day stays) always ≥ high priority; standard bookings escalate based on hours until checkout:
+- Turn + ≤2 hours until checkout: `urgent`
+- Turn + ≤6 hours until checkout: `high`
+- Standard + ≤4 hours until checkout: `urgent`
+- Standard + ≤12 hours until checkout: `high`
 
 ## Critical Integration Points
 
@@ -109,7 +110,7 @@ Turn bookings always ≥ high priority; standard bookings escalate based on hour
 - **Enum Types**: `user_role`, `booking_type`, `booking_status`, `property_type` defined in migrations
 
 ### Database Constraints
-- **Booking Dates**: `CHECK (checkout_date < checkin_date)` ensures valid cleaning-window model (guests depart before next guests arrive)
+- **Booking Dates**: `CHECK (checkin_date <= checkout_date)` ensures valid hotel booking model (guests arrive, then depart)
 - **User Roles**: `role` column typed as `user_role` enum; defaults to `'owner'`
 - **Trigger Functions**: `handle_new_user()` creates `user_profiles` row on auth.users insert (SECURITY DEFINER)
 

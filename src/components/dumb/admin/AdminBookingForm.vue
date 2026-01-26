@@ -400,8 +400,8 @@
                 <v-alert
                   type="error"
                   variant="tonal"
-                  title="Scheduling Conflict"
-                  text="Invalid date configuration detected. Please review checkout/checkin times."
+                  title="Invalid Dates"
+                  text="Checkout date must be after checkin date. Guests must check in before checking out."
                   class="mb-0"
                 />
               </v-col>
@@ -611,8 +611,8 @@ const priorityOptions = [
   
   const showDateError = computed(() => {
     if (!form.value.checkout_date || !form.value.checkin_date) return false
-    // For cleaning events: departure should be before arrival
-    return new Date(form.value.checkout_date as string) >= new Date(form.value.checkin_date as string)
+    // Standard hotel model: checkin should be before checkout (guests arrive, then depart)
+    return new Date(form.value.checkin_date as string) >= new Date(form.value.checkout_date as string)
   })
 
 const showBusinessImpactAlert = computed(() => {

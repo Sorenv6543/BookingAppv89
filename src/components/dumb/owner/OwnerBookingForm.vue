@@ -191,7 +191,7 @@
                   type="error"
                   variant="tonal"
                   title="Invalid Dates"
-                  text="Checkin date cannot be before checkout date. Please check your dates."
+                  text="Checkout date must be after checkin date. Guests must check in before checking out."
                   class="mb-0"
                 />
               </v-col>
@@ -328,7 +328,8 @@ const showDateError = computed(() => {
   const checkinDate = new Date(String(form.value.checkin_date || ''))
   const checkoutDate = new Date(String(form.value.checkout_date || ''))
   if (isNaN(checkinDate.getTime()) || isNaN(checkoutDate.getTime())) return false
-  return checkinDate < checkoutDate
+  // Standard hotel model: checkin must be BEFORE checkout (guests arrive, then depart)
+  return checkinDate >= checkoutDate
 })
 
 
