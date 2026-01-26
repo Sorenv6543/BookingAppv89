@@ -5,19 +5,11 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "${PROJECT_ROOT}"
+        "c:/Users/Soren/.claude-worktrees/BookingAppv89/jolly-feynman"
       ],
       "description": "Enhanced filesystem access for project navigation"
     },
-    "supabase": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@latest",
-        "--access-token",
-        "${SUPABASE_ACCESS_TOKEN}"
-      ]
-    },
+
     
     "fetch": {
       "command": "npx",
@@ -75,12 +67,31 @@
       "note": "Requires GITHUB_PERSONAL_ACCESS_TOKEN in .env.local"
     },
 
+"mcp": {
+  "servers": {
     "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"],
-      "description": "Up-to-date documentation and code examples for any library/framework",
-      "note": "Optional: Get API key at https://context7.com/dashboard for higher rate limits"
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "YOUR_API_KEY"
+      }
     }
+  }
+}
 
   }
 }
+useSupabaseAuth.ts:186 ❌ Error loading user profile (attempt 1): Error: Profile query timeout after 3 seconds
+    at useSupabaseAuth.ts:114:35
+loadUserProfile	@	useSupabaseAuth.ts:186
+await in loadUserProfile		
+(anonymous)	@	useSupabaseAuth.ts:52
+(anonymous)	@	@supabase_supabase-js.js?v=631bb3e8:6700
+_notifyAllSubscribers	@	@supabase_supabase-js.js?v=631bb3e8:6698
+_recoverAndRefresh	@	@supabase_supabase-js.js?v=631bb3e8:6641
+await in _recoverAndRefresh		
+_initialize	@	@supabase_supabase-js.js?v=631bb3e8:5312
+await in _initialize		
+(anonymous)	@	@supabase_supabase-js.js?v=631bb3e8:5266
+(anonymous)	@	@supabase_supabase-js.js?v=631bb3e8:5944
+(anonymous)	@	@supabase_supabase-js.js?v=631bb3e8:5061
