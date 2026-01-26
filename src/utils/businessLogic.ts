@@ -7,7 +7,6 @@ import type { Property } from '@/types/property';
  */
 export const calculateBookingPriority = (booking: Booking): 'low' | 'normal' | 'high' | 'urgent' => {
   const checkoutDate = new Date(booking.checkout_date);
-  const checkinDate = new Date(booking.checkin_date);
   
   // Turn bookings (same-day stays) are always high priority or urgent
   if (booking.booking_type === 'turn') {
@@ -31,15 +30,14 @@ export const calculateBookingPriority = (booking: Booking): 'low' | 'normal' | '
  * Calculate the cleaning window after a guest stay
  * In hotel model: cleaning happens AFTER checkout, before next booking (if any)
  */
-export const getCleaningWindow = (booking: Booking, property: Property): {
+export const getCleaningWindow = (booking: Booking, _property: Property): {
   start: string;
   end: string;
   duration: number;
   bufferTime: number;
 } => {
   const checkoutDate = new Date(booking.checkout_date);
-  const checkinDate = new Date(booking.checkin_date);
-  const cleaningDuration = property.cleaning_duration || 120; // Default 2 hours
+  const cleaningDuration = _property.cleaning_duration || 120; // Default 2 hours
   
   if (booking.booking_type === 'turn') {
     // Turn: Same-day stay, tight cleaning window after checkout
@@ -76,7 +74,7 @@ export const getCleaningWindow = (booking: Booking, property: Property): {
  * Check if a cleaning can be scheduled for a booking
  * In hotel model: checks if the booking duration allows for cleaning after checkout
  */
-export const canScheduleCleaning = (booking: Booking, property: Property): {
+export const canScheduleCleaning = (booking: Booking, _property: Property): {
   possible: boolean;
   reason?: string;
   suggestedTimes?: string[];
@@ -107,7 +105,7 @@ export const canScheduleCleaning = (booking: Booking, property: Property): {
  */
 export const validateTurnBooking = (
   booking: Partial<Booking>, 
-  property: Property
+  _property: Property
 ): { valid: boolean; errors: string[]; warnings: string[] } => {
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -294,7 +292,6 @@ export const calculateSystemMetrics = (
   bookings.forEach(booking => {
     totalBookings++
     
-    const checkinDate = new Date(booking.checkin_date)
     const checkoutDate = new Date(booking.checkout_date)
     
     if (checkoutDate > now && ['confirmed', 'scheduled'].includes(booking.status)) {
