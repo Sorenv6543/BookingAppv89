@@ -1,0 +1,908 @@
+/* Responsive Layout Utilities */
+@use "sass:map";
+
+/* Breakpoint Variables (matching Vuetify) */
+$breakpoints: (
+  xs: 0,
+  sm: 600px,
+  md: 960px,
+  lg: 1280px,
+  xl: 1920px
+);
+
+/* Responsive Layout Classes */
+.responsive-layout {
+  --drawer-width: 380px;
+  --app-bar-height: 64px;
+  --content-padding: 24px;
+  
+  &.is-mobile {
+    --drawer-width: 320px;
+    --app-bar-height: 56px;
+    --content-padding: 16px;
+  }
+  
+  &.is-tablet {
+    --content-padding: 20px;
+  }
+  
+  &.drawer-rail {
+    --drawer-width: 72px;
+  }
+}
+
+/* Mobile Layout Optimizations */
+.mobile-optimized {
+  /* Touch targets */
+  .v-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .v-list-item {
+    min-height: 48px;
+  }
+  
+  /* Text sizing for mobile */
+  .v-app-bar-title {
+    font-size: 1.1rem !important;
+  }
+  
+  /* Card spacing for mobile */
+  .v-card {
+    margin-bottom: 12px;
+  }
+  
+  /* Form elements */
+  .v-text-field,
+  .v-select,
+  .v-textarea {
+    margin-bottom: 16px;
+  }
+}
+
+/* Responsive App Bar */
+.responsive-app-bar {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &.mobile {
+    height: 56px !important;
+    
+    .v-app-bar-title {
+      font-size: 1.1rem;
+      line-height: 1.2;
+    }
+    
+    /* Hide less important elements on mobile */
+    .hide-on-mobile {
+      display: none !important;
+    }
+  }
+  
+  &.desktop {
+    height: 64px !important;
+  }
+}
+
+/* Responsive Navigation Drawer */
+.responsive-drawer {
+  /* Desktop permanent drawer */
+  &.permanent {
+    position: relative;
+    height: 100vh;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &.rail-mode {
+      width: 72px !important;
+      
+      .drawer-content {
+        padding: 8px 4px;
+      }
+      
+      .v-list-item-title,
+      .v-list-item-subtitle {
+        opacity: 0;
+      }
+    }
+  }
+  
+  /* Mobile temporary drawer */
+  &.temporary {
+    position: fixed;
+    z-index: 1005;
+    width: 320px !important;
+    
+    .drawer-content {
+      padding: 16px 12px;
+    }
+  }
+}
+
+/* Main Content Responsive Spacing */
+.responsive-main {
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100vh;
+  
+  &.with-drawer {
+    margin-left: var(--drawer-width);
+  }
+  
+  &.mobile {
+    margin-left: 0 !important;
+    
+    .v-container {
+      padding: var(--content-padding) !important;
+    }
+  }
+  
+  &.rail-drawer {
+    margin-left: 72px;
+  }
+}
+
+/* Mobile Navigation Enhancements */
+.mobile-nav-enhancements {
+  /* Swipe gestures area */
+  .swipe-area {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 100vh;
+    z-index: 1004;
+    background: transparent;
+  }
+  
+  /* Mobile drawer overlay */
+  .mobile-drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1004;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    
+    &.visible {
+      opacity: 1;
+    }
+  }
+}
+
+/* Responsive Card Grid */
+.responsive-grid {
+  .v-row {
+    margin: 0;
+  }
+  
+  .v-col {
+    padding: 8px;
+    
+    @media (min-width: map.get($breakpoints, sm)) {
+      padding: 12px;
+    }
+    
+    @media (min-width: map.get($breakpoints, lg)) {
+      padding: 16px;
+    }
+  }
+}
+
+/* Responsive Typography */
+.responsive-typography {
+  .text-h1, .text-h2, .text-h3 {
+    @media (max-width: map.get($breakpoints, sm)) {
+      font-size: 0.9em;
+      line-height: 1.2;
+    }
+  }
+  
+  .text-body-1, .text-body-2 {
+    @media (max-width: map.get($breakpoints, sm)) {
+      font-size: 0.95em;
+      line-height: 1.4;
+    }
+  }
+}
+
+/* Responsive Spacing Utilities */
+.spacing-responsive {
+  /* Margin utilities */
+  .ma-responsive {
+    margin: 8px;
+    
+    @media (min-width: map.get($breakpoints, sm)) {
+      margin: 12px;
+    }
+    
+    @media (min-width: map.get($breakpoints, lg)) {
+      margin: 16px;
+    }
+  }
+  
+  /* Padding utilities */
+  .pa-responsive {
+    padding: 8px;
+    
+    @media (min-width: map.get($breakpoints, sm)) {
+      padding: 12px;
+    }
+    
+    @media (min-width: map.get($breakpoints, lg)) {
+      padding: 16px;
+    }
+  }
+}
+
+/* Mobile-First Media Queries */
+@media (max-width: 599px) {
+  .hide-mobile { display: none !important; }
+  .show-mobile { display: block !important; }
+}
+
+@media (min-width: 600px) and (max-width: 959px) {
+  .hide-tablet { display: none !important; }
+  .show-tablet { display: block !important; }
+}
+
+@media (min-width: 960px) {
+  .hide-desktop { display: none !important; }
+  .show-desktop { display: block !important; }
+}
+
+/* Safe Area Support for Mobile Devices */
+.mobile-safe-area {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Smooth animations for mobile */
+.mobile-smooth {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  .v-btn, .v-list-item {
+    transition: all 0.2s ease;
+  }
+}
+
+/* PWA Responsive Enhancements */
+.pwa-responsive {
+  /* Full viewport support */
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height */
+  
+  /* iOS PWA specific */
+  @supports (-webkit-touch-callout: none) {
+    .ios-pwa-padding {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+}
+
+/* FullCalendar Full Viewport Adjustments */
+.full-viewport-calendar {
+  /* Remove any FullCalendar internal spacing */
+  :deep(.fc-view-harness),
+  :deep(.fc-view-harness-active),
+  :deep(.fc) {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    height: 100% !important;
+  }
+  
+  :deep(.fc-header-toolbar) {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  :deep(.fc-view) {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  :deep(.fc-daygrid),
+  :deep(.fc-timegrid) {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  :deep(.fc-scroller) {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+  
+  /* Ensure FullCalendar fills the full available height */
+  :deep(.fc-daygrid-body),
+  :deep(.fc-timegrid-body) {
+    height: 100% !important;
+  }
+  
+  /* Make sure week/day views stretch full height */
+  :deep(.fc-timegrid-slots) {
+    height: 100% !important;
+  }
+  
+  /* Critical: Make calendar cells stretch to fill viewport height */
+  :deep(.fc-daygrid-day-frame) {
+    min-height: calc((100vh - 56px - 10vh) / 6) !important; /* Mobile: divide remaining height by 6 weeks */
+  }
+  
+  :deep(.fc-daygrid-week) {
+    flex: 1 !important; /* Each week row stretches equally */
+  }
+  
+  /* Tablet adjustments for cell height */
+  @media (min-width: 600px) and (max-width: 959px) {
+    :deep(.fc-daygrid-day-frame) {
+      min-height: calc((100vh - 64px - 15vh) / 6) !important; /* Tablet: adjust for larger header */
+    }
+  }
+  
+  /* Desktop adjustments for cell height */
+  @media (min-width: 960px) {
+    :deep(.fc-daygrid-day-frame) {
+      min-height: calc((100vh - 64px - 10vh) / 6) !important; /* Desktop: standard header */
+    }
+  }
+  
+  /* Time grid adjustments for full height */
+  :deep(.fc-timegrid-slot) {
+    min-height: 40px !important; /* Ensure time slots have reasonable minimum height */
+  }
+  
+  /* Month view: Make sure all weeks are equal height */
+  :deep(.fc-daygrid-body-natural) {
+    height: 100% !important;
+  }
+  
+  :deep(.fc-daygrid-body-balanced) {
+    height: 100% !important;
+  }
+  
+  /* Complete padding/margin removal for edge-to-edge layout */
+  :deep(.fc-view-harness),
+  :deep(.fc-view-harness-active),
+  :deep(.fc-daygrid),
+  :deep(.fc-timegrid),
+  :deep(.fc-col-header),
+  :deep(.fc-daygrid-header),
+  :deep(.fc-timegrid-header),
+  :deep(.fc-scroller),
+  :deep(.fc-daygrid-body),
+  :deep(.fc-timegrid-body),
+  :deep(.fc-table),
+  :deep(.fc-table-header),
+  :deep(.fc-table-body) {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-spacing: 0 !important;
+  }
+  
+  /* Remove any container padding */
+  :deep(.fc) {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+  }
+  
+  /* Calendar cells - remove internal padding */
+  :deep(.fc-daygrid-day),
+  :deep(.fc-timegrid-slot),
+  :deep(.fc-col-header-cell) {
+    padding: 2px !important; /* Minimal padding for readability */
+    margin: 0 !important;
+  }
+  
+  /* Events - keep minimal padding for text readability */
+  :deep(.fc-event) {
+    margin: 1px !important;
+    padding: 1px 2px !important;
+  }
+  
+  /* Critical: Force FullCalendar tables to stretch full width */
+  :deep(.fc-scrollgrid),
+  :deep(.fc-scrollgrid-sync-table),
+  :deep(.fc-col-header),
+  :deep(.fc-daygrid-body) {
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+  
+  /* Force table elements to stretch */
+  :deep(.fc table),
+  :deep(.fc-col-header table),
+  :deep(.fc-daygrid-body table) {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+  }
+  
+  /* Days of the week header - stretch to full width */
+  :deep(.fc-col-header-row) {
+    width: 100% !important;
+  }
+  
+  :deep(.fc-col-header-cell) {
+    width: calc(100% / 7) !important; /* Each day gets 1/7th of width */
+    text-align: center !important;
+  }
+  
+  /* Calendar day cells - stretch to full width */
+  :deep(.fc-daygrid-day) {
+    width: calc(100% / 7) !important; /* Each day gets 1/7th of width */
+  }
+  
+  /* Table rows - stretch to full width */
+  :deep(.fc-daygrid-week) {
+    width: 100% !important;
+  }
+  
+  :deep(.fc-daygrid-week td) {
+    width: calc(100% / 7) !important;
+  }
+  
+  /* Scrollgrid sync inner - ensure full width */
+  :deep(.fc-scrollgrid-sync-inner) {
+    width: 100% !important;
+  }
+  
+  /* Additional table width enforcement */
+  :deep(.fc-scrollgrid-section),
+  :deep(.fc-scrollgrid-section-body),
+  :deep(.fc-scrollgrid-section-header) {
+    width: 100% !important;
+  }
+  
+  /* Table containers - force full width */
+  :deep(.fc-scrollgrid-section-body > td),
+  :deep(.fc-scrollgrid-section-header > th) {
+    width: 100% !important;
+    padding: 0 !important;
+  }
+  
+  /* Month view specific - ensure full width */
+  :deep(.fc-daygrid) {
+    width: 100vw !important;
+  }
+  
+  /* Week view specific - ensure full width */
+  :deep(.fc-timegrid) {
+    width: 100vw !important;
+  }
+  
+  /* List view specific - ensure full width */
+  :deep(.fc-list) {
+    width: 100vw !important;
+  }
+  
+  /* ===================================================================== */
+  /* UNIVERSAL MOBILE PHONE SUPPORT - ALL DEVICES */
+  /* ===================================================================== */
+  
+  /* All mobile devices - portrait and landscape */
+  @media only screen and (max-width: 768px) {
+    /* Force full viewport width on all mobile devices */
+    :deep(.fc),
+    :deep(.fc-view-harness),
+    :deep(.fc-view-harness-active),
+    :deep(.fc-daygrid),
+    :deep(.fc-timegrid),
+    :deep(.fc-list) {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      min-width: 100vw !important;
+    }
+    
+    /* Mobile table structure - ensure full width */
+    :deep(.fc-scrollgrid),
+    :deep(.fc-scrollgrid-sync-table),
+    :deep(.fc table) {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      table-layout: fixed !important;
+    }
+    
+    /* Mobile day cells - equal distribution */
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day),
+    :deep(.fc-daygrid-week td) {
+      width: calc(100vw / 7) !important;
+      max-width: calc(100vw / 7) !important;
+      min-width: calc(100vw / 7) !important;
+    }
+  }
+  
+  /* Small phones (iPhone SE, older Android) - 320px to 414px */
+  @media only screen and (max-width: 414px) {
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day) {
+      font-size: 0.7rem !important;
+      padding: 1px !important;
+    }
+    
+    :deep(.fc-daygrid-day-number) {
+      font-size: 0.75rem !important;
+    }
+    
+    :deep(.fc-event) {
+      font-size: 0.65rem !important;
+      padding: 0px 1px !important;
+    }
+  }
+  
+  /* Standard phones (iPhone 12/13/14, Samsung Galaxy S) - 375px to 428px */
+  @media only screen and (min-width: 375px) and (max-width: 428px) {
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day) {
+      font-size: 0.8rem !important;
+      padding: 2px !important;
+    }
+    
+    :deep(.fc-event) {
+      font-size: 0.7rem !important;
+    }
+  }
+  
+  /* Large phones (iPhone Pro Max, Samsung Note) - 414px to 480px */
+  @media only screen and (min-width: 414px) and (max-width: 480px) {
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day) {
+      font-size: 0.85rem !important;
+      padding: 2px !important;
+    }
+    
+    :deep(.fc-event) {
+      font-size: 0.75rem !important;
+    }
+  }
+  
+  /* Phone landscape orientation - all sizes */
+  @media only screen and (max-height: 480px) and (orientation: landscape) {
+    /* Landscape phones - optimize for wider viewport */
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day),
+    :deep(.fc-daygrid-week td) {
+      width: calc(100vw / 7) !important;
+    }
+    
+    /* Smaller text for landscape to fit more content */
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day) {
+      font-size: 0.75rem !important;
+    }
+    
+    :deep(.fc-event) {
+      font-size: 0.65rem !important;
+      line-height: 1.1 !important;
+    }
+  }
+  
+  /* High DPI / Retina displays - ensure crisp rendering */
+  @media only screen and (-webkit-min-device-pixel-ratio: 2),
+         only screen and (min-resolution: 192dpi) {
+    :deep(.fc-event),
+    :deep(.fc-daygrid-day-number),
+    :deep(.fc-col-header-cell) {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
+  
+  /* Touch device optimizations */
+  @media (pointer: coarse) {
+    /* Larger touch targets for finger interaction */
+    :deep(.fc-daygrid-day) {
+      min-height: 44px !important; /* iOS recommended minimum touch target */
+    }
+    
+    :deep(.fc-event) {
+      min-height: 32px !important;
+      cursor: pointer !important;
+    }
+    
+    /* Prevent text selection on touch */
+    :deep(.fc) {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  }
+  
+  /* ===================================================================== */
+  /* MOBILE BROWSER COMPATIBILITY */
+  /* ===================================================================== */
+  
+  /* Safari iOS specific fixes */
+  @supports (-webkit-touch-callout: none) {
+    /* iOS Safari viewport fixes */
+    :deep(.fc),
+    :deep(.fc-view-harness) {
+      width: 100vw !important;
+      min-width: 100vw !important;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* iOS Safari table fixes */
+    :deep(.fc table) {
+      width: 100vw !important;
+      border-collapse: collapse !important;
+    }
+    
+    /* Prevent iOS zoom on input focus */
+    :deep(.fc-event) {
+      font-size: 16px; /* Prevent zoom */
+    }
+  }
+  
+  /* Android Chrome/WebView specific fixes */
+  @media screen and (-webkit-min-device-pixel-ratio: 0) {
+    :deep(.fc-scrollgrid),
+    :deep(.fc-daygrid) {
+      width: 100vw !important;
+      overflow-x: hidden !important;
+    }
+  }
+  
+  /* Samsung Internet browser fixes */
+  @media screen and (max-width: 768px) {
+    :deep(.fc-view-harness) {
+      transform: translateZ(0); /* Force hardware acceleration */
+      will-change: transform;
+    }
+  }
+  
+  /* ===================================================================== */
+  /* DEVICE-SPECIFIC OPTIMIZATIONS */
+  /* ===================================================================== */
+  
+  /* iPhone SE (1st gen) - 320px */
+  @media only screen and (device-width: 320px) {
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day) {
+      width: calc(100vw / 7) !important;
+      font-size: 0.65rem !important;
+    }
+  }
+  
+  /* iPhone 12/13 mini - 375px */
+  @media only screen and (device-width: 375px) {
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day) {
+      width: calc(100vw / 7) !important;
+      font-size: 0.7rem !important;
+    }
+  }
+  
+  /* iPhone 12/13/14 standard - 390px */
+  @media only screen and (device-width: 390px) {
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day) {
+      width: calc(100vw / 7) !important;
+      font-size: 0.75rem !important;
+    }
+  }
+  
+  /* iPhone 12/13/14 Pro Max - 428px */
+  @media only screen and (device-width: 428px) {
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day) {
+      width: calc(100vw / 7) !important;
+      font-size: 0.8rem !important;
+    }
+  }
+  
+  /* Samsung Galaxy S series (various sizes) */
+  @media only screen and (min-device-width: 360px) and (max-device-width: 414px) {
+    :deep(.fc-col-header-cell),
+    :deep(.fc-daygrid-day) {
+      width: calc(100vw / 7) !important;
+    }
+  }
+  
+  /* ===================================================================== */
+  /* FALLBACK FOR ANY MISSED MOBILE DEVICES */
+  /* ===================================================================== */
+  
+  /* Catch-all for any mobile device */
+  @media only screen and (max-device-width: 768px) {
+    .full-viewport-calendar {
+      /* Force full width on any mobile device */
+      :deep(.fc),
+      :deep(.fc-view-harness),
+      :deep(.fc-daygrid),
+      :deep(.fc-timegrid),
+      :deep(.fc-scrollgrid),
+      :deep(.fc table) {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+      }
+      
+      /* Ensure day cells use equal width */
+      :deep(.fc-col-header-cell),
+      :deep(.fc-daygrid-day),
+      :deep(.fc-daygrid-week td) {
+        width: calc(100vw / 7) !important;
+        max-width: calc(100vw / 7) !important;
+        min-width: calc(100vw / 7) !important;
+        box-sizing: border-box !important;
+      }
+    }
+  }
+}
+
+/* Loading State Responsiveness */
+.responsive-loading {
+  .v-skeleton-loader {
+    @media (max-width: map.get($breakpoints, sm)) {
+      height: 120px;
+    }
+    
+    @media (min-width: map.get($breakpoints, md)) {
+      height: 200px;
+    }
+  }
+}
+
+/* Calendar Header Mobile Constraints */
+.calendar-responsive {
+  /* Mobile calendar header height limit */
+  @media (max-width: 599px) {
+    .calendar-header,
+    .calendar-header-card {
+      max-height: 10vh !important;
+      overflow-y: auto;
+      margin: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      
+      .v-card-text {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      /* Compact button sizing for mobile */
+      .v-btn {
+        min-height: 36px;
+        min-width: 36px;
+        
+        &.v-btn--size-small {
+          min-height: 32px;
+          min-width: 32px;
+        }
+      }
+      
+      /* Compact button groups */
+      .v-btn-toggle .v-btn {
+        min-height: 32px;
+        padding: 0 8px;
+        font-size: 0.8rem;
+      }
+      
+      /* Compact title text */
+      .text-h6 {
+        font-size: 1rem !important;
+        line-height: 1.2;
+      }
+      
+      /* Make calendar date even smaller */
+      .calendar-header-date {
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+        line-height: 1.2;
+        display: none !important; /* Hide the date */
+      }
+      
+      /* Hide less essential elements on very small mobile */
+      @media (max-width: 480px) {
+        .hide-on-small-mobile {
+          display: none !important;
+        }
+        
+        /* Make button groups more compact */
+        .v-btn-toggle .v-btn {
+          min-width: 28px;
+          padding: 0 6px;
+          font-size: 0.75rem;
+        }
+        
+        /* Extra small date on very small screens */
+        .calendar-header-date {
+          font-size: 0.8rem !important;
+          font-weight: 400 !important;
+        }
+      }
+    }
+    
+    /* Ensure calendar content takes remaining space - no padding */
+    .calendar-content,
+    .calendar-column .admin-calendar-container {
+      flex: 1;
+      min-height: 0;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100vw !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    
+    /* Full viewport calendar layout */
+    &.full-viewport-calendar {
+      .calendar-header,
+      .calendar-header-card {
+        width: 100vw !important;
+        margin: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        border-radius: 0 !important;
+      }
+      
+      .calendar-content {
+        width: 100vw !important;
+        height: calc(100vh - 56px - 10vh) !important; /* Full viewport minus app bar minus header */
+        margin: 0 !important;
+        padding: 0 !important;
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+      }
+      
+      .v-card {
+        border-radius: 0 !important;
+      }
+    }
+  }
+  
+  /* Tablet adjustments */
+  @media (min-width: 600px) and (max-width: 959px) {
+    .calendar-header,
+    .calendar-header-card {
+      max-height: 15vh; /* Slightly more room on tablets */
+      margin: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    
+    &.full-viewport-calendar {
+      .calendar-header,
+      .calendar-header-card {
+        width: 100vw !important;
+        margin: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        border-radius: 0 !important;
+      }
+      
+      .calendar-content {
+        width: 100vw !important;
+        height: calc(100vh - 64px - 15vh) !important; /* Full viewport minus app bar minus header */
+        margin: 0 !important;
+        padding: 0 !important;
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+      }
+    }
+  }
+} 
