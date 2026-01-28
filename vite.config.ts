@@ -5,6 +5,7 @@ import path from 'path'
 // import vueDevTools from 'vite-plugin-vue-devtools' // Temporarily disabled
 import { VitePWA } from 'vite-plugin-pwa'
 
+// where is the dev config located?
 
 
 // https://vitejs.dev/config/
