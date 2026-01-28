@@ -37,7 +37,10 @@
       "Bash(npx supabase@latest:*)",
       "Bash(docker --version:*)",
       "Bash(ls:*)",
-      "Bash(npm run type-check:*)"
+      "Bash(npm run type-check:*)",
+      "Bash(gh pr list:*)",
+      "Bash(where:*)",
+      "Bash(git -C \"c:\\\\Users\\\\Soren\\\\BookingAppv89\" status)"
     ],
     "deny": []
   },
