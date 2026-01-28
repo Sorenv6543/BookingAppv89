@@ -1,213 +1,124 @@
-# Property Cleaning Scheduler - Claude Code Configuration
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
-Vue 3 + TypeScript property cleaning scheduler with role-based architecture (Owner/Admin), Supabase integration, and production-ready performance optimizations.
 
-**Current Status**: Frontend Integration Pending - Component Architecture Complete ✅
+Multi-tenant property cleaning scheduler with role-based Owner/Admin UI. Core product: guest-stay booking plus cleaning operations. Tech stack: Vue 3 + Vite + Vuetify, Pinia for state, Supabase for auth/Postgres/RLS/realtime.
 
----
+## Commands
 
-## ⚠️ Current State - INTEGRATION IN PROGRESS
-
-### Migration Completed Successfully
-- ✅ **RESOLVED**: TypeScript compilation now working (production build succeeds)
-- ✅ **RESOLVED**: All 89 tests passing (100% pass rate)  
-- ✅ **COMPLETED**: Supabase frontend integration activated
-
-### Verified Working Components
-- ✅ Role-based architecture (100% implemented)
-- ✅ Performance optimizations (67% subscription reduction)
-- ✅ HomeOwner, OwnerSidebar, AdminDashboard, AdminCalendar
-- ✅ PropertyCard, TurnAlerts, LoadingSpinner components
-
----
-
-## Tech Stack & Commands
-
-### Core Technologies
-- **Frontend**: Vue 3.4+ + TypeScript 5.3+ + Vite + Vuetify 3
-- **Backend**: Supabase (PostgreSQL, Auth, RLS, Realtime)
-- **Calendar**: FullCalendar integration
-- **State**: Supabase composables (migrated from Pinia)
-- **Testing**: Vitest + Playwright + Performance tests
-- **PWA**: Vite PWA plugin with battery optimization
-
-
-
-### Role-Based Component Architecture
-```
-src/components/
-├── smart/                    # Data-aware components
-│   ├── admin/               # Admin interface (AdminDashboard, AdminUsers)
-│   ├── owner/               # Owner interface (OwnerDashboard, OwnerProperties)
-│   └── shared/              # Cross-role (Calendar, PropertyCard)
-└── dumb/                    # Pure UI components
-    ├── forms/               # Form components
-    ├── layouts/             # Layout components
-    └── navigation/          # Navigation components
-```
-
-### Critical Development Patterns
-- **Smart/Dumb Separation**: Smart components handle data/business logic, dumb components are pure UI
-- **Role-Based Access**: All components automatically filter data by user role
-- **Performance Monitoring**: All smart components track subscriptions and memory usage
-- **TypeScript Strict**: Zero TypeScript errors required for production
-- **Test Coverage**: 100% test pass rate required
-
----
-
-## Current Implementation References
-
-### Business Logic & Rules
-@docs/references/business_logic_reference.md
-
-Key business concepts:
-- Booking types: 'standard' | 'turn'
-- Priority system: 'low' | 'normal' | 'high' | 'urgent'
-- Role permissions: Owner (own data), Admin (all data)
-- Performance limits: ≤40 subscriptions, ≤100MB memory
-
-### Component Architecture & Communication
-@docs/references/component_orchestration_reference.md
-
-Key architectural patterns:
-- SmartComponentProps interface with role context
-- Performance-optimized component loading
-- Pinia store integration with role-based filtering
-- Route protection with authentication guards
-
----
-
-## Authentication & Security
-
-### Current Auth Implementation
-- **Primary**: `useSupabaseAuth` composable (production)
-- **Store**: `useAuthStore` with fallback for testing
-- **Status**: Dual implementation exists, needs consolidation
-
-### Security Rules
-- **RLS**: Row Level Security enabled in Supabase
-- **Route Guards**: Role-based access protection
-- **Data Isolation**: Owners see only their data, admins see all
-
----
-
-## Database Integration
-
-### Supabase Configuration
-- **Project**: otmfvzkokrxduipxkyga
-- **Schema Status**: Complete (TASK-080b finished)
-- **Frontend Integration**: Pending completion
-- **Tables**: user_profiles, properties, bookings, notifications
-
-### Key Files
-- `supabase/migrations/` - Database schema and RLS policies
-- `src/composables/supabase/useSupabaseAuth.ts` - Auth integration
-- `src/stores/auth.ts` - Authentication state management
-
----
-
-## Performance Achievements
-
-### Verified Optimizations
-- **Reactive Subscriptions**: 67% reduction (120 → 40)
-- **Memory Usage**: 60% reduction in computed property duplication
-- **CPU Load**: 70% reduction in redundant filtering operations
-- **Mobile Battery**: 25% improvement
-- **Bundle Sizes**: 400KB (full), 200KB (owner), 300KB (admin)
-
-### Performance Monitoring
-- Automatic component performance tracking
-- Subscription counting per component
-- Memory usage monitoring
-- Bundle size analysis
-
----
-
-## Quality Gates
-
-### Pre-Production Requirements
-- [ ] Zero TypeScript compilation errors
-- [ ] 100% test pass rate (currently 97.8%)
-- [ ] Clean production build
-- [ ] Performance metrics maintained
-- [ ] Security audit passed
-
-### Code Standards
-- **TypeScript**: Strict mode, all interfaces defined
-- **Components**: Smart/dumb separation enforced
-- **Testing**: Unit + integration + E2E coverage
-- **Performance**: Automatic monitoring integration
-- **Accessibility**: WCAG compliance for UI components
-
----
-
-## Development Workflow
-
-### Current Branch Strategy
-- **Current**: main
-- **Main**: main
-- **Feature Branches**: feature/task-name
-
-### Task Execution Pattern
-1. **Analyze Impact**: Check role-based implications
-2. **TypeScript First**: Ensure compilation success
-5. **Documentation**: Update relevant references
-
----
-
-## Critical File Locations
-
-### Core Architecture
-- `src/router/guards.ts` - Route protection and role validation
-- `src/stores/auth.ts` - Authentication state management
-- `src/types/` - TypeScript type definitions
-
-### Component Examples
-- `src/components/smart/owner/HomeOwner.vue` - Owner dashboard (working)
-- `src/components/smart/admin/HomeAdmin.vue` - Admin dashboard (working)
-- `src/components/smart/shared/Calendar.vue` - FullCalendar integration
-
-### Configuration
-- `vite.config.ts` - Build configuration with role-based splitting
-- `supabase/config.toml` - Database configuration
-- `package.json` - Dependencies and scripts
-
----
-
-## Immediate Development Context
-
-### Active Tasks
-    - **TASK-064**: Supabase property persistence (pending, HIGH)
-
-### Known Issues
-
-- 2 test failures related to date field access
-- Authentication dual implementation needs consolidation
-
-### Success Criteria
-- Production build succeeds
-- All tests pass
-- Performance metrics maintained
-- Role-based architecture preserved
-
----
-
-## Environment & Deployment
-
-### Development Environment
 ```bash
-# Required environment variables
-VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
-VITE_SUPABASE_ANON_KEY=[anon_key]
+# Development
+pnpm dev                    # Start dev server
+
+# Testing
+pnpm test                   # Run tests in watch mode
+pnpm test:run               # Run tests once
+pnpm test -- path/to/file   # Run single test file
+pnpm test:coverage          # Run with coverage
+pnpm test:performance       # Performance regression tests
+
+# Building
+pnpm build                  # Full production build (runs vue-tsc --noEmit first)
+pnpm build:fast             # Skip type checking for quick iteration
+pnpm build:owner-only       # Owner-only bundle
+pnpm build:admin-only       # Admin-only bundle
+
+# Linting
+pnpm lint                   # ESLint with auto-fix
+
+# Analysis
+pnpm analyze:bundle         # Bundle size analysis
+pnpm perf:analysis          # Performance analysis
 ```
 
-### Deployment Targets
-- **Primary**: Vercel (recommended)
-- **Requirements**: Static site hosting with SPA support
+## Architecture
 
---
-**Project Phase**: Production finalization  
-**Architecture**: 100% role-based implementation complete  
-**Critical Path**: TypeScript compilation → Supabase integration → Production deployment  
-**Last Updated**: January 2025
+### Smart vs Dumb Components
+- **Smart components** (`src/components/smart/`): Data-aware, orchestration logic, depend on stores/composables
+- **Dumb components** (`src/components/dumb/`): Pure UI, receive props and emit events only
+
+### Role Separation
+Owner and Admin have separate component trees:
+- `src/components/smart/admin/` - Admin-only components
+- `src/components/smart/owner/` - Owner-only components
+- `src/components/smart/shared/` - Cross-role components
+- `src/pages/` - Role-specific pages follow same structure
+
+### State Management
+- Domain stores in `src/stores/` use `Map` collections and cached computed maps for performance
+- Prefer derived computeds over cloning arrays
+- Example: `src/stores/booking.ts` for booking state patterns
+
+### Composables Organization
+- `src/composables/admin/` - Admin-specific data access
+- `src/composables/owner/` - Owner-specific data access
+- `src/composables/shared/` - Cross-cutting concerns
+- `src/composables/supabase/` - Supabase integration
+- Reuse existing composables before adding new Supabase calls
+
+### Key Utilities
+- `src/utils/businessLogic.ts` - Booking/cleaning rules, priority calculation, conflict detection
+- `src/utils/timeDefaults.ts` - Time defaults and Vuetify validation helpers
+- `src/utils/authHelpers.ts` - Auth helpers including `getDefaultRouteForRole`
+
+## Domain Rules
+
+### Booking Model
+- Guest-stay model: `checkout_date` must be strictly after `checkin_date`
+- `booking_type === 'turn'`: Same-day short stays; validated via `validateTurnBooking`
+- Priority: Use `calculateBookingPriority` - turn bookings are always at least `high`
+- Conflicts: Use `detectBookingConflicts` and `validateBooking` instead of ad-hoc date math
+
+### Cleaning Tasks
+- Operational work modeled via `cleaning_tasks` table and `src/types/cleaningTask.ts`
+- `getCleaningWindow` / `canScheduleCleaning` in businessLogic.ts are deprecated
+
+### Time Validation
+Use helpers from `src/utils/timeDefaults.ts`:
+- `getDefaultTimes`, `getTimeValidationRules`, `getCheckoutTimeValidationRules`, `getTimeHint`
+- Don't hard-code time strings or validation rules in components
+
+## Auth & Routing
+
+### Auth Source of Truth
+- `useAuthStore` in `src/stores/auth.ts` delegates to `useSupabaseAuth` outside test mode
+- Derive auth state via store computeds: `isAuthenticated`, `isOwner`, `isAdmin`, `user`, `session`
+- Don't create separate refs for auth in components
+
+### Route Protection
+- Guards in `src/router/guards.ts` and `src/router/index.ts`
+- Use `meta.requiresAuth` / `meta.role` on routes
+- `getDefaultRouteForRole` handles post-login redirects
+
+## Supabase Integration
+
+- Client configured in `src/plugins/supabase.ts`
+- Requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local`
+- Schema and RLS policies in `supabase/migrations/`
+- New queries/mutations go in role-aware composables under `src/composables/`
+
+## Performance
+
+- Stores use `Map`-based collections with cached filters
+- Use computed helpers like `getUpcomingBookings` / `getUrgentTurns` from businessLogic.ts
+- Track subscriptions with `usePerformanceMonitor` from `src/composables/shared/usePerformanceMonitor.ts`
+- Clean up subscriptions on unmount to keep performance tests green
+- Run `pnpm test:performance` after significant data flow changes
+
+## Critical Files
+
+These areas require careful modification - extend existing patterns rather than refactoring:
+- `src/components/smart/` - Working role-based components
+- `src/composables/` - Performance-optimized logic
+- `src/stores/` - Role-based state management
+- `src/router/` - Authentication and role guards
+- `vite.config.ts` - Build optimization settings
+
+## Gotchas
+
+- Strict TypeScript: `pnpm build` runs `vue-tsc --noEmit`; keep `src/types/` in sync with Supabase migrations
+- Don't duplicate business rules in components - call helpers in businessLogic.ts and timeDefaults.ts
+- Before finishing changes: run `pnpm test:run` and `pnpm build`
+- For auth/routing or subscription changes: also run `pnpm test:performance`
