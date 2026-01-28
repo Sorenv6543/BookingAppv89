@@ -27,7 +27,7 @@
 ## Domain rules (bookings & cleaning)
 
 - Guest-stay model: `checkout_date` must be strictly after `checkin_date` (see comments in [src/utils/businessLogic.ts](../src/utils/businessLogic.ts)); do not reintroduce the older “cleaning window” booking model.
-- Turn bookings: `booking_type === 'turn'` means A guest check out and a guest check in on the same day, critical for cleaning compamy; `validateTurnBooking` in [src/utils/businessLogic.ts](../src/utils/businessLogic.ts) enforces same calendar day and ≥ 1 hour duration and adds early/late time warnings.
+- Turn bookings: `booking_type === 'turn'` means A guest check out and a guest check in on the same day, critical for cleaning company; `validateTurnBooking` in [src/utils/businessLogic.ts](../src/utils/businessLogic.ts) enforces same calendar day and ≥ 1 hour duration and adds early/late time warnings.
 - Priority: use `calculateBookingPriority` for all new prioritization logic; turn bookings are always at least `high`, with `urgent` when check-in is very close.
 - Conflicts: use `detectBookingConflicts` and `validateBooking` for overlap detection and warnings instead of ad-hoc date math.
 - Cleaning tasks: operational work is modeled via the `cleaning_tasks` table and types in [src/types/cleaningTask.ts](../src/types/cleaningTask.ts) and store in [src/stores/cleaningTask.ts](../src/stores/cleaningTask.ts); `getCleaningWindow` / `canScheduleCleaning` in `businessLogic.ts` are explicitly marked deprecated.
