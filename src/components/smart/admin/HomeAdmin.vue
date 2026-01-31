@@ -135,8 +135,8 @@ const systemMetrics = computed(() => ({
   totalUsers: allUsers.value.length
 }));
 const systemPropertyMetrics = computed(() => ({
-  activeProperties: allProperties.value.filter(p => p.status === 'active').length,
-  inactiveProperties: allProperties.value.filter(p => p.status === 'inactive').length
+  activeProperties: allProperties.value.filter(p => p.active).length,
+  inactiveProperties: allProperties.value.filter(p => !p.active).length
 }));
 
 // const usersMap = {

@@ -499,16 +499,14 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // Emits
-interface Emits {
+const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   'submit': [data: BookingFormData]
   'delete': [id: string]
   'mark-complete': [id: string]
   'assign-cleaner': [bookingId: string, cleanerId: string]
   'open-cleaner-modal': [booking: Partial<BookingFormData>]
-}
-
-const emit = defineEmits<Emits>()
+}>()
 
 // Form state
 const formRef = ref()
