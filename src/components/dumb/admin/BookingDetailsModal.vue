@@ -45,7 +45,7 @@
             sm="6"
           >
             <div class="text-subtitle-2 text-medium-emphasis">
-              Date
+              Checkout Date
             </div>
             <div class="text-body-1">
               {{ formatDate(booking.checkout_date) }}
@@ -56,7 +56,7 @@
             sm="6"
           >
             <div class="text-subtitle-2 text-medium-emphasis">
-              Time
+              Checkout Time
             </div>
             <div class="text-body-1">
               {{ booking.checkout_time || 'N/A' }}

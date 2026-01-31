@@ -29,6 +29,7 @@ export interface Property {
   default_checkin_time?: string;  // HH:MM format, e.g., '15:00'
   created_at?: string;
   updated_at?: string;
+  [key: string]: unknown; // Allow index signature for Record<string, unknown> compatibility
 }
 
 /**
