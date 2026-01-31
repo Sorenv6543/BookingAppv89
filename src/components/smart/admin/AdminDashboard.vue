@@ -268,57 +268,7 @@
                 
                 <v-card-text>
                   <v-row>
-                    <!-- Mini Calendar -->
-                    <v-col
-                      cols="12"
-                      md="4"
-                    >
-                      <div class="mini-calendar">
-                        <div class="calendar-grid">
-                          <div class="calendar-header">
-                            <div
-                              v-for="day in ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']"
-                              :key="day"
-                              class="day-header"
-                            >
-                              {{ day }}
-                            </div>
-                          </div>
-                          <div class="calendar-body">
-                            <div
-                              v-for="day in getCalendarDays()"
-                              :key="day.date"
-                              class="calendar-day"
-                              :class="{
-                                'today': day.isToday,
-                                'has-bookings': day.bookingCount > 0,
-                                'has-turns': day.turnCount > 0,
-                                'other-month': !day.isCurrentMonth
-                              }"
-                            >
-                              <span class="day-number">{{ day.day }}</span>
-                              <div
-                                v-if="day.bookingCount > 0"
-                                class="booking-dots"
-                              >
-                                <div
-                                  v-for="n in Math.min(day.bookingCount, 3)"
-                                  :key="n"
-                                  class="booking-dot"
-                                  :class="{ 'turn-dot': day.turnCount > 0 && n <= day.turnCount }"
-                                />
-                                <span
-                                  v-if="day.bookingCount > 3"
-                                  class="more-indicator"
-                                >
-                                  +{{ day.bookingCount - 3 }}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </v-col>
+   
 
                     <!-- Schedule Insights -->
                     <v-col

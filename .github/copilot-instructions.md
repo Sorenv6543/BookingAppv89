@@ -43,6 +43,15 @@ Owner and Admin have separate component trees under role-specific subfolders:
 - Prefer derived computeds over cloning arrays
 - Reference pattern: `src/stores/booking.ts`
 
+```typescript
+// Map access always returns T | undefined - add null checks
+const booking = bookingMap.get(id)  // Booking | undefined
+if (!booking) return
+
+// Computed from Map values
+const list = computed(() => [...bookingMap.values()])
+```
+
 ### Composables
 Reuse existing composables before adding new Supabase calls:
 - `src/composables/admin/` - Admin-specific data access
@@ -62,10 +71,6 @@ Reuse existing composables before adding new Supabase calls:
 - `booking_type === 'turn'`: Same-day short stays validated via `validateTurnBooking`
 - Priority: Use `calculateBookingPriority` - turn bookings are always at least `high`
 - Conflicts: Use `detectBookingConflicts` and `validateBooking` instead of ad-hoc date math
-
-### Cleaning Tasks
-- Operational work modeled via `cleaning_tasks` table and `src/types/cleaningTask.ts`
-- `getCleaningWindow` / `canScheduleCleaning` in businessLogic.ts are deprecated
 
 ### Time Validation
 Use helpers from `src/utils/timeDefaults.ts`:
@@ -91,6 +96,70 @@ Use helpers from `src/utils/timeDefaults.ts`:
 - Schema and RLS policies in `supabase/migrations/`
 - New queries/mutations go in role-aware composables under `src/composables/`
 - Keep `src/types/` in sync with Supabase migrations
+- Supabase returns snake_case rows matching app types; cast with `as Booking` when needed
+
+## Vuetify 3 Patterns
+
+### Component Defaults (configured in `src/plugins/vuetify.ts`)
+These defaults are set globally - don't override unless necessary:
+- `VBtn`: `variant="flat"`, `rounded`, no uppercase
+- `VCard`: `elevation="2"`, `rounded="lg"`
+- `VTextField/VSelect/VTextarea`: `variant="outlined"`, `density="comfortable"`, `hideDetails="auto"`
+- `VDialog`: `max-width="700px"`, `rounded="lg"`
+
+### Form Validation
+```vue
+<script setup lang="ts">
+import type { VForm } from 'vuetify/components'
+
+const formRef = ref<VForm | null>(null)
+const formValid = ref(false)
+
+const rules = [
+  (v: string) => !!v || 'Required',
+  (v: string) => v.length >= 3 || 'Min 3 characters'
+]
+
+async function submit() {
+  const { valid } = await formRef.value!.validate()
+  if (!valid) return
+  // proceed...
+}
+</script>
+```
+
+### Existing Dumb Components
+Check `src/components/dumb/shared/` before creating new UI:
+- `ConfirmationDialog.vue`, `LoadingSpinner.vue`, `ErrorAlert.vue`, `SkeletonLoader.vue`, `EnhancedToast.vue`
+
+### Icons
+Use MDI icons (`mdi-*`) - common ones: `mdi-plus`, `mdi-pencil`, `mdi-delete`, `mdi-check`, `mdi-calendar`, `mdi-alert`
+
+## TypeScript Patterns
+
+### Vue-Specific
+```typescript
+// Ref typing
+const bookings = ref<Booking[]>([])
+const selected = ref<Booking | null>(null)
+
+// Computed with explicit return
+const sorted = computed<Booking[]>(() => [...bookings.value].sort(...))
+
+// Props with defaults
+withDefaults(defineProps<{ mode?: 'view' | 'edit' }>(), { mode: 'view' })
+
+// Emits typing
+const emit = defineEmits<{ update: [booking: Booking]; cancel: [] }>()
+```
+
+### Common Type Errors
+
+| Error | Fix |
+|-------|-----|
+| `Property 'x' does not exist on type 'never'` | Add explicit type: `ref<Booking[]>([])` |
+| `Type 'X \| undefined' is not assignable to 'X'` | Add null check or use `!` if guaranteed |
+| `Object is possibly 'undefined'` | Guard with `v-if` in template or `?.` in script |
 
 ## Performance
 

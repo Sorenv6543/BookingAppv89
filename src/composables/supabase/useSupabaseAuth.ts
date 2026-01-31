@@ -42,7 +42,7 @@ export function useSupabaseAuth() {
         try {
           if (event === 'INITIAL_SESSION') {
             session.value = newSession;
-            if (newSession) {
+            if (newSession && !user.value) {
               await loadUserProfile(newSession.user.id);
             }
             // Already set initializing to false above

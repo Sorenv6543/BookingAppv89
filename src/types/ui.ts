@@ -6,7 +6,8 @@
 /**
  * Generic data type for modal and dialog payloads
  */
-export type ModalData = Record<string, unknown> | null | undefined;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ModalData = Record<string, any> | null | undefined;
 
 /**
  * Filter value type for arbitrary filter values

@@ -58,9 +58,8 @@ export function safeBookingField(booking: Record<string, unknown>, field: keyof 
  * @param booking - The booking object
  * @returns Valid Date object
  */
-export function safeDepartureDate(booking: Record<string, unknown>): Date {
-  const dateValue = booking?.checkout_date;
-  return safeDate(dateValue);
+export function safeDepartureDate(booking: { checkout_date?: string | unknown }): Date {
+  return safeDate((booking as Record<string, unknown>)?.checkout_date);
 }
 
 /**
@@ -68,9 +67,8 @@ export function safeDepartureDate(booking: Record<string, unknown>): Date {
  * @param booking - The booking object
  * @returns Valid Date object
  */
-export function safeArrivalDate(booking: Record<string, unknown>): Date {
-  const dateValue = booking?.checkin_date;
-  return safeDate(dateValue);
+export function safeArrivalDate(booking: { checkin_date?: string | unknown }): Date {
+  return safeDate((booking as Record<string, unknown>)?.checkin_date);
 }
 
 /**

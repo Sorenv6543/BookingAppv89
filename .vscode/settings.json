@@ -73,5 +73,6 @@
     },
     "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
     "specstory.cloudSync.enabled": "always",
-    "specstory.showDeveloperTools": true
+    "specstory.showDeveloperTools": true,
+    "window.confirmSaveUntitledWorkspace": true
 }

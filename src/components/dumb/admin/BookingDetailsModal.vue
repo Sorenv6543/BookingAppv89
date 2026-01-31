@@ -48,7 +48,7 @@
               Date
             </div>
             <div class="text-body-1">
-              {{ formatDate(booking.date as string) }}
+              {{ formatDate(booking.checkout_date) }}
             </div>
           </v-col>
           <v-col
@@ -59,7 +59,7 @@
               Time
             </div>
             <div class="text-body-1">
-              {{ booking.time || 'N/A' }}
+              {{ booking.checkout_time || 'N/A' }}
             </div>
           </v-col>
           <v-col

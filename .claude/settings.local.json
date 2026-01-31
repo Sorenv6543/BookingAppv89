@@ -40,7 +40,9 @@
       "Bash(npm run type-check:*)",
       "Bash(gh pr list:*)",
       "Bash(where:*)",
-      "Bash(git -C \"c:\\\\Users\\\\Soren\\\\BookingAppv89\" status)"
+      "Bash(git -C \"c:\\\\Users\\\\Soren\\\\BookingAppv89\" status)",
+      "Bash(pnpm run build:*)",
+      "Bash(pnpm preview)"
     ],
     "deny": []
   },

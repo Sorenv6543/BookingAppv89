@@ -470,7 +470,7 @@ const handleCleanerAssignment = async (cleanerId: string): Promise<void> => {
 };
 
 // Admin booking form event handlers
-const handleAdminBookingFormSubmit = async (data: Record<string, unknown>): Promise<void> => {
+const handleAdminBookingFormSubmit = async (data: BookingFormData): Promise<void> => {
   adminBookingFormModal.value.loading = true;
   try {
     if (adminBookingFormModal.value.mode === 'create') {

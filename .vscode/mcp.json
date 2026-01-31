@@ -51,6 +51,11 @@
     "desktop-commander": {
       "command": "cmd",
       "args": ["/c", "npx", "-y", "@wonderwhy-er/desktop-commander"]
+    },
+        "vuetify-mcp": {
+      "command": "npx",
+      "args": ["-y", "@vuetify/mcp"]
     }
+    
   }
 }

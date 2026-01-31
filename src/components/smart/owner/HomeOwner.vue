@@ -10,7 +10,7 @@ src/components/smart/owner/HomeOwner.vue -
  -->
 
 <template>
-  q<div class="home-owner-layout">
+  <div class="home-owner-layout">
     <!-- Brand Overlay - Fixed on top of everything -->
 
 
@@ -256,7 +256,7 @@ import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 
 // Types
-import type { Booking, Property, BookingFormData, PropertyFormData } from '@/types';
+import type { Booking, Property, BookingFormData, PropertyFormData, ModalData } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
 // Import event logger for component communication
@@ -529,7 +529,7 @@ const handleEditProperty = (property: Property): void => {
     property,
     'receive'
   );
-  uiStore.openModal('propertyModal', 'edit', property as Record<string, unknown>);
+  uiStore.openModal('propertyModal', 'edit', property as unknown as ModalData);
 };
 
 const handleViewProperty = (property: Property): void => {
@@ -540,7 +540,7 @@ const handleViewProperty = (property: Property): void => {
     property,
     'receive'
   );
-  uiStore.openModal('propertyModal', 'view', property as Record<string, unknown>);
+  uiStore.openModal('propertyModal', 'view', property as unknown as ModalData);
 };
 
 const handleCreateTurn = (): void => {
@@ -597,14 +597,14 @@ const handleEventClick = (clickInfo: EventClickArg): void => {
   if (extendedProps && extendedProps.isEdit && extendedProps.booking) {
     // Use the booking data directly from the bottom sheet
     const booking = extendedProps.booking as Booking;
-    uiStore.openModal('eventModal', 'edit', booking);
+    uiStore.openModal('eventModal', 'edit', booking as unknown as ModalData);
     return;
   }
-  
+
   // Fallback: Only allow editing owner's bookings
   const booking = ownerBookingsMap.value.get(clickInfo.event.id);
   if (booking) {
-    uiStore.openModal('eventModal', 'edit', booking);
+    uiStore.openModal('eventModal', 'edit', booking as unknown as ModalData);
   } else {
     console.warn('Cannot edit booking not owned by current user');
   }
@@ -970,32 +970,6 @@ onMounted(async () => {
         checkin_date: b.checkin_date
         })),
         currentUserId: currentOwnerId.value
-      });
-      
-      // Initialize calendar state to ensure proper date range filtering
-      updateDateRange();
-      console.log('✅ [HomeOwner] Calendar state initialized with date range');
-      
-      // Debug: Show the current date range and booking dates
-      console.log('🔍 [HomeOwner] Debug - Current date range:', {
-        currentDate: currentDate.value,
-        currentView: currentView.value
-      });
-      
-      // Debug: Show booking dates to understand filtering
-      const ownerBookings = Array.from(ownerBookingsMap.value.values());
-      console.log('🔍 [HomeOwner] Debug - Owner booking dates:', ownerBookings.map(b => ({
-        id: b.id,
-        checkout_date: b.checkout_date,
-        checkin_date: b.checkin_date,
-        status: b.status,
-        booking_type: b.booking_type
-      })));
-      
-      // Debug: Show the actual date range that should be used for filtering
-      console.log('🔍 [HomeOwner] Debug - Expected date range for August 2025:', {
-        start: new Date(2025, 7, 1).toISOString(), // August 1, 2025
-        end: new Date(2025, 7, 31).toISOString()   // August 31, 2025
       });
       
     } catch (error) {

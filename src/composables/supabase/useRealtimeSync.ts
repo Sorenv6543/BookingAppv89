@@ -146,25 +146,25 @@ export function useRealtimeSync() {
 
     switch (eventType) {
       case 'INSERT':
-        if (newRecord && shouldIncludeBooking(newRecord as Booking)) {
-          debugLog('Adding new booking from real-time:', (newRecord as Booking).id);
-          bookingStore.addBooking(newRecord as Booking);
+        if (newRecord && shouldIncludeBooking(newRecord as unknown as Booking)) {
+          debugLog('Adding new booking from real-time:', (newRecord as unknown as Booking).id);
+          bookingStore.addBooking(newRecord as unknown as Booking);
         }
         break;
       case 'UPDATE':
-        if (newRecord && shouldIncludeBooking(newRecord as Booking)) {
-          debugLog('Updating booking from real-time:', (newRecord as Booking).id);
-          bookingStore.updateBooking((newRecord as Booking).id, newRecord as Booking);
-        } else if (oldRecord && bookingStore.bookings.has((oldRecord as Booking).id)) {
+        if (newRecord && shouldIncludeBooking(newRecord as unknown as Booking)) {
+          debugLog('Updating booking from real-time:', (newRecord as unknown as Booking).id);
+          bookingStore.updateBooking((newRecord as unknown as Booking).id, newRecord as unknown as Booking);
+        } else if (oldRecord && bookingStore.bookings.has((oldRecord as unknown as Booking).id)) {
           // Booking was updated but user no longer has access (e.g., ownership changed)
-          debugLog('Removing booking due to access change:', (oldRecord as Booking).id);
-          bookingStore.removeBooking((oldRecord as Booking).id);
+          debugLog('Removing booking due to access change:', (oldRecord as unknown as Booking).id);
+          bookingStore.removeBooking((oldRecord as unknown as Booking).id);
         }
         break;
       case 'DELETE':
         if (oldRecord) {
-          debugLog('Removing deleted booking from real-time:', (oldRecord as Booking).id);
-          bookingStore.removeBooking((oldRecord as Booking).id);
+          debugLog('Removing deleted booking from real-time:', (oldRecord as unknown as Booking).id);
+          bookingStore.removeBooking((oldRecord as unknown as Booking).id);
         }
         break;
     }
@@ -185,24 +185,24 @@ export function useRealtimeSync() {
 
     switch (eventType) {
       case 'INSERT':
-        if (newRecord && shouldIncludeProperty(newRecord as Property)) {
-          debugLog('Adding new property from real-time:', (newRecord as Property).id);
-          propertyStore.addProperty(newRecord as Property);
+        if (newRecord && shouldIncludeProperty(newRecord as unknown as Property)) {
+          debugLog('Adding new property from real-time:', (newRecord as unknown as Property).id);
+          propertyStore.addProperty(newRecord as unknown as Property);
         }
         break;
       case 'UPDATE':
-        if (newRecord && shouldIncludeProperty(newRecord as Property)) {
-          debugLog('Updating property from real-time:', (newRecord as Property).id);
-          propertyStore.updateProperty((newRecord as Property).id, newRecord as Property);
-        } else if (oldRecord && propertyStore.properties.has((oldRecord as Property).id)) {
-          debugLog('Removing property due to access change:', (oldRecord as Property).id);
-          propertyStore.removeProperty((oldRecord as Property).id);
+        if (newRecord && shouldIncludeProperty(newRecord as unknown as Property)) {
+          debugLog('Updating property from real-time:', (newRecord as unknown as Property).id);
+          propertyStore.updateProperty((newRecord as unknown as Property).id, newRecord as unknown as Property);
+        } else if (oldRecord && propertyStore.properties.has((oldRecord as unknown as Property).id)) {
+          debugLog('Removing property due to access change:', (oldRecord as unknown as Property).id);
+          propertyStore.removeProperty((oldRecord as unknown as Property).id);
         }
         break;
       case 'DELETE':
         if (oldRecord) {
-          debugLog('Removing deleted property from real-time:', (oldRecord as Property).id);
-          propertyStore.removeProperty((oldRecord as Property).id);
+          debugLog('Removing deleted property from real-time:', (oldRecord as unknown as Property).id);
+          propertyStore.removeProperty((oldRecord as unknown as Property).id);
         }
         break;
     }

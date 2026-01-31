@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vuetify from 'vite-plugin-vuetify'
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import path from 'path'
 import vueDevTools from 'vite-plugin-vue-devtools' // Temporarily disabled
 import { VitePWA } from 'vite-plugin-pwa'
@@ -18,6 +18,7 @@ export default defineConfig({
     }),
     vue({
       template: {
+        transformAssetUrls,
         compilerOptions: {
           sourceMap: true
         }
@@ -220,11 +221,10 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000, // Increase limit to allow larger chunks
     rollupOptions: {
       output: {
-        // Safer manual chunking strategy - separate by major functionality
+        // Only split node_modules; let Rollup handle app code to avoid circular init errors
         manualChunks: (id) => {
-          // Core dependencies
           if (id.includes('node_modules')) {
-            if (id.includes('vue/dist') || id.includes('@vue/')) {
+            if (id.includes('vue/dist') || id.includes('@vue/') || id.includes('pinia')) {
               return 'vue-core'
             }
             if (id.includes('vuetify')) {
@@ -233,36 +233,8 @@ export default defineConfig({
             if (id.includes('@fullcalendar')) {
               return 'calendar'
             }
-            if (id.includes('pinia')) {
-              return 'vue-core' // Keep pinia with vue core for better initialization
-            }
             return 'vendor'
           }
-
-          // Skip dev folder completely in production
-          if ((id.includes('/src/dev/') || id.includes('\\src\\dev\\')) && process.env.NODE_ENV === 'production') {
-            return undefined
-          }
-
-          // Group all owner-related code together
-          if (id.includes('/owner/') || id.includes('\\owner\\')) {
-            return 'owner-app'
-          }
-
-          // Group all admin-related code together  
-          if (id.includes('/admin/') || id.includes('\\admin\\')) {
-            return 'admin-app'
-          }
-
-          // Core app code
-          if (id.includes('/stores/') || id.includes('\\stores\\') ||
-              id.includes('/composables/shared/') || id.includes('\\composables\\shared\\') ||
-              id.includes('/utils/') || id.includes('\\utils\\')) {
-            return 'app-core'
-          }
-
-          // Default chunk
-          return 'app'
         }
       }
     },

@@ -819,17 +819,16 @@ const handleSubmit = async () => {
     }
   }
   
-  // Clean form data - convert empty strings to null for UUID fields
-  const cleanFormData = {
+  // Clean form data
+  const cleanFormData: BookingFormData = {
     ...form.value,
-    assigned_cleaner_id: form.value.assigned_cleaner_id || null,
-    owner_id: form.value.owner_id || null,
-    property_id: form.value.property_id || null,
-    // Keep dates and times as they are (no swapping needed)
-            checkout_date: form.value.checkout_date,
-        checkin_date: form.value.checkin_date,
-          checkout_time: form.value.checkout_time,
-      checkin_time: form.value.checkin_time,
+    assigned_cleaner_id: form.value.assigned_cleaner_id || '',
+    owner_id: form.value.owner_id || '',
+    property_id: form.value.property_id || '',
+    checkout_date: form.value.checkout_date,
+    checkin_date: form.value.checkin_date,
+    checkout_time: form.value.checkout_time,
+    checkin_time: form.value.checkin_time,
     guest_count: form.value.guest_count || 1,
     notes: form.value.notes || '',
     priority: form.value.priority || 'normal',
