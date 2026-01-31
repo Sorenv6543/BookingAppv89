@@ -40,7 +40,6 @@ export interface Booking {
   cleaning_duration?: number; // minutes
   created_at?: string;
   updated_at?: string;
-  [key: string]: unknown; // Allow index signature for Record<string, unknown> compatibility
 }
 
 /**
@@ -55,8 +54,14 @@ export interface BookingWithMetadata extends Booking {
     duration: number; // minutes
   };
   priority: 'low' | 'normal' | 'high' | 'urgent';
-  [key: string]: unknown; // Allow index signature for Record<string, unknown> compatibility
 }
+
+/**
+ * Record-compatible wrapper types for boundaries that require Record<string, unknown>
+ * (e.g., modal systems, realtime payloads). Use these instead of weakening domain types.
+ */
+export type BookingRecord = Booking & Record<string, unknown>;
+export type BookingWithMetadataRecord = BookingWithMetadata & Record<string, unknown>;
 
 /**
  * Form data for creating/editing bookings

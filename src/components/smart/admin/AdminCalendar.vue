@@ -474,7 +474,7 @@ const handleAdminBookingFormSubmit = async (data: BookingFormData): Promise<void
   adminBookingFormModal.value.loading = true;
   try {
     if (adminBookingFormModal.value.mode === 'create') {
-      await createBooking(data as BookingFormData);
+      await createBooking(data);
     } else if (adminBookingFormModal.value.booking) {
       await updateBooking(adminBookingFormModal.value.booking.id, data);
     }

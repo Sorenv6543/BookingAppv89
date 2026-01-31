@@ -48,8 +48,8 @@ export function safeString(value: unknown, fallback: string = ''): string {
  * @param field - The field name to access
  * @returns Typed field value or fallback
  */
-export function safeBookingField(booking: Record<string, unknown>, field: keyof Booking): string {
-  const value = booking?.[field];
+export function safeBookingField(booking: Booking | Record<string, unknown>, field: keyof Booking): string {
+  const value = (booking as Record<string, unknown>)?.[field];
   return safeString(value);
 }
 

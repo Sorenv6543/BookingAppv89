@@ -94,7 +94,7 @@ export interface CalendarEvent {
   borderColor?: string;
   textColor?: string;
   extendedProps: {
-    booking: Record<string, unknown>;
+    booking: import('./booking').Booking;
     type: 'standard' | 'turn';
     status: string;
   };
