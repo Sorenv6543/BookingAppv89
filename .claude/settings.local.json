@@ -62,5 +62,8 @@
     "browser-tools-enhanced",
     "puppeteer",
     "playwright"
-  ]
+  ],
+  "enabledPlugins": {
+    "supabase@claude-plugins-official": true
+  }
 }
