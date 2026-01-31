@@ -268,6 +268,8 @@
                 
                 <v-card-text>
                   <v-row>
+   
+
                     <!-- Schedule Insights -->
                     <v-col
                       cols="12"
