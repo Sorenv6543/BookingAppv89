@@ -493,12 +493,15 @@ function useOwnerBookingsPinia() {
     
     // Performance-monitored owner actions
     const createBooking = async (bookingData: BookingFormData): Promise<Booking | null> => {
-      return measureRolePerformance('owner', 'create-booking', async () => {
+      try {
         // Ensure owner_id is set for owner role
-        const result = await bookingStore.addBooking(bookingData as Booking)
-        trackCachePerformance('owner-create-booking', result !== null)
-        return result
-      })
+        await bookingStore.addBooking(bookingData as Booking);
+        trackCachePerformance('owner-create-booking', true);
+        return null; // addBooking doesn't return the booking
+      } catch (error) {
+        trackCachePerformance('owner-create-booking', false);
+        throw error;
+      }
     }
 
     // Role-specific performance metrics

@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import path from 'path'
-// import vueDevTools from 'vite-plugin-vue-devtools' // Temporarily disabled
+import vueDevTools from 'vite-plugin-vue-devtools' // Temporarily disabled
 import { VitePWA } from 'vite-plugin-pwa'
 
 
@@ -11,6 +11,11 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+
+    vueDevTools({
+      launchEditor: 'code',
+      componentInspector: true,
+    }),
     vue({
       template: {
         compilerOptions: {
@@ -20,18 +25,8 @@ export default defineConfig({
     }),
     vuetify({ 
           autoImport: true, // Enable auto-import for Vuetify components
-          styles: {
-            configFile: 'src/styles/variables.scss'
-          }
+          styles: 'sass' // Use 'sass' instead of configFile to prevent 404 errors
     }),
-// Temporarily disabled due to localStorage error in Node.js context
-// vueDevTools({
-//   componentInspector: {
-//     enabled: false,
-//     toggleComboKey: 'alt-shift',
-//     launchEditor: 'code',
-//   }
-// }),
     // Only include PWA plugin in production to prevent manifest errors in development
     ...(process.env.NODE_ENV === 'production' ? [VitePWA({
       registerType: 'autoUpdate',

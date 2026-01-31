@@ -90,11 +90,11 @@ export function isValidDateString(value: unknown): value is string {
  * @returns True if object has basic booking properties
  */
 export function isBookingLike(obj: unknown): obj is Partial<Booking> {
-  return obj && 
-         typeof obj === 'object' && 
-         obj !== null &&
-         'checkout_date' in obj &&
-         'checkin_date' in obj;
+  return !!(obj && 
+          typeof obj === 'object' && 
+          obj !== null &&
+          'checkout_date' in obj &&
+          'checkin_date' in obj);
 }
 
 export const getBookingDate = (booking: Booking | null | undefined): Date | null => {

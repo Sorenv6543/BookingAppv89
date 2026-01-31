@@ -1,0 +1,23 @@
+{
+  "servers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+  
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
+  
+    },
+    "supabase": {
+      "command": "cmd",
+      "args": [
+        "/c", "npx", "-y", "@supabase/mcp-server-supabase@latest",
+        "--access-token", "$env:{SUPABASE_ACCESS_TOKEN}",
+        "--project-ref", "otmfvzkokrxduipxkyga"
+      ],
+
+    }
+  }
+}

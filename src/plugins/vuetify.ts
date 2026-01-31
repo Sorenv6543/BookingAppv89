@@ -1,11 +1,8 @@
 // src/plugins/vuetify.ts
 import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
 import { aliases, mdi } from 'vuetify/iconsets/mdi';
-// import type { ThemeDefinition } from 'vuetify';
 
-// Import Vuetify styles
+// Import Vuetify styles - must be imported before components
 import 'vuetify/styles';
 import '@mdi/font/css/materialdesignicons.css';
 
@@ -34,8 +31,7 @@ import '@mdi/font/css/materialdesignicons.css';
 
 
 export default createVuetify({
-  components,
-  directives,
+  // Don't include components/directives here - vite-plugin-vuetify handles auto-import
   
   // Icon configuration
   icons: {

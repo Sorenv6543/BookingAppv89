@@ -16,10 +16,12 @@ interface OptimisticUpdate {
 }
 
 interface PendingOperation {
+  id?: string;
   type: 'booking' | 'property';
   operation: 'insert' | 'update' | 'delete';
   data: Record<string, unknown>;
   retryCount: number;
+  execute?: () => Promise<void>;
 }
 
 interface RealtimePayload {
@@ -144,25 +146,25 @@ export function useRealtimeSync() {
 
     switch (eventType) {
       case 'INSERT':
-        if (newRecord && shouldIncludeBooking(newRecord)) {
-          debugLog('Adding new booking from real-time:', newRecord.id);
-          bookingStore.addBooking(newRecord);
+        if (newRecord && shouldIncludeBooking(newRecord as Booking)) {
+          debugLog('Adding new booking from real-time:', (newRecord as Booking).id);
+          bookingStore.addBooking(newRecord as Booking);
         }
         break;
       case 'UPDATE':
-        if (newRecord && shouldIncludeBooking(newRecord)) {
-          debugLog('Updating booking from real-time:', newRecord.id);
-          bookingStore.updateBooking(newRecord.id, newRecord);
-        } else if (oldRecord && bookingStore.bookings.has(oldRecord.id)) {
+        if (newRecord && shouldIncludeBooking(newRecord as Booking)) {
+          debugLog('Updating booking from real-time:', (newRecord as Booking).id);
+          bookingStore.updateBooking((newRecord as Booking).id, newRecord as Booking);
+        } else if (oldRecord && bookingStore.bookings.has((oldRecord as Booking).id)) {
           // Booking was updated but user no longer has access (e.g., ownership changed)
-          debugLog('Removing booking due to access change:', oldRecord.id);
-          bookingStore.removeBooking(oldRecord.id);
+          debugLog('Removing booking due to access change:', (oldRecord as Booking).id);
+          bookingStore.removeBooking((oldRecord as Booking).id);
         }
         break;
       case 'DELETE':
         if (oldRecord) {
-          debugLog('Removing deleted booking from real-time:', oldRecord.id);
-          bookingStore.removeBooking(oldRecord.id);
+          debugLog('Removing deleted booking from real-time:', (oldRecord as Booking).id);
+          bookingStore.removeBooking((oldRecord as Booking).id);
         }
         break;
     }
@@ -183,24 +185,24 @@ export function useRealtimeSync() {
 
     switch (eventType) {
       case 'INSERT':
-        if (newRecord && shouldIncludeProperty(newRecord)) {
-          debugLog('Adding new property from real-time:', newRecord.id);
-          propertyStore.addProperty(newRecord);
+        if (newRecord && shouldIncludeProperty(newRecord as Property)) {
+          debugLog('Adding new property from real-time:', (newRecord as Property).id);
+          propertyStore.addProperty(newRecord as Property);
         }
         break;
       case 'UPDATE':
-        if (newRecord && shouldIncludeProperty(newRecord)) {
-          debugLog('Updating property from real-time:', newRecord.id);
-          propertyStore.updateProperty(newRecord.id, newRecord);
-        } else if (oldRecord && propertyStore.properties.has(oldRecord.id)) {
-          debugLog('Removing property due to access change:', oldRecord.id);
-          propertyStore.removeProperty(oldRecord.id);
+        if (newRecord && shouldIncludeProperty(newRecord as Property)) {
+          debugLog('Updating property from real-time:', (newRecord as Property).id);
+          propertyStore.updateProperty((newRecord as Property).id, newRecord as Property);
+        } else if (oldRecord && propertyStore.properties.has((oldRecord as Property).id)) {
+          debugLog('Removing property due to access change:', (oldRecord as Property).id);
+          propertyStore.removeProperty((oldRecord as Property).id);
         }
         break;
       case 'DELETE':
         if (oldRecord) {
-          debugLog('Removing deleted property from real-time:', oldRecord.id);
-          propertyStore.removeProperty(oldRecord.id);
+          debugLog('Removing deleted property from real-time:', (oldRecord as Property).id);
+          propertyStore.removeProperty((oldRecord as Property).id);
         }
         break;
     }
@@ -257,7 +259,13 @@ export function useRealtimeSync() {
   ): Promise<T> {
     try {
       // Track this optimistic update
-      optimisticUpdates.value.set(optimisticKey, Date.now());
+      optimisticUpdates.value.set(optimisticKey, {
+        id: optimisticKey,
+        type: optimisticKey.split('-')[0] as 'booking' | 'property',
+        operation: 'update',
+        timestamp: Date.now(),
+        data: {}
+      });
       
       // Apply optimistic update immediately
       optimisticUpdate();
@@ -304,7 +312,9 @@ export function useRealtimeSync() {
     
     for (const operation of operations) {
       try {
-        await operation.execute();
+        if (operation.execute) {
+          await operation.execute();
+        }
         debugLog('Synced operation:', operation.id);
       } catch (error) {
         debugLog('Failed to sync operation: ' + operation.id, error);
@@ -327,7 +337,7 @@ export function useRealtimeSync() {
     
     subscriptions.value.forEach(subscription => {
       if (subscription) {
-        supabase.removeChannel(subscription);
+        supabase.removeChannel(subscription as any);
       }
     });
     

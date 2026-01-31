@@ -35,7 +35,7 @@ export function useOwnerErrorHandler() {
     stopLoading(`property-${operation}`);
     
     // Handle specific property errors with owner-friendly messages
-    if (error?.code === 'PROPERTY_NOT_FOUND') {
+    if ((error as any)?.code === 'PROPERTY_NOT_FOUND') {
       return handleError(
         { message: 'Property not found', code: 'PROPERTY_NOT_FOUND' },
         context,
@@ -47,7 +47,7 @@ export function useOwnerErrorHandler() {
       );
     }
     
-    if (error?.code === 'PROPERTY_LIMIT_EXCEEDED') {
+    if ((error as any)?.code === 'PROPERTY_LIMIT_EXCEEDED') {
       return handleError(
         { message: 'Property limit exceeded', code: 'PROPERTY_LIMIT_EXCEEDED' },
         context,
@@ -85,7 +85,7 @@ export function useOwnerErrorHandler() {
     stopLoading(`booking-${operation}`);
     
     // Handle specific booking errors
-    if (error?.code === 'BOOKING_CONFLICT') {
+    if ((error as any)?.code === 'BOOKING_CONFLICT') {
       uiStore.addNotification(
         'warning',
         'Booking Conflict',
@@ -99,7 +99,7 @@ export function useOwnerErrorHandler() {
       });
     }
     
-    if (error?.code === 'TURN_BOOKING_INVALID') {
+    if ((error as any)?.code === 'TURN_BOOKING_INVALID') {
       uiStore.addNotification(
         'info',
         'Turn Booking Help',
@@ -161,7 +161,7 @@ export function useOwnerErrorHandler() {
     stopLoading('auth');
     
     // Handle specific auth errors with helpful messages
-    if (error?.code === 'INVALID_CREDENTIALS') {
+    if ((error as any)?.code === 'INVALID_CREDENTIALS') {
       uiStore.addNotification(
         'error',
         'Login Failed',
@@ -175,7 +175,7 @@ export function useOwnerErrorHandler() {
       });
     }
     
-    if (error?.code === 'ACCOUNT_LOCKED') {
+    if ((error as any)?.code === 'ACCOUNT_LOCKED') {
       uiStore.addNotification(
         'warning',
         'Account Locked',
@@ -189,7 +189,7 @@ export function useOwnerErrorHandler() {
       });
     }
     
-    if (error?.code === 'EMAIL_NOT_VERIFIED') {
+    if ((error as any)?.code === 'EMAIL_NOT_VERIFIED') {
       uiStore.addNotification(
         'info',
         'Email Verification Required',

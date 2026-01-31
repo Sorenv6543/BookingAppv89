@@ -116,6 +116,175 @@ These areas require careful modification - extend existing patterns rather than 
 - `src/router/` - Authentication and role guards
 - `vite.config.ts` - Build optimization settings
 
+## Vuetify 3 UI/UX Patterns
+
+### Setup
+- **Version**: Vuetify 3.8.8 with `vite-plugin-vuetify` for auto-imports
+- **Icons**: MDI (`mdi-*`) via `@mdi/font`
+- **Config**: `src/plugins/vuetify.ts` - theme colors, component defaults, breakpoints
+
+### Component Defaults (already configured)
+These defaults are set globally - don't override unless necessary:
+- `VBtn`: `variant="flat"`, `rounded`, no uppercase
+- `VCard`: `elevation="2"`, `rounded="lg"`, `pa-2`
+- `VTextField/VSelect/VTextarea`: `variant="outlined"`, `density="comfortable"`, `rounded="lg"`, `hideDetails="auto"`
+- `VDialog`: `max-width="700px"`, `rounded="lg"`
+- `VAlert`: `variant="tonal"`, `rounded="lg"`
+
+### Layout Patterns
+```vue
+<!-- Standard form layout -->
+<v-container>
+  <v-row>
+    <v-col cols="12" md="6">
+      <v-text-field v-model="field" label="Label" :rules="rules" />
+    </v-col>
+  </v-row>
+</v-container>
+
+<!-- Modal with scroll -->
+<v-dialog v-model="open" persistent scrollable>
+  <v-card class="d-flex flex-column" style="max-height: 90vh">
+    <v-card-title>Title</v-card-title>
+    <v-divider />
+    <v-card-text class="flex-grow-1 overflow-y-auto">Content</v-card-text>
+    <v-divider />
+    <v-card-actions>
+      <v-spacer />
+      <v-btn @click="close">Cancel</v-btn>
+      <v-btn color="primary" @click="save">Save</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+```
+
+### Form Validation
+```vue
+<script setup lang="ts">
+import type { VForm } from 'vuetify/components'
+
+const formRef = ref<VForm | null>(null)
+const formValid = ref(false)
+
+// Rules are arrays of validator functions
+const rules = [
+  (v: string) => !!v || 'Required',
+  (v: string) => v.length >= 3 || 'Min 3 characters'
+]
+
+async function submit() {
+  const { valid } = await formRef.value!.validate()
+  if (!valid) return
+  // proceed...
+}
+</script>
+
+<template>
+  <v-form ref="formRef" v-model="formValid" @submit.prevent="submit">
+    <v-text-field v-model="name" :rules="rules" />
+    <v-btn type="submit" :disabled="!formValid">Submit</v-btn>
+  </v-form>
+</template>
+```
+
+### Common Components Reference
+| Need | Component | Key Props |
+|------|-----------|-----------|
+| Form input | `v-text-field` | `type`, `label`, `:rules`, `prepend-inner-icon` |
+| Dropdown | `v-select` | `:items`, `item-title`, `item-value` |
+| Date input | `v-text-field type="date"` | Native HTML5 date picker |
+| Time input | `v-text-field type="time"` | Native HTML5 time picker |
+| Modal | `v-dialog` | `v-model`, `persistent`, `scrollable`, `max-width` |
+| Feedback | `v-alert` | `type="success/error/warning/info"`, `variant="tonal"` |
+| Loading | `v-btn :loading="true"` | Built-in spinner |
+| Status | `v-chip` | `color`, `size="small"` |
+
+### Icons (MDI)
+Common icons used in this project:
+- Navigation: `mdi-home`, `mdi-calendar`, `mdi-account`
+- Actions: `mdi-plus`, `mdi-pencil`, `mdi-delete`, `mdi-check`
+- Status: `mdi-alert`, `mdi-clock-outline`, `mdi-progress-check`
+- Form: `mdi-calendar-plus`, `mdi-calendar-remove`, `mdi-note-text`
+
+### Responsive Breakpoints
+```typescript
+// From vuetify.ts display config
+xs: 0, sm: 600, md: 960, lg: 1280, xl: 1920
+
+// Usage in templates
+<v-col cols="12" md="6" lg="4">  <!-- Full on mobile, half on tablet, third on desktop -->
+```
+
+### Theme Colors
+Use semantic colors, not hex values:
+- `primary`, `secondary`, `accent`
+- `error`, `warning`, `success`, `info`
+- Access variants: `primary-darken-1`, `primary-lighten-2`
+
+### Existing Dumb Components
+Check `src/components/dumb/shared/` before creating new UI:
+- `ConfirmationDialog.vue` - Confirm/cancel dialogs
+- `LoadingSpinner.vue` - Loading states
+- `ErrorAlert.vue` - Error display
+- `SkeletonLoader.vue` - Content placeholders
+- `EnhancedToast.vue` - Notifications
+
+## Fixing Type Errors
+
+### Diagnostic Commands
+```bash
+pnpm build 2>&1 | head -50      # See first 50 lines of errors
+vue-tsc --noEmit 2>&1 | grep -A2 "error TS"  # Just the errors with context
+```
+
+### Common Error Patterns
+
+| Error | Likely Cause | Fix |
+|-------|--------------|-----|
+| `Property 'x' does not exist on type 'never'` | Uninitialized ref or empty array inference | Add explicit type: `ref<Booking[]>([])` |
+| `Type 'X \| undefined' is not assignable to 'X'` | Optional chaining or Map.get() | Add null check or use `!` if guaranteed |
+| `Argument of type 'X' is not assignable to parameter of type 'Y'` | Supabase row vs app type mismatch | Cast via `as Booking` or map fields explicitly |
+| `Cannot find name 'defineProps'` | Missing Vue macro import | Vue 3.3+ auto-imports; check `<script setup lang="ts">` |
+| `Object is possibly 'undefined'` | Accessing computed before data loads | Guard with `v-if` in template or `?.` in script |
+
+### Type Locations
+- **Domain types**: `src/types/` - Booking, Property, User, etc.
+- **Supabase rows**: Inferred from `supabase.from('table').select()` - may need casting to domain types
+- **Component props**: Define with `defineProps<{ prop: Type }>()` - import types from `@types/*`
+- **Store state**: Pinia stores use `Map<string, T>` - use `.get()` with undefined checks
+
+### Supabase ↔ App Type Mapping
+Supabase returns snake_case rows; app types match this convention. When types drift:
+1. Check `supabase/migrations/` for column changes
+2. Update corresponding type in `src/types/`
+3. Run `pnpm build` to find all affected code
+
+### Vue-Specific Patterns
+```typescript
+// Ref typing
+const bookings = ref<Booking[]>([])
+const selected = ref<Booking | null>(null)
+
+// Computed with explicit return
+const sorted = computed<Booking[]>(() => [...bookings.value].sort(...))
+
+// Props with defaults
+withDefaults(defineProps<{ mode?: 'view' | 'edit' }>(), { mode: 'view' })
+
+// Emits typing
+const emit = defineEmits<{ update: [booking: Booking]; cancel: [] }>()
+```
+
+### Store Patterns (Pinia + Map)
+```typescript
+// Map access always returns T | undefined
+const booking = bookingMap.get(id)  // Booking | undefined
+if (!booking) return
+
+// Computed from Map values
+const list = computed(() => [...bookingMap.values()])
+```
+
 ## Gotchas
 
 - Strict TypeScript: `pnpm build` runs `vue-tsc --noEmit`; keep `src/types/` in sync with Supabase migrations

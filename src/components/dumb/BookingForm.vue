@@ -372,7 +372,7 @@ const selectedProperty = computed((): Property | undefined => {
 
 // Time validation rules and hints
 const checkoutTimeRules = computed(() => getTimeValidationRules(selectedProperty.value));
-const checkinTimeRules = computed(() => getCheckinTimeValidationRules(form.checkout_time || ''));
+const checkinTimeRules = computed(() => getCheckinTimeValidationRules((form.checkout_time as string) || ''));
 const checkoutTimeHint = computed(() => getTimeHint('checkout', selectedProperty.value));
 const checkinTimeHint = computed(() => getTimeHint('checkin', selectedProperty.value));
 
@@ -709,7 +709,7 @@ watch(() => form.property_id, (newPropertyId) => {
   });
   
   if (newPropertyId && props.mode === 'create') {
-    const property = propertyStore.getPropertyById(newPropertyId);
+    const property = propertyStore.getPropertyById(newPropertyId as string);
     console.log('🔍 Found property:', property);
     
     if (property) {

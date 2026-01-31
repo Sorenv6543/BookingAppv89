@@ -180,6 +180,8 @@ export function useAdminCalendarState() {
   /**
    * Handle admin event click with business logic
    */
+  // Fix the TypeScript any type issue here
+  
   function handleAdminEventClick(eventInfo: any) {
     const booking = eventInfo.event.extendedProps.booking as Booking;
     

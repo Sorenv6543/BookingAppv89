@@ -5,7 +5,7 @@
 Write-Host "🔧 Setting up MCP environment variables..." -ForegroundColor Cyan
 
 # Load from .env file
-$envFile = ".env"
+$envFile = ".env.local"
 if (Test-Path $envFile) {
     $envVars = @{}
     Get-Content $envFile | ForEach-Object {

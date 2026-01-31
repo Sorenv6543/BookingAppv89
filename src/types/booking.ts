@@ -40,8 +40,6 @@ export interface Booking {
   cleaning_duration?: number; // minutes
   created_at?: string;
   updated_at?: string;
-  // Add index signature to allow conversion to Record<string, unknown>
-  [key: string]: unknown;
 }
 
 /**

@@ -767,8 +767,8 @@ const handleEventModalClose = (): void => {
 const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
   try {
     console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Raw form data:', {
-                checkin_date: data.checkin_date,
-          checkout_date: data.checkout_date,
+      checkin_date: data.checkin_date,
+      checkout_date: data.checkout_date,
       checkin_time: data.checkin_time,
       checkout_time: data.checkout_time,
       property_id: data.property_id,
@@ -776,9 +776,9 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     });
     
     // Ensure owner_id is set
-    const bookingData = {
+    const bookingData: BookingFormData = {
       ...data,
-      owner_id: currentOwnerId.value
+      owner_id: currentOwnerId.value ?? data.owner_id
     };
     
     console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Final booking data:', {

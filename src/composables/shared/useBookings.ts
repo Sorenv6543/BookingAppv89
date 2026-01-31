@@ -61,8 +61,8 @@ export function useBookings() {
         owner_id: formData.owner_id as string,
         checkout_date: formData.checkout_date as string,
         checkin_date: formData.checkin_date as string,
-        checkin_time: formData.checkin_time,
-        checkout_time: formData.checkout_time,
+        checkin_time: formData.checkin_time as string,
+        checkout_time: formData.checkout_time as string,
         booking_type: bookingType as BookingType,
         status: 'pending', // New bookings start as pending
         guest_count: formData.guest_count as number,

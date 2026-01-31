@@ -582,7 +582,7 @@ const selectedProperty = computed((): Property | undefined => {
 
 // Time validation rules and hints
 const checkoutTimeRules = computed(() => getTimeValidationRules(selectedProperty.value));
-const checkinTimeRules = computed(() => getCheckinTimeValidationRules(form.value.checkout_time || ''));
+const checkinTimeRules = computed(() => getCheckinTimeValidationRules((form.value.checkout_time as string) || ''));
 const checkoutTimeHint = computed(() => getTimeHint('checkin', selectedProperty.value));
 const checkinTimeHint = computed(() => getTimeHint('checkout', selectedProperty.value));
 
@@ -805,7 +805,7 @@ const handleSubmit = async () => {
     // Try to auto-populate from selected property
     if (form.value.property_id) {
       const propertyStore = usePropertyStore();
-      const property = propertyStore.getPropertyById(form.value.property_id);
+      const property = propertyStore.getPropertyById(form.value.property_id as string);
       if (property && property.owner_id) {
         console.log('🚀 [AdminBookingForm] Auto-populating owner_id from property')
         form.value.owner_id = property.owner_id;
@@ -921,7 +921,7 @@ watch(() => form.value.property_id, (newPropertyId) => {
   
   if (newPropertyId && props.mode === 'create') {
     const propertyStore = usePropertyStore();
-    const property = propertyStore.getPropertyById(newPropertyId);
+    const property = propertyStore.getPropertyById(newPropertyId as string);
     console.log('🔍 Found property:', property);
     
     if (property) {

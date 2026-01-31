@@ -71,5 +71,7 @@
             "stash": true
         }
     },
-    "chat.tools.terminal.ignoreDefaultAutoApproveRules": true
+    "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
+    "specstory.cloudSync.enabled": "always",
+    "specstory.showDeveloperTools": true
 }
