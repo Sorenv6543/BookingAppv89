@@ -3,6 +3,8 @@ import { useUIStore } from '@/stores/ui';
 import { useBookingStore } from '@/stores/booking';
 import type { Booking } from '@/types';
 
+const __DEV__ = import.meta.env.DEV;
+
 /**
  * Composable for calendar view state management
  * Controls calendar display options, date ranges, and filtering
@@ -97,14 +99,6 @@ export function useCalendarState() {
    * Update date range based on current view and date
    */
   function updateDateRange() {
-    // Debug: Check what currentDate.value contains
-    console.log('🔍 [useCalendarState] updateDateRange - currentDate.value:', {
-      value: currentDate.value,
-      type: typeof currentDate.value,
-      isDate: currentDate.value instanceof Date,
-      isValid: currentDate.value instanceof Date ? !isNaN(currentDate.value.getTime()) : false
-    });
-
     // Ensure currentDate.value is a valid Date object
     let date: Date;
     if (currentDate.value instanceof Date && !isNaN(currentDate.value.getTime())) {
@@ -142,14 +136,6 @@ export function useCalendarState() {
     // Set time to beginning/end of day
     start.setHours(0, 0, 0, 0);
     end.setHours(23, 59, 59, 999);
-    
-    // Debug: Verify the dates are valid before setting
-    console.log('🔍 [useCalendarState] updateDateRange - calculated dates:', {
-      start: start.toISOString(),
-      end: end.toISOString(),
-      startValid: !isNaN(start.getTime()),
-      endValid: !isNaN(end.getTime())
-    });
     
     dateRange.value = { start, end };
     
@@ -270,7 +256,7 @@ export function useCalendarState() {
       );
     });
 
-    console.log(`🔍 [useCalendarState] Filtered ${bookings.length} bookings down to ${filtered.length}`);
+    __DEV__ && console.log(`🔍 [useCalendarState] Filtered ${bookings.length} bookings down to ${filtered.length}`);
 
     return filtered;
     } catch (error) {

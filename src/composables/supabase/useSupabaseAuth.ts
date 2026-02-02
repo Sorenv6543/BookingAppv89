@@ -4,6 +4,8 @@ import { supabase } from '@/plugins/supabase';
 import type { Session } from '@supabase/supabase-js';
 import type { User, UserRole } from '@/types';
 
+const __DEV__ = import.meta.env.DEV;
+
 export function useSupabaseAuth() {
   const user = ref<User | null>(null);
   const session = ref<Session | null>(null);
@@ -11,18 +13,13 @@ export function useSupabaseAuth() {
   const error = ref<string | null>(null);
   const initializing = ref(true);
 
-  const isAuthenticated = computed(() => {
-    const authenticated = !!session.value && !!user.value;
-    console.log('[Auth Debug] isAuthenticated check:', { 
-      session: !!session.value, 
-      user: !!user.value, 
-      authenticated,
-      userRole: user.value?.role 
-    });
-    return authenticated;
-  });
+  const isAuthenticated = computed(() => !!session.value && !!user.value);
 
   const currentUserId = computed(() => session.value?.user?.id || null);
+
+  // Deduplication: track in-flight profile loads
+  let profileLoadPromise: Promise<void> | null = null;
+  let profileLoadedForUserId: string | null = null;
 
   // Declare timeout variable first
   let initializationTimeout: ReturnType<typeof setTimeout>;
@@ -37,7 +34,7 @@ export function useSupabaseAuth() {
       clearTimeout(initializationTimeout);
       
       supabase.auth.onAuthStateChange(async (event, newSession) => {
-        console.log('[Auth Debug] Auth state changed:', { event, userId: newSession?.user?.id });
+        __DEV__ && console.log('[Auth Debug] Auth state changed:', { event, userId: newSession?.user?.id });
         
         try {
           if (event === 'INITIAL_SESSION') {
@@ -58,7 +55,8 @@ export function useSupabaseAuth() {
             user.value = null;
             session.value = null;
             error.value = null;
-            console.log('✅ User signed out');
+            profileLoadedForUserId = null;
+            __DEV__ && console.log('✅ User signed out');
           }
         } catch (err) {
           console.error('Auth state change error:', err);
@@ -97,138 +95,110 @@ export function useSupabaseAuth() {
   }
 
   async function loadUserProfile(userId: string): Promise<void> {
-    const maxRetries = 3;
-    
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`🔍 Loading user profile for: ${userId} (attempt ${attempt}/${maxRetries})`);
-        
-        // Try a simplified query with timeout to avoid hanging
-        const queryPromise = supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', userId)
-          .maybeSingle(); // Use maybeSingle instead of single to avoid errors when not found
-        
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Profile query timeout after 3 seconds')), 3000);
-        });
-        
-        const result = await Promise.race([queryPromise, timeoutPromise]) as { data: any; error: any };
+    // Skip if already loaded for this user
+    if (profileLoadedForUserId === userId && user.value?.id === userId) {
+      __DEV__ && console.log(`⏭️ Profile already loaded for ${userId}, skipping`);
+      return;
+    }
 
-        const { data, error: profileError } = result;
-        
-        // Handle null data (profile not found) or errors
-        if (profileError) {
-          console.warn(`⚠️ Profile query failed (attempt ${attempt}):`, profileError);
-        }
-        
-        if (!data || profileError) {
-          // Profile not found or error occurred, create fallback profile
-          if (profileError?.code === 'PGRST116' || profileError?.message?.includes('No rows found') || !data) {
-            console.log('ℹ️ User profile not found in database, creating fallback profile');
-          }
-          
-          // Create a basic user profile from session data
-          user.value = {
-            id: userId,
-            email: session.value?.user?.email || '',
-            name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
-            role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
-            company_name: session.value?.user?.user_metadata?.company_name || '',
-            notifications_enabled: true,
-            timezone: 'America/Los_Angeles',
-            theme: 'light',
-            language: 'en',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          console.log('✅ Created fallback profile from session metadata:', { email: user.value.email, role: user.value.role });
-          return; // Success with fallback, exit the retry loop
-        }
+    // Deduplicate: reuse in-flight request
+    if (profileLoadPromise) {
+      __DEV__ && console.log(`⏭️ Profile load already in progress, reusing promise`);
+      return profileLoadPromise;
+    }
 
-        // Success! Process the data
-        if (data) {
-          user.value = {
-            id: data.id,
-            email: session.value?.user?.email || data.email || '',
-            name: data.name,
-            role: data.role as UserRole,
-            company_name: data.company_name,
-            notifications_enabled: data.notifications_enabled ?? true,
-            timezone: data.timezone || 'America/Los_Angeles',
-            theme: data.theme || 'light',
-            language: data.language || 'en',
-            created_at: data.created_at,
-            updated_at: data.updated_at
-          };
-          console.log('✅ User profile loaded successfully:', { email: user.value.email, role: user.value.role });
-          return; // Success, exit the retry loop
-        } else {
-          console.warn('⚠️ No user profile data returned, using fallback');
-          // Create a basic user profile from session data
-          user.value = {
-            id: userId,
-            email: session.value?.user?.email || '',
-            name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
-            role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
-            company_name: session.value?.user?.user_metadata?.company_name || '',
-            notifications_enabled: true,
-            timezone: 'America/Los_Angeles',
-            theme: 'light',
-            language: 'en',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          return; // Success with fallback, exit the retry loop
+    profileLoadPromise = _doLoadUserProfile(userId);
+    try {
+      await profileLoadPromise;
+    } finally {
+      profileLoadPromise = null;
+    }
+  }
+
+  function _buildFallbackProfile(userId: string): User {
+    return {
+      id: userId,
+      email: session.value?.user?.email || '',
+      name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
+      role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
+      company_name: session.value?.user?.user_metadata?.company_name || '',
+      notifications_enabled: true,
+      timezone: 'America/Los_Angeles',
+      theme: 'light',
+      language: 'en',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  function _applyProfileData(data: any, userId: string) {
+    user.value = {
+      id: data.id,
+      email: session.value?.user?.email || data.email || '',
+      name: data.name,
+      role: data.role as UserRole,
+      company_name: data.company_name,
+      notifications_enabled: data.notifications_enabled ?? true,
+      timezone: data.timezone || 'America/Los_Angeles',
+      theme: data.theme || 'light',
+      language: data.language || 'en',
+      created_at: data.created_at,
+      updated_at: data.updated_at
+    };
+    profileLoadedForUserId = userId;
+  }
+
+  async function _doLoadUserProfile(userId: string): Promise<void> {
+    __DEV__ && console.log(`Loading user profile for: ${userId}`);
+
+    // Start the real query — don't race/discard it
+    const queryPromise = supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+
+    // Set a fallback after 3s so the UI isn't blocked, but let the query continue
+    let usedFallback = false;
+    const fallbackTimer = setTimeout(() => {
+      if (!profileLoadedForUserId || profileLoadedForUserId !== userId) {
+        usedFallback = true;
+        user.value = _buildFallbackProfile(userId);
+        profileLoadedForUserId = userId;
+        __DEV__ && console.log('Using fallback profile (query still pending)');
+      }
+    }, 3000);
+
+    try {
+      const { data, error: profileError } = await queryPromise;
+      clearTimeout(fallbackTimer);
+
+      if (profileError) {
+        __DEV__ && console.warn('Profile query error:', profileError.message);
+        // If we didn't set fallback yet, set it now
+        if (!usedFallback) {
+          user.value = _buildFallbackProfile(userId);
+          profileLoadedForUserId = userId;
         }
-      } catch (err) {
-        console.error(`❌ Error loading user profile (attempt ${attempt}):`, err);
-        
-        // If it's a timeout error, use fallback immediately to avoid hanging login
-        if (err instanceof Error && err.message.includes('timeout')) {
-          user.value = {
-            id: userId,
-            email: session.value?.user?.email || '',
-            name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
-            role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
-            company_name: session.value?.user?.user_metadata?.company_name || '',
-            notifications_enabled: true,
-            timezone: 'America/New_York',
-            theme: 'light',
-            language: 'en',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          console.log('✅ Fallback profile created due to timeout');
-          return;
-        }
-        
-        // If this is the last attempt, use fallback
-        if (attempt === maxRetries) {
-          console.error('❌ All profile loading attempts failed, using fallback profile');
-          // Create a basic user profile from session data instead of throwing
-          user.value = {
-            id: userId,
-            email: session.value?.user?.email || '',
-            name: session.value?.user?.user_metadata?.name || session.value?.user?.email?.split('@')[0] || 'User',
-            role: (session.value?.user?.user_metadata?.role as UserRole) || 'owner',
-            company_name: session.value?.user?.user_metadata?.company_name || '',
-            notifications_enabled: true,
-            timezone: 'America/New_York',
-            theme: 'light',
-            language: 'en',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          console.log('⚠️ Using fallback profile due to exception:', err);
-          return;
-        }
-        
-        // Wait before retry (exponential backoff)
-        const retryDelay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-        console.log(`⏳ Waiting ${retryDelay}ms before retry...`);
-        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        return;
+      }
+
+      if (data) {
+        // Always apply real data, even if fallback was used — this upgrades the profile
+        _applyProfileData(data, userId);
+        __DEV__ && console.log('Profile loaded' + (usedFallback ? ' (upgraded from fallback)' : '') + ':', { email: user.value!.email, role: user.value!.role });
+      } else if (!usedFallback) {
+        // No data and no fallback yet
+        user.value = _buildFallbackProfile(userId);
+        profileLoadedForUserId = userId;
+        __DEV__ && console.log('No profile found, using fallback');
+      }
+    } catch (err) {
+      clearTimeout(fallbackTimer);
+      console.error('Profile load failed:', err);
+      if (!usedFallback) {
+        user.value = _buildFallbackProfile(userId);
+        profileLoadedForUserId = userId;
       }
     }
   }

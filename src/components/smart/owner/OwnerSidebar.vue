@@ -3,7 +3,7 @@
     v-model="sidebarOpen"
     class="owner-sidebar"
     :width="SIDEBAR_WIDTH"
-    elevation="4"
+    elevation="8"
     color="white"
     :temporary="mobile"
     location="left"
@@ -68,7 +68,7 @@
             <template #append>
               <v-icon
                 size="16"
-                color="white"
+                color="primary"
               >
                 mdi-chevron-right
               </v-icon>
@@ -121,57 +121,29 @@
             class="property-item compact-property-item"
             :class="{ selected: selectedPropertyId === property.id }"
             @click="selectProperty(property)"
+            @dblclick.stop="editProperty(property)"
           >
             <template #prepend>
-              <v-icon 
-                :color="selectedPropertyId === property.id ? 'primary' : 'info'"
-                size="16"
+              <v-icon
+                color="primary"
+                size="22"
               >
                 mdi-home
               </v-icon>
             </template>
-          
+
             <div class="property-content">
-              <div class="property-title">
+              <div
+                class="property-title"
+                @click.stop="editProperty(property)"
+                style="cursor: pointer;"
+              >
                 {{ property.name }}
               </div>
               <div class="property-subtitle">
                 {{ property.address }}
               </div>
             </div>
-          
-            <template #append>
-              <v-menu>
-                <template #activator="{ props: activatorProps }">
-                  <v-btn
-                    v-bind="activatorProps"
-                    icon="mdi-dots-vertical"
-                    size="x-small"
-                    variant="text"
-                    @click.stop
-                  />
-                </template>
-              
-                <v-list density="compact">
-                  <v-list-item
-                    prepend-icon="mdi-pencil"
-                    title="Edit"
-                    @click="editProperty(property)"
-                  />
-                  <v-list-item
-                    prepend-icon="mdi-eye"
-                    title="View Details"
-                    @click="viewProperty(property)"
-                  />
-                  <v-divider />
-                  <v-list-item
-                    prepend-icon="mdi-delete"
-                    title="Delete"
-                    @click="deleteProperty(property)"
-                  />
-                </v-list>
-              </v-menu>
-            </template>
           </v-list-item>
         
           <!-- No Properties State -->
@@ -319,7 +291,7 @@ import PropertyModal from '@/components/dumb/PropertyModal.vue';
 import type { Property, PropertyFormData, PricingTier } from '@/types';
 
 // Constants for consistent sizing
-const SIDEBAR_WIDTH = 280;
+const SIDEBAR_WIDTH = 300;
 const BRAND_HEIGHT_DESKTOP = 200;
 const BRAND_HEIGHT_MOBILE = 100;
 
@@ -342,7 +314,6 @@ interface Emits {
   (e: 'createBooking'): void;
   (e: 'createProperty'): void;
   (e: 'editProperty', property: Property): void;
-  (e: 'viewProperty', property: Property): void;
   (e: 'update:modelValue', value: boolean): void;
 }
 
@@ -415,11 +386,6 @@ const editProperty = (property: Property) => {
   openEditPropertyModal(property);
 };
 
-const viewProperty = (property: Property) => {
-  // Navigate to property view page
-  navigateTo(`/owner/properties/${property.id}`);
-};
-
 // Property modal functions
 const openCreatePropertyModal = () => {
   propertyModalMode.value = 'create';
@@ -484,21 +450,6 @@ const handlePropertyDelete = async (propertyId: string) => {
   }
 };
 
-const deleteProperty = async (property: Property) => {
-  if (confirm(`Are you sure you want to delete "${property.name}"?`)) {
-    try {
-      await propertyStore.removeProperty(property.id);
-      // Clear selection if deleted property was selected
-      if (selectedPropertyId.value === property.id) {
-        selectedPropertyId.value = null;
-        emit('filterByProperty', null);
-      }
-    } catch (error) {
-      console.error('Failed to delete property:', error);
-      // TODO: Show error toast/snackbar
-    }
-  }
-};
 </script>
 
 <style scoped>
@@ -507,6 +458,7 @@ const deleteProperty = async (property: Property) => {
   top: 0 !important;
   height: 100vh !important;
   background: #f8f9fa !important;
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.12) !important;
 }
 
 /* Main Content Wrapper */
@@ -525,12 +477,12 @@ const deleteProperty = async (property: Property) => {
 
 /* Section Headers */
 .section-header {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: rgb(var(--v-theme-primary));
-  padding: 16px 20px 8px 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #263238;
+  padding: 20px 16px 8px 28px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -542,31 +494,41 @@ const deleteProperty = async (property: Property) => {
 }
 
 .nav-list {
-  padding: 0 12px;
+  padding: 0 12px 0 16px;
 }
 
 .nav-item {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   border-radius: 8px !important;
-  color: rgb(var(--v-theme-success)) !important;
+  color: #212121 !important;
   font-weight: 500 !important;
 }
 
+.nav-item :deep(.v-list-item__prepend .v-icon) {
+  color: #1976D2 !important;
+  opacity: 1 !important;
+}
+
 .nav-item:hover {
-  background: #f3f4f6 !important;
+  background: #ECEFF1 !important;
+}
+
+.nav-item:hover :deep(.v-list-item__prepend .v-icon) {
+  color: #1976D2 !important;
 }
 
 .nav-item.active-nav-item {
-  background: rgb(var(--v-theme-primary)) !important;
-  color: white !important;
+  background: rgba(25, 118, 210, 0.1) !important;
+  color: #1565C0 !important;
 }
 
 .nav-item.active-nav-item :deep(.v-list-item__prepend .v-icon) {
-  color: white !important;
+  color: #1976D2 !important;
 }
 
 .nav-item.active-nav-item :deep(.v-list-item-title) {
-  color: white !important;
+  color: #1565C0 !important;
+  font-weight: 600 !important;
 }
 
 /* Properties Section */
@@ -576,20 +538,28 @@ const deleteProperty = async (property: Property) => {
 }
 
 .properties-list {
-  padding: 0 8px;
+  padding: 0 12px 0 16px;
 }
 
 .property-item {
-  margin-bottom: 2px;
+  margin-bottom: 6px;
   border-radius: 6px !important;
-  color: rgb(var(--v-theme-success)) !important;
+  color: #212121 !important;
   font-weight: 500 !important;
   cursor: pointer;
-  min-height: 32px !important;
+  min-height: 40px !important;
+  border-bottom: 1px solid #bdbdbd !important;
+  padding-bottom: 8px !important;
 }
 
 .compact-property-item {
-  padding: 4px 8px !important;
+  padding: 6px 8px 6px 16px !important;
+}
+
+.compact-property-item :deep(.v-list-item__prepend) {
+  width: 32px !important;
+  min-width: 32px !important;
+  margin-right: 16px !important;
 }
 
 .property-item:hover {
@@ -608,9 +578,9 @@ const deleteProperty = async (property: Property) => {
 }
 
 .property-title {
-  font-size: 0.8rem !important;
+  font-size: 0.875rem !important;
   font-weight: 600 !important;
-  color: rgb(var(--v-theme-primary)) !important;
+  color: #212121 !important;
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -618,9 +588,8 @@ const deleteProperty = async (property: Property) => {
 }
 
 .property-subtitle {
-  font-size: 0.7rem !important;
-  color: rgb(var(--v-theme-info)) !important;
-  opacity: 0.8;
+  font-size: 0.75rem !important;
+  color: #607D8B !important;
   line-height: 1.1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -642,38 +611,48 @@ const deleteProperty = async (property: Property) => {
 }
 
 .actions-list {
-  padding: 0 12px;
+  padding: 0 12px 0 16px;
 }
 
 .action-item {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   border-radius: 8px !important;
-  color: rgb(var(--v-theme-success)) !important;
+  color: #212121 !important;
   font-weight: 500 !important;
 }
 
 .action-item:hover {
-  background: #f3f4f6 !important;
+  background: #ECEFF1 !important;
 }
 
-/* Icon styling */
+/* Icon styling — consistent size + vertical alignment */
+:deep(.v-list-item__prepend) {
+  width: 32px !important;
+  min-width: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 :deep(.v-list-item__prepend .v-icon) {
-  color: rgb(var(--v-theme-info));
-  opacity: 1;
+  color: #1976D2;
+  opacity: 1 !important;
+  font-size: 22px !important;
 }
 
-.nav-item:hover :deep(.v-list-item__prepend .v-icon) {
-  color: rgb(var(--v-theme-success));
+.action-item :deep(.v-list-item__prepend .v-icon) {
+  color: #1976D2 !important;
 }
 
 .action-item:hover :deep(.v-list-item__prepend .v-icon) {
-  color: rgb(var(--v-theme-success));
+  color: #1976D2 !important;
 }
 
 /* List item title styling */
 :deep(.v-list-item-title) {
-  font-size: 0.95rem !important;
+  font-size: 1.0625rem !important;
   font-weight: 500 !important;
+  color: #212121 !important;
 }
 
 /* User Info Section */
@@ -709,7 +688,7 @@ const deleteProperty = async (property: Property) => {
 .user-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: rgb(var(--v-theme-primary));
+  color: #212121;
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -718,7 +697,7 @@ const deleteProperty = async (property: Property) => {
 
 .user-email {
   font-size: 0.75rem;
-  color: rgb(var(--v-theme-info));
+  color: #607D8B;
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -752,7 +731,7 @@ const deleteProperty = async (property: Property) => {
   width: v-bind('SIDEBAR_WIDTH + "px"');
   height: v-bind('BRAND_HEIGHT_DESKTOP + "px"');
  
-  background: linear-gradient(135deg, rgb(var(--v-theme-secondary)) 0%, rgba(var(--v-theme-secondary), 0.9) 100%);
+  background: #F5F5F5;
   display: flex;
   align-items: center;
   padding: 0 24px;

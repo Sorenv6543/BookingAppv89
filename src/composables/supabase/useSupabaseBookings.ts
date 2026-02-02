@@ -3,6 +3,8 @@ import { supabase } from '@/plugins/supabase';
 import type { Booking, BookingFormData, BookingStatus } from '@/types';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
+const __DEV__ = import.meta.env.DEV;
+
 /**
  * Supabase-based booking operations with automatic RLS filtering
  * Replaces frontend filtering with database-level security
@@ -22,6 +24,44 @@ export function useSupabaseBookings() {
   // Real-time subscription
   let subscription: RealtimeChannel | null = null;
   
+  // TURN AUTO-DETECTION
+
+  /**
+   * Recompute booking_type for all bookings on a given property + date.
+   * A booking is a 'turn' if another booking on the same property has
+   * checkout_date === this booking's checkin_date or vice versa.
+   */
+  async function recomputeTurnStatus(propertyId: string, dates: string[]): Promise<void> {
+    const uniqueDates = [...new Set(dates.filter(Boolean))];
+    if (!uniqueDates.length || !propertyId) return;
+
+    // Find all bookings for this property that touch any of the given dates
+    const affected = bookings.value.filter(b =>
+      b.property_id === propertyId &&
+      (uniqueDates.includes(b.checkin_date) || uniqueDates.includes(b.checkout_date))
+    );
+
+    for (const booking of affected) {
+      const isTurn = bookings.value.some(other =>
+        other.id !== booking.id &&
+        other.property_id === propertyId &&
+        (other.checkout_date === booking.checkin_date || other.checkin_date === booking.checkout_date)
+      );
+      const newType = isTurn ? 'turn' : 'standard';
+      if (booking.booking_type !== newType) {
+        const { error: updateError } = await supabase
+          .from('bookings')
+          .update({ booking_type: newType })
+          .eq('id', booking.id);
+        
+        if (updateError) {
+          throw new Error(`Failed to update booking type: ${updateError.message}`);
+        }
+        booking.booking_type = newType;
+      }
+    }
+  }
+
   // CORE DATABASE OPERATIONS
   
   /**
@@ -59,7 +99,7 @@ export function useSupabaseBookings() {
       return transformedBookings;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch bookings';
-      console.error('Supabase booking fetch error:', err);
+      __DEV__ && console.error('Supabase booking fetch error:', err);
       return [];
     } finally {
       loading.value = false;
@@ -94,8 +134,10 @@ export function useSupabaseBookings() {
       // Add to local state for immediate UI update
       if (data) {
         bookings.value.push(data);
+        // Auto-detect turn status for affected dates
+        await recomputeTurnStatus(data.property_id, [data.checkin_date, data.checkout_date]);
       }
-      
+
       return data?.id || null;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to create booking';
@@ -106,6 +148,61 @@ export function useSupabaseBookings() {
     }
   }
   
+  /**
+   * Create a quick turn — two back-to-back bookings on the same property.
+   * If existingBookingId is provided, the outgoing booking already exists.
+   */
+  async function createQuickTurn(payload: {
+    property_id: string;
+    outgoing: BookingFormData & { booking_id?: string };
+    incoming: BookingFormData;
+  }): Promise<{ outgoingId: string | null; incomingId: string | null }> {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      let outgoingId: string | null = null;
+
+      // Create or reference outgoing booking
+      if (payload.outgoing.booking_id) {
+        outgoingId = payload.outgoing.booking_id;
+      } else {
+        const { data, error: err } = await supabase
+          .from('bookings')
+          .insert([{ ...payload.outgoing, owner_id: user.id, booking_type: 'turn' }])
+          .select().single();
+        if (err) throw err;
+        if (data) { bookings.value.push(data); outgoingId = data.id; }
+      }
+
+      // Create incoming booking
+      const { data: inData, error: inErr } = await supabase
+        .from('bookings')
+        .insert([{ ...payload.incoming, owner_id: user.id, booking_type: 'turn' }])
+        .select().single();
+      if (inErr) throw inErr;
+      if (inData) bookings.value.push(inData);
+
+      // Recompute turn status for the shared date
+      await recomputeTurnStatus(payload.property_id, [
+        payload.outgoing.checkout_date || payload.outgoing.checkin_date,
+        payload.incoming.checkin_date,
+        payload.incoming.checkout_date
+      ]);
+
+      return { outgoingId, incomingId: inData?.id || null };
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to create quick turn';
+      console.error('Quick turn creation error:', err);
+      return { outgoingId: null, incomingId: null };
+    } finally {
+      loading.value = false;
+    }
+  }
+
   /**
    * Update a booking (RLS ensures user can only update their own)
    */
@@ -125,12 +222,19 @@ export function useSupabaseBookings() {
       
       // Update local state
       if (data) {
+        const oldBooking = bookings.value.find(b => b.id === id);
         const index = bookings.value.findIndex(b => b.id === id);
         if (index !== -1) {
           bookings.value[index] = { ...bookings.value[index], ...data };
         }
+        // Recompute turns for both old and new dates/property
+        const datesToCheck = [data.checkin_date, data.checkout_date, oldBooking?.checkin_date, oldBooking?.checkout_date].filter(Boolean) as string[];
+        const propertyIds = new Set([data.property_id, oldBooking?.property_id].filter(Boolean) as string[]);
+        for (const pid of propertyIds) {
+          await recomputeTurnStatus(pid, datesToCheck);
+        }
       }
-      
+
       return true;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to update booking';
@@ -155,10 +259,16 @@ export function useSupabaseBookings() {
         .eq('id', id);
       
       if (deleteError) throw deleteError;
-      
+
+      // Capture dates before removing from local state
+      const deleted = bookings.value.find(b => b.id === id);
       // Remove from local state
       bookings.value = bookings.value.filter(b => b.id !== id);
-      
+      // Recompute turns for the dates the deleted booking occupied
+      if (deleted) {
+        await recomputeTurnStatus(deleted.property_id, [deleted.checkin_date, deleted.checkout_date]);
+      }
+
       return true;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to delete booking';
@@ -182,6 +292,9 @@ export function useSupabaseBookings() {
    * Subscribe to real-time booking changes
    * RLS automatically filters to user's accessible data
    */
+  let subscriptionRetryCount = 0;
+  const MAX_SUBSCRIPTION_RETRIES = 3;
+
   function subscribeToBookings() {
     subscription = supabase
       .channel('booking-changes')
@@ -193,15 +306,15 @@ export function useSupabaseBookings() {
           table: 'bookings'
         },
         (payload) => {
-          console.log('Booking change received:', payload);
-          
+          __DEV__ && console.log('Booking change received:', payload.eventType);
+
           switch (payload.eventType) {
             case 'INSERT':
               if (payload.new) {
                 bookings.value.push(payload.new as Booking);
               }
               break;
-              
+
             case 'UPDATE':
               if (payload.new) {
                 const index = bookings.value.findIndex(b => b.id === payload.new.id);
@@ -210,7 +323,7 @@ export function useSupabaseBookings() {
                 }
               }
               break;
-              
+
             case 'DELETE':
               if (payload.old) {
                 bookings.value = bookings.value.filter(b => b.id !== payload.old.id);
@@ -221,9 +334,19 @@ export function useSupabaseBookings() {
       )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
-          console.log('✅ Subscribed to booking changes');
+          subscriptionRetryCount = 0;
+          __DEV__ && console.log('Subscribed to booking changes');
         } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ Booking subscription error');
+          console.error('Booking subscription error, retrying...');
+          // Retry with backoff on channel error (common on Supabase free tier)
+          if (subscriptionRetryCount < MAX_SUBSCRIPTION_RETRIES) {
+            subscriptionRetryCount++;
+            const delay = Math.min(1000 * Math.pow(2, subscriptionRetryCount - 1), 5000);
+            setTimeout(() => {
+              unsubscribeFromBookings();
+              subscribeToBookings();
+            }, delay);
+          }
         }
       });
   }
@@ -320,6 +443,8 @@ export function useSupabaseBookings() {
     updateBooking,
     deleteBooking,
     changeBookingStatus,
+    createQuickTurn,
+    recomputeTurnStatus,
     
     // Computed data (auto-filtered by RLS)
     todayTurns,

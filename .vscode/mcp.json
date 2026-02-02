@@ -1,61 +1,84 @@
 {
-  "servers": {
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
-    },
-    "supabase": {
-      "command": "cmd",
-      "args": [
-        "/c", "npx", "-y", "@supabase/mcp-server-supabase@latest",
-        "--access-token", "${SUPABASE_ACCESS_TOKEN}",
-        "--project-ref", "otmfvzkokrxduipxkyga"
-      ],
-      "env": {
-        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
-      }
-    },
-    "postgres-remote": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "${SUPABASE_DB_URL}"],
-      "env": {
-        "SUPABASE_DB_URL": "${SUPABASE_DB_URL}"
-      }
-    },
-    "github": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
-      }
-    },
-    "fetch": {
-      "command": "npx",
-      "args": ["-y", "fetch-mcp"]
-    },
-    "brave-search": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
-      "env": {
-        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
-      }
-    },
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
-    },
-    "desktop-commander": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "@wonderwhy-er/desktop-commander"]
-    },
-        "vuetify-mcp": {
-      "command": "npx",
-      "args": ["-y", "@vuetify/mcp"]
-    }
-    
-  }
+	"servers": {
+		"filesystem": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-filesystem",
+				"."
+			],
+			"type": "stdio"
+		},
+		"supabase": {
+			"command": "cmd",
+			"args": [
+				"/c",
+				"npx",
+				"-y",
+				"@supabase/mcp-server-supabase@latest",
+				"--access-token",
+				"env:local:SUPABASE_ACCESS_TOKEN",
+				"--project-ref",
+				"otmfvzkokrxduipxkyga"
+			],
+			"env": {
+				"SUPABASE_ACCESS_TOKEN": "${env:local:SUPABASE_ACCESS_TOKEN}"
+			},
+			"type": "stdio"
+		},
+		"postgres-remote": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-postgres",
+				"${env:local:SUPABASE_DB_URL}"
+			],
+			"env": {
+				"SUPABASE_DB_URL": "${env:local:SUPABASE_DB_URL}"
+			},
+			"type": "stdio"
+		},
+		"github": {
+			"command": "cmd",
+			"args": [
+				"/c",
+				"npx",
+				"-y",
+				"@modelcontextprotocol/server-github"
+			],
+			"env": {
+				"GITHUB_PERSONAL_ACCESS_TOKEN": "${env:local:GITHUB_PERSONAL_ACCESS_TOKEN}"
+			},
+			"type": "stdio"
+		},
+		"fetch": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"fetch-mcp"
+			],
+			"type": "stdio"
+		},
+		"brave-search": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-brave-search"
+			],
+			"env": {
+				"BRAVE_API_KEY": "${env:local:BRAVE_API_KEY}"
+			},
+			"type": "stdio"
+		},
+		"desktop-commander": {
+			"command": "cmd",
+			"args": [
+				"/c",
+				"npx",
+				"-y",
+				"@wonderwhy-er/desktop-commander"
+			],
+			"type": "stdio"
+		}
+	}
 }

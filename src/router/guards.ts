@@ -80,7 +80,7 @@ export async function authGuard(
   }
   
   // Redirect authenticated users away from auth pages
-  if ((to.path === '/' || to.path.startsWith('/auth')) && authStore.isAuthenticated) {
+  if (to.path.startsWith('/auth') && authStore.isAuthenticated) {
     console.log('✅ Authenticated user accessing auth page, redirecting to dashboard');
     const defaultRoute = getDefaultRouteForRole(authStore.user?.role);
     next(defaultRoute);

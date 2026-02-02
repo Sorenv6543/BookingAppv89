@@ -37,6 +37,8 @@ import { useAuthStore } from '@/stores/auth';
 // Import event logger for component communication
 import eventLogger from '@/composables/shared/useComponentEventLogger';
 
+const __DEV__ = import.meta.env.DEV;
+
 interface Props {
   bookings: Map<string, Booking>;
   properties: Map<string, Property>;
@@ -86,8 +88,8 @@ const calendarEvents = computed(() => {
     return {
       id: booking.id,
       title: `${property?.name || 'Unknown Property'} - ${isTurn ? 'TURN' : 'Standard'}`,
-      start: booking.checkout_date,
-      end: addOneDay(booking.checkin_date), // Add one day to make end date inclusive
+      start: booking.checkin_date,
+      end: addOneDay(booking.checkout_date), // Add one day to make end date inclusive
       backgroundColor: eventColor,
       borderColor: borderColor,
       textColor: textColor,
@@ -129,75 +131,55 @@ const addOneDay = (dateString: string): string => {
   return date.toISOString().split('T')[0];
 };
 
-// Enhanced dynamic color system with more variety
-const getEventColor = (booking: Booking): string => {
-  const isDark = theme.global.current.value.dark;
-  
-  if (booking.booking_type === 'turn') {
-    switch (booking.priority) {
-      case 'urgent':
-        return isDark ? '#64748b' : '#475569'; // Dark slate for urgent turns
-      case 'high':
-        return isDark ? '#78716c' : '#64748b'; // Slate for high priority turns
-      case 'normal':
-        return isDark ? '#9ca3af' : '#78716c'; // Stone for normal turns
-      case 'low':
-        return isDark ? '#d1d5db' : '#9ca3af'; // Cool gray for low priority turns
-      default:
-        return isDark ? '#6b7280' : '#475569';
-    }
-  } else {
-    switch (booking.priority) {
-      case 'urgent':
-        return isDark ? '#7c3aed' : '#6366f1'; // Indigo for urgent standard
-      case 'high':
-        return isDark ? '#a855f7' : '#8b5cf6'; // Violet for high priority standard
-      case 'normal':
-        return isDark ? '#0ea5e9' : '#06b6d4'; // Cyan for normal
-      case 'low':
-        return isDark ? '#22c55e' : '#10b981'; // Emerald for low priority
-      default:
-        return isDark ? '#3b82f6' : '#2563eb';
-    }
+// Neon color palette — each property gets its own color
+const PROPERTY_COLORS = [
+  { bg: '#1976D2', border: '#1256a1', text: '#ffffff' }, // Blue (first property)
+  { bg: '#e6325a', border: '#c41e3a', text: '#ffffff' }, // Neon rose
+  { bg: '#00c853', border: '#009624', text: '#ffffff' }, // Neon green
+  { bg: '#7c4dff', border: '#5a1ecc', text: '#ffffff' }, // Neon purple
+  { bg: '#00bcd4', border: '#0097a7', text: '#ffffff' }, // Neon cyan
+  { bg: '#ff9100', border: '#c66d00', text: '#ffffff' }, // Neon orange
+  { bg: '#e8507f', border: '#c43a65', text: '#ffffff' }, // Neon pink
+  { bg: '#ffd600', border: '#c6a700', text: '#333333' }, // Neon yellow
+  { bg: '#00e676', border: '#00b248', text: '#ffffff' }, // Neon mint
+  { bg: '#d500f9', border: '#a000c4', text: '#ffffff' }, // Neon magenta
+];
+
+// Map property IDs to a stable color index
+const propertyColorMap = new Map<string, number>();
+
+const getPropertyColorIndex = (propertyId: string): number => {
+  if (propertyColorMap.has(propertyId)) {
+    return propertyColorMap.get(propertyId)!;
   }
+  const index = propertyColorMap.size % PROPERTY_COLORS.length;
+  propertyColorMap.set(propertyId, index);
+  return index;
 };
 
-const getEventBorderColor = (booking: Booking): string => {
-  if (booking.booking_type === 'turn') {
-    switch (booking.priority) {
-      case 'urgent':
-        return '#334155'; // Dark slate border for urgent turns
-      case 'high':
-        return '#475569'; // Slate border for high priority turns
-      case 'normal':
-        return '#57534e'; // Stone border for normal turns
-      case 'low':
-        return '#6b7280'; // Cool gray border for low priority turns
-      default:
-        return '#334155';
-    }
-  } else {
-    switch (booking.priority) {
-      case 'urgent':
-        return '#4f46e5'; // Indigo border for urgent standard
-      case 'high':
-        return '#7c3aed'; // Violet border for high priority standard
-      case 'normal':
-        return '#0891b2'; // Cyan border for normal
-      case 'low':
-        return '#059669'; // Emerald border for low priority
-      default:
-        return '#1d4ed8';
-    }
+// Rebuild color map when properties change
+watch(() => props.properties, (newProps) => {
+  propertyColorMap.clear();
+  let i = 0;
+  for (const id of newProps.keys()) {
+    propertyColorMap.set(id, i % PROPERTY_COLORS.length);
+    i++;
   }
+}, { immediate: true });
+
+const getEventColor = (booking: Booking): string => {
+  const idx = getPropertyColorIndex(booking.property_id);
+  return PROPERTY_COLORS[idx].bg;
+};
+
+const getEventBorderColor = (_booking: Booking): string => {
+  return '#9e9e9e'; // Uniform grey border for all events
 };
 
 const getEventTextColor = (booking: Booking): string => {
-  // Use white text for better contrast on colored backgrounds
-  if (booking.status === 'completed') {
-    return '#E0E0E0'; // Lighter text for completed bookings
-  }
-  return '#FFFFFF';
+  if (booking.status === 'completed') return '#E0E0E0';
+  const idx = getPropertyColorIndex(booking.property_id);
+  return PROPERTY_COLORS[idx].text;
 };
 
 // Mobile viewport height management
@@ -296,11 +278,17 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
   );
   
   emit('dateSelect', selectInfo);
-  
-  // Optionally auto-create booking
+
+  // Check if the selected start date matches an existing booking's checkout date (turn detection)
+  const selectedStart = selectInfo.startStr;
+  const bookingsArray = Array.from(props.bookings.values());
+  const adjacentBooking = bookingsArray.find(b => b.checkout_date === selectedStart);
+
+  // Emit create booking with optional turn context
   emit('createBooking', {
     start: selectInfo.startStr,
-    end: selectInfo.endStr
+    end: selectInfo.endStr,
+    propertyId: adjacentBooking?.property_id
   });
   
   // Clear selection
@@ -370,7 +358,7 @@ const handleEventResize = (resizeInfo: any): void => {
 };
 
 const handleDateClick = (arg: DateClickArg): void => {
-  console.log('🗓️ [FullCalendar] Day clicked:', arg.dateStr);
+  __DEV__ && console.log('🗓️ [FullCalendar] Day clicked:', arg.dateStr);
   
   selectedDate.value = arg.date;
   
@@ -387,8 +375,8 @@ const handleDateClick = (arg: DateClickArg): void => {
   selectedDayBookings.value = dayBookings;
   dayViewVisible.value = true;
   
-  console.log('📅 [FullCalendar] Day view opened with', dayBookings.length, 'bookings for date:', clickedDate);
-  console.log('📅 [FullCalendar] Day bookings:', dayBookings.map(b => ({
+  __DEV__ && console.log('📅 [FullCalendar] Day view opened with', dayBookings.length, 'bookings for date:', clickedDate);
+  __DEV__ && console.log('📅 [FullCalendar] Day bookings:', dayBookings.map(b => ({
     id: b.id,
     property_id: b.property_id,
     arrival: b.checkin_date,
@@ -505,7 +493,7 @@ watch(() => theme.global.current.value.dark, () => {
 
 // Watch for changes in props from Home
 watch(() => props.bookings, (newBookings, oldBookings) => {
-  console.log('🔍 [FullCalendar] Bookings prop changed:', {
+  __DEV__ && console.log('🔍 [FullCalendar] Bookings prop changed:', {
     newSize: newBookings.size,
     oldSize: oldBookings?.size || 0,
     newBookingIds: Array.from(newBookings.keys()),
@@ -556,7 +544,7 @@ const handleViewBooking = (booking: Booking): void => {
     }
   }
   
-  console.log('👁️ [FullCalendar] View booking from day view:', booking.id);
+  __DEV__ && console.log('👁️ [FullCalendar] View booking from day view:', booking.id);
 };
 
 const handleEditBooking = (booking: Booking): void => {
@@ -571,7 +559,7 @@ const handleEditBooking = (booking: Booking): void => {
     }
   } as unknown as EventClickArg);
   
-  console.log('✏️ [FullCalendar] Edit booking from day view:', booking.id);
+  __DEV__ && console.log('✏️ [FullCalendar] Edit booking from day view:', booking.id);
 };
 
 const handleCompleteBooking = (booking: Booking): void => {
@@ -583,7 +571,7 @@ const handleCompleteBooking = (booking: Booking): void => {
     end: booking.checkin_date
   });
   
-  console.log('✅ [FullCalendar] Complete booking from day view:', booking.id);
+  __DEV__ && console.log('✅ [FullCalendar] Complete booking from day view:', booking.id);
 };
 
 const handleAddBookingFromDayView = (date: Date): void => {
@@ -602,13 +590,13 @@ const handleAddBookingFromDayView = (date: Date): void => {
     end: endStr
   });
   
-  console.log('➕ [FullCalendar] Add booking from day view for date:', startStr);
+  __DEV__ && console.log('➕ [FullCalendar] Add booking from day view for date:', startStr);
 };
 
 // Add new handler function after the other event handlers
 const handleLoading = (isLoading: boolean): void => {
   // You can emit an event or handle loading state changes here
-  console.log('Calendar loading state:', isLoading);
+  __DEV__ && console.log('Calendar loading state:', isLoading);
   
   // Log loading state
   eventLogger.logEvent(
@@ -658,7 +646,7 @@ const attachMoreLinkListeners = (): void => {
       link.addEventListener('touchstart', handleManualMoreLinkClick, { passive: false, capture: true });
     });
     
-    console.log('📎 [FullCalendar] Attached listeners to', moreLinks.length, 'more links');
+    __DEV__ && console.log('📎 [FullCalendar] Attached listeners to', moreLinks.length, 'more links');
   } catch (error) {
     console.warn('Error attaching more link listeners:', error);
   }
@@ -729,7 +717,7 @@ const handleManualMoreLinkClick = (event: Event): void => {
   const currentUserId = authStore.user?.id;
   
   // Debug logging
-  console.log('📅 [FullCalendar] Debug info:', {
+  __DEV__ && console.log('📅 [FullCalendar] Debug info:', {
     linkElement,
     dayCell,
     dateAttr,
@@ -758,7 +746,7 @@ const handleManualMoreLinkClick = (event: Event): void => {
   selectedDayBookings.value = dayBookings;
   dayViewVisible.value = true;
   
-  console.log('📅 [FullCalendar] Manual more link clicked for date:', clickedDate.toDateString(), 'with', dayBookings.length, 'owner bookings');
+  __DEV__ && console.log('📅 [FullCalendar] Manual more link clicked for date:', clickedDate.toDateString(), 'with', dayBookings.length, 'owner bookings');
 };
 
 // Lifecycle hooks for mobile viewport management
@@ -891,6 +879,8 @@ defineExpose({
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
   transition: all 0.2s ease !important;
   border-radius: 4px !important;
+  margin-bottom: 3px !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Remove any color overrides and use higher specificity */
@@ -900,83 +890,7 @@ defineExpose({
   color: #ffffff !important;
 }
 
-/* Force specific type and priority combinations with higher specificity */
-:deep(.fc-daygrid-event.fc-event.type-turn-urgent),
-:deep(.fc-timegrid-event.fc-event.type-turn-urgent) {
-  background-color: #475569 !important;
-  border-color: #334155 !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-turn-high),
-:deep(.fc-timegrid-event.fc-event.type-turn-high) {
-  background-color: #64748b !important;
-  border-color: #475569 !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-turn-normal),
-:deep(.fc-timegrid-event.fc-event.type-turn-normal) {
-  background-color: #78716c !important;
-  border-color: #57534e !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-turn-low),
-:deep(.fc-timegrid-event.fc-event.type-turn-low) {
-  background-color: #9ca3af !important;
-  border-color: #6b7280 !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-standard-urgent),
-:deep(.fc-timegrid-event.fc-event.type-standard-urgent) {
-  background-color: #6366f1 !important;
-  border-color: #4f46e5 !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-standard-high),
-:deep(.fc-timegrid-event.fc-event.type-standard-high) {
-  background-color: #8b5cf6 !important;
-  border-color: #7c3aed !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-standard-normal),
-:deep(.fc-timegrid-event.fc-event.type-standard-normal) {
-  background-color: #06b6d4 !important;
-  border-color: #0891b2 !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-standard-low),
-:deep(.fc-timegrid-event.fc-event.type-standard-low) {
-  background-color: #10b981 !important;
-  border-color: #059669 !important;
-  color: #ffffff !important;
-}
-
-/* Additional fallback based on priority class */
-:deep(.fc-event.priority-urgent) {
-  background-color: #475569 !important;
-  border-color: #334155 !important;
-}
-
-:deep(.fc-event.priority-high) {
-  background-color: #64748b !important;
-  border-color: #475569 !important;
-}
-
-:deep(.fc-event.priority-normal) {
-  background-color: #78716c !important;
-  border-color: #57534e !important;
-}
-
-:deep(.fc-event.priority-low) {
-  background-color: #9ca3af !important;
-  border-color: #6b7280 !important;
-}
+/* Let inline event colors from JS take effect — no CSS color overrides */
 
 :deep(.fc-event:hover) {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
@@ -1007,8 +921,16 @@ defineExpose({
   background-color: rgba(var(--v-theme-primary), 0.05) !important;
 }
 
+:deep(.fc-daygrid-day) {
+  transition: box-shadow 0.2s ease, transform 0.2s ease !important;
+}
+
 :deep(.fc-daygrid-day:hover) {
-  background-color: rgba(var(--v-theme-primary), 0.1) !important;
+  background-color: rgba(var(--v-theme-primary), 0.06) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-2px) !important;
+  z-index: 2 !important;
+  position: relative !important;
 }
 
 /* Resize handles */
@@ -1153,7 +1075,7 @@ defineExpose({
 :deep(.fc th) {
   padding: 0 !important;
   margin: 0 !important;
-  border: none !important;
+  border: 1px solid #e0e0e0 !important;
 }
 
 /* Mobile viewport specific fixes with proper height calculations */

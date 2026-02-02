@@ -124,9 +124,13 @@ src/components/smart/owner/HomeOwner.vue -
       :mode="eventModalMode"
       :booking="eventModalMode === 'edit' ? eventModalData : undefined"
       :initial-data="eventModalMode === 'create' ? eventModalData : undefined"
+      :quick-turn="quickTurnActive"
+      :existing-booking="quickTurnExistingBooking"
       @close="handleEventModalClose"
       @save="handleEventModalSave"
+      @save-quick-turn="handleQuickTurnSave"
       @delete="handleEventModalDelete"
+      @add-turn="handleAddTurnToExisting"
     />
 
     <PropertyModal
@@ -204,6 +208,18 @@ src/components/smart/owner/HomeOwner.vue -
         />
       </div>
       
+      <!-- Quick Turn -->
+      <div class="speed-dial-action">
+        <span class="text-body-2 font-weight-medium">Quick Turn</span>
+        <v-fab
+          icon="mdi-swap-horizontal"
+          size="small"
+          color="warning"
+          rounded="circle"
+          @click="handleCreateQuickTurn"
+        />
+      </div>
+
       <!-- Add Booking -->
       <div class="speed-dial-action">
         <span class="text-body-2 font-weight-medium">Add Booking</span>
@@ -262,6 +278,8 @@ import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/c
 // Import event logger for component communication
 import eventLogger from '@/composables/shared/useComponentEventLogger';
 
+const __DEV__ = import.meta.env.DEV;
+
 
 // ============================================================================
 // STORE CONNECTIONS & STATE
@@ -269,7 +287,7 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 
 
 const propertyStore = usePropertyStore();
-const { bookings, fetchBookings, createBooking: createSupabaseBooking } = useSupabaseBookings();
+const { bookings, createBooking: createSupabaseBooking, createQuickTurn } = useSupabaseBookings();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
 const { xs, mobile } = useDisplay();
@@ -400,28 +418,22 @@ const ownerFilteredBookings = computed(() => {
   
   try {
     let bookings = Array.from(ownerBookingsMap.value.values());
-    
-    console.log('🔍 [HomeOwner] ownerFilteredBookings - Input bookings:', bookings.length);
-    
+
     // Apply property filter if selected (within owner's properties)
     if (selectedPropertyFilter.value) {
-      bookings = bookings.filter(booking => 
+      bookings = bookings.filter(booking =>
         booking.property_id === selectedPropertyFilter.value &&
         ownerPropertiesMap.value.has(booking.property_id)
       );
-      console.log('🔍 [HomeOwner] ownerFilteredBookings - After property filter:', bookings.length);
     }
-    
+
     // Apply calendar state filters
     const filteredBookings = filterBookings(bookings);
-    console.log('🔍 [HomeOwner] ownerFilteredBookings - After calendar filter:', filteredBookings.length);
-    
+
     // Convert to Map for components that expect Map format
     filteredBookings.forEach(booking => {
       map.set(booking.id, booking);
     });
-    
-    console.log('🔍 [HomeOwner] ownerFilteredBookings - Final map size:', map.size);
   } catch (error) {
     console.error('❌ [HomeOwner] Error filtering bookings:', error);
   }
@@ -443,6 +455,10 @@ const eventModalData = computed(() => {
   const modal = uiStore.getModalState('eventModal');
   return modal?.data as Booking | undefined;
 });
+
+// Quick Turn state
+const quickTurnActive = ref(false);
+const quickTurnExistingBooking = ref<Booking | undefined>(undefined);
 
 // Property Modal
 const propertyModalOpen = computed(() => uiStore.isModalOpen('propertyModal'));
@@ -485,6 +501,23 @@ const confirmDialogData = computed(() => {
 // ============================================================================
 // OWNER-SPECIFIC EVENT HANDLERS
 // ============================================================================
+
+const handleAddTurnToExisting = (booking: Booking): void => {
+  // Close the edit modal, then open quick turn with the existing booking
+  uiStore.closeModal('eventModal');
+  nextTick(() => {
+    handleCreateQuickTurn(booking);
+  });
+};
+
+const handleCreateQuickTurn = (existingBooking?: Booking): void => {
+  quickTurnActive.value = true;
+  quickTurnExistingBooking.value = existingBooking;
+  const bookingData = existingBooking
+    ? { property_id: existingBooking.property_id, owner_id: currentOwnerId.value }
+    : { owner_id: currentOwnerId.value };
+  uiStore.openModal('eventModal', 'create', bookingData);
+};
 
 const handleCreateBooking = (data?: Partial<BookingFormData>): void => {
   eventLogger.logEvent(
@@ -735,6 +768,17 @@ const handleCalendarDateChange = (date: Date): void => {
 
 
 const handleCreateBookingFromCalendar = (data: { start: string; end: string; propertyId?: string | undefined; }): void => {
+  // Check if this is adjacent to an existing booking (turn detection)
+  if (data.propertyId) {
+    const adjacentBooking = Array.from(ownerBookingsMap.value.values()).find(
+      b => b.property_id === data.propertyId && b.checkout_date === data.start
+    );
+    if (adjacentBooking) {
+      handleCreateQuickTurn(adjacentBooking);
+      return;
+    }
+  }
+
   const bookingData = {
     ...data,
     owner_id: currentOwnerId.value
@@ -761,6 +805,8 @@ const handleUpdateBooking = (data: { id: string; start: string; end: string }): 
 // ============================================================================
 
 const handleEventModalClose = (): void => {
+  quickTurnActive.value = false;
+  quickTurnExistingBooking.value = undefined;
   uiStore.closeModal('eventModal');
 };
 
@@ -791,22 +837,34 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
       booking_type: bookingData.booking_type
     });
     
-    if (eventModalMode.value === 'create') {
+    // Capture modal state before any async work (closing the form can clear it)
+    const mode = eventModalMode.value;
+    const editBooking = eventModalData.value;
+
+    if (mode === 'create') {
       await createSupabaseBooking(bookingData as BookingFormData);
-    } else if (eventModalData.value) {
-      // eventModalData.value should be the booking directly
-      const booking = eventModalData.value;
-      
+    } else if (editBooking) {
       // Verify owner can update this booking
-      if (!booking?.id || !ownerBookingsMap.value.has(booking.id)) {
+      if (!editBooking.id || !ownerBookingsMap.value.has(editBooking.id)) {
         console.error('🚨 [HomeOwner] Booking ownership check failed - booking not found in owner map');
         throw new Error('Cannot update booking not owned by current user');
       }
-      await updateMyBooking(booking.id, bookingData as Partial<BookingFormData>);
+      await updateMyBooking(editBooking.id, bookingData as Partial<BookingFormData>);
     }
     uiStore.closeModal('eventModal');
   } catch (error) {
     console.error('Failed to save your booking:', error);
+  }
+};
+
+const handleQuickTurnSave = async (payload: { property_id: string; outgoing: BookingFormData & { booking_id?: string }; incoming: BookingFormData }): Promise<void> => {
+  try {
+    await createQuickTurn(payload);
+    quickTurnActive.value = false;
+    quickTurnExistingBooking.value = undefined;
+    uiStore.closeModal('eventModal');
+  } catch (error) {
+    console.error('Failed to create quick turn:', error);
   }
 };
 
@@ -917,66 +975,31 @@ const toggleSidebar = (): void => {
 // LIFECYCLE HOOKS
 // ============================================================================
 
-console.log('🔄 [HomeOwner] Script setup running...');
-
-// Watch for template rendering (proper debugging)
-watch(isOwnerAuthenticated, (newValue) => {
-  console.log('🎨 [HomeOwner] Template will render, isOwnerAuthenticated:', newValue);
-}, { immediate: true });
+let ownerDataLoaded = false;
 
 onMounted(async () => {
-  console.log('🚀 [HomeOwner] Component mounted successfully!');
+  __DEV__ && console.log('🚀 [HomeOwner] Component mounted successfully!');
   // Wait for auth to be properly initialized
   if (authStore.loading) {
-    console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
+    __DEV__ && console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
     const maxWait = 5000; // 5 seconds max
     const startTime = Date.now();
     while (authStore.loading && (Date.now() - startTime) < maxWait) {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
-  console.log('🔍 [HomeOwner] Auth state after waiting:', {
-    isAuthenticated: authStore.isAuthenticated,
-    user: authStore.user,
-    loading: authStore.loading,
-    isOwnerAuthenticated: isOwnerAuthenticated.value
-  });
   if (isOwnerAuthenticated.value) {
-    console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
+    __DEV__ && console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
     try {
-      // Fetch data using store methods directly for better performance
-      await Promise.all([
-        propertyStore.fetchProperties(), // Use propertyStore
-        fetchBookings()
-      ]);
-      console.log('✅ [HomeOwner] Owner data loaded successfully');
-      
-      // Debug data after loading
-      console.log('🔍 [HomeOwner] Data state after loading:', {
-        allProperties: propertyStore.properties.size, // Use propertyStore
-        allBookings: bookings.value?.length || 0,
-        ownerProperties: ownerPropertiesMap.value.size,
-        ownerBookings: ownerBookingsMap.value.size,
-        filteredBookings: ownerFilteredBookings.value.size
-      });
-      
-      // Debug booking data specifically
-      console.log('🔍 [HomeOwner] Bookings data:', {
-        allBookings: (bookings.value || []).map(b => ({
-          id: b.id,
-          owner_id: b.owner_id,
-          property_id: b.property_id,
-                  checkout_date: b.checkout_date,
-        checkin_date: b.checkin_date
-        })),
-        currentUserId: currentOwnerId.value
-      });
-      
+      // Fetch properties — bookings are already fetched by useSupabaseBookings onMounted
+      await propertyStore.fetchProperties();
+      ownerDataLoaded = true;
+      __DEV__ && console.log('✅ [HomeOwner] Owner data loaded successfully');
     } catch (error) {
       console.error('❌ [HomeOwner] Failed to load your data:', error);
     }
   } else {
-    console.warn('⚠️ [HomeOwner] User is not authenticated as owner, skipping data load');
+    __DEV__ && console.warn('⚠️ [HomeOwner] User is not authenticated as owner, skipping data load');
   }
 });
 
@@ -994,32 +1017,35 @@ watch(xs, (newValue) => {
   }
 });
 
-// Watch for authentication changes
+// Watch for authentication changes — skip if onMounted already loaded data
 watch(isOwnerAuthenticated, async (newValue, oldValue) => {
-  console.log('🔄 [HomeOwner] isOwnerAuthenticated changed:', { 
-    from: oldValue, 
+  __DEV__ && console.log('🔄 [HomeOwner] isOwnerAuthenticated changed:', {
+    from: oldValue,
     to: newValue,
     user: authStore.user
   });
   if (newValue && !oldValue) {
+    if (ownerDataLoaded) {
+      __DEV__ && console.log('⏭️ [HomeOwner] Data already loaded by onMounted, skipping');
+      return;
+    }
     // User became authenticated - load data
-    console.log('✅ [HomeOwner] User became authenticated, loading data...');
+    __DEV__ && console.log('✅ [HomeOwner] User became authenticated, loading data...');
     try {
-      await Promise.all([
-        propertyStore.fetchProperties(), // Use propertyStore
-        fetchBookings()
-      ]);
-      console.log('✅ [HomeOwner] Data loaded after auth change');
-      
+      // Fetch properties — bookings are already fetched by useSupabaseBookings onMounted
+      await propertyStore.fetchProperties();
+      ownerDataLoaded = true;
+      __DEV__ && console.log('✅ [HomeOwner] Data loaded after auth change');
+
       // Initialize calendar state after auth change
       updateDateRange();
-      console.log('✅ [HomeOwner] Calendar state initialized after auth change');
+      __DEV__ && console.log('✅ [HomeOwner] Calendar state initialized after auth change');
     } catch (error) {
       console.error('❌ [HomeOwner] Failed to load data after auth change:', error);
     }
   } else if (!newValue && oldValue) {
     // User became unauthenticated - could clear data if needed
-    console.log('⚠️ [HomeOwner] User became unauthenticated');
+    __DEV__ && console.log('⚠️ [HomeOwner] User became unauthenticated');
   }
 });
 </script>
@@ -1044,10 +1070,11 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   overflow: hidden;
   transition: margin-left 0.3s ease-in-out;
   margin-left: 0;
+  background: #FAFAFA;
 }
 
 .calendar-main-container.sidebar-open {
-  margin-left: 280px; /* Match sidebar width */
+  margin-left: 300px; /* Match sidebar width */
 }
 
 /* Responsive behavior - overlay on mobile */
@@ -1381,7 +1408,7 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
 }
 
 .main-app-header.sidebar-open {
-  margin-left: 280px; /* Match sidebar width */
+  margin-left: 300px; /* Match sidebar width */
 }
 
 .app-title {

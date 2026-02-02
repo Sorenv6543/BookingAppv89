@@ -46,6 +46,7 @@
     "@fullcalendar/vue3": "^6.1.17",
     "@mdi/font": "^7.4.47",
     "@supabase/supabase-js": "^2.50.0",
+    "html2pdf.js": "^0.14.0",
     "pinia": "^2.1.7",
     "unplugin-fonts": "^1.4.0",
     "uuid": "^11.1.0",

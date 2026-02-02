@@ -3,6 +3,8 @@ import { ref, computed } from 'vue';
 import type { Property, PropertyMap, PricingTier } from '@/types';
 import supabase from '@/plugins/supabase';
 
+const __DEV__ = import.meta.env.DEV;
+
 /**
  * Property store for the Property Cleaning Scheduler
  * Uses Map collections for efficient property access and management
@@ -62,10 +64,7 @@ export const usePropertyStore = defineStore('property', () => {
   });
   
   const getPropertyById = computed(() => (id: string): Property | undefined => {
-    console.log('🔍 getPropertyById called with id:', id);
-    const property = properties.value.get(id);
-    console.log('🔍 getPropertyById result:', property);
-    return property;
+    return properties.value.get(id);
   });
   
   // Map-based pricing tier filtering with caching
@@ -144,26 +143,20 @@ export const usePropertyStore = defineStore('property', () => {
     error.value = null;
     
     try {
-      console.log('🔍 fetchProperties: Starting database query...');
+      __DEV__ && console.log('🔍 fetchProperties: Starting database query...');
       const { data, error: supaError } = await supabase.from('properties').select('*');
       if (supaError) throw supaError;
-      
-      console.log('🔍 fetchProperties: Raw data from database:', data);
-      
+
+      __DEV__ && console.log('🔍 fetchProperties: Raw data from database:', data);
+
       properties.value.clear();
       if (data) {
         for (const prop of data) {
-          console.log('🔍 fetchProperties: Processing property:', {
-            id: prop.id,
-            name: prop.name,
-            default_checkout_time: prop.default_checkout_time,
-            default_checkin_time: prop.default_checkin_time
-          });
           properties.value.set(prop.id, prop);
         }
       }
-      
-      console.log('🔍 fetchProperties: Final properties map size:', properties.value.size);
+
+      __DEV__ && console.log('🔍 fetchProperties: Final properties map size:', properties.value.size);
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch properties.';
       console.error('fetchProperties error:', err);

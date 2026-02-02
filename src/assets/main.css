@@ -1,26 +1,22 @@
 /* Main CSS file */
 @import '../styles/responsive.scss';
 
-:root {
-  --primary-color: #1976D2;
-  --secondary-color: #424242;
-  --accent-color: #82B1FF;
-  --error-color: #FF5252;
-  --info-color: #2196F3;
-  --success-color: #4CAF50;
-  --warning-color: #FFC107;
-}
-
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
-  overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+  overflow-x: hidden;
+  font-family: 'Inter', sans-serif;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Apply Inter to Vuetify components */
+.v-application {
+  font-family: 'Inter', sans-serif !important;
 }
 
 /* Mobile-specific optimizations */
@@ -36,4 +32,4 @@ html, body {
   .v-application {
     min-height: 100dvh;
   }
-} 
+}

@@ -268,9 +268,7 @@
                 
                 <v-card-text>
                   <v-row>
-   
-
-                    <!-- Schedule Insights -->
+                      <!-- Schedule Insights -->
                     <v-col
                       cols="12"
                       md="8"
@@ -939,40 +937,6 @@ function navigateToNextMonth() {
   const newDate = new Date(currentViewingDate.value);
   newDate.setMonth(newDate.getMonth() + 1);
   currentViewingDate.value = newDate;
-}
-
-function getCalendarDays() {
-  const year = currentViewingDate.value.getFullYear();
-  const month = currentViewingDate.value.getMonth();
-  
-  // Get first day of month and calculate starting point
-  const firstDay = new Date(year, month, 1);
-  const startDate = new Date(firstDay);
-  startDate.setDate(startDate.getDate() - firstDay.getDay());
-  
-  const days = [];
-  const currentDate = new Date(startDate);
-  const today = new Date().toISOString().split('T')[0];
-  
-  // Generate 42 days (6 weeks)
-  for (let i = 0; i < 42; i++) {
-    const dateStr = currentDate.toISOString().split('T')[0];
-    const dayBookings = allBookings.value.filter(b => b.checkout_date.startsWith(dateStr));
-    const turns = dayBookings.filter(b => b.booking_type === 'turn');
-    
-    days.push({
-      day: currentDate.getDate(),
-      date: dateStr,
-      isToday: dateStr === today,
-      isCurrentMonth: currentDate.getMonth() === month,
-      bookingCount: dayBookings.length,
-      turnCount: turns.length
-    });
-    
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  
-  return days;
 }
 
 function getWeeklyStats() {

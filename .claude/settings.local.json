@@ -42,7 +42,16 @@
       "Bash(where:*)",
       "Bash(git -C \"c:\\\\Users\\\\Soren\\\\BookingAppv89\" status)",
       "Bash(pnpm run build:*)",
-      "Bash(pnpm preview)"
+      "Bash(pnpm preview)",
+      "mcp__vuetify-mcp__get_component_api_by_version",
+      "mcp__vuetify-mcp__get_feature_guide",
+      "Bash(npx pnpm test:run:*)",
+      "mcp__filesystem__list_directory",
+      "Bash(pnpm add:*)",
+      "Bash(npx vercel:*)",
+      "Bash(pnpm build:fast:*)",
+      "Bash(pnpm run build:fast:*)",
+      "Bash(pnpm build:*)"
     ],
     "deny": []
   },
@@ -68,4 +77,5 @@
   "enabledPlugins": {
     "supabase@claude-plugins-official": true
   }
+  
 }

@@ -43,6 +43,26 @@ const router = createRouter({
       }
     },
 
+    // Public invoice editor (no auth required)
+    {
+      path: '/invoice',
+      name: 'invoice',
+      component: () => import('@/pages/invoice.vue'),
+      meta: {
+        requiresAuth: false
+      }
+    },
+
+    // Demo admin dashboard (no auth required)
+    {
+      path: '/demoadmin',
+      name: 'demoadmin',
+      component: () => import('@/pages/demoadmin.vue'),
+      meta: {
+        requiresAuth: false
+      }
+    },
+
     // Owner routes - only accessible to owner users
     {
       path: '/owner/dashboard',

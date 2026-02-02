@@ -1,38 +1,14 @@
+// Import Vuetify styles - must be imported before components
 // src/plugins/vuetify.ts
 import { createVuetify } from 'vuetify';
 import { aliases, mdi } from 'vuetify/iconsets/mdi';
 
-// Import Vuetify styles - must be imported before components
 import 'vuetify/styles';
 import '@mdi/font/css/materialdesignicons.css';
 
-// Theme configuration
-// // const _lightTheme: ThemeDefinition = {
-//   dark: false,
-//   colors: {
-//     primary: '#1976d2', 
-//     secondary: '#e0e7f81e;',
-//     accent: '#045ecc', 
-//     error: '#80b3ec', 
-//     info: '#6b7280',
-//     success: '#093d8b',
-//     warning: '#FF9800',
-//     background: '#ffffff', 
-//     surface: '#ffffff',  
-//     'on-background': '#1C1B1F',
-//     'on-surface': '#1C1B1F',
-//     'surface-variant': '#69acfa', 
-//     'on-surface-variant': '#49454F',
-//     'turn-urgent': '#F44336',
-//     'turn-standard': '#FF9800', 
-//     'booking-standard': '#2196F3', 
-//   }
-// };
-
-
 export default createVuetify({
   // Don't include components/directives here - vite-plugin-vuetify handles auto-import
-  
+
   // Icon configuration
   icons: {
     defaultSet: 'mdi',
@@ -41,33 +17,98 @@ export default createVuetify({
       mdi
     }
   },
-  
+
   // Theme configuration
   theme: {
     defaultTheme: 'light',
     themes: {
       light: {
+        dark: false,
         colors: {
           primary: '#1976D2',
-          secondary: '#e0e7f81e',
+          'primary-darken-1': '#1565C0',
+          secondary: '#5C6BC0',
+          'secondary-darken-1': '#3949AB',
           accent: '#82B1FF',
-          error: '#FF5252',
+          error: '#E53935',
           info: '#2196F3',
-          success: '#4CAF50',
-          warning: '#FFC107',
+          success: '#43A047',
+          warning: '#FB8C00',
+          background: '#FAFAFA',
+          surface: '#FFFFFF',
+          'surface-bright': '#FFFFFF',
+          'surface-light': '#F5F5F5',
+          'surface-variant': '#E8EAF6',
+          'on-surface-variant': '#49454F',
+          'on-background': '#1C1B1F',
+          'on-surface': '#1C1B1F',
+          // Domain-specific colors
+          'turn-urgent': '#E53935',
+          'turn-standard': '#FB8C00',
+          'booking-standard': '#1E88E5',
+        },
+        variables: {
+          'border-color': '#000000',
+          'border-opacity': 0.12,
+          'high-emphasis-opacity': 0.87,
+          'medium-emphasis-opacity': 0.60,
+          'disabled-opacity': 0.38,
+          'idle-opacity': 0.04,
+          'hover-opacity': 0.04,
+          'focus-opacity': 0.12,
+          'selected-opacity': 0.08,
+          'activated-opacity': 0.12,
+          'pressed-opacity': 0.12,
+          'dragged-opacity': 0.08,
+          'theme-kbd': '#212529',
+          'theme-on-kbd': '#FFFFFF',
+          'theme-code': '#F5F5F5',
+          'theme-on-code': '#000000',
         },
       },
       dark: {
+        dark: true,
         colors: {
-          primary: '#2196F3',
-          secondary: '#424242',
+          primary: '#42A5F5',
+          'primary-darken-1': '#1E88E5',
+          secondary: '#7986CB',
+          'secondary-darken-1': '#5C6BC0',
           accent: '#FF4081',
-          error: '#FF5252',
-          info: '#2196F3',
-          success: '#4CAF50',
-          warning: '#FFC107',
+          error: '#EF5350',
+          info: '#42A5F5',
+          success: '#66BB6A',
+          warning: '#FFA726',
+          background: '#121212',
+          surface: '#1E1E1E',
+          'surface-bright': '#2C2C2C',
+          'surface-light': '#333333',
+          'surface-variant': '#424242',
+          'on-surface-variant': '#EEEEEE',
+          'on-background': '#E0E0E0',
+          'on-surface': '#E0E0E0',
+          'turn-urgent': '#EF5350',
+          'turn-standard': '#FFA726',
+          'booking-standard': '#42A5F5',
         },
-      }         
+        variables: {
+          'border-color': '#FFFFFF',
+          'border-opacity': 0.12,
+          'high-emphasis-opacity': 0.87,
+          'medium-emphasis-opacity': 0.60,
+          'disabled-opacity': 0.38,
+          'idle-opacity': 0.10,
+          'hover-opacity': 0.04,
+          'focus-opacity': 0.12,
+          'selected-opacity': 0.08,
+          'activated-opacity': 0.12,
+          'pressed-opacity': 0.12,
+          'dragged-opacity': 0.08,
+          'theme-kbd': '#212529',
+          'theme-on-kbd': '#FFFFFF',
+          'theme-code': '#2C2C2C',
+          'theme-on-code': '#CCCCCC',
+        },
+      },
     },
     variations: {
       colors: ['primary', 'secondary', 'accent', 'error', 'info', 'success', 'warning'],
