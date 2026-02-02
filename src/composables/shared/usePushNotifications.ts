@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { useAuth } from './useAuth'
+import { useAuthStore } from '@/stores/auth'
 
 // Notification Types for Property Cleaning Business
 export type NotificationType = 
@@ -42,10 +42,10 @@ export const usePushNotifications = () => {
   const subscriptionActive = ref(false)
   const vapidPublicKey = ref<string>('') // Will be set from env or server
 
-  // Auth composable for role-based notifications
-  const { user } = useAuth()
-  const currentUser = computed(() => user.value)
-  const userRole = computed(() => user.value?.role)
+  // Auth store for role-based notifications
+  const authStore = useAuthStore()
+  const currentUser = computed(() => authStore.user)
+  const userRole = computed(() => authStore.user?.role)
 
   // Check initial permission status
   if (isSupported.value) {

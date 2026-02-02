@@ -5,7 +5,7 @@
 
 import { ref, computed, onBeforeUnmount } from 'vue';
 import { useUIStore } from '@/stores/ui';
-import { useUserStore } from '@/stores/user';
+import { useAuthStore } from '@/stores/auth';
 import type { 
   LoadingOperation, 
   LoadingStateOptions, 
@@ -25,7 +25,7 @@ const DEFAULT_TIMEOUT = 30000;
  */
 export function useLoadingState() {
   const uiStore = useUIStore();
-  const userStore = useUserStore();
+  const authStore = useAuthStore();
   
   // State
   const operations = ref<Map<string, LoadingOperation>>(new Map());
@@ -33,7 +33,7 @@ export function useLoadingState() {
   
   // Computed
   const currentUserRole = computed((): UserRole => {
-    return userStore.currentUser?.role || 'owner';
+    return authStore.user?.role || 'owner';
   });
   
   const isLoading = computed(() => operations.value.size > 0);

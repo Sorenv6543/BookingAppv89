@@ -22,7 +22,6 @@ import FullCalendar from '@/components/smart/FullCalendar.vue';
 import type { Booking, Property } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 
-const __DEV__ = import.meta.env.DEV;
 
 console.log('🔄 [OwnerCalendar] Script setup running...');
 

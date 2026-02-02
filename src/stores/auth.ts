@@ -66,32 +66,9 @@ export const useAuthStore = defineStore('auth', () => {
   const isOwner = computed(() => user.value?.role === 'owner');
   const isCleaner = computed(() => user.value?.role === 'cleaner');
 
-  // Enhanced checkAuth method that waits for initialization
   const enhancedCheckAuth = async (): Promise<void> => {
     if (composable) {
-      // Wait for initialization to complete if still initializing
-      if (composable.initializing.value) {
-        console.log('🔄 Auth store: Waiting for composable initialization...');
-        const maxWaitTime = 500; // 500ms max wait (reduced from 1 second)
-        const checkInterval = 50; // Check every 50ms (reduced from 100ms)
-        let waitedTime = 0;
-        
-        while (composable.initializing.value && waitedTime < maxWaitTime) {
-          await new Promise(resolve => setTimeout(resolve, checkInterval));
-          waitedTime += checkInterval;
-        }
-        
-        if (composable.initializing.value) {
-          console.warn('⚠️ Composable initialization timeout in store');
-        } else {
-          console.log('✅ Composable initialization completed in store');
-        }
-      }
-      
-      // Now call the composable's checkAuth
       await composable.checkAuth();
-    } else {
-      console.warn('⚠️ No composable available in auth store');
     }
   };
 
