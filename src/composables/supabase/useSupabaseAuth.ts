@@ -4,7 +4,19 @@ import { supabase } from '@/plugins/supabase';
 import type { Session } from '@supabase/supabase-js';
 import type { User, UserRole } from '@/types';
 
-const __DEV__ = import.meta.env.DEV;
+interface UserProfileData {
+  id: string;
+  email?: string;
+  name: string;
+  role: string;
+  company_name?: string;
+  notifications_enabled?: boolean;
+  timezone?: string;
+  theme?: string;
+  language?: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export function useSupabaseAuth() {
   const user = ref<User | null>(null);
@@ -34,7 +46,7 @@ export function useSupabaseAuth() {
       clearTimeout(initializationTimeout);
       
       supabase.auth.onAuthStateChange(async (event, newSession) => {
-        __DEV__ && console.log('[Auth Debug] Auth state changed:', { event, userId: newSession?.user?.id });
+       console.log('[Auth Debug] Auth state changed:', { event, userId: newSession?.user?.id });
         
         try {
           if (event === 'INITIAL_SESSION') {
@@ -56,7 +68,7 @@ export function useSupabaseAuth() {
             session.value = null;
             error.value = null;
             profileLoadedForUserId = null;
-            __DEV__ && console.log('✅ User signed out');
+            console.log('✅ User signed out');
           }
         } catch (err) {
           console.error('Auth state change error:', err);
@@ -97,17 +109,17 @@ export function useSupabaseAuth() {
   async function loadUserProfile(userId: string): Promise<void> {
     // Skip if already loaded for this user
     if (profileLoadedForUserId === userId && user.value?.id === userId) {
-      __DEV__ && console.log(`⏭️ Profile already loaded for ${userId}, skipping`);
+      console.log(`⏭️ Profile already loaded for ${userId}, skipping`);
       return;
     }
 
     // Deduplicate: reuse in-flight request
     if (profileLoadPromise) {
-      __DEV__ && console.log(`⏭️ Profile load already in progress, reusing promise`);
+      console.log(`⏭️ Profile load already in progress, reusing promise`);
       return profileLoadPromise;
     }
 
-    profileLoadPromise = _doLoadUserProfile(userId);
+    profileLoadPromise = doLoadUserProfile(userId);
     try {
       await profileLoadPromise;
     } finally {
@@ -115,7 +127,7 @@ export function useSupabaseAuth() {
     }
   }
 
-  function _buildFallbackProfile(userId: string): User {
+  function buildFallbackProfile(userId: string): User {
     return {
       id: userId,
       email: session.value?.user?.email || '',
@@ -131,7 +143,7 @@ export function useSupabaseAuth() {
     };
   }
 
-  function _applyProfileData(data: any, userId: string) {
+  function applyProfileData(data: UserProfileData, userId: string) {
     user.value = {
       id: data.id,
       email: session.value?.user?.email || data.email || '',
@@ -140,7 +152,7 @@ export function useSupabaseAuth() {
       company_name: data.company_name,
       notifications_enabled: data.notifications_enabled ?? true,
       timezone: data.timezone || 'America/Los_Angeles',
-      theme: data.theme || 'light',
+      theme: (data.theme as 'light' | 'dark' | 'system') || 'light',
       language: data.language || 'en',
       created_at: data.created_at,
       updated_at: data.updated_at
@@ -148,8 +160,8 @@ export function useSupabaseAuth() {
     profileLoadedForUserId = userId;
   }
 
-  async function _doLoadUserProfile(userId: string): Promise<void> {
-    __DEV__ && console.log(`Loading user profile for: ${userId}`);
+  async function doLoadUserProfile(userId: string): Promise<void> {
+    console.log(`Loading user profile for: ${userId}`);
 
     // Start the real query — don't race/discard it
     const queryPromise = supabase
@@ -163,9 +175,9 @@ export function useSupabaseAuth() {
     const fallbackTimer = setTimeout(() => {
       if (!profileLoadedForUserId || profileLoadedForUserId !== userId) {
         usedFallback = true;
-        user.value = _buildFallbackProfile(userId);
+        user.value = buildFallbackProfile(userId);
         profileLoadedForUserId = userId;
-        __DEV__ && console.log('Using fallback profile (query still pending)');
+        console.log('Using fallback profile (query still pending)');
       }
     }, 3000);
 
@@ -174,10 +186,10 @@ export function useSupabaseAuth() {
       clearTimeout(fallbackTimer);
 
       if (profileError) {
-        __DEV__ && console.warn('Profile query error:', profileError.message);
+        console.warn('Profile query error:', profileError.message);
         // If we didn't set fallback yet, set it now
         if (!usedFallback) {
-          user.value = _buildFallbackProfile(userId);
+          user.value = buildFallbackProfile(userId);
           profileLoadedForUserId = userId;
         }
         return;
@@ -185,19 +197,19 @@ export function useSupabaseAuth() {
 
       if (data) {
         // Always apply real data, even if fallback was used — this upgrades the profile
-        _applyProfileData(data, userId);
-        __DEV__ && console.log('Profile loaded' + (usedFallback ? ' (upgraded from fallback)' : '') + ':', { email: user.value!.email, role: user.value!.role });
+        applyProfileData(data, userId);
+        console.log('Profile loaded' + (usedFallback ? ' (upgraded from fallback)' : '') + ':', { email: user.value!.email, role: user.value!.role });
       } else if (!usedFallback) {
         // No data and no fallback yet
-        user.value = _buildFallbackProfile(userId);
+        user.value = buildFallbackProfile(userId);
         profileLoadedForUserId = userId;
-        __DEV__ && console.log('No profile found, using fallback');
+        console.log('No profile found, using fallback');
       }
     } catch (err) {
       clearTimeout(fallbackTimer);
       console.error('Profile load failed:', err);
       if (!usedFallback) {
-        user.value = _buildFallbackProfile(userId);
+        user.value = buildFallbackProfile(userId);
         profileLoadedForUserId = userId;
       }
     }

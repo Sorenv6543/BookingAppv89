@@ -278,9 +278,6 @@ import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/c
 // Import event logger for component communication
 import eventLogger from '@/composables/shared/useComponentEventLogger';
 
-const __DEV__ = import.meta.env.DEV;
-
-
 // ============================================================================
 // STORE CONNECTIONS & STATE
 // ============================================================================
@@ -978,10 +975,10 @@ const toggleSidebar = (): void => {
 let ownerDataLoaded = false;
 
 onMounted(async () => {
-  __DEV__ && console.log('🚀 [HomeOwner] Component mounted successfully!');
+ console.log('🚀 [HomeOwner] Component mounted successfully!');
   // Wait for auth to be properly initialized
   if (authStore.loading) {
-    __DEV__ && console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
+   console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
     const maxWait = 5000; // 5 seconds max
     const startTime = Date.now();
     while (authStore.loading && (Date.now() - startTime) < maxWait) {
@@ -989,17 +986,17 @@ onMounted(async () => {
     }
   }
   if (isOwnerAuthenticated.value) {
-    __DEV__ && console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
+   console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
     try {
       // Fetch properties — bookings are already fetched by useSupabaseBookings onMounted
       await propertyStore.fetchProperties();
       ownerDataLoaded = true;
-      __DEV__ && console.log('✅ [HomeOwner] Owner data loaded successfully');
+     console.log('✅ [HomeOwner] Owner data loaded successfully');
     } catch (error) {
       console.error('❌ [HomeOwner] Failed to load your data:', error);
     }
   } else {
-    __DEV__ && console.warn('⚠️ [HomeOwner] User is not authenticated as owner, skipping data load');
+   console.warn('⚠️ [HomeOwner] User is not authenticated as owner, skipping data load');
   }
 });
 
@@ -1019,33 +1016,33 @@ watch(xs, (newValue) => {
 
 // Watch for authentication changes — skip if onMounted already loaded data
 watch(isOwnerAuthenticated, async (newValue, oldValue) => {
-  __DEV__ && console.log('🔄 [HomeOwner] isOwnerAuthenticated changed:', {
+ console.log('🔄 [HomeOwner] isOwnerAuthenticated changed:', {
     from: oldValue,
     to: newValue,
     user: authStore.user
   });
   if (newValue && !oldValue) {
     if (ownerDataLoaded) {
-      __DEV__ && console.log('⏭️ [HomeOwner] Data already loaded by onMounted, skipping');
+     console.log('⏭️ [HomeOwner] Data already loaded by onMounted, skipping');
       return;
     }
     // User became authenticated - load data
-    __DEV__ && console.log('✅ [HomeOwner] User became authenticated, loading data...');
+   console.log('✅ [HomeOwner] User became authenticated, loading data...');
     try {
       // Fetch properties — bookings are already fetched by useSupabaseBookings onMounted
       await propertyStore.fetchProperties();
       ownerDataLoaded = true;
-      __DEV__ && console.log('✅ [HomeOwner] Data loaded after auth change');
+     console.log('✅ [HomeOwner] Data loaded after auth change');
 
       // Initialize calendar state after auth change
       updateDateRange();
-      __DEV__ && console.log('✅ [HomeOwner] Calendar state initialized after auth change');
+     console.log('✅ [HomeOwner] Calendar state initialized after auth change');
     } catch (error) {
       console.error('❌ [HomeOwner] Failed to load data after auth change:', error);
     }
   } else if (!newValue && oldValue) {
     // User became unauthenticated - could clear data if needed
-    __DEV__ && console.log('⚠️ [HomeOwner] User became unauthenticated');
+   console.log('⚠️ [HomeOwner] User became unauthenticated');
   }
 });
 </script>
