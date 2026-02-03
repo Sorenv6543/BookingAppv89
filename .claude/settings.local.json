@@ -40,6 +40,7 @@
       "Bash(npm run type-check:*)",
       "Bash(gh pr list:*)",
       "Bash(where:*)",
+<<<<<<< Updated upstream
       "Bash(git -C \"c:\\\\Users\\\\Soren\\\\BookingAppv89\" status)",
       "Bash(pnpm run build:*)",
       "Bash(pnpm preview)",
@@ -52,6 +53,9 @@
       "Bash(pnpm build:fast:*)",
       "Bash(pnpm run build:fast:*)",
       "Bash(pnpm build:*)"
+=======
+      "Bash(git -C \"c:\\\\Users\\\\Soren\\\\BookingAppv89\" status)"
+>>>>>>> Stashed changes
     ],
     "deny": []
   },

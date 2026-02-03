@@ -3,8 +3,6 @@ import { ref, computed } from 'vue';
 import type { Property, PropertyMap, PricingTier } from '@/types';
 import supabase from '@/plugins/supabase';
 
-const __DEV__ = import.meta.env.DEV;
-
 /**
  * Property store for the Property Cleaning Scheduler
  * Uses Map collections for efficient property access and management
@@ -139,29 +137,35 @@ export const usePropertyStore = defineStore('property', () => {
   
   // Actions
   async function fetchProperties() {
+    console.log('🔍 [PropertyStore] fetchProperties called');
     loading.value = true;
     error.value = null;
     
     try {
-      __DEV__ && console.log('🔍 fetchProperties: Starting database query...');
-      const { data, error: supaError } = await supabase.from('properties').select('*');
-      if (supaError) throw supaError;
+console.log('🔍 [PropertyStore] Starting database query...');
+const { data, error: supaError } = await supabase.from('properties').select('*');
 
-      __DEV__ && console.log('🔍 fetchProperties: Raw data from database:', data);
+if (supaError) {
+  console.error('❌ [PropertyStore] Supabase error:', supaError);
+  throw supaError;
+}
 
-      properties.value.clear();
-      if (data) {
-        for (const prop of data) {
-          properties.value.set(prop.id, prop);
-        }
-      }
+console.log('✅ [PropertyStore] Raw data from database:', data);
 
-      __DEV__ && console.log('🔍 fetchProperties: Final properties map size:', properties.value.size);
+properties.value.clear();
+if (data) {
+  for (const prop of data) {
+    properties.value.set(prop.id, prop);
+  }
+}
+
+console.log('✅ [PropertyStore] Final properties map size:', properties.value.size);
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch properties.';
-      console.error('fetchProperties error:', err);
+      console.error('❌ [PropertyStore] fetchProperties error:', err);
     } finally {
       loading.value = false;
+      console.log('🔍 [PropertyStore] fetchProperties completed, loading:', loading.value);
       invalidateCache(); // Invalidate cache after fetch
     }
   }
@@ -248,8 +252,8 @@ export const usePropertyStore = defineStore('property', () => {
     }
   }
   
-  function setPropertyActiveStatus(id: string, active: boolean) {
-    updateProperty(id, { active });
+  async function setPropertyActiveStatus(id: string, active: boolean) {
+    await updateProperty(id, { active });
   }
   
   function clearAll() {

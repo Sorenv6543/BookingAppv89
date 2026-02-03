@@ -468,6 +468,7 @@
             <v-list-item
               prepend-icon="mdi-logout"
               title="Sign Out"
+              :disabled="signingOut"
               @click="handleSignOut"
             />
           </v-list>
@@ -478,7 +479,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { useAuthStore } from '@/stores/auth';
@@ -488,6 +489,7 @@ import type { Booking, Property } from '@/types';
 const SIDEBAR_WIDTH = 280;
 const BRAND_HEIGHT_DESKTOP = 200;
 const BRAND_HEIGHT_MOBILE = 100;
+const signingOut = ref(false);
 
 // Define props matching HomeAdmin expectations
 interface Props {
@@ -567,6 +569,8 @@ const navigateTo = (path: string) => {
 
 // Sign out handler
 const handleSignOut = async () => {
+  if (signingOut.value) return; // Prevent double-clicks
+  signingOut.value = true;
   try {
     const success = await authStore.logout();
     if (success) {
@@ -580,6 +584,8 @@ const handleSignOut = async () => {
     console.error('Error during logout:', error);
     // Force redirect even if logout had issues
     await router.push('/auth/login');
+  } finally {
+    signingOut.value = false;
   }
 };
 

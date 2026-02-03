@@ -3,6 +3,25 @@ import { useCalendarState } from '@/composables/shared/useCalendarState';
 import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
 import { useAuthStore } from '@/stores/auth';
 import { useUIStore } from '@/stores/ui';
+import type { DateSelectArg, EventClickArg } from '@fullcalendar/core';
+
+// Calendar event type for owner calendar
+interface OwnerCalendarEvent {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  className?: string;
+  extendedProps: {
+    booking_type?: string;
+    property_id?: string;
+    isOwnerBooking?: boolean;
+    canEdit?: boolean;
+    canDelete?: boolean;
+    propertyName?: string;
+    [key: string]: unknown;
+  };
+}
 
 /**
  * Owner-specific calendar state composable
@@ -95,7 +114,7 @@ export function useOwnerCalendarState() {
   /**
    * Get calendar events formatted for owner's bookings only
    */
-  function getOwnerCalendarEvents(): any[] {
+  function getOwnerCalendarEvents(): OwnerCalendarEvent[] {
     if (!currentUserId.value) {
       ownerError.value = 'Please log in to view your calendar';
       return [];
@@ -114,7 +133,7 @@ export function useOwnerCalendarState() {
           isOwnerBooking: true,
           canEdit: true,
           canDelete: true,
-          propertyName: getPropertyName(event.extendedProps.property_id)
+          propertyName: getPropertyName(event.extendedProps.property_id as string)
         }
       }));
       
@@ -129,7 +148,7 @@ export function useOwnerCalendarState() {
   /**
    * Handle date selection for creating new owner booking
    */
-  function handleOwnerDateSelect(_selectInfo: any) {
+  function handleOwnerDateSelect(_selectInfo: DateSelectArg) {
     if (!currentUserId.value) {
       ownerError.value = 'Please log in to create bookings';
       return;
@@ -154,7 +173,7 @@ export function useOwnerCalendarState() {
   /**
    * Handle event click for editing owner's booking
    */
-  function handleOwnerEventClick(clickInfo: any) {
+  function handleOwnerEventClick(clickInfo: EventClickArg) {
     if (!currentUserId.value) {
       ownerError.value = 'Please log in to edit bookings';
       return;

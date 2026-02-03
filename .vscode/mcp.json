@@ -9,35 +9,7 @@
 			],
 			"type": "stdio"
 		},
-		"supabase": {
-			"command": "cmd",
-			"args": [
-				"/c",
-				"npx",
-				"-y",
-				"@supabase/mcp-server-supabase@latest",
-				"--access-token",
-				"env:local:SUPABASE_ACCESS_TOKEN",
-				"--project-ref",
-				"otmfvzkokrxduipxkyga"
-			],
-			"env": {
-				"SUPABASE_ACCESS_TOKEN": "${env:local:SUPABASE_ACCESS_TOKEN}"
-			},
-			"type": "stdio"
-		},
-		"postgres-remote": {
-			"command": "npx",
-			"args": [
-				"-y",
-				"@modelcontextprotocol/server-postgres",
-				"${env:local:SUPABASE_DB_URL}"
-			],
-			"env": {
-				"SUPABASE_DB_URL": "${env:local:SUPABASE_DB_URL}"
-			},
-			"type": "stdio"
-		},
+
 		"github": {
 			"command": "cmd",
 			"args": [
@@ -79,6 +51,15 @@
 				"@wonderwhy-er/desktop-commander"
 			],
 			"type": "stdio"
-		}
+		},
+		"supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "${env:local:SUPABASE_ACCESS_TOKEN}"
+      ]
+    }
 	}
 }

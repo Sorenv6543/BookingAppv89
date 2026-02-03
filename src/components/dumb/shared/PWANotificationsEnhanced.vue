@@ -237,7 +237,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { usePWA } from '@/composables/shared/usePWA'
-import { useAuth } from '@/composables/shared/useAuth'
+import { useAuthStore } from '@/stores/auth'
 
 // Emits
 interface Emits {
@@ -258,7 +258,8 @@ const {
   backgroundSync
 } = usePWA()
 
-const { user } = useAuth()
+const authStore = useAuthStore()
+const user = computed(() => authStore.user)
 
 // Local state
 const hideInstallPrompt = ref(false)

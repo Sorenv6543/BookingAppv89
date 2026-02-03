@@ -274,12 +274,10 @@ import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 // Types
 import type { Booking, Property, BookingFormData, PropertyFormData, ModalData } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import type { EventResizeDoneArg } from '@fullcalendar/interaction';
 
 // Import event logger for component communication
 import eventLogger from '@/composables/shared/useComponentEventLogger';
-
-const __DEV__ = import.meta.env.DEV;
-
 
 // ============================================================================
 // STORE CONNECTIONS & STATE
@@ -595,6 +593,22 @@ const handleCreateTurn = (): void => {
 };
 
 // ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Subtract one day from a date string.
+ * Used to convert FullCalendar's exclusive end dates to our database's inclusive checkout_date.
+ * FullCalendar end dates are exclusive (the day AFTER the last visible day),
+ * but checkout_date in our DB is the actual last day of the booking.
+ */
+const subtractOneDay = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  date.setDate(date.getDate() - 1);
+  return date.toISOString().split('T')[0];
+};
+
+// ============================================================================
 // CALENDAR EVENT HANDLERS
 // ============================================================================
 
@@ -607,9 +621,10 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
     'receive'
   );
   
+  // FullCalendar uses exclusive end dates, so subtract one day for checkout_date
   const bookingData: Partial<BookingFormData> = {
-              checkin_date: selectInfo.startStr,    // ✅ Guests arrive on start date
-          checkout_date: selectInfo.endStr,    // ✅ Guests leave on end date  
+    checkin_date: selectInfo.startStr,              // Guests arrive on start date
+    checkout_date: subtractOneDay(selectInfo.endStr), // Convert exclusive end to inclusive checkout
     owner_id: currentOwnerId.value
   };
   
@@ -664,9 +679,14 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     // Use nextTick to batch reactive updates
     await nextTick();
     
+    // FullCalendar uses exclusive end dates, so we need to subtract one day
+    // to get the correct checkout_date for our database
+    const endStr = dropInfo.event.endStr || dropInfo.event.startStr;
+    const checkoutDate = subtractOneDay(endStr);
+    
     const result = await updateMyBooking(booking.id, {
       checkin_date: dropInfo.event.startStr,
-      checkout_date: dropInfo.event.endStr || dropInfo.event.startStr,
+      checkout_date: checkoutDate,
       owner_id: booking.owner_id,
     });
     
@@ -686,7 +706,7 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   }
 };
 
-const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
+const handleEventResize = async (resizeInfo: EventResizeDoneArg): Promise<void> => {
   const booking = resizeInfo.event.extendedProps.booking as Booking;
   
   // Verify owner can modify this booking
@@ -707,9 +727,13 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
     // Use nextTick to batch reactive updates
     await nextTick();
     
+    // FullCalendar uses exclusive end dates, so we need to subtract one day
+    // to get the correct checkout_date for our database
+    const checkoutDate = subtractOneDay(resizeInfo.event.endStr);
+    
     const result = await updateMyBooking(booking.id, {
       checkin_date: resizeInfo.event.startStr,
-      checkout_date: resizeInfo.event.endStr,
+      checkout_date: checkoutDate,
       owner_id: booking.owner_id,
     });
     
@@ -842,7 +866,15 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     const editBooking = eventModalData.value;
 
     if (mode === 'create') {
-      await createSupabaseBooking(bookingData as BookingFormData);
+      console.log('🔍 [DEBUG] HomeOwner - Calling createSupabaseBooking...');
+      const bookingId = await createSupabaseBooking(bookingData as BookingFormData);
+      console.log('🔍 [DEBUG] HomeOwner - createSupabaseBooking result:', bookingId);
+      
+      if (!bookingId) {
+        console.error('❌ [HomeOwner] Booking creation failed - no ID returned');
+        throw new Error('Failed to create booking. Please try again.');
+      }
+      console.log('✅ [HomeOwner] Booking created successfully:', bookingId);
     } else if (editBooking) {
       // Verify owner can update this booking
       if (!editBooking.id || !ownerBookingsMap.value.has(editBooking.id)) {
@@ -853,7 +885,9 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     }
     uiStore.closeModal('eventModal');
   } catch (error) {
-    console.error('Failed to save your booking:', error);
+    console.error('❌ Failed to save your booking:', error);
+    // Show error to user - don't silently fail
+    alert(error instanceof Error ? error.message : 'Failed to save booking');
   }
 };
 
@@ -978,10 +1012,10 @@ const toggleSidebar = (): void => {
 let ownerDataLoaded = false;
 
 onMounted(async () => {
-  __DEV__ && console.log('🚀 [HomeOwner] Component mounted successfully!');
+ console.log('🚀 [HomeOwner] Component mounted successfully!');
   // Wait for auth to be properly initialized
   if (authStore.loading) {
-    __DEV__ && console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
+   console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
     const maxWait = 5000; // 5 seconds max
     const startTime = Date.now();
     while (authStore.loading && (Date.now() - startTime) < maxWait) {
@@ -989,17 +1023,17 @@ onMounted(async () => {
     }
   }
   if (isOwnerAuthenticated.value) {
-    __DEV__ && console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
+   console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
     try {
       // Fetch properties — bookings are already fetched by useSupabaseBookings onMounted
       await propertyStore.fetchProperties();
       ownerDataLoaded = true;
-      __DEV__ && console.log('✅ [HomeOwner] Owner data loaded successfully');
+     console.log('✅ [HomeOwner] Owner data loaded successfully');
     } catch (error) {
       console.error('❌ [HomeOwner] Failed to load your data:', error);
     }
   } else {
-    __DEV__ && console.warn('⚠️ [HomeOwner] User is not authenticated as owner, skipping data load');
+   console.warn('⚠️ [HomeOwner] User is not authenticated as owner, skipping data load');
   }
 });
 
@@ -1019,33 +1053,33 @@ watch(xs, (newValue) => {
 
 // Watch for authentication changes — skip if onMounted already loaded data
 watch(isOwnerAuthenticated, async (newValue, oldValue) => {
-  __DEV__ && console.log('🔄 [HomeOwner] isOwnerAuthenticated changed:', {
+ console.log('🔄 [HomeOwner] isOwnerAuthenticated changed:', {
     from: oldValue,
     to: newValue,
     user: authStore.user
   });
   if (newValue && !oldValue) {
     if (ownerDataLoaded) {
-      __DEV__ && console.log('⏭️ [HomeOwner] Data already loaded by onMounted, skipping');
+     console.log('⏭️ [HomeOwner] Data already loaded by onMounted, skipping');
       return;
     }
     // User became authenticated - load data
-    __DEV__ && console.log('✅ [HomeOwner] User became authenticated, loading data...');
+   console.log('✅ [HomeOwner] User became authenticated, loading data...');
     try {
       // Fetch properties — bookings are already fetched by useSupabaseBookings onMounted
       await propertyStore.fetchProperties();
       ownerDataLoaded = true;
-      __DEV__ && console.log('✅ [HomeOwner] Data loaded after auth change');
+     console.log('✅ [HomeOwner] Data loaded after auth change');
 
       // Initialize calendar state after auth change
       updateDateRange();
-      __DEV__ && console.log('✅ [HomeOwner] Calendar state initialized after auth change');
+     console.log('✅ [HomeOwner] Calendar state initialized after auth change');
     } catch (error) {
       console.error('❌ [HomeOwner] Failed to load data after auth change:', error);
     }
   } else if (!newValue && oldValue) {
     // User became unauthenticated - could clear data if needed
-    __DEV__ && console.log('⚠️ [HomeOwner] User became unauthenticated');
+   console.log('⚠️ [HomeOwner] User became unauthenticated');
   }
 });
 </script>

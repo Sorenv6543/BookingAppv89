@@ -116,6 +116,7 @@ These areas require careful modification - extend existing patterns rather than 
 - `src/router/` - Authentication and role guards
 - `vite.config.ts` - Build optimization settings
 
+<<<<<<< Updated upstream
 ## Vuetify 3 UI/UX Patterns
 
 ### Setup
@@ -285,6 +286,8 @@ if (!booking) return
 const list = computed(() => [...bookingMap.values()])
 ```
 
+=======
+>>>>>>> Stashed changes
 ## Gotchas
 
 - Strict TypeScript: `pnpm build` runs `vue-tsc --noEmit`; keep `src/types/` in sync with Supabase migrations

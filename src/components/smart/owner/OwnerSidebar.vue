@@ -135,8 +135,8 @@
             <div class="property-content">
               <div
                 class="property-title"
-                @click.stop="editProperty(property)"
                 style="cursor: pointer;"
+                @click.stop="editProperty(property)"
               >
                 {{ property.name }}
               </div>
@@ -262,6 +262,7 @@
             <v-list-item
               prepend-icon="mdi-logout"
               title="Sign Out"
+              :disabled="signingOut"
               @click="handleSignOut"
             />
           </v-list>
@@ -330,6 +331,7 @@ const selectedPropertyId = ref<string | null>(null);
 const showPropertyModal = ref(false);
 const propertyModalMode = ref<'create' | 'edit'>('create');
 const selectedPropertyForEdit = ref<Property | undefined>(undefined);
+const signingOut = ref(false);
 
 // v-model support
 const sidebarOpen = computed({
@@ -360,19 +362,28 @@ const navigateTo = (path: string) => {
 
 // Sign out handler
 const handleSignOut = async () => {
+ 
+  if (signingOut.value) return; // Prevent double-clicks
+  signingOut.value = true;
+
   try {
+   
     const success = await authStore.logout();
+  
     if (success) {
       // Small delay to ensure auth state is fully cleared
       await new Promise(resolve => setTimeout(resolve, 100));
+    
       await router.push('/auth/login');
     } else {
-      console.error('Logout failed');
+      console.error('Logout failed - returned false');
     }
   } catch (error) {
     console.error('Error during logout:', error);
     // Force redirect even if logout had issues
     await router.push('/auth/login');
+  } finally {
+    signingOut.value = false;
   }
 };
 

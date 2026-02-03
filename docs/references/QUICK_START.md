@@ -165,7 +165,7 @@ All dependencies from `package.json`:
 - Vue 3.4+
 - TypeScript 5.3+
 - Vuetify 3
-- Supabase
+- base
 - FullCalendar
 - And all dev dependencies (Vite, Vitest, etc.)
 
@@ -274,9 +274,9 @@ COMMAND:
 The project uses environment variables for configuration. Create a `.env.local` file:
 
 ```bash
-# Supabase Configuration
-VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
-VITE_SUPABASE_ANON_KEY=your_anon_key_here
+# base Configuration
+VITE_BASE_URL=https://otmfvzkokrxduipxkyga.base.co
+VITE_BASE_ANON_KEY=your_anon_key_here
 
 # App Configuration
 VITE_APP_NAME="Property Cleaning Scheduler"
@@ -301,7 +301,7 @@ See `environment-setup.sh` for the template.
 ## 📚 Additional Resources
 
 - **Main README**: [README.md](README.md)
-- **Supabase Setup**: [SUPABASE_SETUP_INSTRUCTIONS.md](SUPABASE_SETUP_INSTRUCTIONS.md)
+- **base Setup**: [BASE_SETUP_INSTRUCTIONS.md](BASE_SETUP_INSTRUCTIONS.md)
 - **Package Scripts**: Check [package.json](package.json) for all available commands
 - **Documentation**: [docs/](docs/)
 

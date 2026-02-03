@@ -138,6 +138,7 @@ import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase'
 import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
 import type { Booking, User, Cleaner, BookingFormData } from '@/types'
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core'
+import type { EventResizeDoneArg } from '@fullcalendar/interaction'
 
 // Use the admin calendar state composable for centralized state management
 const {
@@ -324,8 +325,7 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   }
 };
 
-const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
-  console.log('🔄 [AdminCalendar] Event resized:', resizeInfo.event.id);
+const handleEventResize = async (resizeInfo: EventResizeDoneArg): Promise<void> => {
   const booking = resizeInfo.event.extendedProps.booking as Booking;
   
   try {

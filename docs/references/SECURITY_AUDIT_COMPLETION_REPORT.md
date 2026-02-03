@@ -9,10 +9,10 @@
 
 ## Issues Fixed (Detailed Breakdown)
 
-### ✅ Issue 1: Hardcoded Supabase Access Token in `.cursor/mcp.json`
+### ✅ Issue 1: Hardcoded base Access Token in `.cursor/mcp.json`
 **Status**: FIXED
 - **Action**: Token reference updated to use environment variable placeholder
-- **Current**: Already using `${SUPABASE_ACCESS_TOKEN}` (correct format)
+- **Current**: Already using `${BASE_ACCESS_TOKEN}` (correct format)
 - **Files Changed**: `.cursor/mcp.json` → deleted and moved to tracking exceptions
 - **Template Created**: `.cursor/mcp.json.example` with placeholder documentation
 
@@ -29,40 +29,40 @@
 **Status**: FIXED
 - **Before**: 
   ```bash
-  VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
-  VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  VITE_BASE_URL=https://otmfvzkokrxduipxkyga.base.co
+  VITE_BASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   ```
 - **After**: 
   ```bash
-  VITE_SUPABASE_URL=<your-supabase-url>
-  VITE_SUPABASE_ANON_KEY=<your-anon-key>
+  VITE_BASE_URL=<your-base-url>
+  VITE_BASE_ANON_KEY=<your-anon-key>
   ```
 - **Created**: `.env.example` as proper template for contributors
 
-### ✅ Issue 4: Hardcoded Project URLs in `SUPABASE_SETUP_INSTRUCTIONS.md`
+### ✅ Issue 4: Hardcoded Project URLs in `BASE_SETUP_INSTRUCTIONS.md`
 **Status**: FIXED
-- **Before**: `https://app.supabase.com/project/otmfvzkokrxduipxkyga/sql/new`
-- **After**: `https://app.supabase.com/project/<YOUR_PROJECT_REF>/sql/new`
+- **Before**: `https://app.base.com/project/otmfvzkokrxduipxkyga/sql/new`
+- **After**: `https://app.base.com/project/<YOUR_PROJECT_REF>/sql/new`
 - **Added**: Instruction to replace placeholder with actual project reference
 
-### ✅ Issue 5: Hardcoded Credentials in `SUPABASE_SETUP_INSTRUCTIONS.md`
+### ✅ Issue 5: Hardcoded Credentials in `BASE_SETUP_INSTRUCTIONS.md`
 **Status**: FIXED
 - **Before**:
   ```bash
-  VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
-  VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  VITE_BASE_URL=https://otmfvzkokrxduipxkyga.base.co
+  VITE_BASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   ```
 - **After**:
   ```bash
-  VITE_SUPABASE_URL=https://<YOUR_PROJECT_REF>.supabase.co
-  VITE_SUPABASE_ANON_KEY=<YOUR_ANON_KEY>
+  VITE_BASE_URL=https://<YOUR_PROJECT_REF>.base.co
+  VITE_BASE_ANON_KEY=<YOUR_ANON_KEY>
   ```
 - **Added**: Clear instructions on where to find real credentials
 
 ### ✅ Issue 6: SQL Enum Casting Vulnerability in `FIX_MISSING_ENUMS.sql`
 **Status**: FIXED
 - **Vulnerability**: `(NEW.raw_user_meta_data->>'role')::user_role` throws before COALESCE executes
-- **Fix Location**: `supabase/fix_handle_new_user_trigger.sql`
+- **Fix Location**: `base/fix_handle_new_user_trigger.sql`
 - **Solution**:
   ```sql
   -- BEFORE: Can throw if role is invalid
@@ -134,10 +134,10 @@
   ```
 - **Migration**: All calls must provide UUID from auth.users record
 
-### ✅ Issue 12: Invalid ALTER DATABASE for Managed Supabase
+### ✅ Issue 12: Invalid ALTER DATABASE for Managed base
 **Status**: FIXED
 - **Removed**: `ALTER DATABASE postgres SET row_security = on;` (line 13)
-- **Reason**: Managed Supabase instances don't allow database-level configuration
+- **Reason**: Managed base instances don't allow database-level configuration
 - **Retained**: All per-table `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` statements
 
 ### ✅ Issue 13: Misleading SQL Comments in `check_logs.sql`
@@ -146,7 +146,7 @@
   - `pg_stat_statements`: Clarified it shows execution statistics, not errors
   - Added note about extension requirement: `CREATE EXTENSION pg_stat_statements`
   - `pg_stat_activity`: Added warning that it shows only active sessions
-  - Documented alternatives (Supabase Dashboard logs, postgres_logs extension)
+  - Documented alternatives (base Dashboard logs, postgres_logs extension)
 
 ### ✅ Issue 14: Misplaced Commit Summary File
 **Status**: FIXED
@@ -195,24 +195,24 @@
 | `.mcp.json.example` | CREATED | Template |
 | `CLAUDE.md` | UPDATED | Fixed status inconsistency |
 | `SECURITY_FIXES_COMMIT.md` | CREATED | Detailed change documentation |
-| `SUPABASE_SETUP_INSTRUCTIONS.md` | UPDATED | Parameterized URLs and keys |
+| `BASE_SETUP_INSTRUCTIONS.md` | UPDATED | Parameterized URLs and keys |
 | `environment-setup.sh` | UPDATED | Replaced credentials with placeholders |
 | `src/components/dumb/BookingForm.vue` | UPDATED | Removed duplicate fallbacks |
 | `src/composables/owner/vododecmmit–.md` | DELETED | Removed misplaced file |
-| `supabase/check_logs.sql` | UPDATED | Fixed comments, clarified usage |
-| `supabase/combined_migration.sql` | UPDATED | 5 security/correctness fixes |
-| `supabase/fix_handle_new_user_trigger.sql` | UPDATED | Added enum validation |
-| `supabase/fix_signup_complete.sql` | UPDATED | Added enum validation, removed RLS disable |
+| `base/check_logs.sql` | UPDATED | Fixed comments, clarified usage |
+| `base/combined_migration.sql` | UPDATED | 5 security/correctness fixes |
+| `base/fix_handle_new_user_trigger.sql` | UPDATED | Added enum validation |
+| `base/fix_signup_complete.sql` | UPDATED | Added enum validation, removed RLS disable |
 
 ---
 
 ## Security Recommendations - IMMEDIATE ACTIONS REQUIRED
 
 ### 🔴 CRITICAL: Rotate Exposed Credentials
-1. **Supabase Project**: `otmfvzkokrxduipxkyga`
+1. **base Project**: `otmfvzkokrxduipxkyga`
 2. **Action**: 
-   - Go to Supabase Dashboard Settings > API > Regenerate new anon key
-   - Rotate access token in Supabase account settings
+   - Go to base Dashboard Settings > API > Regenerate new anon key
+   - Rotate access token in base account settings
 3. **Timeline**: Within 24 hours
 4. **Reason**: Credentials visible in commit history
 
@@ -230,7 +230,7 @@ git filter-branch --tree-filter 'rm -f environment-setup.sh .cursor/mcp.json .mc
 ```
 
 ### 🟡 HIGH: Update Deployment Configuration
-1. Update CI/CD pipeline to use `SUPABASE_ACCESS_TOKEN` env var
+1. Update CI/CD pipeline to use `BASE_ACCESS_TOKEN` env var
 2. Update Vercel environment variables (use new rotated key)
 3. Update any docker-compose or similar configs to source from env vars
 
@@ -268,18 +268,18 @@ git filter-branch --tree-filter 'rm -f environment-setup.sh .cursor/mcp.json .mc
    ```bash
    cp .env.example .env.local
    ```
-3. Edit `.env.local` with your Supabase credentials:
+3. Edit `.env.local` with your base credentials:
    ```bash
-   VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-   VITE_SUPABASE_ANON_KEY=YOUR_ANON_KEY
+   VITE_BASE_URL=https://YOUR_PROJECT_REF.base.co
+   VITE_BASE_ANON_KEY=YOUR_ANON_KEY
    ```
-4. For Cursor IDE, copy Supabase MCP template:
+4. For Cursor IDE, copy base MCP template:
    ```bash
    cp .cursor/mcp.json.example .cursor/mcp.json
    ```
 5. Set environment variable for MCP:
    ```bash
-   export SUPABASE_ACCESS_TOKEN=your_personal_token
+   export BASE_ACCESS_TOKEN=your_personal_token
    ```
 
 ### Breaking Changes
@@ -305,8 +305,8 @@ ls -la .cursor/mcp.json.example
 ls -la .mcp.json.example
 
 # Verify functions have correct permissions
-grep -A5 "GRANT EXECUTE.*handle_new_user" supabase/combined_migration.sql
-grep -A5 "GRANT EXECUTE.*create_admin_user" supabase/combined_migration.sql
+grep -A5 "GRANT EXECUTE.*handle_new_user" base/combined_migration.sql
+grep -A5 "GRANT EXECUTE.*create_admin_user" base/combined_migration.sql
 ```
 
 ---
@@ -315,7 +315,7 @@ grep -A5 "GRANT EXECUTE.*create_admin_user" supabase/combined_migration.sql
 
 - **Commit**: `02874b7` on branch `CHECKPOINT`
 - **Detailed Changes**: See `SECURITY_FIXES_COMMIT.md`
-- **Supabase Security**: https://supabase.com/docs/guides/auth/managing-user-data
+- **base Security**: https://base.com/docs/guides/auth/managing-user-data
 - **PostgreSQL RLS**: https://www.postgresql.org/docs/current/ddl-rowsecurity.html
 - **Git History Cleanup**: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository
 
@@ -330,7 +330,7 @@ grep -A5 "GRANT EXECUTE.*create_admin_user" supabase/combined_migration.sql
 
 **Next Steps**: 
 1. Review commit and changes
-2. Rotate Supabase credentials (CRITICAL)
+2. Rotate base credentials (CRITICAL)
 3. Update deployment configurations
 4. Test in staging environment
 5. Deploy to production

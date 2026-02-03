@@ -1,7 +1,10 @@
 <template>
   <div class="invoice-wrapper">
     <!-- Toolbar -->
-    <div class="invoice-toolbar" :class="{ 'hide-for-print': printing }">
+    <div
+      class="invoice-toolbar"
+      :class="{ 'hide-for-print': printing }"
+    >
       <v-btn
         variant="outlined"
         size="small"
@@ -23,22 +26,34 @@
     </div>
 
     <!-- Invoice -->
-    <div ref="invoiceRef" class="invoice-page" :class="{ 'printing': printing }">
+    <div
+      ref="invoiceRef"
+      class="invoice-page"
+      :class="{ 'printing': printing }"
+    >
       <!-- Top accent bar -->
-      <div class="top-bar"></div>
+      <div class="top-bar" />
 
       <!-- Header -->
       <div class="header-section">
         <div class="header-left">
-          <div class="invoice-title">INVOICE</div>
+          <div class="invoice-title">
+            INVOICE
+          </div>
           <div class="invoice-meta">
             <div class="meta-line">
               Invoice Number:
-              <input v-model="invoice.number" class="editable" />
+              <input
+                v-model="invoice.number"
+                class="editable"
+              >
             </div>
             <div class="meta-line">
               Invoice Date:
-              <input v-model="invoice.date" class="editable" />
+              <input
+                v-model="invoice.date"
+                class="editable"
+              >
             </div>
           </div>
         </div>
@@ -46,22 +61,47 @@
           <div class="company-logo-area">
             <!-- Logo placeholder -->
           </div>
-          <div class="company-name">Eduardo's Roofing</div>
+          <div class="company-name">
+            Eduardo's Roofing
+          </div>
           <div class="company-info">
-            <input v-model="company.name" class="editable align-right" />
-            <input v-model="company.address" class="editable align-right" />
-            <input v-model="company.city" class="editable align-right" />
-            <input v-model="company.phone" class="editable align-right bold" />
+            <input
+              v-model="company.name"
+              class="editable align-right"
+            >
+            <input
+              v-model="company.address"
+              class="editable align-right"
+            >
+            <input
+              v-model="company.city"
+              class="editable align-right"
+            >
+            <input
+              v-model="company.phone"
+              class="editable align-right bold"
+            >
           </div>
         </div>
       </div>
 
       <!-- Bill To -->
       <div class="bill-to-section">
-        <div class="bill-to-label">BILL TO:</div>
-        <input v-model="billTo.name" class="editable bold" />
-        <input v-model="billTo.address" class="editable" />
-        <input v-model="billTo.email" class="editable" />
+        <div class="bill-to-label">
+          BILL TO:
+        </div>
+        <input
+          v-model="billTo.name"
+          class="editable bold"
+        >
+        <input
+          v-model="billTo.address"
+          class="editable"
+        >
+        <input
+          v-model="billTo.email"
+          class="editable"
+        >
       </div>
 
       <!-- Line Items Table -->
@@ -69,18 +109,34 @@
         <table class="invoice-table">
           <thead>
             <tr>
-              <th class="col-no">No.</th>
-              <th class="col-desc"></th>
-              <th class="col-qty">Qty.</th>
-              <th class="col-price">Price</th>
-              <th class="col-total">Total</th>
+              <th class="col-no">
+                No.
+              </th>
+              <th class="col-desc" />
+              <th class="col-qty">
+                Qty.
+              </th>
+              <th class="col-price">
+                Price
+              </th>
+              <th class="col-total">
+                Total
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, i) in lineItems" :key="i">
-              <td class="col-no">{{ i + 1 }}</td>
+            <tr
+              v-for="(item, i) in lineItems"
+              :key="i"
+            >
+              <td class="col-no">
+                {{ i + 1 }}
+              </td>
               <td class="col-desc">
-                <input v-model="item.description" class="editable bold" />
+                <input
+                  v-model="item.description"
+                  class="editable bold"
+                >
               </td>
               <td class="col-qty">
                 <input
@@ -89,7 +145,7 @@
                   min="0"
                   class="editable center"
                   @input="item.qty = parseNum($event)"
-                />
+                >
               </td>
               <td class="col-price">
                 <input
@@ -97,21 +153,27 @@
                   class="editable center"
                   @focus="onPriceFocus($event, i)"
                   @blur="onPriceBlur($event, i)"
-                />
+                >
               </td>
-              <td class="col-total"></td>
+              <td class="col-total" />
             </tr>
             <!-- Subtotal row inside table -->
             <tr class="total-row">
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td class="col-total">{{ formatCurrency(subtotal) }}</td>
+              <td />
+              <td />
+              <td />
+              <td />
+              <td class="col-total">
+                {{ formatCurrency(subtotal) }}
+              </td>
             </tr>
             <!-- Empty rows -->
-            <tr class="empty-row"><td colspan="5"></td></tr>
-            <tr class="empty-row"><td colspan="5"></td></tr>
+            <tr class="empty-row">
+              <td colspan="5" />
+            </tr>
+            <tr class="empty-row">
+              <td colspan="5" />
+            </tr>
           </tbody>
         </table>
       </div>
@@ -119,30 +181,56 @@
       <!-- Bottom Section -->
       <div class="bottom-section">
         <div class="payment-method">
-          <div class="pm-title">PAYMENT METHOD</div>
-          <input v-model="payment.line1" class="editable bold" />
-          <input v-model="payment.line2" class="editable" />
-          <input v-model="payment.line3" class="editable" />
+          <div class="pm-title">
+            PAYMENT METHOD
+          </div>
+          <input
+            v-model="payment.line1"
+            class="editable bold"
+          >
+          <input
+            v-model="payment.line2"
+            class="editable"
+          >
+          <input
+            v-model="payment.line3"
+            class="editable"
+          >
         </div>
         <div class="totals-box">
           <div class="totals-row">
-            <div class="totals-label">Subtotal</div>
-            <div class="totals-value">{{ formatCurrency(subtotal) }}</div>
+            <div class="totals-label">
+              Subtotal
+            </div>
+            <div class="totals-value">
+              {{ formatCurrency(subtotal) }}
+            </div>
           </div>
           <div class="totals-row">
-            <div class="totals-label">Tax</div>
-            <div class="totals-value"></div>
+            <div class="totals-label">
+              Tax
+            </div>
+            <div class="totals-value" />
           </div>
           <div class="totals-row">
-            <div class="totals-label">Grand Total</div>
-            <div class="totals-value">{{ formatCurrency(grandTotal) }}</div>
+            <div class="totals-label">
+              Grand Total
+            </div>
+            <div class="totals-value">
+              {{ formatCurrency(grandTotal) }}
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Payment Fulfilled Stamp -->
-      <div v-if="paymentFulfilled" class="stamp-section">
-        <div class="stamp-text">PAYMENT FULFILLED</div>
+      <div
+        v-if="paymentFulfilled"
+        class="stamp-section"
+      >
+        <div class="stamp-text">
+          PAYMENT FULFILLED
+        </div>
       </div>
 
       <!-- Footer -->

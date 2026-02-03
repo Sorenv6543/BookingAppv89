@@ -107,12 +107,12 @@ export const getBookingEndDate = (booking: Booking | null | undefined): Date | n
   return dateValue ? new Date(dateValue) : null
 }
 
-export const isBooking = (obj: any): obj is Booking => {
-  return obj &&
+export const isBooking = (obj: unknown): obj is Booking => {
+  return obj !== null &&
     typeof obj === 'object' &&
-    typeof obj.id === 'string' &&
-    typeof obj.property_id === 'string' &&
-    typeof obj.owner_id === 'string' &&
-    obj.checkout_date &&
-    obj.checkin_date
+    typeof (obj as Booking).id === 'string' &&
+    typeof (obj as Booking).property_id === 'string' &&
+    typeof (obj as Booking).owner_id === 'string' &&
+    (obj as Booking).checkout_date !== undefined &&
+    (obj as Booking).checkin_date !== undefined
 }

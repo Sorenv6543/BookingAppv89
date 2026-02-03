@@ -8,6 +8,17 @@ import { useLoadingState } from '@/composables/shared/useLoadingState';
 import { useUIStore } from '@/stores/ui';
 import type { ErrorContext } from '@/types';
 
+// Interface for errors that may have a code property
+interface ErrorWithCode extends Error {
+  code?: string;
+}
+
+function hasErrorCode(error: unknown): error is ErrorWithCode {
+  return error !== null && 
+    typeof error === 'object' && 
+    'code' in error;
+}
+
 /**
  * Owner-specific error handler
  * Provides simple, encouraging error messages for property owners
@@ -35,7 +46,7 @@ export function useOwnerErrorHandler() {
     stopLoading(`property-${operation}`);
     
     // Handle specific property errors with owner-friendly messages
-    if ((error as any)?.code === 'PROPERTY_NOT_FOUND') {
+    if (hasErrorCode(error) && error.code === 'PROPERTY_NOT_FOUND') {
       return handleError(
         { message: 'Property not found', code: 'PROPERTY_NOT_FOUND' },
         context,
@@ -47,7 +58,7 @@ export function useOwnerErrorHandler() {
       );
     }
     
-    if ((error as any)?.code === 'PROPERTY_LIMIT_EXCEEDED') {
+    if (hasErrorCode(error) && error.code === 'PROPERTY_LIMIT_EXCEEDED') {
       return handleError(
         { message: 'Property limit exceeded', code: 'PROPERTY_LIMIT_EXCEEDED' },
         context,
@@ -85,7 +96,7 @@ export function useOwnerErrorHandler() {
     stopLoading(`booking-${operation}`);
     
     // Handle specific booking errors
-    if ((error as any)?.code === 'BOOKING_CONFLICT') {
+    if (hasErrorCode(error) && error.code === 'BOOKING_CONFLICT') {
       uiStore.addNotification(
         'warning',
         'Booking Conflict',
@@ -99,7 +110,7 @@ export function useOwnerErrorHandler() {
       });
     }
     
-    if ((error as any)?.code === 'TURN_BOOKING_INVALID') {
+    if (hasErrorCode(error) && error.code === 'TURN_BOOKING_INVALID') {
       uiStore.addNotification(
         'info',
         'Turn Booking Help',
@@ -161,7 +172,7 @@ export function useOwnerErrorHandler() {
     stopLoading('auth');
     
     // Handle specific auth errors with helpful messages
-    if ((error as any)?.code === 'INVALID_CREDENTIALS') {
+    if (hasErrorCode(error) && error.code === 'INVALID_CREDENTIALS') {
       uiStore.addNotification(
         'error',
         'Login Failed',
@@ -175,7 +186,7 @@ export function useOwnerErrorHandler() {
       });
     }
     
-    if ((error as any)?.code === 'ACCOUNT_LOCKED') {
+    if (hasErrorCode(error) && error.code === 'ACCOUNT_LOCKED') {
       uiStore.addNotification(
         'warning',
         'Account Locked',
@@ -189,7 +200,7 @@ export function useOwnerErrorHandler() {
       });
     }
     
-    if ((error as any)?.code === 'EMAIL_NOT_VERIFIED') {
+    if (hasErrorCode(error) && error.code === 'EMAIL_NOT_VERIFIED') {
       uiStore.addNotification(
         'info',
         'Email Verification Required',

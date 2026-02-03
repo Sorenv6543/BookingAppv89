@@ -5,7 +5,7 @@
 
 import { ref, computed } from 'vue';
 import { useUIStore } from '@/stores/ui';
-import { useUserStore } from '@/stores/user';
+import { useAuthStore } from '@/stores/auth';
 import type { 
   ErrorInfo, 
   ErrorContext, 
@@ -64,7 +64,7 @@ type ApiErrorLike = ErrorLike & {
  */
 export function useErrorHandler() {
   const uiStore = useUIStore();
-  const userStore = useUserStore();
+  const authStore = useAuthStore();
   
   // State
   const errors = ref<Map<string, ErrorInfo>>(new Map());
@@ -74,7 +74,7 @@ export function useErrorHandler() {
   
   // Computed
   const currentUserRole = computed((): UserRole => {
-    return userStore.currentUser?.role || 'owner';
+    return authStore.user?.role || 'owner';
   });
   
   const hasErrors = computed((): boolean => {
@@ -144,10 +144,10 @@ export function useErrorHandler() {
     const category = inferErrorCategory(errorCode, String(errorMessage));
     
     const fullContext: ErrorContext = {
-      userId: userStore.currentUser?.id,
+      userId: authStore.user?.id,
       userRole: currentUserRole.value,
       timestamp: new Date().toISOString(),
-      sessionId: userStore.sessionId,
+      sessionId: undefined,
       requestId: crypto.randomUUID(),
       ...context
     };

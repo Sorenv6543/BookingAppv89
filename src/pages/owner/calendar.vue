@@ -166,6 +166,7 @@ import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase'
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 import { useUIStore } from '@/stores/ui';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import type { Booking, Property } from '@/types';
 
 // Meta information for this page
 defineOptions({
@@ -209,7 +210,7 @@ const loading = computed(() => {
 
 // Convert arrays to Maps for component compatibility
 const ownerBookingsMap = computed(() => {
-  const map = new Map<string, any>();
+  const map = new Map<string, Booking>();
   ownerBookings.value.forEach(booking => {
     map.set(booking.id, booking);
   });
@@ -217,7 +218,7 @@ const ownerBookingsMap = computed(() => {
 });
 
 const ownerPropertiesMap = computed(() => {
-  const map = new Map<string, any>();
+  const map = new Map<string, Property>();
   ownerProperties.value.forEach(property => {
     map.set(property.id, property);
   });

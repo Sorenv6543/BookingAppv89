@@ -2,8 +2,15 @@
   <v-card class="pa-5">
     <div class="d-flex align-center justify-space-between mb-4">
       <div>
-        <div class="text-h6 font-weight-bold">{{ title }}</div>
-        <div v-if="subtitle" class="text-caption text-medium-emphasis">{{ subtitle }}</div>
+        <div class="text-h6 font-weight-bold">
+          {{ title }}
+        </div>
+        <div
+          v-if="subtitle"
+          class="text-caption text-medium-emphasis"
+        >
+          {{ subtitle }}
+        </div>
       </div>
       <v-btn-toggle
         v-model="activeFilter"
@@ -68,15 +75,33 @@
           stroke-width="1.5"
         />
         <defs>
-          <linearGradient :id="`gradient-${uid}`" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="rgb(var(--v-theme-primary))" stop-opacity="0.15" />
-            <stop offset="100%" stop-color="rgb(var(--v-theme-primary))" stop-opacity="0.01" />
+          <linearGradient
+            :id="`gradient-${uid}`"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop
+              offset="0%"
+              stop-color="rgb(var(--v-theme-primary))"
+              stop-opacity="0.15"
+            />
+            <stop
+              offset="100%"
+              stop-color="rgb(var(--v-theme-primary))"
+              stop-opacity="0.01"
+            />
           </linearGradient>
         </defs>
       </svg>
       <!-- Labels -->
       <div class="chart-labels d-flex justify-space-between mt-2">
-        <span v-for="(label, i) in labels" :key="i" class="text-caption text-disabled">
+        <span
+          v-for="(label, i) in labels"
+          :key="i"
+          class="text-caption text-disabled"
+        >
           {{ label }}
         </span>
       </div>

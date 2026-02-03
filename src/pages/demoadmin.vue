@@ -13,7 +13,11 @@
     />
 
     <!-- Top Bar -->
-    <v-app-bar flat color="white" border="b">
+    <v-app-bar
+      flat
+      color="white"
+      border="b"
+    >
       <v-app-bar-nav-icon @click="drawerOpen = !drawerOpen" />
       <v-text-field
         placeholder="Search bookings, properties..."
@@ -27,34 +31,63 @@
         style="max-width: 400px"
       />
       <v-spacer />
-      <v-btn icon variant="text" size="small">
+      <v-btn
+        icon
+        variant="text"
+        size="small"
+      >
         <v-icon>mdi-translate</v-icon>
       </v-btn>
-      <v-btn icon variant="text" size="small">
+      <v-btn
+        icon
+        variant="text"
+        size="small"
+      >
         <v-icon>mdi-apps</v-icon>
       </v-btn>
-      <v-btn icon variant="text" size="small">
-        <v-badge color="error" content="4" dot>
+      <v-btn
+        icon
+        variant="text"
+        size="small"
+      >
+        <v-badge
+          color="error"
+          content="4"
+          dot
+        >
           <v-icon>mdi-bell-outline</v-icon>
         </v-badge>
       </v-btn>
-      <v-avatar color="primary" size="34" class="ml-3 mr-2">
+      <v-avatar
+        color="primary"
+        size="34"
+        class="ml-3 mr-2"
+      >
         <span class="text-caption font-weight-bold text-white">JD</span>
       </v-avatar>
     </v-app-bar>
 
     <!-- Main Content -->
     <v-main class="bg-grey-lighten-4">
-      <v-container fluid class="pa-6">
+      <v-container
+        fluid
+        class="pa-6"
+      >
         <!-- Row 1: Welcome Banner + Trend Chart -->
         <v-row class="mb-2">
-          <v-col cols="12" lg="5">
+          <v-col
+            cols="12"
+            lg="5"
+          >
             <WelcomeBanner
               user-name="Jonathan"
               :stats="{ newBookings: 54, activeTurns: 4, completedToday: 12 }"
             />
           </v-col>
-          <v-col cols="12" lg="7">
+          <v-col
+            cols="12"
+            lg="7"
+          >
             <TrendChart
               title="Total Bookings"
               subtitle="Weekly booking activity"
@@ -73,7 +106,10 @@
 
         <!-- Row 3: Calendar + Event Filters -->
         <v-row class="mb-6">
-          <v-col cols="12" lg="3">
+          <v-col
+            cols="12"
+            lg="3"
+          >
             <!-- Mini Calendar + Filters -->
             <v-card class="mb-4">
               <v-card-text class="pa-4">
@@ -127,15 +163,28 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" lg="9">
+          <v-col
+            cols="12"
+            lg="9"
+          >
             <!-- Main Calendar -->
             <v-card>
               <v-card-title class="d-flex align-center justify-space-between">
                 <div class="d-flex align-center ga-2">
-                  <v-btn icon variant="text" size="small" @click="prevMonth">
+                  <v-btn
+                    icon
+                    variant="text"
+                    size="small"
+                    @click="prevMonth"
+                  >
                     <v-icon>mdi-chevron-left</v-icon>
                   </v-btn>
-                  <v-btn icon variant="text" size="small" @click="nextMonth">
+                  <v-btn
+                    icon
+                    variant="text"
+                    size="small"
+                    @click="nextMonth"
+                  >
                     <v-icon>mdi-chevron-right</v-icon>
                   </v-btn>
                   <span class="text-h6 font-weight-bold ml-2">
@@ -149,10 +198,30 @@
                   divided
                   mandatory
                 >
-                  <v-btn value="month" size="small">Month</v-btn>
-                  <v-btn value="week" size="small">Week</v-btn>
-                  <v-btn value="day" size="small">Day</v-btn>
-                  <v-btn value="list" size="small">List</v-btn>
+                  <v-btn
+                    value="month"
+                    size="small"
+                  >
+                    Month
+                  </v-btn>
+                  <v-btn
+                    value="week"
+                    size="small"
+                  >
+                    Week
+                  </v-btn>
+                  <v-btn
+                    value="day"
+                    size="small"
+                  >
+                    Day
+                  </v-btn>
+                  <v-btn
+                    value="list"
+                    size="small"
+                  >
+                    List
+                  </v-btn>
                 </v-btn-toggle>
               </v-card-title>
               <v-divider />
@@ -161,11 +230,19 @@
                 <table class="calendar-grid">
                   <thead>
                     <tr>
-                      <th v-for="day in weekDays" :key="day">{{ day }}</th>
+                      <th
+                        v-for="day in weekDays"
+                        :key="day"
+                      >
+                        {{ day }}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(week, wi) in calendarWeeks" :key="wi">
+                    <tr
+                      v-for="(week, wi) in calendarWeeks"
+                      :key="wi"
+                    >
                       <td
                         v-for="(day, di) in week"
                         :key="di"
@@ -174,7 +251,9 @@
                           'is-today': day.isToday,
                         }"
                       >
-                        <div class="day-number">{{ day.date }}</div>
+                        <div class="day-number">
+                          {{ day.date }}
+                        </div>
                         <div
                           v-for="(event, ei) in day.events"
                           :key="ei"
@@ -194,7 +273,10 @@
 
         <!-- Row 4: Recent Items + Upcoming Schedule -->
         <v-row>
-          <v-col cols="12" lg="7">
+          <v-col
+            cols="12"
+            lg="7"
+          >
             <RecentItemsList
               title="Recent Bookings"
               action-text="View All"
@@ -202,7 +284,10 @@
               @action="$router.push('/admin/bookings')"
             />
           </v-col>
-          <v-col cols="12" lg="5">
+          <v-col
+            cols="12"
+            lg="5"
+          >
             <UpcomingScheduleCard
               title="Upcoming Schedule"
               :tabs="scheduleTabs"
@@ -214,9 +299,18 @@
         <div class="d-flex align-center justify-space-between mt-8 text-caption text-medium-emphasis">
           <span>© 2026 Made With ❤️ by BookingApp</span>
           <div class="d-flex ga-4">
-            <a href="#" class="text-decoration-none text-medium-emphasis">License</a>
-            <a href="#" class="text-decoration-none text-medium-emphasis">Documentation</a>
-            <a href="#" class="text-decoration-none text-medium-emphasis">Support</a>
+            <a
+              href="#"
+              class="text-decoration-none text-medium-emphasis"
+            >License</a>
+            <a
+              href="#"
+              class="text-decoration-none text-medium-emphasis"
+            >Documentation</a>
+            <a
+              href="#"
+              class="text-decoration-none text-medium-emphasis"
+            >Support</a>
           </div>
         </div>
       </v-container>
