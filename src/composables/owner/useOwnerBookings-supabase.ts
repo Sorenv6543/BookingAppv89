@@ -4,6 +4,7 @@ import { useSupabaseBookings } from '@/composables/supabase/useSupabaseBookings'
 import { useAuthStore } from '@/stores/auth';
 import type { Booking, BookingFormData, BookingStatus, Property } from '@/types';
 import { useSupabaseProperties } from '@/composables/supabase/useSupabaseProperties';
+import { useBookings } from '@/composables/shared/useBookings';
 
 /**
  * Supabase-backed owner booking composable
@@ -14,6 +15,7 @@ export function useOwnerBookings() {
   const supabaseBookings = useSupabaseBookings();
   const supabaseProperties = useSupabaseProperties();
   const bookingStore = useBookingStore();
+  const baseBookings = useBookings();
 
   const currentUserId = computed(() => authStore.user?.id);
 
@@ -187,7 +189,7 @@ export function useOwnerBookings() {
   }
 
   function getMyBookingCleaningWindow(_booking: Booking) {
-    return null;
+    return baseBookings.calculateCleaningWindow(_booking);
   }
 
   const myBookingStats = computed(() => {
@@ -248,8 +250,10 @@ export function useOwnerBookings() {
     return canEditBooking(bookingId);
   }
 
-  const createBooking = async (_bookingData: BookingFormData): Promise<Booking | null> => {
-    return null;
+  const createBooking = async (bookingData: BookingFormData): Promise<Booking | null> => {
+    const bookingId = await createMyBooking(bookingData);
+    if (!bookingId) return null;
+    return myBookings.value.find(booking => booking.id === bookingId) || null;
   };
 
   const getOwnerPerformanceMetrics = computed(() => ({
@@ -284,8 +288,8 @@ export function useOwnerBookings() {
     getMyTurnAlerts,
     calculateMyBookingPriority,
     getMyBookingCleaningWindow,
-    calculateCleaningWindow: () => null,
-    calculateBookingPriority: calculateMyBookingPriority,
+    calculateCleaningWindow: baseBookings.calculateCleaningWindow,
+    calculateBookingPriority: baseBookings.calculateBookingPriority,
     createBooking,
     getOwnerPerformanceMetrics,
     fetchMyProperties

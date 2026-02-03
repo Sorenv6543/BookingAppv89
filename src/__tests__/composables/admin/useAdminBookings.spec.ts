@@ -1,15 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase';
 import { useBookingStore } from '@/stores/booking';
 import { useAuthStore } from '@/stores/auth';
 import type { User, Booking } from '@/types';
 import { setAdminUser, addAdminBookings } from '../../utils/test-utils';
-import { supabaseMock } from '../../utils/supabase-mock';
-
-vi.mock('@/plugins/supabase', () => ({
-  supabase: supabaseMock
-}));
 
 describe('useAdminBookings (Role-Based)', () => {
   beforeEach(() => {

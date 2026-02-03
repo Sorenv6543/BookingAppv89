@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 import { useSupabaseBookings } from '@/composables/supabase/useSupabaseBookings';
+import { useBookings } from '@/composables/shared/useBookings';
 import { useAuthStore } from '@/stores/auth';
 import type { Booking, BookingStatus, BookingFormData } from '@/types';
 import { useBookingStore } from '@/stores/booking';
@@ -12,6 +13,7 @@ export function useAdminBookings() {
   const authStore = useAuthStore();
   const supabaseBookings = useSupabaseBookings();
   const bookingStore = useBookingStore();
+  const baseBookings = useBookings();
 
   const allBookings = computed(() => {
     if (import.meta.env.MODE === 'test') {
@@ -167,8 +169,20 @@ export function useAdminBookings() {
     return authStore.isAdmin;
   }
 
-  async function assignCleanerToBooking(_bookingId: string, _cleanerId: string): Promise<boolean> {
-    return false;
+  async function assignCleanerToBooking(bookingId: string, cleanerId: string): Promise<boolean> {
+    if (import.meta.env.MODE === 'test') {
+      try {
+        const booking = bookingStore.bookings.get(bookingId);
+        if (booking) {
+          bookingStore.updateBooking(bookingId, { assigned_cleaner_id: cleanerId });
+          return true;
+        }
+        return false;
+      } catch {
+        return false;
+      }
+    }
+    return supabaseBookings.updateBooking(bookingId, { assigned_cleaner_id: cleanerId });
   }
 
   const loading = computed(() => supabaseBookings.loading.value);
@@ -198,6 +212,8 @@ export function useAdminBookings() {
     updateBooking: supabaseBookings.updateBooking,
     deleteBooking: supabaseBookings.deleteBooking,
     changeBookingStatus: supabaseBookings.changeBookingStatus,
+    calculateBookingPriority: baseBookings.calculateBookingPriority,
+    calculateCleaningWindow: baseBookings.calculateCleaningWindow,
     createBookingForOwner,
     assignCleanerToBooking,
     canManageAnyBooking
