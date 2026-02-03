@@ -142,21 +142,24 @@ export const usePropertyStore = defineStore('property', () => {
     error.value = null;
     
     try {
-      console.log('🔍 [PropertyStore] Starting database query...');
-      if (import.meta.env.DEV) console.log('🔍 fetchProperties: Starting database query...');
-      const { data, error: supaError } = await supabase.from('properties').select('*');
-      if (supaError) throw supaError;
+console.log('🔍 [PropertyStore] Starting database query...');
+const { data, error: supaError } = await supabase.from('properties').select('*');
 
-      if (import.meta.env.DEV) console.log('🔍 fetchProperties: Raw data from database:', data);
+if (supaError) {
+  console.error('❌ [PropertyStore] Supabase error:', supaError);
+  throw supaError;
+}
 
-      properties.value.clear();
-      if (data) {
-        for (const prop of data) {
-          properties.value.set(prop.id, prop);
-        }
-      }
+console.log('✅ [PropertyStore] Raw data from database:', data);
 
-      if (import.meta.env.DEV) console.log('🔍 fetchProperties: Final properties map size:', properties.value.size);
+properties.value.clear();
+if (data) {
+  for (const prop of data) {
+    properties.value.set(prop.id, prop);
+  }
+}
+
+console.log('✅ [PropertyStore] Final properties map size:', properties.value.size);
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch properties.';
       console.error('❌ [PropertyStore] fetchProperties error:', err);
