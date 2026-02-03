@@ -208,12 +208,17 @@ function useOwnerBookingsPinia() {
           throw new Error('You can only create bookings for your own properties');
         }
         
+
         // Create booking data with owner_id automatically set
         const ownerBookingData: BookingFormData = {
           ...formData,
           owner_id: currentUserId.value
         };
         
+        console.log('📅 Booking dates:', {
+  checkin: formData.checkin_date,
+  checkout: formData.checkout_date
+});
         // Use base composable's create function
         const bookingId = await baseBookings.createBooking(ownerBookingData);
         

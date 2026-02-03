@@ -32,15 +32,18 @@ export function useBookings() {
       }
       
       // Validate dates
-      const checkoutDate = new Date(formData.checkout_date as string);
       const checkinDate = new Date(formData.checkin_date as string);
+      const checkoutDate = new Date(formData.checkout_date as string);
       
 
       
       if (isNaN(checkoutDate.getTime()) || isNaN(checkinDate.getTime())) {
         throw new Error('Invalid dates provided');
       }
-      
+      console.log('📅 Booking dates:', {
+  checkin: formData.checkin_date,
+  checkout: formData.checkout_date
+});
       // Validate dates are in correct order (checkin before or same as checkout for guest stay)
       if (checkinDate > checkoutDate) {
         throw new Error('Check-in date must be before or same as check-out date (guest stay)');
@@ -75,7 +78,7 @@ export function useBookings() {
       
 
       
-      // Add to store (which calls Supabase)
+      // Add to store (which callsSB)
       await bookingStore.addBooking(newBooking);
       
       success.value = 'Booking created successfully';
@@ -141,7 +144,7 @@ export function useBookings() {
         updates.booking_type = isSameDay ? 'turn' : 'standard';
       }
       
-      // Update booking in store (which calls Supabase)
+      // Update booking in store (which callsSB)
       await bookingStore.updateBooking(id, updates);
       
       success.value = 'Booking updated successfully';
@@ -168,7 +171,7 @@ export function useBookings() {
         throw new Error('Booking not found');
       }
       
-      // Remove from store (which calls Supabase)
+      // Remove from store (which callsSB)
       await bookingStore.removeBooking(id);
       
       success.value = 'Booking deleted successfully';
@@ -207,7 +210,7 @@ export function useBookings() {
         throw new Error(`Cannot transition from ${booking.status} to ${status}`);
       }
       
-      // Update status in store (which calls Supabase)
+      // Update status in store (which callsSB)
       await bookingStore.updateBookingStatus(id, status);
       
       success.value = 'Booking status updated successfully';
@@ -236,7 +239,7 @@ export function useBookings() {
       // In a real app, we would validate the cleaner exists
       // For now, we'll just update the booking
       
-      // Update cleaner assignment in store (which calls Supabase)
+      // Update cleaner assignment in store (which callsSB)
       await bookingStore.assignCleaner(bookingId, cleanerId);
       
       success.value = 'Cleaner assigned successfully';

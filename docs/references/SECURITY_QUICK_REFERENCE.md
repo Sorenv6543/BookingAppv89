@@ -7,9 +7,9 @@ Branch: `CHECKPOINT`
 
 ## 🚨 IMMEDIATE ACTIONS (DO NOW)
 
-### 1. Rotate Supabase Credentials ⏰ CRITICAL
+### 1. Rotate base Credentials ⏰ CRITICAL
 ```bash
-# Go to: https://app.supabase.com/project/otmfvzkokrxduipxkyga
+# Go to: https://app.base.com/project/otmfvzkokrxduipxkyga
 # Settings > API > Regenerate new anon key
 # Settings > Access Tokens > Create new token
 ```
@@ -21,8 +21,8 @@ cp .env.example .env.local
 cp .cursor/mcp.json.example .cursor/mcp.json
 
 # Edit .env.local with YOUR credentials
-VITE_SUPABASE_URL=https://<YOUR-PROJECT>.supabase.co
-VITE_SUPABASE_ANON_KEY=<YOUR-KEY>
+VITE_BASE_URL=https://<YOUR-PROJECT>.base.co
+VITE_BASE_ANON_KEY=<YOUR-KEY>
 ```
 
 ### 3. Update Code Calling `create_admin_user()`
@@ -33,10 +33,10 @@ VITE_SUPABASE_ANON_KEY=<YOUR-KEY>
 const userId = await createAdminUser('admin@example.com', 'Admin User');
 
 // NEW (USE THIS)
-import { supabase } from '@/lib/supabase';
+import { base } from '@/lib/base';
 
 // First create auth user
-const { data: authUser } = await supabase.auth.admin.createUser({
+const { data: authUser } = await base.auth.admin.createUser({
   email: 'admin@example.com',
   password: 'temp-password'
 });
@@ -74,10 +74,10 @@ const userId = await createAdminUser(authUser.user.id, 'admin@example.com', 'Adm
 ## 📋 Key Changes by File
 
 ### SQL Security Fixes
-- ✅ `supabase/combined_migration.sql` - 5 major fixes
-- ✅ `supabase/fix_handle_new_user_trigger.sql` - Enum validation
-- ✅ `supabase/fix_signup_complete.sql` - Enum validation + RLS fix
-- ✅ `supabase/check_logs.sql` - Fixed misleading comments
+- ✅ `base/combined_migration.sql` - 5 major fixes
+- ✅ `base/fix_handle_new_user_trigger.sql` - Enum validation
+- ✅ `base/fix_signup_complete.sql` - Enum validation + RLS fix
+- ✅ `base/check_logs.sql` - Fixed misleading comments
 
 ### Configuration Files
 - ✅ `.env.example` - Created template
@@ -87,7 +87,7 @@ const userId = await createAdminUser(authUser.user.id, 'admin@example.com', 'Adm
 
 ### Documentation
 - ✅ `CLAUDE.md` - Fixed "Production Ready" status
-- ✅ `SUPABASE_SETUP_INSTRUCTIONS.md` - Parameterized
+- ✅ `BASE_SETUP_INSTRUCTIONS.md` - Parameterized
 - ✅ `environment-setup.sh` - Replaced credentials
 - ✅ Created `SECURITY_FIXES_COMMIT.md` - Full details
 - ✅ Created `SECURITY_AUDIT_COMPLETION_REPORT.md` - This file
@@ -151,16 +151,16 @@ CREATE FUNCTION public.create_admin_user(
 
 ### `.env.example` - Environment Variables Template
 ```bash
-VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=<your-anon-key>
+VITE_BASE_URL=https://<your-project-ref>.base.co
+VITE_BASE_ANON_KEY=<your-anon-key>
 ```
 
 ### `.cursor/mcp.json.example` - Cursor IDE MCP Config
 ```json
 {
   "mcpServers": {
-    "supabase": {
-      "args": ["...", "${SUPABASE_ACCESS_TOKEN}"]
+    "base": {
+      "args": ["...", "${BASE_ACCESS_TOKEN}"]
     }
   }
 }
@@ -208,12 +208,12 @@ git show 02874b7 --stat
 ### Update Environment Variables
 ```bash
 # Vercel / Netlify
-SUPABASE_ACCESS_TOKEN=<your-new-token>
-VITE_SUPABASE_URL=https://<project-ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=<new-anon-key>
+BASE_ACCESS_TOKEN=<your-new-token>
+VITE_BASE_URL=https://<project-ref>.base.co
+VITE_BASE_ANON_KEY=<new-anon-key>
 
 # CI/CD Pipelines
-export SUPABASE_ACCESS_TOKEN=<service-account-token>
+export BASE_ACCESS_TOKEN=<service-account-token>
 ```
 
 ### Database Backup Before Migration
@@ -249,4 +249,4 @@ A: Yes - `create_admin_user()` now requires `auth_user_id` parameter (BREAKING).
 - See `SECURITY_AUDIT_COMPLETION_REPORT.md` for comprehensive report
 - Check git commit `02874b7` for all changes
 
-**Remember**: Rotate Supabase credentials FIRST before anything else! 🔐
+**Remember**: Rotate base credentials FIRST before anything else! 🔐

@@ -3,7 +3,7 @@
 ## Problem
 User signup fails with a 500 error: "Database error saving new user"
 
-## Root Cause (Confirmed by Supabase AI)
+## Root Cause (Confirmed by base AI)
 **ERROR: type "user_role" does not exist (SQLSTATE 42704)**
 
 The enum types were never created in the database:
@@ -20,13 +20,13 @@ When the `handle_new_user()` trigger tries to insert into `user_profiles` with `
 
 ## Solution - Apply This Fix
 
-### Step 1: Open Supabase SQL Editor
+### Step 1: Open base SQL Editor
 
-Go to: **https://supabase.com/dashboard/project/otmfvzkokrxduipxkyga/sql/new**
+Go to: **https://base.com/dashboard/project/otmfvzkokrxduipxkyga/sql/new**
 
 ### Step 2: Copy and Run the Complete Fix Script
 
-**UPDATED FIX:** Copy **ALL** contents from: `supabase/FIX_MISSING_ENUMS.sql`
+**UPDATED FIX:** Copy **ALL** contents from: `base/FIX_MISSING_ENUMS.sql`
 
 This script will:
 1. **Create all missing enum types** (user_role, booking_type, etc.)
@@ -126,7 +126,7 @@ After running the script, you should see:
 
 ### Step 5: Verify User Was Created
 
-Run this query in Supabase SQL Editor:
+Run this query in base SQL Editor:
 
 ```sql
 -- Check user profiles were created
@@ -208,8 +208,8 @@ ALTER FUNCTION public.handle_new_user() OWNER TO postgres;
 
 ### If signup still fails:
 
-1. **Check Supabase logs:**
-   - Go to: https://supabase.com/dashboard/project/otmfvzkokrxduipxkyga/logs
+1. **Check base logs:**
+   - Go to: https://base.com/dashboard/project/otmfvzkokrxduipxkyga/logs
    - Look for errors mentioning "handle_new_user"
 
 2. **Verify trigger exists:**
@@ -244,13 +244,13 @@ ALTER FUNCTION public.handle_new_user() OWNER TO postgres;
 
 After signup works:
 
-1. ✅ Commit updated `supabase/combined_migration.sql` to git
+1. ✅ Commit updated `base/combined_migration.sql` to git
 2. ✅ Test login with newly created user
 3. ✅ Verify role-based access works (Owner dashboard)
-4. ✅ Update `SUPABASE_SETUP_INSTRUCTIONS.md` with this fix
+4. ✅ Update `BASE_SETUP_INSTRUCTIONS.md` with this fix
 
 ## Files Updated
 
-- ✅ `supabase/APPLY_THIS_FIX.sql` - Complete fix script
-- ✅ `supabase/combined_migration.sql` - Updated with proper trigger configuration
+- ✅ `base/APPLY_THIS_FIX.sql` - Complete fix script
+- ✅ `base/combined_migration.sql` - Updated with proper trigger configuration
 - ✅ `FIX_SIGNUP_ERROR.md` - This document

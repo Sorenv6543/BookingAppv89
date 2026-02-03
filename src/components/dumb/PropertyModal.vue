@@ -61,7 +61,7 @@
                 <v-text-field
                   v-model="form.address"
                   label="Property Address"
-                  :rules="addressRules"
+                 
                   required
                   variant="outlined"
                   :disabled="loading"
