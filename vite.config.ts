@@ -162,9 +162,9 @@ export default defineConfig({
       '@layouts': path.resolve(__dirname, './src/layouts'),
       '@pages': path.resolve(__dirname, './src/pages'),
       '@plugins': path.resolve(__dirname, './src/plugins'),
-      '@assets': path.resolve(__dirname, './src/assets'),
-      // Fix Vue runtime compilation warning by using full build with template compiler
-      'vue': 'vue/dist/vue.esm-bundler.js'
+      '@assets': path.resolve(__dirname, './src/assets')
+      // Note: Removed 'vue': 'vue/dist/vue.esm-bundler.js' alias to fix
+      // "Slot invoked outside of render function" warnings from Vuetify
     }
   },
   // Define build-time feature flags for role-based features

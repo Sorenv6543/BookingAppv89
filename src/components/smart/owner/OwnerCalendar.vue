@@ -21,6 +21,7 @@ import { ref, watch, nextTick, onMounted } from 'vue';
 import FullCalendar from '@/components/smart/FullCalendar.vue';
 import type { Booking, Property } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import type { EventResizeDoneArg } from '@fullcalendar/interaction';
 
 
 console.log('🔄 [OwnerCalendar] Script setup running...');
@@ -37,7 +38,7 @@ interface Emits {
   (e: 'dateSelect', selectInfo: DateSelectArg): void;
   (e: 'eventClick', clickInfo: EventClickArg): void;
   (e: 'eventDrop', dropInfo: EventDropArg): void;
-  (e: 'eventResize', resizeInfo: EventDropArg): void;
+  (e: 'eventResize', resizeInfo: EventResizeDoneArg): void;
   (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
   (e: 'viewChange', view: string): void;
   (e: 'dateChange', date: Date): void;
@@ -73,7 +74,7 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
   emit('eventDrop', dropInfo);
 };
 
-const handleEventResize = (resizeInfo: EventDropArg): void => {
+const handleEventResize = (resizeInfo: EventResizeDoneArg): void => {
   console.log('🔄 [OwnerCalendar] Event resized:', resizeInfo.event.id);
   emit('eventResize', resizeInfo);
 };

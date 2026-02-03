@@ -4,6 +4,7 @@ import { useBookingStore } from '@/stores/booking';
 import { usePropertyStore } from '@/stores/property';
 import { useUIStore } from '@/stores/ui';
 import type { Booking, BookingStatus, BookingType } from '@/types';
+import type { EventClickArg } from '@fullcalendar/core';
 
 /**
  * Admin-specific calendar state composable
@@ -182,7 +183,7 @@ export function useAdminCalendarState() {
    */
   // Fix the TypeScript any type issue here
   
-  function handleAdminEventClick(eventInfo: any) {
+  function handleAdminEventClick(eventInfo: EventClickArg) {
     const booking = eventInfo.event.extendedProps.booking as Booking;
     
     // Admin-specific logic: show different options based on booking state

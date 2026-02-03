@@ -138,7 +138,7 @@ export interface ToastNotification {
   details?: string;
   showProgress?: boolean;
   progressValue?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface Props {
@@ -271,7 +271,9 @@ watch(
 // Critical notification audio alert
 const playAudioAlert = () => {
   if (props.notification.priority === 'critical') {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    // Type assertion for webkit audio context compatibility
+    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const audioContext = new AudioContextClass();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     

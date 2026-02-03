@@ -3,7 +3,11 @@
     <v-card-title class="text-h6 font-weight-bold pb-0">
       {{ title }}
     </v-card-title>
-    <v-tabs v-model="activeTab" density="compact" class="px-4">
+    <v-tabs
+      v-model="activeTab"
+      density="compact"
+      class="px-4"
+    >
       <v-tab
         v-for="(tab, i) in tabs"
         :key="i"
@@ -20,7 +24,11 @@
         :key="i"
         :value="i"
       >
-        <v-list v-if="tab.items.length" lines="two" density="compact">
+        <v-list
+          v-if="tab.items.length"
+          lines="two"
+          density="compact"
+        >
           <v-list-item
             v-for="(item, j) in tab.items"
             :key="j"
@@ -42,7 +50,10 @@
             </v-list-item-subtitle>
           </v-list-item>
         </v-list>
-        <v-card-text v-else class="text-center text-medium-emphasis py-8">
+        <v-card-text
+          v-else
+          class="text-center text-medium-emphasis py-8"
+        >
           No upcoming items
         </v-card-text>
       </v-window-item>

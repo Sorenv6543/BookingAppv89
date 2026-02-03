@@ -444,7 +444,7 @@ const availableSkills = [
 
 // Validation rules
 const rules = {
-  required: (value: any) => !!value || 'This field is required',
+  required: (value: string | number | boolean | null | undefined) => !!value || 'This field is required',
   email: (value: string) => {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return pattern.test(value) || 'Invalid email address'

@@ -31,6 +31,9 @@
     "perf:regression": "vitest run src/__tests__/utils/performance-regression.spec.ts",
     "perf:analysis": "pnpm perf:bundle && pnpm perf:regression",
     "perf:report": "pnpm perf:analysis && echo 'Performance analysis complete. See performance-bundle-report.json for details.'",
+    "test:supabase": "npx tsx scripts/test-supabase-integration.ts",
+    "db:push": "supabase db push",
+    "db:status": "supabase migration list",
     "mcp": "ruler apply",
     "mcp:revert": "ruler revert"
   },
@@ -50,7 +53,7 @@
     "pinia": "^2.1.7",
     "unplugin-fonts": "^1.4.0",
     "uuid": "^11.1.0",
-    "vue": "^3.4.15",
+    "vue": "^3.5.27",
     "vue-router": "^4.2.5",
     "vuetify": "^3.11.8"
   },
@@ -77,6 +80,7 @@
     "prettier": "^3.5.3",
     "sass-embedded": "^1.88.0",
     "supabase": "^2.30.4",
+    "tsx": "^4.21.0",
     "typescript": "~5.3.3",
     "vite": "^5.0.12",
     "vite-plugin-css-injected-by-js": "^3.5.2",

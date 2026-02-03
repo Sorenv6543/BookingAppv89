@@ -40,7 +40,13 @@
         </div>
       </div>
       <div class="welcome-illustration d-none d-sm-flex align-center justify-center">
-        <v-icon size="120" color="white" style="opacity: 0.15">mdi-home-city</v-icon>
+        <v-icon
+          size="120"
+          color="white"
+          style="opacity: 0.15"
+        >
+          mdi-home-city
+        </v-icon>
       </div>
     </div>
   </v-card>

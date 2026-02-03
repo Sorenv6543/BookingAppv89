@@ -274,6 +274,7 @@ import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 // Types
 import type { Booking, Property, BookingFormData, PropertyFormData, ModalData } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
+import type { EventResizeDoneArg } from '@fullcalendar/interaction';
 
 // Import event logger for component communication
 import eventLogger from '@/composables/shared/useComponentEventLogger';
@@ -683,7 +684,7 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
   }
 };
 
-const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
+const handleEventResize = async (resizeInfo: EventResizeDoneArg): Promise<void> => {
   const booking = resizeInfo.event.extendedProps.booking as Booking;
   
   // Verify owner can modify this booking
@@ -839,7 +840,15 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     const editBooking = eventModalData.value;
 
     if (mode === 'create') {
-      await createSupabaseBooking(bookingData as BookingFormData);
+      console.log('🔍 [DEBUG] HomeOwner - Calling createSupabaseBooking...');
+      const bookingId = await createSupabaseBooking(bookingData as BookingFormData);
+      console.log('🔍 [DEBUG] HomeOwner - createSupabaseBooking result:', bookingId);
+      
+      if (!bookingId) {
+        console.error('❌ [HomeOwner] Booking creation failed - no ID returned');
+        throw new Error('Failed to create booking. Please try again.');
+      }
+      console.log('✅ [HomeOwner] Booking created successfully:', bookingId);
     } else if (editBooking) {
       // Verify owner can update this booking
       if (!editBooking.id || !ownerBookingsMap.value.has(editBooking.id)) {
@@ -850,7 +859,9 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     }
     uiStore.closeModal('eventModal');
   } catch (error) {
-    console.error('Failed to save your booking:', error);
+    console.error('❌ Failed to save your booking:', error);
+    // Show error to user - don't silently fail
+    alert(error instanceof Error ? error.message : 'Failed to save booking');
   }
 };
 

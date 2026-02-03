@@ -14,7 +14,9 @@
             size="42"
             variant="tonal"
           >
-            <v-icon size="22">{{ card.icon ?? 'mdi-chart-line' }}</v-icon>
+            <v-icon size="22">
+              {{ card.icon ?? 'mdi-chart-line' }}
+            </v-icon>
           </v-avatar>
           <v-chip
             v-if="card.trend"
@@ -25,9 +27,16 @@
             {{ card.trend }}
           </v-chip>
         </div>
-        <div class="text-h5 font-weight-bold mb-1">{{ card.value }}</div>
-        <div class="text-body-2 text-medium-emphasis">{{ card.title }}</div>
-        <div v-if="card.subtitle" class="text-caption text-disabled mt-1">
+        <div class="text-h5 font-weight-bold mb-1">
+          {{ card.value }}
+        </div>
+        <div class="text-body-2 text-medium-emphasis">
+          {{ card.title }}
+        </div>
+        <div
+          v-if="card.subtitle"
+          class="text-caption text-disabled mt-1"
+        >
           {{ card.subtitle }}
         </div>
       </v-card>

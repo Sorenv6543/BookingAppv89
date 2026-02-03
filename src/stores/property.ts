@@ -143,11 +143,11 @@ export const usePropertyStore = defineStore('property', () => {
     error.value = null;
     
     try {
-      __DEV__ && console.log('🔍 fetchProperties: Starting database query...');
+      if (__DEV__) console.log('🔍 fetchProperties: Starting database query...');
       const { data, error: supaError } = await supabase.from('properties').select('*');
       if (supaError) throw supaError;
 
-      __DEV__ && console.log('🔍 fetchProperties: Raw data from database:', data);
+      if (__DEV__) console.log('🔍 fetchProperties: Raw data from database:', data);
 
       properties.value.clear();
       if (data) {
@@ -156,7 +156,7 @@ export const usePropertyStore = defineStore('property', () => {
         }
       }
 
-      __DEV__ && console.log('🔍 fetchProperties: Final properties map size:', properties.value.size);
+      if (__DEV__) console.log('🔍 fetchProperties: Final properties map size:', properties.value.size);
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch properties.';
       console.error('fetchProperties error:', err);
@@ -248,8 +248,8 @@ export const usePropertyStore = defineStore('property', () => {
     }
   }
   
-  function setPropertyActiveStatus(id: string, active: boolean) {
-    updateProperty(id, { active });
+  async function setPropertyActiveStatus(id: string, active: boolean) {
+    await updateProperty(id, { active });
   }
   
   function clearAll() {

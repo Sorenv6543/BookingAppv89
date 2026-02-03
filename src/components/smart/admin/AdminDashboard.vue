@@ -268,7 +268,7 @@
                 
                 <v-card-text>
                   <v-row>
-                      <!-- Schedule Insights -->
+                    <!-- Schedule Insights -->
                     <v-col
                       cols="12"
                       md="8"

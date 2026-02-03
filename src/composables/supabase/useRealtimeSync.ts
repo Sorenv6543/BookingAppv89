@@ -337,7 +337,7 @@ export function useRealtimeSync() {
     
     subscriptions.value.forEach(subscription => {
       if (subscription) {
-        supabase.removeChannel(subscription as any);
+        subscription.unsubscribe();
       }
     });
     

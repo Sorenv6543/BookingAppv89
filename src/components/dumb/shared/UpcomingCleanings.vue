@@ -251,13 +251,12 @@
                         <div class="d-flex flex-column">
                           <span>Checkout: {{ formatTime(safeString(booking.checkout_date)) }}</span>
                           <span>Checkin: {{ formatTime(safeString(booking.checkin_date)) }}</span>
-                          class="text-caption"
-                          >
-                          <v-icon
-                            icon="mdi-timer-outline"
-                            size="small"
-                          />
-                          Window: {{ getCleaningWindowText(booking) }}
+                          <span class="text-caption">
+                            <v-icon
+                              icon="mdi-timer-outline"
+                              size="small"
+                            />
+                            Window: {{ getCleaningWindowText(booking) }}
                           </span>
                         </div>
                       </v-list-item-subtitle>

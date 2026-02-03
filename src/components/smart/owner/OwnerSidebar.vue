@@ -135,8 +135,8 @@
             <div class="property-content">
               <div
                 class="property-title"
-                @click.stop="editProperty(property)"
                 style="cursor: pointer;"
+                @click.stop="editProperty(property)"
               >
                 {{ property.name }}
               </div>

@@ -256,7 +256,7 @@ export function useCalendarState() {
       );
     });
 
-    __DEV__ && console.log(`🔍 [useCalendarState] Filtered ${bookings.length} bookings down to ${filtered.length}`);
+    if (__DEV__) console.log(`🔍 [useCalendarState] Filtered ${bookings.length} bookings down to ${filtered.length}`);
 
     return filtered;
     } catch (error) {

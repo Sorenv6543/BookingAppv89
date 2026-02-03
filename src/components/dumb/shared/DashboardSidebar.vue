@@ -10,8 +10,17 @@
   >
     <!-- Logo / Brand -->
     <div class="sidebar-brand d-flex align-center pa-4 mb-2">
-      <v-avatar :color="dark ? '#7C6DF0' : 'primary'" size="36" class="mr-3">
-        <v-icon color="white" size="20">mdi-rhombus-split</v-icon>
+      <v-avatar
+        :color="dark ? '#7C6DF0' : 'primary'"
+        size="36"
+        class="mr-3"
+      >
+        <v-icon
+          color="white"
+          size="20"
+        >
+          mdi-rhombus-split
+        </v-icon>
       </v-avatar>
       <div v-if="!rail">
         <div :class="['text-subtitle-2 font-weight-bold', dark ? 'text-white' : '']">
@@ -23,7 +32,10 @@
       </div>
     </div>
 
-    <v-divider :class="dark ? 'border-opacity-10' : ''" class="mb-2" />
+    <v-divider
+      :class="dark ? 'border-opacity-10' : ''"
+      class="mb-2"
+    />
 
     <!-- Navigation Groups -->
     <v-list
@@ -32,7 +44,10 @@
       class="px-2"
       :bg-color="dark ? '#2B2C40' : undefined"
     >
-      <template v-for="(group, gi) in groups" :key="gi">
+      <template
+        v-for="(group, gi) in groups"
+        :key="gi"
+      >
         <!-- Group Header -->
         <v-list-subheader
           v-if="group.title"
@@ -44,9 +59,15 @@
           {{ rail ? '' : group.title }}
         </v-list-subheader>
 
-        <template v-for="(item, ii) in group.items" :key="`${gi}-${ii}`">
+        <template
+          v-for="(item, ii) in group.items"
+          :key="`${gi}-${ii}`"
+        >
           <!-- Expandable group -->
-          <v-list-group v-if="item.children?.length" :value="`${gi}-${ii}`">
+          <v-list-group
+            v-if="item.children?.length"
+            :value="`${gi}-${ii}`"
+          >
             <template #activator="{ props: activatorProps }">
               <v-list-item
                 v-bind="activatorProps"
@@ -80,7 +101,10 @@
             rounded="lg"
             @click="item.to && $emit('navigate', item.to)"
           >
-            <template v-if="item.badge" #append>
+            <template
+              v-if="item.badge"
+              #append
+            >
               <v-chip
                 :color="item.badgeColor ?? 'error'"
                 size="x-small"

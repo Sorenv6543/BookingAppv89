@@ -99,7 +99,7 @@ export function useSupabaseBookings() {
       return transformedBookings;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch bookings';
-      __DEV__ && console.error('Supabase booking fetch error:', err);
+      if (__DEV__) console.error('Supabase booking fetch error:', err);
       return [];
     } finally {
       loading.value = false;
@@ -115,13 +115,27 @@ export function useSupabaseBookings() {
     
     try {
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      console.log('🔍 [useSupabaseBookings] createBooking called with:', formData);
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) {
+        console.error('❌ [useSupabaseBookings] Auth error:', authError);
+        throw new Error(`Authentication error: ${authError.message}`);
+      }
+      
+      if (!user) {
+        console.error('❌ [useSupabaseBookings] No user found');
+        throw new Error('Not authenticated');
+      }
+      
+      console.log('🔍 [useSupabaseBookings] User authenticated:', user.id);
       
       const bookingData = {
         ...formData,
         owner_id: user.id // Automatic owner assignment
       };
+      
+      console.log('🔍 [useSupabaseBookings] Inserting booking:', bookingData);
       
       const { data, error: createError } = await supabase
         .from('bookings')
@@ -129,7 +143,12 @@ export function useSupabaseBookings() {
         .select()
         .single();
       
-      if (createError) throw createError;
+      if (createError) {
+        console.error('❌ [useSupabaseBookings] Insert error:', createError);
+        throw createError;
+      }
+      
+      console.log('✅ [useSupabaseBookings] Booking created:', data);
       
       // Add to local state for immediate UI update
       if (data) {
@@ -141,7 +160,7 @@ export function useSupabaseBookings() {
       return data?.id || null;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to create booking';
-      console.error('Supabase booking creation error:', err);
+      console.error('❌ Supabase booking creation error:', err);
       return null;
     } finally {
       loading.value = false;
@@ -306,7 +325,7 @@ export function useSupabaseBookings() {
           table: 'bookings'
         },
         (payload) => {
-          __DEV__ && console.log('Booking change received:', payload.eventType);
+          if (__DEV__) console.log('Booking change received:', payload.eventType);
 
           switch (payload.eventType) {
             case 'INSERT':
@@ -335,7 +354,7 @@ export function useSupabaseBookings() {
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           subscriptionRetryCount = 0;
-          __DEV__ && console.log('Subscribed to booking changes');
+          if (__DEV__) console.log('Subscribed to booking changes');
         } else if (status === 'CHANNEL_ERROR') {
           console.error('Booking subscription error, retrying...');
           // Retry with backoff on channel error (common on Supabase free tier)
