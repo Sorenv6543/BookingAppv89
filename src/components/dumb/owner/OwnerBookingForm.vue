@@ -244,7 +244,7 @@ interface Props {
   modelValue: boolean
   mode: 'create' | 'edit'
   booking?: Booking | null
-  properties: Property[]
+  properties: Map<string, Property>
   loading?: boolean
   errors?: Map<string, string[]>
 }
@@ -298,7 +298,7 @@ const submitButtonText = computed(() => {
 })
 
 const propertiesArray = computed(() => {
-  return Array.from(props.properties).map(property => ({
+  return Array.from(props.properties.values()).map(property => ({
     id: property.id,
     name: property.name,
     address: property.address
@@ -308,7 +308,7 @@ const propertiesArray = computed(() => {
 // Get selected property for default times
 const selectedProperty = computed((): Property | undefined => {
   if (!form.value.property_id) return undefined;
-  return props.properties.find(p => p.id === form.value.property_id);
+  return props.properties.get(form.value.property_id);
 });
 
 // Time validation rules and hints
@@ -445,7 +445,7 @@ watch(() => props.booking, (newBooking) => {
 // Watch for property selection to set default times
 watch(() => form.value.property_id, (newPropertyId) => {
   if (newPropertyId && props.mode === 'create') {
-    const property = props.properties.find(p => p.id === newPropertyId);
+    const property = props.properties.get(newPropertyId);
     if (property) {
       const defaultTimes = getDefaultTimes(property);
       // Only set defaults if times are not already set

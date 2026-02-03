@@ -401,7 +401,7 @@ import { safeDepartureDate } from '@/utils/typeHelpers'
 // Props
 interface Props {
   turns: Booking[]
-  properties: Property[]
+  properties: Map<string, Property>
   cleaners: Cleaner[]
   propertyOwners: Array<{ id: string; name: string }>
   loading?: boolean
@@ -600,12 +600,12 @@ const formatDateTime = (dateTime: string) => {
 }
 
 const getPropertyName = (propertyId: string) => {
-  const property = props.properties.find(p => p.id === propertyId)
+  const property = props.properties.get(propertyId)
   return property?.name || 'Unknown Property'
 }
 
 const getPropertyAddress = (propertyId: string) => {
-  const property = props.properties.find(p => p.id === propertyId)
+  const property = props.properties.get(propertyId)
   return property?.address || 'Unknown Address'
 }
 
