@@ -2,7 +2,7 @@ import { computed } from 'vue';
 import { useBookingStore } from '@/stores/booking';
 import { useSupabaseBookings } from '@/composables/supabase/useSupabaseBookings';
 import { useAuthStore } from '@/stores/auth';
-import type { Booking, BookingFormData, BookingStatus, Property } from '@/types';
+import type { Booking, BookingFormData, BookingStatus } from '@/types';
 import { useSupabaseProperties } from '@/composables/supabase/useSupabaseProperties';
 import { useBookings } from '@/composables/shared/useBookings';
 

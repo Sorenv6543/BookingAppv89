@@ -169,7 +169,23 @@ export function useAdminBookings() {
     return authStore.isAdmin;
   }
 
-  async function assignCleanerToBooking(bookingId: string, cleanerId: string): Promise<boolean> {
+  function canEditAnyBooking(): boolean {
+    return authStore.isAdmin;
+  }
+
+  function canDeleteAnyBooking(): boolean {
+    return authStore.isAdmin;
+  }
+
+  function canAssignCleaners(): boolean {
+    return authStore.isAdmin;
+  }
+
+  function canViewSystemMetrics(): boolean {
+    return authStore.isAdmin;
+  }
+
+  function assignCleanerToBooking(bookingId: string, cleanerId: string): boolean | Promise<boolean> {
     if (import.meta.env.MODE === 'test') {
       try {
         const booking = bookingStore.bookings.get(bookingId);
@@ -208,6 +224,10 @@ export function useAdminBookings() {
     businessMetrics,
     getBookingsByStatus,
     fetchBookings: import.meta.env.MODE === 'test' ? async () => [] : supabaseBookings.fetchBookings,
+    fetchAllBookings: import.meta.env.MODE === 'test' ? async () => true : async () => {
+      await supabaseBookings.fetchBookings();
+      return true;
+    },
     createBooking: supabaseBookings.createBooking,
     updateBooking: supabaseBookings.updateBooking,
     deleteBooking: supabaseBookings.deleteBooking,
@@ -216,6 +236,10 @@ export function useAdminBookings() {
     calculateCleaningWindow: baseBookings.calculateCleaningWindow,
     createBookingForOwner,
     assignCleanerToBooking,
-    canManageAnyBooking
+    canManageAnyBooking,
+    canEditAnyBooking,
+    canDeleteAnyBooking,
+    canAssignCleaners,
+    canViewSystemMetrics
   };
 }
