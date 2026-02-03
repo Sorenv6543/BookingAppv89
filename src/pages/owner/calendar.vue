@@ -162,7 +162,7 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue';
 import OwnerCalendar from '@/components/smart/owner/OwnerCalendar.vue';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 import { useUIStore } from '@/stores/ui';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';

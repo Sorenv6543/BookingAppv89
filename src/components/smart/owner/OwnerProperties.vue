@@ -257,7 +257,7 @@ import ConfirmationDialog from '@/components/dumb/shared/ConfirmationDialog.vue'
 
 // ✅ SAME COMPOSABLES AS HomeOwner.vue - SINGLE SOURCE OF TRUTH MAINTAINED
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties'
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings'
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import type { Property, PropertyFormData } from '@/types'

@@ -134,7 +134,7 @@ import FullCalendar from '@/components/smart/FullCalendar.vue';
 import AdminBookingForm from '@/components/dumb/admin/AdminBookingForm.vue';
 
 import { useAdminCalendarState } from '@/composables/admin/useAdminCalendarState';
-import { useAdminBookings } from '@/composables/admin/useAdminBookings';
+import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase';
 import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
 import type { Booking, User, Cleaner, BookingFormData } from '@/types'
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core'
