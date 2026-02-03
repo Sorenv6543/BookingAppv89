@@ -87,7 +87,7 @@ function createMockAuthStore(userRole: 'owner' | 'admin', userId: string) {
       }
     },
     $reset: () => {
-      mockUser.value = null;
+      mockUser.value = {};
       mockSession.value = null;
     }
   };

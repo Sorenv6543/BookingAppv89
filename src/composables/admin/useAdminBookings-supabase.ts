@@ -185,7 +185,7 @@ export function useAdminBookings() {
     return authStore.isAdmin;
   }
 
-  function assignCleanerToBooking(bookingId: string, cleanerId: string): boolean | Promise<boolean> {
+  async function assignCleanerToBooking(bookingId: string, cleanerId: string): Promise<boolean> {
     if (import.meta.env.MODE === 'test') {
       try {
         const booking = bookingStore.bookings.get(bookingId);

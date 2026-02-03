@@ -221,7 +221,7 @@ describe('useAdminBookings (Role-Based)', () => {
     expect(getBookingsByStatus('cancelled')).toHaveLength(1);
   });
 
-  it('should handle cleaner assignment across all properties', () => {
+  it('should handle cleaner assignment across all properties', async () => {
     const bookingStore = useBookingStore();
     const userStore = useAuthStore();
     
@@ -270,7 +270,7 @@ describe('useAdminBookings (Role-Based)', () => {
     expect(unassignedBookings.value).toHaveLength(2);
 
     // Should be able to assign cleaners to any booking
-    const success = assignCleanerToBooking('unassigned1', 'cleaner1');
+    const success = await assignCleanerToBooking('unassigned1', 'cleaner1');
     expect(success).toBe(true);
   });
 
