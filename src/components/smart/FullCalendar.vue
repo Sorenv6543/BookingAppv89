@@ -449,8 +449,8 @@ const handleEditBooking = (booking: Booking): void => {
 const handleCompleteBooking = (booking: Booking): void => {
   emit('updateBooking', {
     id: booking.id,
-    start: booking.checkout_date,
-    end: booking.checkin_date
+    start: booking.checkin_date,
+    end: booking.checkout_date
   });
 };
 

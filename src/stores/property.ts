@@ -3,8 +3,6 @@ import { ref, computed } from 'vue';
 import type { Property, PropertyMap, PricingTier } from '@/types';
 import supabase from '@/plugins/supabase';
 
-const __DEV__ = import.meta.env.DEV;
-
 /**
  * Property store for the Property Cleaning Scheduler
  * Uses Map collections for efficient property access and management
@@ -139,10 +137,12 @@ export const usePropertyStore = defineStore('property', () => {
   
   // Actions
   async function fetchProperties() {
+    console.log('🔍 [PropertyStore] fetchProperties called');
     loading.value = true;
     error.value = null;
     
     try {
+      console.log('🔍 [PropertyStore] Starting database query...');
       if (__DEV__) console.log('🔍 fetchProperties: Starting database query...');
       const { data, error: supaError } = await supabase.from('properties').select('*');
       if (supaError) throw supaError;
@@ -156,12 +156,13 @@ export const usePropertyStore = defineStore('property', () => {
         }
       }
 
-      if (__DEV__) console.log('🔍 fetchProperties: Final properties map size:', properties.value.size);
+      __DEV__ && console.log('🔍 fetchProperties: Final properties map size:', properties.value.size);
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch properties.';
-      console.error('fetchProperties error:', err);
+      console.error('❌ [PropertyStore] fetchProperties error:', err);
     } finally {
       loading.value = false;
+      console.log('🔍 [PropertyStore] fetchProperties completed, loading:', loading.value);
       invalidateCache(); // Invalidate cache after fetch
     }
   }

@@ -159,7 +159,7 @@ dist/
 ### **Technical References**
 - 🎨 **[Vuetify Integration](docs/references/vuetify_typescript_reference.md)** - UI component usage
 - 📅 **[FullCalendar Integration](docs/references/fullcalendar_integration_reference.md)** - Calendar implementation
-- 🗄️ **[Supabase TypeScript](docs/references/supabase_typescript_reference.md)** - Database integration
+- 🗄️ **[base TypeScript](docs/references/base_typescript_reference.md)** - Database integration
 - 🛡️ **[Error Handling](docs/references/error_handling_reference.md)** - Error management patterns
 
 ---
@@ -281,7 +281,7 @@ pnpm run build:admin-only   # Deploy to admin.yourapp.com
 ### **Next Steps**
 1. **Testing Infrastructure**: Comprehensive test suite completion
 2. **Performance Monitoring**: Production analytics setup  
-3. **Backend Integration**: Supabase RLS and API integration
+3. **Backend Integration**: base RLS and API integration
 4. **User Onboarding**: Role-specific user flows
 
 ---

@@ -189,37 +189,37 @@ export const useBackgroundSync = () => {
 
   // Sync operation implementations (replace with actual API calls)
   const createBookingSync = async (data: BookingFormData): Promise<void> => {
-    // TODO: Replace with actual Supabase API call
+    // TODO: Replace with actual SB API call
     console.log('Syncing create booking:', data)
     await mockApiCall('/api/bookings', 'POST', data)
   }
 
   const updateBookingSync = async (id: string, data: Partial<Booking>): Promise<void> => {
-    // TODO: Replace with actual Supabase API call
+    // TODO: Replace with actual  API call
     console.log('Syncing update booking:', id, data)
     await mockApiCall(`/api/bookings/${id}`, 'PATCH', data)
   }
 
   const createPropertySync = async (data: PropertyFormData): Promise<void> => {
-    // TODO: Replace with actual Supabase API call
+    // TODO: Replace with actual e API call
     console.log('Syncing create property:', data)
     await mockApiCall('/api/properties', 'POST', data)
   }
 
   const updatePropertySync = async (id: string, data: Partial<Property>): Promise<void> => {
-    // TODO: Replace with actual Supabase API call
+    // TODO: Replace with actual  API call
     console.log('Syncing update property:', id, data)
     await mockApiCall(`/api/properties/${id}`, 'PATCH', data)
   }
 
   const deleteBookingSync = async (id: string): Promise<void> => {
-    // TODO: Replace with actual Supabase API call
+    // TODO: Replace with actual  API call
     console.log('Syncing delete booking:', id)
     await mockApiCall(`/api/bookings/${id}`, 'DELETE')
   }
 
   const deletePropertySync = async (id: string): Promise<void> => {
-    // TODO: Replace with actual Supabase API call
+    // TODO: Replace with actual  API call
     console.log('Syncing delete property:', id)
     await mockApiCall(`/api/properties/${id}`, 'DELETE')
   }
