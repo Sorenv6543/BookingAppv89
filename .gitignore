@@ -31,7 +31,7 @@ dist-ssr
 !.env.example
 
 # MCP Configuration (contains sensitive credentials)
-
+mcp.json
 .mcp.json
 
 # Build output
