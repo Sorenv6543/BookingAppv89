@@ -481,7 +481,7 @@ const isOpen = computed({
 
 const selectedProperty = computed(() => {
   if (!props.booking?.property_id) return null
-  return props.properties.get(props.booking?.property_id || '')
+  return props.properties.get(props.booking.property_id)
 })
 
 const selectedCleanerDetails = computed(() => {
