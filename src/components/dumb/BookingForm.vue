@@ -7,18 +7,28 @@
     scrim="rgba(0,0,0,0.6)"
     @keydown.esc="handleClose"
   >
-    <v-card class="modal-card" rounded="xl" elevation="12">
-<!-- Header with gradient -->
-<div
-  class="modal-header"
-  elevation="10"
-  style="background: linear-gradient(90deg, #3B82F6 0%, #2563EB 100%); padding: 16px 24px; border-top-left-radius: 12px; border-top-right-radius: 12px;"
->
+    <v-card
+      class="modal-card"
+      rounded="xl"
+      elevation="12"
+    >
+      <!-- Header with gradient -->
+      <div
+        class="modal-header"
+        elevation="10"
+        style="background: linear-gradient(90deg, #3B82F6 0%, #2563EB 100%); padding: 16px 24px; border-top-left-radius: 12px; border-top-right-radius: 12px;"
+      >
         <div class="d-flex align-center ga-2">
-          <v-icon :color="quickTurn ? 'white' : 'white'" size="26">
+          <v-icon
+            :color="quickTurn ? 'white' : 'white'"
+            size="26"
+          >
             {{ quickTurn ? 'mdi-lightning-bolt' : (mode === 'edit' ? 'mdi-calendar-edit' : 'mdi-calendar-plus') }}
           </v-icon>
-          <span class="text-h5 font-weight-bold white--text" style="color: white;">{{ formTitle }}</span>
+          <span
+            class="text-h5 font-weight-bold white--text"
+            style="color: white;"
+          >{{ formTitle }}</span>
           <v-chip
             v-if="form.booking_type === 'turn'"
             color="white"
@@ -41,15 +51,26 @@
         </div>
       </div>
 
-      <v-card-text class="modal-content px-6 pt-5" style="background: #FAFBFC;">
+      <v-card-text
+        class="modal-content px-6 pt-5"
+        style="background: #FAFBFC;"
+      >
         <v-form
           ref="formRef"
           v-model="formValid"
           @submit.prevent="handleSubmit"
         >
           <!-- Quick Turn: Outgoing Guest Header -->
-          <div v-if="quickTurn" class="section-label mb-3">
-            <v-icon color="error" size="18">mdi-account-arrow-right</v-icon>
+          <div
+            v-if="quickTurn"
+            class="section-label mb-3"
+          >
+            <v-icon
+              color="error"
+              size="18"
+            >
+              mdi-account-arrow-right
+            </v-icon>
             <span>{{ existingBooking ? 'Existing Booking (Outgoing Guest)' : 'Outgoing Guest' }}</span>
           </div>
 
@@ -74,12 +95,23 @@
 
           <!-- Check-in: Date + Time on same row -->
           <div class="section-label mb-2">
-            <v-icon color="primary" size="18">mdi-login-variant</v-icon>
+            <v-icon
+              color="primary"
+              size="18"
+            >
+              mdi-login-variant
+            </v-icon>
             <span>Check-in</span>
           </div>
           <v-row>
-            <v-col cols="12" sm="7">
-              <v-menu v-model="menuCheckinDate" :close-on-content-click="false">
+            <v-col
+              cols="12"
+              sm="7"
+            >
+              <v-menu
+                v-model="menuCheckinDate"
+                :close-on-content-click="false"
+              >
                 <template #activator="{ props: menuProps }">
                   <v-text-field
                     v-bind="menuProps"
@@ -104,8 +136,14 @@
                 />
               </v-menu>
             </v-col>
-            <v-col cols="12" sm="5">
-              <v-menu v-model="menuCheckinTime" :close-on-content-click="false">
+            <v-col
+              cols="12"
+              sm="5"
+            >
+              <v-menu
+                v-model="menuCheckinTime"
+                :close-on-content-click="false"
+              >
                 <template #activator="{ props: menuProps }">
                   <v-text-field
                     v-bind="menuProps"
@@ -135,12 +173,23 @@
 
           <!-- Check-out: Date + Time on same row -->
           <div class="section-label mb-2">
-            <v-icon color="error" size="18">mdi-logout-variant</v-icon>
+            <v-icon
+              color="error"
+              size="18"
+            >
+              mdi-logout-variant
+            </v-icon>
             <span>Check-out</span>
           </div>
           <v-row>
-            <v-col cols="12" sm="7">
-              <v-menu v-model="menuCheckoutDate" :close-on-content-click="false">
+            <v-col
+              cols="12"
+              sm="7"
+            >
+              <v-menu
+                v-model="menuCheckoutDate"
+                :close-on-content-click="false"
+              >
                 <template #activator="{ props: menuProps }">
                   <v-text-field
                     v-bind="menuProps"
@@ -165,8 +214,14 @@
                 />
               </v-menu>
             </v-col>
-            <v-col cols="12" sm="5">
-              <v-menu v-model="menuCheckoutTime" :close-on-content-click="false">
+            <v-col
+              cols="12"
+              sm="5"
+            >
+              <v-menu
+                v-model="menuCheckoutTime"
+                :close-on-content-click="false"
+              >
                 <template #activator="{ props: menuProps }">
                   <v-text-field
                     v-bind="menuProps"
@@ -196,7 +251,10 @@
 
           <!-- Booking Type and Guest Count (hidden in quickTurn mode) -->
           <v-row v-if="!quickTurn">
-            <v-col cols="12" md="6">
+            <v-col
+              cols="12"
+              md="6"
+            >
               <v-select
                 v-model="form.booking_type"
                 :items="bookingTypeItems"
@@ -217,7 +275,10 @@
               />
             </v-col>
 
-            <v-col cols="12" md="6">
+            <v-col
+              cols="12"
+              md="6"
+            >
               <v-text-field
                 v-model.number="form.guest_count"
                 label="Guest Count"
@@ -250,7 +311,13 @@
           </v-row>
 
           <!-- Quick Turn: Cleaning Window Badge -->
-          <v-alert v-if="quickTurn && cleaningWindow" type="info" variant="tonal" density="compact" class="mb-4">
+          <v-alert
+            v-if="quickTurn && cleaningWindow"
+            type="info"
+            variant="tonal"
+            density="compact"
+            class="mb-4"
+          >
             <div class="d-flex align-center ga-2">
               <v-icon>mdi-broom</v-icon>
               <span class="font-weight-bold">Cleaning Window: {{ cleaningWindow }}</span>
@@ -262,17 +329,33 @@
           <template v-if="quickTurn">
             <v-divider class="my-4" />
             <div class="section-label mb-3">
-              <v-icon color="success" size="18">mdi-account-arrow-left</v-icon>
+              <v-icon
+                color="success"
+                size="18"
+              >
+                mdi-account-arrow-left
+              </v-icon>
               <span>Incoming Guest</span>
             </div>
 
             <!-- Incoming Check-in: Date + Time -->
-            <div class="section-label mb-2" style="font-size: 0.75rem;">
-              <v-icon color="primary" size="16">mdi-login-variant</v-icon>
+            <div
+              class="section-label mb-2"
+              style="font-size: 0.75rem;"
+            >
+              <v-icon
+                color="primary"
+                size="16"
+              >
+                mdi-login-variant
+              </v-icon>
               <span>Check-in</span>
             </div>
             <v-row>
-              <v-col cols="12" sm="7">
+              <v-col
+                cols="12"
+                sm="7"
+              >
                 <v-text-field
                   :model-value="formatDisplayDate(incomingForm.checkin_date as string)"
                   label="Date"
@@ -284,8 +367,14 @@
                   bg-color="white"
                 />
               </v-col>
-              <v-col cols="12" sm="5">
-                <v-menu v-model="menuIncomingCheckinTime" :close-on-content-click="false">
+              <v-col
+                cols="12"
+                sm="5"
+              >
+                <v-menu
+                  v-model="menuIncomingCheckinTime"
+                  :close-on-content-click="false"
+                >
                   <template #activator="{ props: menuProps }">
                     <v-text-field
                       v-bind="menuProps"
@@ -312,13 +401,27 @@
             </v-row>
 
             <!-- Incoming Check-out: Date + Time -->
-            <div class="section-label mb-2" style="font-size: 0.75rem;">
-              <v-icon color="error" size="16">mdi-logout-variant</v-icon>
+            <div
+              class="section-label mb-2"
+              style="font-size: 0.75rem;"
+            >
+              <v-icon
+                color="error"
+                size="16"
+              >
+                mdi-logout-variant
+              </v-icon>
               <span>Check-out</span>
             </div>
             <v-row>
-              <v-col cols="12" sm="7">
-                <v-menu v-model="menuIncomingCheckoutDate" :close-on-content-click="false">
+              <v-col
+                cols="12"
+                sm="7"
+              >
+                <v-menu
+                  v-model="menuIncomingCheckoutDate"
+                  :close-on-content-click="false"
+                >
                   <template #activator="{ props: menuProps }">
                     <v-text-field
                       v-bind="menuProps"
@@ -341,8 +444,14 @@
                   />
                 </v-menu>
               </v-col>
-              <v-col cols="12" sm="5">
-                <v-menu v-model="menuIncomingCheckoutTime" :close-on-content-click="false">
+              <v-col
+                cols="12"
+                sm="5"
+              >
+                <v-menu
+                  v-model="menuIncomingCheckoutTime"
+                  :close-on-content-click="false"
+                >
                   <template #activator="{ props: menuProps }">
                     <v-text-field
                       v-bind="menuProps"

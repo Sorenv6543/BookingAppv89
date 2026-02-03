@@ -2,7 +2,7 @@
 
 _A comprehensive, production-ready checklist for integrating Supabase with your role-based, multi-tenant property cleaning scheduler._
 
----
+<!-- ---
 
 ## 1. Supabase Client Configuration
 - [ ] **Review `src/plugins/supabase.ts`**
@@ -22,7 +22,7 @@ _A comprehensive, production-ready checklist for integrating Supabase with your 
   - [ ] CRUD operations use Supabase client
   - [ ] Role-based data access patterns are followed
 - [ ] **Ensure Pinia stores use composables in production**
-  - [ ] Owner/admin stores fetch/update data via Supabase
+  - [ ] Owner/admin stores fetch/update data via Supabase -->
 
 ---
 
