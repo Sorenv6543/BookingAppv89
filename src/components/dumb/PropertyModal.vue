@@ -265,10 +265,6 @@ const nameRules = [
   (v: string) => (v && v.length <= 100) || 'Name must be less than 100 characters'
 ];
 
-const addressRules = [
-  (v: string) => !!v || 'Property address is required',
-  (v: string) => (v && v.length <= 250) || 'Address must be less than 250 characters'
-];
 
 const durationRules = [
   (v: number) => !!v || 'Cleaning duration is required',
