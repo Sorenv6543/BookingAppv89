@@ -326,7 +326,6 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
 };
 
 const handleEventResize = async (resizeInfo: EventResizeDoneArg): Promise<void> => {
-  console.log('🔄 [AdminCalendar] Event resized:', resizeInfo.event.id);
   const booking = resizeInfo.event.extendedProps.booking as Booking;
   
   try {

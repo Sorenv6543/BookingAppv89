@@ -70,7 +70,6 @@ const handleEventClick = (clickInfo: EventClickArg): void => {
 };
 
 const handleEventDrop = (dropInfo: EventDropArg): void => {
-  console.log('🎯 [OwnerCalendar] Event dropped:', dropInfo.event.id);
   emit('eventDrop', dropInfo);
 };
 
@@ -80,7 +79,6 @@ const handleEventResize = (resizeInfo: EventResizeDoneArg): void => {
 };
 
 const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }): void => {
-  console.log('➕ [OwnerCalendar] Create booking:', data);
   emit('createBooking', data);
 };
 
