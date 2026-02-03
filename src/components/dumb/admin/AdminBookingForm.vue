@@ -486,7 +486,7 @@ interface Props {
   modelValue: boolean
   mode: 'create' | 'edit'
   booking?: Booking | null
-  properties: Property[]
+  properties: Map<string, Property>
   cleaners: Cleaner[]
   loading?: boolean
   errors?: Map<string, string[]>
@@ -538,7 +538,7 @@ const isOpen = computed({
 
 const propertyName = computed(() => {
   if (!props.booking?.property_id) return 'Unknown Property'
-  const property = props.properties.find(p => p.id === props.booking?.property_id)
+  const property = props.properties.get(props.booking?.property_id)
   return property?.name || 'Unknown Property'
 })
 
@@ -554,7 +554,7 @@ const submitButtonText = computed(() => {
 })
 
 const propertiesArray = computed(() => {
-  return Array.from(props.properties).map(property => ({
+  return Array.from(props.properties.values()).map(property => ({
     ...property,
     title: `${property.name} - ${property.address}`
   }))
@@ -575,7 +575,7 @@ const selectedCleaner = computed(() => {
 // Get selected property for default times
 const selectedProperty = computed((): Property | undefined => {
   if (!form.value.property_id) return undefined;
-  return props.properties.find(p => p.id === form.value.property_id);
+  return props.properties.get(form.value.property_id);
 });
 
 // Time validation rules and hints

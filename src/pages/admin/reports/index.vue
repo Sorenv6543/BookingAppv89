@@ -261,7 +261,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useAdminBookings } from '@/composables/admin/useAdminBookings'
+import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase'
 import { useAdminProperties } from '@/composables/admin/useAdminProperties'
 import { useCleanerManagement } from '@/composables/admin/useCleanerManagement'
 

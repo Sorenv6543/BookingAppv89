@@ -103,7 +103,7 @@
       v-model="cleanerAssignmentModal.show"
       :booking="cleanerAssignmentModal.booking"
       :cleaners="cleanerAssignmentModal.cleaners"
-      :properties="Array.from(allProperties.values())"
+      :properties="allProperties"
       :loading="cleanerAssignmentModal.loading"
       @assign="handleCleanerAssignment"
       @close="closeCleanerAssignmentModal"
@@ -114,7 +114,7 @@
       v-model="adminBookingFormModal.show"
       :mode="adminBookingFormModal.mode"
       :booking="adminBookingFormModal.booking"
-      :properties="Array.from(allProperties.values())"
+      :properties="allProperties"
       :cleaners="(allUsers as any).filter((user: any) => user.role === 'cleaner' || user.role === 'admin')"
       :loading="adminBookingFormModal.loading"
       :errors="adminBookingFormModal.errors"
@@ -134,7 +134,7 @@ import FullCalendar from '@/components/smart/FullCalendar.vue';
 import AdminBookingForm from '@/components/dumb/admin/AdminBookingForm.vue';
 
 import { useAdminCalendarState } from '@/composables/admin/useAdminCalendarState';
-import { useAdminBookings } from '@/composables/admin/useAdminBookings';
+import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase';
 import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
 import type { Booking, User, Cleaner, BookingFormData } from '@/types'
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core'

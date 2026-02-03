@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
 import { useBookingStore } from '@/stores/booking';
 import { useAuthStore } from '@/stores/auth';
 import type { Booking } from '@/types';

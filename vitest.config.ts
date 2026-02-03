@@ -292,6 +292,10 @@ export default defineConfig({
     // Remove force: true to prevent forced re-optimization that can cause hangs
     // force: true
   },
+  test: {
+    environment: 'happy-dom',
+    setupFiles: ['src/__tests__/setup/setupTests.ts']
+  },
   // Preview configuration for testing builds
   preview: {
     port: 4173,

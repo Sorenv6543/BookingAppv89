@@ -675,7 +675,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
-import { useAdminBookings } from '@/composables/admin/useAdminBookings';
+import { useAdminBookings } from '@/composables/admin/useAdminBookings-supabase';
 import { useAdminProperties } from '@/composables/admin/useAdminProperties';
 import { useAdminUserManagement } from '@/composables/admin/useAdminUserManagement';
 import type { Booking } from '@/types';

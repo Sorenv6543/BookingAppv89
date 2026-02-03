@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
 import { useAuthStore } from '@/stores/auth';
 import { useUIStore } from '@/stores/ui';
 

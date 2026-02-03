@@ -1,9 +1,11 @@
 // src/plugins/supabase.ts - Production Configuration
 import { createClient } from '@supabase/supabase-js';
 
+const isTest = import.meta.env.MODE === 'test';
+
 // Environment variables validation
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || (isTest ? 'http://localhost' : '');
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || (isTest ? 'test-key' : '');
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
@@ -13,7 +15,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-console.log('🔗 Connecting to Supabase:', supabaseUrl);
+if (!isTest) {
+  console.log('🔗 Connecting to Supabase:', supabaseUrl);
+}
 
 // Create Supabase client with production settings
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -40,20 +44,22 @@ if (import.meta.env.VITE_DEBUG_AUTH === 'true') {
   });
 }
 
-// Safe connection test - check auth service instead of protected tables
-supabase.auth.getSession()
-  .then(({ data, error }) => {
-    if (error) {
-      console.error('❌ Supabase connection failed:', error);
-    } else {
-      console.log('✅ Supabase connected successfully. Auth service operational.');
-      if (data.session) {
-        console.log('🔐 Existing session found for user:', data.session.user.id);
+if (!isTest) {
+  // Safe connection test - check auth service instead of protected tables
+  supabase.auth.getSession()
+    .then(({ data, error }) => {
+      if (error) {
+        console.error('❌ Supabase connection failed:', error);
+      } else {
+        console.log('✅ Supabase connected successfully. Auth service operational.');
+        if (data.session) {
+          console.log('🔐 Existing session found for user:', data.session.user.id);
+        }
       }
-    }
-  })
-  .catch((error) => {
-    console.error('❌ Supabase connection failed:', error);
-  });
+    })
+    .catch((error) => {
+      console.error('❌ Supabase connection failed:', error);
+    });
+}
 
 export default supabase;

@@ -268,7 +268,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 // Business logic composables
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+import { useOwnerBookings } from '@/composables/owner/useOwnerBookings-supabase';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 
 // Types
