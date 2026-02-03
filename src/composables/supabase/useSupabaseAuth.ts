@@ -162,6 +162,7 @@ export function useSupabaseAuth() {
 
   async function doLoadUserProfile(userId: string): Promise<void> {
     console.log(`Loading user profile for: ${userId}`);
+    console.time(`profile-load-${userId}`);
 
     // Start the real query — don't race/discard it
     const queryPromise = supabase
@@ -178,11 +179,14 @@ export function useSupabaseAuth() {
         user.value = buildFallbackProfile(userId);
         profileLoadedForUserId = userId;
         console.log('Using fallback profile (query still pending)');
+        console.log('Fallback profile role:', user.value?.role);
       }
     }, 3000);
 
     try {
+      console.log('Profile query started...');
       const { data, error: profileError } = await queryPromise;
+      console.timeEnd(`profile-load-${userId}`);
       clearTimeout(fallbackTimer);
 
       if (profileError) {
@@ -295,22 +299,46 @@ export function useSupabaseAuth() {
   }
 
   async function signOut(): Promise<boolean> {
+    console.log('🟡 useSupabaseAuth.signOut() called');
     try {
       loading.value = true;
       error.value = null;
 
-      const { error: signOutError } = await supabase.auth.signOut();
-
-      if (signOutError) {
-        throw signOutError;
+      console.log('🟡 Calling supabase.auth.signOut()...');
+      
+      // Add timeout to prevent hanging forever
+      const signOutPromise = supabase.auth.signOut();
+      const timeoutPromise = new Promise<{ error: Error }>((_, reject) => 
+        setTimeout(() => reject(new Error('Sign out timed out after 5 seconds')), 5000)
+      );
+      
+      try {
+        const { error: signOutError } = await Promise.race([signOutPromise, timeoutPromise]);
+        console.log('🟡 supabase.auth.signOut() completed', signOutError);
+        
+        if (signOutError) {
+          console.warn('⚠️ Sign out had error, but proceeding with local cleanup:', signOutError);
+        }
+      } catch {
+        console.warn('⚠️ Sign out timed out, proceeding with local cleanup');
       }
 
-      // Auth state change handler will clear user state
+      // Force clear local state regardless of Supabase response
+      user.value = null;
+      session.value = null;
+      error.value = null;
+      profileLoadedForUserId = null;
+      
+      console.log('🟡 Local state cleared, signOut returning true');
       return true;
     } catch (err) {
       console.error('❌ Sign out error:', err);
+      // Still clear local state on error
+      user.value = null;
+      session.value = null;
+      profileLoadedForUserId = null;
       error.value = err instanceof Error ? err.message : 'Sign out failed';
-      return false;
+      return true; // Return true anyway so redirect happens
     } finally {
       setTimeout(() => {
         loading.value = false;

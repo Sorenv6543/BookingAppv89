@@ -593,6 +593,22 @@ const handleCreateTurn = (): void => {
 };
 
 // ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Subtract one day from a date string.
+ * Used to convert FullCalendar's exclusive end dates to our database's inclusive checkout_date.
+ * FullCalendar end dates are exclusive (the day AFTER the last visible day),
+ * but checkout_date in our DB is the actual last day of the booking.
+ */
+const subtractOneDay = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  date.setDate(date.getDate() - 1);
+  return date.toISOString().split('T')[0];
+};
+
+// ============================================================================
 // CALENDAR EVENT HANDLERS
 // ============================================================================
 
@@ -605,9 +621,10 @@ const handleDateSelect = (selectInfo: DateSelectArg): void => {
     'receive'
   );
   
+  // FullCalendar uses exclusive end dates, so subtract one day for checkout_date
   const bookingData: Partial<BookingFormData> = {
-              checkin_date: selectInfo.startStr,    // ✅ Guests arrive on start date
-          checkout_date: selectInfo.endStr,    // ✅ Guests leave on end date  
+    checkin_date: selectInfo.startStr,              // Guests arrive on start date
+    checkout_date: subtractOneDay(selectInfo.endStr), // Convert exclusive end to inclusive checkout
     owner_id: currentOwnerId.value
   };
   
@@ -662,9 +679,14 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     // Use nextTick to batch reactive updates
     await nextTick();
     
+    // FullCalendar uses exclusive end dates, so we need to subtract one day
+    // to get the correct checkout_date for our database
+    const endStr = dropInfo.event.endStr || dropInfo.event.startStr;
+    const checkoutDate = subtractOneDay(endStr);
+    
     const result = await updateMyBooking(booking.id, {
       checkin_date: dropInfo.event.startStr,
-      checkout_date: dropInfo.event.endStr || dropInfo.event.startStr,
+      checkout_date: checkoutDate,
       owner_id: booking.owner_id,
     });
     
@@ -705,9 +727,13 @@ const handleEventResize = async (resizeInfo: EventResizeDoneArg): Promise<void> 
     // Use nextTick to batch reactive updates
     await nextTick();
     
+    // FullCalendar uses exclusive end dates, so we need to subtract one day
+    // to get the correct checkout_date for our database
+    const checkoutDate = subtractOneDay(resizeInfo.event.endStr);
+    
     const result = await updateMyBooking(booking.id, {
       checkin_date: resizeInfo.event.startStr,
-      checkout_date: resizeInfo.event.endStr,
+      checkout_date: checkoutDate,
       owner_id: booking.owner_id,
     });
     

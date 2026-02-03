@@ -38,6 +38,15 @@ export async function authGuard(
     console.warn('Auth initialization timeout in guard, proceeding anyway');
   }
 
+  // Wait for user profile to be loaded (max 3500ms to account for fallback)
+  // This prevents race condition where session exists but user profile hasn't loaded yet
+  waitedTime = 0;
+  const userWaitTime = 3500;
+  while (!authStore.user && authStore.session && waitedTime < userWaitTime) {
+    await new Promise(resolve => setTimeout(resolve, checkInterval));
+    waitedTime += checkInterval;
+  }
+
   // Check authentication
   if (!authStore.isAuthenticated) {
     next('/auth/login');

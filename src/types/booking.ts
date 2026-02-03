@@ -26,8 +26,8 @@ export interface Booking {
   owner_id: string;
   checkin_date: string;  // ISO date when guests check in (arrive) - start of guest stay
   checkout_date: string; // ISO date when guests check out (depart) - end of guest stay
-  checkin_time: string;  // Time when guests arrive (HH:MM format)
-  checkout_time: string; // Time when guests depart (HH:MM format)
+  checkin_time: string;  // Time when guests arrive (HH:MM:SS format)
+  checkout_time: string; // Time when guests depart (HH:MM:SS format)
   booking_type: BookingType;
   status: BookingStatus;
   guest_count?: number;

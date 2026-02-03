@@ -9,7 +9,7 @@ _A comprehensive, production-ready checklist for integrating Supabase with your 
 ### ✅ COMPLETED
 - [x] **Pinia stores use Supabase directly**
   - [x] `booking.ts` - All CRUD operations call Supabase with optimistic updates
-  - [x] `property.ts` - All CRUD operations call Supabase with optimistic updates
+  - [x] `property.ts` - All CRUD operations call Supabase with optimistic 3updates
 - [x] **Shared composables properly await store operations**
   - [x] `useBookings.ts` - Removed fake delays, properly awaits async store calls
   - [x] `useProperties.ts` - Removed fake delays, properly awaits async store calls

@@ -734,15 +734,42 @@ function onIncomingDatePick(value: unknown) {
 
 // COMPUTED PROPERTIES
 
-// Quick turn: auto-lock incoming checkin_date to outgoing checkout_date
+// Clear date validation errors when dates change and re-validate
 watch(() => form.checkout_date, (newDate) => {
+  // Clear date-related errors when checkout date changes
+  errors.value.delete('checkout_date');
+  errors.value.delete('checkin_date');
+  
   if (props.quickTurn && newDate) {
     incomingForm.checkin_date = newDate as string;
   }
+  
+  // Update booking type based on new dates
+  updateBookingType();
+});
+
+watch(() => form.checkin_date, () => {
+  // Clear date-related errors when checkin date changes
+  errors.value.delete('checkout_date');
+  errors.value.delete('checkin_date');
+  
+  // Update booking type based on new dates
+  updateBookingType();
+});
+
+// Clear time errors when times change
+watch(() => form.checkout_time, () => {
+  errors.value.delete('checkout_time');
+  errors.value.delete('checkin_time');
+});
+
+watch(() => form.checkin_time, () => {
+  errors.value.delete('checkin_time');
 });
 
 // Quick turn: share property_id
 watch(() => form.property_id, (newId) => {
+  errors.value.delete('property_id');
   if (props.quickTurn && newId) {
     incomingForm.property_id = newId as string;
   }
