@@ -1,0 +1,32 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Check Errors",
+      "type": "shell",
+      "command": "pnpm check",
+      "problemMatcher": ["$tsc-watch", "$eslint-stylish"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Fix Errors",
+      "type": "shell", 
+      "lint": "eslint . --fix",
+      "problemMatcher": ["$tsc-watch", "$eslint-stylish"]
+    }
+  ]
+}
+    "@vitejs/plugin-vue": "^4.3.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-vue": "^9.9.0",
+    "prettier": "^2.8.4",
+    "vite": "^4.3.9",
+    "vite-bundle-analyzer": "^1.7.3",
+    "vitest": "^0.32.2"
+  }
+}
