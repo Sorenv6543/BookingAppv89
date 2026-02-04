@@ -146,9 +146,9 @@
                 chips
                 @update:model-value="handleFilterChange"
               >
-                <template #chip="{ props, item }">
+                <template #chip="{ props: chipProps, item }">
                   <v-chip
-                    v-bind="props"
+                    v-bind="chipProps"
                     :color="getStatusColor(item.value)"
                     size="small"
                   >
@@ -173,8 +173,8 @@
                 chips
                 @update:model-value="handleFilterChange"
               >
-                <template #item="{ props, item }">
-                  <v-list-item v-bind="props">
+                <template #item="{ props: itemProps, item }">
+                  <v-list-item v-bind="itemProps">
                     <template #prepend>
                       <v-avatar
                         :color="getCleanerColor(item.value)"
@@ -203,9 +203,9 @@
                 chips
                 @update:model-value="handleFilterChange"
               >
-                <template #chip="{ props, item }">
+                <template #chip="{ props: chipProps, item }">
                   <v-chip
-                    v-bind="props"
+                    v-bind="chipProps"
                     :color="item.value === 'turn' ? 'error' : 'primary'"
                     size="small"
                   >
@@ -250,9 +250,9 @@
                 chips
                 @update:model-value="handleFilterChange"
               >
-                <template #chip="{ props, item }">
+                <template #chip="{ props: chipProps, item }">
                   <v-chip
-                    v-bind="props"
+                    v-bind="chipProps"
                     :color="getPriorityColor(item.value)"
                     size="small"
                   >

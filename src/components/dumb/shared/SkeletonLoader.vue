@@ -215,6 +215,8 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'rectangle',
   variant: 'shimmer',
   animated: true,
+  width: undefined,
+  height: undefined,
   lines: 3,
   menuItems: 5,
   showProgress: false,

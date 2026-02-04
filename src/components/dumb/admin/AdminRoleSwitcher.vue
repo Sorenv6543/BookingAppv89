@@ -1,8 +1,8 @@
 <template>
   <v-menu offset-y>
-    <template #activator="{ props }">
+    <template #activator="{ props: activatorProps }">
       <v-btn
-        v-bind="props"
+        v-bind="activatorProps"
         :color="currentViewColor"
         :variant="currentViewVariant"
         size="small"
