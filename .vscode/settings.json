@@ -74,5 +74,7 @@
     "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
     "specstory.cloudSync.enabled": "always",
     "specstory.showDeveloperTools": true,
-    "window.confirmSaveUntitledWorkspace": true
+    "window.confirmSaveUntitledWorkspace": true,
+    "workbench.editor.defaultBinaryEditor": "markdown-preview-enhanced",
+    "workbench.editor.limit.perEditorGroup": true
 }
