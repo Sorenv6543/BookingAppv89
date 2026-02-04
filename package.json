@@ -17,6 +17,8 @@
     "preview:production": "vite preview --mode production",
     "preview:pwa": "vite preview --host",
     "lint": "eslint . --fix",
+    "check": "vue-tsc --noEmit && eslint .",
+    "fixerrors": "eslint . --fix",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
