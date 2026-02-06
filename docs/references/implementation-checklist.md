@@ -3,7 +3,7 @@
 
 ## 🎯 **Your base Project is Ready!**
 
-**Project URL:** `https://yplrudursbvzcdaroqly.base.co`
+**Project URL:** `https://yplrudursbvzcdaroqly.supabase.co`
 **Database:** ✅ Schema applied with RLS policies
 **Tables:** ✅ user_profiles, properties, bookings (all with RLS enabled)
 

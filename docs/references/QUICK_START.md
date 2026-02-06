@@ -275,8 +275,8 @@ The project uses environment variables for configuration. Create a `.env.local` 
 
 ```bash
 # base Configuration
-VITE_BASE_URL=https://otmfvzkokrxduipxkyga.base.co
-VITE_BASE_ANON_KEY=your_anon_key_here
+VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
+VITE_SUPABASE_ANON_KEY=your_anon_key_here
 
 # App Configuration
 VITE_APP_NAME="Property Cleaning Scheduler"

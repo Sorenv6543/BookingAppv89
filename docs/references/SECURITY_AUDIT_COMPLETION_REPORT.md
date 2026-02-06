@@ -29,33 +29,33 @@
 **Status**: FIXED
 - **Before**: 
   ```bash
-  VITE_BASE_URL=https://otmfvzkokrxduipxkyga.base.co
-  VITE_BASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
+  VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   ```
 - **After**: 
   ```bash
-  VITE_BASE_URL=<your-base-url>
-  VITE_BASE_ANON_KEY=<your-anon-key>
+  VITE_SUPABASE_URL=<your-base-url>
+  VITE_SUPABASE_ANON_KEY=<your-anon-key>
   ```
 - **Created**: `.env.example` as proper template for contributors
 
 ### ✅ Issue 4: Hardcoded Project URLs in `BASE_SETUP_INSTRUCTIONS.md`
 **Status**: FIXED
-- **Before**: `https://app.base.com/project/otmfvzkokrxduipxkyga/sql/new`
-- **After**: `https://app.base.com/project/<YOUR_PROJECT_REF>/sql/new`
+- **Before**: `https://app.supabase.com/project/otmfvzkokrxduipxkyga/sql/new`
+- **After**: `https://app.supabase.com/project/<YOUR_PROJECT_REF>/sql/new`
 - **Added**: Instruction to replace placeholder with actual project reference
 
 ### ✅ Issue 5: Hardcoded Credentials in `BASE_SETUP_INSTRUCTIONS.md`
 **Status**: FIXED
 - **Before**:
   ```bash
-  VITE_BASE_URL=https://otmfvzkokrxduipxkyga.base.co
-  VITE_BASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  VITE_SUPABASE_URL=https://otmfvzkokrxduipxkyga.supabase.co
+  VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   ```
 - **After**:
   ```bash
-  VITE_BASE_URL=https://<YOUR_PROJECT_REF>.base.co
-  VITE_BASE_ANON_KEY=<YOUR_ANON_KEY>
+  VITE_SUPABASE_URL=https://<YOUR_PROJECT_REF>.supabase.co
+  VITE_SUPABASE_ANON_KEY=<YOUR_ANON_KEY>
   ```
 - **Added**: Clear instructions on where to find real credentials
 
@@ -270,8 +270,8 @@ git filter-branch --tree-filter 'rm -f environment-setup.sh .cursor/mcp.json .mc
    ```
 3. Edit `.env.local` with your base credentials:
    ```bash
-   VITE_BASE_URL=https://YOUR_PROJECT_REF.base.co
-   VITE_BASE_ANON_KEY=YOUR_ANON_KEY
+   VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+   VITE_SUPABASE_ANON_KEY=YOUR_ANON_KEY
    ```
 4. For Cursor IDE, copy base MCP template:
    ```bash
@@ -315,7 +315,7 @@ grep -A5 "GRANT EXECUTE.*create_admin_user" base/combined_migration.sql
 
 - **Commit**: `02874b7` on branch `CHECKPOINT`
 - **Detailed Changes**: See `SECURITY_FIXES_COMMIT.md`
-- **base Security**: https://base.com/docs/guides/auth/managing-user-data
+- **base Security**: https://supabase.com/docs/guides/auth/managing-user-data
 - **PostgreSQL RLS**: https://www.postgresql.org/docs/current/ddl-rowsecurity.html
 - **Git History Cleanup**: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository
 

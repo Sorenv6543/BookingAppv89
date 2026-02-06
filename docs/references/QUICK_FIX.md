@@ -8,7 +8,7 @@ Your signup is failing because the enum types were never created in the database
 ## The Solution (30 seconds)
 
 ### 1. Open base SQL Editor
-🔗 https://base.com/dashboard/project/otmfvzkokrxduipxkyga/sql/new
+🔗 https://supabase.com/dashboard/project/otmfvzkokrxduipxkyga/sql/new
 
 ### 2. Copy & Paste This File
 📁 Open: `base/FIX_MISSING_ENUMS.sql`
@@ -58,6 +58,6 @@ Then a table showing all 7 enum types with their values.
 ## If It Still Fails
 
 Check the base logs for the specific error:
-🔗 https://base.com/dashboard/project/otmfvzkokrxduipxkyga/logs
+🔗 https://supabase.com/dashboard/project/otmfvzkokrxduipxkyga/logs
 
 Look for any errors mentioning enum types or the handle_new_user function.

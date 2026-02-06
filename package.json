@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node scripts/remove-dev-manifest.js && vite --host",
+    "dev": "node scripts/remove-dev-manifest.js && vite",
     "dev:local": "node scripts/remove-dev-manifest.js && vite",
     "build": "vue-tsc --noEmit && vite build && node scripts/format-manifest.js && cross-env NODE_ENV=production node scripts/remove-dev-manifest.js",
     "build:fast": "vite build",

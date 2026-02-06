@@ -22,7 +22,7 @@ When the `handle_new_user()` trigger tries to insert into `user_profiles` with `
 
 ### Step 1: Open base SQL Editor
 
-Go to: **https://base.com/dashboard/project/otmfvzkokrxduipxkyga/sql/new**
+Go to: **https://supabase.com/dashboard/project/otmfvzkokrxduipxkyga/sql/new**
 
 ### Step 2: Copy and Run the Complete Fix Script
 
@@ -209,7 +209,7 @@ ALTER FUNCTION public.handle_new_user() OWNER TO postgres;
 ### If signup still fails:
 
 1. **Check base logs:**
-   - Go to: https://base.com/dashboard/project/otmfvzkokrxduipxkyga/logs
+   - Go to: https://supabase.com/dashboard/project/otmfvzkokrxduipxkyga/logs
    - Look for errors mentioning "handle_new_user"
 
 2. **Verify trigger exists:**

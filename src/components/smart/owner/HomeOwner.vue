@@ -248,6 +248,7 @@ src/components/smart/owner/HomeOwner.vue -
 </template>
 
 <script setup lang="ts">
+const __DEV__ = import.meta.env.DEV;
 
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { useDisplay } from 'vuetify';
@@ -836,7 +837,7 @@ const handleEventModalClose = (): void => {
 
 const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
   try {
-    console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Raw form data:', {
+    if (__DEV__) console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Raw form data:', {
       checkin_date: data.checkin_date,
       checkout_date: data.checkout_date,
       checkin_time: data.checkin_time,
@@ -851,7 +852,7 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
       owner_id: currentOwnerId.value ?? data.owner_id
     };
     
-    console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Final booking data:', {
+    if (__DEV__) console.log('🔍 [DEBUG] HomeOwner.handleEventModalSave - Final booking data:', {
       checkin_date: bookingData.checkin_date,
       checkout_date: bookingData.checkout_date,
       checkin_time: bookingData.checkin_time,
@@ -866,15 +867,15 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     const editBooking = eventModalData.value;
 
     if (mode === 'create') {
-      console.log('🔍 [DEBUG] HomeOwner - Calling createSupabaseBooking...');
+      if (__DEV__) console.log('🔍 [DEBUG] HomeOwner - Calling createSupabaseBooking...');
       const bookingId = await createSupabaseBooking(bookingData as BookingFormData);
-      console.log('🔍 [DEBUG] HomeOwner - createSupabaseBooking result:', bookingId);
+      if (__DEV__) console.log('🔍 [DEBUG] HomeOwner - createSupabaseBooking result:', bookingId);
       
       if (!bookingId) {
         console.error('❌ [HomeOwner] Booking creation failed - no ID returned');
         throw new Error('Failed to create booking. Please try again.');
       }
-      console.log('✅ [HomeOwner] Booking created successfully:', bookingId);
+      if (__DEV__) console.log('✅ [HomeOwner] Booking created successfully:', bookingId);
     } else if (editBooking) {
       // Verify owner can update this booking
       if (!editBooking.id || !ownerBookingsMap.value.has(editBooking.id)) {
@@ -886,7 +887,7 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
     uiStore.closeModal('eventModal');
   } catch (error) {
     console.error('❌ Failed to save your booking:', error);
-    // Show error to user - don't silently fail
+    // TODO: Replace alert with proper toast/snackbar once global notification system is wired up
     alert(error instanceof Error ? error.message : 'Failed to save booking');
   }
 };
@@ -1012,10 +1013,10 @@ const toggleSidebar = (): void => {
 let ownerDataLoaded = false;
 
 onMounted(async () => {
- console.log('🚀 [HomeOwner] Component mounted successfully!');
+ if (__DEV__) console.log('🚀 [HomeOwner] Component mounted successfully!');
   // Wait for auth to be properly initialized
   if (authStore.loading) {
-   console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
+   if (__DEV__) console.log('⏳ [HomeOwner] Auth store still loading, waiting...');
     const maxWait = 5000; // 5 seconds max
     const startTime = Date.now();
     while (authStore.loading && (Date.now() - startTime) < maxWait) {
@@ -1023,12 +1024,12 @@ onMounted(async () => {
     }
   }
   if (isOwnerAuthenticated.value) {
-   console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
+   if (__DEV__) console.log('✅ [HomeOwner] User is authenticated as owner, loading data...');
     try {
       // Fetch properties — bookings are already fetched by useSupabaseBookings onMounted
       await propertyStore.fetchProperties();
       ownerDataLoaded = true;
-     console.log('✅ [HomeOwner] Owner data loaded successfully');
+     if (__DEV__) console.log('✅ [HomeOwner] Owner data loaded successfully');
     } catch (error) {
       console.error('❌ [HomeOwner] Failed to load your data:', error);
     }
@@ -1053,33 +1054,33 @@ watch(xs, (newValue) => {
 
 // Watch for authentication changes — skip if onMounted already loaded data
 watch(isOwnerAuthenticated, async (newValue, oldValue) => {
- console.log('🔄 [HomeOwner] isOwnerAuthenticated changed:', {
+ if (__DEV__) console.log('🔄 [HomeOwner] isOwnerAuthenticated changed:', {
     from: oldValue,
     to: newValue,
     user: authStore.user
   });
   if (newValue && !oldValue) {
     if (ownerDataLoaded) {
-     console.log('⏭️ [HomeOwner] Data already loaded by onMounted, skipping');
+     if (__DEV__) console.log('⏭️ [HomeOwner] Data already loaded by onMounted, skipping');
       return;
     }
     // User became authenticated - load data
-   console.log('✅ [HomeOwner] User became authenticated, loading data...');
+   if (__DEV__) console.log('✅ [HomeOwner] User became authenticated, loading data...');
     try {
       // Fetch properties — bookings are already fetched by useSupabaseBookings onMounted
       await propertyStore.fetchProperties();
       ownerDataLoaded = true;
-     console.log('✅ [HomeOwner] Data loaded after auth change');
+     if (__DEV__) console.log('✅ [HomeOwner] Data loaded after auth change');
 
       // Initialize calendar state after auth change
       updateDateRange();
-     console.log('✅ [HomeOwner] Calendar state initialized after auth change');
+     if (__DEV__) console.log('✅ [HomeOwner] Calendar state initialized after auth change');
     } catch (error) {
       console.error('❌ [HomeOwner] Failed to load data after auth change:', error);
     }
   } else if (!newValue && oldValue) {
     // User became unauthenticated - could clear data if needed
-   console.log('⚠️ [HomeOwner] User became unauthenticated');
+   if (__DEV__) console.log('⚠️ [HomeOwner] User became unauthenticated');
   }
 });
 </script>

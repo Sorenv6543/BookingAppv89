@@ -1,4 +1,6 @@
 // src/composables/supabase/useSupabaseAuth.ts - Enhanced Production Version
+const __DEV__ = import.meta.env.DEV;
+
 import { ref, computed } from 'vue';
 import { supabase } from '@/plugins/supabase';
 import type { Session } from '@supabase/supabase-js';
@@ -46,7 +48,7 @@ export function useSupabaseAuth() {
       clearTimeout(initializationTimeout);
       
       supabase.auth.onAuthStateChange(async (event, newSession) => {
-       console.log('[Auth Debug] Auth state changed:', { event, userId: newSession?.user?.id });
+       if (__DEV__) console.log('[Auth Debug] Auth state changed:', { event, userId: newSession?.user?.id });
         
         try {
           if (event === 'INITIAL_SESSION') {
@@ -68,7 +70,7 @@ export function useSupabaseAuth() {
             session.value = null;
             error.value = null;
             profileLoadedForUserId = null;
-            console.log('✅ User signed out');
+            if (__DEV__) console.log('✅ User signed out');
           }
         } catch (err) {
           console.error('Auth state change error:', err);
@@ -109,13 +111,13 @@ export function useSupabaseAuth() {
   async function loadUserProfile(userId: string): Promise<void> {
     // Skip if already loaded for this user
     if (profileLoadedForUserId === userId && user.value?.id === userId) {
-      console.log(`⏭️ Profile already loaded for ${userId}, skipping`);
+      if (__DEV__) console.log(`⏭️ Profile already loaded for ${userId}, skipping`);
       return;
     }
 
     // Deduplicate: reuse in-flight request
     if (profileLoadPromise) {
-      console.log(`⏭️ Profile load already in progress, reusing promise`);
+      if (__DEV__) console.log(`⏭️ Profile load already in progress, reusing promise`);
       return profileLoadPromise;
     }
 
@@ -161,8 +163,8 @@ export function useSupabaseAuth() {
   }
 
   async function doLoadUserProfile(userId: string): Promise<void> {
-    console.log(`Loading user profile for: ${userId}`);
-    console.time(`profile-load-${userId}`);
+    if (__DEV__) console.log(`Loading user profile for: ${userId}`);
+    if (__DEV__) console.time(`profile-load-${userId}`);
 
     // Start the real query — don't race/discard it
     const queryPromise = supabase
@@ -178,15 +180,15 @@ export function useSupabaseAuth() {
         usedFallback = true;
         user.value = buildFallbackProfile(userId);
         profileLoadedForUserId = userId;
-        console.log('Using fallback profile (query still pending)');
-        console.log('Fallback profile role:', user.value?.role);
+        if (__DEV__) console.log('Using fallback profile (query still pending)');
+        if (__DEV__) console.log('Fallback profile role:', user.value?.role);
       }
     }, 3000);
 
     try {
-      console.log('Profile query started...');
+      if (__DEV__) console.log('Profile query started...');
       const { data, error: profileError } = await queryPromise;
-      console.timeEnd(`profile-load-${userId}`);
+      if (__DEV__) console.timeEnd(`profile-load-${userId}`);
       clearTimeout(fallbackTimer);
 
       if (profileError) {
@@ -202,12 +204,12 @@ export function useSupabaseAuth() {
       if (data) {
         // Always apply real data, even if fallback was used — this upgrades the profile
         applyProfileData(data, userId);
-        console.log('Profile loaded' + (usedFallback ? ' (upgraded from fallback)' : '') + ':', { email: user.value!.email, role: user.value!.role });
+        if (__DEV__) console.log('Profile loaded' + (usedFallback ? ' (upgraded from fallback)' : '') + ':', { email: user.value!.email, role: user.value!.role });
       } else if (!usedFallback) {
         // No data and no fallback yet
         user.value = buildFallbackProfile(userId);
         profileLoadedForUserId = userId;
-        console.log('No profile found, using fallback');
+        if (__DEV__) console.log('No profile found, using fallback');
       }
     } catch (err) {
       clearTimeout(fallbackTimer);
@@ -299,12 +301,12 @@ export function useSupabaseAuth() {
   }
 
   async function signOut(): Promise<boolean> {
-    console.log('🟡 useSupabaseAuth.signOut() called');
+    if (__DEV__) console.log('🟡 useSupabaseAuth.signOut() called');
     try {
       loading.value = true;
       error.value = null;
 
-      console.log('🟡 Calling supabase.auth.signOut()...');
+      if (__DEV__) console.log('🟡 Calling supabase.auth.signOut()...');
       
       // Add timeout to prevent hanging forever
       const signOutPromise = supabase.auth.signOut();
@@ -314,7 +316,7 @@ export function useSupabaseAuth() {
       
       try {
         const { error: signOutError } = await Promise.race([signOutPromise, timeoutPromise]);
-        console.log('🟡 supabase.auth.signOut() completed', signOutError);
+        if (__DEV__) console.log('🟡 supabase.auth.signOut() completed', signOutError);
         
         if (signOutError) {
           console.warn('⚠️ Sign out had error, but proceeding with local cleanup:', signOutError);
@@ -329,7 +331,7 @@ export function useSupabaseAuth() {
       error.value = null;
       profileLoadedForUserId = null;
       
-      console.log('🟡 Local state cleared, signOut returning true');
+      if (__DEV__) console.log('🟡 Local state cleared, signOut returning true');
       return true;
     } catch (err) {
       console.error('❌ Sign out error:', err);

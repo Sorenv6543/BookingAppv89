@@ -17,14 +17,18 @@
 </template>
 
 <script setup lang="ts">
+const __DEV__ = import.meta.env.DEV;
+
 import { ref, watch, nextTick, onMounted } from 'vue';
+
+
 import FullCalendar from '@/components/smart/FullCalendar.vue';
 import type { Booking, Property } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
 import type { EventResizeDoneArg } from '@fullcalendar/interaction';
 
 
-console.log('🔄 [OwnerCalendar] Script setup running...');
+if (__DEV__) console.log('🔄 [OwnerCalendar] Script setup running...');
 
 interface Props {
   bookings: Map<string, Booking>;
@@ -60,12 +64,12 @@ const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
 // ===== EVENT HANDLERS (SAFE - SIMPLE EMIT PATTERNS) =====
 
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  console.log('🗓️ [OwnerCalendar] Date selected:', selectInfo.startStr, 'to', selectInfo.endStr);
+  if (__DEV__) console.log('🗓️ [OwnerCalendar] Date selected:', selectInfo.startStr, 'to', selectInfo.endStr);
   emit('dateSelect', selectInfo);
 };
 
 const handleEventClick = (clickInfo: EventClickArg): void => {
-  console.log('👆 [OwnerCalendar] Event clicked:', clickInfo.event.id);
+  if (__DEV__) console.log('👆 [OwnerCalendar] Event clicked:', clickInfo.event.id);
   emit('eventClick', clickInfo);
 };
 
@@ -74,7 +78,7 @@ const handleEventDrop = (dropInfo: EventDropArg): void => {
 };
 
 const handleEventResize = (resizeInfo: EventResizeDoneArg): void => {
-  console.log('🔄 [OwnerCalendar] Event resized:', resizeInfo.event.id);
+  if (__DEV__) console.log('🔄 [OwnerCalendar] Event resized:', resizeInfo.event.id);
   emit('eventResize', resizeInfo);
 };
 
@@ -85,7 +89,7 @@ const handleCreateBooking = (data: { start: string; end: string; propertyId?: st
 // ===== PROGRAMMATIC CALENDAR METHODS =====
 
 const goToDate = (date: string | Date): void => {
-  console.log('🗓️ [OwnerCalendar] goToDate called:', date);
+  if (__DEV__) console.log('🗓️ [OwnerCalendar] goToDate called:', date);
   const targetDate = typeof date === 'string' ? new Date(date) : date;
   
   if (calendarRef.value) {
@@ -97,7 +101,7 @@ const goToDate = (date: string | Date): void => {
 };
 
 const changeView = (view: string): void => {
-  console.log('👁️ [OwnerCalendar] changeView called:', view);
+  if (__DEV__) console.log('👁️ [OwnerCalendar] changeView called:', view);
   
   if (calendarRef.value) {
     calendarRef.value.changeView(view);
@@ -106,7 +110,7 @@ const changeView = (view: string): void => {
 };
 
 const refreshEvents = (): void => {
-  console.log('🔄 [OwnerCalendar] refreshEvents called');
+  if (__DEV__) console.log('🔄 [OwnerCalendar] refreshEvents called');
   if (calendarRef.value) {
     calendarRef.value.refreshEvents();
   }
@@ -120,7 +124,7 @@ const getApi = () => {
 
 // Watch for view changes from parent (safe - simple prop watching)
 watch(() => props.currentView, (newView) => {
-  console.log('🎯 [OwnerCalendar] Current view changed from parent:', newView);
+  if (__DEV__) console.log('🎯 [OwnerCalendar] Current view changed from parent:', newView);
   
   nextTick(() => {
     if (newView && calendarRef.value) {
@@ -131,7 +135,7 @@ watch(() => props.currentView, (newView) => {
 
 // Watch for date changes from parent (safe - simple prop watching)
 watch(() => props.currentDate, (newDate) => {
-  console.log('📅 [OwnerCalendar] Current date changed from parent:', newDate);
+  if (__DEV__) console.log('📅 [OwnerCalendar] Current date changed from parent:', newDate);
   
   nextTick(() => {
     if (newDate && calendarRef.value) {
@@ -143,15 +147,15 @@ watch(() => props.currentDate, (newDate) => {
 // ===== LIFECYCLE =====
 
 onMounted(async () => {
-  console.log('🎬 [OwnerCalendar] Component mounted');
+  if (__DEV__) console.log('🎬 [OwnerCalendar] Component mounted');
   
   // Wait for DOM to be fully ready
   await nextTick();
   
-  console.log('🔗 [OwnerCalendar] Component ready');
+  if (__DEV__) console.log('🔗 [OwnerCalendar] Component ready');
 });
 
-console.log('✅ [OwnerCalendar] Setup complete!');
+if (__DEV__) console.log('✅ [OwnerCalendar] Setup complete!');
 
 // ===== EXPOSE METHODS TO PARENT =====
 defineExpose({

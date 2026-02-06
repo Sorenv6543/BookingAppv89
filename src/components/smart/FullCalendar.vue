@@ -7,7 +7,7 @@
     />
     
     <!-- Owner Day View Bottom Sheet -->
-    <OwnerDayViewBottomSheet
+    <!-- <OwnerDayViewBottomSheet
       v-model:visible="dayViewVisible"
       :date="selectedDate"
       :bookings="selectedDayBookings"
@@ -16,7 +16,7 @@
       @edit-booking="handleEditBooking"
       @complete-booking="handleCompleteBooking"
       @add-booking="handleAddBookingFromDayView"
-    />
+    /> -->
   </div>
 </template>
 
@@ -35,13 +35,13 @@ import type {
 import type { DateClickArg, EventResizeDoneArg } from '@fullcalendar/interaction';
 
 // Vue imports
-import { computed, ref, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue';
+import { computed, ref, shallowRef, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue';
 import { useTheme } from 'vuetify';
 
 // App imports
 import type { Booking, Property } from '@/types';
 import { getMobileCalendarOptions, handleViewportResize } from '@/utils/mobileViewport';
-import OwnerDayViewBottomSheet from '@/components/dumb/owner/OwnerDayViewBottomSheet.vue';
+// import OwnerDayViewBottomSheet from '@/components/dumb/owner/OwnerDayViewBottomSheet.vue';
 import { useAuthStore } from '@/stores/auth';
 import eventLogger from '@/composables/shared/useComponentEventLogger';
 
@@ -80,7 +80,7 @@ const emit = defineEmits<Emits>();
 
 const theme = useTheme();
 const authStore = useAuthStore();
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const calendarRef = shallowRef<InstanceType<typeof FullCalendar> | null>(null);
 
 // Day view bottom sheet state
 const dayViewVisible = ref(false);
@@ -133,7 +133,7 @@ const getEventColor = (booking: Booking): string => {
   return PROPERTY_COLORS[idx].bg;
 };
 
-const getEventBorderColor = (_booking: Booking): string => '#9e9e9e';
+const getEventBorderColor = (): string => '#9e9e9e';
 
 const getEventTextColor = (booking: Booking): string => {
   if (booking.status === 'completed') return '#E0E0E0';
@@ -151,52 +151,54 @@ const addOneDay = (dateString: string): string => {
   return date.toISOString().split('T')[0];
 };
 
+const convertBookingToEvent = (booking: Booking, property: Property | undefined) => {
+  const isTurn = booking.booking_type === 'turn';
+  const isUrgent = booking.priority === 'urgent';
+
+  const eventColor = getEventColor(booking);
+  const borderColor = getEventBorderColor();
+  const textColor = getEventTextColor(booking);
+
+  return {
+    id: booking.id,
+    title: `${property?.name || 'Unknown Property'} - ${isTurn ? 'TURN' : 'Standard'}`,
+    start: booking.checkin_date,
+    end: addOneDay(booking.checkout_date),
+    backgroundColor: eventColor,
+    borderColor: borderColor,
+    textColor: textColor,
+    editable: true,
+    startEditable: true,
+    durationEditable: true,
+    overlap: true,
+    extendedProps: {
+      booking,
+      property,
+      bookingType: booking.booking_type,
+      status: booking.status,
+      priority: booking.priority,
+      guestCount: booking.guest_count,
+      notes: booking.notes,
+      eventColor,
+      borderColor,
+      textColor
+    },
+    classNames: [
+      `booking-${booking.booking_type}`,
+      `status-${booking.status}`,
+      `priority-${booking.priority}`,
+      `type-${booking.booking_type}-${booking.priority}`,
+      isTurn ? 'turn-booking-event' : 'standard-booking-event',
+      isUrgent && isTurn ? 'turn-urgent-event' : '',
+      isUrgent ? 'urgent-event' : ''
+    ].filter(Boolean)
+  };
+};
+
 const calendarEvents = computed(() => {
-  const bookingsArray = Array.from(props.bookings.values());
-   
-  return bookingsArray.map(booking => {
+  return Array.from(props.bookings.values()).map(booking => {
     const property = props.properties.get(booking.property_id);
-    const isTurn = booking.booking_type === 'turn';
-    const isUrgent = booking.priority === 'urgent';
-    
-    const eventColor = getEventColor(booking);
-    const borderColor = getEventBorderColor(booking);
-    const textColor = getEventTextColor(booking);
-    
-    return {
-      id: booking.id,
-      title: `${property?.name || 'Unknown Property'} - ${isTurn ? 'TURN' : 'Standard'}`,
-      start: booking.checkin_date,
-      end: addOneDay(booking.checkout_date),
-      backgroundColor: eventColor,
-      borderColor: borderColor,
-      textColor: textColor,
-      editable: true,
-      startEditable: true,
-      durationEditable: true,
-      overlap: true,
-      extendedProps: {
-        booking,
-        property,
-        bookingType: booking.booking_type,
-        status: booking.status,
-        priority: booking.priority,
-        guestCount: booking.guest_count,
-        notes: booking.notes,
-        eventColor,
-        borderColor,
-        textColor
-      },
-      classNames: [
-        `booking-${booking.booking_type}`,
-        `status-${booking.status}`,
-        `priority-${booking.priority}`,
-        `type-${booking.booking_type}-${booking.priority}`,
-        isTurn ? 'turn-booking-event' : 'standard-booking-event',
-        isUrgent && isTurn ? 'turn-urgent-event' : '',
-        isUrgent ? 'urgent-event' : ''
-      ].filter(Boolean)
-    };
+    return convertBookingToEvent(booking, property);
   });
 });
 

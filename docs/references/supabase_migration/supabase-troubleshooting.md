@@ -16,7 +16,7 @@ Common issues and solutions when working with Supabase in the Property Cleaning 
 3. Update your `.env.local`:
    ```
    VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
    ```
 4. Restart your dev server: `pnpm dev`
 
@@ -118,7 +118,7 @@ SELECT * FROM bookings; -- Should return only user's bookings
 1. Create `.env.local` in project root:
    ```
    VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   
    ```
 2. Restart dev server (env vars only load on startup)
 3. Check file is not `.env.local.txt` (no extension needed)

@@ -14,72 +14,22 @@
       "Bash(compgen:*)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs",
-      "Bash(sed:*)",
-      "Bash(npx vue-tsc:*)",
-      "Bash(Remove-Item -Recurse -Force node_modules.vite -ErrorAction SilentlyContinue)",
-      "Bash(rm:*)",
-      "Bash(curl:*)",
-      "mcp__sequential-thinking__get-library-docs",
-      "Bash(npm run lint)",
-      "Bash(grep:*)",
-      "Bash(npm run build:*)",
-      "Bash(grep:*)",
-      "Bash(mkdir:*)",
-      "Bash(npm test)",
-      "Bash(find:*)",
-      "mcp__serena__replace_regex",
-      "mcp__serena__search_for_pattern",
-      "Bash(pnpm dev:*)",
-      "mcp__supabase__list_migrations",
-      "Bash(git add:*)",
-      "Bash(wc:*)",
-      "Bash(npm install:*)",
-      "Bash(npx supabase@latest:*)",
-      "Bash(docker --version:*)",
-      "Bash(ls:*)",
-      "Bash(npm run type-check:*)",
-      "Bash(gh pr list:*)",
-      "Bash(where:*)",
-<<<<<<< Updated upstream
-      "Bash(git -C \"c:\\\\Users\\\\Soren\\\\BookingAppv89\" status)",
-      "Bash(pnpm run build:*)",
-      "Bash(pnpm preview)",
-      "mcp__vuetify-mcp__get_component_api_by_version",
-      "mcp__vuetify-mcp__get_feature_guide",
-      "Bash(npx pnpm test:run:*)",
-      "mcp__filesystem__list_directory",
-      "Bash(pnpm add:*)",
-      "Bash(npx vercel:*)",
-      "Bash(pnpm build:fast:*)",
-      "Bash(pnpm run build:fast:*)",
-      "Bash(pnpm build:*)"
-=======
-      "Bash(git -C \"c:\\\\Users\\\\Soren\\\\BookingAppv89\" status)"
->>>>>>> Stashed changes
+      "mcp__context7__get-library-usage",
+      "mcp__context7__get-library-dependencies",
+      "Bash(git rev-list:*)",
+      "Bash(git rev-list --left-right --count origin/main...HEAD)"
     ],
     "deny": []
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
-    "sequential-thinking",
     "supabase",
     "context7",
-    "desktop-commander",
     "browser-tools-enhanced",
-    "puppeteer",
-    "playwright"
+    "browser-tools"
   ],
-  "disabledMcpjsonServers": [
-    "sequential-thinking",
-    "supabase",
-    "context7",
-    "desktop-commander",
-    "browser-tools-enhanced",
-    "puppeteer",
-    "playwright"
-  ],
+  "disabledMcpjsonServers": [],
   "enabledPlugins": {
     "supabase@claude-plugins-official": true
   }
-  
 }

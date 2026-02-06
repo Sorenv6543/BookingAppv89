@@ -9,7 +9,7 @@ Branch: `CHECKPOINT`
 
 ### 1. Rotate base Credentials ⏰ CRITICAL
 ```bash
-# Go to: https://app.base.com/project/otmfvzkokrxduipxkyga
+# Go to: https://app.supabase.com/project/otmfvzkokrxduipxkyga
 # Settings > API > Regenerate new anon key
 # Settings > Access Tokens > Create new token
 ```
@@ -21,8 +21,8 @@ cp .env.example .env.local
 cp .cursor/mcp.json.example .cursor/mcp.json
 
 # Edit .env.local with YOUR credentials
-VITE_BASE_URL=https://<YOUR-PROJECT>.base.co
-VITE_BASE_ANON_KEY=<YOUR-KEY>
+VITE_SUPABASE_URL=https://<YOUR-PROJECT>.supabase.co
+VITE_SUPABASE_ANON_KEY=<YOUR-KEY>
 ```
 
 ### 3. Update Code Calling `create_admin_user()`
@@ -151,8 +151,8 @@ CREATE FUNCTION public.create_admin_user(
 
 ### `.env.example` - Environment Variables Template
 ```bash
-VITE_BASE_URL=https://<your-project-ref>.base.co
-VITE_BASE_ANON_KEY=<your-anon-key>
+VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
+VITE_SUPABASE_ANON_KEY=<your-anon-key>
 ```
 
 ### `.cursor/mcp.json.example` - Cursor IDE MCP Config
@@ -209,8 +209,8 @@ git show 02874b7 --stat
 ```bash
 # Vercel / Netlify
 BASE_ACCESS_TOKEN=<your-new-token>
-VITE_BASE_URL=https://<project-ref>.base.co
-VITE_BASE_ANON_KEY=<new-anon-key>
+VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+VITE_SUPABASE_ANON_KEY=<new-anon-key>
 
 # CI/CD Pipelines
 export BASE_ACCESS_TOKEN=<service-account-token>

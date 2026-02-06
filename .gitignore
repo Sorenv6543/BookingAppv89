@@ -34,6 +34,9 @@ dist-ssr
 mcp.json
 .mcp.json
 
+# Vite temp files
+vite.config.ts.timestamp-*
+
 # Build output
 /dist
 /build
