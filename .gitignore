@@ -46,6 +46,9 @@ dist-ssr
 .temp
 .tmp
 
+# TypeScript build info
+*.tsbuildinfo
+
 # Playwright
 /test-results/
 /playwright-report/
