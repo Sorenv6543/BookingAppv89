@@ -90,15 +90,18 @@ const toggleSidebar = () => {
 };
 
 // Event handlers for sidebar
-const handleNavigateToBooking = (bookingId: string) => {
+const handleNavigateToBooking = (...args: any[]) => {
+  const bookingId = args[0] as string;
   router.push(`/admin/bookings/${bookingId}`);
 };
 
-const handleNavigateToDate = (date: Date) => {
+const handleNavigateToDate = (...args: any[]) => {
+  const date = args[0] as Date;
   router.push(`/admin/schedule?date=${date.toISOString().split('T')[0]}`);
 };
 
-const handleFilterByProperty = (propertyId: string | null) => {
+const handleFilterByProperty = (...args: any[]) => {
+  const propertyId = args[0] as string | null;
   console.log('Filter by property:', propertyId);
 };
 
@@ -110,7 +113,8 @@ const handleCreateProperty = () => {
   router.push('/admin/properties/create');
 };
 
-const handleAssignCleaner = (data: { bookingId: string, cleanerId?: string }) => {
+const handleAssignCleaner = (...args: any[]) => {
+  const data = args[0] as { bookingId: string, cleanerId?: string };
   console.log('Assign cleaner:', data);
 };
 
