@@ -7,7 +7,7 @@
     />
     
     <!-- Owner Day View Bottom Sheet -->
-    <!-- <OwnerDayViewBottomSheet
+    <OwnerDayViewBottomSheet
       v-model:visible="dayViewVisible"
       :date="selectedDate"
       :bookings="selectedDayBookings"
@@ -16,7 +16,7 @@
       @edit-booking="handleEditBooking"
       @complete-booking="handleCompleteBooking"
       @add-booking="handleAddBookingFromDayView"
-    /> -->
+    />
   </div>
 </template>
 
@@ -249,6 +249,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   datesSet: handleCalendarMount,
   viewDidMount: handleViewMount,
   eventContent: renderEventContent,
+ 
   
   // Business hours
   businessHours: {

@@ -439,9 +439,9 @@
         </div>
         
         <v-menu offset-y>
-          <template #activator="{ props }">
+          <template #activator="{ props: slotProps }">
             <v-btn
-              v-bind="props"
+              v-bind="slotProps"
               icon
               size="small"
               variant="text"

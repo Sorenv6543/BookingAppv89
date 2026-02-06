@@ -26,7 +26,8 @@ export default defineConfig({
     }),
     vuetify({ 
           autoImport: true, // Enable auto-import for Vuetify components
-          styles: 'sass' // Use 'sass' instead of configFile to prevent 404 errors
+          
+        
     }),
     // Only include PWA plugin in production to prevent manifest errors in development
     ...(process.env.NODE_ENV === 'production' ? [VitePWA({

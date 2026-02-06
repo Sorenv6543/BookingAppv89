@@ -57,6 +57,11 @@ vite.config.ts.timestamp-*
 # Accidentally committed diagnostic files
 nul
 
+# specstory 
+/specstory
+/vercel
+
+
 
 
 

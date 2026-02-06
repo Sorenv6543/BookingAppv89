@@ -57,6 +57,9 @@ const props = withDefaults(defineProps<Props>(), {
   size: 40,
   width: 4,
   color: 'primary',
+  message: undefined,
+  progress: undefined,
+  showProgress: false,
   variant: 'inline',
   centered: true,
   minHeight: 'auto'

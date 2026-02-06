@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant User
+    participant HomeOwner
+    participant BookingForm
+    participant useOwnerBookings
+    participant BookingStore
+    participant Supabase
+    participant Performance
+    
+    User->>HomeOwner: Click "Create Booking"
+    HomeOwner->>HomeOwner: handleCreateBooking()
+    HomeOwner->>BookingForm: Open modal
+    User->>BookingForm: Fill form data
+    BookingForm->>BookingForm: Validate form
+    BookingForm->>HomeOwner: @save event
+    HomeOwner->>useOwnerBookings: createMyBooking()
+    useOwnerBookings->>BookingStore: addBooking()
+    BookingStore->>BookingStore: Optimistic update
+    BookingStore->>Supabase: Insert booking
+    Supabase-->>BookingStore: Success response
+    BookingStore->>BookingStore: invalidateCache()
+    BookingStore->>Performance: Cache invalidation
+    useOwnerBookings->>HomeOwner: Success response
+    HomeOwner->>BookingForm: Close modal

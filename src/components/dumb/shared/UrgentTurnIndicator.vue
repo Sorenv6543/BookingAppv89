@@ -214,6 +214,9 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   userRole: 'owner',
+  propertyName: undefined,
+  cleaningWindow: undefined,
+  timeRemaining: undefined,
   animated: true,
   striped: true,
   closable: true,

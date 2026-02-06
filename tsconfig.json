@@ -53,7 +53,10 @@
     "docs",
     "docs/**/*",
     "scripts",
-    "scripts/**/*"
+    "scripts/**/*",
+    "vercel.json",
+    "vercel/**",
+    "vercel-build.sh"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

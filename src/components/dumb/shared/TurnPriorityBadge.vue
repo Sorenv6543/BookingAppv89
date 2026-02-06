@@ -80,6 +80,7 @@ const props = withDefaults(defineProps<Props>(), {
   label: true,
   showIcon: true,
   showTimeRemaining: false,
+  timeRemaining: undefined,
   size: 'small',
   variant: 'flat'
 });
