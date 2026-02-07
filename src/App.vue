@@ -20,7 +20,13 @@ import PWANotificationsEnhanced from '@/components/dumb/shared/PWANotificationsE
 
 // Available layouts
 const layouts = {
-  default: markRaw(DefaultLayout),
+  _default: markRaw(DefaultLayout),
+  get default() {
+    return this._default
+  },
+  set default(value) {
+    this._default = value
+  },
   auth: markRaw(AuthLayout),
   admin: markRaw(AdminLayout),
 }
