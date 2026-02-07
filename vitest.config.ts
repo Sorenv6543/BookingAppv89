@@ -1,3 +1,4 @@
+import { test } from '@playwright/test';
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
@@ -18,6 +19,9 @@ export default defineConfig({
         compilerOptions: {
           sourceMap: true // Enable template source maps for debugging
         }
+        test: {
+         environment: 'happy-dom' // Enable test-specific compiler options if needed
+        }
       },
       features: {
         propsDestructure: true,         // Reactive destructure for defineProps (Vue 3.5+)
@@ -29,7 +33,7 @@ export default defineConfig({
     vuetify({ 
       autoImport: true, // Enable auto-import for Vuetify components
       styles: {
-        configFile: 'src/styles/variables.scss'
+        configFile: 
       }
     }),
     // Only include PWA plugin in production to prevent manifest errors in development

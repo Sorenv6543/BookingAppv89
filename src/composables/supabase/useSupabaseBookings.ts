@@ -3,6 +3,7 @@ import { supabase } from '@/plugins/supabase';
 import type { Booking, BookingFormData, BookingStatus } from '@/types';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
+
 const __DEV__ = import.meta.env.DEV;
 
 /**
@@ -20,6 +21,7 @@ export function useSupabaseBookings() {
   const bookings = ref<Booking[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  
   
   // Real-time subscription
   let subscription: RealtimeChannel | null = null;

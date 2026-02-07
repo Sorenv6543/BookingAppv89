@@ -59,7 +59,7 @@ src/components/smart/owner/HomeOwner.vue -
         <v-card
           flat
           density="compact"
-          class="calendar-header-card flex-shrink-0 prominent-header"
+          class="calendar-header-card shrink-0 prominent-header"
           elevation="3"
         >
           <v-card-text class="pa-4">
@@ -97,7 +97,7 @@ src/components/smart/owner/HomeOwner.vue -
         </v-card>
 
         <!-- Calendar Content - Flexible height -->
-        <div class="calendar-content flex-grow-1">
+        <div class="calendar-content grow">
           <OwnerCalendar
             ref="calendarRef"
             :bookings="ownerFilteredBookings"
