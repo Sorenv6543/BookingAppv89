@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Multi-tenant property cleaning scheduler with role-based Owner/Admin UI. Core product: guest-stay booking plus cleaning operations. Tech stack: Vue 3 + Vite + Vuetify, Pinia for state, Supabase for auth/Postgres/RLS/realtime.
 
-## Commands
+##< Commands
 
 ```bash
 # Development
