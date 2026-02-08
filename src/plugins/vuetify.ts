@@ -1,41 +1,19 @@
 // src/plugins/vuetify.ts
 import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
 import { aliases, mdi } from 'vuetify/iconsets/mdi';
-// import type { ThemeDefinition } from 'vuetify';
+import * as labsComponents from 'vuetify/labs/components';
 
-// Import Vuetify styles
+// Import Vuetify styles (vite-plugin-vuetify handles component styles via autoImport)
 import 'vuetify/styles';
 import '@mdi/font/css/materialdesignicons.css';
 
-// Theme configuration
-// // const _lightTheme: ThemeDefinition = {
-//   dark: false,
-//   colors: {
-//     primary: '#1976d2', 
-//     secondary: '#e0e7f81e;',
-//     accent: '#045ecc', 
-//     error: '#80b3ec', 
-//     info: '#6b7280',
-//     success: '#093d8b',
-//     warning: '#FF9800',
-//     background: '#ffffff', 
-//     surface: '#ffffff',  
-//     'on-background': '#1C1B1F',
-//     'on-surface': '#1C1B1F',
-//     'surface-variant': '#69acfa', 
-//     'on-surface-variant': '#49454F',
-//     'turn-urgent': '#F44336',
-//     'turn-standard': '#FF9800', 
-//     'booking-standard': '#2196F3', 
-//   }
-// };
+// Terminal Swiss Design System theme
 
 
 export default createVuetify({
-  components,
-  directives,
+  components: {
+    ...labsComponents,
+  },
   
   // Icon configuration
   icons: {
@@ -52,24 +30,34 @@ export default createVuetify({
     themes: {
       light: {
         colors: {
-          primary: '#1976D2',
-          secondary: '#e0e7f81e',
-          accent: '#82B1FF',
-          error: '#FF5252',
-          info: '#2196F3',
-          success: '#4CAF50',
-          warning: '#FFC107',
+          primary: '#000000',
+          secondary: '#777777',
+          accent: '#E53935',
+          error: '#E53935',
+          info: '#777777',
+          success: '#000000',
+          warning: '#E53935',
+          background: '#FFFFFF',
+          surface: '#FFFFFF',
+          'on-background': '#000000',
+          'on-surface': '#000000',
+          'surface-variant': '#E4E4E4',
+          'on-surface-variant': '#777777',
         },
       },
       dark: {
         colors: {
-          primary: '#2196F3',
-          secondary: '#424242',
-          accent: '#FF4081',
-          error: '#FF5252',
-          info: '#2196F3',
-          success: '#4CAF50',
-          warning: '#FFC107',
+          primary: '#FFFFFF',
+          secondary: '#999999',
+          accent: '#E53935',
+          error: '#E53935',
+          info: '#999999',
+          success: '#DDDDDD',
+          warning: '#E53935',
+          background: '#000000',
+          surface: '#111111',
+          'on-background': '#FFFFFF',
+          'on-surface': '#FFFFFF',
         },
       }         
     },
@@ -83,73 +71,73 @@ export default createVuetify({
   // Default configuration for components
   defaults: {
     VBtn: {
-      style: 'text-transform: none;', // Remove uppercase transform
+      style: 'text-transform: none;',
       variant: 'flat',
-      rounded: true,
-      elevation: 1
+      rounded: 0,
+      elevation: 0
     },
     VCard: {
-      elevation: 2,
-      rounded: 'lg',
+      elevation: 0,
+      rounded: 0,
       class: 'pa-2'
     },
     VChip: {
-      rounded: 'pill',
+      rounded: 0,
     },
     VTextField: {
       variant: 'outlined',
       density: 'comfortable',
-      rounded: 'lg',
+      rounded: 0,
       hideDetails: 'auto'
     },
     VSelect: {
-      variant: 'outlined', 
+      variant: 'outlined',
       density: 'comfortable',
-      rounded: 'lg',
+      rounded: 0,
       hideDetails: 'auto'
     },
     VTextarea: {
       variant: 'outlined',
-      rounded: 'lg',
+      rounded: 0,
       hideDetails: 'auto'
     },
     VAutocomplete: {
       variant: 'outlined',
       density: 'comfortable',
-      rounded: 'lg',
+      rounded: 0,
       hideDetails: 'auto'
     },
     VCombobox: {
       variant: 'outlined',
       density: 'comfortable',
-      rounded: 'lg',
+      rounded: 0,
       hideDetails: 'auto'
     },
     VList: {
       bgColor: 'transparent',
-      rounded: 'lg'
+      rounded: 0
     },
     VListItem: {
-      rounded: 'lg',
+      rounded: 0,
       minHeight: '40px'
     },
     VNavigationDrawer: {
-      rounded: 'lg',
-      elevation: 3
+      rounded: 0,
+      elevation: 0
     },
     VDialog: {
       maxWidth: '700px',
-      rounded: 'lg'
+      rounded: 0
     },
     VAlert: {
-      rounded: 'lg',
+      rounded: 0,
       variant: 'tonal'
     },
     VBadge: {
-      rounded: 'pill'
+      rounded: 0
     },
     VExpansionPanel: {
-      rounded: 'lg',
+      rounded: 0,
       elevation: 0
     }
   },

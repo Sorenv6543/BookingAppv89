@@ -8,7 +8,7 @@
     @keydown.esc="handleClose"
   >
     <v-card class="modal-card">
-      <v-card-title class="text-h5 pb-2 flex-shrink-0">
+      <v-card-title class="text-h5 pb-2 shrink-0">
         {{ formTitle }}
         <v-chip
           v-if="form.booking_type === 'turn'"
@@ -57,7 +57,6 @@
                 <v-text-field
                   v-model="form.checkin_date"
                   label="Check-in Date"
-                  type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
@@ -66,8 +65,20 @@
                   hint="When guests arrive (start of stay)"
                   persistent-hint
                   prepend-inner-icon="mdi-calendar-plus"
-                  @update:model-value="updateBookingType"
-                />
+                  readonly
+                >
+                  <v-dialog
+                    activator="parent"
+                    max-width="360"
+                  >
+                    <template #default="{ isActive }">
+                      <v-date-picker
+                        :model-value="toDate(form.checkin_date as string)"
+                        @update:model-value="(d: unknown) => { form.checkin_date = toDateStr(d); updateBookingType(); isActive.value = false; }"
+                      />
+                    </template>
+                  </v-dialog>
+                </v-text-field>
               </v-col>
               
               <v-col
@@ -77,7 +88,6 @@
                 <v-text-field
                   v-model="form.checkout_date"
                   label="Check-out Date"
-                  type="date"
                   :rules="dateRules"
                   required
                   variant="outlined"
@@ -86,8 +96,20 @@
                   hint="When guests leave (end of stay)"
                   persistent-hint
                   prepend-inner-icon="mdi-calendar-remove"
-                  @update:model-value="updateBookingType"
-                />
+                  readonly
+                >
+                  <v-dialog
+                    activator="parent"
+                    max-width="360"
+                  >
+                    <template #default="{ isActive }">
+                      <v-date-picker
+                        :model-value="toDate(form.checkout_date as string)"
+                        @update:model-value="(d: unknown) => { form.checkout_date = toDateStr(d); updateBookingType(); isActive.value = false; }"
+                      />
+                    </template>
+                  </v-dialog>
+                </v-text-field>
               </v-col>
             </v-row>
             
@@ -100,7 +122,6 @@
                 <v-text-field
                   v-model="form.checkin_time"
                   label="Check-in Time"
-                  type="time"
                   :rules="checkinTimeRules"
                   required
                   variant="outlined"
@@ -109,7 +130,21 @@
                   :hint="checkinTimeHint"
                   persistent-hint
                   prepend-inner-icon="mdi-clock-outline"
-                />
+                  readonly
+                >
+                  <v-dialog
+                    activator="parent"
+                    max-width="340"
+                  >
+                    <template #default="{ isActive }">
+                      <v-time-picker
+                        v-model="form.checkin_time"
+                        format="ampm"
+                        @update:model-value="isActive.value = false"
+                      />
+                    </template>
+                  </v-dialog>
+                </v-text-field>
               </v-col>
               
               <v-col
@@ -119,7 +154,6 @@
                 <v-text-field
                   v-model="form.checkout_time"
                   label="Check-out Time"
-                  type="time"
                   :rules="checkoutTimeRules"
                   required
                   variant="outlined"
@@ -128,7 +162,21 @@
                   :hint="checkoutTimeHint"
                   persistent-hint
                   prepend-inner-icon="mdi-clock-outline"
-                />
+                  readonly
+                >
+                  <v-dialog
+                    activator="parent"
+                    max-width="340"
+                  >
+                    <template #default="{ isActive }">
+                      <v-time-picker
+                        v-model="form.checkout_time"
+                        format="ampm"
+                        @update:model-value="isActive.value = false"
+                      />
+                    </template>
+                  </v-dialog>
+                </v-text-field>
               </v-col>
             </v-row>
             
@@ -279,6 +327,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue';
+import { useDate } from 'vuetify';
 import { usePropertyStore } from '@/stores/property';
 import type { Booking, BookingFormData, BookingStatus, BookingType, Property } from '@/types';
 import type { VForm } from 'vuetify/components';
@@ -289,6 +338,16 @@ import {
   getCheckinTimeValidationRules, 
   getTimeHint 
 } from '@/utils/timeDefaults';
+
+const dateAdapter = useDate();
+function toDate(str: string): Date | undefined {
+  if (!str) return undefined;
+  return dateAdapter.parseISO(str) as Date;
+}
+function toDateStr(d: unknown): string {
+  if (!d) return '';
+  return dateAdapter.toISO(d as Date).substring(0, 10);
+}
 
 // PROPS & EMITS
 interface Props {
@@ -372,7 +431,7 @@ const selectedProperty = computed((): Property | undefined => {
 
 // Time validation rules and hints
 const checkoutTimeRules = computed(() => getTimeValidationRules(selectedProperty.value));
-const checkinTimeRules = computed(() => getCheckinTimeValidationRules(form.checkout_time || ''));
+const checkinTimeRules = computed(() => getCheckinTimeValidationRules(String(form.checkout_time || '')));
 const checkoutTimeHint = computed(() => getTimeHint('checkout', selectedProperty.value));
 const checkinTimeHint = computed(() => getTimeHint('checkin', selectedProperty.value));
 
@@ -465,12 +524,15 @@ function resetForm(): void {
     const checkoutDate = props.booking.checkout_date;
     const checkinDate = props.booking.checkin_date;
     
+    // Normalize times: strip seconds (HH:MM:SS → HH:MM) for display and validation
+    const normalizeTime = (t: string) => t && t.length > 5 ? t.substring(0, 5) : (t || '');
+    
     Object.assign(form, {
       property_id: props.booking.property_id,
       checkout_date: formatDateForInput(safeString(checkoutDate)),
       checkin_date: formatDateForInput(safeString(checkinDate)),
-      checkin_time: props.booking.checkin_time || '',
-      checkout_time: props.booking.checkout_time || '',
+      checkin_time: normalizeTime(props.booking.checkin_time || ''),
+      checkout_time: normalizeTime(props.booking.checkout_time || ''),
       booking_type: props.booking.booking_type,
       guest_count: props.booking.guest_count,
       notes: props.booking.notes,
@@ -683,6 +745,10 @@ watch(() => props.open, (newValue) => {
     // Add small delay to ensure props are fully updated
     nextTick(() => {
       resetForm();
+      // Trigger validation after form data is loaded so formValid reflects actual state
+      nextTick(() => {
+        formRef.value?.validate();
+      });
     });
   }
 });
@@ -709,7 +775,7 @@ watch(() => form.property_id, (newPropertyId) => {
   });
   
   if (newPropertyId && props.mode === 'create') {
-    const property = propertyStore.getPropertyById(newPropertyId);
+    const property = propertyStore.getPropertyById(String(newPropertyId));
     console.log('🔍 Found property:', property);
     
     if (property) {

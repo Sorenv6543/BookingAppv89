@@ -409,6 +409,15 @@ export function useCalendarState() {
   }
   
   /**
+   * Add one day to a date string (FullCalendar end dates are exclusive)
+   */
+  function addOneDay(dateString: string): string {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toISOString().split('T')[0];
+  }
+
+  /**
    * Convert bookings to FullCalendar event format
    */
   function bookingsToEvents(bookings: Booking[]) {
@@ -429,7 +438,7 @@ export function useCalendarState() {
         id: booking.id,
         title: isPriority ? '🔥 TURN BOOKING' : 'Standard Cleaning',
         start: booking.checkin_date,
-        end: booking.checkout_date,
+        end: addOneDay(booking.checkout_date), // FullCalendar end is exclusive, so +1 to include checkout day
         backgroundColor: statusColors[booking.status],
         borderColor: statusColors[booking.status],
         textColor: '#FFFFFF',

@@ -124,41 +124,37 @@ export function validateTimeOrder(checkinTime: string, checkoutTime: string): {
  */
 export function validateTimeFormat(time: string): boolean {
   if (!time) return false;
-  return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(time);
+  // Accept both HH:MM and HH:MM:SS (database format)
+  return /^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/.test(time);
 }
 
 /**
  * Get time validation rules for Vuetify forms
  */
-export function getTimeValidationRules(property?: Property) {
-  const defaultTimes = getDefaultTimes(property);
-  
+export function getTimeValidationRules(_property?: Property) {
   return [
     (v: string) => !!v || 'Time is required',
     (v: string) => validateTimeFormat(v) || 'Invalid time format (HH:MM)',
-    (v: string) => {
-      if (!v) return true;
-      const checkinTime = v;
-      const checkoutTime = defaultTimes.checkout;
-      const validation = validateTimeOrder(checkinTime, checkoutTime);
-      return validation.valid || validation.error || 'Invalid time order';
-    }
+  ];
+}
+
+/**
+ * Get checkin time validation rules (depends on checkout time)
+ */
+export function getCheckinTimeValidationRules(_checkoutTime?: string) {
+  return [
+    (v: string) => !!v || 'Time is required',
+    (v: string) => validateTimeFormat(v) || 'Invalid time format (HH:MM)',
   ];
 }
 
 /**
  * Get checkout time validation rules (depends on checkin time)
  */
-export function getCheckoutTimeValidationRules(checkinTime: string) {
-  
+export function getCheckoutTimeValidationRules(_checkinTime?: string) {
   return [
     (v: string) => !!v || 'Time is required',
     (v: string) => validateTimeFormat(v) || 'Invalid time format (HH:MM)',
-    (v: string) => {
-      if (!v || !checkinTime) return true;
-      const validation = validateTimeOrder(checkinTime, v);
-      return validation.valid || validation.error || 'Checkout time must be after checkin time';
-    }
   ];
 }
 

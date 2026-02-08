@@ -1,6 +1,29 @@
 <template>
   <div class="owner-calendar-container">
-    <!-- Owner Calendar: Shows only owner's bookings across their properties -->
+    <!-- Custom Month Navigation Toolbar -->
+    <div class="calendar-toolbar">
+      <button
+        class="nav-btn"
+        @click="handlePrev"
+      >
+        <v-icon size="20">
+          mdi-chevron-left
+        </v-icon>
+      </button>
+      <div class="month-label">
+        <span class="month-text">{{ currentMonthLabel }}</span>
+      </div>
+      <button
+        class="nav-btn"
+        @click="handleNext"
+      >
+        <v-icon size="20">
+          mdi-chevron-right
+        </v-icon>
+      </button>
+    </div>
+
+    <!-- Owner Calendar -->
     <FullCalendar
       ref="calendarRef"
       :bookings="props.bookings"
@@ -12,17 +35,17 @@
       @event-drop="handleEventDrop"
       @event-resize="handleEventResize"
       @create-booking="handleCreateBooking"
+      @update-booking="handleUpdateBooking"
+      @delete-booking="handleDeleteBooking"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted } from 'vue';
+import { ref, watch, nextTick, onMounted, computed } from 'vue';
 import FullCalendar from '@/components/smart/FullCalendar.vue';
 import type { Booking, Property } from '@/types';
 import type { DateSelectArg, EventClickArg, EventDropArg } from '@fullcalendar/core';
-
-console.log('🔄 [OwnerCalendar] Script setup running...');
 
 interface Props {
   bookings: Map<string, Booking>;
@@ -38,13 +61,15 @@ interface Emits {
   (e: 'eventDrop', dropInfo: EventDropArg): void;
   (e: 'eventResize', resizeInfo: EventDropArg): void;
   (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
+  (e: 'updateBooking', data: { id: string; start: string; end: string }): void;
+  (e: 'deleteBooking', bookingId: string): void;
   (e: 'viewChange', view: string): void;
   (e: 'dateChange', date: Date): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
-  currentView: 'timeGridWeek',
+  currentView: 'dayGridMonth',
   currentDate: () => new Date()
 });
 
@@ -52,53 +77,76 @@ const emit = defineEmits<Emits>();
 
 // ===== REFS AND REACTIVE DATA =====
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const displayDate = ref(new Date());
 
+// ===== COMPUTED =====
+const currentMonthLabel = computed(() => {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  return `${months[displayDate.value.getMonth()]} ${displayDate.value.getFullYear()}`;
+});
 
+// ===== TOOLBAR NAVIGATION =====
+const handlePrev = (): void => {
+  const api = calendarRef.value?.getApi();
+  if (api) {
+    api.prev();
+    displayDate.value = api.getDate();
+  }
+};
 
-// ===== EVENT HANDLERS (SAFE - SIMPLE EMIT PATTERNS) =====
+const handleNext = (): void => {
+  const api = calendarRef.value?.getApi();
+  if (api) {
+    api.next();
+    displayDate.value = api.getDate();
+  }
+};
+
+// ===== EVENT HANDLERS =====
 
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  console.log('🗓️ [OwnerCalendar] Date selected:', selectInfo.startStr, 'to', selectInfo.endStr);
   emit('dateSelect', selectInfo);
 };
 
 const handleEventClick = (clickInfo: EventClickArg): void => {
-  console.log('👆 [OwnerCalendar] Event clicked:', clickInfo.event.id);
   emit('eventClick', clickInfo);
 };
 
 const handleEventDrop = (dropInfo: EventDropArg): void => {
-  console.log('🎯 [OwnerCalendar] Event dropped:', dropInfo.event.id);
   emit('eventDrop', dropInfo);
 };
 
 const handleEventResize = (resizeInfo: EventDropArg): void => {
-  console.log('🔄 [OwnerCalendar] Event resized:', resizeInfo.event.id);
   emit('eventResize', resizeInfo);
 };
 
 const handleCreateBooking = (data: { start: string; end: string; propertyId?: string }): void => {
-  console.log('➕ [OwnerCalendar] Create booking:', data);
   emit('createBooking', data);
+};
+
+const handleUpdateBooking = (data: { id: string; start: string; end: string }): void => {
+  emit('updateBooking', data);
+};
+
+const handleDeleteBooking = (bookingId: string): void => {
+  emit('deleteBooking', bookingId);
 };
 
 // ===== PROGRAMMATIC CALENDAR METHODS =====
 
 const goToDate = (date: string | Date): void => {
-  console.log('🗓️ [OwnerCalendar] goToDate called:', date);
   const targetDate = typeof date === 'string' ? new Date(date) : date;
-  
   if (calendarRef.value) {
     calendarRef.value.goToDate(targetDate);
   }
-  
-  // Emit date change event
+  displayDate.value = targetDate;
   emit('dateChange', targetDate);
 };
 
 const changeView = (view: string): void => {
-  console.log('👁️ [OwnerCalendar] changeView called:', view);
-  
   if (calendarRef.value) {
     calendarRef.value.changeView(view);
   }
@@ -106,7 +154,6 @@ const changeView = (view: string): void => {
 };
 
 const refreshEvents = (): void => {
-  console.log('🔄 [OwnerCalendar] refreshEvents called');
   if (calendarRef.value) {
     calendarRef.value.refreshEvents();
   }
@@ -116,12 +163,9 @@ const getApi = () => {
   return calendarRef.value?.getApi() || null;
 };
 
-// ===== WATCHERS (SAFE - SIMPLE, NON-CIRCULAR) =====
+// ===== WATCHERS =====
 
-// Watch for view changes from parent (safe - simple prop watching)
 watch(() => props.currentView, (newView) => {
-  console.log('🎯 [OwnerCalendar] Current view changed from parent:', newView);
-  
   nextTick(() => {
     if (newView && calendarRef.value) {
       changeView(newView);
@@ -129,10 +173,7 @@ watch(() => props.currentView, (newView) => {
   });
 });
 
-// Watch for date changes from parent (safe - simple prop watching)
 watch(() => props.currentDate, (newDate) => {
-  console.log('📅 [OwnerCalendar] Current date changed from parent:', newDate);
-  
   nextTick(() => {
     if (newDate && calendarRef.value) {
       goToDate(newDate);
@@ -143,15 +184,12 @@ watch(() => props.currentDate, (newDate) => {
 // ===== LIFECYCLE =====
 
 onMounted(async () => {
-  console.log('🎬 [OwnerCalendar] Component mounted');
-  
-  // Wait for DOM to be fully ready
   await nextTick();
-  
-  console.log('🔗 [OwnerCalendar] Component ready');
+  const api = calendarRef.value?.getApi();
+  if (api) {
+    displayDate.value = api.getDate();
+  }
 });
-
-console.log('✅ [OwnerCalendar] Setup complete!');
 
 // ===== EXPOSE METHODS TO PARENT =====
 defineExpose({
@@ -163,10 +201,7 @@ defineExpose({
 </script>
 
 <style scoped>
-/* ================================================================ */
-/* MOBILE-FIRST CALENDAR CONTAINER */
-/* ================================================================ */
-
+/* Terminal Swiss Calendar Container */
 .owner-calendar-container {
   height: 100%;
   width: 100%;
@@ -174,8 +209,56 @@ defineExpose({
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: #FFFFFF;
+  font-family: 'Inter', sans-serif;
 }
 
+/* Custom Calendar Toolbar - Terminal Swiss */
+.calendar-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E4E4E4;
+}
+
+.nav-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.nav-btn:hover {
+  background: #333333;
+}
+
+.month-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 24px;
+  background: #000000;
+  min-width: 180px;
+}
+
+.month-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: 14px;
+  color: #FFFFFF;
+  letter-spacing: 0;
+}
+
+/* Calendar body */
 .owner-calendar {
   flex: 1;
   min-height: 0;
@@ -184,131 +267,109 @@ defineExpose({
   position: relative;
 }
 
-/* ================================================================ */
-/* OWNER-SPECIFIC FULLCALENDAR STYLING */
-/* ================================================================ */
+/* Day column headers - Terminal Swiss */
+:deep(.fc-col-header-cell) {
+  background: #000000 !important;
+  border: none !important;
+}
 
-/* Enhanced turn booking styling for owners */
+:deep(.fc-col-header-cell-cushion) {
+  color: #FFFFFF !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  padding: 8px 4px !important;
+  text-decoration: none !important;
+}
+
+/* Day numbers */
+:deep(.fc-daygrid-day-number) {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 400 !important;
+  font-size: 13px !important;
+  color: #000000 !important;
+  text-decoration: none !important;
+  padding: 4px 8px !important;
+}
+
+/* Today highlight */
+:deep(.fc-daygrid-day.fc-day-today) {
+  background-color: rgba(229, 57, 53, 0.06) !important;
+}
+
+:deep(.fc-daygrid-day.fc-day-today .fc-daygrid-day-number) {
+  color: #E53935 !important;
+  font-weight: 600 !important;
+}
+
+/* Grid borders */
+:deep(.fc td),
+:deep(.fc th) {
+  border-color: #E4E4E4 !important;
+}
+
+:deep(.fc-scrollgrid) {
+  border-color: #E4E4E4 !important;
+}
+
+/* Turn booking styling */
 :deep(.fc-event.booking-turn) {
   font-weight: 600;
-  border-width: 3px !important;
-  position: relative;
+  border-left: 3px solid #E53935 !important;
 }
 
-/* Urgent priority styling with owner branding */
+/* Priority styling */
 :deep(.fc-event.priority-urgent) {
-  /* animation: pulse-owner-urgent 2s infinite; */
-  border-color: #d32f2f !important;
+  border-left: 3px solid #E53935 !important;
 }
 
-/* High priority styling */
 :deep(.fc-event.priority-high) {
-  border-left: 4px solid #ff9800 !important;
+  border-left: 3px solid #000000 !important;
 }
 
-/* Owner calendar specific adjustments */
-:deep(.fc-header-toolbar) {
-  margin-bottom: 0.5em;
-}
-
-:deep(.fc-daygrid-day-number) {
-  font-weight: 500;
-}
-
-:deep(.fc-col-header-cell) {
-  background: rgb(var(--v-theme-primary));
-}
-
-/* ================================================================ */
-/* ANIMATIONS FOR OWNER CALENDAR */
-/* ================================================================ */
-
-/* @keyframes pulse-owner-urgent {
-  0% { 
-    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.8);
-    transform: scale(1);
-  }
-  70% { 
-    box-shadow: 0 0 0 6px rgba(244, 67, 54, 0);
-    transform: scale(1.01);
-  }
-  100% { 
-    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
-    transform: scale(1);
-  }
-} */
-
-/* ================================================================ */
-/* MOBILE OPTIMIZATIONS */
-/* ================================================================ */
-
+/* Mobile optimizations */
 @media (max-width: 768px) {
   .owner-calendar-container {
-    height: calc(100vh - 120px); /* Account for mobile navigation */
+    height: calc(100vh - 48px);
   }
-  
-  :deep(.fc-header-toolbar) {
-    flex-direction: column;
-    gap: 0.0em;
+
+  .calendar-toolbar {
+    padding: 8px 12px;
   }
-  
-  :deep(.fc-toolbar-chunk) {
-    display: flex;
-    justify-content: center;
+
+  .month-label {
+    min-width: 150px;
+    padding: 6px 16px;
   }
-  
-  :deep(.fc-button) {
-    font-size: 0.875rem;
-    padding: 0.5em 0.75em;
+
+  .month-text {
+    font-size: 13px;
   }
 }
 
-/* ================================================================ */
-/* TOUCH GESTURE OPTIMIZATIONS */
-/* ================================================================ */
-
-/* Ensure calendar area is touch-friendly */
+/* Touch gesture optimizations */
 .owner-calendar {
   touch-action: pan-x pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Prevent text selection during swipes */
 .owner-calendar-container {
   user-select: none;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
 }
 
-/* Smooth transitions for swipe gestures */
-:deep(.fc-view-harness) {
-  transition: transform 0.2s ease-out;
-}
-
-/* ================================================================ */
-/* ACCESSIBILITY */
-/* ================================================================ */
-
-/* High contrast mode support */
+/* Accessibility */
 @media (prefers-contrast: high) {
   :deep(.fc-event) {
     border-width: 2px !important;
   }
-  
-  :deep(.fc-button) {
-    border-width: 2px !important;
-  }
 }
 
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   :deep(.fc-view-harness) {
     transition: none;
   }
-  
-  :deep(.fc-event.priority-urgent) {
-    animation: none;
-  }
 }
-</style> 
+</style>

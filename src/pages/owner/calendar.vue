@@ -1,166 +1,56 @@
 <template>
   <div class="owner-calendar-page">
-    <v-container fluid>
-      <v-row>
-        <v-col cols="12">
-          <div class="d-flex justify-space-between align-center mb-4">
-            <h1 class="text-h4">
-              My Booking Calendar
-            </h1>
-            <div class="d-flex gap-2">
-              <v-btn
-                color="primary"
-                prepend-icon="mdi-plus"
-                @click="handleQuickBooking"
-              >
-                Quick Booking
-              </v-btn>
-              <v-btn
-                color="secondary"
-                prepend-icon="mdi-home-plus"
-                variant="outlined"
-                @click="handleAddProperty"
-              >
-                Add Property
-              </v-btn>
-            </div>
-          </div>
-        </v-col>
-      </v-row>
+    <!-- App Bar -->
+    <div class="calendar-app-bar">
+      <div class="app-bar-brand">
+        <div class="brand-icon">C</div>
+        <span class="brand-text">Claro</span>
+      </div>
+      <v-btn
+        icon
+        variant="text"
+        size="small"
+        color="white"
+        @click="handleQuickBooking"
+      >
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
+    </div>
 
-      <!-- Calendar Stats -->
-      <v-row class="mb-4">
-        <v-col
-          cols="12"
-          sm="6"
-          md="3"
-        >
-          <v-card>
-            <v-card-text>
-              <div class="d-flex align-center">
-                <v-icon
-                  color="primary"
-                  class="mr-2"
-                >
-                  mdi-calendar-today
-                </v-icon>
-                <div>
-                  <div class="text-h6">
-                    {{ todayBookings.length }}
-                  </div>
-                  <div class="text-caption text-medium-emphasis">
-                    Today's Bookings
-                  </div>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-          md="3"
-        >
-          <v-card>
-            <v-card-text>
-              <div class="d-flex align-center">
-                <v-icon
-                  color="warning"
-                  class="mr-2"
-                >
-                  mdi-clock-fast
-                </v-icon>
-                <div>
-                  <div class="text-h6">
-                    {{ todayTurns.length }}
-                  </div>
-                  <div class="text-caption text-medium-emphasis">
-                    Today's Turns
-                  </div>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-          md="3"
-        >
-          <v-card>
-            <v-card-text>
-              <div class="d-flex align-center">
-                <v-icon
-                  color="success"
-                  class="mr-2"
-                >
-                  mdi-calendar-week
-                </v-icon>
-                <div>
-                  <div class="text-h6">
-                    {{ upcomingBookings.length }}
-                  </div>
-                  <div class="text-caption text-medium-emphasis">
-                    This Week
-                  </div>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-          md="3"
-        >
-          <v-card>
-            <v-card-text>
-              <div class="d-flex align-center">
-                <v-icon
-                  color="info"
-                  class="mr-2"
-                >
-                  mdi-home
-                </v-icon>
-                <div>
-                  <div class="text-h6">
-                    {{ ownerProperties.length }}
-                  </div>
-                  <div class="text-caption text-medium-emphasis">
-                    My Properties
-                  </div>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
+    <!-- Calendar with toolbar -->
+    <div class="calendar-content">
+      <OwnerCalendar
+        ref="ownerCalendarRef"
+        :bookings="ownerBookingsMap"
+        :properties="ownerPropertiesMap"
+        :loading="loading"
+        @date-select="handleDateSelect"
+        @event-click="handleEventClick"
+        @event-drop="handleEventDrop"
+        @event-resize="handleEventResize"
+        @create-booking="handleCreateBooking"
+        @update-booking="handleUpdateBooking"
+        @delete-booking="handleDeleteBooking"
+      />
+    </div>
 
-      <!-- Calendar Component -->
-      <v-row>
-        <v-col cols="12">
-          <v-card>
-            <v-card-text class="pa-0">
-              <OwnerCalendar
-                :bookings="ownerBookingsMap"
-                :properties="ownerPropertiesMap"
-                :loading="loading"
-                @date-select="handleDateSelect"
-                @event-click="handleEventClick"
-                @event-drop="handleEventDrop"
-                @create-booking="handleCreateBooking"
-                @update-booking="handleUpdateBooking"
-              />
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="deleteDialogVisible" max-width="400" persistent>
+      <v-card>
+        <v-card-title class="text-h6">Delete Booking</v-card-title>
+        <v-card-text>Are you sure you want to delete this booking? This action cannot be undone.</v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="deleteDialogVisible = false">Cancel</v-btn>
+          <v-btn color="error" variant="elevated" @click="confirmDelete">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import OwnerCalendar from '@/components/smart/owner/OwnerCalendar.vue';
 import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
@@ -173,26 +63,12 @@ defineOptions({
 });
 
 // Composables
-const { 
+const {
   myBookings: ownerBookings,
-  myTodayBookings: todayBookings,
-  myTodayTurns: todayTurns,
-  // myUpcomingBookings: upcomingBookings, // Property doesn't exist - using computed instead
   fetchMyBookings,
-  updateMyBooking
+  updateMyBooking,
+  deleteMyBooking
 } = useOwnerBookings();
-
-// Computed property for upcoming bookings
-const upcomingBookings = computed(() => {
-  const now = new Date();
-  const oneWeek = new Date();
-  oneWeek.setDate(oneWeek.getDate() + 7);
-  
-  return ownerBookings.value.filter(booking => {
-          const checkoutDate = new Date(booking.checkout_date);
-    return checkoutDate >= now && checkoutDate <= oneWeek;
-  });
-});
 
 const {
   myProperties: ownerProperties,
@@ -202,9 +78,12 @@ const {
 // Stores
 const uiStore = useUIStore();
 
+// Refs
+const ownerCalendarRef = ref<InstanceType<typeof OwnerCalendar> | null>(null);
+
 // Computed
 const loading = computed(() => {
-  return false; // Add loading states from composables if needed
+  return false;
 });
 
 // Convert arrays to Maps for component compatibility
@@ -225,58 +104,71 @@ const ownerPropertiesMap = computed(() => {
 });
 
 // Event handlers
+// Helper: FullCalendar end dates are exclusive, subtract 1 day to get actual checkout
+const subtractOneDay = (dateStr: string): string => {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split('T')[0];
+};
+
 const handleDateSelect = (selectInfo: DateSelectArg): void => {
-  // Open booking modal with pre-filled dates
   uiStore.openModal('eventModal', 'create', {
-            checkout_date: selectInfo.startStr,
-        checkin_date: selectInfo.endStr
+    checkin_date: selectInfo.startStr,
+    checkout_date: subtractOneDay(selectInfo.endStr)
   });
 };
 
 const handleEventClick = (clickInfo: EventClickArg): void => {
-  // Get the booking data from the event
   const booking = clickInfo.event.extendedProps.booking;
-  
-  // Only allow editing if this is the owner's booking
   if (booking) {
     uiStore.openModal('eventModal', 'edit', booking);
   }
 };
 
 const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
-  // Get the booking data from the event
   const booking = dropInfo.event.extendedProps.booking;
-  
   if (booking) {
     try {
-      // Update booking dates
+      const endStr = dropInfo.event.endStr || dropInfo.event.startStr;
       await updateMyBooking(booking.id, {
-        checkout_date: dropInfo.event.startStr,
-        checkin_date: dropInfo.event.endStr || dropInfo.event.startStr
+        checkin_date: dropInfo.event.startStr,
+        checkout_date: subtractOneDay(endStr)
       });
-      
       uiStore.showNotification('Booking updated successfully', 'success');
     } catch {
       uiStore.showNotification('Failed to update booking', 'error');
-      // Revert the event position
       dropInfo.revert();
     }
   }
 };
 
 const handleCreateBooking = (): void => {
-  // Open booking modal for creating new booking
   uiStore.openModal('eventModal', 'create');
+};
+
+const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
+  const booking = resizeInfo.event.extendedProps.booking;
+  if (booking) {
+    try {
+      const endStr = resizeInfo.event.endStr || resizeInfo.event.startStr;
+      await updateMyBooking(booking.id, {
+        checkin_date: resizeInfo.event.startStr,
+        checkout_date: subtractOneDay(endStr)
+      });
+      uiStore.showNotification('Booking updated successfully', 'success');
+    } catch {
+      uiStore.showNotification('Failed to update booking', 'error');
+      resizeInfo.revert();
+    }
+  }
 };
 
 const handleUpdateBooking = async (data: { id: string; start: string; end: string }): Promise<void> => {
   try {
-    // Update booking with new dates
     await updateMyBooking(data.id, {
-              checkout_date: data.start,
-        checkin_date: data.end
+      checkin_date: data.start,
+      checkout_date: subtractOneDay(data.end)
     });
-    
     uiStore.showNotification('Booking updated successfully', 'success');
   } catch {
     uiStore.showNotification('Failed to update booking', 'error');
@@ -287,8 +179,26 @@ const handleQuickBooking = (): void => {
   uiStore.openModal('eventModal', 'create');
 };
 
-const handleAddProperty = (): void => {
-  uiStore.openModal('propertyModal', 'create');
+// Delete booking state
+const deleteDialogVisible = ref(false);
+const pendingDeleteId = ref<string | null>(null);
+
+const handleDeleteBooking = (bookingId: string): void => {
+  pendingDeleteId.value = bookingId;
+  deleteDialogVisible.value = true;
+};
+
+const confirmDelete = async (): Promise<void> => {
+  if (pendingDeleteId.value) {
+    try {
+      await deleteMyBooking(pendingDeleteId.value);
+      uiStore.showNotification('Booking deleted successfully', 'success');
+    } catch {
+      uiStore.showNotification('Failed to delete booking', 'error');
+    }
+  }
+  deleteDialogVisible.value = false;
+  pendingDeleteId.value = null;
 };
 
 // Initialize data
@@ -302,15 +212,54 @@ onMounted(async () => {
 
 <style scoped>
 .owner-calendar-page {
-  padding: 1rem;
-  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #FFFFFF;
+  font-family: 'Inter', sans-serif;
 }
 
-.v-card {
-  height: 100%;
+/* Terminal Swiss App Bar */
+.calendar-app-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 16px;
+  background: #000000;
+  color: #FFFFFF;
 }
 
-.gap-2 {
-  gap: 0.5rem;
+.app-bar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-</style> 
+
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  background: #E53935;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.brand-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: 18px;
+  color: #FFFFFF;
+}
+
+.calendar-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+</style>

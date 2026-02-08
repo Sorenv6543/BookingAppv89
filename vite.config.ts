@@ -1,30 +1,22 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vuetify from 'vite-plugin-vuetify'
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import path from 'path'
 // import vueDevTools from 'vite-plugin-vue-devtools' // Temporarily disabled
 import { VitePWA } from 'vite-plugin-pwa'
 
-// where is the dev config located?
-
-
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
   const isProd = mode === 'production'
   const isDev = mode === 'development'
 
   return {
   plugins: [
     vue({
-      template: {
-        compilerOptions: {
-          sourceMap: true
-        }
-      }
+      template: { transformAssetUrls }
     }),
     vuetify({ 
-          autoImport: true, // Enable auto-import for Vuetify components
+          autoImport: { labs: true }, // Enable auto-import for Vuetify components including labs (VDatePicker, etc.)
           styles: {
             configFile: 'src/styles/variables.scss'
           }

@@ -15,6 +15,7 @@
       @view-booking="handleViewBooking"
       @edit-booking="handleEditBooking"
       @complete-booking="handleCompleteBooking"
+      @delete-booking="handleDeleteBooking"
       @add-booking="handleAddBookingFromDayView"
     />
   </div>
@@ -50,6 +51,7 @@ interface Emits {
   (e: 'eventResize', resizeInfo: EventDropArg): void;
   (e: 'createBooking', data: { start: string; end: string; propertyId?: string }): void;
   (e: 'updateBooking', data: { id: string; start: string; end: string }): void;
+  (e: 'deleteBooking', bookingId: string): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -86,8 +88,8 @@ const calendarEvents = computed(() => {
     return {
       id: booking.id,
       title: `${property?.name || 'Unknown Property'} - ${isTurn ? 'TURN' : 'Standard'}`,
-      start: booking.checkout_date,
-      end: addOneDay(booking.checkin_date), // Add one day to make end date inclusive
+      start: booking.checkin_date,
+      end: addOneDay(booking.checkout_date), // FullCalendar end is exclusive, so +1 to include checkout day
       backgroundColor: eventColor,
       borderColor: borderColor,
       textColor: textColor,
@@ -129,35 +131,23 @@ const addOneDay = (dateString: string): string => {
   return date.toISOString().split('T')[0];
 };
 
-// Enhanced dynamic color system with more variety
+// Terminal Swiss color system
 const getEventColor = (booking: Booking): string => {
-  const isDark = theme.global.current.value.dark;
-  
   if (booking.booking_type === 'turn') {
     switch (booking.priority) {
-      case 'urgent':
-        return isDark ? '#64748b' : '#475569'; // Dark slate for urgent turns
-      case 'high':
-        return isDark ? '#78716c' : '#64748b'; // Slate for high priority turns
-      case 'normal':
-        return isDark ? '#9ca3af' : '#78716c'; // Stone for normal turns
-      case 'low':
-        return isDark ? '#d1d5db' : '#9ca3af'; // Cool gray for low priority turns
-      default:
-        return isDark ? '#6b7280' : '#475569';
+      case 'urgent': return '#E53935'; // Red accent for urgent turns
+      case 'high': return '#000000'; // Black for high priority turns
+      case 'normal': return '#333333'; // Dark gray for normal turns
+      case 'low': return '#777777'; // Gray for low priority turns
+      default: return '#000000';
     }
   } else {
     switch (booking.priority) {
-      case 'urgent':
-        return isDark ? '#7c3aed' : '#6366f1'; // Indigo for urgent standard
-      case 'high':
-        return isDark ? '#a855f7' : '#8b5cf6'; // Violet for high priority standard
-      case 'normal':
-        return isDark ? '#0ea5e9' : '#06b6d4'; // Cyan for normal
-      case 'low':
-        return isDark ? '#22c55e' : '#10b981'; // Emerald for low priority
-      default:
-        return isDark ? '#3b82f6' : '#2563eb';
+      case 'urgent': return '#E53935'; // Red accent for urgent standard
+      case 'high': return '#000000'; // Black for high priority
+      case 'normal': return '#E4E4E4'; // Light gray for normal
+      case 'low': return '#DDDDDD'; // Lighter gray for low
+      default: return '#E4E4E4';
     }
   }
 };
@@ -165,37 +155,30 @@ const getEventColor = (booking: Booking): string => {
 const getEventBorderColor = (booking: Booking): string => {
   if (booking.booking_type === 'turn') {
     switch (booking.priority) {
-      case 'urgent':
-        return '#334155'; // Dark slate border for urgent turns
-      case 'high':
-        return '#475569'; // Slate border for high priority turns
-      case 'normal':
-        return '#57534e'; // Stone border for normal turns
-      case 'low':
-        return '#6b7280'; // Cool gray border for low priority turns
-      default:
-        return '#334155';
+      case 'urgent': return '#E53935';
+      case 'high': return '#000000';
+      case 'normal': return '#333333';
+      case 'low': return '#777777';
+      default: return '#000000';
     }
   } else {
     switch (booking.priority) {
-      case 'urgent':
-        return '#4f46e5'; // Indigo border for urgent standard
-      case 'high':
-        return '#7c3aed'; // Violet border for high priority standard
-      case 'normal':
-        return '#0891b2'; // Cyan border for normal
-      case 'low':
-        return '#059669'; // Emerald border for low priority
-      default:
-        return '#1d4ed8';
+      case 'urgent': return '#E53935';
+      case 'high': return '#000000';
+      case 'normal': return '#E4E4E4';
+      case 'low': return '#DDDDDD';
+      default: return '#E4E4E4';
     }
   }
 };
 
 const getEventTextColor = (booking: Booking): string => {
-  // Use white text for better contrast on colored backgrounds
+  // Terminal Swiss: dark text on light backgrounds, white on dark
+  if (booking.booking_type === 'standard' && (booking.priority === 'normal' || booking.priority === 'low')) {
+    return '#000000';
+  }
   if (booking.status === 'completed') {
-    return '#E0E0E0'; // Lighter text for completed bookings
+    return '#999999';
   }
   return '#FFFFFF';
 };
@@ -372,8 +355,6 @@ const handleEventResize = (resizeInfo: any): void => {
 const handleDateClick = (arg: DateClickArg): void => {
   console.log('🗓️ [FullCalendar] Day clicked:', arg.dateStr);
   
-  selectedDate.value = arg.date;
-  
   const clickedDate = arg.dateStr;
   const currentUserId = authStore.user?.id;
   const dayBookings = Array.from(props.bookings.values()).filter(booking => {
@@ -384,73 +365,49 @@ const handleDateClick = (arg: DateClickArg): void => {
     return dateMatches && ownerMatches;
   });
   
+  // Only open bottom sheet if there are bookings for this date
+  if (dayBookings.length === 0) {
+    console.log('📅 [FullCalendar] No bookings for date:', clickedDate, '- skipping day view');
+    return;
+  }
+  
+  selectedDate.value = arg.date;
   selectedDayBookings.value = dayBookings;
   dayViewVisible.value = true;
   
   console.log('📅 [FullCalendar] Day view opened with', dayBookings.length, 'bookings for date:', clickedDate);
-  console.log('📅 [FullCalendar] Day bookings:', dayBookings.map(b => ({
-    id: b.id,
-    property_id: b.property_id,
-    arrival: b.checkin_date,
-            checkout: b.checkout_date
-  })));
 };
 
 
 
-// Custom event rendering with enhanced visual variety
+// Terminal Swiss event rendering - clean, no emojis, monospace status
 const renderEventContent = (eventInfo: { event: { extendedProps: { booking: Booking; property: Property; eventColor?: string; borderColor?: string; textColor?: string }; backgroundColor?: string; borderColor?: string; textColor?: string } }) => {
   const booking = eventInfo.event.extendedProps.booking as Booking;
   const property = eventInfo.event.extendedProps.property as Property;
-  const eventColor = eventInfo.event.extendedProps.eventColor || eventInfo.event.backgroundColor;
-  const borderColor = eventInfo.event.extendedProps.borderColor || eventInfo.event.borderColor;
-  const textColor = eventInfo.event.extendedProps.textColor || eventInfo.event.textColor;
-  
-  // Get priority icon
-  const getPriorityIcon = (priority: string, type: string) => {
-    if (type === 'turn') {
-      switch (priority) {
-        case 'urgent': return '🚨';
-        case 'high': return '🔥';
-        case 'normal': return '🏠';
-        case 'low': return '🧹';
-        default: return '🏠';
-      }
-    } else {
-      switch (priority) {
-        case 'urgent': return '⚡';
-        case 'high': return '⭐';
-        case 'normal': return '🏠';
-        case 'low': return '✨';
-        default: return '🏠';
-      }
-    }
-  };
-  
-  // Get status badge
-  const getStatusBadge = (status: string) => {
+  const textColor = eventInfo.event.extendedProps.textColor || eventInfo.event.textColor || '#FFFFFF';
+
+  // Status dot color based on Terminal Swiss status system
+  const getStatusDotColor = (status: string): string => {
     switch (status) {
-      case 'completed': return '✅';
-      case 'pending': return '⏳';
-      case 'confirmed': return '📋';
-      case 'in_progress': return '🔄';
-      default: return '📋';
+      case 'pending': return '#E53935';
+      case 'in_progress': return '#000000';
+      case 'confirmed': return '#000000';
+      case 'completed': return '#DDDDDD';
+      default: return '#999999';
     }
   };
-  
-  const priorityIcon = getPriorityIcon(booking.priority || 'normal', booking.booking_type);
-  const statusBadge = getStatusBadge(booking.status || 'pending');
-  
+
+  const dotColor = getStatusDotColor(booking.status || 'pending');
+
   return {
     html: `
-      <div class="fc-event-content-wrapper booking-${booking.booking_type} priority-${booking.priority}" 
-           style="background-color: ${eventColor}; border-color: ${borderColor}; color: ${textColor};">
-        <div class="fc-event-title">
-          ${priorityIcon} ${property?.name || 'Property'}
+      <div class="fc-event-content-wrapper" style="color: ${textColor};">
+        <div class="fc-event-title" style="font-family: Inter, sans-serif; font-weight: 500; font-size: 11px; line-height: 1.2;">
+          <span class="status-dot" style="display: inline-block; width: 6px; height: 6px; background: ${dotColor}; margin-right: 4px; flex-shrink: 0;"></span>
+          ${property?.name || 'Property'}
         </div>
-        <div class="fc-event-subtitle">
-          ${statusBadge} ${booking.status.toUpperCase()}
-          ${booking.guest_count ? ` • ${booking.guest_count}👥` : ''}
+        <div class="fc-event-subtitle" style="font-family: 'JetBrains Mono', monospace; font-weight: 400; font-size: 9px; opacity: 0.85; margin-top: 1px; padding-left: 10px;">
+          ${booking.status.toUpperCase()}
         </div>
       </div>
     `
@@ -603,6 +560,12 @@ const handleAddBookingFromDayView = (date: Date): void => {
   });
   
   console.log('➕ [FullCalendar] Add booking from day view for date:', startStr);
+};
+
+const handleDeleteBooking = (booking: Booking): void => {
+  dayViewVisible.value = false;
+  emit('deleteBooking', booking.id);
+  console.log('🗑️ [FullCalendar] Delete booking from day view:', booking.id);
 };
 
 // Add new handler function after the other event handlers
@@ -822,6 +785,11 @@ defineExpose({
 </script>
 
 <style scoped>
+/* ================================================================ */
+/* Terminal Swiss Design System - Calendar Styles                    */
+/* Zero radius, no shadows, 1px borders, Inter + JetBrains Mono    */
+/* ================================================================ */
+
 .calendar-container {
   height: 100%;
   width: 100%;
@@ -830,6 +798,7 @@ defineExpose({
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  font-family: 'Inter', sans-serif;
 }
 
 .custom-calendar {
@@ -842,216 +811,109 @@ defineExpose({
 }
 
 .custom-calendar {
-  --fc-border-color: rgb(var(--v-theme-on-surface), 0.12);
-  --fc-button-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-border-color: rgb(var(--v-theme-primary));
-  --fc-button-hover-bg-color: rgb(var(--v-theme-primary));
-  --fc-button-active-bg-color: rgb(var(--v-theme-primary));
-  --fc-today-bg-color: rgb(var(--v-theme-primary), 0.1);
+  --fc-border-color: #E4E4E4;
+  --fc-button-bg-color: #000000;
+  --fc-button-border-color: #000000;
+  --fc-button-hover-bg-color: #333333;
+  --fc-button-active-bg-color: #000000;
+  --fc-today-bg-color: rgba(229, 57, 53, 0.06);
 }
 
-/* Turn booking highlighting */
-.fc-event.booking-turn {
-  font-weight: bold;
-  border-width: 3px !important;
-  animation: pulse 2s infinite;
-  position: relative;
-}
-
-.fc-event.booking-turn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(45deg, #ff0000, #ff6600, #ff0000);
-  border-radius: 2px 2px 0 0;
-}
-
-/* Standard booking styling */
-.fc-event.booking-standard {
-  border-width: 2px !important;
-  position: relative;
-}
-
-.fc-event.booking-standard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(45deg, currentColor, transparent, currentColor);
-  border-radius: 2px 2px 0 0;
-}
-
-/* Add elevation to all booking events */
+/* Terminal Swiss: All events have 0 border-radius, no shadows */
 :deep(.fc-event) {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
-  transition: all 0.2s ease !important;
-  border-radius: 4px !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  transition: opacity 0.15s !important;
+  border-left: 3px solid #E53935 !important;
+  font-family: 'Inter', sans-serif !important;
 }
 
-/* Remove any color overrides and use higher specificity */
 :deep(.fc-daygrid-event.fc-event) {
   background-color: inherit !important;
   border-color: inherit !important;
-  color: #ffffff !important;
 }
 
-/* Force specific type and priority combinations with higher specificity */
-:deep(.fc-daygrid-event.fc-event.type-turn-urgent),
-:deep(.fc-timegrid-event.fc-event.type-turn-urgent) {
-  background-color: #475569 !important;
-  border-color: #334155 !important;
-  color: #ffffff !important;
+/* Turn booking - red left border */
+:deep(.fc-event.booking-turn) {
+  border-left: 3px solid #E53935 !important;
 }
 
-:deep(.fc-daygrid-event.fc-event.type-turn-high),
-:deep(.fc-timegrid-event.fc-event.type-turn-high) {
-  background-color: #64748b !important;
-  border-color: #475569 !important;
-  color: #ffffff !important;
+/* Standard booking - black left border */
+:deep(.fc-event.booking-standard) {
+  border-left: 3px solid #000000 !important;
 }
 
-:deep(.fc-daygrid-event.fc-event.type-turn-normal),
-:deep(.fc-timegrid-event.fc-event.type-turn-normal) {
-  background-color: #78716c !important;
-  border-color: #57534e !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-turn-low),
-:deep(.fc-timegrid-event.fc-event.type-turn-low) {
-  background-color: #9ca3af !important;
-  border-color: #6b7280 !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-standard-urgent),
-:deep(.fc-timegrid-event.fc-event.type-standard-urgent) {
-  background-color: #6366f1 !important;
-  border-color: #4f46e5 !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-standard-high),
-:deep(.fc-timegrid-event.fc-event.type-standard-high) {
-  background-color: #8b5cf6 !important;
-  border-color: #7c3aed !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-standard-normal),
-:deep(.fc-timegrid-event.fc-event.type-standard-normal) {
-  background-color: #06b6d4 !important;
-  border-color: #0891b2 !important;
-  color: #ffffff !important;
-}
-
-:deep(.fc-daygrid-event.fc-event.type-standard-low),
-:deep(.fc-timegrid-event.fc-event.type-standard-low) {
-  background-color: #10b981 !important;
-  border-color: #059669 !important;
-  color: #ffffff !important;
-}
-
-/* Additional fallback based on priority class */
+/* Priority-based left border colors */
 :deep(.fc-event.priority-urgent) {
-  background-color: #475569 !important;
-  border-color: #334155 !important;
+  border-left: 3px solid #E53935 !important;
 }
 
 :deep(.fc-event.priority-high) {
-  background-color: #64748b !important;
-  border-color: #475569 !important;
+  border-left: 3px solid #000000 !important;
 }
 
 :deep(.fc-event.priority-normal) {
-  background-color: #78716c !important;
-  border-color: #57534e !important;
+  border-left: 3px solid #777777 !important;
 }
 
 :deep(.fc-event.priority-low) {
-  background-color: #9ca3af !important;
-  border-color: #6b7280 !important;
+  border-left: 3px solid #DDDDDD !important;
 }
 
+/* Hover: subtle opacity change, no shadow */
 :deep(.fc-event:hover) {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-  transform: translateY(-1px) !important;
+  opacity: 0.85 !important;
   cursor: grab !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 :deep(.fc-event:active) {
   cursor: grabbing !important;
 }
 
-/* Drag feedback */
+/* Drag feedback - minimal */
 :deep(.fc-event-dragging) {
-  opacity: 0.75 !important;
-  transform: rotate(2deg) !important;
+  opacity: 0.7 !important;
   z-index: 999 !important;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 :deep(.fc-event-mirror) {
-  opacity: 0.8 !important;
-  transform: rotate(-2deg) !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  opacity: 0.75 !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
-/* Drop zone feedback */
+/* Today highlight - subtle red accent */
 :deep(.fc-daygrid-day.fc-day-today) {
-  background-color: rgba(var(--v-theme-primary), 0.05) !important;
+  background-color: rgba(229, 57, 53, 0.06) !important;
 }
 
 :deep(.fc-daygrid-day:hover) {
-  background-color: rgba(var(--v-theme-primary), 0.1) !important;
+  background-color: rgba(0, 0, 0, 0.03) !important;
 }
 
 /* Resize handles */
 :deep(.fc-event-resizer) {
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid rgba(0, 0, 0, 0.2) !important;
-  border-radius: 2px !important;
-}
-
-:deep(.fc-event-resizer:hover) {
-  background-color: rgba(255, 255, 255, 1) !important;
-  border-color: rgba(var(--v-theme-primary), 0.5) !important;
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(var(--v-theme-error), 0); }
-  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-error), 0); }
+  background-color: #E53935 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  width: 4px !important;
 }
 
 /* Status-based styling */
-.fc-event.status-pending {
-  opacity: 0.8;
+:deep(.fc-event.status-completed) {
+  opacity: 0.5;
 }
-
-.fc-event.status-completed {
-  opacity: 0.6;
-  text-decoration: line-through;
-}
-
 
 /* Custom event content */
 .fc-event-content-wrapper {
-  padding: 2px;
+  padding: 2px 4px;
 }
 
-.fc-event-subtitle {
-  font-size: 0.75em;
-  opacity: 0.9;
-  margin-top: 1px;
-}
-
-/* Force hide any FullCalendar popovers/tooltips */
+/* Force hide FullCalendar popovers */
 :deep(.fc-popover),
 :deep(.fc-more-popover),
 :deep(.fc-popover-header),
@@ -1063,16 +925,32 @@ defineExpose({
   pointer-events: none !important;
 }
 
-/* Remove unnecessary padding and dead space */
+/* Header toolbar - hidden (custom toolbar in OwnerCalendar) */
 :deep(.fc-header-toolbar) {
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
+  display: none !important;
+}
+
+/* Column headers - Terminal Swiss black */
+:deep(.fc-col-header-cell) {
+  background: #000000 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
 }
 
 :deep(.fc .fc-col-header-cell-cushion) {
-  padding: 2px 4px !important;
+  color: #FFFFFF !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  padding: 8px 4px !important;
   margin: 0 !important;
+  text-decoration: none !important;
 }
 
 :deep(.fc-col-header) {
@@ -1081,12 +959,22 @@ defineExpose({
   border: none !important;
 }
 
-:deep(.fc-col-header-cell) {
-  padding: 2px !important;
-  margin: 0 !important;
-  border: none !important;
+/* Day numbers - JetBrains Mono */
+:deep(.fc-daygrid-day-number) {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 400 !important;
+  font-size: 13px !important;
+  color: #000000 !important;
+  text-decoration: none !important;
+  padding: 4px 8px !important;
 }
 
+:deep(.fc-daygrid-day.fc-day-today .fc-daygrid-day-number) {
+  color: #E53935 !important;
+  font-weight: 600 !important;
+}
+
+/* Grid structure - clean 1px borders */
 :deep(.fc-view) {
   margin: 0 !important;
   padding: 0 !important;
@@ -1098,41 +986,25 @@ defineExpose({
   padding: 0 !important;
 }
 
-:deep(.fc-daygrid-header) {
+:deep(.fc-scrollgrid) {
   margin: 0 !important;
   padding: 0 !important;
-  border: none !important;
+  border: 1px solid #E4E4E4 !important;
 }
 
+:deep(.fc-scrollgrid-section-header),
+:deep(.fc-scrollgrid-section-body),
+:deep(.fc-daygrid-header),
 :deep(.fc-daygrid-body) {
   margin: 0 !important;
   padding: 0 !important;
 }
 
-:deep(.fc-scrollgrid) {
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-}
-
-:deep(.fc-scrollgrid-section-header) {
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-}
-
-:deep(.fc-scrollgrid-section-body) {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Remove any container spacing */
 :deep(.fc) {
   margin: 0 !important;
   padding: 0 !important;
 }
 
-/* Ensure day cells have minimal padding */
 :deep(.fc-daygrid-day-frame) {
   padding: 1px !important;
   margin: 0 !important;
@@ -1143,7 +1015,6 @@ defineExpose({
   margin: 0 !important;
 }
 
-/* Remove any table spacing */
 :deep(.fc table) {
   border-spacing: 0 !important;
   border-collapse: collapse !important;
@@ -1153,61 +1024,63 @@ defineExpose({
 :deep(.fc th) {
   padding: 0 !important;
   margin: 0 !important;
-  border: none !important;
+  border: 1px solid #E4E4E4 !important;
 }
 
-/* Mobile viewport specific fixes with proper height calculations */
+/* More link styling */
+:deep(.fc-more-link) {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 10px !important;
+  color: #E53935 !important;
+  font-weight: 500 !important;
+}
+
+/* Mobile viewport specific fixes */
 @media (max-width: 959px) {
   .calendar-container {
     position: relative;
-    /* Use calculated height instead of 100% */
-    height: calc(100vh - 56px - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px) !important;
-    min-height: 400px; /* Minimum height for very small screens */
-    max-height: calc(100vh - 100px); /* Maximum height to prevent overflow */
+    height: calc(100vh - 48px - 56px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    min-height: 400px;
+    max-height: calc(100vh - 100px);
   }
-  
+
   .custom-calendar {
     position: relative;
     height: 100% !important;
     width: 100% !important;
   }
-  
-  /* Ensure FullCalendar takes full available space on mobile */
+
   :deep(.fc) {
     height: 100% !important;
     width: 100% !important;
   }
-  
+
   :deep(.fc-view-harness) {
     height: 100% !important;
     width: 100% !important;
   }
-  
+
   :deep(.fc-scroller) {
     height: 100% !important;
     overflow-y: auto !important;
-    /* Smooth scrolling on mobile */
     -webkit-overflow-scrolling: touch;
   }
-  
-  /* Fix for mobile browser address bar height changes */
+
   :deep(.fc-daygrid-body) {
-    min-height: 300px; /* Ensure minimum content height */
+    min-height: 300px;
   }
-  
-  /* Prevent horizontal scrolling on mobile */
+
   :deep(.fc-daygrid-day-frame) {
     min-height: 40px;
   }
-  
-  /* Mobile-optimized event spacing */
+
   :deep(.fc-event) {
     margin: 1px 0;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
 }
 
-/* Desktop-specific booking size optimization */
+/* Desktop-specific */
 @media (min-width: 960px) {
   :deep(.fc-event) {
     font-size: 0.75rem !important;
@@ -1215,17 +1088,7 @@ defineExpose({
     padding: 2px 4px !important;
     margin: 1px 0 !important;
   }
-  
-  :deep(.fc-event-title) {
-    font-size: 0.75rem !important;
-    line-height: 1.1 !important;
-  }
-  
-  :deep(.fc-event-subtitle) {
-    font-size: 0.65rem !important;
-    line-height: 1 !important;
-  }
-  
+
   :deep(.fc-daygrid-day-frame) {
     min-height: 120px !important;
   }

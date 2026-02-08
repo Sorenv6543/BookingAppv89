@@ -1,0 +1,102 @@
+{
+  "version": "2.7",
+  "children": [
+    {
+      "type": "frame",
+      "id": "bi8Au",
+      "x": -96,
+      "y": -344.9999999999999,
+      "name": "Frame",
+      "clip": true,
+      "width": 753,
+      "height": 1258,
+      "fill": "#FFFFFF",
+      "layout": "none"
+    },
+    {
+      "type": "rectangle",
+      "id": "Sxl1F",
+      "x": -96,
+      "y": -358,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "images\\image.png",
+        "mode": "fill"
+      },
+      "width": 753,
+      "height": 1271
+    },
+    {
+      "type": "prompt",
+      "id": "7XRXm",
+      "x": -538.7755775577559,
+      "y": -112.21892189218914,
+      "width": 250,
+      "height": 219,
+      "content": "redesign this calendar this to look more approachable. give it a a sleek UX. No emojis. remove the top v-app bar with the logo and menu button. Change to the color scheme to something that is friendly but professional"
+    }
+  ],
+  "themes": {
+    "Theme": [
+      "Default"
+    ]
+  },
+  "variables": {
+    "color-1": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#c32525ff",
+          "theme": {
+            "Theme": "Default"
+          }
+        }
+      ]
+    },
+    "color-2": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#000000",
+          "theme": {
+            "Theme": "Default"
+          }
+        }
+      ]
+    },
+    "color-3": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#06b6d4ff",
+          "theme": {
+            "Theme": "Default"
+          }
+        }
+      ]
+    },
+    "color-4": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#000000",
+          "theme": {
+            "Theme": "Default"
+          }
+        }
+      ]
+    },
+    "color-5": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#000000",
+          "theme": {
+            "Theme": "Default"
+          }
+        }
+      ]
+    }
+  }
+}

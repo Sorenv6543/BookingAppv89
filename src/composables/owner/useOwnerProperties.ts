@@ -142,9 +142,8 @@ export function useOwnerProperties() {
     error.value = null;
     
     try {
-      // In a real app, this would make an API call with owner filter
-      // For now, we simulate the call and rely on computed filtering
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Fetch all properties from Supabase; RLS + computed filtering handles owner scoping
+      await propertyStore.fetchProperties();
       
       success.value = `Loaded ${myProperties.value.length} of your properties`;
       loading.value = false;

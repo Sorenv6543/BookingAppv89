@@ -154,6 +154,16 @@
               >
                 Complete
               </v-btn>
+              <v-btn
+                variant="text"
+                size="small"
+                prepend-icon="mdi-delete"
+                color="error"
+                class="action-btn"
+                @click="deleteBooking(booking)"
+              >
+                Delete
+              </v-btn>
             </div>
 
             <!-- Divider -->
@@ -232,6 +242,7 @@ interface Emits {
   (e: 'view-booking', booking: Booking): void;
   (e: 'edit-booking', booking: Booking): void;
   (e: 'complete-booking', booking: Booking): void;
+  (e: 'delete-booking', booking: Booking): void;
   (e: 'add-booking', date: Date): void;
 }
 
@@ -306,6 +317,10 @@ const editBooking = (booking: Booking): void => {
 
 const markComplete = (booking: Booking): void => {
   emit('complete-booking', booking);
+};
+
+const deleteBooking = (booking: Booking): void => {
+  emit('delete-booking', booking);
 };
 
 const addBooking = (): void => {

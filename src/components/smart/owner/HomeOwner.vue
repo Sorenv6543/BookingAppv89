@@ -10,36 +10,8 @@ src/components/smart/owner/HomeOwner.vue -
  -->
 
 <template>
-  q<div class="home-owner-layout">
+  <div class="home-owner-layout">
     <!-- Brand Overlay - Fixed on top of everything -->
-
-
-    <!-- Main App Header -->
-    <v-app-bar
-      order="0"
-      app
-      flat
-      height="56"
-      class="main-app-header"
-      :class="{ 'sidebar-open': sidebarOpen && !mobile }"
-      color="white"
-    >
-      <v-app-bar-nav-icon
-        color="black"
-        @click="toggleSidebar"
-      />
-      <!--logo-->
-      <v-app-bar-title class="app-title">
-        <div class="brand-container">
-          <div class="brand-icon">
-            C
-          </div>
-          <span class="brand-text">Claro</span>
-        </div>
-      </v-app-bar-title>
-      <!--logo-->
-    </v-app-bar>
-    <!--test-->
     <!-- Owner Sidebar -->
     <OwnerSidebar
       v-model="sidebarOpen"
@@ -252,7 +224,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useCalendarState } from '@/composables/shared/useCalendarState';
 
 // Business logic composables
-import { useOwnerBookings } from '@/composables/owner/useOwnerBookings';
+// useOwnerBookings removed - using useSupabaseBookings as single data source for all CRUD
 import { useOwnerProperties } from '@/composables/owner/useOwnerProperties';
 
 // Types
@@ -269,7 +241,7 @@ import eventLogger from '@/composables/shared/useComponentEventLogger';
 
 
 const propertyStore = usePropertyStore();
-const { bookings, fetchBookings, createBooking: createSupabaseBooking } = useSupabaseBookings();
+const { bookings, fetchBookings, createBooking: createSupabaseBooking, updateBooking: updateSupabaseBooking, deleteBooking: deleteSupabaseBooking, loading: supabaseBookingsLoading } = useSupabaseBookings();
 const uiStore = useUIStore();
 const authStore = useAuthStore();
 const { xs, mobile } = useDisplay();
@@ -277,11 +249,8 @@ const { xs, mobile } = useDisplay();
 // ============================================================================
 // COMPOSABLES - BUSINESS LOGIC
 // ============================================================================
-const { 
-  loading: bookingsLoading, 
-  updateMyBooking,
-  deleteMyBooking
-} = useOwnerBookings();
+// Use Supabase bookings loading state directly (single data source)
+const bookingsLoading = supabaseBookingsLoading;
 
 const { 
   loading: propertiesLoading, 
@@ -631,10 +600,9 @@ const handleEventDrop = async (dropInfo: EventDropArg): Promise<void> => {
     // Use nextTick to batch reactive updates
     await nextTick();
     
-    const result = await updateMyBooking(booking.id, {
+    const result = await updateSupabaseBooking(booking.id, {
       checkin_date: dropInfo.event.startStr,
       checkout_date: dropInfo.event.endStr || dropInfo.event.startStr,
-      owner_id: booking.owner_id,
     });
     
     if (!result) {
@@ -674,10 +642,9 @@ const handleEventResize = async (resizeInfo: EventDropArg): Promise<void> => {
     // Use nextTick to batch reactive updates
     await nextTick();
     
-    const result = await updateMyBooking(booking.id, {
+    const result = await updateSupabaseBooking(booking.id, {
       checkin_date: resizeInfo.event.startStr,
       checkout_date: resizeInfo.event.endStr,
-      owner_id: booking.owner_id,
     });
     
     if (!result) {
@@ -749,10 +716,9 @@ const handleUpdateBooking = (data: { id: string; start: string; end: string }): 
     return;
   }
   
-  updateMyBooking(data.id, {
-                      checkout_date: data.start,
-          checkin_date: data.end,
-    owner_id: currentOwnerId.value,
+  updateSupabaseBooking(data.id, {
+    checkout_date: data.start,
+    checkin_date: data.end,
   });
 };
 
@@ -802,7 +768,7 @@ const handleEventModalSave = async (data: BookingFormData): Promise<void> => {
         console.error('🚨 [HomeOwner] Booking ownership check failed - booking not found in owner map');
         throw new Error('Cannot update booking not owned by current user');
       }
-      await updateMyBooking(booking.id, bookingData as Partial<BookingFormData>);
+      await updateSupabaseBooking(booking.id, bookingData as Partial<BookingFormData>);
     }
     uiStore.closeModal('eventModal');
   } catch (error) {
@@ -880,7 +846,7 @@ const handleConfirmDialogConfirm = async (): Promise<void> => {
   
   if (data?.type === 'booking' && data?.id) {
     try {
-      await deleteMyBooking(data.id as string);
+      await deleteSupabaseBooking(data.id as string);
       uiStore.closeModal('eventModal');
     } catch (error) {
       console.error('Failed to delete your booking:', error);
@@ -1098,17 +1064,17 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   border-bottom: 1px solid rgb(var(--v-theme-on-surface), 0.12);
   background: rgb(var(--v-theme-surface));
   /* Fixed height for consistent layout calculations */
-  height: 48px;
+  /* height: 48px;
   min-height: 48px;
-  max-height: 48px;
+  max-height: 48px; */
 }
 
 .prominent-header {
   background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgba(var(--v-theme-primary), 0.9) 100%) !important;
   border-bottom: 3px solid rgba(var(--v-theme-secondary), 0.8) !important;
-  height: 70px !important;
+  /* height: 70px !important;
   min-height: 70px !important;
-  max-height: 70px !important;
+  max-height: 70px !important; */
   box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.25) !important;
 }
 
@@ -1118,7 +1084,7 @@ watch(isOwnerAuthenticated, async (newValue, oldValue) => {
   overflow: hidden;
   position: relative;
   /* Mobile-specific height management */
-  height: calc(100% - 70px); /* Subtract prominent header card height */
+  height: calc(100% - 0px); /* Subtract prominent header card height */
 }
 
 /* Clean Calendar Header Layout */
